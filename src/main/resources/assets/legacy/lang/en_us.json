@@ -627,6 +627,8 @@
   "gamerule.lceMobcapLimits.description": "When enabled, Legacy Console Edition mobcap limits are enforced for spawning, breeding and placement.",
   "gamerule.legacyFlight": "Legacy Flight",
   "gamerule.legacyFlight.description": "When enabled, players will be able to fly in any direction and go up and down while fall flying in a Elytra.",
+  "gamerule.legacyShieldControls": "Legacy Shield Blocking",
+  "gamerule.legacyShieldControls.description": "When enabled, shields automatically block while players are crouching or riding.",
   "gamerule.legacyMapGrid": "Legacy Map Grid",
   "gamerule.legacyMapGrid.description": "When enabled, the maps will be centered on X:0 and Y:0.",
   "gamerule.legacySwimming": "Legacy Swimming",

@@ -13,8 +13,10 @@ import net.minecraft.client.player.ClientInput;
 //?}
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -59,6 +61,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private double legacyStoredElytraBoost;
     private double legacyActiveElytraReleaseBoost;
     private boolean legacyWasJumpHeld;
+    private boolean legacyAutoShielding;
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
@@ -255,6 +258,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         }
     }
 
+    @Inject(method = "aiStep", at = @At("RETURN"))
+    private void aiStepShieldControls(CallbackInfo ci) {
+        legacy$updateShieldControls();
+    }
+
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isAllowedInPortal()Z"))
     public boolean handleConfusionTransitionEffect(boolean original) {
         return original || Legacy4JClient.hasModOnServer();
@@ -271,5 +279,29 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         if (Legacy4JClient.hasModOnServer() && wantsToStopRiding() && this.isPassenger()) {
             minecraft.options.keyShift.setDown(false);
         }
+    }
+
+    @Inject(method = "rideTick", at = @At("RETURN"))
+    private void rideTickShieldControls(CallbackInfo ci) {
+        legacy$updateShieldControls();
+    }
+
+    private void legacy$updateShieldControls() {
+        InteractionHand hand = legacy$getShieldHand();
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
+            if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
+                if (isUsingItem()) stopUsingItem();
+                startUsingItem(hand);
+            }
+            legacyAutoShielding = true;
+        } else {
+            if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+            legacyAutoShielding = false;
+        }
+    }
+
+    private InteractionHand legacy$getShieldHand() {
+        if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
+        return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
     }
 }
