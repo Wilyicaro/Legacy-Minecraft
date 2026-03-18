@@ -13,7 +13,7 @@ import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(Slot.class)
-public abstract class OffhandSlotMixin {
+public abstract class SlotMixin {
     @Shadow @Final public Container container;
     @Shadow public abstract int getContainerSlot();
 

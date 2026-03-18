@@ -2,7 +2,10 @@ package wily.legacy.util;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -24,6 +27,7 @@ public class LegacyItemUtil {
     public static final String DECAY_ARROW_NAME = "decay";
     public static final int DECAY_EFFECT_DURATION = 800;
     public static final int DECAY_EFFECT_AMPLIFIER = 1;
+    public static final TagKey<Item> LCE_OFFHAND = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("legacy", "lce_offhand"));
 
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient) {
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted() && !ingredient.isEnchanted();
@@ -92,7 +96,7 @@ public class LegacyItemUtil {
     }
 
     public static boolean canGoInLceOffhand(ItemStack stack) {
-        return stack.isEmpty() || stack.is(Items.FIREWORK_ROCKET) || stack.is(ItemTags.ARROWS) || stack.is(Items.FILLED_MAP) || stack.is(Items.SHIELD) || stack.is(Items.TOTEM_OF_UNDYING);
+        return stack.isEmpty() || stack.is(LCE_OFFHAND);
     }
 
     public static Holder<Potion> getPotionContent(ItemStack itemStack) {
