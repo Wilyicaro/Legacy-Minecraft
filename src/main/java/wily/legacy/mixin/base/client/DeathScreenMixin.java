@@ -1,5 +1,8 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,11 +15,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.ControlTooltip;
@@ -85,26 +85,26 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 0))
-    private void renderLegacyTitle(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 0))
+    private void renderLegacyTitle(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
         LegacyRenderUtil.drawOutlinedString(guiGraphics, font, component, i - font.width(component) / 2, this.height / 8 + 10, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 1))
-    private void renderLegacyCauseOfDeath(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
-        guiGraphics.drawCenteredString(font, component, i, this.height / 2 - 24, k);
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 1))
+    private void renderLegacyCauseOfDeath(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
+        original.call(guiGraphics, font, component, i, this.height / 2 - 24, k);
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 2))
-    private void hideDeathScore(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 2))
+    private void hideDeathScore(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
     }
 
-    @ModifyConstant(method = "mouseClicked", constant = @Constant(doubleValue = 85.0D))
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "CONSTANT", args = "doubleValue=85.0"))
     private double legacyCauseOfDeathClickY(double d) {
         return this.height / 2.0 - 24.0;
     }
 
-    @ModifyConstant(method = {"render", "mouseClicked"}, constant = @Constant(intValue = 85))
+    @ModifyExpressionValue(method = {"render", "mouseClicked"}, at = @At(value = "CONSTANT", args = "intValue=85"))
     private int legacyCauseOfDeathY(int i) {
         return this.height / 2 - 24;
     }
