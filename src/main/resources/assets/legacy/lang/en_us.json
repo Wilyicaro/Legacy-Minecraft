@@ -1264,6 +1264,7 @@
   "legacy.loading_spawn_area": "Loading spawn area",
   "legacy.map.coords": "X:%s,Y:%s,Z:%s",
   "legacy.map.id": " #%s",
+  "filled_map.level": "Level %s/%s",
   "legacy.menu.accept": "Accept",
   "legacy.menu.add_album": "Add Album",
   "legacy.menu.add_server": "Add Server",
