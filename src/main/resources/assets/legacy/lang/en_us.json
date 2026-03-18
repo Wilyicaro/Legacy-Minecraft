@@ -1263,6 +1263,7 @@
   "legacy.loadingTip.woolFire": "Take caution when building structures made of wool in open air, as lightning from thunderstorms can set wool on fire.",
   "legacy.loading_spawn_area": "Loading spawn area",
   "legacy.map.coords": "X:%s,Y:%s,Z:%s",
+  "legacy.map.id": " #%s",
   "legacy.menu.accept": "Accept",
   "legacy.menu.add_album": "Add Album",
   "legacy.menu.add_server": "Add Server",

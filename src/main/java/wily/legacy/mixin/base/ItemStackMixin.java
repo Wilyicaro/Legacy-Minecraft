@@ -45,7 +45,7 @@ public abstract class ItemStackMixin implements DataComponentHolder {
     private void getHoverName(CallbackInfoReturnable<Component> cir) {
         if (self().is(Items.FILLED_MAP) && !self().has(DataComponents.CUSTOM_NAME) && !self().has(DataComponents.MAP_POST_PROCESSING)) {
             MapId mapId = self().get(DataComponents.MAP_ID);
-            if (mapId != null) cir.setReturnValue(self().getItem().getName(self()).copy().append(CommonComponents.SPACE).append(Component.literal("#" + mapId.id())));
+            if (mapId != null) cir.setReturnValue(self().getItem().getName(self()).copy().append(Component.translatable("legacy.map.id", mapId.id())));
         }
     }
 
