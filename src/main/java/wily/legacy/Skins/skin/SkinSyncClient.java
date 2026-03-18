@@ -33,6 +33,13 @@ public final class SkinSyncClient {
     private SkinSyncClient() {
     }
 
+    public static boolean requestSetSkin(String skinId) {
+        Minecraft client = Minecraft.getInstance();
+        if (client == null) return false;
+        requestSetSkin(client, skinId);
+        return true;
+    }
+
     public static void initClient() {
         try {
             Minecraft mc = Minecraft.getInstance();

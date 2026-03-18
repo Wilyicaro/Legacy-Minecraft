@@ -9,17 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ExternalSkinProviders {
-    private static final LegacySkinsProviderCompat LEGACY_PROVIDER = new LegacySkinsProviderCompat();
-    private static final BedrockSkinsProviderCompat BEDROCK_PROVIDER = new BedrockSkinsProviderCompat();
-    private static final List<ExternalSkinProvider> PROVIDERS = List.of(LEGACY_PROVIDER, BEDROCK_PROVIDER);
-    private static final List<ExternalSkinSelectionProvider> SELECTION_PROVIDERS = List.of(LEGACY_PROVIDER, BEDROCK_PROVIDER);
-    private static final List<ExternalSkinPreviewProvider> PREVIEW_PROVIDERS = List.of(LEGACY_PROVIDER, BEDROCK_PROVIDER);
-    private static final List<ExternalSkinPackProvider> PACK_PROVIDERS = List.of(BEDROCK_PROVIDER);
+    private static final List<ExternalSkinProvider> PROVIDERS = new ArrayList<>();
+    private static final List<ExternalSkinSelectionProvider> SELECTION_PROVIDERS = new ArrayList<>();
+    private static final List<ExternalSkinPreviewProvider> PREVIEW_PROVIDERS = new ArrayList<>();
+    private static final List<ExternalSkinPackProvider> PACK_PROVIDERS = new ArrayList<>();
     private static volatile boolean capabilitiesLogged;
     private static volatile String activeSelectionProviderId;
     private static volatile SkinPackSourceKind preferredSelectionSourceKind;
 
+    static {
+        registerProviderInternal(new LegacySkinsProviderCompat(), false);
+        registerProviderInternal(new BedrockSkinsProviderCompat(), false);
+    }
+
     private ExternalSkinProviders() {
+    }
+
+    public static boolean registerProvider(ExternalSkinProvider provider) {
+        return registerProviderInternal(provider, true);
+    }
+
+    public static List<ExternalSkinProvider> providers() {
+        synchronized (ExternalSkinProviders.class) {
+            return List.copyOf(PROVIDERS);
+        }
     }
 
     public static void logCapabilitiesOnce() {
@@ -27,28 +40,22 @@ public final class ExternalSkinProviders {
         synchronized (ExternalSkinProviders.class) {
             if (capabilitiesLogged) return;
             capabilitiesLogged = true;
-            for (ExternalSkinProvider provider : PROVIDERS) {
-                ExternalSkinProviderCapabilities capabilities = safeCapabilities(provider);
-                if (capabilities.isDegraded()) {
-                    DebugLog.warn("Skin compat {} degraded: {}", provider.providerId(), capabilities.summary());
-                } else {
-                    DebugLog.debug("Skin compat {} ready: {}", provider.providerId(), capabilities.summary());
-                }
-            }
+            for (ExternalSkinProvider provider : PROVIDERS) logProviderCapabilities(provider);
         }
     }
 
     public static boolean hasAdditionalPackProvider() {
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
-            if (safeCapabilities(provider).coreAvailable()) return true;
+        for (ExternalSkinPackProvider provider : packProviders()) {
+            ExternalSkinProviderCapabilities capabilities = safeCapabilities(provider);
+            if (capabilities.packListingAvailable()) return true;
         }
         return false;
     }
 
     public static boolean isSourceAvailable(SkinPackSourceKind sourceKind) {
         if (sourceKind == null) return false;
-        for (ExternalSkinProvider provider : PROVIDERS) {
-            if (provider.sourceKind() == sourceKind) return safeCapabilities(provider).coreAvailable();
+        for (ExternalSkinProvider provider : providers()) {
+            if (provider.sourceKind() == sourceKind && safeCapabilities(provider).coreAvailable()) return true;
         }
         return false;
     }
@@ -72,7 +79,7 @@ public final class ExternalSkinProviders {
 
     public static void clearAllSelectedSkins() {
         activeSelectionProviderId = null;
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
+        for (ExternalSkinSelectionProvider provider : selectionProviders()) {
             try {
                 provider.clearSelectedSkin();
             } catch (Throwable throwable) {
@@ -82,7 +89,7 @@ public final class ExternalSkinProviders {
     }
 
     public static void importCurrentSelectionsIfAbsent() {
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
+        for (ExternalSkinSelectionProvider provider : selectionProviders()) {
             if (!safeCapabilities(provider).coreAvailable()) continue;
             try {
                 provider.importCurrentSelectionIfAbsent();
@@ -120,7 +127,7 @@ public final class ExternalSkinProviders {
     }
 
     public static void resetPreviewCaches() {
-        for (ExternalSkinPreviewProvider provider : PREVIEW_PROVIDERS) {
+        for (ExternalSkinPreviewProvider provider : previewProviders()) {
             if (!safeCapabilities(provider).coreAvailable()) continue;
             try {
                 provider.resetPreviewCache();
@@ -131,22 +138,23 @@ public final class ExternalSkinProviders {
 
     public static List<ExternalSkinPackDescriptor> loadPackDescriptors(SkinPackSourceKind sourceKind) {
         if (sourceKind == null) return List.of();
-        for (ExternalSkinPackProvider provider : PACK_PROVIDERS) {
+        ArrayList<ExternalSkinPackDescriptor> descriptors = new ArrayList<>();
+        for (ExternalSkinPackProvider provider : packProviders()) {
             if (provider.sourceKind() != sourceKind) continue;
-            if (!safeCapabilities(provider).coreAvailable()) return List.of();
+            if (!safeCapabilities(provider).packListingAvailable()) continue;
             try {
-                List<ExternalSkinPackDescriptor> descriptors = provider.loadPackDescriptors();
-                return descriptors == null ? List.of() : descriptors;
-            } catch (Throwable ignored) {
-                return List.of();
+                List<ExternalSkinPackDescriptor> loaded = provider.loadPackDescriptors();
+                if (loaded != null) descriptors.addAll(withProviderMetadata(provider, loaded));
+            } catch (Throwable throwable) {
+                DebugLog.warn("Skin compat {} failed to load pack descriptors: {}", provider.providerId(), throwable.toString());
             }
         }
-        return List.of();
+        return descriptors.isEmpty() ? List.of() : List.copyOf(descriptors);
     }
 
     public static List<ExternalSkinProvider> degradedProviders() {
         ArrayList<ExternalSkinProvider> degraded = new ArrayList<>();
-        for (ExternalSkinProvider provider : PROVIDERS) {
+        for (ExternalSkinProvider provider : providers()) {
             if (safeCapabilities(provider).isDegraded()) degraded.add(provider);
         }
         return List.copyOf(degraded);
@@ -163,7 +171,7 @@ public final class ExternalSkinProviders {
 
     private static ExternalSkinSelectionProvider findSelectionProvider(String skinId) {
         if (skinId == null || skinId.isBlank()) return null;
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
+        for (ExternalSkinSelectionProvider provider : selectionProviders()) {
             if (provider.ownsSkinId(skinId)) return provider;
         }
         return null;
@@ -171,14 +179,14 @@ public final class ExternalSkinProviders {
 
     private static ExternalSkinPreviewProvider findPreviewProvider(String skinId) {
         if (skinId == null || skinId.isBlank()) return null;
-        for (ExternalSkinPreviewProvider provider : PREVIEW_PROVIDERS) {
+        for (ExternalSkinPreviewProvider provider : previewProviders()) {
             if (provider.ownsSkinId(skinId)) return provider;
         }
         return null;
     }
 
     private static void clearSelectedSkinExcept(ExternalSkinSelectionProvider selectedProvider) {
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
+        for (ExternalSkinSelectionProvider provider : selectionProviders()) {
             if (provider == selectedProvider) continue;
             try {
                 provider.clearSelectedSkin();
@@ -193,7 +201,7 @@ public final class ExternalSkinProviders {
         if (ownedSelection != null) return ownedSelection;
 
         ArrayList<ResolvedSelection> candidates = new ArrayList<>();
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
+        for (ExternalSkinSelectionProvider provider : selectionProviders()) {
             ResolvedSelection candidate = readSelection(provider);
             if (candidate != null) candidates.add(candidate);
         }
@@ -218,7 +226,7 @@ public final class ExternalSkinProviders {
 
     private static ResolvedSelection resolveSelectionForProviderId(String providerId) {
         if (providerId == null || providerId.isBlank()) return null;
-        for (ExternalSkinSelectionProvider provider : SELECTION_PROVIDERS) {
+        for (ExternalSkinSelectionProvider provider : selectionProviders()) {
             if (!providerId.equals(provider.providerId())) continue;
             ResolvedSelection selection = readSelection(provider);
             if (selection == null) {
@@ -243,6 +251,83 @@ public final class ExternalSkinProviders {
             DebugLog.warn("Skin compat {} failed to read current selection: {}", provider.providerId(), throwable.toString());
             return null;
         }
+    }
+
+    private static boolean registerProviderInternal(ExternalSkinProvider provider, boolean logImmediately) {
+        if (provider == null) return false;
+        String providerId = provider.providerId();
+        if (providerId == null || providerId.isBlank()) return false;
+        synchronized (ExternalSkinProviders.class) {
+            if (findProviderById(providerId) != null) {
+                DebugLog.warn("Skin compat {} already registered", providerId);
+                return false;
+            }
+            PROVIDERS.add(provider);
+            if (provider instanceof ExternalSkinSelectionProvider selectionProvider) SELECTION_PROVIDERS.add(selectionProvider);
+            if (provider instanceof ExternalSkinPreviewProvider previewProvider) PREVIEW_PROVIDERS.add(previewProvider);
+            if (provider instanceof ExternalSkinPackProvider packProvider) PACK_PROVIDERS.add(packProvider);
+        }
+        if (logImmediately && capabilitiesLogged) logProviderCapabilities(provider);
+        return true;
+    }
+
+    private static ExternalSkinProvider findProviderById(String providerId) {
+        for (ExternalSkinProvider provider : PROVIDERS) {
+            if (providerId.equals(provider.providerId())) return provider;
+        }
+        return null;
+    }
+
+    private static void logProviderCapabilities(ExternalSkinProvider provider) {
+        ExternalSkinProviderCapabilities capabilities = safeCapabilities(provider);
+        if (capabilities.isDegraded()) {
+            DebugLog.warn("Skin compat {} degraded: {}", provider.providerId(), capabilities.summary());
+        } else {
+            DebugLog.debug("Skin compat {} ready: {}", provider.providerId(), capabilities.summary());
+        }
+    }
+
+    private static List<ExternalSkinSelectionProvider> selectionProviders() {
+        synchronized (ExternalSkinProviders.class) {
+            return List.copyOf(SELECTION_PROVIDERS);
+        }
+    }
+
+    private static List<ExternalSkinPreviewProvider> previewProviders() {
+        synchronized (ExternalSkinProviders.class) {
+            return List.copyOf(PREVIEW_PROVIDERS);
+        }
+    }
+
+    private static List<ExternalSkinPackProvider> packProviders() {
+        synchronized (ExternalSkinProviders.class) {
+            return List.copyOf(PACK_PROVIDERS);
+        }
+    }
+
+    private static List<ExternalSkinPackDescriptor> withProviderMetadata(ExternalSkinPackProvider provider, List<ExternalSkinPackDescriptor> descriptors) {
+        ArrayList<ExternalSkinPackDescriptor> resolved = new ArrayList<>(descriptors.size());
+        for (ExternalSkinPackDescriptor descriptor : descriptors) {
+            if (descriptor == null) continue;
+            ArrayList<ExternalSkinDescriptor> skins = new ArrayList<>();
+            if (descriptor.skins() != null) {
+                for (ExternalSkinDescriptor skin : descriptor.skins()) {
+                    if (skin == null) continue;
+                    skins.add(skin.withProviderMetadata(provider.providerId(), provider.sourceKind()));
+                }
+            }
+            resolved.add(new ExternalSkinPackDescriptor(
+                    descriptor.id(),
+                    descriptor.name(),
+                    descriptor.type(),
+                    descriptor.icon(),
+                    List.copyOf(skins),
+                    descriptor.nativeOrder(),
+                    descriptor.providerId() == null || descriptor.providerId().isBlank() ? provider.providerId() : descriptor.providerId(),
+                    descriptor.sourceKind() == null ? provider.sourceKind() : descriptor.sourceKind()
+            ));
+        }
+        return resolved;
     }
 
     private record ResolvedSelection(ExternalSkinSelectionProvider provider, String skinId) {
