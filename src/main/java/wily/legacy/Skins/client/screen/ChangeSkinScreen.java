@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.Skins.client.screen.changeskin.ChangeSkinLayoutMetrics;
 import wily.legacy.Skins.client.screen.changeskin.ChangeSkinPackList;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
@@ -34,21 +35,110 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 
 public class ChangeSkinScreen extends AbstractChangeSkinScreen {
+    private static final float NORMAL_CAROUSEL_BASE_SCALE = 0.935f;
+    private static final float NORMAL_CAROUSEL_BASE_SPACING = 80f;
+    private static final int PACK_LIST_VISIBLE_ROWS = 6;
+    private static final int PACK_LIST_FOOTER_RESERVE = 12;
+    private static final ChangeSkinScreenLayout HD_LAYOUT = new ChangeSkinScreenLayout(
+            false,
+            180, 290, 400,
+            24, 112,
+            34, 20, 7,
+            10, 5, 5,
+            5, 18, 10,
+            1.485f, 0.65f,
+            1.045f, 0.60f,
+            ChangeSkinLayoutMetrics.DEFAULT
+    );
+
+    private record NormalLayoutMetrics(
+            int skinPanelInsetX,
+            int skinPanelTop,
+            int panelFillerInsetX,
+            int panelFillerTop,
+            int panelFillerBottomTrim,
+            int panelFillerWidthTrim,
+            int panelFillerHeight,
+            int infoPanelInsetX,
+            int infoPanelBottomTrim,
+            int infoPanelWidthTrim,
+            int infoPanelHeight,
+            int packNameInsetX,
+            int packNameTop,
+            int packNameWidthTrim,
+            int packNameHeight,
+            int skinBoxInsetX,
+            int skinBoxTop,
+            int skinBoxWidthTrim,
+            int skinBoxBottomTrim,
+            int actionHolderSize,
+            int actionHolderXOffset,
+            int actionHolderBaseY,
+            int actionHolderTopOffset,
+            int actionHolderGap,
+            int packFrameInsetX,
+            int packFrameTop,
+            int packFrameWidthTrim,
+            int packFrameBottomTrim,
+            int packListInsetX,
+            int packListWidthTrim,
+            int packListTop,
+            int packListBottomInset,
+            int previewListGap,
+            int scrollArrowOffset,
+            int infoCenterInsetX,
+            int infoCenterWidthTrim,
+            int skinNameBottomTrim,
+            int themeTextWidthTrim,
+            int themeTextGap,
+            int themeBottomInset,
+            int packTitleTop,
+            int packMetaGap,
+            int packTypeAdvance
+    ) {
+        static final NormalLayoutMetrics DEFAULT = new NormalLayoutMetrics(
+                10, 7,
+                5, 16, 80, 14, 60,
+                1, 59, 55, 55,
+                5, 20, 18, 40,
+                5, 16, 14, 80,
+                24, 50, 60, 3, 30,
+                7, 129, 14, 140,
+                11, 22, 136, 8, 2, 8,
+                5, 18, 49, 26, 6, 12,
+                27, 8, 10
+        );
+
+        static final NormalLayoutMetrics SD_480 = new NormalLayoutMetrics(
+                7, 6,
+                4, 8, 48, 10, 34,
+                1, 38, 34, 40,
+                4, 11, 12, 26,
+                4, 10, 10, 50,
+                18, 34, 40, 2, 18,
+                5, 92, 10, 102,
+                8, 12, 94, 8, 1, 6,
+                4, 10, 32, 18, 4, 10,
+                18, 6, 8
+        );
+    }
+
     private static final int BEACON_CHECK_TEXTURE_SIZE = 28;
     private static final int BEACON_CHECK_VISIBLE_X = 3;
     private static final int BEACON_CHECK_VISIBLE_Y = 4;
     private static final int BEACON_CHECK_VISIBLE_W = 24;
     private static final int BEACON_CHECK_VISIBLE_H = 20;
     private static final int SELECTION_ICON_SIZE = 16;
-    private static final int SELECTION_ICON_OFFSET_X = 1;
-    private static final int SELECTION_ICON_OFFSET_Y = 1;
+    private static final int ACTION_ICON_PADDING = 2;
+    private static final int ACTION_HOLDER_BORDER = 1;
+    private static final int PACK_BUTTON_BASE_HEIGHT = 20;
 
     
     private static final ResourceLocation SKIN_PANEL          = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_panel");
     private static final ResourceLocation PANEL_FILLER        = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/panel_filler");
     private static final ResourceLocation PACK_NAME_BOX       = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/pack_name_box");
     private static final ResourceLocation SKIN_BOX            = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_box");
-    private static final ResourceLocation SIZEABLE_ICON_HOLDER = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/sizeable_icon_holder.png");
+    private static final ResourceLocation SIZEABLE_ICON_HOLDER = ResourceLocation.fromNamespaceAndPath("legacy", "container/sizeable_icon_holder");
     private static final ResourceLocation BEACON_CHECK        = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/beacon_check.png");
     private static final ResourceLocation HEART_CONTAINER     = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/container");
     private static final ResourceLocation HEART_FULL          = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/full");
@@ -58,10 +148,84 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private boolean holdingPackStick;
     private int     holdingPackDir;
     private long    holdingPackStartAt, holdingPackNextAt;
+    private NormalLayoutMetrics normalLayout = NormalLayoutMetrics.DEFAULT;
+    private int resolvedPackRowHeight = PACK_BUTTON_BASE_HEIGHT;
+    private int lastLayoutWidth = -1;
+    private int lastLayoutHeight = -1;
 
 
     public ChangeSkinScreen(Screen parent) {
         super(parent);
+    }
+
+    @Override
+    protected ChangeSkinScreenLayout resolveRuntimeLayout() {
+        return isCompact480() ? ChangeSkinScreenLayout.DEFAULT : HD_LAYOUT;
+    }
+
+    @Override
+    protected ChangeSkinScreenLayout resolveFitReferenceLayout() {
+        return isCompact480() ? ChangeSkinScreenLayout.DEFAULT : HD_LAYOUT;
+    }
+
+    private void refreshNormalLayout() {
+        normalLayout = NormalLayoutMetrics.DEFAULT;
+    }
+
+    private void refreshNormalSdFit() {
+        if (isCompact480()) {
+            uiScale = Math.min(1f, uiScale * 1.10f);
+        } else {
+            uiScale = Math.min(1f, uiScale * 1.14f);
+        }
+        tooltipWidth = Math.max(1, Math.round(layoutProfile.baseTooltipWidth() * uiScale));
+    }
+
+    private void applyNormalCarouselTuning(boolean relayout) {
+        if (playerSkinWidgetList == null) return;
+
+        float scaleMultiplier = getLayoutMetrics().centerScale() / NORMAL_CAROUSEL_BASE_SCALE;
+        float spacingMultiplier = getLayoutMetrics().carouselOffset() / NORMAL_CAROUSEL_BASE_SPACING;
+        if (scaleMultiplier <= 0f) scaleMultiplier = 1f;
+        if (spacingMultiplier <= 0f) spacingMultiplier = 1f;
+
+        playerSkinWidgetList.setCarouselTuning(scaleMultiplier, spacingMultiplier);
+        if (relayout) playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index, true);
+    }
+
+    private int resolvePackRowHeight() {
+        int scaledHeight = Math.max(10, Math.round(PACK_BUTTON_BASE_HEIGHT * uiScale));
+        int availableHeight = resolvePackListAvailableHeight();
+        int fittedHeight = Math.max(10, (availableHeight - PACK_LIST_FOOTER_RESERVE) / PACK_LIST_VISIBLE_ROWS);
+        if (isCompact480()) return Math.min(scaledHeight, fittedHeight);
+        return Math.min(fittedHeight, Math.max(18, scaledHeight));
+    }
+
+    private int resolvePackListAvailableHeight() {
+        int minY = Math.max(panel.y + sc(normalLayout.packListTop()), previewBoxY() + previewBoxSize() + sc(normalLayout.previewListGap()));
+        return Math.max(1, panel.y + panel.height - sc(normalLayout.packListBottomInset()) - minY);
+    }
+
+    private int adjustPackListHeight(int height) {
+        if (!isCompact480()) return height;
+        int visibleRowsHeight = resolvedPackRowHeight * PACK_LIST_VISIBLE_ROWS;
+        return Math.max(1, Math.min(height, visibleRowsHeight + PACK_LIST_FOOTER_RESERVE));
+    }
+
+    @Override
+    protected int previewBoxX() {
+        int size = previewBoxSize();
+        return panel.x + Math.max(sc(7), (panel.width - size) / 2);
+    }
+
+    @Override
+    protected void onWidgetListCreated(PlayerSkinWidgetList list) {
+        applyNormalCarouselTuning(false);
+    }
+
+    @Override
+    protected void onAfterSkinPackChanged() {
+        applyNormalCarouselTuning(true);
     }
 
 
@@ -71,17 +235,22 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             @Override
             public void init(String name) {
                 super.init(name);
-                
-                panel.x -= (tooltipWidth - 2) / 2;
                 int groupWidth = panel.width + tooltipWidth - 2;
-                int minX = sc(5), maxX = ChangeSkinScreen.this.width - groupWidth - sc(5);
+                int desiredGroupX = (ChangeSkinScreen.this.width - groupWidth) / 2;
+                panel.x = desiredGroupX;
+                int minX = sc(layoutProfile.tooltipGroupMargin()), maxX = ChangeSkinScreen.this.width - groupWidth - sc(layoutProfile.tooltipGroupMargin());
                 if (maxX < minX) maxX = minX;
                 panel.x = Math.max(minX, Math.min(panel.x, maxX));
-                int minY = sc(5), maxY = ChangeSkinScreen.this.height - panel.height - sc(5);
+                int minY = sc(layoutProfile.tooltipGroupMargin());
+                int groupBottomTrim = Math.max(0, sc(layoutProfile.tooltipYOffset() - layoutProfile.tooltipHeightInset()));
+                int groupHeight = panel.height + groupBottomTrim;
+                int desiredGroupY = (ChangeSkinScreen.this.height - groupHeight) / 2;
+                panel.y = desiredGroupY;
+                int maxY = ChangeSkinScreen.this.height - controlTooltipFooterReserve() - groupHeight - sc(layoutProfile.tooltipGroupMargin());
                 if (maxY < minY) maxY = minY;
                 panel.y = Math.max(minY, Math.min(panel.y, maxY));
-                appearance(LegacySprites.POINTER_PANEL, tooltipWidth, panel.height - sc(10));
-                pos(panel.x + panel.width - 2, panel.y + sc(18));
+                appearance(LegacySprites.POINTER_PANEL, tooltipWidth, panel.height - sc(layoutProfile.tooltipHeightInset()));
+                pos(panel.x + panel.width - 2, panel.y + sc(layoutProfile.tooltipYOffset()));
             }
             @Override public void init()                                                { init("tooltipBox"); }
             @Override public void render(GuiGraphics g, int i, int j, float f)         { LegacyRenderUtil.renderPointerPanel(g, getX(), getY(), getWidth(), getHeight()); }
@@ -90,12 +259,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     protected boolean isInCarouselBounds(double mx, double my) {
-        
         if (tooltipBox == null || panel == null) return false;
-        int x  = tooltipBox.x, y = panel.y + sc(45);
-        int x2 = x + tooltipBox.getWidth() - sc(23);
-        int y2 = y + tooltipBox.getHeight() - sc(90) - sc(24);
-        return inside(mx, my, x + sc(2), y, Math.max(1, x2 - x - sc(2)), Math.max(1, y2 - y));
+        int clipLeft = carouselClipLeft();
+        int clipTop = tooltipContentTop();
+        int clipRight = carouselClipRight();
+        int clipBottom = tooltipContentBottom() - sc(getLayoutMetrics().carouselClipBottomTrim());
+        return inside(mx, my, clipLeft, clipTop, Math.max(1, clipRight - clipLeft), Math.max(1, clipBottom - clipTop));
     }
 
     @Override
@@ -103,20 +272,29 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         return inside(mx, my, tooltipBox.x, tooltipBox.y, tooltipBox.getWidth(), tooltipBox.getHeight());
     }
 
+    private int carouselClipLeft() {
+        int clipLeft = tooltipBox.x + sc(getLayoutMetrics().carouselClipInset());
+        if (!isCompact480()) clipLeft += sc(3);
+        return clipLeft;
+    }
+
+    private int carouselClipRight() {
+        int clipRight = tooltipContentRight();
+        if (!isCompact480()) clipRight -= sc(3);
+        return clipRight;
+    }
+
 
     @Override
     public void renderableVListInit() {
-        
         addRenderableOnly((g, i, j, f) ->
                 blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL,
-                        panel.x + sc(7), panel.y + sc(129), panel.width - sc(14), panel.height - sc(140)));
+                        panel.x + sc(normalLayout.packFrameInsetX()), panel.y + sc(normalLayout.packFrameTop()), panel.width - sc(normalLayout.packFrameWidthTrim()), panel.height - sc(normalLayout.packFrameBottomTrim())));
 
-        
         addRenderableOnly((g, i, j, f) ->
                 blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL,
                         previewBoxX(), previewBoxY(), previewBoxSize(), previewBoxSize()));
 
-        
         addRenderableOnly((g, i, j, f) -> {
             ResourceLocation icon = getFocusedPackIcon();
             if (icon == null) return;
@@ -134,28 +312,37 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         packList.refreshPackIdsIfNeeded();
         packList.populateInto(getRenderableVList());
 
-        
-        int x        = panel.x + sc(11);
-        int w        = Math.max(1, panel.width - sc(22));
-        int minY     = previewBoxY() + previewBoxSize() + sc(2);
-        int y        = Math.max(panel.y + sc(136), minY);
-        int h        = Math.max(1, panel.y + panel.height - sc(8) - y);
-        getRenderableVList().scrollArrowYOffset(-8 - sc(8));
+        int x        = panel.x + sc(normalLayout.packListInsetX());
+        int w        = Math.max(1, panel.width - sc(normalLayout.packListWidthTrim()));
+        int minY     = previewBoxY() + previewBoxSize() + sc(normalLayout.previewListGap());
+        int y        = Math.max(panel.y + sc(normalLayout.packListTop()), minY);
+        int h        = adjustPackListHeight(Math.max(1, panel.y + panel.height - sc(normalLayout.packListBottomInset()) - y));
+        getRenderableVList().verticalScrollArrowSize(isCompact480() ? 13 : 16, isCompact480() ? 7 : 9);
+        getRenderableVList().verticalScrollArrowOffset(isCompact480() ? 0 : -5, isCompact480() ? 8 : -2);
+        getRenderableVList().scrollArrowYOffset(-normalLayout.scrollArrowOffset() - sc(normalLayout.scrollArrowOffset()));
         getRenderableVList().init("consoleskins.packList", x, y, w, h);
     }
 
     @Override
     protected void panelInit() {
-        uiScale      = computeScale(width, height);
-        tooltipWidth = Math.max(1, Math.round(BASE_TOOLTIP_WIDTH * uiScale));
+        boolean windowResized = width != lastLayoutWidth || height != lastLayoutHeight;
+        refreshSharedLayout();
+        refreshNormalLayout();
+        refreshNormalSdFit();
         renderableVList.layoutSpacing(l -> 0);
-        packList.applyUiScale(uiScale);
+        if (windowResized) {
+            getRenderableVList().resetScroll();
+        }
         addRenderableOnly(panel);
         panel.init();
+        applyResolvedPanelBounds();
+        resolvedPackRowHeight = resolvePackRowHeight();
+        packList.applyResolvedButtonHeight(resolvedPackRowHeight);
         tooltipBox.init("tooltipBox");
+        lastLayoutWidth = width;
+        lastLayoutHeight = height;
 
         if (firstOpen) {
-            
             UUID self = minecraft.player != null ? minecraft.player.getUUID()
                       : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
             String selectedId = self != null ? ClientSkinCache.get(self) : null;
@@ -269,19 +456,27 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         holdingPackNextAt = now + (now - holdingPackStartAt < 700L ? 120L : 80L);
     }
 
-    
+
     private void renderSelectedSkinMarker(GuiGraphics g, int iconX, int iconY, int holderSize) {
         float drawW = Math.max(1, sc(SELECTION_ICON_SIZE));
         float drawH = Math.max(1, Math.round(drawW * (BEACON_CHECK_VISIBLE_H / (float) BEACON_CHECK_VISIBLE_W)));
         float scaleX = drawW / BEACON_CHECK_VISIBLE_W;
         float scaleY = drawH / BEACON_CHECK_VISIBLE_H;
-        float drawX = iconX + (holderSize - drawW) / 2.0f + sc(SELECTION_ICON_OFFSET_X);
-        float drawY = iconY + (holderSize - drawH) / 2.0f + sc(SELECTION_ICON_OFFSET_Y);
+        float drawX = iconX + (holderSize - drawW) / 2.0f;
+        float drawY = iconY + (holderSize - drawH) / 2.0f;
         g.pose().pushMatrix();
         g.pose().translate(drawX - BEACON_CHECK_VISIBLE_X * scaleX, drawY - BEACON_CHECK_VISIBLE_Y * scaleY);
         g.pose().scale(scaleX, scaleY);
         g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
         g.pose().popMatrix();
+    }
+
+    private void renderFavoriteHeart(GuiGraphics g, int iconX, int iconY, int holderSize) {
+        int heartSize = Math.max(1, holderSize - 8);
+        int heartX = iconX + Math.round((holderSize - heartSize) / 2.0f);
+        int heartY = iconY + Math.round((holderSize - heartSize) / 2.0f);
+        blitSprite(g, HEART_CONTAINER, heartX, heartY, heartSize, heartSize);
+        blitSprite(g, HEART_FULL, heartX, heartY, heartSize, heartSize);
     }
 
     
@@ -292,11 +487,11 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
         
         double mx = e.x(), my = e.y();
-        int holder = Math.max(1, sc(24));
-        int iconX  = tooltipBox.x + tooltipBox.getWidth() - sc(50);
-        int iconY  = panel.y + tooltipBox.getHeight() - sc(60);
-        if (inside(mx, my, iconX, iconY + sc(3),  holder, holder)) { selectSkin(); return true; }
-        if (inside(mx, my, iconX, iconY + sc(30), holder, holder)) { favorite();   return true; }
+        int holder = Math.max(1, sc(normalLayout.actionHolderSize()));
+        int iconX  = tooltipBox.x + tooltipBox.getWidth() - sc(normalLayout.actionHolderXOffset());
+        int iconY  = panel.y + tooltipBox.getHeight() - sc(normalLayout.actionHolderBaseY());
+        if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderTopOffset()), holder, holder)) { selectSkin(); return true; }
+        if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderGap()), holder, holder)) { favorite(); return true; }
 
         return super.mouseClicked(e, bl);
     }
@@ -332,19 +527,19 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
 
-        blitSprite(g, SKIN_PANEL,   tooltipBox.x - sc(10), panel.y + sc(7),  Math.max(1, tooltipBox.getWidth()), Math.max(1, tooltipBox.getHeight() - sc(2)));
-        blitSprite(g, PANEL_FILLER, tooltipBox.x - sc(5),  panel.y + sc(16) + tooltipBox.getHeight() - sc(80), Math.max(1, tooltipBox.getWidth() - sc(14)), Math.max(1, sc(60)));
-        blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, tooltipBox.x - sc(1), panel.y + tooltipBox.getHeight() - sc(59), Math.max(1, tooltipBox.getWidth() - sc(55)), Math.max(1, sc(55)));
-        blitSprite(g, PACK_NAME_BOX, tooltipBox.x - sc(5), panel.y + sc(20), Math.max(1, tooltipBox.getWidth() - sc(18)), Math.max(1, sc(40)));
-        blitSprite(g, SKIN_BOX,     tooltipBox.x - sc(5),  panel.y + sc(16), Math.max(1, tooltipBox.getWidth() - sc(14)), Math.max(1, tooltipBox.getHeight() - sc(80)));
+        blitSprite(g, SKIN_PANEL, tooltipBox.x - sc(normalLayout.skinPanelInsetX()), panel.y + sc(normalLayout.skinPanelTop()), Math.max(1, tooltipBox.getWidth()), Math.max(1, tooltipBox.getHeight() - sc(2)));
+        blitSprite(g, PANEL_FILLER, tooltipBox.x - sc(normalLayout.panelFillerInsetX()), panel.y + sc(normalLayout.panelFillerTop()) + tooltipBox.getHeight() - sc(normalLayout.panelFillerBottomTrim()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.panelFillerWidthTrim())), Math.max(1, sc(normalLayout.panelFillerHeight())));
+        blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, tooltipBox.x - sc(normalLayout.infoPanelInsetX()), panel.y + tooltipBox.getHeight() - sc(normalLayout.infoPanelBottomTrim()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.infoPanelWidthTrim())), Math.max(1, sc(normalLayout.infoPanelHeight())));
+        blitSprite(g, PACK_NAME_BOX, tooltipBox.x - sc(normalLayout.packNameInsetX()), panel.y + sc(normalLayout.packNameTop()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())), Math.max(1, sc(normalLayout.packNameHeight())));
+        blitSprite(g, SKIN_BOX, tooltipBox.x - sc(normalLayout.skinBoxInsetX()), panel.y + sc(normalLayout.skinBoxTop()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.skinBoxWidthTrim())), Math.max(1, tooltipBox.getHeight() - sc(normalLayout.skinBoxBottomTrim())));
 
-        int holder    = Math.max(1, sc(24));
-        int iconX     = tooltipBox.x + tooltipBox.getWidth() - sc(50);
-        int iconBaseY = panel.y + tooltipBox.getHeight() - sc(60);
-        g.blit(RenderPipelines.GUI_TEXTURED, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(3),  0, 0, holder, holder, 24, 24);
-        g.blit(RenderPipelines.GUI_TEXTURED, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(30), 0, 0, holder, holder, 24, 24);
+        int holder    = Math.max(1, sc(normalLayout.actionHolderSize()));
+        int iconX     = tooltipBox.x + tooltipBox.getWidth() - sc(normalLayout.actionHolderXOffset());
+        int iconBaseY = panel.y + tooltipBox.getHeight() - sc(normalLayout.actionHolderBaseY());
+        blitSprite(g, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder, holder);
+        blitSprite(g, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(normalLayout.actionHolderGap()), holder, holder);
 
         if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null) {
             String selected     = playerSkinWidgetList.element3.skinId.get();
@@ -357,23 +552,22 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             
             
             if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
-                renderSelectedSkinMarker(g, iconX, iconBaseY + sc(3), holder);
+                renderSelectedSkinMarker(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             }
 
             if (selected != null && FavoritesStore.isFavorite(selected)) {
-                int hx = iconX + sc(4);
-                int hy = iconBaseY + sc(30) + sc(4);
-                int hs = Math.max(1, sc(16));
-                blitSprite(g, HEART_CONTAINER, hx, hy, hs, hs);
-                blitSprite(g, HEART_FULL,      hx, hy, hs, hs);
+                renderFavoriteHeart(g, iconX, iconBaseY + sc(normalLayout.actionHolderGap()), holder);
             }
         }
 
         
         
         
-        int cx = tooltipBox.x, cy = panel.y + sc(45);
-        PlayerSkinWidget.setCarouselClip(cx + sc(2), cy, cx + tooltipBox.getWidth() - sc(23), cy + tooltipBox.getHeight() - sc(90) - sc(24));
+        int clipLeft = carouselClipLeft();
+        int clipTop = tooltipContentTop();
+        int clipRight = carouselClipRight();
+        int clipBottom = tooltipContentBottom() - sc(getLayoutMetrics().carouselClipBottomTrim());
+        PlayerSkinWidget.setCarouselClip(clipLeft, clipTop, clipRight, clipBottom);
         PlayerSkinWidget.setCarouselYawDenom(Math.max(1f, 240f * uiScale));
 
         
@@ -381,8 +575,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             String    skinId = playerSkinWidgetList.element3.skinId.get();
             SkinEntry entry  = skinId == null ? null : SkinPackLoader.getSkin(skinId);
             String    name   = entry == null ? String.valueOf(skinId) : entry.name();
-            int mid       = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
-            int skinNameY = panel.y + tooltipBox.getHeight() - sc(49);
+            int mid       = tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
+            int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
             drawBigCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF);
 
             ResourceLocation modelId = null;
@@ -393,27 +587,33 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
             String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
-                float scale = Math.max(0.65f, 1.485f * uiScale);
-                int maxUnscaled = (int) ((tooltipBox.getWidth() - sc(26)) / scale);
+                float scale = bigTextScale();
+                int maxUnscaled = (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / scale);
                 String show = theme;
+                show = show.replace("\u00E2\u20AC\u00A6", "...");
                 if (minecraft.font.width(show) > maxUnscaled) { int ellW = minecraft.font.width("…"); show = minecraft.font.plainSubstrByWidth(show, Math.max(0, maxUnscaled - ellW)) + "…"; }
-                int themeY = skinNameY + (int) (minecraft.font.lineHeight * scale) + sc(6);
-                drawBigCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(12)), 0xFFFFFFFF);
+                show = show.replace("\u00E2\u20AC\u00A6", "...");
+                int themeY = skinNameY + (int) (minecraft.font.lineHeight * scale) + sc(normalLayout.themeTextGap());
+                drawBigCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF);
             }
         }
 
         
         SkinPack pack = getFocusedPack();
+        int packMid = tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
+        int packMetaY = panel.y + sc(normalLayout.packTitleTop()) + (int) (minecraft.font.lineHeight * bigTextScale()) + sc(normalLayout.packMetaGap());
         if (pack != null) {
-            int mid = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
-            drawBigCentered(g, Component.literal(SkinPackLoader.nameString(pack.name(), pack.id())), mid, panel.y + sc(27), 0xFFFFFFFF);
+            drawBigCentered(g, Component.literal(SkinPackLoader.nameString(pack.name(), pack.id())), packMid, panel.y + sc(normalLayout.packTitleTop()), 0xFFFFFFFF);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);
                 Component label = null;
                 if (k.equals("skin"))   label = Component.translatable("legacy.skinpack.type.skin");
                 if (k.equals("mashup")) label = Component.translatable("legacy.skinpack.type.mashup");
-                if (label != null) drawSmallCentered(g, label, mid, panel.y + sc(27) + (int) (minecraft.font.lineHeight * (1.55f * uiScale)) + sc(8), 0xCCFFFFFF);
+                if (label != null) {
+                    drawSmallCentered(g, label, packMid, packMetaY, 0xCCFFFFFF);
+                    packMetaY += Math.max(sc(normalLayout.packTypeAdvance()), (int) (minecraft.font.lineHeight * smallTextScale()));
+                }
             }
         }
     }
@@ -428,9 +628,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             String id = playerSkinWidgetList != null && playerSkinWidgetList.element3 != null ? playerSkinWidgetList.element3.skinId.get() : null;
             return id != null && FavoritesStore.isFavorite(id) ? Component.literal("Remove Favorite") : Component.literal("Add Favorite");
         });
+        addPreviewControlTooltips(r);
         r.add(() -> ControlType.getActiveType().isKbm()
                 ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_W), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_S), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
                 : ControllerBinding.LEFT_STICK.bindingState.getIcon(), () -> Component.literal("Navigate"));
+        if (canUsePackFilter()) {
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_T) : ControllerBinding.BACK.bindingState.getIcon(), this::currentPackFilterLabel);
+        }
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> Component.literal("Advanced Options"));
     }
 

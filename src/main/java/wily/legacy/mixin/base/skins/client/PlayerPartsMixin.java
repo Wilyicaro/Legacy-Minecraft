@@ -33,7 +33,6 @@ import wily.legacy.Skins.util.DebugLog;
 @Mixin(PlayerModel.class)
 public abstract class PlayerPartsMixin {
 
-    // Cached reflection for isSpectator - resolved once, reused every frame
     @Unique
     private static volatile boolean consoleskins$triedResolveSpectator;
     @Unique
@@ -41,7 +40,6 @@ public abstract class PlayerPartsMixin {
     @Unique
     private static volatile Method consoleskins$spectatorMethod;
 
-    // Log once to confirm this version of hidePart is running (uses skipDraw only, not skipRenderOverride)
 
 
     @Unique
@@ -146,7 +144,6 @@ public abstract class PlayerPartsMixin {
 
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        // Use values cached on render state by AvatarSkinMixin
         ResourceLocation tex = (state instanceof RenderStateSkinIdAccess ra) ? ra.consoleskins$getCachedTexture() : null;
         BuiltBoxModel model = (state instanceof RenderStateSkinIdAccess ra2) ? ra2.consoleskins$getCachedBoxModel() : null;
 
@@ -411,7 +408,6 @@ public abstract class PlayerPartsMixin {
     }
 
     private static boolean consoleskins$isSpectator(AvatarRenderState state, UUID uuid) {
-        // Use cached reflection instead of per-frame getField/getMethod
         if (state != null) {
             if (!consoleskins$triedResolveSpectator) {
                 synchronized (PlayerPartsMixin.class) {

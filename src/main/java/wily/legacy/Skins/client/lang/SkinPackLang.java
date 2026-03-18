@@ -86,23 +86,26 @@ public final class SkinPackLang {
 
     private static void loadLocale(ResourceManager rm, String locale, Map<String, String> out) {
         try {
-             Map<ResourceLocation, Resource> res = new java.util.HashMap<>();
-try {
-    res.putAll(rm.listResources("skinpacks", rl -> {
-        String p = rl.getPath();
-        return p.contains("/lang/") && p.endsWith(".json");
-    }));
-} catch (Throwable ignored) {
-}
-try {
-    res.putAll(rm.listResources("default_skinpacks", rl -> {
-        String p = rl.getPath();
-        return p.contains("/lang/") && p.endsWith(".json");
-    }));
-} catch (Throwable ignored) {
-}
+            Map<ResourceLocation, Resource> res = new java.util.HashMap<>();
+            try {
+                res.putAll(rm.listResources("skinpacks", rl -> {
+                    String p = rl.getPath();
+                    return p.contains("/lang/") && p.endsWith(".json");
+                }));
+            } catch (Throwable ignored) {
+            }
+            try {
+                res.putAll(rm.listResources("default_skinpacks", rl -> {
+                    String p = rl.getPath();
+                    return p.contains("/lang/") && p.endsWith(".json");
+                }));
+            } catch (Throwable ignored) {
+            }
 
-            Map<ResourceLocation, Resource> vanilla = rm.listResources("lang", rl -> rl.getPath().equals("lang/" + locale + ".json"));
+            Map<ResourceLocation, Resource> vanilla = rm.listResources("lang", rl -> {
+                String p = rl.getPath();
+                return p.equals("lang/" + locale + ".json") || (p.startsWith("lang/" + locale + ".") && p.endsWith(".json"));
+            });
 
             if (res.isEmpty() && vanilla.isEmpty()) return;
 
@@ -117,16 +120,14 @@ try {
                 if (r == null) continue;
                 JsonObject obj = readObj(r);
                 if (obj == null) continue;
-                boolean isVanillaLang = rl.getPath().startsWith("lang/");
                 for (Map.Entry<String, JsonElement> e : obj.entrySet()) {
                     String k = e.getKey();
-                    if (k == null) continue;
-                    if (isVanillaLang && !k.startsWith("skinpacks.")) continue;
+                    if (k == null || k.isBlank()) continue;
                     JsonElement v = e.getValue();
                     if (v == null || !v.isJsonPrimitive()) continue;
                     try {
                         String s = v.getAsString();
-                        if (s != null) out.put(k, s);
+                        if (s != null && !s.isEmpty()) out.put(k, s);
                     } catch (Throwable ignored) {
                     }
                 }

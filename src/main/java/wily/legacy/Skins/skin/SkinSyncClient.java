@@ -3,8 +3,8 @@ package wily.legacy.Skins.skin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.Skins.client.compat.ExternalSkinProviders;
 
 import java.util.Objects;
 import wily.legacy.Skins.skin.ClientSkinAssets;
@@ -27,7 +27,6 @@ public final class SkinSyncClient {
     private static final java.util.concurrent.ConcurrentHashMap<UUID, String> LAST_APPLIED =
             new java.util.concurrent.ConcurrentHashMap<>();
 
-    /** Throttle: only scan all players every SCAN_INTERVAL ticks (1 second). */
     private static final int SCAN_INTERVAL = 20;
     private static int scanTickCounter;
 
@@ -71,8 +70,6 @@ public final class SkinSyncClient {
         } catch (Throwable ignored) {
         }
 
-        // Throttle the expensive all-players scan to once per second instead of every tick.
-        // Skin changes are infrequent events so this is fine.
         try {
             if (client != null && client.level != null && ++scanTickCounter >= SCAN_INTERVAL) {
                 scanTickCounter = 0;
@@ -84,7 +81,6 @@ public final class SkinSyncClient {
                         String last = LAST_APPLIED.get(p.getUUID());
                         if (!Objects.equals(last, s)) {
                             LAST_APPLIED.put(p.getUUID(), s);
-                            // Only update name mapping when skin actually changed
                             ClientSkinCache.setName(p.getScoreboardName(), s);
                         }
                     }
@@ -196,37 +192,37 @@ public final class SkinSyncClient {
 
     public static void requestSetSkin(Minecraft client, String skinId) {
         if (client == null) return;
-        String id = skinId == null ? "" : skinId;
+        String localId = skinId == null ? "" : skinId;
+        String networkId = normalizeNetworkSkinId(localId);
 
         try {
             UUID uid = client.getUser() != null ? client.getUser().getProfileId() : null;
-            if (uid != null) ClientSkinPersistence.save(uid, id);
+            if (uid != null) ClientSkinPersistence.save(uid, localId);
         } catch (Throwable ignored) {
         }
 
         try {
-            if (client.player != null) ClientSkinCache.set(client.player.getUUID(), id);
-            if (client.getUser() != null) ClientSkinCache.set(client.getUser().getProfileId(), id);
+            cacheLocalSelection(client, localId);
         } catch (Throwable ignored) {
         }
 
         if (client.getConnection() == null || client.player == null) {
-            pendingSkinId = id;
+            pendingSkinId = localId;
             return;
         }
 
         try {
-            CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));
+            CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(networkId));
 
             try {
-                if (!id.isBlank() && SENT_ASSETS.putIfAbsent(id, true) == null) {
-                    byte[] texBytes = ClientSkinAssets.getTextureBytes(id);
-                    byte[] modelBytes = ClientSkinAssets.getModelBytes(id);
+                if (!networkId.isBlank() && SENT_ASSETS.putIfAbsent(networkId, true) == null) {
+                    byte[] texBytes = ClientSkinAssets.getTextureBytes(networkId);
+                    byte[] modelBytes = ClientSkinAssets.getModelBytes(networkId);
 
                     SkinEntry e = null;
                     if (texBytes == null || modelBytes == null) {
                         try {
-                            e = SkinPackLoader.getSkin(id);
+                            e = SkinPackLoader.getSkin(networkId);
                         } catch (Throwable ignored) {
                         }
 
@@ -236,13 +232,13 @@ public final class SkinSyncClient {
                         }
 
                         if (modelBytes == null) {
-                            ResourceLocation modelRl = resolveModelLocation(client, id, e);
+                            ResourceLocation modelRl = resolveModelLocation(client, networkId, e);
                             modelBytes = loadBytes(client, modelRl);
                         }
                     }
 
-                    sendChunks(id, 0, texBytes);
-                    sendChunks(id, 1, modelBytes);
+                    sendChunks(networkId, 0, texBytes);
+                    sendChunks(networkId, 1, modelBytes);
                 }
             } catch (Throwable ignored) {
             }
@@ -277,18 +273,19 @@ public final class SkinSyncClient {
                 }
             }
             if (skinId == null) skinId = "";
+            String networkId = normalizeNetworkSkinId(skinId);
 
-            CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(skinId));
+            CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(networkId));
 
             try {
-                if (!skinId.isBlank() && SENT_ASSETS.putIfAbsent(skinId, true) == null) {
-                    byte[] texBytes = ClientSkinAssets.getTextureBytes(skinId);
-                    byte[] modelBytes = ClientSkinAssets.getModelBytes(skinId);
+                if (!networkId.isBlank() && SENT_ASSETS.putIfAbsent(networkId, true) == null) {
+                    byte[] texBytes = ClientSkinAssets.getTextureBytes(networkId);
+                    byte[] modelBytes = ClientSkinAssets.getModelBytes(networkId);
 
                     SkinEntry e = null;
                     if (texBytes == null || modelBytes == null) {
                         try {
-                            e = SkinPackLoader.getSkin(skinId);
+                            e = SkinPackLoader.getSkin(networkId);
                         } catch (Throwable ignored) {
                         }
 
@@ -303,8 +300,8 @@ public final class SkinSyncClient {
                         }
                     }
 
-                    sendChunks(skinId, 0, texBytes);
-                    sendChunks(skinId, 1, modelBytes);
+                    sendChunks(networkId, 0, texBytes);
+                    sendChunks(networkId, 1, modelBytes);
                 }
             } catch (Throwable ignored) {
             }
@@ -345,7 +342,7 @@ public final class SkinSyncClient {
         return ResourceLocation.fromNamespaceAndPath("legacy", "box_models/" + skinId + ".json");
     }
 
-private static void sendChunks(String skinId, int type, byte[] bytes) {
+    private static void sendChunks(String skinId, int type, byte[] bytes) {
         if (skinId == null || skinId.isBlank()) return;
         if (bytes == null) bytes = new byte[0];
         int max = SkinSync.UploadAssetChunkC2S.MAX_CHUNK;
@@ -369,7 +366,7 @@ private static void sendChunks(String skinId, int type, byte[] bytes) {
         }
     }
 
-private static byte[] loadBytes(Minecraft mc, ResourceLocation rl) {
+    private static byte[] loadBytes(Minecraft mc, ResourceLocation rl) {
         try {
             if (mc == null || rl == null) return new byte[0];
             Resource res = mc.getResourceManager().getResource(rl).orElse(null);
@@ -452,8 +449,40 @@ private static byte[] loadBytes(Minecraft mc, ResourceLocation rl) {
         ClientSkinCache.set(uuid, skinId);
     }
 
-public static void onSyncSkin(UUID uuid, String skinId) {
+    public static void onSyncSkin(UUID uuid, String skinId) {
         receivedAnySyncSinceJoin = true;
+        Minecraft mc = Minecraft.getInstance();
+        String localExternal = resolveLocalExternalSelectionId(mc, uuid);
+        if (localExternal != null) {
+            cacheLocalSelection(mc, localExternal);
+            return;
+        }
         ClientSkinCache.set(uuid, skinId);
+    }
+
+    private static String normalizeNetworkSkinId(String skinId) {
+        String id = skinId == null ? "" : skinId;
+        if (ExternalSkinProviders.isExternalSkinId(id)) return "";
+        return id;
+    }
+
+    private static void cacheLocalSelection(Minecraft client, String skinId) {
+        if (client == null) return;
+        if (client.player != null) ClientSkinCache.set(client.player.getUUID(), skinId);
+        if (client.getUser() != null) ClientSkinCache.set(client.getUser().getProfileId(), skinId);
+    }
+
+    private static String resolveLocalExternalSelectionId(Minecraft client, UUID syncedUuid) {
+        if (client == null || syncedUuid == null) return null;
+
+        UUID playerId = client.player != null ? client.player.getUUID() : null;
+        UUID userId = client.getUser() != null ? client.getUser().getProfileId() : null;
+        if (!syncedUuid.equals(playerId) && !syncedUuid.equals(userId)) return null;
+
+        try {
+            return ExternalSkinProviders.getCurrentSelectedSkinId();
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 }

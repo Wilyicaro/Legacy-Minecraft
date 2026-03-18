@@ -1,8 +1,11 @@
 package wily.legacy.Skins;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.Skins.client.compat.ExternalSkinProviders;
+import wily.legacy.Skins.client.compat.bedrockskins.BedrockSkinsCompat;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.client.util.ViewBobbingSkinOverride;
 import wily.legacy.Skins.skin.SkinPackLoader;
@@ -21,12 +24,14 @@ public final class SkinsClientBootstrap {
 
     public static void initClient() {
         SkinSyncClient.initClient();
+        ExternalSkinProviders.logCapabilitiesOnce();
 
         Legacy4JClient.whenResetOptions.add(ConsoleSkinsClientSettings::resetToDefaults);
 
         Legacy4JClient.whenResetOptions.add(() -> {
             try {
                 Minecraft mc = Minecraft.getInstance();
+                ExternalSkinProviders.clearAllSelectedSkins();
                 SkinPackLoader.setLastUsedCustomPackId(null);
                 SkinSyncClient.requestSetSkin(mc, "");
                 ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
@@ -75,6 +80,7 @@ public final class SkinsClientBootstrap {
             }
         }
 
+        BedrockSkinsCompat.redirectLegacyScreenIfNeeded(minecraft);
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
 
@@ -93,6 +99,9 @@ public final class SkinsClientBootstrap {
                                 existing = wily.legacy.Skins.skin.ClientSkinPersistence.load(uid);
                             } catch (Throwable ignored) {
                             }
+                        }
+                        if (existing == null || existing.isBlank()) {
+                            existing = ExternalSkinProviders.getCurrentSelectedSkinId();
                         }
                         if (existing == null || existing.isBlank()) {
                             SkinPackLoader.setLastUsedCustomPackId(null);
@@ -127,15 +136,26 @@ public final class SkinsClientBootstrap {
         }
     }
 
-    public static void requestOpenChangeSkinScreen(Minecraft minecraft, net.minecraft.client.gui.screens.Screen parent) {
+    public static Screen createChangeSkinScreen(Screen parent) {
+        try {
+            SkinPackLoader.ensureLoaded();
+        } catch (Throwable ignored) {
+        }
+
+        try {
+            if (ConsoleSkinsClientSettings.isTu3ChangeSkinScreen()) {
+                return new wily.legacy.Skins.client.screen.TU3ChangeSkinScreen(parent);
+            }
+            return new wily.legacy.Skins.client.screen.ChangeSkinScreen(parent);
+        } catch (Throwable ignored) {
+            return parent;
+        }
+    }
+
+    public static void requestOpenChangeSkinScreen(Minecraft minecraft, Screen parent) {
         try {
             if (minecraft == null) return;
-            SkinPackLoader.ensureLoaded();
-            if (wily.legacy.Skins.client.util.ConsoleSkinsClientSettings.isTu3ChangeSkinScreen()) {
-                minecraft.setScreen(new wily.legacy.Skins.client.screen.TU3ChangeSkinScreen(parent));
-            } else {
-                minecraft.setScreen(new wily.legacy.Skins.client.screen.ChangeSkinScreen(parent));
-            }
+            minecraft.setScreen(createChangeSkinScreen(parent));
         } catch (Throwable ignored) {
         }
     }

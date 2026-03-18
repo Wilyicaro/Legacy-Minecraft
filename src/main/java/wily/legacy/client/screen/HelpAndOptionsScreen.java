@@ -28,10 +28,13 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
             s -> Panel.centered(s, 250, 150),
             new ArrayList<>(List.of(o -> {
                 List<AbstractWidget> widgets = createPlayerSkinWidgets();
-                int customCount = Math.min(4, widgets.size());
+                int vanillaCount = PlayerModelPart.values().length + 1;
+                int customCount = Math.max(0, widgets.size() - vanillaCount);
 
-                o.renderableVList.addCategory(Component.literal("Custom Skin Settings"));
-                for (int i = 0; i < customCount; i++) o.renderableVList.addRenderable(widgets.get(i));
+                if (customCount > 0) {
+                    o.renderableVList.addCategory(Component.literal("Legacy4J Skin Options"));
+                    for (int i = 0; i < customCount; i++) o.renderableVList.addRenderable(widgets.get(i));
+                }
 
                 o.renderableVList.addCategory(Component.literal("Minecraft Skin Settings"));
                 for (int i = customCount; i < widgets.size(); i++) o.renderableVList.addRenderable(widgets.get(i));
@@ -65,12 +68,40 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         List<AbstractWidget> list = new ArrayList<>();
         for (PlayerModelPart p : PlayerModelPart.values()) {
             list.add(new TickBox(0, 0, Minecraft.getInstance().options.isModelPartEnabled(p), b -> p.getName(), b -> null, t -> {
-                Minecraft.getInstance().options./*? if <1.21.2 {*//*toggleModelPart*//*?} else {*/setModelPart/*?}*/(p, t.selected);
+                Minecraft.getInstance().options.setModelPart(p, t.selected);
                 Minecraft.getInstance().options.save();
             }));
         }
         list.add(LegacyConfigWidgets.createWidget(LegacyOptions.of(Minecraft.getInstance().options.mainHand())));
         return list;
+    }
+
+    public static Screen buildChangeSkinOptionsScreen(Screen parent) {
+        try {
+            return CHANGE_SKIN.build(parent);
+        } catch (Throwable ignored) {
+            return buildFallbackChangeSkinOptionsScreen(parent);
+        }
+    }
+
+    private static Screen buildFallbackChangeSkinOptionsScreen(Screen parent) {
+        return new OptionsScreen(parent, new OptionsScreen.Section(
+                Component.translatable("legacy.menu.change_skin"),
+                s -> Panel.centered(s, 250, 150),
+                new ArrayList<>(List.of(o -> {
+                    List<AbstractWidget> widgets = createPlayerSkinWidgets();
+                    int vanillaCount = PlayerModelPart.values().length + 1;
+                    int customCount = Math.max(0, widgets.size() - vanillaCount);
+
+                    if (customCount > 0) {
+                        o.renderableVList.addCategory(Component.literal("Legacy4J Skin Options"));
+                        for (int i = 0; i < customCount; i++) o.renderableVList.addRenderable(widgets.get(i));
+                    }
+
+                    o.renderableVList.addCategory(Component.literal("Minecraft Skin Settings"));
+                    for (int i = customCount; i < widgets.size(); i++) o.renderableVList.addRenderable(widgets.get(i));
+                }))
+        ));
     }
 
 }

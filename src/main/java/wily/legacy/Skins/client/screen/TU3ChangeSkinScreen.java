@@ -30,6 +30,56 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 
 public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
+    private record Tu3LayoutMetrics(
+            float topStripScale,
+            int bottomStripBaseHeight,
+            float greyHeightRatio,
+            int tabInsetNumerator,
+            int midExtra,
+            int activeTabLift,
+            float carouselScale,
+            float carouselSpacing,
+            int panelTopOffset,
+            int tooltipWidthOverscan,
+            int tooltipBottomOverscan,
+            int carouselPad,
+            int namePlateBaseHeight,
+            int namePlateTopMargin,
+            int namePlateBottomMargin,
+            float badgeWidthRatio,
+            int badgeBaseHeight,
+            int badgeYOffset,
+            float badgeScale,
+            int tabLabelWidthTrim,
+            int centerOriginYOffset,
+            int spawnerExtraMin,
+            float spawnerExtraFactor
+    ) {
+        static final Tu3LayoutMetrics DEFAULT = new Tu3LayoutMetrics(
+                0.60f, 20, 0.67f,
+                105, 11, 2,
+                1.5f, 1.1f,
+                45, 23, 90,
+                6,
+                16, 4, 8,
+                0.52f, 12, 4, 0.75f,
+                16,
+                20, 10, 0.35f
+        );
+
+        static final Tu3LayoutMetrics SD_480 = new Tu3LayoutMetrics(
+                0.48f, 14, 0.60f,
+                84, 8, 1,
+                1.28f, 0.95f,
+                34, 18, 72,
+                4,
+                14, 3, 6,
+                0.48f, 10, 3, 0.70f,
+                12,
+                12, 8, 0.25f
+        );
+    }
+
 
     
     private static final ResourceLocation TU3_TOP_STRIP      = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip");
@@ -39,11 +89,6 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final ResourceLocation TU3_SELECTED_BADGE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
 
     
-    private static final float TU3_CAROUSEL_SCALE   = 1.5f;
-    private static final float TU3_CAROUSEL_SPACING = 1.1f;
-
-    // Precomputed layout: reused by rendering.
-
     private int layoutX, layoutY, layoutW, layoutH;
     private int tu3StripY, tu3StripH;
     private int tu3BottomStripY, tu3BottomStripH;
@@ -54,16 +99,20 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     
 
     private boolean lastPendingSwap;
+    private Tu3LayoutMetrics tu3Layout = Tu3LayoutMetrics.DEFAULT;
 
 
     public TU3ChangeSkinScreen(Screen parent) {
         super(parent);
     }
 
+    private void refreshTu3Layout() {
+        tu3Layout = isCompact480() ? Tu3LayoutMetrics.SD_480 : Tu3LayoutMetrics.DEFAULT;
+    }
+
 
     @Override
     protected Panel createTooltipBox() {
-        
         return new Panel(UIAccessor.of(this)) {
             @Override public void init(String name) { super.init(name); }
             @Override public void init()            { init("tooltipBox"); }
@@ -73,7 +122,6 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     protected void onWidgetListCreated(PlayerSkinWidgetList list) {
-        
         if (list != null) list.setAlwaysVirtualCarousel(true);
     }
 
@@ -92,15 +140,14 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void renderableVListInit() {
         packList.refreshPackIdsIfNeeded();
         packList.populateInto(getRenderableVList());
-        // Pack names are rendered in.
         getRenderableVList().scrollArrowYOffset(0);
         getRenderableVList().init("consoleskins.packList.tu3.hidden", -100000, -100000, 1, 1);
     }
 
     @Override
     protected void panelInit() {
-        uiScale      = computeScale(width, height);
-        tooltipWidth = Math.max(1, Math.round(BASE_TOOLTIP_WIDTH * uiScale));
+        refreshSharedLayout();
+        refreshTu3Layout();
         renderableVList.layoutSpacing(l -> 0);
         packList.applyUiScale(uiScale);
 
@@ -111,13 +158,12 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         layoutX = 0;
         layoutW = Math.max(1, width);
 
-        float topScale    = 0.6f;
-        tu3StripH         = Math.max(1, Math.round(62f * uiScale * topScale));
-        tu3BottomStripH   = Math.max(1, Math.round(20f * uiScale));
+        tu3StripH         = Math.max(1, Math.round(62f * uiScale * tu3Layout.topStripScale()));
+        tu3BottomStripH   = Math.max(1, Math.round(tu3Layout.bottomStripBaseHeight() * uiScale));
 
         int maxGrey    = height - tu3StripH - tu3BottomStripH;
         if (maxGrey < 1) maxGrey = 1;
-        int shrunkGrey = Math.max(1, Math.round(maxGrey * 0.67f));
+        int shrunkGrey = Math.max(1, Math.round(maxGrey * tu3Layout.greyHeightRatio()));
         int blockH     = tu3StripH + shrunkGrey + tu3BottomStripH;
         tu3StripY      = Math.max(0, (height - blockH) / 2);
 
@@ -131,9 +177,9 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         tu3BottomStripY  = Math.max(layoutY + 1, Math.min(height - tu3BottomStripH, layoutY + shrunkGrey));
         layoutH          = Math.max(1, tu3BottomStripY - layoutY);
 
-        int off45 = Math.round(45 * uiScale);
-        int off23 = Math.round(23 * uiScale);
-        int off90 = Math.round(90 * uiScale);
+        int off45 = Math.round(tu3Layout.panelTopOffset() * uiScale);
+        int off23 = Math.round(tu3Layout.tooltipWidthOverscan() * uiScale);
+        int off90 = Math.round(tu3Layout.tooltipBottomOverscan() * uiScale);
 
         panel.pos(layoutX, layoutY - off45);
         panel.size(1, layoutH);
@@ -159,7 +205,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     
     private void computeTu3Tabs() {
-        int inset = Math.round((105f / 1280f) * width);
+        int inset = Math.round((tu3Layout.tabInsetNumerator() / 1280f) * width);
         if (inset < 0) inset = 0;
         int left  = inset;
         int total = width - inset * 2;
@@ -178,7 +224,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         return s == null ? "" : s;
     }
 
-    private int tu3MidExtra() { return Math.max(1, sc(11)); }
+    private int tu3MidExtra() { return Math.max(1, sc(tu3Layout.midExtra())); }
 
     private int wrapPackIndex(int idx) {
         int n = packList.getPackCount();
@@ -196,7 +242,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private void renderTu3Tabs(GuiGraphics g) {
         computeTu3Tabs();
-        int midExtra = tu3MidExtra(), shiftUpPx = 2;
+        int midExtra = tu3MidExtra(), shiftUpPx = tu3Layout.activeTabLift();
         int baseY    = tu3TabY - shiftUpPx;
         int midY     = baseY - midExtra, midH = tu3TabH + midExtra;
         blitSprite(g, TU3_TAB_PLATE, tu3TabMidX, midY, Math.max(1, tu3TabMidW), midH);
@@ -211,19 +257,21 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private void renderTu3TabLabel(GuiGraphics g, int x, int w, int y, String label, int color) {
         if (label == null) label = "";
-        int maxPx = Math.max(1, w - sc(16));
+        int maxPx = Math.max(1, w - sc(tu3Layout.tabLabelWidthTrim()));
         String show = label;
+        show = show.replace("\u00E2\u20AC\u00A6", "...");
         if (minecraft.font.width(show) > maxPx) {
             int ellW = minecraft.font.width("…");
             show = minecraft.font.plainSubstrByWidth(show, Math.max(0, maxPx - ellW)) + "…";
         }
+        show = show.replace("\u00E2\u20AC\u00A6", "...");
         g.drawCenteredString(minecraft.font, Component.literal(show), x + Math.max(1, w) / 2, y, color);
     }
 
     
     private void applyTu3CarouselTuning() {
         if (playerSkinWidgetList == null) return;
-        playerSkinWidgetList.setCarouselTuning(TU3_CAROUSEL_SCALE, TU3_CAROUSEL_SPACING);
+        playerSkinWidgetList.setCarouselTuning(tu3Layout.carouselScale(), tu3Layout.carouselSpacing());
 
         SkinPack p   = actions.getFocusedPack();
         boolean fav  = p != null && SkinIdUtil.isFavouritesPack(p.id());
@@ -231,12 +279,12 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         playerSkinWidgetList.clearLinearCarousel();
 
         
-        float mult = TU3_CAROUSEL_SCALE;
+        float mult = tu3Layout.carouselScale();
         float s0 = 0.935f * uiScale * mult, s1 = 0.77f * uiScale * mult;
         float s2 = 0.605f * uiScale * mult, s3 = 0.44f * uiScale * mult;
         float w0 = 106f * s0, w1 = 106f * s1, w2 = 106f * s2, w3 = 106f * s3;
 
-        int   pad       = Math.max(1, sc(6));
+        int   pad       = Math.max(1, sc(tu3Layout.carouselPad()));
         float available = Math.max(1f, (float) layoutW - pad * 2f);
         float sum       = w0 + (w1 + w2 + w3) * 2f;
         float gap       = (available - sum) / 6f;
@@ -250,7 +298,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         float cP1 = c0  + w0 / 2f + gap + w1 / 2f;
         float cP2 = cP1 + w1 / 2f + gap + w2 / 2f;
         float cP3 = cP2 + w2 / 2f + gap + w3 / 2f;
-        float spawnerExtra = Math.max(10f * uiScale, w3 * 0.35f);
+        float spawnerExtra = Math.max(tu3Layout.spawnerExtraMin() * uiScale, w3 * tu3Layout.spawnerExtraFactor());
         float cM4 = cM3 - (w3 / 2f + gap + w3 / 2f) - spawnerExtra;
         float cP4 = cP3 + (w3 / 2f + gap + w3 / 2f) + spawnerExtra;
 
@@ -262,10 +310,10 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
         
         int   baseCenterW    = Math.round(106f * 0.935f * uiScale);
-        int   dx             = Math.round(baseCenterW * (TU3_CAROUSEL_SCALE - 1f) / 2f);
+        int   dx             = Math.round(baseCenterW * (tu3Layout.carouselScale() - 1f) / 2f);
         float areaCenter     = (layoutY + tu3BottomStripY) / 2f;
         float centerH        = 150f * s0;
-        int   desiredOriginY = Math.round(areaCenter - (centerH / 2f) - 20f * uiScale);
+        int   desiredOriginY = Math.round(areaCenter - (centerH / 2f) - tu3Layout.centerOriginYOffset() * uiScale);
 
         playerSkinWidgetList.setOrigin(playerSkinWidgetList.x - dx, desiredOriginY);
         playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index, true);
@@ -327,7 +375,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (e.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             computeTu3Tabs();
             double mx = e.x(), my = e.y();
-            int midExtra = tu3MidExtra(), shiftUpPx = 2;
+            int midExtra = tu3MidExtra(), shiftUpPx = tu3Layout.activeTabLift();
             int midY = tu3TabY - shiftUpPx - midExtra, midH = tu3TabH + midExtra;
 
             if (inside(mx, my, tu3TabLeftX,  tu3TabY, Math.max(1, tu3TabLeftW),  tu3TabH)) { packList.setFocusedPackIndex(packList.getFocusedPackIndex() - 1, true); return true; }
@@ -391,7 +439,6 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         } else {
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_TRIGGER), InputConstants.KEY_W, state);
         }
-        manager.simulateKeyAction(s -> s.is(ControllerBinding.TOUCHPAD_BUTTON), InputConstants.KEY_T,  state);
         manager.simulateKeyAction(s -> s.is(ControllerBinding.CAPTURE),         InputConstants.KEY_F2, state);
     }
 
@@ -403,9 +450,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         boolean wasPending = false;
         try { wasPending = actions.isPendingSwap(); } catch (Throwable ignored) {}
 
-        if (sharedTick()) return; 
+        if (sharedTick()) return;
 
-        // Swap resolves async; this is.
         boolean isPending = false;
         try { isPending = actions.isPendingSwap(); } catch (Throwable ignored) {}
         if ((wasPending || lastPendingSwap) && !isPending) applyTu3CarouselTuning();
@@ -417,40 +463,33 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
 
-        
         renderTu3TabsBehindStrip(g);
 
         if (tu3StripH > 0) blitSprite(g, TU3_TOP_STRIP, 0, tu3StripY, Math.max(1, width), Math.max(1, tu3StripH));
 
-        
-        // without a hard edge, matching.
         g.fill(0, tu3StripY + tu3StripH, Math.max(1, width), Math.max(tu3StripY + tu3StripH + 1, tu3BottomStripY), 0x880D0D0D);
 
         if (tu3BottomStripH > 0) blitSprite(g, TU3_BOTTOM_STRIP, 0, tu3BottomStripY, Math.max(1, width), Math.max(1, tu3BottomStripH));
 
-        // Widgets render themselves, so we.
-        
-        int pad = sc(4);
+        int pad = sc(tu3Layout.carouselPad());
         PlayerSkinWidget.setCarouselClip(layoutX + pad, layoutY + pad, layoutX + layoutW - pad, tu3BottomStripY - pad);
         PlayerSkinWidget.setCarouselYawDenom(Math.max(1f, 240f * uiScale));
 
-        // Rendered after the strip so.
-        
         renderTu3Tabs(g);
 
         
         
         
-        int plateH = Math.max(1, Math.round(16f * uiScale) * 2);
-        int plateY = Math.max(tu3StripY + tu3StripH + Math.max(1, sc(4)), tu3BottomStripY - Math.max(1, sc(8)) - plateH);
+        int plateH = Math.max(1, Math.round(tu3Layout.namePlateBaseHeight() * uiScale) * 2);
+        int plateY = Math.max(tu3StripY + tu3StripH + Math.max(1, sc(tu3Layout.namePlateTopMargin())), tu3BottomStripY - Math.max(1, sc(tu3Layout.namePlateBottomMargin())) - plateH);
         PlayerSkinWidget.setCenterNamePlate(true, tu3TabMidW, plateH, 0, plateY);
         PlayerSkinWidget.setCenterNamePlateCenterX(width / 2);
         PlayerSkinWidget.setCenterNamePlateSprite(TU3_NAME_PLATE);
-        int badgeW = Math.max(1, Math.round(tu3TabMidW * 0.52f));
-        int badgeH = Math.max(1, Math.round(12f * uiScale));
-        PlayerSkinWidget.setCenterSelectedBadge(true, badgeW, badgeH, Math.max(0, sc(4)), 0.75f, TU3_SELECTED_BADGE);
+        int badgeW = Math.max(1, Math.round(tu3TabMidW * tu3Layout.badgeWidthRatio()));
+        int badgeH = Math.max(1, Math.round(tu3Layout.badgeBaseHeight() * uiScale));
+        PlayerSkinWidget.setCenterSelectedBadge(true, badgeW, badgeH, Math.max(0, sc(tu3Layout.badgeYOffset())), tu3Layout.badgeScale(), TU3_SELECTED_BADGE);
     }
 
     @Override
@@ -461,9 +500,13 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
             String id = playerSkinWidgetList != null && playerSkinWidgetList.element3 != null ? playerSkinWidgetList.element3.skinId.get() : null;
             return id != null && FavoritesStore.isFavorite(id) ? Component.literal("Remove Favorite") : Component.literal("Add Favorite");
         });
+        addPreviewControlTooltips(r);
         r.add(() -> ControlType.getActiveType().isKbm()
                 ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
                 : ControllerBinding.LEFT_STICK.bindingState.getIcon(), () -> Component.literal("Navigate"));
+        if (canUsePackFilter()) {
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_T) : ControllerBinding.BACK.bindingState.getIcon(), this::currentPackFilterLabel);
+        }
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> Component.literal("Advanced Options"));
     }
 

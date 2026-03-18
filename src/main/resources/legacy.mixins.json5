@@ -20,6 +20,10 @@
     //?}
     //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
+    "compat.legacyskins.LegacySkinsClientMixin",
+    "compat.legacyskins.cpm.LegacySkinsCpmPreviewMixin",
+    "compat.legacyskins.cpm.LegacySkinsCpmPoseMixin",
+    "compat.legacyskins.cpm.LegacySkinsCpmRenderCollectorMixin",
     //?}
     //? if fabric {
     "client.TerrainRenderContextMixin",
@@ -192,6 +196,7 @@
     "skins.client.UpsideDownMixin",
     "skins.client.SkinTickMixin",
     "skins.client.SkinsOptionMixin",
+    "skins.client.HelpAndOptionsChangeSkinButtonMixin",
     "skins.client.SkipDrawAccessor",
     "skins.client.SkipRenderMixin",
     "skins.client.PlayerPartsMixin",

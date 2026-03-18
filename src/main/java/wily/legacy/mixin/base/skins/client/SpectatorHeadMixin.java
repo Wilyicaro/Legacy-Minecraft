@@ -34,12 +34,10 @@ import java.util.List;
 @Mixin(LivingEntityRenderer.class)
 public abstract class SpectatorHeadMixin {
 
-    // Cached reflection for isSpectator - resolved once, reused every frame
     private static volatile boolean consoleskins$triedResolveSpectator;
     private static volatile Field consoleskins$spectatorField;
     private static volatile Method consoleskins$spectatorMethod;
 
-    // Cached reflection for extracting texture from PlayerSkin
     private static volatile boolean consoleskins$triedResolveSkinTexture;
     private static volatile Method consoleskins$skinTextureMethod;
     private static volatile Field consoleskins$skinTextField;

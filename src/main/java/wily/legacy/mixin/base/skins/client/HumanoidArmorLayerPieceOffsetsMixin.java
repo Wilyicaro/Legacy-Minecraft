@@ -42,9 +42,6 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
     @Unique private Set<ModelPart> consoleskins$cachedArmorParts;
     @Unique private boolean consoleskins$cachedArmorPartsFailed;
 
-    // -----------------------------------------------------------------------
-    // helpers
-    // -----------------------------------------------------------------------
 
     @Unique
     private RenderLayerParent<?, ?> consoleskins$getRenderer() {
@@ -102,11 +99,6 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
         }
     }
 
-    /**
-     * Collect ModelParts that belong to the armor models only, explicitly
-     * skipping the RenderLayerParent field (which leads to the player model).
-     * Any parts shared with the player model are removed as a final safety step.
-     */
     @Unique
     private void consoleskins$collectArmorOnlyParts(Set<ModelPart> out, Set<Object> visited) {
         RenderLayerParent<?, ?> renderer = consoleskins$getRenderer();
@@ -120,7 +112,7 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
         while (c != null && c != Object.class) {
             for (Field f : c.getDeclaredFields()) {
                 if (f.isSynthetic()) continue;
-                if (RenderLayerParent.class.isAssignableFrom(f.getType())) continue; // skip player renderer
+                if (RenderLayerParent.class.isAssignableFrom(f.getType())) continue;
                 Class<?> ft = f.getType();
                 if (ft.isPrimitive() || ft == String.class || ft == Class.class) continue;
                 try {
@@ -160,9 +152,6 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
         catch (Throwable ignored) {}
     }
 
-    // -----------------------------------------------------------------------
-    // Main inject
-    // -----------------------------------------------------------------------
 
     @Inject(method = "renderArmorPiece", at = @At("HEAD"), require = 0, cancellable = true)
     private void consoleskins$pushArmorOffsets(PoseStack poseStack, SubmitNodeCollector nodeCollector,
@@ -269,7 +258,6 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
             try { if (Boolean.TRUE.equals(ArmorOffsetContext.POSE_PUSHED.get())) poseStack.popPose(); }
             catch (Throwable ignored) {}
         }
-        // forceRender intentionally NOT cleared — must survive until deferred batch calls render()
         consoleskins$clearContext();
     }
 }

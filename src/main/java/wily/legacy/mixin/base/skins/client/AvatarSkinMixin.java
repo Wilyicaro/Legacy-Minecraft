@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.skins.client;
 
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.Skins.client.compat.bedrockskins.BedrockSkinsCompat;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
@@ -32,6 +33,15 @@ public abstract class AvatarSkinMixin {
     @Unique
     private static void consoleskins$applySkinToState(Avatar avatar, AvatarRenderState state) {
         try {
+            if (state instanceof RenderStateSkinIdAccess access) {
+                consoleskins$clearSkinState(access);
+            }
+
+            if (BedrockSkinsCompat.isBedrockPreviewPlayer(avatar)) {
+                BedrockSkinsCompat.applyPreviewRenderState(avatar, state);
+                return;
+            }
+
             String name = null;
             try {
                 name = avatar.getScoreboardName();
@@ -52,6 +62,7 @@ public abstract class AvatarSkinMixin {
 
             if (skinId == null || skinId.isBlank()) return;
             if ("auto_select".equals(skinId)) return;
+            if (BedrockSkinsCompat.isBedrockSkinId(skinId)) return;
 
             if (state instanceof RenderStateSkinIdAccess a) {
                 a.consoleskins$setSkinId(skinId);
@@ -107,9 +118,6 @@ public abstract class AvatarSkinMixin {
 
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
 
-            // Cache the entry and resolved texture/model on the render state so
-            // downstream mixins (PlayerPartsMixin, ModelOffsetsMixin, BoxAddonLayer,
-            // ArmorOffsetsMixin) don't repeat these lookups.
             if (state instanceof RenderStateSkinIdAccess acc) {
                 acc.consoleskins$setCachedEntry(entry);
 
@@ -134,7 +142,6 @@ public abstract class AvatarSkinMixin {
                 }
             }
 
-            // Determine if cape should show
             boolean wantCape = entry != null && entry.cape() != null;
             if (wantCape) {
                 try {
@@ -145,13 +152,28 @@ public abstract class AvatarSkinMixin {
 
             state.showCape = wantCape;
 
-            // Use cached PlayerSkin to avoid per-frame allocation of ResourceTexture + PlayerSkin
             PlayerSkin cachedSkin = ClientSkinAssets.getCachedPlayerSkin(skinId, entry, wantCape);
             if (cachedSkin == null) return;
 
             state.skin = cachedSkin;
         } catch (Throwable ignored) {
         }
+    }
+
+    @Unique
+    private static void consoleskins$clearSkinState(RenderStateSkinIdAccess access) {
+        if (access == null) return;
+        access.consoleskins$setSkinId(null);
+        access.consoleskins$setEntityUuid(null);
+        access.consoleskins$setMoving(false);
+        access.consoleskins$setMoveSpeedSq(0.0F);
+        access.consoleskins$setSitting(false);
+        access.consoleskins$setUsingItem(false);
+        access.consoleskins$setBlocking(false);
+        access.consoleskins$setCachedEntry(null);
+        access.consoleskins$setCachedTexture(null);
+        access.consoleskins$setCachedModelId(null);
+        access.consoleskins$setCachedBoxModel(null);
     }
 
     @Inject(

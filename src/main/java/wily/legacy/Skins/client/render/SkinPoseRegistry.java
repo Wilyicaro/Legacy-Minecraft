@@ -51,10 +51,6 @@ public final class SkinPoseRegistry {
 
     private static final Object LOCK = new Object();
 
-    /**
-     * Volatile references allow lock-free reads on the render thread.
-     * Writers (addSelector/addRuntimeSelector/clearRuntime) still synchronize.
-     */
     private static volatile Map<PoseTag, List<Selector>> ACTIVE = empty();
     private static volatile Map<PoseTag, List<Selector>> RUNTIME = empty();
     private static Map<PoseTag, List<Selector>> STAGING = empty();
@@ -130,13 +126,9 @@ public final class SkinPoseRegistry {
     public static boolean hasPose(PoseTag tag, String skinId) {
         if (tag == null || skinId == null || skinId.isEmpty()) return false;
 
-        // Lock-free volatile reads — ACTIVE and RUNTIME are replaced atomically
-        // with frozen immutable lists, so no synchronization needed for reads.
         List<Selector> sels = ACTIVE.get(tag);
         List<Selector> rt = RUNTIME.get(tag);
 
-        // Fast path: skinIds from our system are already trimmed, skip normalize()
-        // for the common case. Only normalize if the id might need a namespace prefix.
         String id = skinId.indexOf(' ') >= 0 ? skinId.trim() : skinId;
         if (id.isEmpty()) return false;
 

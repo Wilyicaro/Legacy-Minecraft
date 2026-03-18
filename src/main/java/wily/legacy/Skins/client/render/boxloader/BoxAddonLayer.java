@@ -27,7 +27,6 @@ import java.util.UUID;
 
 public class BoxAddonLayer extends RenderLayer {
 
-    // Cached reflection for isInvisible - resolved once, reused every frame
     private static volatile boolean triedResolveInvisible;
     private static volatile Field cachedInvisibleField;
     private static volatile Method cachedInvisibleMethod;
@@ -48,7 +47,6 @@ public class BoxAddonLayer extends RenderLayer {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        // Use values cached on the render state by AvatarSkinMixin.extractRenderState
         ResourceLocation texture = a.consoleskins$getCachedTexture();
         if (texture == null) {
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
@@ -99,7 +97,6 @@ public class BoxAddonLayer extends RenderLayer {
     }
 
     private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
-        // Use cached reflection instead of per-frame getField/getMethod
         if (!triedResolveInvisible) {
             synchronized (BoxAddonLayer.class) {
                 if (!triedResolveInvisible) {

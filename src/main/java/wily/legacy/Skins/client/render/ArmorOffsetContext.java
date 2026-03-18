@@ -5,7 +5,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 
 public final class ArmorOffsetContext {
 
-    /* * The equipment slot currently. */
     public static final ThreadLocal<EquipmentSlot> CURRENT_SLOT = new ThreadLocal<>();
 
     

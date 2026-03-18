@@ -24,7 +24,6 @@ public class PlayerSkinWidgetList {
     public PlayerSkinWidget element4;
     public PlayerSkinWidget element5;
     public PlayerSkinWidget element6;
-    private static final int VERTICAL_OFFSET = 10;
     private static final int OFFSET = 80;
     private static final float FACING_FROM_LEFT = -45f;
     private static final float FACING_FROM_RIGHT = 45f;
@@ -42,6 +41,7 @@ public class PlayerSkinWidgetList {
     private static final float LEGACY_DY_2 = 53f / 294f;
     private static final float LEGACY_DY_3 = 72f / 294f;
     private static final float LEGACY_DY_4 = 87f / 294f;
+    private static final int[] VISIBLE_OFFSETS = new int[]{0, -1, 1, -2, 2, -3, 3, -4, 4};
     private float uiScale = 1f;
     private float carouselScaleMultiplier = 1f;
     private float carouselSpacingMultiplier = 1f;
@@ -347,24 +347,17 @@ public class PlayerSkinWidgetList {
             }
         }
         this.index = wrappedIndex;
-        element0 = element1 = element2 = element4 = element5 = element6 = null;
+        clearVisibleElements();
         element3 = getWrappedNonVirtual(this.index);
         Set<PlayerSkinWidget> used = new HashSet<>();
-        int[] offsets = {0, -1, 1, -2, 2, -3, 3, -4, 4};
-        for (int offset : offsets) {
+        for (int offset : VISIBLE_OFFSETS) {
             PlayerSkinWidget w = getWrappedNonVirtual(this.index + offset);
             if (w == null || used.contains(w)) continue;
             used.add(w);
             if (offset != 0) w.resetPoseState();
             setupSlot(w, offset);
             w.prewarm();
-            if (offset == 0) element3 = w;
-            else if (offset == -1) element2 = w;
-            else if (offset == -2) element1 = w;
-            else if (offset == -3) element0 = w;
-            else if (offset == 1) element4 = w;
-            else if (offset == 2) element5 = w;
-            else if (offset == 3) element6 = w;
+            assignVisibleElement(offset, w);
         }
         for (int i = 0; i < n && i < widgets.size(); i++) {
             PlayerSkinWidget w = widgets.get(i);
@@ -390,7 +383,7 @@ public class PlayerSkinWidgetList {
         int delta = requestedIndex - this.index;
         this.index = wrappedIndex;
         if (!instant) {
-            boolean sparse = n > 0 && n < 7;
+            boolean sparse = isSparseCarousel(n);
             if (sparse && (delta == 1 || delta == -1)) {
                 int visible = n;
                 int startOff = -visible / 2;
@@ -424,8 +417,7 @@ public class PlayerSkinWidgetList {
                 }
             }
         }
-        element0 = element1 = element2 = element4 = element5 = element6 = null;
-        element3 = null;
+        clearVisibleElements();
         boolean avoid = avoidRepeatsWhenFew && n <= avoidRepeatsThreshold;
         String[] avoidIds = null;
         if (avoid) {
@@ -451,9 +443,9 @@ public class PlayerSkinWidgetList {
         }
         for (int pos = 0; pos < ring.size(); pos++) {
             int offset = pos - 4;
-            boolean sparse = n > 0 && n < 7;
-            int sparseStart = -Math.max(1, n) / 2;
-            int sparseEnd = sparseStart + Math.max(1, n) - 1;
+            boolean sparse = isSparseCarousel(n);
+            int sparseStart = sparseStartOffset(n);
+            int sparseEnd = sparseEndOffset(n);
             PlayerSkinWidget w = ring.get(pos);
             String id;
             if (sparse && (offset < sparseStart || offset > sparseEnd)) {
@@ -475,18 +467,43 @@ public class PlayerSkinWidgetList {
             if (offset != 0) w.resetPoseState();
             setupSlot(w, offset);
             w.prewarm();
-            if (offset == 0) element3 = w;
-            else if (offset == -1) element2 = w;
-            else if (offset == -2) element1 = w;
-            else if (offset == -3) element0 = w;
-            else if (offset == 1) element4 = w;
-            else if (offset == 2) element5 = w;
-            else if (offset == 3) element6 = w;
+            assignVisibleElement(offset, w);
         }
     }
 
-    private void hideAll() {
+
+    private void clearVisibleElements() {
         element0 = element1 = element2 = element3 = element4 = element5 = element6 = null;
+    }
+
+    private void assignVisibleElement(int offset, PlayerSkinWidget widget) {
+        switch (offset) {
+            case 0 -> element3 = widget;
+            case -1 -> element2 = widget;
+            case -2 -> element1 = widget;
+            case -3 -> element0 = widget;
+            case 1 -> element4 = widget;
+            case 2 -> element5 = widget;
+            case 3 -> element6 = widget;
+            default -> {
+            }
+        }
+    }
+
+    private static boolean isSparseCarousel(int size) {
+        return size > 0 && size < 7;
+    }
+
+    private static int sparseStartOffset(int size) {
+        return -Math.max(1, size) / 2;
+    }
+
+    private static int sparseEndOffset(int size) {
+        return sparseStartOffset(size) + Math.max(1, size) - 1;
+    }
+
+    private void hideAll() {
+        clearVisibleElements();
         for (PlayerSkinWidget w : widgets) {
             w.setSkinId(null);
             w.invisible();
@@ -517,7 +534,7 @@ public class PlayerSkinWidgetList {
         int warp = Math.max(1, Math.round(120 * uiScale));
         int wrapThreshold = Math.max(warp, fin.step * 4);
         int n = skinIds == null ? 0 : skinIds.size();
-        boolean sparse = n > 0 && n < 7;
+        boolean sparse = isSparseCarousel(n);
         boolean wrapCross = sparse && w.visible && lastShiftDir != 0 && prevOffset != 0 && offset != 0
                 && Integer.signum(prevOffset) != Integer.signum(offset);
         boolean wrap = w.visible && (Math.abs(currentX - fin.x) > wrapThreshold || wrapCross);

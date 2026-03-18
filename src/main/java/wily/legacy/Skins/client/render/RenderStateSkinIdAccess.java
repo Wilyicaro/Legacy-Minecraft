@@ -34,19 +34,15 @@ public interface RenderStateSkinIdAccess {
 
     void consoleskins$setBlocking(boolean blocking);
 
-    /** Cached SkinEntry resolved once per frame in extractRenderState. */
     default SkinEntry consoleskins$getCachedEntry() { return null; }
     default void consoleskins$setCachedEntry(SkinEntry entry) {}
 
-    /** Cached texture ResourceLocation resolved once per frame. */
     default ResourceLocation consoleskins$getCachedTexture() { return null; }
     default void consoleskins$setCachedTexture(ResourceLocation tex) {}
 
-    /** Cached model id resolved once per frame. */
     default ResourceLocation consoleskins$getCachedModelId() { return null; }
     default void consoleskins$setCachedModelId(ResourceLocation id) {}
 
-    /** Cached BuiltBoxModel resolved once per frame. */
     default BuiltBoxModel consoleskins$getCachedBoxModel() { return null; }
     default void consoleskins$setCachedBoxModel(BuiltBoxModel model) {}
 }

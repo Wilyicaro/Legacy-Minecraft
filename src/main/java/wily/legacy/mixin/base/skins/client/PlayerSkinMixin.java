@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.skins.client;
 
+import wily.legacy.Skins.client.compat.bedrockskins.BedrockSkinsCompat;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
@@ -26,13 +27,13 @@ public abstract class PlayerSkinMixin {
         String skinId = ClientSkinCache.get(player.getUUID());
 
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
+        if (BedrockSkinsCompat.isBedrockSkinId(skinId)) return;
 
         PlayerSkin original = cir.getReturnValue();
         if (original == null) return;
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
 
-        // Check if cape should be shown (not wearing elytra)
         boolean wantCape = entry != null && entry.cape() != null;
         if (wantCape) {
             try {
@@ -41,7 +42,6 @@ public abstract class PlayerSkinMixin {
             }
         }
 
-        // Use cached PlayerSkin to avoid per-frame allocation of ResourceTexture + PlayerSkin
         PlayerSkin skin = ClientSkinAssets.getCachedPlayerSkin(skinId, entry, wantCape);
         if (skin == null) return;
 

@@ -16,8 +16,8 @@
     },
     {
       "id": "rudolph1",
-      "name": "key:custom.festive.rudolph1",
-      "texture": "skins/rudolph.png",
+      "name": "key:custom.festive.rudolph",
+      "texture": "skins/rudolph1.png",
       "order": 3
     },
     {

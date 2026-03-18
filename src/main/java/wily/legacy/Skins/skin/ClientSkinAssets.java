@@ -26,13 +26,7 @@ public final class ClientSkinAssets {
     private static volatile java.lang.reflect.Method cachedTextureRelease;
     private static volatile boolean triedResolveTextureRelease;
 
-    /**
-     * Cached PlayerSkin objects keyed by skinId, so we don't allocate new
-     * ClientAsset.ResourceTexture + PlayerSkin objects every single frame per player.
-     * Invalidated when textures/models change for a given skinId.
-     */
     private static final Map<String, net.minecraft.world.entity.player.PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
-    /** Cached PlayerSkin variants for skins with capes. Key = skinId + "|cape" */
     private static final Map<String, net.minecraft.world.entity.player.PlayerSkin> SKIN_CACHE_CAPE = new ConcurrentHashMap<>();
 
     private ClientSkinAssets() {
@@ -94,25 +88,14 @@ public final class ClientSkinAssets {
         return null;
     }
 
-    /**
-     * Returns a cached PlayerSkin for the given skinId + cape combination,
-     * avoiding per-frame allocation of ClientAsset.ResourceTexture and PlayerSkin objects.
-     * Returns null if no texture is available for this skinId.
-     *
-     * @param skinId   the skin identifier
-     * @param entry    the SkinEntry (may be null for runtime skins)
-     * @param wantCape whether to include the cape texture
-     */
     public static net.minecraft.world.entity.player.PlayerSkin getCachedPlayerSkin(
             String skinId, SkinEntry entry, boolean wantCape) {
         if (skinId == null || skinId.isBlank()) return null;
 
-        // Choose cache based on whether cape is requested
         Map<String, net.minecraft.world.entity.player.PlayerSkin> cache = wantCape ? SKIN_CACHE_CAPE : SKIN_CACHE;
         net.minecraft.world.entity.player.PlayerSkin cached = cache.get(skinId);
         if (cached != null) return cached;
 
-        // Build the skin
         ResourceLocation tex = TEXTURES.get(skinId);
         if (tex == null && entry != null) tex = entry.texture();
         if (tex == null) return null;
@@ -140,20 +123,12 @@ public final class ClientSkinAssets {
         return skin;
     }
 
-    /**
-     * Invalidates the PlayerSkin cache for the given skinId.
-     * Called when textures or models change.
-     */
     private static void invalidateSkinCache(String skinId) {
         if (skinId == null) return;
         SKIN_CACHE.remove(skinId);
         SKIN_CACHE_CAPE.remove(skinId);
     }
 
-    /**
-     * Resolves a model ResourceLocation from a texture ResourceLocation.
-     * Cached via a static map to avoid per-frame string operations.
-     */
     private static final Map<ResourceLocation, ResourceLocation> MODEL_ID_CACHE = new ConcurrentHashMap<>();
 
     public static ResourceLocation getModelIdFromTexture(ResourceLocation texture) {
@@ -203,7 +178,6 @@ public final class ClientSkinAssets {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null) return;
 
-        // Invalidate the cached PlayerSkin whenever assets change
         invalidateSkinCache(skinId);
 
         if (texturePng != null && texturePng.length > 0) {

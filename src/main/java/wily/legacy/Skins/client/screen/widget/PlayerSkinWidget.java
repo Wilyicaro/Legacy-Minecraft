@@ -2,6 +2,7 @@ package wily.legacy.Skins.client.screen.widget;
 
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.client.util.SkinPreviewWarmup;
+import wily.legacy.Skins.client.compat.ExternalSkinProviders;
 import wily.legacy.Skins.client.gui.GuiDollRender;
 import wily.legacy.Skins.client.gui.GuiSessionSkin;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -33,13 +35,12 @@ public class PlayerSkinWidget extends AbstractWidget {
     private static final float CAROUSEL_INTERP_SMOOTH_MS = 190.0F;
     private static final long CAROUSEL_FPS_FRAME_MS = 16L;
     private static final int CAROUSEL_KEYFRAMES = 15;
-private static volatile boolean CLIP_ENABLED;
+    private static volatile boolean CLIP_ENABLED;
     private static volatile int CLIP_X1;
     private static volatile int CLIP_Y1;
     private static volatile int CLIP_X2;
     private static volatile int CLIP_Y2;
     private static volatile float CAROUSEL_YAW_DENOM = 240.0f;
-    /** Tracks whether carousel scissor is already active, avoiding redundant GPU calls. */
     private static volatile boolean CLIP_ACTIVE;
 
     private static volatile boolean CENTER_NAME_PLATE;
@@ -110,7 +111,7 @@ private static volatile boolean CLIP_ENABLED;
         CLIP_Y1 = y1;
         CLIP_X2 = x2;
         CLIP_Y2 = y2;
-        CLIP_ACTIVE = false; // Will be activated by the first widget that renders
+        CLIP_ACTIVE = false;
     }
 
     public static void clearCarouselClip() {
@@ -126,7 +127,6 @@ private static volatile boolean CLIP_ENABLED;
     public final Supplier<String> skinId;
     private String lastStableId;
     private ResourceLocation lastStableTexture;
-    /** Cached SkinEntry to avoid per-frame map lookups in SkinPackLoader */
     private String cachedEntryId;
     private SkinEntry cachedEntry;
     private final int originalWidth;
@@ -156,7 +156,8 @@ private static volatile boolean CLIP_ENABLED;
     private Float snapRotX;
     private Float snapRotY;
     private Float snapScale;
-    private boolean crouchPose;    private boolean punchLoop;
+    private boolean crouchPose;
+    private boolean punchLoop;
     private int punchCooldown;
 
     private int pendingPoseMode = -1;
@@ -190,14 +191,12 @@ private static volatile boolean CLIP_ENABLED;
 
     public void setSkinId(String id) {
         this.skinIdValue = (id == null || id.isBlank()) ? null : id;
-        // Invalidate entry cache when skin changes
         if (this.skinIdValue == null || !this.skinIdValue.equals(cachedEntryId)) {
             cachedEntryId = null;
             cachedEntry = null;
         }
     }
 
-    /** Returns cached SkinEntry, only doing the map lookup when skinId changes. */
     private SkinEntry getCachedEntry(String id) {
         if (id == null || id.isBlank() || "auto_select".equals(id)) return null;
         if (id.equals(cachedEntryId)) return cachedEntry;
@@ -370,174 +369,181 @@ private static volatile boolean CLIP_ENABLED;
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!visible) return;
-        long now = System.currentTimeMillis();
-        final boolean smoothScroll = ConsoleSkinsClientSettings.isSmoothPreviewScroll();
-        final float interpMs = smoothScroll ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
-        if (smoothScroll) {
-            lastAnimUpdate = now;
-            if (start == 0L) start = now;
-            progress = (now - start) / interpMs;
-            interpolate(progress);
-        } else {
-            if (start == 0L) {
-                start = now;
-                lastStep = -1;
-            }
-            float stepMs = interpMs / (float) CAROUSEL_KEYFRAMES;
-            int step = (int) ((now - start) / stepMs);
-            if (step != lastStep) {
-                lastStep = step;
-                progress = step / (float) CAROUSEL_KEYFRAMES;
+        try {
+            long now = System.currentTimeMillis();
+            final boolean smoothScroll = ConsoleSkinsClientSettings.isSmoothPreviewScroll();
+            final float interpMs = smoothScroll ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
+            if (smoothScroll) {
+                lastAnimUpdate = now;
+                if (start == 0L) start = now;
+                progress = (now - start) / interpMs;
                 interpolate(progress);
-            }
-        }
-
-        // Skip rendering the outermost spawner slots (±4) when not animating.
-        // These are tiny (~40% scale) and used only as slide-in sources during
-        // carousel transitions. Saves 2 entity renders per frame when idle.
-        int absOffset = Math.abs(this.slotOffset);
-        if (absOffset >= 4 && progress > 1f) return;
-
-        int left = this.getX();
-        int top = this.getY();
-        int right = left + this.getWidth();
-        int bottom = top + this.getHeight();
-
-        int renderTop = top;
-        int renderBottom = bottom;
-        if (CLIP_ENABLED) {
-            if (right <= CLIP_X1 || left >= CLIP_X2 || bottom <= CLIP_Y1 || top >= CLIP_Y2) return;
-        }
-        if (absOffset > 4) return;
-        String id = skinId.get();
-        if (id == null) return;
-        float yawOffset = this.rotationY;
-if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
-        float attackTime = 0.0F;
-        if (punchLoop) {
-            long ms = now;
-            long swing = 300L;
-            long phase = ms % (swing + 5L);
-            attackTime = phase < swing ? phase / (float) swing : 0.0F;
-        }
-        int sizeCap = 165;
-        if (CLIP_ENABLED && !CLIP_ACTIVE) {
-            try { guiGraphics.disableScissor(); } catch (Throwable ignored) {}
-            guiGraphics.enableScissor(CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2);
-            CLIP_ACTIVE = true;
-        }
-        if ("auto_select".equals(id)) {
-            var ps = GuiSessionSkin.getSessionPlayerSkin();
-            if (ps != null) {
-                GuiDollRender.renderDollInRect(guiGraphics, id, ps, yawOffset, crouchPose, attackTime, partialTick, left, renderTop, right, renderBottom, sizeCap);
             } else {
-                SkinEntry entry = SkinPackLoader.getSkin(id);
-                if (entry != null) {
-                    GuiDollRender.renderDollInRect(guiGraphics, id, entry.texture(), yawOffset, crouchPose, attackTime, partialTick, left, renderTop, right, renderBottom, sizeCap);
+                if (start == 0L) {
+                    start = now;
+                    lastStep = -1;
+                }
+                float stepMs = interpMs / (float) CAROUSEL_KEYFRAMES;
+                int step = (int) ((now - start) / stepMs);
+                if (step != lastStep) {
+                    lastStep = step;
+                    progress = step / (float) CAROUSEL_KEYFRAMES;
+                    interpolate(progress);
                 }
             }
-        } else {
-            SkinEntry entry = getCachedEntry(id);
-            if (entry != null) {
-                ResourceLocation tex = entry.texture();
-                if (tex != null) {
-                    lastStableId = id;
-                    lastStableTexture = tex;
-                    GuiDollRender.renderDollInRect(guiGraphics, id, tex, yawOffset, crouchPose, attackTime, partialTick, left, renderTop, right, renderBottom, sizeCap);
-                }
-            }
-        }
 
-        if (CENTER_NAME_PLATE && this.slotOffset == 0) {
-            String label = null;
-            if (!"auto_select".equals(id)) {
-                SkinEntry e = getCachedEntry(id);
-                if (e != null) {
-                    label = SkinPackLoader.nameString(e.name(), id);
-                }
-            } else {
-                label = "Current Skin";
-            }
-            if (label == null) label = "";
+            int absOffset = Math.abs(this.slotOffset);
+            if (absOffset >= 4 && progress > 1f) return;
 
-            int plateW = CENTER_NAME_PLATE_W;
-            int plateH = CENTER_NAME_PLATE_H;
-            int cx = CENTER_NAME_PLATE_FIXED_CENTER_X ? CENTER_NAME_PLATE_CENTER_X : (left + right) / 2;
-            int plateX = cx - plateW / 2;
-            int plateY = CENTER_NAME_PLATE_FIXED_Y ? CENTER_NAME_PLATE_Y : bottom + CENTER_NAME_PLATE_PAD_Y;
+            int left = this.getX();
+            int top = this.getY();
+            int right = left + this.getWidth();
+            int bottom = top + this.getHeight();
+
+            int renderTop = top;
+            int renderBottom = bottom;
             if (CLIP_ENABLED) {
-                int maxY = CLIP_Y2 - plateH - 1;
-                if (plateY > maxY) plateY = maxY;
-                if (plateY < CLIP_Y1) plateY = CLIP_Y1;
+                if (right <= CLIP_X1 || left >= CLIP_X2 || bottom <= CLIP_Y1 || top >= CLIP_Y2) return;
             }
-
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
-
-            var font = Minecraft.getInstance().font;
-            int maxPx = Math.max(1, plateW - 8);
-
-            
-            String theme = null;
-            if (!"auto_select".equals(id)) {
+            if (absOffset > 4) return;
+            String id = skinId.get();
+            if (id == null) return;
+            float yawOffset = this.rotationY;
+            if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
+            float attackTime = 0.0F;
+            if (punchLoop) {
+                long swing = 300L;
+                long phase = now % (swing + 5L);
+                attackTime = phase < swing ? phase / (float) swing : 0.0F;
+            }
+            int sizeCap = 165;
+            if (CLIP_ENABLED && !CLIP_ACTIVE) {
                 try {
-                    SkinEntry e = getCachedEntry(id);
-                    String ns = e != null && e.texture() != null ? e.texture().getNamespace() : SkinSync.ASSET_NS;
-                    ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(
-                            e != null && e.texture() != null ? e.texture() : ResourceLocation.fromNamespaceAndPath(ns, id));
-                    theme = BoxModelManager.getThemeText(modelId);
+                    guiGraphics.disableScissor();
                 } catch (Throwable ignored) {
                 }
-            if (theme != null && (theme.isBlank() || theme.equals(label))) theme = null;
+                guiGraphics.enableScissor(CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2);
+                CLIP_ACTIVE = true;
             }
-
-            String showName = label;
-            if (font.width(showName) > maxPx) {
-                int ellW = font.width("…");
-                showName = font.plainSubstrByWidth(showName, Math.max(0, maxPx - ellW)) + "…";
-            }
-
-            if (theme == null) {
-                int textY = plateY + (plateH - font.lineHeight) / 2;
-                guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showName), plateX + plateW / 2, textY, 0xFFFFFFFF);
+            if ("auto_select".equals(id)) {
+                var ps = GuiSessionSkin.getSessionPlayerSkin();
+                if (ps != null) {
+                    GuiDollRender.renderDollInRect(guiGraphics, id, ps, yawOffset, crouchPose, attackTime, partialTick, left, renderTop, right, renderBottom, sizeCap);
+                } else {
+                    SkinEntry entry = SkinPackLoader.getSkin(id);
+                    if (entry != null) {
+                        GuiDollRender.renderDollInRect(guiGraphics, id, entry.texture(), yawOffset, crouchPose, attackTime, partialTick, left, renderTop, right, renderBottom, sizeCap);
+                    }
+                }
             } else {
-                String showTheme = theme;
-                if (font.width(showTheme) > maxPx) {
-                    int ellW = font.width("…");
-                    showTheme = font.plainSubstrByWidth(showTheme, Math.max(0, maxPx - ellW)) + "…";
+                SkinEntry entry = getCachedEntry(id);
+                if (entry != null) {
+                    ResourceLocation tex = entry.texture();
+                    if (tex != null) {
+                        lastStableId = id;
+                        lastStableTexture = tex;
+                        GuiDollRender.renderDollInRect(guiGraphics, id, tex, yawOffset, crouchPose, attackTime, partialTick, left, renderTop, right, renderBottom, sizeCap);
+                    } else if (ExternalSkinProviders.isExternalSkinId(id)) {
+                        ExternalSkinProviders.renderPreview(this, guiGraphics, id, this.rotationX, yawOffset, crouchPose, punchLoop, partialTick, left, renderTop, right, renderBottom);
+                    }
                 }
-
-                int totalH = font.lineHeight * 2;
-                int baseY = plateY + (plateH - totalH) / 2;
-                guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
-                guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showTheme), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
             }
 
-            if (CENTER_SELECTED_BADGE && isCurrentSkinSelected(id)) {
-                int badgeW = CENTER_SELECTED_BADGE_W;
-                int badgeH = CENTER_SELECTED_BADGE_H;
-                int badgeX = cx - badgeW / 2;
-                int badgeY = plateY - CENTER_SELECTED_BADGE_GAP - badgeH;
+            if (CENTER_NAME_PLATE && this.slotOffset == 0) {
+                String label = null;
+                if (!"auto_select".equals(id)) {
+                    SkinEntry e = getCachedEntry(id);
+                    if (e != null) {
+                        label = SkinPackLoader.nameString(e.name(), id);
+                    }
+                } else {
+                    label = "Current Skin";
+                }
+                if (label == null) label = "";
+
+                int plateW = CENTER_NAME_PLATE_W;
+                int plateH = CENTER_NAME_PLATE_H;
+                int cx = CENTER_NAME_PLATE_FIXED_CENTER_X ? CENTER_NAME_PLATE_CENTER_X : (left + right) / 2;
+                int plateX = cx - plateW / 2;
+                int plateY = CENTER_NAME_PLATE_FIXED_Y ? CENTER_NAME_PLATE_Y : bottom + CENTER_NAME_PLATE_PAD_Y;
                 if (CLIP_ENABLED) {
-                    int minY = CLIP_Y1;
-                    int maxY = CLIP_Y2 - badgeH - 1;
-                    if (badgeY < minY) badgeY = minY;
-                    if (badgeY > maxY) badgeY = maxY;
+                    int maxY = CLIP_Y2 - plateH - 1;
+                    if (plateY > maxY) plateY = maxY;
+                    if (plateY < CLIP_Y1) plateY = CLIP_Y1;
                 }
 
-                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
 
-                int by = badgeY + (badgeH - font.lineHeight) / 2;
-                guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal("Selected"), badgeX + badgeW / 2, by, 0xFFFFFFFF);
+                var font = Minecraft.getInstance().font;
+                int maxPx = Math.max(1, plateW - 8);
+
+                String theme = null;
+                if (!"auto_select".equals(id)) {
+                    try {
+                        SkinEntry e = getCachedEntry(id);
+                        String ns = e != null && e.texture() != null ? e.texture().getNamespace() : SkinSync.ASSET_NS;
+                        ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(
+                            e != null && e.texture() != null ? e.texture() : ResourceLocation.fromNamespaceAndPath(ns, id));
+                        theme = BoxModelManager.getThemeText(modelId);
+                    } catch (Throwable ignored) {
+                    }
+                    if (theme != null && (theme.isBlank() || theme.equals(label))) theme = null;
+                }
+
+                String showName = truncateCenterPlateText(font, label, maxPx);
+
+                if (theme == null) {
+                    int textY = plateY + (plateH - font.lineHeight) / 2;
+                    guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showName), plateX + plateW / 2, textY, 0xFFFFFFFF);
+                } else {
+                    String showTheme = truncateCenterPlateText(font, theme, maxPx);
+
+                    int totalH = font.lineHeight * 2;
+                    int baseY = plateY + (plateH - totalH) / 2;
+                    guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
+                    guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showTheme), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
+                }
+
+                if (CENTER_SELECTED_BADGE && isCurrentSkinSelected(id)) {
+                    int badgeW = CENTER_SELECTED_BADGE_W;
+                    int badgeH = CENTER_SELECTED_BADGE_H;
+                    int badgeX = cx - badgeW / 2;
+                    int badgeY = plateY - CENTER_SELECTED_BADGE_GAP - badgeH;
+                    if (CLIP_ENABLED) {
+                        int minY = CLIP_Y1;
+                        int maxY = CLIP_Y2 - badgeH - 1;
+                        if (badgeY < minY) badgeY = minY;
+                        if (badgeY > maxY) badgeY = maxY;
+                    }
+
+                    guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
+
+                    int by = badgeY + (badgeH - font.lineHeight) / 2;
+                    guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal("Selected"), badgeX + badgeW / 2, by, 0xFFFFFFFF);
+                }
             }
-        }
-        if (CLIP_ACTIVE) {
-            try { guiGraphics.disableScissor(); } catch (Throwable ignored) {}
-            CLIP_ACTIVE = false;
+        } catch (Throwable ignored) {
+        } finally {
+            GuiDollRender.restorePreviewRenderState(guiGraphics);
+            if (CLIP_ACTIVE) {
+                try { guiGraphics.disableScissor(); } catch (Throwable ignored) {}
+                CLIP_ACTIVE = false;
+            }
         }
     }
 
     @Override
     public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+        this.defaultButtonNarrationText(narrationElementOutput);
+    }
+
+    private static String truncateCenterPlateText(Font font, String value, int maxPx) {
+        if (font == null || value == null || value.isBlank()) return "";
+        if (font.width(value) <= maxPx) return value;
+
+        int ellipsisWidth = font.width("...");
+        String truncated = font.plainSubstrByWidth(value, Math.max(0, maxPx - ellipsisWidth));
+        return truncated + "...";
     }
 
     @Override

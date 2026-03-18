@@ -77,7 +77,6 @@ public abstract class ModelOffsetsMixin {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        // Use cached texture/modelId from render state
         ResourceLocation tex = a.consoleskins$getCachedTexture();
         if (tex == null) {
             SkinEntry entry = SkinPackLoader.getSkin(skinId);

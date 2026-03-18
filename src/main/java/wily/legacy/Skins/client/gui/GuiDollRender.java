@@ -88,8 +88,11 @@ public final class GuiDollRender {
         int expandedBottom = bottom + baseHeight;
 
         applyPreviewLighting(gui, PREVIEW_BRIGHTNESS_MUL);
-        gui.submitEntityRenderState(state, renderScale, translate, quat, quat2, left, expandedTop, right, expandedBottom);
-        resetPreviewLighting(gui);
+        try {
+            gui.submitEntityRenderState(state, renderScale, translate, quat, quat2, left, expandedTop, right, expandedBottom);
+        } finally {
+            resetPreviewLighting(gui);
+        }
     }
 
     public static void renderDollInRect(GuiGraphics gui, String selectionId, ResourceLocation skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
@@ -195,7 +198,15 @@ public final class GuiDollRender {
         int expandedBottom = bottom + baseHeight;
 
         applyPreviewLighting(gui, PREVIEW_BRIGHTNESS_MUL);
-        gui.submitEntityRenderState(state, renderScale, translate, quat, quat2, left, expandedTop, right, expandedBottom);
+        try {
+            gui.submitEntityRenderState(state, renderScale, translate, quat, quat2, left, expandedTop, right, expandedBottom);
+        } finally {
+            resetPreviewLighting(gui);
+        }
+    }
+
+    public static void restorePreviewRenderState(GuiGraphics gui) {
+        if (gui == null) return;
         resetPreviewLighting(gui);
     }
 

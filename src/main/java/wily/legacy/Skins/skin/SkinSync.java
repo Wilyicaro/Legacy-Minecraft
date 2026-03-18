@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/* * * Skin IDs are. */
 public final class SkinSync {
     public static final String MODID = Legacy4J.MOD_ID;
     public static final String ASSET_NS = Legacy4J.MOD_ID;

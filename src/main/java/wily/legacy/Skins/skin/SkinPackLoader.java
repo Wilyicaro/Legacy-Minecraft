@@ -12,6 +12,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import wily.legacy.Skins.client.lang.SkinPackLang;
+import wily.legacy.Skins.client.compat.ExternalSkinDescriptor;
+import wily.legacy.Skins.client.compat.ExternalSkinPackDescriptor;
+import wily.legacy.Skins.client.compat.ExternalSkinProviders;
+import wily.legacy.Skins.client.compat.legacyskins.LegacySkinsCompat;
 import wily.legacy.Skins.client.render.SkinPoseRegistry;
 import wily.legacy.Skins.util.DebugLog;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
@@ -23,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,13 +37,16 @@ import java.util.Set;
 
 public final class SkinPackLoader {
 
-    
-
     private static final Object LOCK = new Object();
 
     private static volatile Map<String, SkinPack> PACKS = Map.of();
+    private static volatile Map<String, SkinPack> ALL_PACKS = Map.of();
     private static volatile Map<String, SkinEntry> SKINS_BY_ID = Map.of();
     private static volatile Map<String, String> PACK_BY_SKIN = Map.of();
+    private static volatile Map<String, SkinPackSourceKind> PACK_SOURCE_KINDS = Map.of();
+    private static volatile Map<String, Integer> PACK_SOURCE_ORDER = Map.of();
+    private static volatile Set<String> HIDDEN_DUPLICATE_PACK_IDS = Set.of();
+    private static volatile boolean HAS_MANAGED_PACK_ORDER;
     private static volatile boolean loaded;
 
     private static volatile String LAST_USED_CUSTOM_PACK_ID;
@@ -47,10 +55,13 @@ public final class SkinPackLoader {
 
     private static final String BUILTIN_PACK_NAMESPACE = "lce_skinpacks";
     private static final ResourceLocation BUILTIN_PACK_MANIFEST = ResourceLocation.fromNamespaceAndPath(BUILTIN_PACK_NAMESPACE, "skinpacks/manifest.json");
+    private static final ResourceLocation PACK_ORDER_RULES_FILE = ResourceLocation.fromNamespaceAndPath(BUILTIN_PACK_NAMESPACE, "skinpacks/pack_order_rules.json");
+    private static final ResourceLocation PACK_FAMILY_RULES_FILE = ResourceLocation.fromNamespaceAndPath(BUILTIN_PACK_NAMESPACE, "skinpacks/pack_family_rules.json");
 
     private static final String SKINPACKS_PREFIX = "skinpacks/";
     private static final String DEFAULT_SKINPACKS_PREFIX = "default_skinpacks/";
     private static final String PACK_JSON_SUFFIX = "/pack.json";
+    private static final int EXTERNAL_PACK_SORT_BASE = 20000;
 
     private SkinPackLoader() {
     }
@@ -58,6 +69,11 @@ public final class SkinPackLoader {
     public static Map<String, SkinPack> getPacks() {
         ensureLoaded();
         return PACKS;
+    }
+
+    public static Map<String, SkinPack> getAllPacks() {
+        ensureLoaded();
+        return ALL_PACKS;
     }
 
     public static SkinEntry getSkin(String id) {
@@ -71,8 +87,38 @@ public final class SkinPackLoader {
         return PACK_BY_SKIN.get(skinId);
     }
 
+    public static SkinPackSourceKind getPackSourceKind(String packId) {
+        ensureLoaded();
+        if (SkinIds.PACK_FAVOURITES.equals(packId)) return SkinPackSourceKind.SPECIAL;
+        if (SkinIds.PACK_DEFAULT.equals(packId)) {
+            return PACK_SOURCE_KINDS.getOrDefault(packId, SkinPackSourceKind.BOX_MODEL);
+        }
+        return PACK_SOURCE_KINDS.getOrDefault(packId, SkinPackSourceKind.SPECIAL);
+    }
+
+    public static boolean isHiddenDuplicatePack(String packId) {
+        ensureLoaded();
+        return HIDDEN_DUPLICATE_PACK_IDS.contains(packId);
+    }
+
+    public static int getHiddenDuplicatePackCount() {
+        ensureLoaded();
+        return HIDDEN_DUPLICATE_PACK_IDS.size();
+    }
+
+    public static int getPackSourceOrder(String packId) {
+        ensureLoaded();
+        if (packId == null || packId.isBlank()) return Integer.MAX_VALUE;
+        return PACK_SOURCE_ORDER.getOrDefault(packId, Integer.MAX_VALUE);
+    }
+
     public static String getLastUsedCustomPackId() {
         return LAST_USED_CUSTOM_PACK_ID;
+    }
+
+    public static boolean hasManagedPackOrder() {
+        ensureLoaded();
+        return HAS_MANAGED_PACK_ORDER;
     }
 
     public static void setLastUsedCustomPackId(String packId) {
@@ -116,11 +162,20 @@ public final class SkinPackLoader {
     public static void rebuildFavouritesPack() {
         ensureLoaded();
         FavoritesStore.ensureLoaded();
-        Map<String, SkinPack> cur = PACKS;
-        LinkedHashMap<String, SkinPack> base = new LinkedHashMap<>(cur);
-        LinkedHashMap<String, SkinPack> ordered = withFavourites(base, SKINS_BY_ID);
+        LinkedHashMap<String, SkinPack> visibleBase = new LinkedHashMap<>(PACKS);
+        visibleBase.remove(SkinIds.PACK_FAVOURITES);
+        LinkedHashMap<String, SkinPack> orderedVisible = withFavourites(visibleBase, SKINS_BY_ID);
+
+        LinkedHashMap<String, SkinPack> allBase = new LinkedHashMap<>(ALL_PACKS);
+        allBase.remove(SkinIds.PACK_FAVOURITES);
+        LinkedHashMap<String, SkinPack> orderedAll = withFavourites(allBase, SKINS_BY_ID);
+
+        LinkedHashMap<String, SkinPackSourceKind> sourceKinds = new LinkedHashMap<>(PACK_SOURCE_KINDS);
+        sourceKinds.put(SkinIds.PACK_FAVOURITES, SkinPackSourceKind.SPECIAL);
         synchronized (LOCK) {
-            PACKS = Collections.unmodifiableMap(ordered);
+            PACKS = Collections.unmodifiableMap(orderedVisible);
+            ALL_PACKS = Collections.unmodifiableMap(orderedAll);
+            PACK_SOURCE_KINDS = Collections.unmodifiableMap(sourceKinds);
         }
     }
 
@@ -178,9 +233,20 @@ public final class SkinPackLoader {
         HashMap<String, Integer> packSortIndex = new HashMap<>();
         HashSet<String> packHasSort = new HashSet<>();
         HashMap<String, Integer> packInsertIndex = new HashMap<>();
+        HashMap<String, Integer> packSortAnchorInsertIndex = new HashMap<>();
+        HashMap<String, Integer> packSortPriority = new HashMap<>();
+        HashMap<String, SkinPackSourceKind> packSourceKinds = new HashMap<>();
+        HashMap<String, Integer> packSourceOrder = new HashMap<>();
+        LinkedHashSet<String> hiddenDuplicatePackIds = new LinkedHashSet<>();
         final int[] insertCounter = new int[]{0};
         LinkedHashMap<String, SkinEntry> skinsById = new LinkedHashMap<>();
         LinkedHashMap<String, String> packBySkin = new LinkedHashMap<>();
+        HashMap<String, String> preferredNewFormatPackAliases = new HashMap<>();
+        HashMap<String, String> preferredNewFormatPackFingerprints = new HashMap<>();
+        LinkedHashMap<String, List<String>> preferredNewFormatPackTokens = new LinkedHashMap<>();
+        SkinPackOrderRules packOrderRules = SkinPackOrderRules.load(rm, PACK_ORDER_RULES_FILE);
+        SkinPackFamilyRules packFamilyRules = SkinPackFamilyRules.load(rm, PACK_FAMILY_RULES_FILE);
+        HAS_MANAGED_PACK_ORDER = packOrderRules.hasEntries();
 
         try {
             List<String> namespaces = new ArrayList<>(rm.getNamespaces());
@@ -188,7 +254,7 @@ public final class SkinPackLoader {
 
             boolean anyManifest = false;
             for (String ns : namespaces) {
-                if (loadFromManifest(rm, ns, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter)) anyManifest = true;
+                if (loadFromManifest(rm, ns, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter, packSourceKinds, packSourceOrder, preferredNewFormatPackAliases, preferredNewFormatPackFingerprints, preferredNewFormatPackTokens, packOrderRules)) anyManifest = true;
             }
 
             try {
@@ -207,67 +273,124 @@ public final class SkinPackLoader {
                     if (packs.containsKey(packId)) continue;
                     if (PackExclusions.isExcluded(packId)) continue;
 
+                    Integer explicitBoxModelOrder = packOrderRules.findBoxModelPackOrder(ns, packId, BUILTIN_PACK_NAMESPACE);
+
                     if (anyManifest && packId.startsWith("_")) continue;
 
                     JsonObject json = readObj(jsons.get(rl));
                     if (json != null) {
                         String prefix = path.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
+                        boolean hadPack = packs.containsKey(packId);
                         loadSinglePack(ns, packId, packId, prefix, json, rm, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter);
+                        if (!hadPack && packs.containsKey(packId)) {
+                            SkinPackOrderingSupport.registerPackSource(packSourceKinds, packId, SkinPackSourceKind.BOX_MODEL);
+                            SkinPackOrderingSupport.registerPackSourceOrder(packSourceOrder, packId, explicitBoxModelOrder, packSortIndex, packInsertIndex);
+                        }
+                        if (!hadPack && packs.containsKey(packId) && BUILTIN_PACK_NAMESPACE.equals(ns)) {
+                            if (explicitBoxModelOrder != null) {
+                                packSortIndex.put(packId, explicitBoxModelOrder);
+                                packHasSort.add(packId);
+                            }
+                            SkinPack pack = packs.get(packId);
+                            registerNewFormatPackAliases(preferredNewFormatPackAliases, ns, packId, packId, pack.name());
+                            registerManagedBoxModelNameAlias(preferredNewFormatPackAliases, packOrderRules, packId);
+                            registerNewFormatPackFingerprint(preferredNewFormatPackFingerprints, pack);
+                            registerNewFormatPackTokens(preferredNewFormatPackTokens, pack);
+                        }
                     }
                 }
             } catch (Throwable ex) {
                 DebugLog.warn("ResourceManager skinpack scan failed: {}", ex.toString());
             }
 
-            loadLegacySkinPacksIndex(rm, packs, skinsById, packBySkin);
+            boolean hideDuplicateExternalPacks = true;
+            loadLegacySkinPacksIndex(rm, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority, packSourceKinds, packSourceOrder, hiddenDuplicatePackIds, insertCounter, preferredNewFormatPackAliases, preferredNewFormatPackFingerprints, preferredNewFormatPackTokens, hideDuplicateExternalPacks, packOrderRules);
+            loadBedrockSkinPacksIndex(packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority, packSourceKinds, packSourceOrder, hiddenDuplicatePackIds, insertCounter, preferredNewFormatPackAliases, preferredNewFormatPackFingerprints, preferredNewFormatPackTokens, hideDuplicateExternalPacks, packOrderRules);
         } finally {
             SkinPoseRegistry.endReload();
         }
 
-        packs = sortPacks(packs, packSortIndex, packHasSort, packInsertIndex);
+        packs = SkinPackOrderingSupport.sortPacks(packs, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority);
 
-        LinkedHashMap<String, SkinPack> ordered = withFavourites(packs, skinsById);
-        applyBuiltinAutoSelection(rm, ordered);
+        SkinPackDefaultOrganizer.OrganizationResult organization = SkinPackDefaultOrganizer.organize(
+                packs,
+                packSourceKinds,
+                packSourceOrder,
+                packInsertIndex,
+                packOrderRules,
+                packFamilyRules,
+                true
+        );
+        LinkedHashMap<String, SkinPack> organizedBasePacks = organization.orderedBasePacks();
+        LinkedHashSet<String> organizedHiddenDuplicatePackIds = new LinkedHashSet<>(organization.hiddenDuplicatePackIds());
+        LinkedHashMap<String, Integer> organizedSourceOrder = new LinkedHashMap<>(organization.sourceOrder());
+        enforcePreferredFamilyVisibility(organizedBasePacks, packSourceKinds, packFamilyRules, organizedHiddenDuplicatePackIds);
+
+        LinkedHashMap<String, SkinPack> orderedAll = withFavourites(organizedBasePacks, skinsById);
+        LinkedHashMap<String, SkinPack> orderedVisible = SkinPackOrderingSupport.filterVisiblePacks(orderedAll, organizedHiddenDuplicatePackIds);
+        SkinPackDiagnostics.logLoadDiagnostics(organizedBasePacks, packBySkin, packSourceKinds, organizedHiddenDuplicatePackIds, packOrderRules, packFamilyRules);
+        applyBuiltinAutoSelection(rm, orderedVisible);
+        packSourceKinds.put(SkinIds.PACK_FAVOURITES, SkinPackSourceKind.SPECIAL);
         synchronized (LOCK) {
-            PACKS = Collections.unmodifiableMap(ordered);
+            PACKS = Collections.unmodifiableMap(orderedVisible);
+            ALL_PACKS = Collections.unmodifiableMap(orderedAll);
             SKINS_BY_ID = Collections.unmodifiableMap(skinsById);
             PACK_BY_SKIN = Collections.unmodifiableMap(packBySkin);
+            PACK_SOURCE_KINDS = Collections.unmodifiableMap(new LinkedHashMap<>(packSourceKinds));
+            PACK_SOURCE_ORDER = Collections.unmodifiableMap(organizedSourceOrder);
+            HIDDEN_DUPLICATE_PACK_IDS = Collections.unmodifiableSet(organizedHiddenDuplicatePackIds);
             loaded = true;
         }
     }
 
-    private static LinkedHashMap<String, SkinPack> sortPacks(LinkedHashMap<String, SkinPack> in,
-                                                            Map<String, Integer> sortIndex,
-                                                            Set<String> hasSort,
-                                                            Map<String, Integer> insertIndex) {
-        if (in == null || in.isEmpty()) return in;
-        boolean any = false;
-        for (String k : in.keySet()) {
-            if (hasSort.contains(k)) {
-                any = true;
-                break;
+    private static void enforcePreferredFamilyVisibility(Map<String, SkinPack> basePacks,
+                                                         Map<String, SkinPackSourceKind> packSourceKinds,
+                                                         SkinPackFamilyRules familyRules,
+                                                         Set<String> hiddenDuplicatePackIds) {
+        if (basePacks == null || basePacks.isEmpty() || packSourceKinds == null || packSourceKinds.isEmpty() || familyRules == null || !familyRules.hasEntries() || hiddenDuplicatePackIds == null) {
+            return;
+        }
+
+        HashMap<String, SkinPackSourceKind> preferredSourceByFamily = new HashMap<>();
+        HashMap<String, Set<SkinPackSourceKind>> presentSourcesByFamily = new HashMap<>();
+        HashMap<String, String> familyByPackId = new HashMap<>();
+
+        for (Map.Entry<String, SkinPack> entry : basePacks.entrySet()) {
+            String packId = entry.getKey();
+            SkinPack pack = entry.getValue();
+            if (packId == null || pack == null || SkinIds.PACK_DEFAULT.equals(packId) || SkinIds.PACK_FAVOURITES.equals(packId)) continue;
+
+            SkinPackSourceKind sourceKind = packSourceKinds.getOrDefault(packId, SkinPackSourceKind.SPECIAL);
+            if (sourceKind != SkinPackSourceKind.BOX_MODEL && sourceKind != SkinPackSourceKind.LEGACY_SKINS && sourceKind != SkinPackSourceKind.BEDROCK_SKINS) continue;
+
+            String familyId = familyRules.findFamilyId(sourceKind, packId, nameString(pack.name(), packId));
+            if (familyId == null || familyId.isBlank()) continue;
+
+            familyByPackId.put(packId, familyId);
+            preferredSourceByFamily.putIfAbsent(familyId, familyRules.preferredSource(familyId));
+            presentSourcesByFamily.computeIfAbsent(familyId, ignored -> new LinkedHashSet<>()).add(sourceKind);
+        }
+
+        for (Map.Entry<String, String> entry : familyByPackId.entrySet()) {
+            String packId = entry.getKey();
+            String familyId = entry.getValue();
+            SkinPackSourceKind sourceKind = packSourceKinds.getOrDefault(packId, SkinPackSourceKind.SPECIAL);
+            SkinPackSourceKind preferredSource = preferredSourceByFamily.get(familyId);
+            Set<SkinPackSourceKind> presentSources = presentSourcesByFamily.get(familyId);
+            if (preferredSource == null || presentSources == null || !presentSources.contains(preferredSource)) continue;
+            if (sourceKind != preferredSource) {
+                hiddenDuplicatePackIds.add(packId);
             }
         }
-        if (!any) return in;
+    }
 
-        ArrayList<Map.Entry<String, SkinPack>> list = new ArrayList<>(in.entrySet());
-        list.sort((a, b) -> {
-            String ka = a.getKey();
-            String kb = b.getKey();
-            boolean ha = hasSort.contains(ka);
-            boolean hb = hasSort.contains(kb);
-            if (ha != hb) return ha ? -1 : 1;
-            int sa = sortIndex.getOrDefault(ka, 0);
-            int sb = sortIndex.getOrDefault(kb, 0);
-            if (sa != sb) return Integer.compare(sa, sb);
-            int ia = insertIndex.getOrDefault(ka, 0);
-            int ib = insertIndex.getOrDefault(kb, 0);
-            return Integer.compare(ia, ib);
-        });
-
-        LinkedHashMap<String, SkinPack> out = new LinkedHashMap<>(in.size());
-        for (Map.Entry<String, SkinPack> e : list) out.put(e.getKey(), e.getValue());
-        return out;
+    private static void registerManagedBoxModelNameAlias(Map<String, String> newFormatPackAliases,
+                                                         SkinPackOrderRules packOrderRules,
+                                                         String packId) {
+        if (newFormatPackAliases == null || packOrderRules == null || packId == null || packId.isBlank()) return;
+        String managedName = packOrderRules.managedBoxModelName(packId);
+        if (managedName == null || managedName.isBlank()) return;
+        registerNewFormatPackNameAlias(newFormatPackAliases, managedName, packId);
     }
 
     private static boolean loadFromManifest(ResourceManager rm,
@@ -278,7 +401,13 @@ public final class SkinPackLoader {
                                         Map<String, Integer> packSortIndex,
                                         Set<String> packHasSort,
                                         Map<String, Integer> packInsertIndex,
-                                        int[] insertCounter) {
+                                        int[] insertCounter,
+                                        Map<String, SkinPackSourceKind> packSourceKinds,
+                                        Map<String, Integer> packSourceOrder,
+                                        Map<String, String> preferredNewFormatPackAliases,
+                                        Map<String, String> preferredNewFormatPackFingerprints,
+                                        Map<String, List<String>> preferredNewFormatPackTokens,
+                                        SkinPackOrderRules packOrderRules) {
     if (rm == null || namespace == null || namespace.isBlank()) return false;
 
     ResourceLocation manifestRl = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + "manifest.json");
@@ -342,6 +471,7 @@ public final class SkinPackLoader {
     for (ManifestPack mp : list) {
         String packId = mp.id();
         if (packsOut.containsKey(packId)) continue;
+        Integer explicitBoxModelOrder = packOrderRules.findBoxModelPackOrder(namespace, packId, BUILTIN_PACK_NAMESPACE);
 
         String resolved = resolvePackJsonPath(mp.path(), packId);
         ResourceLocation packRl = ResourceLocation.fromNamespaceAndPath(namespace, resolved);
@@ -367,7 +497,23 @@ public final class SkinPackLoader {
 
         String folder = inferPackFolderFromPackPath(resolved, packId);
         String prefix = resolved.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
+        boolean hadPack = packsOut.containsKey(packId);
         loadSinglePack(namespace, packId, folder, prefix, packObj, rm, packsOut, skinsByIdOut, packBySkinOut, packSortIndex, packHasSort, packInsertIndex, insertCounter);
+        if (!hadPack && packsOut.containsKey(packId)) {
+            SkinPackOrderingSupport.registerPackSource(packSourceKinds, packId, SkinPackSourceKind.BOX_MODEL);
+            SkinPackOrderingSupport.registerPackSourceOrder(packSourceOrder, packId, explicitBoxModelOrder, packSortIndex, packInsertIndex);
+        }
+        if (!hadPack && packsOut.containsKey(packId) && BUILTIN_PACK_NAMESPACE.equals(namespace)) {
+            if (explicitBoxModelOrder != null) {
+                packSortIndex.put(packId, explicitBoxModelOrder);
+                packHasSort.add(packId);
+            }
+            SkinPack pack = packsOut.get(packId);
+            registerNewFormatPackAliases(preferredNewFormatPackAliases, namespace, packId, folder, pack.name());
+            registerManagedBoxModelNameAlias(preferredNewFormatPackAliases, packOrderRules, packId);
+            registerNewFormatPackFingerprint(preferredNewFormatPackFingerprints, pack);
+            registerNewFormatPackTokens(preferredNewFormatPackTokens, pack);
+        }
     }
 
     return true;
@@ -439,7 +585,6 @@ private static String parsePackIdForPrefix(String path, String prefix) {
     return null;
 }
 
-
     private static LinkedHashMap<String, SkinPack> withFavourites(Map<String, SkinPack> base, Map<String, SkinEntry> skinsById) {
         ArrayList<SkinEntry> fav = new ArrayList<>();
         for (String id : FavoritesStore.getFavorites()) {
@@ -472,87 +617,488 @@ private static String parsePackIdForPrefix(String path, String prefix) {
         return out;
     }
 
+    private static void loadBedrockSkinPacksIndex(Map<String, SkinPack> packsOut,
+                                                  Map<String, SkinEntry> skinsByIdOut,
+                                                  Map<String, String> packBySkinOut,
+                                                  Map<String, Integer> packSortIndex,
+                                                  Set<String> packHasSort,
+                                                  Map<String, Integer> packInsertIndex,
+                                                  Map<String, Integer> packSortAnchorInsertIndex,
+                                                  Map<String, Integer> packSortPriority,
+                                                  Map<String, SkinPackSourceKind> packSourceKinds,
+                                                  Map<String, Integer> packSourceOrder,
+                                                  Set<String> hiddenDuplicatePackIds,
+                                                  int[] insertCounter,
+                                                  Map<String, String> preferredNewFormatPackAliases,
+                                                  Map<String, String> preferredNewFormatPackFingerprints,
+                                                  Map<String, List<String>> preferredNewFormatPackTokens,
+                                                  boolean hideDuplicateExternalPacks,
+                                                  SkinPackOrderRules packOrderRules) {
+        List<ExternalSkinPackDescriptor> bedrockPacks = ExternalSkinProviders.loadPackDescriptors(SkinPackSourceKind.BEDROCK_SKINS);
+        if (bedrockPacks == null || bedrockPacks.isEmpty()) return;
+
+        for (ExternalSkinPackDescriptor descriptor : bedrockPacks) {
+            if (descriptor == null) continue;
+            List<ExternalSkinDescriptor> bedrockSkins = descriptor.skins();
+            if (bedrockSkins == null || bedrockSkins.isEmpty()) continue;
+
+            ArrayList<SkinEntry> entries = new ArrayList<>(bedrockSkins.size());
+            int ordinal = 0;
+            for (ExternalSkinDescriptor skin : bedrockSkins) {
+                if (skin == null || skin.id() == null || skin.id().isBlank()) continue;
+                String name = skin.name();
+                if (name == null || name.isBlank()) name = skin.id();
+                entries.add(new SkinEntry(skin.id(), name, null, null, false, ++ordinal));
+            }
+            if (entries.isEmpty()) continue;
+
+            String packId = descriptor.id();
+            if (packId == null || packId.isBlank()) continue;
+            String packName = descriptor.name();
+            if (packName == null || packName.isBlank()) packName = packId;
+            String packType = descriptor.type() == null ? "" : descriptor.type();
+            Integer explicitBedrockOrder = packOrderRules.findBedrockPackOrder(packId);
+            int reservedInsertIndex = packInsertIndex.containsKey(packId) ? packInsertIndex.get(packId) : insertCounter[0]++;
+            boolean hiddenDuplicate = false;
+
+            String preferredPackId = SkinPackDuplicateResolver.findNewFormatDuplicatePackId(
+                    null,
+                    packId,
+                    packName,
+                    entries,
+                    preferredNewFormatPackAliases,
+                    preferredNewFormatPackFingerprints,
+                    preferredNewFormatPackTokens
+            );
+
+            if (explicitBedrockOrder != null) {
+                SkinPackOrderingSupport.applyManagedPackFamilyOrder(preferredPackId, explicitBedrockOrder, packSortIndex, packHasSort, packOrderRules);
+            }
+
+            if (hideDuplicateExternalPacks && preferredPackId != null) {
+                DebugLog.debug("Keeping duplicate bedrock pack {} hidden behind preferred new-format pack {}", packId, preferredPackId);
+                hiddenDuplicate = true;
+            }
+
+            packsOut.put(packId, new SkinPack(packId, packName, "", packType, descriptor.icon(), entries));
+            SkinPackOrderingSupport.registerPackSource(packSourceKinds, packId, SkinPackSourceKind.BEDROCK_SKINS);
+            SkinPackOrderingSupport.registerPackSourceOrder(packSourceOrder, packId, descriptor.nativeOrder(), null, Map.of(packId, reservedInsertIndex));
+            for (SkinEntry entry : entries) {
+                skinsByIdOut.put(entry.id(), entry);
+                packBySkinOut.put(entry.id(), packId);
+            }
+
+            if (explicitBedrockOrder != null) {
+                packSortIndex.put(packId, explicitBedrockOrder);
+                packHasSort.add(packId);
+            } else if (preferredPackId != null) {
+                SkinPackOrderingSupport.inheritPreferredPackSort(packId, preferredPackId, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority, reservedInsertIndex);
+            } else {
+                Integer externalSortIndex = SkinPackDuplicateResolver.findExternalPackSortIndexOverride(null, packId, packName);
+                if (externalSortIndex == null) {
+                    Integer descriptorSortIndex = descriptor.nativeOrder();
+                    externalSortIndex = EXTERNAL_PACK_SORT_BASE + (descriptorSortIndex == null ? reservedInsertIndex : descriptorSortIndex);
+                }
+                packSortIndex.put(packId, externalSortIndex);
+                packHasSort.add(packId);
+            }
+            packInsertIndex.put(packId, reservedInsertIndex);
+            if (hiddenDuplicate) hiddenDuplicatePackIds.add(packId);
+            else hiddenDuplicatePackIds.remove(packId);
+        }
+    }
+
     private static void loadLegacySkinPacksIndex(ResourceManager rm,
                                                  Map<String, SkinPack> packsOut,
                                                  Map<String, SkinEntry> skinsByIdOut,
-                                                 Map<String, String> packBySkinOut) {
-        for (String ns : rm.getNamespaces()) {
+                                                 Map<String, String> packBySkinOut,
+                                                 Map<String, Integer> packSortIndex,
+                                                 Set<String> packHasSort,
+                                                 Map<String, Integer> packInsertIndex,
+                                                 Map<String, Integer> packSortAnchorInsertIndex,
+                                                 Map<String, Integer> packSortPriority,
+                                                 Map<String, SkinPackSourceKind> packSourceKinds,
+                                                 Map<String, Integer> packSourceOrder,
+                                                 Set<String> hiddenDuplicatePackIds,
+                                                 int[] insertCounter,
+                                                 Map<String, String> preferredNewFormatPackAliases,
+                                                 Map<String, String> preferredNewFormatPackFingerprints,
+                                                 Map<String, List<String>> preferredNewFormatPackTokens,
+                                                 boolean hideDuplicateExternalLegacyPacks,
+                                                 SkinPackOrderRules packOrderRules) {
+        LegacySkinsCompat.clearRegisteredSkins();
 
-            ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(ns, "skin_packs.json");
-            Resource res = rm.getResource(rl).orElse(null);
-            if (res == null) continue;
+        HashMap<String, List<String>> legacySkinIdsByPack = new HashMap<>();
+        ArrayList<String> namespaces = new ArrayList<>(rm.getNamespaces());
+        namespaces.sort(Comparator.comparingInt((String s) -> "legacyskins".equals(s) ? 0 : 1).thenComparing(String::compareTo));
 
-            try {
-                JsonObject root = readObj(res);
-                if (root == null) continue;
+        for (String ns : namespaces) {
+            loadLegacySkinPackFile(rm, ns, "skin_packs.json", packsOut, skinsByIdOut, packBySkinOut, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority, packSourceKinds, packSourceOrder, hiddenDuplicatePackIds, insertCounter, legacySkinIdsByPack, preferredNewFormatPackAliases, preferredNewFormatPackFingerprints, preferredNewFormatPackTokens, hideDuplicateExternalLegacyPacks, packOrderRules);
+            loadLegacySkinPackFile(rm, ns, "skin_packs2.json", packsOut, skinsByIdOut, packBySkinOut, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority, packSourceKinds, packSourceOrder, hiddenDuplicatePackIds, insertCounter, legacySkinIdsByPack, preferredNewFormatPackAliases, preferredNewFormatPackFingerprints, preferredNewFormatPackTokens, hideDuplicateExternalLegacyPacks, packOrderRules);
+        }
 
-                for (Map.Entry<String, JsonElement> pe : root.entrySet()) {
-                    if (!pe.getValue().isJsonObject()) continue;
-                    String rawPackId = pe.getKey();
+        LegacySkinsCompat.importCurrentSelectionIfAbsent();
+    }
 
-                    ResourceLocation packLoc;
+    private static void loadLegacySkinPackFile(ResourceManager rm,
+                                               String namespace,
+                                               String fileName,
+                                               Map<String, SkinPack> packsOut,
+                                               Map<String, SkinEntry> skinsByIdOut,
+                                               Map<String, String> packBySkinOut,
+                                               Map<String, Integer> packSortIndex,
+                                               Set<String> packHasSort,
+                                               Map<String, Integer> packInsertIndex,
+                                               Map<String, Integer> packSortAnchorInsertIndex,
+                                               Map<String, Integer> packSortPriority,
+                                               Map<String, SkinPackSourceKind> packSourceKinds,
+                                               Map<String, Integer> packSourceOrder,
+                                               Set<String> hiddenDuplicatePackIds,
+                                               int[] insertCounter,
+                                               Map<String, List<String>> legacySkinIdsByPack,
+                                               Map<String, String> preferredNewFormatPackAliases,
+                                               Map<String, String> preferredNewFormatPackFingerprints,
+                                               Map<String, List<String>> preferredNewFormatPackTokens,
+                                               boolean hideDuplicateExternalLegacyPacks,
+                                               SkinPackOrderRules packOrderRules) {
+        if (rm == null || namespace == null || namespace.isBlank() || fileName == null || fileName.isBlank()) return;
+
+        ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(namespace, fileName);
+        Resource res = rm.getResource(rl).orElse(null);
+        if (res == null) return;
+
+        try {
+            JsonObject root = readObj(res);
+            if (root == null) return;
+            ArrayList<SkinPackOrderingSupport.LegacyPackCandidate> pendingPacks = new ArrayList<>();
+
+            for (Map.Entry<String, JsonElement> pe : root.entrySet()) {
+                if (!pe.getValue().isJsonObject()) continue;
+
+                ResourceLocation packLoc = parseLegacyPackLocation(namespace, pe.getKey());
+                if (packLoc == null) continue;
+
+                String packId = packLoc.getNamespace() + ":" + packLoc.getPath();
+                Integer explicitLegacyOrder = packOrderRules.findLegacyPackOrder(packId);
+                boolean legacyOwned = legacySkinIdsByPack.containsKey(packId);
+                if (!legacyOwned && packsOut.containsKey(packId)) continue;
+                if (PackExclusions.isExcluded(packId) || SkinIdUtil.containsMinecon(packLoc.getPath())) continue;
+
+                JsonObject obj = pe.getValue().getAsJsonObject();
+                collectPoseTagsFromPackJson(namespace, obj);
+
+                String fallbackPackName = tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath(), packLoc.getPath());
+                String name = trMaybeKey(safeString(obj.get("name")), fallbackPackName);
+                String author = safeString(obj.get("author"));
+                if (author == null) author = "";
+                String type = safeString(obj.get("type"));
+                if (type == null) type = "";
+
+                if (LegacySkinsCompat.shouldSkipPack(packLoc, type)) {
+                    if (legacyOwned) {
+                        cleanupLegacyPackEntries(packId, skinsByIdOut, packBySkinOut, legacySkinIdsByPack);
+                        packsOut.remove(packId);
+                        packSortIndex.remove(packId);
+                        packHasSort.remove(packId);
+                        packInsertIndex.remove(packId);
+                        packSortAnchorInsertIndex.remove(packId);
+                        packSortPriority.remove(packId);
+                    }
+                    continue;
+                }
+
+                ResourceLocation icon = DEFAULT_PACK_ICON;
+                String iconPath = safeString(obj.get("icon"));
+                if (iconPath != null && !iconPath.isBlank()) {
                     try {
-                        packLoc = rawPackId != null && rawPackId.indexOf(':') > 0
-                                ? ResourceLocation.parse(rawPackId)
-                                : ResourceLocation.fromNamespaceAndPath(ns, rawPackId);
+                        icon = ResourceLocation.parse(iconPath);
                     } catch (Throwable ignored) {
+                        icon = DEFAULT_PACK_ICON;
+                    }
+                }
+
+                JsonArray skinsArr = obj.has("skins") && obj.get("skins").isJsonArray() ? obj.getAsJsonArray("skins") : null;
+                if (skinsArr == null) continue;
+
+                String packFolder = packLoc.getPath();
+                ArrayList<SkinEntry> entries = new ArrayList<>();
+                ArrayList<String> insertedIds = new ArrayList<>();
+                HashMap<String, Integer> legacyRuntimeOrdinals = new HashMap<>();
+
+                for (int i = 0; i < skinsArr.size(); i++) {
+                    JsonElement se = skinsArr.get(i);
+                    if (!se.isJsonObject()) continue;
+                    JsonObject so = se.getAsJsonObject();
+
+                    int runtimeOrdinal = LegacySkinsCompat.runtimeOrdinal(packLoc, i);
+
+                    if (so.has("id") && so.has("texture")) {
+                        String skinId = safeString(so.get("id"));
+                        if (skinId == null || skinId.isBlank()) continue;
+
+                        String fallbackName = legacyFallbackSkinName(null, packLoc, runtimeOrdinal);
+                        String skinName = trMaybeKey(safeString(so.get("name")),
+                                tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath() + "." + runtimeOrdinal, fallbackName));
+                        int order = safeInt(so.get("order"), i + 1);
+
+                        String texPath = safeString(so.get("texture"));
+                        if (texPath == null || texPath.isBlank()) continue;
+                        ResourceLocation tex = parseLegacyTextureLocation(namespace, packFolder, texPath);
+                        if (tex == null) continue;
+
+                        SkinEntry entry = new SkinEntry(skinId, skinName, tex, null, false, order);
+                        entries.add(entry);
+                        insertedIds.add(entry.id());
+                        collectPoseTagsFromSkinJson(so, skinId);
                         continue;
                     }
 
-                    String packId = packLoc.getNamespace() + ":" + packLoc.getPath();
-                    if (packsOut.containsKey(packId)) continue;
-                    if (PackExclusions.isExcluded(packId) || SkinIdUtil.containsMinecon(packLoc.getPath())) continue;
+                    String modelPath = safeString(so.get("model"));
+                    if (modelPath == null || modelPath.isBlank()) continue;
 
-                    JsonObject obj = pe.getValue().getAsJsonObject();
+                    String modelType = safeString(so.get("modelType"));
+                    if (modelType == null || modelType.isBlank()) modelType = "cpm";
+                    if (!"cpm".equalsIgnoreCase(modelType.trim())) continue;
+                    if (!LegacySkinsCompat.isSkinUsable(packLoc, runtimeOrdinal)) continue;
 
-                    collectPoseTagsFromPackJson(ns, obj);
-                    String name = obj.has("name") ? obj.get("name").getAsString() : tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath(), packLoc.getPath());
-                    String author = obj.has("author") ? obj.get("author").getAsString() : "";
-                    String type = obj.has("type") ? obj.get("type").getAsString() : "";
+                    String skinId = LegacySkinsCompat.syntheticSkinId(packLoc, runtimeOrdinal);
+                    if (skinId == null || skinId.isBlank()) continue;
 
-                    ResourceLocation icon = DEFAULT_PACK_ICON;
-                    if (obj.has("icon")) {
-                        try {
-                            icon = ResourceLocation.parse(obj.get("icon").getAsString());
-                        } catch (Throwable ignored) {
-                            icon = DEFAULT_PACK_ICON;
-                        }
-                    }
-JsonArray skinsArr = obj.has("skins") && obj.get("skins").isJsonArray() ? obj.getAsJsonArray("skins") : null;
-                    if (skinsArr == null) continue;
+                    String fallbackName = legacyFallbackSkinName(modelPath, packLoc, runtimeOrdinal);
+                    String skinName = trMaybeKey(safeString(so.get("name")),
+                            tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath() + "." + runtimeOrdinal, fallbackName));
+                    int order = safeInt(so.get("order"), i + 1);
 
-                    String packFolder = packLoc.getPath();
-                    ArrayList<SkinEntry> entries = new ArrayList<>();
-                    for (int i = 0; i < skinsArr.size(); i++) {
-                        JsonElement se = skinsArr.get(i);
-                        if (!se.isJsonObject()) continue;
-                        JsonObject so = se.getAsJsonObject();
-
-                        if (so.has("id") && so.has("texture")) {
-                            String skinId = so.get("id").getAsString();
-                            String skinName = so.has("name") ? so.get("name").getAsString() : tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath() + "." + i, skinId);
-                            int order = so.has("order") ? so.get("order").getAsInt() : (i + 1);
-
-                            String texPath = so.get("texture").getAsString();
-                            ResourceLocation tex = ResourceLocation.fromNamespaceAndPath(ns, texPath);
-                            if (!tex.getPath().startsWith(SKINPACKS_PREFIX)) {
-                                tex = ResourceLocation.fromNamespaceAndPath(ns, SKINPACKS_PREFIX + packFolder + "/" + texPath);
-                            }
-                            SkinEntry entry = new SkinEntry(skinId, skinName, tex, null, false, order);
-                            entries.add(entry);
-                            collectPoseTagsFromSkinJson(so, skinId);
-                            skinsByIdOut.putIfAbsent(entry.id(), entry);
-                            packBySkinOut.putIfAbsent(entry.id(), packId);
-                        }
-                    }
-
-                    if (!entries.isEmpty()) packsOut.put(packId, new SkinPack(packId, name, author, type, icon, entries));
-
+                    SkinEntry entry = new SkinEntry(skinId, skinName, null, null, false, order);
+                    entries.add(entry);
+                    insertedIds.add(entry.id());
+                    legacyRuntimeOrdinals.put(entry.id(), runtimeOrdinal);
                 }
-            } catch (Throwable ex) {
-                DebugLog.warn("Failed to read legacy skin_packs.json from {}: {}", rl, ex.toString());
+
+                String preferredPackId = null;
+                if (!BUILTIN_PACK_NAMESPACE.equals(packLoc.getNamespace())) {
+                    preferredPackId = SkinPackDuplicateResolver.findNewFormatDuplicatePackId(
+                            packLoc,
+                            packId,
+                            name,
+                            entries,
+                            preferredNewFormatPackAliases,
+                            preferredNewFormatPackFingerprints,
+                            preferredNewFormatPackTokens
+                    );
+                }
+
+                if (explicitLegacyOrder != null) {
+                    SkinPackOrderingSupport.applyManagedPackFamilyOrder(preferredPackId, explicitLegacyOrder, packSortIndex, packHasSort, packOrderRules);
+                }
+
+                int reservedInsertIndex = packInsertIndex.containsKey(packId) ? packInsertIndex.get(packId) : insertCounter[0]++;
+                if (hideDuplicateExternalLegacyPacks && preferredPackId != null) {
+                    if (legacyOwned) {
+                        cleanupLegacyPackEntries(packId, skinsByIdOut, packBySkinOut, legacySkinIdsByPack);
+                        packsOut.remove(packId);
+                    }
+                    packSortIndex.remove(packId);
+                    packHasSort.remove(packId);
+                    packInsertIndex.remove(packId);
+                    packSortAnchorInsertIndex.remove(packId);
+                    packSortPriority.remove(packId);
+                    pendingPacks.add(new SkinPackOrderingSupport.LegacyPackCandidate(
+                            packLoc,
+                            packId,
+                            name,
+                            author,
+                            type,
+                            icon,
+                            List.copyOf(entries),
+                            List.copyOf(insertedIds),
+                            Map.copyOf(legacyRuntimeOrdinals),
+                            preferredPackId,
+                            null,
+                            reservedInsertIndex,
+                            reservedInsertIndex,
+                            true
+                    ));
+                    continue;
+                }
+
+                if (legacyOwned) {
+                    cleanupLegacyPackEntries(packId, skinsByIdOut, packBySkinOut, legacySkinIdsByPack);
+                }
+                packsOut.remove(packId);
+                packSortAnchorInsertIndex.remove(packId);
+                packSortPriority.remove(packId);
+
+                if (entries.isEmpty()) {
+                    packSortIndex.remove(packId);
+                    packHasSort.remove(packId);
+                    packInsertIndex.remove(packId);
+                    packSortAnchorInsertIndex.remove(packId);
+                    packSortPriority.remove(packId);
+                    continue;
+                }
+
+                pendingPacks.add(new SkinPackOrderingSupport.LegacyPackCandidate(
+                        packLoc,
+                        packId,
+                        name,
+                        author,
+                        type,
+                        icon,
+                        List.copyOf(entries),
+                        List.copyOf(insertedIds),
+                        Map.copyOf(legacyRuntimeOrdinals),
+                        preferredPackId,
+                        explicitLegacyOrder,
+                        reservedInsertIndex,
+                        reservedInsertIndex,
+                        false
+                ));
+            }
+
+            SkinPackOrderingSupport.applyLegacyPackSortMetadata(pendingPacks, packSortIndex, packHasSort, packInsertIndex, packSortAnchorInsertIndex, packSortPriority);
+
+            for (SkinPackOrderingSupport.LegacyPackCandidate candidate : pendingPacks) {
+                String packId = candidate.packId();
+                packInsertIndex.put(packId, candidate.insertIndex());
+                packsOut.put(packId, new SkinPack(packId, candidate.name(), candidate.author(), candidate.type(), candidate.icon(), candidate.entries()));
+                SkinPackOrderingSupport.registerPackSource(packSourceKinds, packId, SkinPackSourceKind.LEGACY_SKINS);
+                SkinPackOrderingSupport.registerPackSourceOrder(packSourceOrder, packId, candidate.sourceOrder(), null, Map.of(packId, candidate.insertIndex()));
+                legacySkinIdsByPack.put(packId, candidate.insertedIds());
+                if (candidate.hiddenDuplicate()) hiddenDuplicatePackIds.add(packId);
+                else hiddenDuplicatePackIds.remove(packId);
+
+                for (SkinEntry entry : candidate.entries()) {
+                    skinsByIdOut.put(entry.id(), entry);
+                    packBySkinOut.put(entry.id(), packId);
+                }
+
+                for (Map.Entry<String, Integer> legacySkin : candidate.legacyRuntimeOrdinals().entrySet()) {
+                    LegacySkinsCompat.registerLegacySkin(legacySkin.getKey(), candidate.packLoc(), legacySkin.getValue());
+                }
+            }
+        } catch (Throwable ex) {
+            DebugLog.warn("LegacySkins pack import failed for {}:{}: {}", namespace, fileName, ex.toString());
+        }
+    }
+    private static void registerNewFormatPackAliases(Map<String, String> newFormatPackAliases,
+                                                     String namespace,
+                                                     String packId,
+                                                     String packFolder,
+                                                     String packName) {
+        if (newFormatPackAliases == null || packId == null || packId.isBlank()) return;
+
+        registerNewFormatPackAlias(newFormatPackAliases, packId, packId);
+
+        String strippedPackId = SkinPackDuplicateResolver.stripNamespace(packId);
+        if (strippedPackId != null && !strippedPackId.isBlank()) {
+            registerNewFormatPackAlias(newFormatPackAliases, strippedPackId, packId);
+            String namespacedIdAlias = SkinPackDuplicateResolver.namespaceOf(packId);
+            if (namespacedIdAlias == null || namespacedIdAlias.isBlank()) namespacedIdAlias = namespace;
+            if (namespacedIdAlias != null && !namespacedIdAlias.isBlank()) {
+                registerNewFormatPackAlias(newFormatPackAliases, namespacedIdAlias + ":" + strippedPackId, packId);
             }
         }
+
+        if (packFolder != null && !packFolder.isBlank()) {
+            registerNewFormatPackAlias(newFormatPackAliases, packFolder, packId);
+            if (namespace != null && !namespace.isBlank()) {
+                registerNewFormatPackAlias(newFormatPackAliases, namespace + ":" + packFolder, packId);
+            }
+        }
+
+        registerNewFormatPackNameAlias(newFormatPackAliases, packName, packId);
+    }
+
+    private static void registerNewFormatPackFingerprint(Map<String, String> preferredNewFormatPackFingerprints,
+                                                         SkinPack pack) {
+        if (preferredNewFormatPackFingerprints == null || pack == null) return;
+        for (String fingerprint : SkinPackDuplicateResolver.buildDuplicatePackFingerprints(nameString(pack.name(), pack.id()), pack.skins())) {
+            preferredNewFormatPackFingerprints.putIfAbsent(fingerprint, pack.id());
+        }
+    }
+
+    private static void registerNewFormatPackTokens(Map<String, List<String>> preferredNewFormatPackTokens,
+                                                    SkinPack pack) {
+        if (preferredNewFormatPackTokens == null || pack == null) return;
+        List<String> tokens = SkinPackDuplicateResolver.buildDuplicatePackTokens(pack.skins());
+        if (tokens.isEmpty()) return;
+        preferredNewFormatPackTokens.putIfAbsent(pack.id(), List.copyOf(tokens));
+    }
+
+    private static void registerNewFormatPackAlias(Map<String, String> newFormatPackAliases,
+                                                   String alias,
+                                                   String packId) {
+        if (newFormatPackAliases == null || packId == null || packId.isBlank()) return;
+        for (String aliasKey : SkinPackDuplicateResolver.buildDuplicatePackAliasKeys(alias)) {
+            newFormatPackAliases.putIfAbsent(aliasKey, packId);
+        }
+    }
+
+    private static void registerNewFormatPackNameAlias(Map<String, String> newFormatPackAliases,
+                                                       String packName,
+                                                       String packId) {
+        String normalizedPackName = SkinPackDuplicateResolver.normalizeDuplicatePackNameKey(nameString(packName, packId));
+        if (normalizedPackName == null) return;
+        newFormatPackAliases.putIfAbsent("name:" + normalizedPackName, packId);
+    }
+
+    private static void cleanupLegacyPackEntries(String packId,
+                                                 Map<String, SkinEntry> skinsByIdOut,
+                                                 Map<String, String> packBySkinOut,
+                                                 Map<String, List<String>> legacySkinIdsByPack) {
+        List<String> oldIds = legacySkinIdsByPack.remove(packId);
+        if (oldIds == null || oldIds.isEmpty()) return;
+        for (String oldId : oldIds) {
+            if (oldId == null || oldId.isBlank()) continue;
+            skinsByIdOut.remove(oldId);
+            packBySkinOut.remove(oldId);
+            LegacySkinsCompat.unregisterLegacySkin(oldId);
+        }
+    }
+
+    private static ResourceLocation parseLegacyPackLocation(String namespace, String rawPackId) {
+        if (namespace == null || namespace.isBlank() || rawPackId == null || rawPackId.isBlank()) return null;
+        try {
+            return rawPackId.indexOf(':') > 0
+                    ? ResourceLocation.parse(rawPackId)
+                    : ResourceLocation.fromNamespaceAndPath(namespace, rawPackId);
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static ResourceLocation parseLegacyTextureLocation(String namespace, String packFolder, String texturePath) {
+        if (namespace == null || namespace.isBlank() || texturePath == null || texturePath.isBlank()) return null;
+        try {
+            ResourceLocation tex = texturePath.indexOf(':') > 0
+                    ? ResourceLocation.parse(texturePath)
+                    : ResourceLocation.fromNamespaceAndPath(namespace, texturePath);
+            if (tex.getPath().startsWith(SKINPACKS_PREFIX)) return tex;
+            String folder = packFolder == null ? "" : packFolder;
+            return ResourceLocation.fromNamespaceAndPath(tex.getNamespace(), SKINPACKS_PREFIX + folder + "/" + tex.getPath());
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static String legacyFallbackSkinName(String modelPath, ResourceLocation packLoc, int runtimeOrdinal) {
+        if (modelPath != null && !modelPath.isBlank()) {
+            try {
+                ResourceLocation modelLoc = modelPath.indexOf(':') > 0
+                        ? ResourceLocation.parse(modelPath)
+                        : ResourceLocation.fromNamespaceAndPath(packLoc.getNamespace(), modelPath);
+                String path = modelLoc.getPath();
+                int slash = path.lastIndexOf('/');
+                if (slash >= 0 && slash + 1 < path.length()) path = path.substring(slash + 1);
+                if (path.endsWith(".cpmmodel")) path = path.substring(0, path.length() - ".cpmmodel".length());
+                path = path.replace('_', ' ').replace('-', ' ').trim();
+                if (!path.isBlank()) return path;
+            } catch (Throwable ignored) {
+            }
+        }
+        if (packLoc == null) return "legacy skin #" + runtimeOrdinal;
+        return packLoc.getPath() + " #" + runtimeOrdinal;
     }
 
     private static void loadSinglePack(String namespace, String packId, String packFolder, String packPrefix, JsonObject json, ResourceManager rm,
@@ -658,7 +1204,6 @@ if (capePath != null && !capePath.isBlank()) {
         packInsertIndex.putIfAbsent(packId, insertCounter[0]++);
 
     }
-
 
     private static void applyBuiltinAutoSelection(ResourceManager rm, Map<String, SkinPack> ordered) {
         if (LAST_USED_CUSTOM_PACK_ID != null) {
@@ -844,8 +1389,7 @@ if (capePath != null && !capePath.isBlank()) {
         }
     }
 
-
-public static String nameString(String name, String fallbackId) {
+    public static String nameString(String name, String fallbackId) {
     return trMaybeKey(name, fallbackId);
 }
 
