@@ -6,8 +6,8 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.StringUtil;
         //?}
 import net.minecraft.SharedConstants;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public interface RenameItemMenu {
 
@@ -18,6 +18,10 @@ public interface RenameItemMenu {
             return string2;
         }
         return null;
+    }
+
+    static String getItemName(ItemStack stack) {
+        return stack.is(Items.FILLED_MAP) && !stack.has(DataComponents.CUSTOM_NAME) ? stack.getItem().getName(stack).getString() : stack.getHoverName().getString();
     }
 
     String getResultItemName();
