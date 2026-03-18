@@ -1,26 +1,26 @@
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.Util;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
-import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
@@ -33,26 +33,18 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
     public boolean hardcore;
 
     @Shadow
-    @Final
-    public Component causeOfDeath;
-
-    @Shadow
-    @Nullable
     private Button exitToTitleButton;
     @Shadow
     @Final
     private List<Button> exitButtons;
     @Shadow
     private int delayTicker;
+    @Unique
     private final long screenInit = Util.getMillis();
 
     protected DeathScreenMixin(Component component) {
         super(component);
     }
-
-    @Shadow
-    @Nullable
-    protected abstract Style getClickedComponentStyleAt(int i);
 
     @Shadow
     protected abstract void handleExitToTitleScreen();
@@ -86,27 +78,35 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         }
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    private void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         float alpha = Math.min((Util.getMillis() - screenInit) / 1200f, 1.0f);
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20);
-        guiGraphics.pose().scale(2.0F, 2.0F);
-        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
-        guiGraphics.pose().popMatrix();
-        if (this.causeOfDeath != null) {
-            guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
-            if (j > height / 2 - 24 && j < height / 2 - 15)
-                guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
-        }
+    }
 
-        if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DRAFT_REPORT, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 15, 15);
-        }
-        for (Renderable renderable : this.renderables)
-            renderable.render(guiGraphics, i, j, f);
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 0))
+    private void renderLegacyTitle(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, font, component, i - font.width(component) / 2, this.height / 8 + 10, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
+    }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 1))
+    private void renderLegacyCauseOfDeath(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
+        guiGraphics.drawCenteredString(font, component, i, this.height / 2 - 24, k);
+    }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 2))
+    private void hideDeathScore(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
+    }
+
+    @ModifyConstant(method = "mouseClicked", constant = @Constant(doubleValue = 85.0D))
+    private double legacyCauseOfDeathClickY(double d) {
+        return this.height / 2.0 - 24.0;
+    }
+
+    @ModifyConstant(method = {"render", "mouseClicked"}, constant = @Constant(intValue = 85))
+    private int legacyCauseOfDeathY(int i) {
+        return this.height / 2 - 24;
     }
 
 }
