@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -68,6 +70,11 @@ public abstract class ScreenEffectRendererMixin {
         } else texRenderColor = 0xFFFFFFFF;
 
         return f;
+    }
+
+    @Redirect(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isOnFire()Z"))
+    private boolean renderScreenEffect(LocalPlayer player) {
+        return player.isOnFire() && !player.hasEffect(MobEffects.FIRE_RESISTANCE);
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
