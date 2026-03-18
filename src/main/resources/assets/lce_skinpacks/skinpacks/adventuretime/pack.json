@@ -18,12 +18,14 @@
       "id": "fionna",
       "name": "key:custom.adventuretime.fionna",
       "texture": "skins/fionna.png",
+      "model": "slim",
       "order": 3
     },
     {
       "id": "fionna_dress",
       "name": "key:custom.adventuretime.fionna_dress",
       "texture": "skins/fionna_dress.png",
+      "model": "slim",
       "order": 4
     },
     {
@@ -42,18 +44,21 @@
       "id": "princess_bubblegum",
       "name": "key:custom.adventuretime.princess_bubblegum",
       "texture": "skins/princess_bubblegum.png",
+      "model": "slim",
       "order": 7
     },
     {
       "id": "prince_gumball",
       "name": "key:custom.adventuretime.prince_gumball",
       "texture": "skins/prince_gumball.png",
+      "model": "slim",
       "order": 8
     },
     {
       "id": "lady_rainicorn",
       "name": "key:custom.adventuretime.lady_rainicorn",
       "texture": "skins/lady_rainicorn.png",
+      "model": "slim",
       "order": 9
     },
     {
@@ -63,16 +68,17 @@
       "order": 9.1
     },
     {
-      "id": "simon_petrikov",
+      "id": "simon_petrikov1,
       "name": "key:custom.adventuretime.simon_petrikov",
       "texture": "skins/simon_petrikov.png",
       "order": 9.3
     },
     {
-      "id": "ice_queen",
+      "id": "ice_queen1",
       "name": "key:custom.adventuretime.ice_queen",
       "texture": "skins/ice_queen.png",
       "order": 9.2,
+      "model": "slim",
       "poses": [
         "stiff_legs"
       ]
@@ -81,6 +87,7 @@
       "id": "marceline",
       "name": "key:custom.adventuretime.marceline",
       "texture": "skins/marceline.png",
+      "model": "slim",
       "order": 9.4
     },
     {
@@ -291,12 +298,14 @@
       "id": "minerva",
       "name": "key:custom.adventuretime.minerva",
       "texture": "skins/minerva.png",
+      "model": "slim",
       "order": 41
     },
     {
       "id": "betty_grof",
       "name": "key:custom.adventuretime.betty_grof",
       "texture": "skins/betty_grof.png",
+      "model": "slim",
       "order": 42
     },
     {
