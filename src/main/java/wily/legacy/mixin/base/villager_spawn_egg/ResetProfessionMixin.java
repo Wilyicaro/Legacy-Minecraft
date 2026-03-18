@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.villager_spawn_egg;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.server.level.ServerLevel;

@@ -2,7 +2,6 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -11,8 +10,6 @@ import net.minecraft.world.entity.*;
 //?} else {
 /*import net.minecraft.world.entity.MobSpawnType;
  *///?}
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -25,9 +22,6 @@ import wily.legacy.util.LegacyComponents;
 
 @Mixin(EntityType.class)
 public abstract class EntityTypeMixin {
-    @Unique
-    private static final ResourceKey<VillagerProfession>[] SPAWN_EGG_PROFESSIONS = new ResourceKey[]{VillagerProfession.ARMORER, VillagerProfession.BUTCHER, VillagerProfession.CARTOGRAPHER, VillagerProfession.CLERIC, VillagerProfession.FARMER, VillagerProfession.FISHERMAN, VillagerProfession.FLETCHER, VillagerProfession.LEATHERWORKER, VillagerProfession.LIBRARIAN, VillagerProfession.MASON, VillagerProfession.SHEPHERD, VillagerProfession.TOOLSMITH, VillagerProfession.WEAPONSMITH};
-
     @Unique
     boolean wasLastEnemySpawnFailed = false;
 
@@ -42,10 +36,6 @@ public abstract class EntityTypeMixin {
 
     @Inject(method = "spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity;", at = @At("RETURN"))
     public void spawn(ServerLevel arg, ItemStack arg2, LivingEntity arg3, BlockPos arg4, EntitySpawnReason arg5, boolean bl, boolean bl2, CallbackInfoReturnable<Entity> cir) {
-        if (cir.getReturnValue() instanceof Villager v && (arg5 == EntitySpawnReason.SPAWN_ITEM_USE || arg5 == EntitySpawnReason.DISPENSER) && v.getVillagerData().profession().is(VillagerProfession.NONE)) {
-            v.setVillagerData(v.getVillagerData().withProfession(arg.registryAccess(), SPAWN_EGG_PROFESSIONS[v.getRandom().nextInt(SPAWN_EGG_PROFESSIONS.length)]));
-            v.addTag("legacy_spawn_egg_profession");
-        }
         if (arg5 == EntitySpawnReason.SPAWN_ITEM_USE && wasLastEnemySpawnFailed && cir.getReturnValue() == null && arg3 instanceof ServerPlayer sp)
             sp.displayClientMessage(LegacyComponents.PEACEFUL_SPAWN_TIP, true);
     }

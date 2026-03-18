@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.villager_spawn_egg;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.Holder;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AssignProfessionFromJobSite.class)
-public class AssignProffesionMixin {
+public class AssignProfessionMixin {
     @ModifyExpressionValue(method = "method_46890", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;is(Lnet/minecraft/resources/ResourceKey;)Z"))
     private static boolean allowSpawnEggProfessionSwap(boolean original, BehaviorBuilder.Instance<?> instance, MemoryAccessor<?, ?> potentialJobSite, MemoryAccessor<?, ?> jobSite, ServerLevel level, Villager villager, long time) {
         return original || villager.getVillagerXp() == 0 && villager.getTags().contains("legacy_spawn_egg_profession");
