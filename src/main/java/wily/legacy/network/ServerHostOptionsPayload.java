@@ -36,6 +36,10 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
         return new ServerHostOptionsPayload(Action.DIFFICULTY, difficulty.getKey(), EMPTY_UUID);
     }
 
+    public static ServerHostOptionsPayload defaultGameMode(GameType gameType) {
+        return new ServerHostOptionsPayload(Action.DEFAULT_GAME_MODE, gameType.getName(), EMPTY_UUID);
+    }
+
     public static ServerHostOptionsPayload gameMode(GameType gameType, UUID player) {
         return new ServerHostOptionsPayload(Action.GAME_MODE, gameType.getName(), player);
     }
@@ -83,14 +87,14 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
                     default -> Difficulty.NORMAL.getDisplayName();
                 }), false);
             }
+            case DEFAULT_GAME_MODE -> {
+                GameType gameType = gameTypeFromValue(value);
+                server.getCommands().performPrefixedCommand(source, "defaultgamemode " + gameType.getName());
+                sp.displayClientMessage(Component.translatable("commands.defaultgamemode.success", gameType.getLongDisplayName()), false);
+            }
             case GAME_MODE -> {
                 ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
-                GameType gameType = switch (value) {
-                    case "creative" -> GameType.CREATIVE;
-                    case "adventure" -> GameType.ADVENTURE;
-                    case "spectator" -> GameType.SPECTATOR;
-                    default -> GameType.SURVIVAL;
-                };
+                GameType gameType = gameTypeFromValue(value);
                 if (affectPlayer != null && affectPlayer.gameMode.changeGameModeForPlayer(gameType)) {
                     affectPlayer.displayClientMessage(Component.translatable("legacy.menu.host_options.message.game_mode_changed"), false);
                     if (sp == affectPlayer) sp.displayClientMessage(Component.translatable("commands.gamemode.success.self", gameType.getLongDisplayName()), false);
@@ -120,11 +124,21 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
         return ID;
     }
 
+    private static GameType gameTypeFromValue(String value) {
+        return switch (value) {
+            case "creative" -> GameType.CREATIVE;
+            case "adventure" -> GameType.ADVENTURE;
+            case "spectator" -> GameType.SPECTATOR;
+            default -> GameType.SURVIVAL;
+        };
+    }
+
     public enum Action {
         COMMAND,
         TIME,
         WEATHER,
         DIFFICULTY,
+        DEFAULT_GAME_MODE,
         GAME_MODE,
         WORLD_SPAWN,
         PLAYER_SPAWN
