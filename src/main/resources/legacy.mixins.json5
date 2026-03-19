@@ -198,6 +198,8 @@
     "ServerExplosionMixin",
     "ItemMixin",
     "AbstractContainerMenuMixin",
+    "AbstractArrowMixin",
+    "ProjectileInvoker",
     "AbstractMinecartMixin",
     "AbstractVillagerMixin",
     "AnimalMixin",

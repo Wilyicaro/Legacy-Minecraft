@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ThrownTrident.class)
@@ -27,5 +28,9 @@ public abstract class ThrownTridentMixin extends AbstractArrow {
             return;
         }
         setNoPhysics(true);
+    }
+
+    @Overwrite
+    public void tickDespawn() {
     }
 }
