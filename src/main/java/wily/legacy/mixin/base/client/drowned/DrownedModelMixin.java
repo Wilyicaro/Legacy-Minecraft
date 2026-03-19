@@ -1,14 +1,14 @@
 package wily.legacy.mixin.base.client.drowned;
 
 import net.minecraft.client.model.AnimationUtils;
-import net.minecraft.client.model.DrownedModel;
-import net.minecraft.client.model.ZombieModel;
+import net.minecraft.client.model.monster.zombie.DrownedModel;
+import net.minecraft.client.model.monster.zombie.ZombieModel;
 import net.minecraft.client.model.geom.ModelPart;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.entity.state.ZombieRenderState;
 //?}
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

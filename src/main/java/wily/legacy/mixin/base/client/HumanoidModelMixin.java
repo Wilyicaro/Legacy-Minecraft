@@ -40,10 +40,10 @@ public abstract class HumanoidModelMixin {
     public ModelPart leftArm;
 
     @Invoker("poseRightArm")
-    protected abstract void legacy$poseRightArm(HumanoidRenderState humanoidRenderState, HumanoidModel.ArmPose armPose);
+    protected abstract void legacy$poseRightArm(HumanoidRenderState humanoidRenderState/*? if <1.21.11 {*//*, HumanoidModel.ArmPose armPose*//*?}*/);
 
     @Invoker("poseLeftArm")
-    protected abstract void legacy$poseLeftArm(HumanoidRenderState humanoidRenderState, HumanoidModel.ArmPose armPose);
+    protected abstract void legacy$poseLeftArm(HumanoidRenderState humanoidRenderState/*? if <1.21.11 {*//*, HumanoidModel.ArmPose armPose*//*?}*/);
 
     private float getLegacyTridentRaiseProgress(int ticksUsingItem) {
         return switch (Mth.clamp(ticksUsingItem, 0, LEGACY_TRIDENT_RAISE_TICKS)) {
@@ -67,13 +67,13 @@ public abstract class HumanoidModelMixin {
     private void applyLegacyTridentSupportArmPose(HumanoidRenderState humanoidRenderState, HumanoidArm useArm) {
         HumanoidArm supportArm = useArm.getOpposite();
         HumanoidModel.ArmPose supportArmPose = supportArm == HumanoidArm.RIGHT ? humanoidRenderState.rightArmPose : humanoidRenderState.leftArmPose;
-        if (supportArmPose == null || supportArmPose.isTwoHanded()) {
+        if (supportArmPose.isTwoHanded()) {
             return;
         }
         if (supportArm == HumanoidArm.RIGHT) {
-            legacy$poseRightArm(humanoidRenderState, supportArmPose);
+            legacy$poseRightArm(humanoidRenderState/*? if <1.21.11 {*//*, supportArmPose*//*?}*/);
         } else {
-            legacy$poseLeftArm(humanoidRenderState, supportArmPose);
+            legacy$poseLeftArm(humanoidRenderState/*? if <1.21.11 {*//*, supportArmPose*//*?}*/);
         }
     }
 
@@ -81,7 +81,7 @@ public abstract class HumanoidModelMixin {
     private void setupAnim(/*? if <1.21.2 {*/ /*LivingEntity livingEntity, float f, float g, float h, float i, float j*//*?} else {*/ HumanoidRenderState humanoidRenderState/*?}*/, CallbackInfo info) {
         HumanoidArm mainArm = /*? if <1.21.2 {*//*livingEntity.getMainArm()*//*?} else {*/ humanoidRenderState.mainArm/*?}*/;
         float ageInTicks = /*? if <1.21.2 {*//*h*//*?} else {*/humanoidRenderState.ageInTicks/*?}*/;
-        if (/*? if <1.21.2 {*//*!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)*//*?} else {*/ humanoidRenderState.getMainHandItem().isEmpty()/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isShiftKeyDown()*//*?} else {*/humanoidRenderState.isDiscrete/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isFallFlying()*//*?} else {*/humanoidRenderState.isFallFlying/*?}*/) {
+        if (/*? if <1.21.2 {*//*!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)*//*?} else {*/ humanoidRenderState.getMainHandItemStack().isEmpty()/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isShiftKeyDown()*//*?} else {*/humanoidRenderState.isDiscrete/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isFallFlying()*//*?} else {*/humanoidRenderState.isFallFlying/*?}*/) {
             (mainArm == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI) + (mainArm == HumanoidArm.RIGHT ? 1.0f : -1.0f) * Mth.sin(ageInTicks * 0.067F) * 0.05F;
         }
         HumanoidArm useArm = /*? if <1.21.2 {*//*livingEntity.getUsedItemHand()*//*?} else {*/ humanoidRenderState.useItemHand/*?}*/ == InteractionHand.MAIN_HAND ? mainArm : mainArm.getOpposite();
@@ -99,7 +99,7 @@ public abstract class HumanoidModelMixin {
         }
         if (/*? if <1.21.2 {*//*livingEntity.getUseItemRemainingTicks() > 0*//*?} else {*/humanoidRenderState.isUsingItem/*?}*/ && useAnim == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.SPEAR) {
             applyLegacyTridentSupportArmPose(humanoidRenderState, useArm);
-            applyLegacyTridentRaise(useArm == HumanoidArm.RIGHT ? rightArm : leftArm, /*? if <1.21.2 {*//*livingEntity.getTicksUsingItem()*//*?} else {*/humanoidRenderState.ticksUsingItem/*?}*/);
+            applyLegacyTridentRaise(useArm == HumanoidArm.RIGHT ? rightArm : leftArm, /*? if <1.21.2 {*//*livingEntity.getTicksUsingItem()*//*?} else {*/(int) humanoidRenderState.ticksUsingItem/*?}*/);
         }
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
@@ -47,7 +47,7 @@ public abstract class AbstractMinecartMixin extends Entity {
         Vec3 movement = Legacy4J.getRelativeMovement(p,1.0f,new Vec3(0,0,p.zza),0);
         return instance.add(movement.x*0.1f,e,movement.z*0.1f);
     }
-    @Redirect(method = "moveAlongTrack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isInWater()Z"))
+    @Redirect(method = "moveAlongTrack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;isInWater()Z"))
     public boolean moveAlongTrack(AbstractMinecart instance) {
         return false;
     }
@@ -125,7 +125,7 @@ public abstract class AbstractMinecartMixin extends Entity {
         super(entityType, level);
     }
 
-    @Redirect(method = "applyNaturalSlowdown", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isInWater()Z"))
+    @Redirect(method = "applyNaturalSlowdown", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;isInWater()Z"))
     public boolean applyNaturalSlowdown(AbstractMinecart instance) {
         return false;
     }

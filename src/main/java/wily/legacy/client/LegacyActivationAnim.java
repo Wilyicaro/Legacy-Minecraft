@@ -1,12 +1,14 @@
 package wily.legacy.client;
 
+//~ rendertypes
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.util.ARGB;
@@ -16,8 +18,6 @@ import org.joml.Matrix4f;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 
 public class LegacyActivationAnim {
-
-
     public static Render itemActivationRenderReplacement = null;
 
     public static void display(Render render) {
@@ -48,7 +48,7 @@ public class LegacyActivationAnim {
         float o = textureAtlasSprite.getV0();
         float p = textureAtlasSprite.getV1();
         Matrix4f matrix4f = poseStack.last().pose();
-        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.blockScreenEffect(textureAtlasSprite.atlasLocation()));
+        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderTypes.blockScreenEffect(textureAtlasSprite.atlasLocation()));
         vertexConsumer.addVertex(matrix4f, -1.0F, -1.0F, -0.5F).setUv(n, p).setColor(i);
         vertexConsumer.addVertex(matrix4f, 1.0F, -1.0F, -0.5F).setUv(m, p).setColor(i);
         vertexConsumer.addVertex(matrix4f, 1.0F, 1.0F, -0.5F).setUv(m, o).setColor(i);

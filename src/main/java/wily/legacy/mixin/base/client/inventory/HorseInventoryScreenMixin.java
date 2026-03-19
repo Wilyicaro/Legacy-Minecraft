@@ -2,13 +2,15 @@ package wily.legacy.mixin.base.client.inventory;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.Llama;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.HorseInventoryMenu;
 import net.minecraft.world.inventory.Slot;
@@ -28,11 +30,22 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-@Mixin(HorseInventoryScreen.class)
+//? if >=1.21.11 {
+@Mixin(AbstractMountInventoryScreen.class)
+//?} else {
+/*@Mixin(HorseInventoryScreen.class)
+*///?}
 public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
     @Shadow
     @Final
-    private AbstractHorse horse;
+    //? if >=1.21.11 {
+    protected LivingEntity mount;
+
+    @Unique
+    AbstractHorse horse = (AbstractHorse) mount;
+    //?} else {
+    /*private AbstractHorse horse;
+     *///?}
 
     @Unique
     private static Vec2 SD_SLOTS_OFFSET = new Vec2(0.5f, 0.5f);

@@ -12,7 +12,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.GameRules;
+//? if >=1.21.11 {
+import net.minecraft.world.level.gamerules.GameRules;
+//?} else {
+/*import net.minecraft.world.level.GameRules;
+ *///?}
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
@@ -66,7 +70,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         this.summary = summary;
         this.access = access;
         difficulty = summary.getSettings().difficulty();
-        gameTypeSlider = new LegacySliderButton<>(0, 0, 220, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), summary.getSettings().gameType(), () -> GAME_TYPES, b -> {});
+        gameTypeSlider = new LegacySliderButton<>(0, 0, 220, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), summary.getSettings().gameType(), () -> GAME_TYPES, b -> {
+        });
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.PUBLISH, b -> null, button -> {
@@ -232,7 +237,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                 server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END), minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
-            applyGameRules.accept(server.getGameRules(), minecraft.getSingleplayerServer());
+            applyGameRules.accept(/*? if >=1.21.11 {*/s.level()/*?} else {*//*server*//*?}*/.getGameRules(), minecraft.getSingleplayerServer());
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             server.getPlayerList().sendPlayerPermissionLevel(s);

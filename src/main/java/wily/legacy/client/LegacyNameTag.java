@@ -5,7 +5,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+//? if >=1.21.11 {
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+//?} else {
+/*import net.minecraft.client.renderer.RenderType;
+ *///?}
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Component;
@@ -33,7 +37,7 @@ public interface LegacyNameTag {
         float thickness = getThickness(submit.distanceToCameraSq());
         float[] color = LegacyNameTag.of(submit).getNameTagColor();
         if (!LegacyOptions.displayNameTagBorder.get() || thickness >= 1 || color == null) return;
-        renderOutline(bufferSource.getBuffer(seeThrough ? RenderType.textBackgroundSeeThrough() : RenderType.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
+        renderOutline(bufferSource.getBuffer(seeThrough ? /*? if >=1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.textBackgroundSeeThrough() : /*? if >=1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
     }
 
     static void renderOutline(VertexConsumer consumer, Matrix4f matrix4f, float x, float y, float width, float height, float thickness, float r, float g, float b, float a) {

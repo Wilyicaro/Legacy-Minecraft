@@ -9,7 +9,7 @@ import net.minecraft.client.gui.render.state.pip.GuiBannerResultRenderState;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.model.BannerFlagModel;
+import net.minecraft.client.model.object.banner.BannerFlagModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.Sheets;

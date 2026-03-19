@@ -24,6 +24,11 @@
     //? if fabric {
     "client.TerrainRenderContextMixin",
     //?}
+    //? if >=1.21.11 {
+    "client.RenderSetupAccessor",
+    //?} else {
+    /*"client.CompositeRenderTypeAccessor",
+    *///?}
     "client.SectionOcclusionGraphMixin",
     "client.LevelEventHandlerMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
@@ -155,11 +160,6 @@
     "client.LogoRendererMixin",
     "client.LightTextureMixin",
     "client.LightingMixin",
-    //? if >=1.21.11 {
-    "client.RenderSetupAccessor",
-    //?} else {
-    /*"client.CompositeRenderTypeAccessor",
-    *///?}
     "client.ClientLivingEntityMixin",
     "client.VillagerModelMixin",
     "client.BubbleParticleMixin",
@@ -198,6 +198,9 @@
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",
     *///?}
+    //? if >=1.21.11 {
+    "GameRuleCategoryAccessor",
+    //?}
     "OldMinecartBehaviorMixin",
     "ServerExplosionMixin",
     "ItemMixin",

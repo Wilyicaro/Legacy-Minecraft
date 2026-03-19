@@ -2,10 +2,11 @@ import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 import groovy.json.JsonParserType
 import groovy.json.JsonOutput
+
 plugins {
-    id "dev.architectury.loom"
-    id "me.modmuss50.mod-publish-plugin" version "0.7.4"
-    id 'maven-publish'
+    id("dev.architectury.loom")
+    id("me.modmuss50.mod-publish-plugin") version "0.7.4"
+    id("maven-publish")
 }
 
 base.archivesName = project.archives_base_name
@@ -27,7 +28,7 @@ repositories {
         url "https://www.cursemaven.com"
     }
     maven {
-        name = 'Kyubion Mod Resources'
+        name = "Kyubion Mod Resources"
         url "https://raw.githubusercontent.com/Kyubion-Studios/Mod-Resources/main/maven/"
     }
 
@@ -49,7 +50,7 @@ repositories {
         url = "https://maven.terraformersmc.com/"
     }
 
-    maven{url = "https://maven.su5ed.dev/releases"}
+    maven { url = "https://maven.su5ed.dev/releases" }
 
 
     maven {
@@ -72,10 +73,10 @@ configurations.configureEach {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${stonecutter.current.version}"
-    mappings loom.officialMojangMappings()
+    minecraft("com.mojang:minecraft:${stonecutter.current.version}")
+    mappings(loom.officialMojangMappings())
     api(include(sdl_dependency))
-    modApi "wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}"
+    modApi("wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}")
     modCompileOnly("maven.modrinth:world-host:${world_host_version}")
     modCompileOnly("maven.modrinth:vivecraft:${vivecraft_version}")
     if (stonecutter.eval(stonecutter.current.version, "<=1.21.1")) {
@@ -83,29 +84,29 @@ dependencies {
         modCompileOnly("mezz.jei:jei-${stonecutter.current.version}-${loader}:${jei_version}")
     }
 
-    // TODO: complains of architectury loom's version being too low (1.13 vs 1.14), not going to be an issue in 26.1
-    if (stonecutter.eval(stonecutter.current.version, "<1.21.11") && loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
+    // TODO: complains of architectury loom"s version being too low (1.13 vs 1.14), not going to be an issue in 26.1
+    if (stonecutter.eval(stonecutter.current.version, "<1.21.11") && loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge") {
         modCompileOnly("maven.modrinth:sodium:${sodium_version}")
         modCompileOnly("maven.modrinth:iris:${iris_version}")
     }
 
     if (loader == "fabric") {
-        modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-        modApi "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+        modImplementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
+        modApi("net.fabricmc.fabric-api:fabric-api:${fabric_api_version}")
         modImplementation("com.terraformersmc:modmenu:${modmenu_version}")
         if (stonecutter.eval(stonecutter.current.version, ">=1.21") || stonecutter.eval(stonecutter.current.version, "1.20.1")) {
             modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
             modCompileOnly("dev.architectury:architectury-fabric:${architectury_version}")
         }
     } else if (loader == "forge") {
-        forge "net.minecraftforge:forge:${stonecutter.current.version}-${forge_version}"
-        if (stonecutter.eval(stonecutter.current.version, "1.20.1")){
+        forge("net.minecraftforge:forge:${stonecutter.current.version}-${forge_version}")
+        if (stonecutter.eval(stonecutter.current.version, "1.20.1")) {
             modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
             modCompileOnly("dev.architectury:architectury-forge:${architectury_version}")
         }
         compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
     } else if (loader == "neoforge") {
-        neoForge "net.neoforged:neoforge:${neoforge_version}"
+        neoForge("net.neoforged:neoforge:${neoforge_version}")
     }
 
     if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, ">=1.21")) {
@@ -114,14 +115,16 @@ dependencies {
     }
 
     if (loader == "forge" || loader == "neoforge") {
-        forgeRuntimeLibrary sdl_dependency
+        forgeRuntimeLibrary(sdl_dependency)
     }
 }
 
 stonecutter {
     replacements {
         string(stonecutter.eval(stonecutter.current.version, ">=1.21.11")) {
+            replace("critereon", "criterion")
             replace("ResourceLocation", "Identifier")
+            replace("getResourceLocation()", "getResourceLocation()")
             replace("location()", "identifier()")
             replace("CommonNetwork.Identifier", "CommonNetwork.Identifier")
             replace("Progress.Identifier", "Progress.Identifier")
@@ -135,7 +138,58 @@ stonecutter {
             replace("vehicle.MinecartBehavior", "vehicle.minecart.MinecartBehavior")
             replace("vehicle.OldMinecartBehavior", "vehicle.minecart.OldMinecartBehavior")
             replace("vehicle.MinecartFurnace", "vehicle.minecart.MinecartFurnace")
+            replace("vehicle.AbstractBoat", "vehicle.boat.AbstractBoat")
+            replace("net/minecraft/world/entity/vehicle/AbstractMinecart", "net/minecraft/world/entity/vehicle/minecart/AbstractMinecart")
             replace("animal.Pig", "animal.pig.Pig")
+            replace("animal.Squid", "animal.squid.Squid")
+            replace("animal.IronGolem", "animal.golem.IronGolem")
+            replace("animal.SnowGolem", "animal.golem.SnowGolem")
+            replace("animal.horse", "animal.equine")
+            replace("monster.Zombie", "monster.zombie.Zombie")
+            replace("monster.Drowned", "monster.zombie.Drowned")
+            replace("npc.AbstractVillager", "npc.villager.AbstractVillager")
+            replace("npc.Villager", "npc.villager.Villager")
+            replace("npc.VillagerProfession", "npc.villager.VillagerProfession")
+            replace("projectile.AbstractArrow", "projectile.arrow.AbstractArrow")
+            replace("projectile.ThrownTrident", "projectile.arrow.ThrownTrident")
+            replace("projectile.ThrownEgg", "projectile.throwableitemprojectile.ThrownEgg")
+            replace("model.ArrowModel", "model.object.projectile.ArrowModel")
+            replace("model.DrownedModel", "model.monster.zombie.DrownedModel")
+            replace("model.ZombieModel", "model.monster.zombie.ZombieModel")
+            replace("model.WitchModel", "model.monster.witch.WitchModel")
+            replace("model.VillagerModel", "model.npc.VillagerModel")
+            replace("model.BookModel", "model.object.book.BookModel")
+            replace("model.BannerFlagModel", "model.object.banner.BannerFlagModel")
+            replace("world.level.biome.AmbientMoodSettings", "world.attribute.AmbientMoodSettings")
+//            replace("GameRules.Key<GameRules.BooleanValue>", "GameRule<Boolean>")
+//            replace("GameRules.Key<GameRules.IntegerValue>", "GameRule<Integer>")
+        }
+        string(stonecutter.eval(stonecutter.current.version, ">=1.21.11"), "gamerule") {
+            replace("GameRules.Key", "GameRule")
+            replace("GameRules.BooleanValue", "Boolean")
+            replace("GameRules.IntegerValue", "Integer")
+            replace("GameRules.Category", "GameRuleCategory")
+            replace("GameRules.GameRuleTypeVisitor()", "GameRuleTypeVisitor()")
+            replace("getRule(key).get()", "get(key)")
+            replace("key.getId()", "key.id()")
+            replace("k.getId()", "k.id()")
+            replace("key.getCategory()", "key.category()")
+            replace("k.getCategory()", "k.category()")
+            replace("RULE_DOFIRETICK", "FIRE_DAMAGE")
+            replace("RULE_TNT_EXPLODES", "TNT_EXPLODES")
+            replace("RULE_DAYLIGHT", "ADVANCE_TIME")
+            replace("RULE_KEEPINVENTORY", "KEEP_INVENTORY")
+            replace("RULE_DOMOBSPAWNING", "SPAWN_MOBS")
+            replace("RULE_MOBGRIEFING", "MOB_GRIEFING")
+            replace("RULE_WEATHER_CYCLE", "ADVANCE_WEATHER")
+            replace("RULE_DOMOBLOOT", "MOB_DROPS")
+            replace("RULE_DOBLOCKDROPS", "BLOCK_DROPS")
+            replace("RULE_NATURAL_REGENERATION", "NATURAL_HEALTH_REGENERATION")
+            replace("RULE_DO_IMMEDIATE_RESPAWN", "IMMEDIATE_RESPAWN")
+        }
+        string(stonecutter.eval(stonecutter.current.version, ">=1.21.11"), "rendertypes") {
+            replace("RenderType", "RenderTypes")
+            replace("renderer.RenderType;", "renderer.rendertype.RenderTypes;")
         }
     }
 }
@@ -157,7 +211,7 @@ loom {
 
 def isJava21 = stonecutter.eval(stonecutter.current.version, ">=1.20.5")
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.release = isJava21 ? 21 : 17
 }
@@ -178,7 +232,7 @@ java {
     targetCompatibility = isJava21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
 }
 remapJar {
-    if (loader == "neoforge") atAccessWideners.add aw
+    if (loader == "neoforge") atAccessWideners.add(aw)
 }
 ext {
     releaseChangelog = {
@@ -202,7 +256,7 @@ ext {
             def processedLine = line.toString()
             def lines = processedLine.split(" -")
             changes << "\n**${lines[0]}**  "
-            lines.each {s-> if (s != lines[0]) changes << "\n- " + s + "  "}
+            lines.each { s -> if (s != lines[0]) changes << "\n- " + s + "  " }
         }
         changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
         proc.waitFor()
@@ -217,60 +271,59 @@ processResources {
     if (loader == "fabric") {
         version_range = version_range.split(",").join("\",\"")
     }
-    def properties = [
-            "version" : mod_version,
-            "mod_id" : mod_id,
-            "mod_name" : mod_name,
-            "mod_license" : mod_license,
-            "mod_description" : mod_description,
-            "mod_authors" : mod_authors,
-            "mod_group" : project.group,
-            "mod_credits" : mod_credits,
-            "mod_source" : mod_source,
-            "mod_issues" : mod_issues,
-            "neoforge_version" : neoforge_version,
-            "forge_version" : forge_version,
-            "fabric_api_version" : fabric_api_version,
-            "mc_version_range" : version_range,
-            "mc_version" : stonecutter.current.version,
-            "aw": aw,
-            "factory_api_version": factory_api_version
-    ]
+    def properties = ["version"            : mod_version,
+                      "mod_id"             : mod_id,
+                      "mod_name"           : mod_name,
+                      "mod_license"        : mod_license,
+                      "mod_description"    : mod_description,
+                      "mod_authors"        : mod_authors,
+                      "mod_group"          : project.group,
+                      "mod_credits"        : mod_credits,
+                      "mod_source"         : mod_source,
+                      "mod_issues"         : mod_issues,
+                      "neoforge_version"   : neoforge_version,
+                      "forge_version"      : forge_version,
+                      "fabric_api_version" : fabric_api_version,
+                      "mc_version_range"   : version_range,
+                      "mc_version"         : stonecutter.current.version,
+                      "aw"                 : aw,
+                      "factory_api_version": factory_api_version]
+
     if (loader == "fabric" || loader == "forge" || loader == "neoforge") {
         if (loader != "fabric") {
-            exclude "fabric.mod.json"
-            exclude "${mod_id}-fabric.mixins.json"
+            exclude("fabric.mod.json")
+            exclude("${mod_id}-fabric.mixins.json")
         }
         if (loader != "forge") exclude "META-INF/mods.toml"
         if (loader != "neoforge") {
-            exclude "META-INF/neoforge.mods.toml"
+            exclude("META-INF/neoforge.mods.toml")
         }
         filesMatching(loader == "fabric" ? "fabric.mod.json" : loader == "forge" ? "META-INF/mods.toml" : "META-INF/neoforge.mods.toml") {
-            expand properties
+            expand(properties)
         }
     }
 
     def parser = new JsonSlurper().setType(JsonParserType.LAX)
 
-    filesMatching("**/*.json5"){
+    filesMatching("**/*.json5") {
         String noComments = JsonOutput.prettyPrint(JsonOutput.toJson(parser.parse(it.file)))
-        File newFile = new File(outputs.files.asPath,it.path.substring(0,it.path.length() - 1))
-        if (!noComments.isBlank()){
+        File newFile = new File(outputs.files.asPath, it.path.substring(0, it.path.length() - 1))
+        if (!noComments.isBlank()) {
             newFile.getParentFile().mkdirs()
             newFile.write(noComments)
         }
         it.exclude()
     }
     inputs.properties(properties)
-    if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, "<=1.20.4")){
-        filesMatching("META-INF/neoforge.mods.toml"){
-            it.copyTo(new File(outputs.files.asPath,"META-INF/mods.toml"))
+    if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, "<=1.20.4")) {
+        filesMatching("META-INF/neoforge.mods.toml") {
+            it.copyTo(new File(outputs.files.asPath, "META-INF/mods.toml"))
             it.exclude()
         }
     }
 }
 
-tasks.register('renameJarForPublication', Zip) {
+tasks.register("renameJarForPublication", Zip) {
     dependsOn remapJar
     from remapJar.archiveFile.map { zipTree(it) }
     archiveExtension = "jar"
@@ -279,7 +332,7 @@ tasks.register('renameJarForPublication', Zip) {
     archiveClassifier = loader
 }
 
-assemble.dependsOn renameJarForPublication
+assemble.dependsOn(renameJarForPublication)
 
 var modPlatformName = loader.capitalize()
 
@@ -300,13 +353,13 @@ publishing {
                     developerConnection = "${mod_source}".replace("https://github.com/", "scm:git:git@github.com:").concat(".git")
                 }
                 issueManagement {
-                    system = 'github'
+                    system = "github"
                     url = "${mod_issues}"
                 }
                 licenses {
                     license {
-                        name = 'MPL-2'
-                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                        name = "MPL-2"
+                        url = "https://www.mozilla.org/en-US/MPL/2.0/"
                     }
                 }
                 developers {
@@ -316,14 +369,14 @@ publishing {
                     }
                 }
             }
-            // this is necessary when not using 'from components.java', otherwise dependencies block will still be empty at this point
+            // this is necessary when not using "from components.java", otherwise dependencies block will still be empty at this point
             afterEvaluate {
                 // exclude certain dependencies when publishing to maven
                 // from https://stackoverflow.com/a/50121790
                 pom.withXml {
                     asNode().dependencies.dependency.each { dep ->
                         // use this approach to make excluding dependencies from Curse Maven more convenient
-                        if (["curse.maven:","dev.architectury:"].stream().anyMatch(mod -> "${dep.groupId.last().value().last()}:${dep.artifactId.last().value().last()}".startsWith(mod))) {
+                        if (["curse.maven:", "dev.architectury:"].stream().anyMatch(mod -> "${dep.groupId.last().value().last()}:${dep.artifactId.last().value().last()}".startsWith(mod))) {
                             assert dep.parent().remove(dep)
                         }
                     }
@@ -334,30 +387,26 @@ publishing {
     }
     repositories {
         maven {
-            name = 'ModResources'
+            name = "ModResources"
             def modResourcesURL = project.findProperty("MOD_RESOURCES") ?: System.getenv("MOD_RESOURCES")
-            if (modResourcesURL != null)
-                url uri(modResourcesURL)
+            if (modResourcesURL != null) url uri(modResourcesURL)
         }
     }
 }
 
 publishMods {
-
     def isFabric = loader == "fabric"
     displayName = "$mod_name [$modPlatformName] $project.version"
     type = STABLE
     changelog = releaseChangelog()
     modLoaders.add(loader)
-    if (isFabric) modLoaders.add "quilt"
-    else if (loader == "forge" && stonecutter.eval(stonecutter.current.version, "<=1.20.1")) modLoaders.add "neoforge"
+    if (isFabric) modLoaders.add "quilt" else if (loader == "forge" && stonecutter.eval(stonecutter.current.version, "<=1.20.1")) modLoaders.add "neoforge"
     file = renameJarForPublication.archiveFile
     def versions = mc_version_range.split(",")
 
     curseforge {
         minecraftVersions.addAll versions
-        if (isJava21) javaVersions.add(JavaVersion.VERSION_21)
-        else javaVersions.addAll(JavaVersion.VERSION_17,JavaVersion.VERSION_18)
+        if (isJava21) javaVersions.add(JavaVersion.VERSION_21) else javaVersions.addAll(JavaVersion.VERSION_17, JavaVersion.VERSION_18)
         clientRequired = true
         serverRequired = true
         accessToken = project.findProperty("CURSE_API_KEY") ?: System.getenv("CURSE_API_KEY")
@@ -374,5 +423,4 @@ publishMods {
         requires("factory-api")
         if (isFabric) requires("fabric-api")
     }
-
 }
