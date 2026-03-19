@@ -1389,7 +1389,7 @@
   "legacy.menu.host_options.set_day": "Set Day",
   "legacy.menu.host_options.set_night": "Set Night",
   "legacy.menu.host_options.message.set_day": "Set time to day",
-  "legacy.menu.host_options.message.set_night": "Set time to night",
+  "legacy.menu.host_options.message.set_night": "Set the time to night",
   "legacy.menu.host_options.set_player_spawn": "Set Player Spawn Point",
   "legacy.menu.host_options.set_world_spawn": "Set World Spawn Point",
   "legacy.menu.host_options.message.weather.clear": "Changing to clear weather",
