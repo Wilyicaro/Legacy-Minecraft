@@ -1383,7 +1383,7 @@
   "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
   "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
   "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
-  "legacy.menu.host_options.message.game_mode_changed": "Your game mode has been updated",
+  "legacy.menu.host_options.message.game_mode_changed": "Your game mode has changed",
   "legacy.menu.host_options.message.difficulty": "Set game difficulty to %s",
   "legacy.menu.host_options.message.player_spawn": "Set %s's spawn point to (%s, %s, %s)",
   "legacy.menu.host_options.set_day": "Set Day",
