@@ -37,6 +37,7 @@
     "client.anvil.AnvilScreenMixin",
     "client.BaseAshSmokeParticleMixin",
     "client.beacon.BeaconScreenMixin",
+    "client.beacon.BeamMixin",
     "client.BiomeAmbientSoundsHandlerMixin",
     "client.ClientBiomeMixin",
     "client.BitmapProviderMixin",
