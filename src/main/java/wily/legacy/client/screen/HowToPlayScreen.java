@@ -8,7 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.sounds.SoundEvents;
@@ -115,9 +115,9 @@ public class HowToPlayScreen extends LegacyScreen {
         }
     }
 
-    public record Section(Component title, Identifier uiDefinitionLocation, boolean hasButton,
+    public record Section(Component title, ResourceLocation uiDefinitionLocation, boolean hasButton,
                           int index) implements ScreenSection<HowToPlayScreen> {
-        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), Identifier.CODEC.xmap(r -> r.withPrefix("ui_definitions/").withSuffix(".json"), r -> r).fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
+        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), ResourceLocation.CODEC.xmap(r -> r.withPrefix("ui_definitions/").withSuffix(".json"), r -> r).fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
         public static final Codec<List<Section>> LIST_CODEC = CODEC.listOf();
         public static final List<Section> list = new ArrayList<>();
 

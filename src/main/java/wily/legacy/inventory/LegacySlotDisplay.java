@@ -1,6 +1,6 @@
 package wily.legacy.inventory;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
@@ -9,7 +9,7 @@ import wily.factoryapi.base.ArbitrarySupplier;
 public interface LegacySlotDisplay {
     LegacySlotDisplay DEFAULT = new LegacySlotDisplay() {
     };
-    ArbitrarySupplier<Identifier> EMPTY_OVERRIDE = ArbitrarySupplier.empty();
+    ArbitrarySupplier<ResourceLocation> EMPTY_OVERRIDE = ArbitrarySupplier.empty();
     LegacySlotDisplay VANILLA = new LegacySlotDisplay() {
         @Override
         public int getWidth() {
@@ -17,7 +17,7 @@ public interface LegacySlotDisplay {
         }
 
         @Override
-        public ArbitrarySupplier<Identifier> getIconHolderOverride() {
+        public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
             return EMPTY_OVERRIDE;
         }
     };
@@ -70,11 +70,11 @@ public interface LegacySlotDisplay {
         return Vec2.ZERO;
     }
 
-    default Identifier getIconSprite() {
+    default ResourceLocation getIconSprite() {
         return null;
     }
 
-    default ArbitrarySupplier<Identifier> getIconHolderOverride() {
+    default ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
         return null;
     }
 

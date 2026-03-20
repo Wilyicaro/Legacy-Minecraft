@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -113,7 +113,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
 
             @Override
-            public Identifier getSprite() {
+            public ResourceLocation getSprite() {
                 return shiftLock ? LegacySprites.BUTTON_SLOT_SELECTED : super.getSprite();
             }
 
@@ -245,7 +245,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding,
-                                    Identifier iconSprite, SoundEvent downSound) {
+                                    ResourceLocation iconSprite, SoundEvent downSound) {
         public CharButton build(KeyboardScreen screen) {
             return screen.new CharButton(width, chars, shiftChars, binding, iconSprite, downSound);
         }
@@ -257,11 +257,11 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         private final Supplier<GuiEventListener> keyListener;
 
-        public KeyButton(int key, Supplier<GuiEventListener> keyListener, ControllerBinding binding, Identifier iconSprite) {
+        public KeyButton(int key, Supplier<GuiEventListener> keyListener, ControllerBinding binding, ResourceLocation iconSprite) {
             this(key, 40, keyListener, binding, iconSprite);
         }
 
-        public KeyButton(int key, int height, Supplier<GuiEventListener> keyListener, ControllerBinding binding, Identifier iconSprite) {
+        public KeyButton(int key, int height, Supplier<GuiEventListener> keyListener, ControllerBinding binding, ResourceLocation iconSprite) {
             super(50, height, CommonComponents.EMPTY, binding, iconSprite);
             this.key = key;
             this.keyListener = keyListener;
@@ -279,7 +279,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             FactoryScreenUtil.disableBlend();
         }
 
-        public Identifier getSprite() {
+        public ResourceLocation getSprite() {
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
         }
 
@@ -296,10 +296,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     public static abstract class ActionButton extends AbstractButton {
         public final ControllerBinding binding;
-        private final Identifier iconSprite;
+        private final ResourceLocation iconSprite;
         public int pressTime = 0;
 
-        public ActionButton(int k, int l, Component component, ControllerBinding binding, Identifier iconSprite) {
+        public ActionButton(int k, int l, Component component, ControllerBinding binding, ResourceLocation iconSprite) {
             super(0, 0, k, l, component);
             this.binding = binding;
             this.iconSprite = iconSprite;
@@ -380,7 +380,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         private int selectedChar = 0;
 
 
-        public CharButton(int width, String chars, String shiftChars, ControllerBinding binding, Identifier iconSprite, SoundEvent downSound) {
+        public CharButton(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound) {
             super(width, 20, CommonComponents.EMPTY, binding, iconSprite);
             this.chars = chars;
             this.shiftChars = shiftChars;

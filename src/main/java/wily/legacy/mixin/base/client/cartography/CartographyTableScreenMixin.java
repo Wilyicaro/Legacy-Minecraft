@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CartographyTableMenu;
@@ -180,7 +180,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getIdentifier("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         name.render(guiGraphics, i, j, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.COMBINER_PLUS, leftPos + (sd ? 7 : 14), topPos + (sd ? 56 : 88), 13, 13);
         ItemStack input2 = menu.getSlot(1).getItem();
@@ -192,7 +192,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         int arrowHeight = sd ? 14 : 15;
         int arrowY = topPos + (sd ? 55 : 87);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW, leftPos + (sd ? 24 : 36), arrowY, arrowWidth, arrowHeight);
-        Identifier cartographySprite;
+        ResourceLocation cartographySprite;
         if (input.is(Items.FILLED_MAP)) {
             MapItemSavedData mapItemSavedData = MapItem.getSavedData(/*? if <1.20.5 {*//*MapItem.getMapId(input)*//*?} else {*/input.get(DataComponents.MAP_ID)/*?}*/, this.minecraft.level);
             if (mapItemSavedData != null && (mapItemSavedData.locked && (zoom || lock) || zoom && mapItemSavedData.scale >= 4))

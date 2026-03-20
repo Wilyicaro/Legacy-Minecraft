@@ -93,7 +93,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public void addStructure(Holder.Reference<StructureSet> structure) {
         MutableComponent component = Component.empty();
-        String nameKey = "structure." + structure.key().identifier().toLanguageKey();
+        String nameKey = "structure." + structure.key().location().toLanguageKey();
         String descriptionKey = nameKey + ".description";
         Component name = Component.translatable(nameKey);
         if (LegacyTipManager.hasTip(nameKey)) component.append(name);
@@ -109,7 +109,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public void addBiome(Holder.Reference<Biome> biome) {
         AbstractButton b;
-        displayBiomes.addRenderable(b = new ItemIconButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().identifier().toLanguageKey())) {
+        displayBiomes.addRenderable(b = new ItemIconButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().location().toLanguageKey())) {
             @Override
             public void onPress(InputWithModifiers input) {
                 generator.biome = biome;
@@ -138,7 +138,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             }
         });
         MutableComponent descr = b.getMessage().copy();
-        String descriptionKey = "biome." + biome.key().identifier().toLanguageKey() + ".description";
+        String descriptionKey = "biome." + biome.key().location().toLanguageKey() + ".description";
         if (LegacyTipManager.hasTip(descriptionKey)) {
             descr.append("\n\n").append(Component.translatable(descriptionKey));
         }

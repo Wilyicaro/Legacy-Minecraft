@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -238,7 +238,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return getMenuProvider((i, inv, p) -> stoneCutterMenu(i, inv, pos), STONECUTTER_TITLE);
     }
 
-    public ResourceKey<Recipe<?>> getRecipeKey(Identifier id) {
+    public ResourceKey<Recipe<?>> getRecipeKey(ResourceLocation id) {
         return ResourceKey.create(Registries.RECIPE, id);
     }
 

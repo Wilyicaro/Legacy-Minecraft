@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+//~ gamerule
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
@@ -11,10 +12,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 //? if >=1.21.11 {
-import net.minecraft.world.level.gamerules.GameRules;
-//?} else {
-/*import net.minecraft.world.level.GameRules;
- *///?}
+/*import net.minecraft.world.level.gamerules.GameRules;
+*///?} else {
+import net.minecraft.world.level.GameRules;
+ //?}
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +33,7 @@ public abstract class LevelMixin {
 
     @Inject(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;explode()I"), cancellable = true)
     public void explode(Entity entity, DamageSource damageSource, ExplosionDamageCalculator explosionDamageCalculator, double d, double e, double f, float g, boolean bl, Level.ExplosionInteraction explosionInteraction, ParticleOptions particleOptions, ParticleOptions particleOptions2, WeightedList<ExplosionParticleInfo> weightedList, Holder<SoundEvent> holder, CallbackInfo ci) {
-        if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules()./*? if >=1.21.11 {*/get/*?} else {*//*getBoolean*//*?}*/(GameRules.TNT_EXPLODES))
+        if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules()./*? if >=1.21.11 {*//*get*//*?} else {*/getBoolean/*?}*/(GameRules.RULE_TNT_EXPLODES))
             ci.cancel();
     }
 }

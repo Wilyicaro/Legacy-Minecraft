@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
@@ -157,7 +157,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         CommonNetwork.sendToServer(new ServerMenuCraftPayload(getRecipeId(), List.copyOf(getIngredientsGrid()), -1, input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
     }
 
-    public Optional<Identifier> getRecipeId() {
+    public Optional<ResourceLocation> getRecipeId() {
         return Optional.empty();
     }
 

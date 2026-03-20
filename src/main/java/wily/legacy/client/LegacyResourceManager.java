@@ -12,7 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -38,17 +38,17 @@ import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final boolean DEBUG = false;
-    public static final Identifier GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
-    public static final Identifier INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
-    public static final Identifier GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
-    public static final Identifier DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.createModLocation("keyboard_layout/en_us.json");
-    public static final Identifier PLAYER_IDENTIFIERS_LOCATION = Legacy4J.createModLocation("player_identifiers.json");
+    public static final ResourceLocation GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
+    public static final ResourceLocation INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
+    public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
+    public static final ResourceLocation DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.createModLocation("keyboard_layout/en_us.json");
+    public static final ResourceLocation PLAYER_IDENTIFIERS_LOCATION = Legacy4J.createModLocation("player_identifiers.json");
 
     public static final String COMMON_COLORS = "common_colors.json";
     public static final String COMMON_VALUES = "common_values.json";
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
     public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
-    public static final Identifier DEFAULT_CHANGELOG_PATH = Legacy4J.createModLocation("changelog");
+    public static final ResourceLocation DEFAULT_CHANGELOG_PATH = Legacy4J.createModLocation("changelog");
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static LegacyIntro intro = LegacyIntro.EMPTY;
     public static ControllerBinding<?> shiftBinding;
@@ -70,7 +70,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         }
     }
 
-    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, Identifier location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, ResourceLocation location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         resourceManager.getResource(location).ifPresent(r -> {
             try (BufferedReader reader = r.openAsReader()) {
                 codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", location, error)).ifPresent(charsIcons -> {
@@ -84,11 +84,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         });
     }
 
-    public static void addControllerIcons(ResourceManager resourceManager, Identifier location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         addIcons(resourceManager, location, ControlTooltip.ControllerIcon.LIST_CODEC, addIcon);
     }
 
-    public static void addKbmIcons(ResourceManager resourceManager, Identifier location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         addIcons(resourceManager, location, ControlTooltip.KeyIcon.LIST_CODEC, addIcon);
     }
 
@@ -144,7 +144,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                 try {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
                     obj.asMap().forEach((s, e) -> {
-                        Identifier id = FactoryAPI.createLocation(s);
+                        ResourceLocation id = FactoryAPI.createLocation(s);
                         if (CommonColor.COMMON_COLORS.containsKey(id))
                             CommonColor.COMMON_COLORS.get(id).parse(new Dynamic<>(JsonOps.INSTANCE, e));
                     });
@@ -156,7 +156,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                 try {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
                     obj.asMap().forEach((s, e) -> {
-                        Identifier id = FactoryAPI.createLocation(s);
+                        ResourceLocation id = FactoryAPI.createLocation(s);
                         if (CommonColor.COMMON_VALUES.containsKey(id))
                             CommonColor.COMMON_VALUES.get(id).parse(new Dynamic<>(JsonOps.INSTANCE, e));
                     });
@@ -195,7 +195,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                     if (!value.isKbm()) value.icons().put(s, b);
             });
             for (ControlType value : Legacy4JClient.controlTypesManager.map().values()) {
-                Identifier location = FactoryAPI.createLocation(value.id().getNamespace(), "control_tooltips/icons/%s.json".formatted(value.id().getPath()));
+                ResourceLocation location = FactoryAPI.createLocation(value.id().getNamespace(), "control_tooltips/icons/%s.json".formatted(value.id().getPath()));
                 if (value.isKbm()) addKbmIcons(resourceManager, location, value.icons()::put);
                 else addControllerIcons(resourceManager, location, value.icons()::put);
             }
@@ -203,7 +203,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             resourceManager.getResource(FactoryAPI.createLocation(name, "keyboard_layout/%s.json".formatted(langKey))).ifPresent(LegacyResourceManager::setKeyboardLayout);
         });
 
-        Identifier location = DEFAULT_CHANGELOG_PATH.withSuffix("/" + langKey + ".txt");
+        ResourceLocation location = DEFAULT_CHANGELOG_PATH.withSuffix("/" + langKey + ".txt");
         Optional<Resource> externalComponent = Minecraft.getInstance().getResourceManager().getResource(location);
         WHATS_NEW_COMPONENT = Component.empty();
         externalComponent.ifPresent((resource) -> {

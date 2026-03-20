@@ -1,7 +1,7 @@
 package wily.legacy.client.controller;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 import wily.legacy.client.ControlType;
@@ -54,7 +54,7 @@ public class GLFWControllerHandler implements Controller.Handler {
             @Override
             public ControlType getType() {
                 String name = getName();
-                Identifier id = ControlType.x360;
+                ResourceLocation id = ControlType.x360;
                 if (name != null) {
                     if (name.contains("PS3")) id = ControlType.PS3;
                     else if (name.contains("PS4")) id = ControlType.PS4;

@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.SharedConstants;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -15,7 +15,7 @@ import net.minecraft.world.entity.HumanoidArm;
 //? if <1.21.2 {
 /*import net.minecraft.world.entity.vehicle.Boat;
  *///?} else {
-import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.AbstractBoat;
 //?}
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -459,7 +459,7 @@ public class LegacyOptions {
     }
 
     public enum ControlTooltipDisplay implements StringRepresentable {
-        AUTO("auto"), LEFT("left", HumanoidArm.LEFT./*? if >=1.21.11 {*/caption()/*?} else {*//*getCaption()*//*?}*/), RIGHT("right", HumanoidArm.RIGHT./*? if >=1.21.11 {*/caption()/*?} else {*//*getCaption()*//*?}*/);
+        AUTO("auto"), LEFT("left", HumanoidArm.LEFT./*? if >=1.21.11 {*//*caption()*//*?} else {*/getCaption()/*?}*/), RIGHT("right", HumanoidArm.RIGHT./*? if >=1.21.11 {*//*caption()*//*?} else {*/getCaption()/*?}*/);
         public static final EnumCodec<ControlTooltipDisplay> CODEC = StringRepresentable.fromEnum(ControlTooltipDisplay::values);
         private final String name;
         public final Component displayName;

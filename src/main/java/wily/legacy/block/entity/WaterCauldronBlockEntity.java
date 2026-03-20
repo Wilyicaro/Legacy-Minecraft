@@ -11,7 +11,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.Item;
@@ -93,8 +93,8 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         super.loadAdditional(input);
         waterColor = null;
         input.getInt("dyeColor").ifPresent(i -> waterColor = i);
-        input.getString("potion").flatMap(id -> BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, Identifier.tryParse(id)))).ifPresent(p -> potion = p);
-        input.getString("lastPotionItemUsed").flatMap(id -> BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, Identifier.tryParse(id)))).ifPresent(p -> lastPotionItemUsed = p);
+        input.getString("potion").flatMap(id -> BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(id)))).ifPresent(p -> potion = p);
+        input.getString("lastPotionItemUsed").flatMap(id -> BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(id)))).ifPresent(p -> lastPotionItemUsed = p);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         if (waterColor != null) {
             output.putInt("dyeColor", waterColor);
         }
-        potion.unwrapKey().ifPresent(r -> output.putString("potion", r.identifier().toString()));
-        lastPotionItemUsed.unwrapKey().ifPresent(r -> output.putString("lastPotionItemUsed", r.identifier().toString()));
+        potion.unwrapKey().ifPresent(r -> output.putString("potion", r.location().toString()));
+        lastPotionItemUsed.unwrapKey().ifPresent(r -> output.putString("lastPotionItemUsed", r.location().toString()));
     }
 }

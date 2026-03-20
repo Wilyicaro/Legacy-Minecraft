@@ -21,7 +21,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.client.player.inventory.Hotbar;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -137,8 +137,8 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     public static boolean canDisplayVanillaCreativeTab(CreativeModeTab c) {
-        Identifier location = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(c);
-        return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (LegacyOptions.vanillaTabs.get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.identifier()));
+        ResourceLocation location = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(c);
+        return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (LegacyOptions.vanillaTabs.get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.location()));
     }
 
     public static List<ItemStack> getItemsSearchResult(Minecraft minecraft, String value) {

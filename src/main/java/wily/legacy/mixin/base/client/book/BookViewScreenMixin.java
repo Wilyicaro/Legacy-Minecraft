@@ -131,7 +131,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
 
     //? if <1.21.11 {
-    /*@Shadow
+    @Shadow
     public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
 
     @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
@@ -157,7 +157,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(null);
     }
-    *///?}
+    //?}
 
     @Override
     public boolean isPauseScreen() {

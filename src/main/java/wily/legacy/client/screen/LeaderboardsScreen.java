@@ -19,7 +19,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.stats.Stat;
@@ -362,7 +362,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 h.itemIcon = i.asItem().getDefaultInstance();
                 return h;
             } else if (stat.getValue() instanceof EntityType<?> e) {
-                Identifier entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().identifier().getPath());
+                ResourceLocation entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().location().getPath());
                 if (FactoryGuiGraphics.getSprites().texturesByName.containsKey(entityIcon)) {
                     LegacyIconHolder h = new LegacyIconHolder(24, 24);
                     h.iconSprite = entityIcon;
@@ -428,7 +428,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
 
         protected StatsBoard statsBoardFromJson(JsonObject o) {
-            var statType = FactoryAPIPlatform.getRegistryValue(Identifier.tryParse(GsonHelper.getAsString(o, "type")), BuiltInRegistries.STAT_TYPE);
+            var statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o, "type")), BuiltInRegistries.STAT_TYPE);
             Component name = o.has("displayName") ? Component.translatable(GsonHelper.getAsString(o, "displayName")) : statType.getDisplayName();
             StatsBoard statsBoard;
             if (o.get("predicate") instanceof JsonObject predObj) {
@@ -446,17 +446,17 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 var predicate = IOUtil.registryMatches(statType.getRegistry(), override.getAsJsonObject("predicate"));
                 switch (type) {
                     case "item" -> {
-                        Item item = FactoryAPIPlatform.getRegistryValue(Identifier.tryParse(GsonHelper.getAsString(override, "id")), BuiltInRegistries.ITEM);
+                        Item item = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")), BuiltInRegistries.ITEM);
                         LegacyIconHolder h = new LegacyIconHolder(24, 24);
                         h.itemIcon = item.getDefaultInstance();
                         statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));
                     }
                     case "entity_type" -> {
-                        EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(Identifier.tryParse(GsonHelper.getAsString(override, "id")), BuiltInRegistries.ENTITY_TYPE);
+                        EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")), BuiltInRegistries.ENTITY_TYPE);
                         statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, LegacyIconHolder.entityHolder(0, 0, 24, 24, entityType)));
                     }
                     case "sprite" -> {
-                        Identifier sprite = Identifier.tryParse(GsonHelper.getAsString(override, "id"));
+                        ResourceLocation sprite = ResourceLocation.tryParse(GsonHelper.getAsString(override, "id"));
                         LegacyIconHolder h = new LegacyIconHolder(24, 24);
                         h.iconSprite = sprite;
                         statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));

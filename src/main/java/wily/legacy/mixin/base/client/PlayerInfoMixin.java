@@ -26,12 +26,12 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
     }
 
     @Override
-    public int getIdentifierIndex() {
+    public int getResourceLocationIndex() {
         return position;
     }
 
     @Override
-    public void setIdentifierIndex(int i) {
+    public void setResourceLocationIndex(int i) {
         position = i;
     }
 

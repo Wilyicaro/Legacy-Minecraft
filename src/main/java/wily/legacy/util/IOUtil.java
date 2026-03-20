@@ -9,7 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
 //?}
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -30,7 +30,7 @@ public class IOUtil {
 
     //TODO: Replace this with a Codec, like RecipeInfo.Filter
     public static <T> Predicate<T> registryMatches(Registry<T> registry, JsonObject o) {
-        String name = registry.key().identifier().getPath();
+        String name = registry.key().location().getPath();
         if (!o.has(name) && !o.has(name + "s")) return t -> false;
         List<T> tip = new ArrayList<>();
         List<T> tipExclusions = new ArrayList<>();
@@ -49,7 +49,7 @@ public class IOUtil {
                     if (s.startsWith("#"))
                         tipTags.add(TagKey.create(registry.key(), FactoryAPI.createLocation(s.replaceFirst("#", ""))));
                     else if (s.startsWith("!")) {
-                        Identifier l = FactoryAPI.createLocation(s.replaceFirst("!", ""));
+                        ResourceLocation l = FactoryAPI.createLocation(s.replaceFirst("!", ""));
                         registry.getOptional(l).ifPresent(tipExclusions::add);
                     } else tip.add(FactoryAPIPlatform.getRegistryValue(FactoryAPI.createLocation(s), registry));
                 }

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.render.state.pip.GuiBannerResultRenderState;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.model.object.banner.BannerFlagModel;
+import net.minecraft.client.model.BannerFlagModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.Sheets;
@@ -20,7 +20,7 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.LoomMenu;
@@ -114,7 +114,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     }
 
                     @Override
-                    public Identifier getIconSprite() {
+                    public ResourceLocation getIconSprite() {
                         return s.hasItem() ? null : BANNER_SLOT;
                     }
                 });
@@ -125,7 +125,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     }
 
                     @Override
-                    public Identifier getIconSprite() {
+                    public ResourceLocation getIconSprite() {
                         return s.hasItem() ? null : DYE_SLOT;
                     }
                 });
@@ -136,7 +136,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     }
 
                     @Override
-                    public Identifier getIconSprite() {
+                    public ResourceLocation getIconSprite() {
                         return s.hasItem() ? null : PATTERN_SLOT;
                     }
                 });
@@ -163,7 +163,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getIdentifier("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         int patternsPanelSize = sd ? 51 : 75;
         int patternsPanelX = leftPos + (sd ? 36 : 72);
         int patternsPanelY = topPos + (sd ? 16 : 18);

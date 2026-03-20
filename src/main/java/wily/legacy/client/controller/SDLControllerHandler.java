@@ -9,7 +9,7 @@ import dev.isxander.sdl3java.api.joystick.SDL_JoystickID;
 import dev.isxander.sdl3java.api.joystick.SdlJoystick;
 import dev.isxander.sdl3java.api.version.SdlVersionConst;
 import dev.isxander.sdl3java.jna.SdlNativeLibraryLoader;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;

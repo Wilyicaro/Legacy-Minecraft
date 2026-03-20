@@ -40,10 +40,10 @@ public abstract class HumanoidModelMixin {
     public ModelPart leftArm;
 
     @Invoker("poseRightArm")
-    protected abstract void legacy$poseRightArm(HumanoidRenderState humanoidRenderState/*? if <1.21.11 {*//*, HumanoidModel.ArmPose armPose*//*?}*/);
+    protected abstract void legacy$poseRightArm(HumanoidRenderState humanoidRenderState/*? if <1.21.11 {*/, HumanoidModel.ArmPose armPose/*?}*/);
 
     @Invoker("poseLeftArm")
-    protected abstract void legacy$poseLeftArm(HumanoidRenderState humanoidRenderState/*? if <1.21.11 {*//*, HumanoidModel.ArmPose armPose*//*?}*/);
+    protected abstract void legacy$poseLeftArm(HumanoidRenderState humanoidRenderState/*? if <1.21.11 {*/, HumanoidModel.ArmPose armPose/*?}*/);
 
     private float getLegacyTridentRaiseProgress(int ticksUsingItem) {
         return switch (Mth.clamp(ticksUsingItem, 0, LEGACY_TRIDENT_RAISE_TICKS)) {
@@ -71,9 +71,9 @@ public abstract class HumanoidModelMixin {
             return;
         }
         if (supportArm == HumanoidArm.RIGHT) {
-            legacy$poseRightArm(humanoidRenderState/*? if <1.21.11 {*//*, supportArmPose*//*?}*/);
+            legacy$poseRightArm(humanoidRenderState/*? if <1.21.11 {*/, supportArmPose/*?}*/);
         } else {
-            legacy$poseLeftArm(humanoidRenderState/*? if <1.21.11 {*//*, supportArmPose*//*?}*/);
+            legacy$poseLeftArm(humanoidRenderState/*? if <1.21.11 {*/, supportArmPose/*?}*/);
         }
     }
 
@@ -81,7 +81,7 @@ public abstract class HumanoidModelMixin {
     private void setupAnim(/*? if <1.21.2 {*/ /*LivingEntity livingEntity, float f, float g, float h, float i, float j*//*?} else {*/ HumanoidRenderState humanoidRenderState/*?}*/, CallbackInfo info) {
         HumanoidArm mainArm = /*? if <1.21.2 {*//*livingEntity.getMainArm()*//*?} else {*/ humanoidRenderState.mainArm/*?}*/;
         float ageInTicks = /*? if <1.21.2 {*//*h*//*?} else {*/humanoidRenderState.ageInTicks/*?}*/;
-        if (/*? if <1.21.2 {*//*!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)*//*?} else {*/ humanoidRenderState.getMainHandItemStack().isEmpty()/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isShiftKeyDown()*//*?} else {*/humanoidRenderState.isDiscrete/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isFallFlying()*//*?} else {*/humanoidRenderState.isFallFlying/*?}*/) {
+        if (/*? if <1.21.2 {*//*!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)*//*?} else {*/ humanoidRenderState./*? if >=1.21.11 {*//*getMainHandItemStack*//*?} else {*/getMainHandItem/*?}*/().isEmpty()/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isShiftKeyDown()*//*?} else {*/humanoidRenderState.isDiscrete/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isFallFlying()*//*?} else {*/humanoidRenderState.isFallFlying/*?}*/) {
             (mainArm == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI) + (mainArm == HumanoidArm.RIGHT ? 1.0f : -1.0f) * Mth.sin(ageInTicks * 0.067F) * 0.05F;
         }
         HumanoidArm useArm = /*? if <1.21.2 {*//*livingEntity.getUsedItemHand()*//*?} else {*/ humanoidRenderState.useItemHand/*?}*/ == InteractionHand.MAIN_HAND ? mainArm : mainArm.getOpposite();

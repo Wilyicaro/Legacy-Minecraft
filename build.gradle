@@ -121,11 +121,11 @@ dependencies {
 
 stonecutter {
     replacements {
-        string(stonecutter.eval(stonecutter.current.version, ">=1.21.11")) {
-            replace("critereon", "criterion")
+        string(stonecutter.eval(stonecutter.current.version, ">=1.21.11"), "!identifier") {
             replace("ResourceLocation", "Identifier")
-            replace("getResourceLocation()", "getResourceLocation()")
+            replace("getResourceLocation(", "getResourceLocation(")
             replace("location()", "identifier()")
+            replace("PlayerIdentifier", "PlayerIdentifier")
             replace("CommonNetwork.Identifier", "CommonNetwork.Identifier")
             replace("Progress.Identifier", "Progress.Identifier")
             replace("withSlotIdentifier", "withSlotIdentifier")
@@ -133,6 +133,9 @@ stonecutter {
             replace("SlotsIdentifier", "SlotsIdentifier")
             replace("IHasIdentifier", "IHasIdentifier")
             replace("Identifier<T extends Payload>", "Identifier<T extends Payload>")
+        }
+        string(stonecutter.eval(stonecutter.current.version, ">=1.21.11")) {
+            replace("critereon", "criterion")
             replace("import net.minecraft.Util;", "import net.minecraft.util.Util;")
             replace("vehicle.AbstractMinecart", "vehicle.minecart.AbstractMinecart")
             replace("vehicle.MinecartBehavior", "vehicle.minecart.MinecartBehavior")
@@ -165,10 +168,15 @@ stonecutter {
 //            replace("GameRules.Key<GameRules.IntegerValue>", "GameRule<Integer>")
         }
         string(stonecutter.eval(stonecutter.current.version, ">=1.21.11"), "gamerule") {
-            replace("GameRules.Key", "GameRule")
-            replace("GameRules.BooleanValue", "Boolean")
-            replace("GameRules.IntegerValue", "Integer")
+            replace("GameRules.Key<", "GameRule<")
+            replace("GameRules.BooleanValue>", "Boolean>")
+            replace("GameRules.IntegerValue>", "Integer>")
+            replace("GameRules.BooleanValue ", "Boolean ")
+            replace("GameRules.IntegerValue ", "Integer ")
+            replace("Bearer<Boolean>", "Bearer<Boolean>")
+            replace("Bearer<Integer>", "Bearer<Integer>")
             replace("GameRules.Category", "GameRuleCategory")
+            replace("GameRuleCategoryAccessor", "GameRuleCategoryAccessor")
             replace("GameRules.GameRuleTypeVisitor()", "GameRuleTypeVisitor()")
             replace("getRule(key).get()", "get(key)")
             replace("key.getId()", "key.id()")

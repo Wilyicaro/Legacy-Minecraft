@@ -27,8 +27,9 @@ public class ClientBiomeMixin {
         return LegacyBiomeOverride.getOrDefault(l != null ? l.registryAccess()./*? if <1.21.2 {*//*registryOrThrow*//*?} else {*/lookupOrThrow/*?}*/(Registries.BIOME).getResourceKey(self()) : Optional.empty());
     }
 
+    //TODO: implement in 1.21.11 (move to levelrenderer)
     //? if <1.21.11 {
-    /*@Inject(method = "getWaterColor", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getWaterColor", at = @At("HEAD"), cancellable = true)
     private void getWaterColor(CallbackInfoReturnable<Integer> cir) {
         biomeOverride().waterColor().ifPresent(cir::setReturnValue);
     }
@@ -49,5 +50,5 @@ public class ClientBiomeMixin {
     private void getSkyColor(CallbackInfoReturnable<Integer> cir) {
         biomeOverride().skyColor().ifPresent(cir::setReturnValue);
     }
-    *///?}
+    //?}
 }

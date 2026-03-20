@@ -12,9 +12,9 @@
     "client.AbstractRecipeBookScreenMixin",
     "client.crafter.CrafterScreenMixin",
     //? if >=1.21 && !(>=1.21.11 && fabric) && (fabric || neoforge) {
-    /*"compat.sodium.FluidRendererFactoryMixin",
+    "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.BlockRendererMixin",
-    *///?}
+    //?}
     //? (<1.21.11 && fabric || >=1.21 && neoforge) {
     /*"compat.sodium.OcclusionCullerMixin",
     *///?}
@@ -25,10 +25,12 @@
     "client.TerrainRenderContextMixin",
     //?}
     //? if >=1.21.11 {
-    "client.RenderSetupAccessor",
-    //?} else {
-    /*"client.CompositeRenderTypeAccessor",
-    *///?}
+    /*"client.RenderSetupAccessor",
+    "client.RenderingTextCollectorMixin",
+    "client.ActiveTextCollectorMixin",
+    *///?} else {
+    "client.CompositeRenderTypeAccessor",
+    //?}
     "client.SectionOcclusionGraphMixin",
     "client.LevelEventHandlerMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
@@ -199,8 +201,8 @@
     "IAttributeExtensionMixin",
     *///?}
     //? if >=1.21.11 {
-    "GameRuleCategoryAccessor",
-    //?}
+    /*"GameRuleCategoryAccessor",
+    *///?}
     "OldMinecartBehaviorMixin",
     "ServerExplosionMixin",
     "ItemMixin",

@@ -36,6 +36,7 @@ public record ServerOpenClientMenuPayload(ClientMenu menu) implements CommonNetw
         }
     }
 
+    //~ !identifier
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;

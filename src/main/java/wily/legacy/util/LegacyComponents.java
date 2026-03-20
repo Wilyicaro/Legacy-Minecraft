@@ -268,7 +268,7 @@ public class LegacyComponents {
     }
 
     public static Component getDimensionName(ResourceKey<Level> dimension) {
-        String s = dimension.identifier().toLanguageKey("dimension");
+        String s = dimension.location().toLanguageKey("dimension");
         return Component.translatable(!FactoryAPI.isClient() || LegacyTipManager.hasTip(s) ? s : "dimension.minecraft");
     }
 

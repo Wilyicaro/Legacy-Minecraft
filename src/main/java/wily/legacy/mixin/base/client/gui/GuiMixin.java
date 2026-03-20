@@ -19,7 +19,7 @@ import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
@@ -82,12 +82,12 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) ? AttackIndicatorStatus.OFF : instance.get();
     }
 
-    @ModifyArg(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"))
+    @ModifyArg(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
     public RenderPipeline renderCrosshair(RenderPipeline renderPipeline) {
         return LegacyOptions.invertedCrosshair.get() ? renderPipeline : RenderPipelines.GUI_TEXTURED;
     }
 
-    @ModifyArg(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIIIIIII)V"))
+    @ModifyArg(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"))
     public RenderPipeline renderCrosshairAttackIndicator(RenderPipeline renderPipeline) {
         return LegacyOptions.invertedCrosshair.get() ? renderPipeline : RenderPipelines.GUI_TEXTURED;
     }
@@ -98,13 +98,13 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         LegacyRenderUtil.renderGuiEffects(guiGraphics);
     }
 
-    @Inject(method = "renderItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V", ordinal = 1))
+    @Inject(method = "renderItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
     private void renderHotbarSelection(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION, 24, 24, 0, 23, guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ * 20, guiGraphics.guiHeight(), 0, 24, 1);
     }
 
-    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V", ordinal = 0))
-    private boolean renderCrosshair(GuiGraphics instance, RenderPipeline renderPipeline, Identifier arg, int i, int j, int k, int l) {
+    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 0))
+    private boolean renderCrosshair(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation arg, int i, int j, int k, int l) {
         if (LegacyOptions.getUIMode().isFHD()) {
             int size = 15 * minecraft.getWindow().getGuiScale() - 1;
             instance.pose().pushMatrix();

@@ -33,7 +33,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
     }
 
     public void addBiome(Holder.Reference<Biome> biome) {
-        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().identifier().toLanguageKey())) {
+        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().location().toLanguageKey())) {
             @Override
             public void onPress(InputWithModifiers input) {
                 selectedBiome = biome;

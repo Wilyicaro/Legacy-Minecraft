@@ -12,10 +12,10 @@ import net.minecraft.network.chat.Component;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyMapDecorationRenderState;
 //? if >=1.21.11 {
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-//?} else {
-/*import net.minecraft.client.renderer.RenderType;
- *///?}
+/*import net.minecraft.client.renderer.rendertype.RenderTypes;
+*///?} else {
+import net.minecraft.client.renderer.RenderType;
+ //?}
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.saveddata.maps.*;
@@ -82,13 +82,13 @@ public abstract class MapRendererMixin {
                 Minecraft minecraft = Minecraft.getInstance();
                 LegacyPlayerInfo playerInfo = mapDecoration.name == null || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(mapDecoration.name.getString()) instanceof LegacyPlayerInfo info) ? null : info;
                 float[] color = playerInfo == null ? new float[]{1.0f, 1.0f, 1.0f} : Legacy4JClient.getVisualPlayerColor(playerInfo);
-                TextureAtlasSprite textureAtlasSprite = playerInfo == null ? mapDecoration.atlasSprite : minecraft.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS).getSprite(PlayerIdentifier.of(playerInfo.getIdentifierIndex()).spriteByMapDecorationType(type));
+                TextureAtlasSprite textureAtlasSprite = playerInfo == null ? mapDecoration.atlasSprite : minecraft.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS).getSprite(PlayerIdentifier.of(playerInfo.getResourceLocationIndex()).spriteByMapDecorationType(type));
                 float g = textureAtlasSprite.getU0();
                 float h = textureAtlasSprite.getV0();
                 float m = textureAtlasSprite.getU1();
                 float n = textureAtlasSprite.getV1();
                 float z = l * -0.001f;
-                submitNodeCollector.submitCustomGeometry(poseStack, /*? if >=1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.text(textureAtlasSprite.atlasLocation()), (pose, vertexConsumer) -> {
+                submitNodeCollector.submitCustomGeometry(poseStack, /*? if >=1.21.11 {*//*RenderTypes*//*?} else {*/RenderType/*?}*/.text(textureAtlasSprite.atlasLocation()), (pose, vertexConsumer) -> {
                     vertexConsumer.addVertex(pose, -1.0f, 1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(g, h).setLight(i);
                     vertexConsumer.addVertex(pose, 1.0f, 1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(m, h).setLight(i);
                     vertexConsumer.addVertex(pose, 1.0f, -1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(m, n).setLight(i);

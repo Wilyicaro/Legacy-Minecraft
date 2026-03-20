@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client.gui;
 //? if >=1.21.1 {
 //?}
 
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.SubtitleOverlay;
@@ -111,7 +111,7 @@ public class SubtitleOverlayMixin {
                     if (soundPlayedAt == null) continue;
                     //?}
 
-                    Vec3 vec34 = /*? if <1.20.5 {*//*subtitle2.getLocation()*//*?} else {*/soundPlayedAt.identifier()/*?}*/.subtract(vec3).normalize();
+                    Vec3 vec34 = /*? if <1.20.5 {*//*subtitle2.getLocation()*//*?} else {*/soundPlayedAt.location()/*?}*/.subtract(vec3).normalize();
                     double e = vec33.dot(vec34);
                     double f = vec32.dot(vec34);
                     boolean bl = f > (double) 0.5F;

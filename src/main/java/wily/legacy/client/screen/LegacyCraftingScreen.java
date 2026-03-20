@@ -707,7 +707,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         if (hasTypeTabList()) typeTabList.render(guiGraphics, i, j, f);
         getTabList().render(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getIdentifier("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         getTabList().renderSelected(guiGraphics, i, j, f);
         if (hasTypeTabList()) typeTabList.renderSelected(guiGraphics, i, j, f);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
