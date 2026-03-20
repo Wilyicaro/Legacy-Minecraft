@@ -1759,6 +1759,8 @@
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "旧版溺尸",
   "legacy.options.legacyDrownedAnimation": "旧版溺尸动画",
+  "legacy.options.legacyZombieAggressionAnimation": "Legacy Zombie Aggression Animation",
+  "legacy.options.legacyZombieAggressionAnimation.tooltip": "Keeps zombies, husks, drowned, zombie villagers, and zombified piglins from raising their arms when they become aggressive.",
   "legacy.options.legacyEnchantmentScreen": "旧版附魔界面",
   "legacy.options.legacyEntityFireTint": "旧版实体火焰着色",
   "legacy.options.legacyEvokerFangs": "Legacy Evoker Fangs",
