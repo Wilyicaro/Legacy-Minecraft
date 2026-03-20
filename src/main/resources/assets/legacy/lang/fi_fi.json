@@ -1759,6 +1759,8 @@
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "Perinteiset Hukkuneet",
   "legacy.options.legacyDrownedAnimation": "Perinteinen Hukkuneen Animaatio",
+  "legacy.options.legacyZombieAggressionAnimation": "Legacy Zombie Aggression Animation",
+  "legacy.options.legacyZombieAggressionAnimation.tooltip": "Keeps zombies, husks, drowned, zombie villagers, and zombified piglins from raising their arms when they become aggressive.",
   "legacy.options.legacyEnchantmentScreen": "Perinteinen Lumousnäyttö",
   "legacy.options.legacyEntityFireTint": "Perinteinen Entiteetin Tulisävy",
   "legacy.options.legacyEvokerFangs": "Perinteinen Evoker Hampaat",
