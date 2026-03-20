@@ -1759,6 +1759,8 @@
   "legacy.options.legacyCursor": "Mouvement du curseur legacy",
   "legacy.options.legacyDrowned": "Noyés legacy",
   "legacy.options.legacyDrownedAnimation": "Animation des noyés legacy",
+  "legacy.options.legacyZombieAggressionAnimation": "Legacy Zombie Aggression Animation",
+  "legacy.options.legacyZombieAggressionAnimation.tooltip": "Keeps zombies, husks, drowned, zombie villagers, and zombified piglins from raising their arms when they become aggressive.",
   "legacy.options.legacyEnchantmentScreen": "Écran d'enchantement legacy",
   "legacy.options.legacyEntityFireTint": "Teinte de feu d'entité legacy",
   "legacy.options.legacyEvokerFangs": "Crocs d'évocateur legacy",
