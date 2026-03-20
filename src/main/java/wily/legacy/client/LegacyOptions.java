@@ -205,23 +205,19 @@ public class LegacyOptions {
     }, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> smoothMovement = CLIENT_STORAGE.register(createBoolean("smoothMovement", true));
     public static final FactoryConfig<Boolean> forceSmoothMovement = CLIENT_STORAGE.register(createBoolean("forceSmoothMovement", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
-    public static final FactoryConfig<Boolean> legacyCreativeBlockPlacing = CLIENT_STORAGE.register(createBoolean("legacyCreativeBlockPlacing", true));
-    public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter", false));
-    public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair", false));
-    public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation", true));
-    public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator", true));
-    public static final FactoryConfig<Boolean> itemLightingInHand = CLIENT_STORAGE.register(createBoolean("itemLightingInHand", true));
-    public static final FactoryConfig<Boolean> loyaltyLines = CLIENT_STORAGE.register(createBoolean("loyaltyLines", true));
-    public static final FactoryConfig<Boolean> controllerToggleCrouch = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleCrouch", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleSneak")), true, b -> {
-    }, CLIENT_STORAGE));
-    ;
-    public static final FactoryConfig<Boolean> controllerToggleSprint = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleSprint", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleSprint")), false, b -> {
-    }, CLIENT_STORAGE));
-    public static final FactoryConfig<Boolean> controllerToggleUse = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleUse", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleUse")), false, b -> {
-    }, CLIENT_STORAGE));
-    public static final FactoryConfig<Boolean> controllerToggleAttack = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleAttack", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleAttack")), false, b -> {
-    }, CLIENT_STORAGE));
-    public static final FactoryConfig<Boolean> lockControlTypeChange = CLIENT_STORAGE.register(createBoolean("lockControlTypeChange", false));
+    public static final FactoryConfig<Boolean> legacyCreativeBlockPlacing = CLIENT_STORAGE.register(createBoolean("legacyCreativeBlockPlacing",true));
+    public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
+    public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
+    public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
+    public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBoolean("legacyZombieAggressionAnimation", b -> Component.translatable("legacy.options.legacyZombieAggressionAnimation.tooltip"), false));
+    public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));
+    public static final FactoryConfig<Boolean> itemLightingInHand = CLIENT_STORAGE.register(createBoolean("itemLightingInHand",true));
+    public static final FactoryConfig<Boolean> loyaltyLines = CLIENT_STORAGE.register(createBoolean("loyaltyLines",true));
+    public static final FactoryConfig<Boolean> controllerToggleCrouch = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleCrouch", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleSneak")), true, b -> {}, CLIENT_STORAGE));;
+    public static final FactoryConfig<Boolean> controllerToggleSprint = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleSprint", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleSprint")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> controllerToggleUse = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleUse", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleUse")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> controllerToggleAttack = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleAttack", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleAttack")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> lockControlTypeChange = CLIENT_STORAGE.register(createBoolean("lockControlTypeChange",false));
     public static final FactoryConfig<Integer> selectedItemTooltipLines = CLIENT_STORAGE.register(createInteger("selectedItemTooltipLines", Function.identity(), 0, () -> 6, 4));
     public static final FactoryConfig<Boolean> itemTooltipEllipsis = CLIENT_STORAGE.register(createBoolean("itemTooltipEllipsis", true));
     public static final FactoryConfig<Integer> selectedItemTooltipSpacing = CLIENT_STORAGE.register(createInteger("selectedItemTooltipSpacing", Function.identity(), 8, () -> 12, 12));
