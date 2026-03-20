@@ -20,6 +20,7 @@ import wily.legacy.Skins.client.screen.changeskin.ChangeSkinPackList;
 import wily.legacy.Skins.client.screen.changeskin.SkinPackViewFilter;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
+import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
@@ -537,6 +538,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected Component currentPackFilterLabel() {
         SkinPackViewFilter filter = packList != null ? packList.getViewFilter() : SkinPackViewFilter.DEFAULT;
         return Component.literal("Filter: " + filter.label());
+    }
+
+    protected boolean showExpandedControlTooltips() {
+        return !ConsoleSkinsClientSettings.isMinimizeTooltips();
     }
 
     protected boolean recenterCenterPreview() {

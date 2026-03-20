@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.helpers.NOPLogger;
+import wily.legacy.Skins.util.LegacySkinsPaths;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -70,15 +71,7 @@ public final class PackExclusions {
     }
 
     private static Path filePath() {
-        Path base;
-        try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc != null && mc.gameDirectory != null) base = mc.gameDirectory.toPath();
-            else base = Path.of(System.getProperty("user.dir"));
-        } catch (Throwable t) {
-            base = Path.of(System.getProperty("user.dir"));
-        }
-        return base.resolve("config").resolve(FILE_NAME);
+        return LegacySkinsPaths.resolve("pack_exclusions.json", FILE_NAME);
     }
 
     private static void loadLocked() {

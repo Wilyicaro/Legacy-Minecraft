@@ -1,6 +1,7 @@
 package wily.legacy.Skins.client.util;
 
 import net.minecraft.client.Minecraft;
+import wily.legacy.Skins.util.LegacySkinsPaths;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +15,7 @@ public final class SessionSkinStore {
     }
 
     private static Path filePath() {
-        return Minecraft.getInstance().gameDirectory.toPath().resolve("config").resolve(FILE_NAME);
+        return LegacySkinsPaths.resolve("session_skin.txt", FILE_NAME);
     }
 
     public static String loadTexturesB64() {

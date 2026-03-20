@@ -2,6 +2,7 @@ package wily.legacy.Skins.client.util;
 
 import net.minecraft.client.Minecraft;
 import wily.legacy.Skins.client.screen.changeskin.SkinPackViewFilter;
+import wily.legacy.Skins.util.LegacySkinsPaths;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +18,7 @@ public final class ConsoleSkinsClientSettings {
     private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
     private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
     private static final boolean DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS = false;
+    private static final boolean DEFAULT_MINIMIZE_TOOLTIPS = false;
     private static final boolean DEFAULT_SKIN_SELECTION_INITIALIZED = false;
     private static volatile boolean loaded;
     private static volatile boolean smoothPreviewScroll;
@@ -24,6 +26,7 @@ public final class ConsoleSkinsClientSettings {
     private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
     private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
     private static volatile boolean hideDuplicateExternalLegacyPacks = DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS;
+    private static volatile boolean minimizeTooltips = DEFAULT_MINIMIZE_TOOLTIPS;
     private static volatile boolean skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
     private static volatile String lastUsedCustomPackId;
     private static volatile String lastSkinPackViewFilter;
@@ -86,6 +89,17 @@ public final class ConsoleSkinsClientSettings {
         saveQuiet();
     }
 
+    public static boolean isMinimizeTooltips() {
+        ensureLoaded();
+        return minimizeTooltips;
+    }
+
+    public static void setMinimizeTooltips(boolean enabled) {
+        ensureLoaded();
+        minimizeTooltips = enabled;
+        saveQuiet();
+    }
+
     public static boolean isSkinSelectionInitialized() {
         ensureLoaded();
         return skinSelectionInitialized;
@@ -132,6 +146,7 @@ public final class ConsoleSkinsClientSettings {
         hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
         tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
         hideDuplicateExternalLegacyPacks = DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS;
+        minimizeTooltips = DEFAULT_MINIMIZE_TOOLTIPS;
         skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
         lastUsedCustomPackId = null;
         lastSkinPackViewFilter = SkinPackViewFilter.DEFAULT.name();
@@ -152,6 +167,7 @@ public final class ConsoleSkinsClientSettings {
             hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
             tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
             hideDuplicateExternalLegacyPacks = DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS;
+            minimizeTooltips = DEFAULT_MINIMIZE_TOOLTIPS;
             skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
             lastUsedCustomPackId = null;
             lastSkinPackViewFilter = SkinPackViewFilter.DEFAULT.name();
@@ -199,6 +215,12 @@ public final class ConsoleSkinsClientSettings {
                         continue;
                     }
 
+                    if (k.equalsIgnoreCase("minimize_tooltips") || k.equalsIgnoreCase("minimizeTooltips")
+                            || k.equalsIgnoreCase("minimize_change_skin_tooltips") || k.equalsIgnoreCase("minimizeChangeSkinTooltips")) {
+                        minimizeTooltips = parseBool(v, DEFAULT_MINIMIZE_TOOLTIPS);
+                        continue;
+                    }
+
                     if (k.equalsIgnoreCase("skin_selection_initialized") || k.equalsIgnoreCase("skinSelectionInitialized")
                             || k.equalsIgnoreCase("initialized_skin_selection") || k.equalsIgnoreCase("initializedSkinSelection")) {
                         skinSelectionInitialized = parseBool(v, DEFAULT_SKIN_SELECTION_INITIALIZED);
@@ -240,6 +262,7 @@ public final class ConsoleSkinsClientSettings {
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
                     + "hide_duplicate_external_legacy_packs=" + hideDuplicateExternalLegacyPacks + "\n"
+                    + "minimize_tooltips=" + minimizeTooltips + "\n"
                     + "skin_selection_initialized=" + skinSelectionInitialized + "\n"
                     + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n"
                     + "last_skin_pack_view_filter=" + (lastSkinPackViewFilter == null ? SkinPackViewFilter.DEFAULT.name() : lastSkinPackViewFilter) + "\n";
@@ -249,8 +272,6 @@ public final class ConsoleSkinsClientSettings {
     }
 
     private static Path resolveConfigFile() {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null || mc.gameDirectory == null) return null;
-        return mc.gameDirectory.toPath().resolve("config").resolve(FILE_NAME);
+        return LegacySkinsPaths.resolve("client_options.txt", FILE_NAME);
     }
 }

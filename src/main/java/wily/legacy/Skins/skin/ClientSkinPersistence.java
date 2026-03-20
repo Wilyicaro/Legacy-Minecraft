@@ -1,6 +1,7 @@
 package wily.legacy.Skins.skin;
 
 import net.minecraft.client.Minecraft;
+import wily.legacy.Skins.util.LegacySkinsPaths;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,8 +16,7 @@ public final class ClientSkinPersistence {
     }
 
     private static Path filePath() {
-        Path cfg = Minecraft.getInstance().gameDirectory.toPath().resolve("config");
-        return cfg.resolve("consoleskins").resolve(FILE_NAME);
+        return LegacySkinsPaths.resolve(FILE_NAME, "consoleskins/" + FILE_NAME);
     }
 
     public static void save(UUID userProfileId, String skinId) {

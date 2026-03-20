@@ -69,6 +69,17 @@ public abstract class ArmorOffsetsMixin {
     }
 
     @Unique
+    private HumanoidModel<?> consoleskins$getParentHumanoidModel() {
+        RenderLayerParent<?, ?> renderer = consoleskins$getRenderer();
+        if (renderer == null) return null;
+        try {
+            Object model = renderer.getModel();
+            return model instanceof HumanoidModel<?> humanoidModel ? humanoidModel : null;
+        } catch (Throwable ignored) {}
+        return null;
+    }
+
+    @Unique
     private static void consoleskins$collectParts(Object obj, int depth, Set<ModelPart> out, Set<Object> visited) {
         if (obj == null || depth > 3 || !visited.add(obj)) return;
         Class<?> c = obj.getClass();
@@ -235,10 +246,13 @@ public abstract class ArmorOffsetsMixin {
 
         if (slot == EquipmentSlot.HEAD) {
             float x = v[0], y = v[1], z = v[2];
-            float pitch = renderState.xRot * ((float) Math.PI / 180f);
+            HumanoidModel<?> model = consoleskins$getParentHumanoidModel();
+            float pitch = model != null ? model.head.xRot : renderState.xRot * ((float) Math.PI / 180f);
             if (pitch != 0f) { float c = Mth.cos(pitch), s = Mth.sin(pitch); float ny=y*c-z*s, nz=y*s+z*c; y=ny; z=nz; }
-            float yaw   = renderState.yRot * ((float) Math.PI / 180f);
+            float yaw   = model != null ? model.head.yRot : renderState.yRot * ((float) Math.PI / 180f);
             if (yaw   != 0f) { float c = Mth.cos(yaw),   s = Mth.sin(yaw);   float nx=x*c+z*s, nz2=-x*s+z*c; x=nx; z=nz2; }
+            float roll  = model != null ? model.head.zRot : 0f;
+            if (roll  != 0f) { float c = Mth.cos(roll),  s = Mth.sin(roll);  float nx=x*c-y*s, ny=x*s+y*c; x=nx; y=ny; }
             poseStack.pushPose();
             poseStack.translate(x / 16f, y / 16f, z / 16f);
             ArmorOffsetContext.POSE_PUSHED.set(Boolean.TRUE);

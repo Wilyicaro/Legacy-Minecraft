@@ -56,5 +56,14 @@ public class SkinsOptionMixin {
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setHideArmorOnAllBoxSkins(t.selected)
         ));
+
+        list.add(Math.min(idx + 1, list.size()), new TickBox(
+                0,
+                0,
+                ConsoleSkinsClientSettings.isMinimizeTooltips(),
+                b -> Component.translatable("legacy.menu.change_skin.minimize_tooltips"),
+                b -> null,
+                t -> ConsoleSkinsClientSettings.setMinimizeTooltips(t.selected)
+        ));
     }
 }

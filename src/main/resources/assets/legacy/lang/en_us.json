@@ -1273,6 +1273,7 @@
   "legacy.menu.change_skin.skin_animations": "Skin Animations",
   "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
   "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
+  "legacy.menu.change_skin.minimize_tooltips": "Minimize Tooltips",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",

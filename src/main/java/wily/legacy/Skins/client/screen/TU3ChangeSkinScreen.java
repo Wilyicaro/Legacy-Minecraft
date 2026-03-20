@@ -501,13 +501,15 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
             return id != null && FavoritesStore.isFavorite(id) ? Component.literal("Remove Favorite") : Component.literal("Add Favorite");
         });
         addPreviewControlTooltips(r);
-        r.add(() -> ControlType.getActiveType().isKbm()
-                ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
-                : ControllerBinding.LEFT_STICK.bindingState.getIcon(), () -> Component.literal("Navigate"));
-        if (canUsePackFilter()) {
-            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_T) : ControllerBinding.BACK.bindingState.getIcon(), this::currentPackFilterLabel);
+        if (showExpandedControlTooltips()) {
+            r.add(() -> ControlType.getActiveType().isKbm()
+                    ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
+                    : ControllerBinding.LEFT_STICK.bindingState.getIcon(), () -> Component.literal("Navigate"));
+            if (canUsePackFilter()) {
+                r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_T) : ControllerBinding.BACK.bindingState.getIcon(), this::currentPackFilterLabel);
+            }
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> Component.literal("Advanced Options"));
         }
-        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> Component.literal("Advanced Options"));
     }
 
     @Override
