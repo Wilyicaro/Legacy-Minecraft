@@ -1759,6 +1759,8 @@
   "legacy.options.legacyCursor": "Legacy рух курсора",
   "legacy.options.legacyDrowned": "Legacy утопленик",
   "legacy.options.legacyDrownedAnimation": "Legacy анімація утопленика",
+  "legacy.options.legacyZombieAggressionAnimation": "Legacy Zombie Aggression Animation",
+  "legacy.options.legacyZombieAggressionAnimation.tooltip": "Keeps zombies, husks, drowned, zombie villagers, and zombified piglins from raising their arms when they become aggressive.",
   "legacy.options.legacyEnchantmentScreen": "Legacy інтерфейс зачарування",
   "legacy.options.legacyEntityFireTint": "Legacy відтінок вогню сутності",
   "legacy.options.legacyEvokerFangs": "Legacy ікла заклинача",
