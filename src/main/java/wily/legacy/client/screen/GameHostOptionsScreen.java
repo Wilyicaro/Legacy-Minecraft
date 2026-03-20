@@ -1,14 +1,22 @@
 package wily.legacy.client.screen;
 
+//~ gamerule
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Difficulty;
+//? if >=1.21.11 {
+/*import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRules;
+*///?} else {
 import net.minecraft.world.level.GameRules;
+//?}
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIDefinition;
@@ -26,7 +34,7 @@ import java.util.function.Supplier;
 import static wily.legacy.client.screen.LoadSaveScreen.GAME_MODEL_LABEL;
 
 public class GameHostOptionsScreen extends PanelVListScreen {
-    public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, LegacyGameRules.LEGACY_FLIGHT));
+    public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, GameRules.RULE_TNT_EXPLODES, GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, LegacyGameRules.LEGACY_FLIGHT));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE, GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION, GameRules.RULE_DO_IMMEDIATE_RESPAWN));
     public static final List<String> WEATHERS = List.of("clear", "rain", "thunder");
 
@@ -34,10 +42,10 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     protected final Map<AbstractWidget, Runnable> commandsOnClose = new HashMap<>();
 
     public GameHostOptionsScreen(Screen parent, Minecraft minecraft) {
-        super(parent, s -> Panel.centered(s, LegacySprites.PANEL, 265, minecraft.player.hasPermissions(2) ? 200 : 130), HostOptionsScreen.HOST_OPTIONS);
+        super(parent, s -> Panel.centered(s, LegacySprites.PANEL, 265, /*? if >=1.21.11 {*//*Commands.LEVEL_GAMEMASTERS.check(minecraft.player.permissions())*//*?} else {*/minecraft.player.hasPermissions(2)/*?}*/ ? 200 : 130), HostOptionsScreen.HOST_OPTIONS);
         getRenderableVList().layoutSpacing(l -> 2);
 
-        boolean isOp =  minecraft.player.hasPermissions(2);
+        boolean isOp = /*? if >=1.21.11 {*//*Commands.LEVEL_GAMEMASTERS.check(minecraft.player.permissions())*//*?} else {*/minecraft.player.hasPermissions(2)/*?}*/;
 
         accessor.addStatic(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", isOp)));
 
@@ -59,7 +67,8 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), b1 -> Tooltip.create(Component.translatable("selectWorld.gameMode." + gameType.get().getName() + ".info")), gameType.get(), () -> gameTypes, b1 -> commandsOnClose.put(b1, () -> minecraft.getConnection().sendCommand("defaultgamemode " + b1.getObjectValue().getName()))));
         getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_world_spawn"), b1 -> commandsOnClose.put(b1, () -> minecraft.player.connection.sendCommand("setworldspawn"))));
-        getRenderableVList().addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {}))));
+        getRenderableVList().addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {
+        }))));
         getRenderableVList().addCategory(Component.translatable("soundCategory.weather"));
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> Component.translatable("legacy.weather_state." + b1.getObjectValue()), b1 -> null, WEATHERS.get(initialWeather), () -> WEATHERS, b1 -> {
             if (!Objects.equals(b1.getObjectValue(), WEATHERS.get(initialWeather)))
@@ -83,7 +92,8 @@ public class GameHostOptionsScreen extends PanelVListScreen {
             @Override
             protected void addPlayerButtons() {
                 addPlayerButtons(false, (profile, b1) -> {
-                    if (toPlayer) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().name()));
+                    if (toPlayer)
+                        minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().name()));
                     else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().name()));
                 });
             }

@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import com.google.common.collect.Ordering;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -36,6 +37,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -342,6 +344,25 @@ public class LegacyRenderUtil {
         Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
         Quaternionf quaternionf2 = new Quaternionf().rotateX(q * 20.0F * (float) (Math.PI / 180.0));
         quaternionf.mul(quaternionf2);
+        //? if >=1.21.11 {
+        /*EntityRenderState entityRenderState = extractRenderState(livingEntity);
+        if (entityRenderState instanceof LivingEntityRenderState livingEntityRenderState) {
+            livingEntityRenderState.bodyRot = 180.0F + p * 20.0F;
+            livingEntityRenderState.yRot = p * 20.0F;
+            if (livingEntityRenderState.pose != Pose.FALL_FLYING) {
+                livingEntityRenderState.xRot = -q * 20.0F;
+            } else {
+                livingEntityRenderState.xRot = 0.0F;
+            }
+
+            livingEntityRenderState.boundingBoxWidth /= livingEntityRenderState.scale;
+            livingEntityRenderState.boundingBoxHeight /= livingEntityRenderState.scale;
+            livingEntityRenderState.scale = 1.0F;
+        }
+
+        Vector3f vector3f = new Vector3f(0.0F, entityRenderState.boundingBoxHeight / 2.0F + f, 0.0F);
+        guiGraphics.submitEntityRenderState(entityRenderState, (float)m, vector3f, quaternionf, quaternionf2, i, j, k, l);
+        *///?} else {
         float r = livingEntity.yBodyRot;
         float s = livingEntity.getYRot();
         float t = livingEntity.getXRot();
@@ -362,6 +383,7 @@ public class LegacyRenderUtil {
         livingEntity.yHeadRotO = u;
         livingEntity.yHeadRot = v;
         guiGraphics.disableScissor();
+         //?}
     }
 
     public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, float size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
@@ -377,13 +399,25 @@ public class LegacyRenderUtil {
         EntityRenderer<? super Entity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
         EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
         entityRenderState.lightCoords = 15728880;
+        //? if <1.21.11 {
         entityRenderState.hitboxesRenderState = null;
+        //?}
         entityRenderState.shadowPieces.clear();
         entityRenderState.outlineColor = 0;
         ScreenRectangle scissorStack = guiGraphics.scissorStack.peek();
         GuiEntityRenderState guiRenderState = new GuiEntityRenderState(entityRenderState, vector3f, quaternionf, quaternionf2, x, y, x0, y0, h, scissorStack, PictureInPictureRenderState.getBounds(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), scissorStack));
         MutablePIPRenderState.of(guiRenderState).setPose(guiGraphics.pose());
         guiGraphics.guiRenderState.submitPicturesInPictureState(guiRenderState);
+    }
+
+    public static EntityRenderState extractRenderState(LivingEntity livingEntity) {
+        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        EntityRenderer<? super LivingEntity, ?> entityRenderer = entityRenderDispatcher.getRenderer(livingEntity);
+        EntityRenderState entityRenderState = entityRenderer.createRenderState(livingEntity, 1.0F);
+        entityRenderState.lightCoords = 15728880;
+        entityRenderState.shadowPieces.clear();
+        entityRenderState.outlineColor = 0;
+        return entityRenderState;
     }
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {

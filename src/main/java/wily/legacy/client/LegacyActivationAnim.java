@@ -1,5 +1,7 @@
 package wily.legacy.client;
 
+//~ rendertypes
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -16,8 +18,6 @@ import org.joml.Matrix4f;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 
 public class LegacyActivationAnim {
-
-
     public static Render itemActivationRenderReplacement = null;
 
     public static void display(Render render) {

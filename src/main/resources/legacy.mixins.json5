@@ -11,18 +11,25 @@
     "client.MapDecorationRenderStateMixin",
     "client.AbstractRecipeBookScreenMixin",
     "client.crafter.CrafterScreenMixin",
-    //? if >=1.21 && (fabric || neoforge) {
+    //? if >=1.21 && !(>=1.21.11 && fabric) && (fabric || neoforge) {
     "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.BlockRendererMixin",
     //?}
-    //? (fabric || >=1.21 && neoforge) {
-    "compat.sodium.OcclusionCullerMixin",
-    //?}
+    //? (<1.21.11 && fabric || >=1.21 && neoforge) {
+    /*"compat.sodium.OcclusionCullerMixin",
+    *///?}
     //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
     //?}
     //? if fabric {
     "client.TerrainRenderContextMixin",
+    //?}
+    //? if >=1.21.11 {
+    /*"client.RenderSetupAccessor",
+    "client.RenderingTextCollectorMixin",
+    "client.ActiveTextCollectorMixin",
+    *///?} else {
+    "client.CompositeRenderTypeAccessor",
     //?}
     "client.SectionOcclusionGraphMixin",
     "client.LevelEventHandlerMixin",
@@ -158,7 +165,6 @@
     "client.LogoRendererMixin",
     "client.LightTextureMixin",
     "client.LightingMixin",
-    "client.CompositeRenderTypeAccessor",
     "client.ClientLivingEntityMixin",
     "client.VillagerModelMixin",
     "client.BubbleParticleMixin",
@@ -196,6 +202,9 @@
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",
+    *///?}
+    //? if >=1.21.11 {
+    /*"GameRuleCategoryAccessor",
     *///?}
     "OldMinecartBehaviorMixin",
     "ServerExplosionMixin",

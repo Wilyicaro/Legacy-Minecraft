@@ -28,7 +28,7 @@ public final class LegacyMobCaps {
     }
 
     public static boolean isEnabled(ServerLevel level) {
-        return level.getGameRules().getBoolean(LegacyGameRules.LCE_MOBCAP_LIMITS);
+        return level.getGameRules()./*? if >=1.21.11 {*//*get*//*?} else {*/getBoolean/*?}*/(LegacyGameRules.LCE_MOBCAP_LIMITS);
     }
 
     public static void handleEntityAdded(Entity entity) {

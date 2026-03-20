@@ -2,7 +2,11 @@ package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.MinecartSoundInstance;
+//? if >=1.21.11 {
+/*import net.minecraft.client.resources.sounds.RidingEntitySoundInstance;
+*///?} else {
 import net.minecraft.client.resources.sounds.RidingMinecartSoundInstance;
+ //?}
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -12,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 
-@Mixin(value = {MinecartSoundInstance.class, RidingMinecartSoundInstance.class})
+@Mixin(value = {MinecartSoundInstance.class, /*? if >=1.21.11 {*//*RidingEntitySoundInstance.class*//*?} else {*/RidingMinecartSoundInstance.class/*?}*/})
 public abstract class MinecartSoundInstanceMixin extends AbstractTickableSoundInstance {
     protected MinecartSoundInstanceMixin(SoundEvent soundEvent, SoundSource soundSource, RandomSource randomSource) {
         super(soundEvent, soundSource, randomSource);

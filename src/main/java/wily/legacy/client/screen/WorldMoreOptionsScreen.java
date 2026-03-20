@@ -1,5 +1,7 @@
 package wily.legacy.client.screen;
 
+//~ gamerule
+
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,7 +18,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
+//? if >=1.21.11 {
+/*import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
+import net.minecraft.world.level.gamerules.GameRules.Category;
+import wily.legacy.mixin.base.GameRuleCategoryAccessor;
+*///?} else {
 import net.minecraft.world.level.GameRules;
+//?}
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.DatapackRepositoryAccessor;
@@ -107,7 +118,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
         addGameRulesOptions(renderableVList, gameRules, k -> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(hostPrivileges);
-        for (GameRules.Category value : GameRules.Category.values()) {
+        for (GameRules.Category value : /*? if >=1.21.11 {*//*GameRuleCategoryAccessor.getSortOrder()*//*?} else {*/GameRules.Category.values()/*?}*/) {
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables, gameRules, k -> k.getCategory() == value);
         }
@@ -126,12 +137,12 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, t -> parent.trustPlayers = t.selected));
         addGameRulesOptions(renderableVList, gameRules, k -> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(new TickBox(0, 0, parent.hostPrivileges, b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.hostPrivileges = b.selected));
-        for (GameRules.Category value : GameRules.Category.values()) {
+        for (GameRules.Category value : /*? if >=1.21.11 {*//*GameRuleCategoryAccessor.getSortOrder()*//*?} else {*/GameRules.Category.values()/*?}*/) {
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables, gameRules, k -> k.getCategory() == value);
         }
         parent.applyGameRules = (g, s) -> {
-            if (!g.equals(gameRules)) g.assignFrom(gameRules, s);
+            if (!g.equals(gameRules)) g./*? if >=1.21.11 {*//*setAll*//*?} else {*/assignFrom/*?}*/(gameRules, s);
         };
     }
 
@@ -143,7 +154,41 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRules.Key<?>> allowGamerule) {
         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+            //? if >=1.21.11 {
+            /*@Override
+            public void visitBoolean(GameRules.Key<Boolean> key) {
+                if (!allowGamerule.test(key)) return;
+                boolean defaultValue = key.defaultValue();
+                Component message = Component.translatable(key.getDescriptionId());
+                Tooltip tooltip = Tooltip.create(
+                        Component.translatable(key.getDescriptionId() + ".description").append("\n").append(
+                                Component.translatable("editGamerule.default", key.serialize(defaultValue)).withStyle(ChatFormatting.GRAY)));
+                list.addRenderable(new TickBox(0, 0, gameRules.getRule(key).get(), b -> message, b -> tooltip, b -> gameRules.set(key, b.selected, null)));
+            }
 
+            @Override
+            public void visitInteger(GameRules.Key<Integer> key) {
+                if (!allowGamerule.test(key)) return;
+                int value = gameRules.getRule(key).get();
+                int defaultValue = key.defaultValue();
+                Tooltip tooltip = Tooltip.create(
+                        Component.translatable(key.getDescriptionId() + ".description").append("\n").append(
+                                Component.translatable("editGamerule.default", key.serialize(defaultValue)).withStyle(ChatFormatting.GRAY)));
+                EditBox integerEdit = new EditBox(Minecraft.getInstance().font, 0, 0, 220, 20, Component.translatable(key.getDescriptionId()));
+                integerEdit.setTooltip(tooltip);
+                integerEdit.setValue(Integer.toString(value));
+                integerEdit.setResponder(string -> {
+                    if (key.deserialize(string).isSuccess()) {
+                        integerEdit.setTextColor(0xFFE0E0E0);
+                        gameRules.set(key, Integer.parseInt(string), null);
+                    } else {
+                        integerEdit.setTextColor(0xFFFF0000);
+                    }
+                });
+                list.addCategory(Component.translatable(key.getDescriptionId()));
+                list.addRenderable(integerEdit);
+            }
+            *///?} else {
             @Override
             public void visitBoolean(GameRules.Key<GameRules.BooleanValue> key, GameRules.Type<GameRules.BooleanValue> type) {
                 if (!allowGamerule.test(key)) return;
@@ -178,6 +223,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 list.addCategory(Component.translatable(key.getDescriptionId()));
                 list.addRenderable(integerEdit);
             }
+            //?}
         });
     }
 
@@ -225,7 +271,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
             tooltipBox.render(guiGraphics, i, j, f);
             if (label != null) {
-                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF));
+                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () ->
+                        //? if >=1.21.11 {
+                        /*label.visitLines(TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, guiGraphics.textRenderer())
+                        *///?} else {
+                        label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF)
+                         //?}
+                );
             }
         }
     }

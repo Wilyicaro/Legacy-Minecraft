@@ -1,5 +1,10 @@
 package wily.legacy.mixin.base.client;
 
+//? if >=1.21.11 {
+/*import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
+*///?}
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -15,9 +20,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.CommonColor;
+//? if >=1.21.11 {
+/*import wily.legacy.client.LegacyTextCollector;
+*///?}
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.util.LegacySprites;
@@ -51,14 +61,66 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
     }
 
     @Shadow
-    @Nullable
-    protected abstract Style getClickedComponentStyleAt(int i);
-
-    @Shadow
     protected abstract void handleExitToTitleScreen();
 
     @Shadow
     protected abstract void setButtonsActive(boolean bl);
+
+    //? if >=1.21.11 {
+    /*@Inject(method = "render", at = @At("HEAD"))
+    public void renderBack(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        float alpha = Math.min((Util.getMillis() - screenInit) / 1200f, 1.0f);
+        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
+    }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/DeathScreen;visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V"))
+    public void visitText(DeathScreen instance, ActiveTextCollector activeTextCollector) {
+        ActiveTextCollector outlinedRenderer = new LegacyTextCollector(activeTextCollector, 0.5f, CommonColor.TITLE_TEXT_OUTLINE.get());
+        ActiveTextCollector.Parameters parameters = outlinedRenderer.defaultParameters();
+
+        int x = this.width / 2;
+        outlinedRenderer.defaultParameters(parameters.withScale(2.0F));
+        outlinedRenderer.accept(TextAlignment.CENTER, x / 2, height / 4 + 20, this.title);
+        outlinedRenderer.defaultParameters(parameters);
+
+        if (this.causeOfDeath != null) {
+            activeTextCollector.accept(TextAlignment.CENTER, x, this.height / 2 - 24, this.causeOfDeath);
+        }
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"), index = 1)
+    public ResourceLocation blitDraft(ResourceLocation arg) {
+        return LegacySprites.DRAFT_REPORT;
+    }
+
+    *///?} else {
+    @Shadow
+    @Nullable
+    protected abstract Style getClickedComponentStyleAt(int i);
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
+        float alpha = Math.min((Util.getMillis() - screenInit) / 1200f, 1.0f);
+        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20);
+        guiGraphics.pose().scale(2.0F, 2.0F);
+
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
+        guiGraphics.pose().popMatrix();
+        if (this.causeOfDeath != null) {
+            guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
+            if (j > height / 2 - 24 && j < height / 2 - 15)
+                guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
+        }
+
+        if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DRAFT_REPORT, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 15, 15);
+        }
+        super.render(guiGraphics, i, j, f);
+    }
+    //?}
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
@@ -85,28 +147,4 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
             this.minecraft.setScreen(new ExitConfirmationScreen(this));
         }
     }
-
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        ci.cancel();
-        float alpha = Math.min((Util.getMillis() - screenInit) / 1200f, 1.0f);
-        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20);
-        guiGraphics.pose().scale(2.0F, 2.0F);
-        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
-        guiGraphics.pose().popMatrix();
-        if (this.causeOfDeath != null) {
-            guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
-            if (j > height / 2 - 24 && j < height / 2 - 15)
-                guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
-        }
-
-        if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DRAFT_REPORT, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 15, 15);
-        }
-        for (Renderable renderable : this.renderables)
-            renderable.render(guiGraphics, i, j, f);
-    }
-
 }

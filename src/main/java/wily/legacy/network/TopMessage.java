@@ -97,6 +97,7 @@ public record TopMessage(Component message, int baseColor, int ticksOnScreen, bo
             if (sendType().isMedium()) setMedium(topMessage);
         }
 
+        //~ !identifier
         @Override
         public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
             return ID;

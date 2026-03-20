@@ -59,7 +59,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(color[0], color[1], color[2], 1.0f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(), x, y, width, height);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getResourceLocationIndex()).optionsMapSprite(), x, y, width, height);
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
     }
@@ -67,7 +67,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     public static List<PlayerInfo> getActualPlayerInfos() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
-            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.player.getGameProfile().equals(p.getProfile()) ? 0 : ((LegacyPlayerInfo) p).getIdentifierIndex()))).toList();
+            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.player.getGameProfile().equals(p.getProfile()) ? 0 : ((LegacyPlayerInfo) p).getResourceLocationIndex()))).toList();
         return Collections.emptyList();
     }
 

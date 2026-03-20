@@ -50,6 +50,7 @@ public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Op
             context.executor().execute(() -> m.tryCraft(sp, this));
     }
 
+    //~ !identifier
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;

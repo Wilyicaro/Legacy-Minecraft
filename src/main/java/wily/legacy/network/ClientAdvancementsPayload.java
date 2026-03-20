@@ -55,6 +55,7 @@ public record ClientAdvancementsPayload(/*? if >1.20.1 {*/List<AdvancementHolder
          *///?}
     }
 
+    //~ !identifier
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;

@@ -15,12 +15,14 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -67,8 +69,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Shadow
     protected abstract boolean isControlledCamera();
 
-    @Shadow
+    //? if >=1.21.11 {
+    /*protected abstract boolean hasEnoughFoodToDoExhaustiveManoeuvres();
+
+    @Unique
+    boolean hasEnoughFoodToSprint() {
+        return hasEnoughFoodToDoExhaustiveManoeuvres();
+    }
+    *///?} else {
     protected abstract boolean hasEnoughFoodToSprint();
+    //?}
 
     @Shadow
     public abstract void move(MoverType arg, Vec3 arg2);
@@ -97,7 +107,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD, ordinal = 0))
     public void aiStepCrouching(LocalPlayer instance, boolean value) {
-        crouching = value && (!gameRules.getBoolean(LegacyGameRules.LEGACY_FLIGHT) || ((onGround() || !isInWater()) && !getAbilities().flying && !isFallFlying()));
+        crouching = value && (!gameRules./*? if >=1.21.11 {*//*get*//*?} else {*/getBoolean/*?}*/(LegacyGameRules.LEGACY_FLIGHT) || ((onGround() || !isInWater()) && !getAbilities().flying && !isFallFlying()));
     }
 
     @Inject(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z", opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
@@ -158,7 +168,12 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     
     private boolean legacy$canUseStoredElytraBoost() {
-        return isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get();
+        return isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() &&
+                //? if >=1.21.11 {
+                /*gameRules.get(LegacyGameRules.LEGACY_FLIGHT);
+                *///?} else {
+                gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get();
+                //?}
     }
 
     // Charges extra  speed while the player is climbing and looking downward 

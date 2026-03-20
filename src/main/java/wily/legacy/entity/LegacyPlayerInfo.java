@@ -31,7 +31,7 @@ public interface LegacyPlayerInfo {
     }
 
     static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info) {
-        buf.get().writeVarInt(info.getIdentifierIndex());
+        buf.get().writeVarInt(info.getResourceLocationIndex());
         buf.get().writeBoolean(info.isVisible());
         buf.get().writeBoolean(info.isExhaustionDisabled());
         buf.get().writeBoolean(info.mayFlySurvival());
@@ -46,9 +46,9 @@ public interface LegacyPlayerInfo {
         return null;
     }
 
-    int getIdentifierIndex();
+    int getResourceLocationIndex();
 
-    void setIdentifierIndex(int i);
+    void setResourceLocationIndex(int i);
 
     boolean isVisible();
 
@@ -67,7 +67,7 @@ public interface LegacyPlayerInfo {
     void setStatsMap(Object2IntMap<Stat<?>> statsMap);
 
     default void copyFrom(LegacyPlayerInfo info) {
-        this.setIdentifierIndex(info.getIdentifierIndex());
+        this.setResourceLocationIndex(info.getResourceLocationIndex());
         this.setVisibility(info.isVisible());
         this.setDisableExhaustion(info.isExhaustionDisabled());
         this.setMayFlySurvival(info.mayFlySurvival());
@@ -82,7 +82,7 @@ public interface LegacyPlayerInfo {
         Object2IntMap<Stat<?>> statsMap;
 
         public Instance(int index, boolean invisible, boolean disableExhaustion, boolean mayFlySurvival, Object2IntMap<Stat<?>> object2IntMap) {
-            setIdentifierIndex(index);
+            setResourceLocationIndex(index);
             setVisibility(invisible);
             setDisableExhaustion(disableExhaustion);
             setMayFlySurvival(mayFlySurvival);
@@ -90,12 +90,12 @@ public interface LegacyPlayerInfo {
         }
 
         @Override
-        public int getIdentifierIndex() {
+        public int getResourceLocationIndex() {
             return index;
         }
 
         @Override
-        public void setIdentifierIndex(int i) {
+        public void setResourceLocationIndex(int i) {
             index = i;
         }
 

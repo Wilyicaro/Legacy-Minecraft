@@ -4,7 +4,15 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.DataResult;
 import net.minecraft.SharedConstants;
+//? if >=1.21.11 {
+/*import net.minecraft.client.GraphicsPreset;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.world.level.gamerules.GameRules;
+*///?} else {
 import net.minecraft.client.GraphicsStatus;
+import net.minecraft.client.renderer.RenderType;
+//?}
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
@@ -94,9 +102,9 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
 //? if fabric || >=1.21 && neoforge {
-import wily.legacy.client.screen.compat.IrisCompat;
+/*import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
-//?}
+*///?}
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
@@ -141,8 +149,8 @@ public class Legacy4JClient {
     public static final ControllerManager controllerManager = new ControllerManager();
     public static final Map<Block, ResourceLocation> fastLeavesModels = new HashMap<>();
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
-    public static final RenderType GHAST_SHOOTING_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
-    public static final RenderType DROWNED_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
+    public static final RenderType GHAST_SHOOTING_GLOW = /*? if >=1.21.11 {*//*RenderTypes*//*?} else {*/RenderType/*?}*/.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
+    public static final RenderType DROWNED_GLOW = /*? if >=1.21.11 {*//*RenderTypes*//*?} else {*/RenderType/*?}*/.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
     public static final Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> VANILLA_PRESET_EDITORS = new HashMap<>(Map.of(Optional.of(WorldPresets.FLAT), (createWorldScreen, settings) -> {
         ChunkGenerator chunkGenerator = settings.selectedDimensions().overworld();
         RegistryAccess.Frozen registryAccess = settings.worldgenLoadContext();
@@ -173,16 +181,16 @@ public class Legacy4JClient {
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
 
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info) {
-        return getVisualPlayerColor(info.getIdentifierIndex() >= 0 ? info.getIdentifierIndex() : info.legacyMinecraft$getProfile().id().hashCode());
+        return getVisualPlayerColor(info.getResourceLocationIndex() >= 0 ? info.getResourceLocationIndex() : info.legacyMinecraft$getProfile().id().hashCode());
     }
 
     public static float[] getVisualPlayerColor(int i) {
-        PlayerIdentifier playerIdentifier = PlayerIdentifier.of(i);
+        PlayerIdentifier playerResourceLocation = PlayerIdentifier.of(i);
         if (PlayerIdentifier.list.containsKey(i))
-            return new float[]{(playerIdentifier.color() >> 16 & 255) / 255f, (playerIdentifier.color() >> 8 & 255) / 255f, (playerIdentifier.color() & 255) / 255f};
-        float r = ((playerIdentifier.color() >> 16 & 255) * (0.8f + (i % 15) / 30f)) / 255f;
-        float g = ((playerIdentifier.color() >> 8 & 255) * (1.2f - (i % 16) / 32f)) / 255f;
-        float b = ((playerIdentifier.color() & 255) * (0.8f + (i % 17) / 34f)) / 255f;
+            return new float[]{(playerResourceLocation.color() >> 16 & 255) / 255f, (playerResourceLocation.color() >> 8 & 255) / 255f, (playerResourceLocation.color() & 255) / 255f};
+        float r = ((playerResourceLocation.color() >> 16 & 255) * (0.8f + (i % 15) / 30f)) / 255f;
+        float g = ((playerResourceLocation.color() >> 8 & 255) * (1.2f - (i % 16) / 32f)) / 255f;
+        float b = ((playerResourceLocation.color() & 255) * (0.8f + (i % 17) / 34f)) / 255f;
         return new float[]{r, g, b};
     }
 
@@ -422,14 +430,14 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
-            FactoryAPIClient.registerRenderType(ChunkSectionLayer.CUTOUT_MIPPED, SHRUB.get());
+            FactoryAPIClient.registerRenderType(ChunkSectionLayer./*? if >=1.21.11 {*//*CUTOUT*//*?} else {*/CUTOUT_MIPPED/*?}*/, SHRUB.get());
             FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
             //? if fabric || >=1.21 && neoforge {
-            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+            /*if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            //?}
+            *///?}
             LegacyGuiElements.setup(m);
         });
 
@@ -565,7 +573,11 @@ public class Legacy4JClient {
     }
 
     public static BlockStateModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
+        //? if >=1.21.11 {
+        /*boolean fastGraphics = Minecraft.getInstance().options.graphicsPreset().get() == GraphicsPreset.FAST;
+        *///?} else {
         boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
+         //?}
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())) {
             if (!fastGraphics && blockGetter != null) {
                 for (Direction value : Direction.values()) {

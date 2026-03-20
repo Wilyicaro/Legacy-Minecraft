@@ -66,12 +66,12 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
-    public int getIdentifierIndex() {
+    public int getResourceLocationIndex() {
         return position;
     }
 
     @Override
-    public void setIdentifierIndex(int i) {
+    public void setResourceLocationIndex(int i) {
         position = i;
     }
 

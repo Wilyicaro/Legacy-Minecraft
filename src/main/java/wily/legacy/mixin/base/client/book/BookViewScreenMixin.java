@@ -63,9 +63,6 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     @Shadow
     protected abstract int getNumPages();
 
-    @Shadow
-    public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
-
     @Override
     public void added() {
         super.added();
@@ -133,6 +130,10 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
+    //? if <1.21.11 {
+    @Shadow
+    public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
+
     @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
         if (this.cachedPageComponents.isEmpty()) {
@@ -156,6 +157,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(null);
     }
+    //?}
 
     @Override
     public boolean isPauseScreen() {

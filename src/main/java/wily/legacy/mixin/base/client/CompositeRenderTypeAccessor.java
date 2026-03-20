@@ -1,3 +1,4 @@
+//? if <1.21.11 {
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.renderer.RenderType;
@@ -13,3 +14,4 @@ public interface CompositeRenderTypeAccessor {
     //?}
     RenderType.CompositeState getState();
 }
+//?}

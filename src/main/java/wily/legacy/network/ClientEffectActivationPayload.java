@@ -29,6 +29,7 @@ public record ClientEffectActivationPayload(/*? if <1.20.5 {*//*MobEffect*//*?} 
         if (FactoryAPIPlatform.isClient()) LegacyActivationAnim.displayEffect(effect);
     }
 
+    //~ !identifier
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;

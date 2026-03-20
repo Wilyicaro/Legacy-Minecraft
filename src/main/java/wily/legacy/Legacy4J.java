@@ -191,13 +191,13 @@ public class Legacy4J {
         while (b) {
             b = false;
             for (ServerPlayer player : server.getPlayerList().getPlayers())
-                if (player != p && ((LegacyPlayerInfo) player).getIdentifierIndex() == pos) {
+                if (player != p && ((LegacyPlayerInfo) player).getResourceLocationIndex() == pos) {
                     pos++;
                     b = true;
                     continue main;
                 }
         }
-        ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
+        ((LegacyPlayerInfo) p).setResourceLocationIndex(pos);
         CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(), (LegacyPlayerInfo) p), Collections.emptyMap(), server.getDefaultGameType(), PlayerInfoSync.All.ID_S2C));
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
