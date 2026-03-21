@@ -22,7 +22,12 @@ public class RGBPreviewWidget extends AbstractWidget {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.RGB_PREVIEW, getX(), getY(), getWidth(), getHeight());
         guiGraphics.fill(getX() + 2, getY() + 2, getX() + getWidth() - 2, getY() + getHeight() - 2, ColorUtil.colorFromInt(LegacyOptions.controllerLedRed.get(), LegacyOptions.controllerLedGreen.get(), LegacyOptions.controllerLedBlue.get(), 255));
         int k = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
-        renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24);
+        int color = k | Mth.ceil(this.alpha * 255.0f) << 24;
+        //? if >=1.21.11 {
+        renderScrollingStringOverContents(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE, style -> style.withColor(color)), this.getMessage(), 2);
+        //?} else {
+        /*renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, color);
+        *///?}
     }
 
     @Override

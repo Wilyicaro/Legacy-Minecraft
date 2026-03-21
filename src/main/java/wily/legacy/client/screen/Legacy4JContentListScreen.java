@@ -1,6 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import wily.legacy.client.ContentManager;
@@ -10,7 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -47,8 +50,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private static class RemoteImage {
         public final int width;
         public final int height;
-        public final ResourceLocation id;
-        public RemoteImage(ResourceLocation id, int width, int height) {
+        public final Identifier id;
+        public RemoteImage(Identifier id, int width, int height) {
             this.id = id;
             this.width = width;
             this.height = height;
@@ -141,7 +144,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 
                 minecraft.execute(() -> {
                     String cleanId = packId.toLowerCase().replaceAll("[^a-z0-9_.-]", "");
-                    ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
+                    Identifier textureId = Identifier.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
                     
                     minecraft.getTextureManager().register(textureId, new DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
                     
@@ -236,7 +239,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.lineHeight = lineHeight;
 
             scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
+                label
+                        //? if >=1.21.11 {
+                        .visitLines(TextAlignment.LEFT, x, descriptionY, lineHeight, guiGraphics.textRenderer())
+                        //?} else {
+                        /*.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
+                        *///?}
             );
         }
 
@@ -277,31 +285,25 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
     }
 
-    private static class LeftAlignedButton extends Button {
+    private static class LeftAlignedButton extends Legacy4JStoreScreen.LeftAlignedButton {
         private final ContentManager.Pack pack;
         private final ContentManager.Category category;
 
         public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category, OnPress onPress) {
-            super(0, 0, width, height, Component.literal(pack.name()), onPress, DEFAULT_NARRATION);
+            super(width, height, Component.literal(pack.name()), onPress);
             this.pack = pack;
             this.category = category;
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        public void /*? if >=1.21.11 {*/renderContents/*?} else {*//*renderWidget*//*?}*/(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            super./*? if >=1.21.11 {*/renderContents/*?} else {*//*renderWidget*//*?}*/(guiGraphics, mouseX, mouseY, partialTick);
             if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
                 int spriteSize = 20;
                 int sx = this.getX() + this.width - spriteSize - 10;
                 int sy = this.getY() + (this.height - spriteSize) / 2;
                 guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
             }
-        }
-
-        @Override
-        public void renderString(GuiGraphics guiGraphics, Font font, int color) {
-            int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
-            guiGraphics.drawString(font, this.getMessage(), this.getX() + 12, textY, color, true);
         }
     }
 }

@@ -128,8 +128,8 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         Legacy4JClient.postScreenInit((Screen) (Object) this);
     }
 
-    @Inject(method = /*? if >=1.21.11 {*//*"init(II)V"*//*?} else {*/"init(Lnet/minecraft/client/Minecraft;II)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V", shift = At.Shift.AFTER))
-    public void init(/*? if <1.21.11 {*/Minecraft minecraft, /*?}*/int i, int j, CallbackInfo ci) {
+    @Inject(method = /*? if >=1.21.11 {*/"init(II)V"/*?} else {*//*"init(Lnet/minecraft/client/Minecraft;II)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V", shift = At.Shift.AFTER))
+    public void init(/*? if <1.21.11 {*//*Minecraft minecraft, *//*?}*/int i, int j, CallbackInfo ci) {
         Legacy4JClient.postScreenInit((Screen) (Object) this);
     }
     //?}

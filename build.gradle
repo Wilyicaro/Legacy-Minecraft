@@ -79,6 +79,7 @@ dependencies {
     modApi("wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}")
     modCompileOnly("maven.modrinth:world-host:${world_host_version}")
     modCompileOnly("maven.modrinth:vivecraft:${vivecraft_version}")
+
     if (stonecutter.eval(stonecutter.current.version, "<=1.21.1")) {
         modCompileOnlyApi("mezz.jei:jei-${stonecutter.current.version}-${loader}-api:${jei_version}")
         modCompileOnly("mezz.jei:jei-${stonecutter.current.version}-${loader}:${jei_version}")
@@ -117,6 +118,9 @@ dependencies {
     if (loader == "forge" || loader == "neoforge") {
         forgeRuntimeLibrary(sdl_dependency)
     }
+
+    api("org.apache.httpcomponents:httpcore:4.4.16")
+    api("org.apache.httpcomponents:httpclient:4.5.14")
 }
 
 stonecutter {
@@ -150,6 +154,7 @@ stonecutter {
             replace("animal.horse", "animal.equine")
             replace("monster.Zombie", "monster.zombie.Zombie")
             replace("monster.Drowned", "monster.zombie.Drowned")
+            replace("monster.ZombifiedPiglin", "monster.zombie.ZombifiedPiglin")
             replace("npc.AbstractVillager", "npc.villager.AbstractVillager")
             replace("npc.Villager", "npc.villager.Villager")
             replace("npc.VillagerProfession", "npc.villager.VillagerProfession")
@@ -164,6 +169,8 @@ stonecutter {
             replace("model.BookModel", "model.object.book.BookModel")
             replace("model.BannerFlagModel", "model.object.banner.BannerFlagModel")
             replace("world.level.biome.AmbientMoodSettings", "world.attribute.AmbientMoodSettings")
+            replace("showNowPlayingToast()", "musicToast()")
+            replace("graphicsMode()", "graphicsPreset()")
 //            replace("GameRules.Key<GameRules.BooleanValue>", "GameRule<Boolean>")
 //            replace("GameRules.Key<GameRules.IntegerValue>", "GameRule<Integer>")
         }

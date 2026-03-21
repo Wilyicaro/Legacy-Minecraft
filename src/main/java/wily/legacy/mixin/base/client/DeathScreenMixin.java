@@ -1,11 +1,11 @@
 package wily.legacy.mixin.base.client;
 
 //? if >=1.21.11 {
-/*import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.TextAlignment;
-*///?}
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.Util;
+//?}
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -26,8 +26,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.CommonColor;
 //? if >=1.21.11 {
-/*import wily.legacy.client.LegacyTextCollector;
-*///?}
+import wily.legacy.client.LegacyTextCollector;
+//?}
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.util.LegacySprites;
@@ -67,7 +67,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
     protected abstract void setButtonsActive(boolean bl);
 
     //? if >=1.21.11 {
-    /*@Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     public void renderBack(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         float alpha = Math.min((Util.getMillis() - screenInit) / 1200f, 1.0f);
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
@@ -88,13 +88,13 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         }
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"), index = 1)
-    public ResourceLocation blitDraft(ResourceLocation arg) {
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"), index = 1)
+    public Identifier blitDraft(Identifier arg) {
         return LegacySprites.DRAFT_REPORT;
     }
 
-    *///?} else {
-    @Shadow
+    //?} else {
+    /*@Shadow
     @Nullable
     protected abstract Style getClickedComponentStyleAt(int i);
 
@@ -120,7 +120,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         }
         super.render(guiGraphics, i, j, f);
     }
-    //?}
+    *///?}
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {

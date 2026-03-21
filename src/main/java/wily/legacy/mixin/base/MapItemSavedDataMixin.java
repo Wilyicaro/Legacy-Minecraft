@@ -72,10 +72,10 @@ public abstract class MapItemSavedDataMixin {
     @Unique
     private static boolean canCreate(ResourceKey<Level> level) {
         //? if >=1.21.11 {
-        /*return !(FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getLevel(level).getGameRules().get(LegacyGameRules.LEGACY_MAP_GRID));
-        *///?} else {
-        return !(FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID));
-         //?}
+        return !(FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getLevel(level).getGameRules().get(LegacyGameRules.LEGACY_MAP_GRID));
+        //?} else {
+        /*return !(FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID));
+         *///?}
     }
 
     @Inject(method = "createFresh", at = @At("HEAD"), cancellable = true)
@@ -99,12 +99,12 @@ public abstract class MapItemSavedDataMixin {
     public boolean tickCarriedByAddGlobalPlayers(boolean original, Player player) {
         MinecraftServer server = FactoryAPIPlatform.getEntityServer(player);
         //? if <1.21.11 {
-        if (!server.getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
-        //?}
+        /*if (!server.getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
+        *///?}
         if (player instanceof ServerPlayer sp && server != null) {
             //? if >=1.21.11 {
-            /*if (sp.level().getGameRules().get(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
-            *///?}
+            if (sp.level().getGameRules().get(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
+            //?}
             server.getPlayerList().getPlayers().forEach(p -> {
                 if (!carriedByPlayers.containsKey(p)) {
                     MapItemSavedData.HoldingPlayer hp = self().new HoldingPlayer(p);
@@ -122,10 +122,10 @@ public abstract class MapItemSavedDataMixin {
     @ModifyExpressionValue(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;contains(Ljava/util/function/Predicate;)Z"))
     public boolean tickCarriedByRemoveInvalid(boolean original, Player player) {
         //? if >=1.21.11 {
-        /*return player instanceof ServerPlayer sp && sp.level().getGameRules().get(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
-        *///?} else {
-        return FactoryAPIPlatform.getEntityServer(player).getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
-        //?}
+        return player instanceof ServerPlayer sp && sp.level().getGameRules().get(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
+        //?} else {
+        /*return FactoryAPIPlatform.getEntityServer(player).getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
+        *///?}
     }
 
     @ModifyArg(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;addDecoration(Lnet/minecraft/core/Holder;Lnet/minecraft/world/level/LevelAccessor;Ljava/lang/String;DDDLnet/minecraft/network/chat/Component;)V", ordinal = 0))

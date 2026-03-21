@@ -1,5 +1,5 @@
 //? if >=1.21.11 {
-/*package wily.legacy.client;
+package wily.legacy.client;
 
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.TextAlignment;
@@ -49,4 +49,4 @@ public class LegacyTextCollector implements ActiveTextCollector {
         this.collector.acceptScrolling(component, i, j, k, l, m, parameters);
     }
 }
-*///?}
+//?}

@@ -12,6 +12,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.stats.Stat;
 import net.minecraft.util.Unit;
+//? if >=1.21.11 {
+import net.minecraft.world.attribute.BedRule;
+//?}
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -66,12 +69,12 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
-    public int getResourceLocationIndex() {
+    public int getIdentifierIndex() {
         return position;
     }
 
     @Override
-    public void setResourceLocationIndex(int i) {
+    public void setIdentifierIndex(int i) {
         position = i;
     }
 
@@ -171,7 +174,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)
     public void startSleepInBed(BlockPos blockPos, CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
         Either<BedSleepingProblem, Unit> either = cir.getReturnValue();
-        if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
+        if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == /*? if >=1.21.11 {*/BedRule.CAN_SLEEP_WHEN_DARK.asProblem()/*?} else {*//*BedSleepingProblem.NOT_POSSIBLE_NOW*//*?}*/ && !this.isCreative()) {
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
             if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(level(), this)).isEmpty()) {
                 cir.setReturnValue(Either.left(BedSleepingProblem.NOT_SAFE));

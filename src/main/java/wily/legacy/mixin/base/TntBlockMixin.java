@@ -33,21 +33,21 @@ public class TntBlockMixin {
     }
     *///?} else {
     //? if >=1.21.11 {
-    /*@ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;"))
+    @ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;"))
     private static Object explode(Object original, @Local BlockPos pos, @Local ServerLevel serverLevel) {
         return (Boolean) original && (serverLevel.getGameRules().get(LegacyGameRules.TNT_LIMIT) == 0 || serverLevel.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(pos)).size() < serverLevel.getGameRules().get(LegacyGameRules.TNT_LIMIT));
     }
-    *///?} else {
-    @ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
+    //?} else {
+    /*@ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     private static boolean explode(boolean original, @Local BlockPos pos, @Local ServerLevel serverLevel) {
         return original && (serverLevel.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get() == 0 || serverLevel.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(pos)).size() < serverLevel.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get());
     }
-    //?}
+    *///?}
 
     //?}
     @Inject(method = "wasExploded", at = @At("HEAD"), cancellable = true)
     private void wasExploded(/*? if <1.21.2 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, BlockPos blockPos, Explosion explosion, CallbackInfo ci) {
-        int tntLimit = level.getGameRules()./*? if >=1.21.11 {*//*get(LegacyGameRules.TNT_LIMIT)*//*?} else {*/getRule(LegacyGameRules.TNT_LIMIT).get()/*?}*/;
+        int tntLimit = level.getGameRules()./*? if >=1.21.11 {*/get(LegacyGameRules.TNT_LIMIT)/*?} else {*//*getRule(LegacyGameRules.TNT_LIMIT).get()*//*?}*/;
         if (/*? if <1.21.5 {*//*!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) ||*//*?}*/tntLimit > 0 && level.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(blockPos)).size() >= tntLimit)
             ci.cancel();
     }

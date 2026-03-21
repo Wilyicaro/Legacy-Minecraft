@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.BeaconMenu;
@@ -186,7 +186,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     }
 
     @Unique
-    private void renderBeaconSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y) {
+    private void renderBeaconSprite(GuiGraphics graphics, Identifier sprite, int x, int y) {
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
         if (LegacyOptions.getUIMode().isSD())

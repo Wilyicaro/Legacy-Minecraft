@@ -1,5 +1,5 @@
 //? if >=1.21.11 {
-/*package wily.legacy.mixin.base;
+package wily.legacy.mixin.base;
 
 import net.minecraft.world.level.gamerules.GameRuleCategory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,4 +14,4 @@ public interface GameRuleCategoryAccessor {
         throw new AssertionError();
     }
 }
-*///?}
+//?}

@@ -7,10 +7,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 //? if >=1.21.11 {
-/*import net.minecraft.world.entity.npc.villager.*;
-*///?} else {
-import net.minecraft.world.entity.npc.*;
- //?}
+import net.minecraft.world.entity.npc.villager.*;
+//?} else {
+/*import net.minecraft.world.entity.npc.*;
+ *///?}
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
@@ -43,20 +43,20 @@ public abstract class VillagerMixin extends AbstractVillager {
     public abstract VillagerData getVillagerData();
 
     //? if >=1.21.11 {
-    /*@Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/villager/Villager;updateTrades(Lnet/minecraft/server/level/ServerLevel;)V"))
+    @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/villager/Villager;updateTrades(Lnet/minecraft/server/level/ServerLevel;)V"))
     private void increaseMerchantCareer(Villager instance, ServerLevel int2objectmap) {
         if (getLevel() < 5) {
             updateTrades(getLevel() + 1);
         }
     }
-    *///?} else {
-    @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;updateTrades()V"))
+    //?} else {
+    /*@Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;updateTrades()V"))
     private void increaseMerchantCareer(Villager instance) {
         if (getLevel() < 5) {
             updateTrades(getLevel() + 1);
         }
     }
-     //?}
+     *///?}
 
     @Unique
     private int getLevel() {
@@ -71,11 +71,11 @@ public abstract class VillagerMixin extends AbstractVillager {
     public MerchantOffers getOffers() {
         if (this.offers == null) {
             this.offers = new MerchantOffers();
-            //? if >1.21.11 {
-            /*if (this.level() instanceof ServerLevel l) this.updateTrades(l);
-            *///?} else {
-            this.updateTrades();
-             //?}
+            //? if >=1.21.11 {
+            if (this.level() instanceof ServerLevel l) this.updateTrades(l);
+            //?} else {
+            /*this.updateTrades();
+             *///?}
             updateTrades(getLevel() + 1);
         }
         return this.offers;
@@ -103,7 +103,7 @@ public abstract class VillagerMixin extends AbstractVillager {
         }
         int j = 0;
         while (j < 2 && !arrayList.isEmpty()) {
-            MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer(/*? if >=1.21.11 {*//*(ServerLevel) this.level(),*//*?}*/ self(), self().getRandom());
+            MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer(/*? if >=1.21.11 {*/(ServerLevel) this.level(),/*?}*/ self(), self().getRandom());
             if (merchantOffer == null) continue;
             ((LegacyMerchantOffer) merchantOffer).setRequiredLevel(level);
             self().getOffers().add(merchantOffer);
@@ -113,16 +113,16 @@ public abstract class VillagerMixin extends AbstractVillager {
     }
 
     //? if >=1.21.11 {
-    /*@Unique
+    @Unique
     protected MerchantOffer getDecayArrowTrade(ServerLevel serverLevel, Entity trader, net.minecraft.util.RandomSource randomSource) {
         return new MerchantOffer(new ItemCost(Items.ARROW, 5), Optional.of(new ItemCost(Items.EMERALD, 2)), LegacyItemUtil.createDecayTippedArrow().copyWithCount(5), 12, 30, 0.2f);
     }
-    *///?} else {
-    @Unique
+    //?} else {
+    /*@Unique
     protected MerchantOffer getDecayArrowTrade(Entity trader, net.minecraft.util.RandomSource randomSource) {
         return new MerchantOffer(new ItemCost(Items.ARROW, 5), Optional.of(new ItemCost(Items.EMERALD, 2)), LegacyItemUtil.createDecayTippedArrow().copyWithCount(5), 12, 30, 0.2f);
     }
-     //?}
+     *///?}
 
     @Inject(method = "getBreedOffspring*", at = @At("HEAD"), cancellable = true)
     public void getBreedOffspring(ServerLevel level, AgeableMob partner, CallbackInfoReturnable<Villager> cir) {

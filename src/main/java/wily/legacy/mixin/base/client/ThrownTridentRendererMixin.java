@@ -2,10 +2,10 @@ package wily.legacy.mixin.base.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 //? if >=1.21.11 {
-/*import net.minecraft.client.renderer.rendertype.RenderTypes;
-*///?} else {
-import net.minecraft.client.renderer.RenderType;
-//?}
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+//?} else {
+/*import net.minecraft.client.renderer.RenderType;
+*///?}
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.entity.ThrownTridentRenderer;
 import net.minecraft.client.renderer.entity.state.ThrownTridentRenderState;
 //?}
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,7 +32,7 @@ public abstract class ThrownTridentRendererMixin extends /*? if >=1.21.2 {*/Enti
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/ThrownTridentRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("RETURN"))
     public void render(ThrownTridentRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (LegacyOptions.loyaltyLines.get()) {
-            submitNodeCollector.submitCustomGeometry(poseStack, /*? if >=1.21.11 {*//*RenderTypes*//*?} else {*/RenderType/*?}*/.leash(), new LoyaltyLinesRenderer.Submit(LoyaltyLinesRenderState.of(renderState)));
+            submitNodeCollector.submitCustomGeometry(poseStack, /*? if >=1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.leash(), new LoyaltyLinesRenderer.Submit(LoyaltyLinesRenderState.of(renderState)));
         }
     }
 }

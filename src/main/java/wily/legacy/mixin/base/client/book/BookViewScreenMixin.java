@@ -1,6 +1,9 @@
 package wily.legacy.mixin.base.client.book;
 
 import com.mojang.blaze3d.platform.InputConstants;
+//? if >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+//?}
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
@@ -107,7 +110,11 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
             FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(o);
             guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0xFF000000, false);
         }
-        Style style = this.getClickedComponentStyleAt(i, j);
+        //? if >=1.21.11 {
+        Style style = new ActiveTextCollector.ClickableStyleFinder(this.font, i, j).result();
+        //?} else {
+        /*Style style = this.getClickedComponentStyleAt(i, j);
+        *///?}
         if (style != null) {
             guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
         }
@@ -131,7 +138,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
 
     //? if <1.21.11 {
-    @Shadow
+    /*@Shadow
     public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
 
     @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
@@ -157,7 +164,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(null);
     }
-    //?}
+    *///?}
 
     @Override
     public boolean isPauseScreen() {

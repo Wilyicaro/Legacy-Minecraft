@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -67,8 +67,8 @@ public abstract class GuiGraphicsMixin {
         LegacyFontUtil.legacyFont = true;
     }
 
-    @Inject(method = /*? if forge || neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"renderTooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
-    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, ResourceLocation location/*? if forge || neoforge {*//*, ItemStack tooltipStack*//*?}*/, CallbackInfo ci) {
+    @Inject(method = /*? if forge || neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"renderTooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
+    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, Identifier location/*? if forge || neoforge {*//*, ItemStack tooltipStack*//*?}*/, CallbackInfo ci) {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
         LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderTooltipInternal(self(), font, list, i, j, clientTooltipPositioner/*? if forge || neoforge {*//*, tooltipStack*//*?}*/));

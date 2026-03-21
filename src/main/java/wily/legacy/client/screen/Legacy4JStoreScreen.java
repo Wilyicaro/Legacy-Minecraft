@@ -1,5 +1,7 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.util.FormattedCharSequence;
@@ -119,15 +121,22 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         }
     }
 
-    private static class LeftAlignedButton extends Button {
+    public static class LeftAlignedButton extends Button/*? if >=1.21.11 {*/.Plain/*?}*/ {
         public LeftAlignedButton(int width, int height, Component message, OnPress onPress) {
             super(0, 0, width, height, message, onPress, DEFAULT_NARRATION);
         }
 
         @Override
-        public void renderString(GuiGraphics guiGraphics, Font font, int color) {
+        //? if >=1.21.11 {
+        protected void renderDefaultLabel(ActiveTextCollector activeTextCollector) {
+            int textY = this.getY() + (this.getHeight() - Minecraft.getInstance().font.lineHeight) / 2 + 1;
+            activeTextCollector.accept(this.getX() + 12, textY, this.getMessage());
+        }
+        //?} else {
+        /*public void renderString(GuiGraphics guiGraphics, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             guiGraphics.drawString(font, this.getMessage(), this.getX() + 12, textY, color, true);
         }
+        *///?}
     }
 }

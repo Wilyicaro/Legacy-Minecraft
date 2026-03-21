@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -59,7 +60,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(color[0], color[1], color[2], 1.0f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getResourceLocationIndex()).optionsMapSprite(), x, y, width, height);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(), x, y, width, height);
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
     }
@@ -67,7 +68,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     public static List<PlayerInfo> getActualPlayerInfos() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
-            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.player.getGameProfile().equals(p.getProfile()) ? 0 : ((LegacyPlayerInfo) p).getResourceLocationIndex()))).toList();
+            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.player.getGameProfile().equals(p.getProfile()) ? 0 : ((LegacyPlayerInfo) p).getIdentifierIndex()))).toList();
         return Collections.emptyList();
     }
 
@@ -118,7 +119,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     protected void addPlayerButtons() {
         addPlayerButtons(true, (playerInfo, b) -> {
-            if (!minecraft.player.hasPermissions(2)) return;
+            if (!/*? if >=1.21.11 {*/Commands.LEVEL_GAMEMASTERS.check(minecraft.player.permissions())/*?} else {*//*minecraft.player.hasPermissions(2)*//*?}*/) return;
             minecraft.setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
         });
     }
@@ -154,7 +155,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addHostOptionsButton() {
-        if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
+        if (!/*? if >=1.21.11 {*/Commands.LEVEL_GAMEMASTERS.check(minecraft.player.permissions())/*?} else {*//*minecraft.player.hasPermissions(2)*//*?}*/ && !minecraft.hasSingleplayerServer()) return;
         addRenderableWidget(accessor.putWidget("hostOptionsButton", Button.builder(HOST_OPTIONS, this::pressHostOptionsButton).bounds(panel.x, panel.y - 36, 250, 20).build()));
     }
 
@@ -179,7 +180,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font, title, panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false));
     }
 
-    protected abstract class PlayerButton extends AbstractButton implements RenderableVListEntry {
+    protected abstract class PlayerButton extends AbstractLegacyButton implements RenderableVListEntry {
         public final PlayerInfo playerInfo;
         protected RenderableVList list;
 
@@ -189,9 +190,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isHoveredOrFocused()) shouldFade = true;
-            super.renderWidget(guiGraphics, i, j, f);
+            super.renderButton(guiGraphics, i, j, f);
             drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics,
                     getX() + list.accessor.getInteger(list.name + ".playerIcon.x", 6),
                     getY() + list.accessor.getInteger(list.name + ".playerIcon.y", 5),

@@ -9,7 +9,7 @@ import io.github.gaming32.worldhost.gui.widget.UserListWidget;
 import io.github.gaming32.worldhost.plugin.FriendAdder;
 import io.github.gaming32.worldhost.plugin.FriendListFriend;
 import io.github.gaming32.worldhost.plugin.ProfileInfo;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -109,8 +109,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
             private void addFriendButton(FriendListFriend friend) {
                 renderableVList.addRenderable(new FriendButton(0, 0, 230, 30, friend) {
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderWidget(guiGraphics, i, j, f);
+                    protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
+                        super.renderButton(guiGraphics, i, j, f);
                         FactoryScreenUtil.enableBlend();
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 30, this.getY() + (height - 12) / 2, 12, 12);
                         if (friendsToAdd.contains(friend))
@@ -201,7 +201,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         afterButtonsAdd.run();
     }
 
-    public class FriendButton extends AbstractButton implements ControlTooltip.ActionHolder {
+    public class FriendButton extends AbstractLegacyButton implements ControlTooltip.ActionHolder {
         public final FriendListFriend friend;
         public ProfileInfo profileInfo;
 
@@ -223,8 +223,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderButton(guiGraphics, i, j, f);
             profileInfo.iconRenderer().draw(guiGraphics, getX() + 5, getY() + 5, 20, 20);
         }
 

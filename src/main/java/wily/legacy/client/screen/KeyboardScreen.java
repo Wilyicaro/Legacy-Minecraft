@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -113,7 +113,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
 
             @Override
-            public ResourceLocation getSprite() {
+            public Identifier getSprite() {
                 return shiftLock ? LegacySprites.BUTTON_SLOT_SELECTED : super.getSprite();
             }
 
@@ -158,7 +158,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void resize(Minecraft minecraft, int i, int j) {
+    public void resize(/*? if <1.21.11 {*//*Minecraft minecraft,*//*?}*/ int i, int j) {
         onClose();
     }
 
@@ -245,7 +245,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding,
-                                    ResourceLocation iconSprite, SoundEvent downSound) {
+                                    Identifier iconSprite, SoundEvent downSound) {
         public CharButton build(KeyboardScreen screen) {
             return screen.new CharButton(width, chars, shiftChars, binding, iconSprite, downSound);
         }
@@ -257,11 +257,11 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         private final Supplier<GuiEventListener> keyListener;
 
-        public KeyButton(int key, Supplier<GuiEventListener> keyListener, ControllerBinding binding, ResourceLocation iconSprite) {
+        public KeyButton(int key, Supplier<GuiEventListener> keyListener, ControllerBinding binding, Identifier iconSprite) {
             this(key, 40, keyListener, binding, iconSprite);
         }
 
-        public KeyButton(int key, int height, Supplier<GuiEventListener> keyListener, ControllerBinding binding, ResourceLocation iconSprite) {
+        public KeyButton(int key, int height, Supplier<GuiEventListener> keyListener, ControllerBinding binding, Identifier iconSprite) {
             super(50, height, CommonComponents.EMPTY, binding, iconSprite);
             this.key = key;
             this.keyListener = keyListener;
@@ -271,15 +271,17 @@ public class KeyboardScreen extends OverlayPanelScreen {
             return true;
         }
 
-        @Override
+        //? if <1.21.11 {
+        /*@Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
             FactoryScreenUtil.enableBlend();
             renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             FactoryScreenUtil.disableBlend();
         }
+        *///?}
 
-        public ResourceLocation getSprite() {
+        public Identifier getSprite() {
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
         }
 
@@ -296,10 +298,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     public static abstract class ActionButton extends AbstractButton {
         public final ControllerBinding binding;
-        private final ResourceLocation iconSprite;
+        private final Identifier iconSprite;
         public int pressTime = 0;
 
-        public ActionButton(int k, int l, Component component, ControllerBinding binding, ResourceLocation iconSprite) {
+        public ActionButton(int k, int l, Component component, ControllerBinding binding, Identifier iconSprite) {
             super(0, 0, k, l, component);
             this.binding = binding;
             this.iconSprite = iconSprite;
@@ -348,16 +350,28 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         }
 
+        //? if >=1.21.11 {
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            this.renderDefaultSprite(guiGraphics);
+            this.renderDefaultLabel(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE, style -> style.withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()))));
+        }
+        //?}
+
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int bindingOffset = 0;
 
             if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
                 bindingOffset = binding.getIcon().render(guiGraphics, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
 
-            if (iconSprite == null)
-                renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
+            if (iconSprite == null) {
+                //? if >=1.21.11 {
+                renderScrollingString(guiGraphics, font, this.getX() + i + bindingOffset, this.getY());
+                //?} else {
+                /*renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
+                *///?}
+            }
             else {
-                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
+                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.get(iconSprite);
                 if (sprite == null) return;
                 try (SpriteContents contents = sprite.contents()) {
                     FactoryScreenUtil.enableBlend();
@@ -380,7 +394,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         private int selectedChar = 0;
 
 
-        public CharButton(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound) {
+        public CharButton(int width, String chars, String shiftChars, ControllerBinding binding, Identifier iconSprite, SoundEvent downSound) {
             super(width, 20, CommonComponents.EMPTY, binding, iconSprite);
             this.chars = chars;
             this.shiftChars = shiftChars;

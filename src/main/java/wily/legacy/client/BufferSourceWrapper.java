@@ -4,14 +4,14 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=1.21.11 {
-/*import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import wily.legacy.mixin.base.client.RenderSetupAccessor;
-*///?} else {
-import net.minecraft.client.renderer.RenderType;
+//?} else {
+/*import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderStateShard;
 import wily.legacy.mixin.base.client.CompositeRenderTypeAccessor;
-//?}
+*///?}
 import net.minecraft.client.renderer.Sheets;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.mixin.base.client.BufferSourceAccessor;
@@ -33,17 +33,19 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
         return new BufferSourceWrapper(source) {
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {
+                //~ !identifier
                 if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentItemSheet());
                 //? if >=1.21.11 {
-                /*else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && !((RenderTypeMixin) renderType).getState().getTextures().isEmpty())
+                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && !((RenderTypeMixin) renderType).getState().getTextures().isEmpty())
                     return super.getBuffer(
                             RenderTypes.itemEntityTranslucentCull(
-                                    ((RenderSetupAccessor) ((RenderTypeMixin) renderType).getState()).getTextures().values().stream().findFirst().get().location()));
-                *///?} else {
-                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
+                                    ((RenderSetupAccessor)(Object) ((RenderTypeMixin) renderType).getState()).getTextures().values().stream().findFirst().get().location()));
+                //?} else {
+                /*else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
                     return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
-                 //?}
+                 *///?}
                 return super.getBuffer(renderType);
+                //~ identifier
             }
         }.setVertexConsumerFunction(consumer -> new VertexConsumerWrapper(consumer).setColorMultiplier(ColorUtil.withAlpha(0xFFFFFF, opacity)));
     }

@@ -1,6 +1,6 @@
 package wily.legacy.client.controller;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import wily.legacy.client.screen.ControlTooltip;
 
 import java.util.Arrays;

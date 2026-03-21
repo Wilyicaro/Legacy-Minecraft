@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
@@ -131,10 +132,17 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         return false;
     }
 
+
     @Override
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-        LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingString(guiGraphics, font, i, j));
+    //? if >=1.21.11 {
+    protected void renderScrollingStringOverContents(ActiveTextCollector activeTextCollector, Component component, int i) {
+        LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingStringOverContents(activeTextCollector, component, i));
     }
+    //?} else {
+    /*protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+        LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingString(guiGraphics, font, i, j));
+    }*/
+    //?}
 
     @Override
     public boolean keyReleased(KeyEvent keyEvent) {

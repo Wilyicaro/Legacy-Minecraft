@@ -47,7 +47,7 @@ public abstract class ChatComponentMixin {
     public abstract boolean isChatFocused();
 
     //? if >=1.21.11 {
-    /*@Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "HEAD"), cancellable = true)
     private void renderWithFont(CallbackInfo ci) {
         if (minecraft.screen != null && !isChatFocused()) ci.cancel();
         if (LegacyOptions.getUIMode().isSD()) LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
@@ -74,8 +74,8 @@ public abstract class ChatComponentMixin {
     private static void offsetChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<Matrix3x2f> matrix3x2f) {
         matrix3x2f.set(matrix3x2f.get().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42));
     }
-    *///?} else {
-    @Shadow
+    //?} else {
+    /*@Shadow
     protected abstract void drawTagIcon(GuiGraphics guiGraphics, int i, int j, GuiMessageTag.Icon icon);
 
     @Shadow
@@ -144,7 +144,7 @@ public abstract class ChatComponentMixin {
         double e = (double) this.minecraft.getWindow().getGuiScaledHeight() - d - 40 + LegacyRenderUtil.getHUDDistance() - 42;
         cir.setReturnValue(e / (this.getScale() * (double) this.getLineHeight()));
     }
-    //?}
+    *///?}
 
     @Inject(method = "getWidth(D)I", at = @At(value = "HEAD"), cancellable = true)
     private static void getWidth(double d, CallbackInfoReturnable<Integer> cir) {

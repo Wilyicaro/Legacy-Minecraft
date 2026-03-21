@@ -3,7 +3,7 @@ package wily.legacy;
 import net.minecraft.core.Holder;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -136,7 +136,7 @@ public class Legacy4J {
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static ResourceLocation createModLocation(String path) {
+    public static Identifier createModLocation(String path) {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 
@@ -191,16 +191,16 @@ public class Legacy4J {
         while (b) {
             b = false;
             for (ServerPlayer player : server.getPlayerList().getPlayers())
-                if (player != p && ((LegacyPlayerInfo) player).getResourceLocationIndex() == pos) {
+                if (player != p && ((LegacyPlayerInfo) player).getIdentifierIndex() == pos) {
                     pos++;
                     b = true;
                     continue main;
                 }
         }
-        ((LegacyPlayerInfo) p).setResourceLocationIndex(pos);
+        ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
         CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(), (LegacyPlayerInfo) p), Collections.emptyMap(), server.getDefaultGameType(), PlayerInfoSync.All.ID_S2C));
 
-        CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
+        CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(/*? if >=1.21.11 {*/p.level()/*?} else {*//*server*//*?}*/ ), true);
         playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayer(p, payload, true));
 
         if (!FactoryAPIPlatform.getEntityServer(p).isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);

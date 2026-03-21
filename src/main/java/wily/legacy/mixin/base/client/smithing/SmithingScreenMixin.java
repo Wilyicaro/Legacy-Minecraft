@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -54,10 +54,10 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     @Final
     @Shadow
     //? if >=1.21.11 {
-    /*private ArmorStandRenderState armorStandPreview;
-    *///?} else {
-    private ArmorStand armorStandPreview;
-    //?}
+    private ArmorStandRenderState armorStandPreview;
+    //?} else {
+    /*private ArmorStand armorStandPreview;
+    *///?}
     @Shadow
     @Final
     private CyclingSlotBackground templateIcon;
@@ -68,7 +68,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     @Final
     private CyclingSlotBackground additionalIcon;
 
-    public SmithingScreenMixin(SmithingMenu itemCombinerMenu, Inventory inventory, Component component, ResourceLocation resourceLocation) {
+    public SmithingScreenMixin(SmithingMenu itemCombinerMenu, Inventory inventory, Component component, Identifier resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
 
@@ -149,10 +149,10 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
         int d = this.topPos + (sd ? 100 : 150);
         int scale = sd ? 20 : 35;
         //? if >=1.21.11 {
-        /*guiGraphics.submitEntityRenderState(armorStandPreview, (float) scale, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, l, t, r, d);
-        *///?} else {
-        InventoryScreen.renderEntityInInventory(guiGraphics, l, t, r, d, scale, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
-        //?}
+        guiGraphics.submitEntityRenderState(armorStandPreview, (float) scale, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, l, t, r, d);
+        //?} else {
+        /*InventoryScreen.renderEntityInInventory(guiGraphics, l, t, r, d, scale, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
+        *///?}
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/ItemCombinerScreen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))

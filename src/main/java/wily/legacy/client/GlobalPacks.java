@@ -6,6 +6,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+//? if >=1.21.11 {
+import net.minecraft.client.gui.TextAlignment;
+//?}
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.Tooltip;
@@ -18,7 +21,7 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import org.jetbrains.annotations.Nullable;
@@ -138,9 +141,14 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getTitle(), nameWidth)
+                        //? if >=1.21.11 {
+                        .visitLines(TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, graphics.textRenderer());
+                        //?} else {
+                        /*.render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                         *///?}
                 graphics.disableScissor();
-                ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
+                Identifier background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
                 MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
@@ -148,7 +156,13 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
                 scrollableRenderer.lineHeight = lineHeight;
                 int left = x + (sd ? 5 : 8);
-                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
+                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label
+                        //? if >=1.21.11 {
+                        .visitLines(TextAlignment.LEFT, left, y + 40, lineHeight, graphics.textRenderer())
+                        //?} else {
+                        /*.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF)
+                         *///?}
+                );
                 if (background != null)
                     FactoryGuiGraphics.of(graphics).blit(background, left, y + height - descriptionFromBottom, 0.0f, 0.0f, descriptionWidth, sd ? 47 : 72, descriptionWidth, sd ? 47 : 72);
             }

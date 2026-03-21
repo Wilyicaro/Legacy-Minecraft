@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 //? if <1.21.11 {
-import net.minecraft.client.renderer.RenderType;
+/*import net.minecraft.client.renderer.RenderType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,8 +23,8 @@ public abstract class RenderTypeMixin {
         return OptionalDouble.of(1.0);
     }
 }
-//?} else {
-/*import net.minecraft.client.renderer.rendertype.RenderSetup;
+*///?} else {
+import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
 @Mixin(RenderType.class)
@@ -32,4 +32,4 @@ public interface RenderTypeMixin {
     @Accessor
     RenderSetup getState();
 }
-*///?}
+//?}

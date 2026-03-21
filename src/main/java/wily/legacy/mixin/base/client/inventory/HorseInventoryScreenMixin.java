@@ -3,17 +3,17 @@ package wily.legacy.mixin.base.client.inventory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 //? if >=1.21.11 {
-/*import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
-*///?} else {
-import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
+//?} else {
+/*import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-//?}
+*///?}
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.Llama;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.HorseInventoryMenu;
 import net.minecraft.world.inventory.Slot;
@@ -34,21 +34,21 @@ import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 //? if >=1.21.11 {
-/*@Mixin(AbstractMountInventoryScreen.class)
-*///?} else {
-@Mixin(HorseInventoryScreen.class)
-//?}
+@Mixin(AbstractMountInventoryScreen.class)
+//?} else {
+/*@Mixin(HorseInventoryScreen.class)
+*///?}
 public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
     @Shadow
     @Final
     //? if >=1.21.11 {
-    /*protected LivingEntity mount;
+    protected LivingEntity mount;
 
     @Unique
     AbstractHorse horse = (AbstractHorse) mount;
-    *///?} else {
-    private AbstractHorse horse;
-     //?}
+    //?} else {
+    /*private AbstractHorse horse;
+     *///?}
 
     @Unique
     private static Vec2 SD_SLOTS_OFFSET = new Vec2(0.5f, 0.5f);
@@ -79,7 +79,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
             if (i == 0) {
                 LegacySlotDisplay.override(s, inventoryLabelX, sd ? 16 : 21, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? LegacySprites.SADDLE_SLOT : null;
                     }
 
@@ -96,7 +96,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
             } else if (i == 1) {
                 LegacySlotDisplay.override(s, inventoryLabelX, sd ? 29 : 42, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? horse instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT : LegacySprites.ARMOR_SLOT : null;
                     }
 

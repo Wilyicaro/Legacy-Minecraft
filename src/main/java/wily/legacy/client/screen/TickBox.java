@@ -21,7 +21,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class TickBox extends AbstractButton implements RenderableVListEntry {
+public class TickBox extends AbstractLegacyButton implements RenderableVListEntry {
     protected final Function<Boolean, Component> message;
     private final Consumer<TickBox> onPress;
     public boolean selected;
@@ -70,7 +70,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
         Minecraft minecraft = Minecraft.getInstance();
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);

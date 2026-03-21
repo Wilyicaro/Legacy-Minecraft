@@ -17,12 +17,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 //?}
 //? if >=1.21.11 {
-/*import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
+import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.gamerules.GameRule;
-*///?} else {
-import net.minecraft.world.level.GameRules;
- //?}
+//?} else {
+/*import net.minecraft.world.level.GameRules;
+ *///?}
 import net.minecraft.world.level.Level;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
@@ -57,12 +57,12 @@ public class LegacyWorldOptions {
         return starterMap;
     }
 
-    public record InitialItem(ItemStack item, Optional<GameRules.Key<GameRules.BooleanValue>> dependentGamerule) {
-        public static final Codec<GameRules.Key<GameRules.BooleanValue>> BOOLEAN_GAMERULE_CODEC = Codec.STRING.xmap(InitialItem::getGameruleFromId, /*? if >=1.21.11 {*//*GameRule::id*//*?} else {*/GameRules.Key::getId/*?}*/);
+    public record InitialItem(ItemStack item, Optional<GameRule<Boolean>> dependentGamerule) {
+        public static final Codec<GameRule<Boolean>> BOOLEAN_GAMERULE_CODEC = Codec.STRING.xmap(InitialItem::getGameruleFromId, /*? if >=1.21.11 {*/GameRule::id/*?} else {*//*GameRules.Key::getId*//*?}*/);
         public static final Codec<InitialItem> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.ITEM_CODEC.fieldOf("item").forGetter(InitialItem::item), BOOLEAN_GAMERULE_CODEC.optionalFieldOf("gamerule").forGetter(InitialItem::dependentGamerule)).apply(i, InitialItem::new));
         public static final Codec<List<InitialItem>> LIST_CODEC = CODEC.listOf();
 
-        public InitialItem(ItemStack item, GameRules.Key<GameRules.BooleanValue> gamerule) {
+        public InitialItem(ItemStack item, GameRule<Boolean> gamerule) {
             this(item, Optional.of(gamerule));
         }
 
@@ -70,33 +70,33 @@ public class LegacyWorldOptions {
             this(item, Optional.empty());
         }
 
-        public static GameRules.Key<GameRules.BooleanValue> getGameruleFromId(String id) {
-            Bearer<GameRules.Key<GameRules.BooleanValue>> keyBearer = Bearer.of(null);
+        public static GameRule<Boolean> getGameruleFromId(String id) {
+            Bearer<GameRule<Boolean>> keyBearer = Bearer.of(null);
             //? if >=1.21.11 {
-            /*ServerLevel level = FactoryAPI.currentServer.getAllLevels().iterator().next();
+            ServerLevel level = FactoryAPI.currentServer.getAllLevels().iterator().next();
             GameRules gameRules = level.getGameRules();
-            gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+            gameRules.visitGameRuleTypes(new GameRuleTypeVisitor() {
                 @Override
-                public <T> void visit(GameRules.Key<T> key) {
-                    if (gameRules.getRule(key).get() instanceof GameRules.BooleanValue && key.getId().equals(id))
-                        keyBearer.set((GameRules.Key<Boolean>) key);
+                public <T> void visit(GameRule<T> key) {
+                    if (gameRules.get(key) instanceof Boolean && key.id().equals(id))
+                        keyBearer.set((GameRule<Boolean>) key);
                 }
             });
-            *///?} else {
-            GameRules gameRules = FactoryAPI.currentServer.getGameRules();
-            gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+            //?} else {
+            /*GameRules gameRules = FactoryAPI.currentServer.getGameRules();
+            gameRules.visitGameRuleTypes(new GameRuleTypeVisitor() {
                 @Override
-                public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
-                    if (gameRules.getRule(key) instanceof GameRules.BooleanValue && key.getId().equals(id))
-                        keyBearer.set((GameRules.Key<GameRules.BooleanValue>) key);
+                public <T extends GameRules.Value<T>> void visit(GameRule<T> key, GameRules.Type<T> type) {
+                    if (gameRules.getRule(key) instanceof Boolean && key.id().equals(id))
+                        keyBearer.set((GameRule<Boolean>) key);
                 }
             });
-            //?}
+            *///?}
             return keyBearer.get();
         }
 
         public boolean isEnabled(MinecraftServer server) {
-            return dependentGamerule.isEmpty() || server./*? if >=1.21.11 {*//*getAllLevels().iterator().next().*//*?}*/getGameRules()./*? if >=1.21.11 {*//*get*//*?} else {*/getBoolean/*?}*/(dependentGamerule.get());
+            return dependentGamerule.isEmpty() || server./*? if >=1.21.11 {*/getAllLevels().iterator().next()./*?}*/getGameRules()./*? if >=1.21.11 {*/get/*?} else {*//*getBoolean*//*?}*/(dependentGamerule.get());
         }
     }
 

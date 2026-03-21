@@ -46,4 +46,16 @@ public class VertexConsumerWrapper implements VertexConsumer {
     public VertexConsumer setNormal(float f, float g, float h) {
         return consumer.setNormal(f, g, h);
     }
+
+    //? if >=1.21.11 {
+    @Override
+    public VertexConsumer setColor(int i) {
+        return consumer.setColor(i);
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float f) {
+        return consumer.setLineWidth(f);
+    }
+    //?}
 }

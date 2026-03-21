@@ -233,7 +233,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         }
     }
 
-    public abstract class MappingButton extends AbstractButton {
+    public abstract class MappingButton extends AbstractLegacyButton {
         public final LegacyKeyMapping mapping;
 
         public MappingButton(int i, int j, int k, int l, LegacyKeyMapping mapping) {
@@ -246,9 +246,9 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         public abstract boolean isNone();
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
             if (!isFocused() && isPressed()) setSelectedMapping(null);
-            super.renderWidget(guiGraphics, i, j, f);
+            super.renderButton(guiGraphics, i, j, f);
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
             if (c != null) {
                 guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));

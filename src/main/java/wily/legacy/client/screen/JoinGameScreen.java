@@ -4,7 +4,9 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
+//? if >=1.21.11 {
+import net.minecraft.client.gui.TextAlignment;
+//?}
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -28,7 +30,7 @@ public class JoinGameScreen extends PanelVListScreen {
         this.connect = connect;
         if (data.players == null) return;
         for (NameAndId gameProfile : data.players.sample()) {
-            renderableVList.addRenderable(new AbstractButton(0, 0, 210, 30, Component.literal(gameProfile.name())) {
+            renderableVList.addRenderable(new AbstractLegacyButton(0, 0, 210, 30, Component.literal(gameProfile.name())) {
                 @Override
                 public void onPress(InputWithModifiers input) {
                 }
@@ -62,6 +64,12 @@ public class JoinGameScreen extends PanelVListScreen {
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
         tooltipBox.render(guiGraphics, i, j, f);
-        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, true, 0xFFFFFFFF));
+        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label
+                //? if >=1.21.11 {
+                .visitLines(TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, guiGraphics.textRenderer())
+                //?} else {
+                /*.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, true, 0xFFFFFFFF)
+                *///?}
+        );
     }
 }

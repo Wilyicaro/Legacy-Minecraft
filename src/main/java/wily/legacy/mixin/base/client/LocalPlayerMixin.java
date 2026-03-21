@@ -70,15 +70,15 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     protected abstract boolean isControlledCamera();
 
     //? if >=1.21.11 {
-    /*protected abstract boolean hasEnoughFoodToDoExhaustiveManoeuvres();
+    protected abstract boolean hasEnoughFoodToDoExhaustiveManoeuvres();
 
     @Unique
     boolean hasEnoughFoodToSprint() {
         return hasEnoughFoodToDoExhaustiveManoeuvres();
     }
-    *///?} else {
-    protected abstract boolean hasEnoughFoodToSprint();
-    //?}
+    //?} else {
+    /*protected abstract boolean hasEnoughFoodToSprint();
+    *///?}
 
     @Shadow
     public abstract void move(MoverType arg, Vec3 arg2);
@@ -107,7 +107,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD, ordinal = 0))
     public void aiStepCrouching(LocalPlayer instance, boolean value) {
-        crouching = value && (!gameRules./*? if >=1.21.11 {*//*get*//*?} else {*/getBoolean/*?}*/(LegacyGameRules.LEGACY_FLIGHT) || ((onGround() || !isInWater()) && !getAbilities().flying && !isFallFlying()));
+        crouching = value && (!gameRules./*? if >=1.21.11 {*/get/*?} else {*//*getBoolean*//*?}*/(LegacyGameRules.LEGACY_FLIGHT) || ((onGround() || !isInWater()) && !getAbilities().flying && !isFallFlying()));
     }
 
     @Inject(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z", opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
@@ -170,10 +170,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private boolean legacy$canUseStoredElytraBoost() {
         return isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() &&
                 //? if >=1.21.11 {
-                /*gameRules.get(LegacyGameRules.LEGACY_FLIGHT);
-                *///?} else {
-                gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get();
-                //?}
+                gameRules.get(LegacyGameRules.LEGACY_FLIGHT);
+                //?} else {
+                /*gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get();
+                *///?}
     }
 
     // Charges extra  speed while the player is climbing and looking downward 

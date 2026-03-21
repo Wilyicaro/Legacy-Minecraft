@@ -8,7 +8,7 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -233,7 +233,7 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         return hasTip(LegacyTipBuilder.getTipId(s)) || hasValidTipOverride(s);
     }
 
-    public static Component getTipComponent(ResourceLocation location) {
+    public static Component getTipComponent(Identifier location) {
         return Component.translatable(location.toLanguageKey() + ".tip");
     }
 

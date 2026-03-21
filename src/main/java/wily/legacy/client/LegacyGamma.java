@@ -6,6 +6,7 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.util.profiling.Profiler;
@@ -38,7 +39,11 @@ public class LegacyGamma implements AutoCloseable {
             renderPass.setPipeline(LegacyRenderPipelines.GAMMA);
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("GammaInfo", this.ubo.currentBuffer());
-            renderPass.bindSampler("InSampler", target.getColorTextureView());
+            //? if >=1.21.11 {
+            renderPass.bindTexture("InSampler", target.getColorTextureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST));
+            //?} else {
+            /*renderPass.bindSampler("InSampler", target.getColorTextureView());
+            *///?}
             renderPass.draw(0, 3);
         }
         this.ubo.rotate();

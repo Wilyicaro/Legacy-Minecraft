@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CrafterScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CrafterMenu;
 import net.minecraft.world.inventory.CrafterSlot;
@@ -34,11 +34,11 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
 
     @Shadow
     @Final
-    private static ResourceLocation POWERED_REDSTONE_LOCATION_SPRITE;
+    private static Identifier POWERED_REDSTONE_LOCATION_SPRITE;
 
     @Shadow
     @Final
-    private static ResourceLocation UNPOWERED_REDSTONE_LOCATION_SPRITE;
+    private static Identifier UNPOWERED_REDSTONE_LOCATION_SPRITE;
 
     public CrafterScreenMixin(CrafterMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
@@ -50,11 +50,19 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
         renderBg(guiGraphics, f, i, j);
     }
 
+    //? if >=1.21.11 {
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
+    public void renderSlot(GuiGraphics guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        super.renderSlot(guiGraphics, slot, i, j);
+    }
+    //?} else {
+    /*@Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     public void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
         super.renderSlot(guiGraphics, slot);
     }
+    *///?}
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
@@ -85,7 +93,7 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
             if (i < 9) {
                 LegacySlotDisplay.override(s, (sd ? 19 : 34) + s.getContainerSlot() % 3 * slotsSize, (sd ? 18 : 23) + s.getContainerSlot() / 3 * slotsSize, new LegacySlotDisplay() {
                     @Override
-                    public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
+                    public ArbitrarySupplier<Identifier> getIconHolderOverride() {
                         return () -> (menu.isSlotDisabled(s.index) ? LegacySprites.DISABLED_CRAFTER_SLOT : LegacySprites.CRAFTER_SLOT);
                     }
 
@@ -100,7 +108,7 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
                 LegacySlotDisplay.override(s, inventoryLabelX + s.getContainerSlot() * slotsSize, sd ? 120 : 171, defaultDisplay);
             } else {
                 LegacySlotDisplay.override(s, sd ? 90 : 150, sd ? 28 : 39, new LegacySlotDisplay() {
-                    public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
+                    public ArbitrarySupplier<Identifier> getIconHolderOverride() {
                         return () -> LegacySprites.NON_INTERACTIVE_RESULT_SLOT;
                     }
 

@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

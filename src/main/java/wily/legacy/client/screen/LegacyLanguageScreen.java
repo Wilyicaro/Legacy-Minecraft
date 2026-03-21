@@ -22,10 +22,10 @@ public class LegacyLanguageScreen extends PanelVListScreen {
     public LegacyLanguageScreen(Screen parent, LanguageManager manager) {
         super(parent, s -> Panel.centered(s, 255, 240, 0, 24), Component.translatable("controls.keybinds.title"));
         String autoCode = getSystemLanguageCode();
-        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, Component.translatable("legacy.menu.system_language")) {
+        renderableVList.addRenderable(new AbstractLegacyButton(0, 0, 260, 20, Component.translatable("legacy.menu.system_language")) {
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.renderButton(guiGraphics, i, j, f);
                 if (manager.getSelected().equals(autoCode)) setFocused(true);
             }
 
@@ -39,10 +39,10 @@ public class LegacyLanguageScreen extends PanelVListScreen {
                 defaultButtonNarrationText(narrationElementOutput);
             }
         });
-        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, languageInfo.toComponent()) {
+        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractLegacyButton(0, 0, 260, 20, languageInfo.toComponent()) {
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.renderButton(guiGraphics, i, j, f);
                 if (manager.getSelected().equals(s)) setFocused(true);
             }
 

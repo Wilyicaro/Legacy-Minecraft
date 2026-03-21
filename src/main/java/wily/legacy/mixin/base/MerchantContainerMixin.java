@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base;
 
-import net.minecraft.world.entity.npc.VillagerDataHolder;
+import net.minecraft.world.entity.npc.villager.VillagerDataHolder;
 import net.minecraft.world.inventory.MerchantContainer;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.ItemStack;
