@@ -135,11 +135,6 @@ public final class LegacyCloudAtmosphere {
             blue *= damping;
         }
 
-        float fogBrightness = getFogBrightnessScale(level, camera.getPosition(), renderDistanceChunks);
-        red *= fogBrightness;
-        green *= fogBrightness;
-        blue *= fogBrightness;
-
         return ARGB.colorFromFloat(1.0f, red, green, blue);
     }
 
@@ -194,13 +189,6 @@ public final class LegacyCloudAtmosphere {
     private static float getFogToSkyBlendFactor(int renderDistanceChunks) {
         float normalizedDistance = 0.25f + 0.75f * Mth.clamp(renderDistanceChunks, 4, 32) / 32.0f;
         return 1.0f - (float) Math.pow(normalizedDistance, 0.25d);
-    }
-
-    private static float getFogBrightnessScale(ClientLevel level, Vec3 cameraPosition, int renderDistanceChunks) {
-        BlockPos blockPos = BlockPos.containing(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-        float localBrightness = level.getLightLevelDependentMagicValue(blockPos);
-        float whiteness = 1.0f - Mth.clamp((renderDistanceChunks - 4.0f) / 28.0f, 0.0f, 1.0f);
-        return localBrightness * (1.0f - whiteness) + whiteness;
     }
 
     private static float getSunriseViewBlend(ClientLevel level, float partialTick) {
