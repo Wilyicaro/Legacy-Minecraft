@@ -132,7 +132,7 @@ public class CreationList extends RenderableVList {
     }
 
 
-    public static abstract class ContentButton extends AbstractButton {
+    public static abstract class ContentButton extends ListButton {
 
         protected final RenderableVList list;
 
@@ -142,8 +142,8 @@ public class CreationList extends RenderableVList {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderButton(guiGraphics, i, j, f);
             if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true))
                 renderIcon(guiGraphics, i, j, f);
         }

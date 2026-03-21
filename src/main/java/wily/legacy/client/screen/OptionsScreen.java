@@ -242,7 +242,11 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.showSubtitles()),
                                 LegacyOptions.of(mc.options.directionalAudio()),
                                 LegacyOptions.of(mc.options.musicFrequency()),
+                                //? if <1.21.11 {
                                 LegacyOptions.of(mc.options.showNowPlayingToast())),
+                                //?} else {
+                                 /*LegacyOptions.of(mc.options.musicToast())),
+                                *///?}
                         o -> o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss -> ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
@@ -322,7 +326,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("options.videoTitle"),
                                 LegacyOptions.of(createResolutionOptionInstance(o)),
                                 LegacyOptions.of(mc.options.fullscreen()),
+                                //? if <1.21.11 {
                                 LegacyOptions.of(mc.options.graphicsMode()),
+                                //?}
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),

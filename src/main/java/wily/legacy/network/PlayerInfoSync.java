@@ -115,7 +115,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             if (sp.getUUID().equals(player)) {
                 switch (sync) {
                     case ASK_ALL ->
-                            CommonNetwork.sendToPlayer(sp, All.fromPlayerList(/*? if >=1.21.11 {*//*sp.level()*//*?} else {*/FactoryAPIPlatform.getEntityServer(sp)/*?}*/));
+                            CommonNetwork.sendToPlayer(sp, All.fromPlayerList(FactoryAPIPlatform.getEntityServer(sp)));
                     case CLASSIC_CRAFTING, LEGACY_CRAFTING ->
                             ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
                     case CLASSIC_TRADING, LEGACY_TRADING ->
@@ -225,16 +225,9 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
         //?}
 
-        //? if >=1.21.11 {
-        /*public static All fromPlayerList(ServerLevel serverLevel) {
-            MinecraftServer server = serverLevel.getServer();
-            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(serverLevel.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
-        }
-        *///?} else {
         public static All fromPlayerList(MinecraftServer server) {
-            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
+            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server/*? if >=1.21.11 {*//*.overworld()*//*?}*/.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
         }
-        //?}
 
         @Override
         public void encode(CommonNetwork.PlayBuf buf) {

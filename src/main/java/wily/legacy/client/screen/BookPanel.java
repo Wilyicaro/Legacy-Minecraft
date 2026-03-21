@@ -61,6 +61,7 @@ public class BookPanel extends WidgetPanel {
         return new PageButton(i, j, bl, onPress, bl2) {
             private long lastPressTime;
 
+            //? if <1.21.11 {
             @Override
             public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || isMouseOver(i, j);
@@ -71,6 +72,18 @@ public class BookPanel extends WidgetPanel {
                 super.renderWidget(guiGraphics, i, j, f);
                 guiGraphics.pose().popMatrix();
             }
+            //?} else {
+            /*@Override
+            public void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                isHovered = Util.getMillis() - lastPressTime <= 300 || isMouseOver(i, j);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(getX(), getY());
+                guiGraphics.pose().scale(1.5f, 1.5f);
+                guiGraphics.pose().translate(-getX(), -getY());
+                super.renderContents(guiGraphics, i, j, f);
+                guiGraphics.pose().popMatrix();
+            }
+            *///?}
 
             @Override
             public void onPress(InputWithModifiers input) {

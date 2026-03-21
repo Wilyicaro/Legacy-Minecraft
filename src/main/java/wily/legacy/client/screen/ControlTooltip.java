@@ -54,6 +54,16 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.*;
+//? if >=1.21.11 {
+/*import net.minecraft.world.entity.vehicle.boat.*;
+import net.minecraft.world.entity.vehicle.minecart.*;
+import net.minecraft.world.entity.animal.golem.*;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.animal.parrot.Parrot;
+import net.minecraft.world.entity.animal.panda.Panda;
+import net.minecraft.world.entity.animal.feline.Cat;
+*///?}
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;

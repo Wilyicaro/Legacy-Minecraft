@@ -79,7 +79,7 @@ public class LegacyWorldOptions {
                 @Override
                 public <T> void visit(GameRules.Key<T> key) {
                     if (gameRules.getRule(key).get() instanceof GameRules.BooleanValue && key.getId().equals(id))
-                        keyBearer.set((GameRules.Key<Boolean>) key);
+                        keyBearer.set((GameRules.Key<GameRules.BooleanValue>) key);
                 }
             });
             *///?} else {

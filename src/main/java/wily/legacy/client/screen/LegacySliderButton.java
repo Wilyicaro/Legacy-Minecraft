@@ -131,10 +131,13 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         return false;
     }
 
+    //? if <1.21.11 {
     @Override
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
         LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingString(guiGraphics, font, i, j));
     }
+    //?} else {
+    //?}
 
     @Override
     public boolean keyReleased(KeyEvent keyEvent) {

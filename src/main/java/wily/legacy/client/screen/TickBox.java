@@ -21,7 +21,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class TickBox extends AbstractButton implements RenderableVListEntry {
+public class TickBox extends ListButton implements RenderableVListEntry {
     protected final Function<Boolean, Component> message;
     private final Consumer<TickBox> onPress;
     public boolean selected;
@@ -70,7 +70,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
         Minecraft minecraft = Minecraft.getInstance();
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
@@ -85,7 +85,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0F);
         guiGraphics.pose().pushMatrix();
         if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
-        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get());
+        this.renderScrollingString(guiGraphics, minecraft.font, 2, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get());
         guiGraphics.pose().popMatrix();
     }
 
@@ -109,7 +109,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
     }
 
     @Override
-    public void renderString(GuiGraphics guiGraphics, Font font, int i) {
+    public void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
         LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i, isHoveredOrFocused()));
     }
 

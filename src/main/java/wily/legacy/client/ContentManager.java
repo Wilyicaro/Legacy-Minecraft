@@ -8,6 +8,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -54,23 +55,23 @@ public class ContentManager {
 
     public record Pack(
         String id,
-        String name,
-        String description,
+        Component name,
+        Component description,
         URI downloadURI,
         Optional<URI> imageUrl,
         Optional<String> checkSum
     ) {
         public static final Codec<Pack> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("id").forGetter(Pack::id),
-            Codec.STRING.fieldOf("name").forGetter(Pack::name),
-            Codec.STRING.optionalFieldOf("description", "").forGetter(Pack::description),
+            DynamicUtil.getComponentCodec().fieldOf("name").forGetter(Pack::name),
+            DynamicUtil.getComponentCodec().optionalFieldOf("description", CommonComponents.EMPTY).forGetter(Pack::description),
             Codec.STRING.xmap(URI::create, URI::toString).fieldOf("downloadURI").forGetter(Pack::downloadURI),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl)
         ).apply(i, Pack::create));
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, URI compoundDownloadURI, Optional<URI> imageUrl) {
+        public static Pack create(String id, Component name, Component description, URI compoundDownloadURI, Optional<URI> imageUrl) {
             String[] splitURI = compoundDownloadURI.toString().split("\\?checksum=");
             URI downloadURI = URI.create(splitURI[0]);
             Optional<String> checkSum = splitURI.length < 2 ? Optional.empty() : Optional.of(splitURI[1]);

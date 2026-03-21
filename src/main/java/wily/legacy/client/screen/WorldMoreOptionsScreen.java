@@ -24,6 +24,7 @@ import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 import net.minecraft.world.level.gamerules.GameRules.Category;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.legacy.mixin.base.GameRuleCategoryAccessor;
 *///?} else {
 import net.minecraft.world.level.GameRules;
@@ -156,7 +157,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
             //? if >=1.21.11 {
             /*@Override
-            public void visitBoolean(GameRules.Key<Boolean> key) {
+            public void visitBoolean(GameRules.Key<GameRules.BooleanValue> key) {
                 if (!allowGamerule.test(key)) return;
                 boolean defaultValue = key.defaultValue();
                 Component message = Component.translatable(key.getDescriptionId());
@@ -167,7 +168,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             }
 
             @Override
-            public void visitInteger(GameRules.Key<Integer> key) {
+            public void visitInteger(GameRules.Key<GameRules.IntegerValue> key) {
                 if (!allowGamerule.test(key)) return;
                 int value = gameRules.getRule(key).get();
                 int defaultValue = key.defaultValue();
@@ -258,7 +259,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
             boolean sd = LegacyOptions.getUIMode().isSD();
 
-            MultiLineLabel label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
+            AdvancedTextWidget label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
 
             int lineHeight = sd ? 8 : 12;
 
@@ -267,16 +268,12 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (label == null)
                 scrollableRenderer.resetScrolled();
             else
-                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - (tooltipBox.getHeight() - (sd ? 20 : 44)) / (lineHeight));
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLines().size() - (tooltipBox.getHeight() - (sd ? 20 : 44)) / (lineHeight));
 
             tooltipBox.render(guiGraphics, i, j, f);
             if (label != null) {
                 scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () ->
-                        //? if >=1.21.11 {
-                        /*label.visitLines(TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, guiGraphics.textRenderer())
-                        *///?} else {
-                        label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF)
-                         //?}
+                        label.withPos(panel.x + panel.width + 3, panel.y + 13).lineSpacing(lineHeight).render(guiGraphics, i, j, f)
                 );
             }
         }

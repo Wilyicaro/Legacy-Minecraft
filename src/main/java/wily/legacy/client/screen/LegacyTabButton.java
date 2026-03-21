@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -114,8 +115,7 @@ public class LegacyTabButton extends AbstractButton {
         guiGraphics.pose().popMatrix();
     }
 
-    @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderTabButton(GuiGraphics guiGraphics, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
         FactoryScreenUtil.enableBlend();
@@ -136,6 +136,18 @@ public class LegacyTabButton extends AbstractButton {
         guiGraphics.pose().popMatrix();
     }
 
+    //? if <1.21.11 {
+    
+        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        renderTabButton(guiGraphics, i, j, f);
+    }
+    //?} else {
+    /*@Override
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+        renderTabButton(guiGraphics, i, j, f);
+    }
+    *///?}
+
     public boolean isMouseOver(double d, double e) {
         Vec2 translate = offset.apply(this);
         double x = getX() + (translate.equals(Vec2.ZERO) ? 0 : translate.x);
@@ -148,7 +160,6 @@ public class LegacyTabButton extends AbstractButton {
         narrationElementOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.tab", this.getMessage().getString()));
     }
 
-    @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         renderString(guiGraphics, font, i, false);
     }

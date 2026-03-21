@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.client.ContentManager;
 import net.minecraft.client.gui.Font;
@@ -15,6 +16,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTooltip.Event {
 
@@ -78,8 +80,13 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         panelRecess.init("panelRecess");
     }
 
-    private void addMenuButton(Component name, Button.OnPress onPress) {
-        renderableVList.addRenderable(new LeftAlignedButton(324, 30, name, onPress));
+    private void addMenuButton(Component name, Consumer<LeftAlignedButton> onPress) {
+        renderableVList.addRenderable(new LeftAlignedButton(324, 30, name) {
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                onPress.accept(this);
+            }
+        });
     }
 
     @Override
@@ -119,13 +126,13 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         }
     }
 
-    private static class LeftAlignedButton extends Button {
-        public LeftAlignedButton(int width, int height, Component message, OnPress onPress) {
-            super(0, 0, width, height, message, onPress, DEFAULT_NARRATION);
+    private abstract static class LeftAlignedButton extends ListButton {
+        public LeftAlignedButton(int width, int height, Component message) {
+            super(0, 0, width, height, message);
         }
 
         @Override
-        public void renderString(GuiGraphics guiGraphics, Font font, int color) {
+        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int offset, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             guiGraphics.drawString(font, this.getMessage(), this.getX() + 12, textY, color, true);
         }

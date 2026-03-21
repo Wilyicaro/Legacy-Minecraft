@@ -2,7 +2,9 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.legacy.client.ContentManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
@@ -75,13 +77,16 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private void addMenuButton(ContentManager.Pack pack) {
-        renderableVList.addRenderable(new LeftAlignedButton(254, 36, pack, category, b -> {
-            if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
-                minecraft.setScreen(new PackActionScreen(this, pack, category));
-            } else {
-                ContentManager.downloadPack(pack, category.targetDirectoryName(), () -> needsReload = true);
+        renderableVList.addRenderable(new LeftAlignedButton(254, 36, pack, category) {
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
+                    minecraft.setScreen(new PackActionScreen(Legacy4JContentListScreen.this, pack, category));
+                } else {
+                    ContentManager.downloadPack(pack, category.targetDirectoryName(), () -> needsReload = true);
+                }
             }
-        }) {
+
             @Override
             public void setFocused(boolean focused) {
                 super.setFocused(focused);
@@ -228,15 +233,14 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             // 2. Render Description with ScrollableRenderer
             int lineHeight = 12;
             int descriptionY = y + imageAreaHeight;
-            int descriptionWidth = width;
-            MultiLineLabel label = MultiLineLabel.create(font, Component.literal(hoveredPack.description()), descriptionWidth);
+            AdvancedTextWidget label = Panel.getUILabel(hoveredPack.description(), width);
             
             int visibleLines = (tooltipBox.getY() + tooltipBox.getHeight() - 24 - descriptionY) / lineHeight;
-            scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
+            scrollableRenderer.scrolled.max = Math.max(0, label.getLines().size() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
 
-            scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
+            scrollableRenderer.render(guiGraphics, x, descriptionY, width, visibleLines * lineHeight, () ->
+                label.withPos(x, descriptionY).lineSpacing(lineHeight).render(guiGraphics, 0, 0, 0)
             );
         }
 
@@ -258,7 +262,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         private final ContentManager.Pack pack;
 
         public PackActionScreen(Screen parent, ContentManager.Pack pack, ContentManager.Category category) {
-            super(parent, ConfirmationScreen::getPanelWidth, () -> 95, Component.literal(pack.name()), 
+            super(parent, ConfirmationScreen::getPanelWidth, () -> 95, (pack.name()),
                   Component.translatable("legacy.menu.delete_message"), 
                   (b) -> {} 
             );
@@ -277,19 +281,19 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
     }
 
-    private static class LeftAlignedButton extends Button {
+    private abstract static class LeftAlignedButton extends ListButton {
         private final ContentManager.Pack pack;
         private final ContentManager.Category category;
 
-        public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category, OnPress onPress) {
-            super(0, 0, width, height, Component.literal(pack.name()), onPress, DEFAULT_NARRATION);
+        public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category) {
+            super(0, 0, width, height, pack.name());
             this.pack = pack;
             this.category = category;
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        public void renderButton(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            super.renderButton(guiGraphics, mouseX, mouseY, partialTick);
             if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
                 int spriteSize = 20;
                 int sx = this.getX() + this.width - spriteSize - 10;
@@ -299,7 +303,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
 
         @Override
-        public void renderString(GuiGraphics guiGraphics, Font font, int color) {
+        public void renderScrollingString(GuiGraphics guiGraphics, Font font, int offset, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             guiGraphics.drawString(font, this.getMessage(), this.getX() + 12, textY, color, true);
         }

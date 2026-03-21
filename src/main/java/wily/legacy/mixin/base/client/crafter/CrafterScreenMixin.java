@@ -50,11 +50,19 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
         renderBg(guiGraphics, f, i, j);
     }
 
+    //? if <1.21.11 {
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     public void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
         super.renderSlot(guiGraphics, slot);
     }
+    //?} else {
+    /*@Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
+    public void renderSlot(GuiGraphics guiGraphics, Slot slot, int x, int y, CallbackInfo ci) {
+        ci.cancel();
+        super.renderSlot(guiGraphics, slot, x, y);
+    }
+    *///?}
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {

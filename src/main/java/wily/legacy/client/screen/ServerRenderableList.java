@@ -9,6 +9,7 @@ import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
+import net.minecraft.server.network.EventLoopGroupHolder;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -239,7 +240,7 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
             if (server.state() == ServerData.State.INITIAL) {
                 server.setState(ServerData.State.PINGING);
                 server.motd = CommonComponents.EMPTY;
@@ -249,7 +250,7 @@ public class ServerRenderableList extends RenderableVList {
                         getScreen(PlayGameScreen.class).getPinger().pingServer(server, () -> minecraft.execute(this::updateServerList), () -> {
                             server.setState(server.protocol == SharedConstants.getCurrentVersion().protocolVersion() ? ServerData.State.SUCCESSFUL : ServerData.State.INCOMPATIBLE);
                             minecraft.execute(this::refreshStatus);
-                        });
+                        }/*? if >=1.21.11 {*//*, EventLoopGroupHolder.remote(minecraft.options.useNativeTransport())*//*?}*/);
                     } catch (UnknownHostException unknownHostException) {
                         server.setState(ServerData.State.UNREACHABLE);
                         server.motd = CANT_RESOLVE_TEXT;

@@ -90,6 +90,11 @@ dependencies {
         modCompileOnly("maven.modrinth:iris:${iris_version}")
     }
 
+    // Minecraft doesn't include apache http since 1.21.11...
+    if (stonecutter.eval(stonecutter.current.version, ">=1.21.11")) {
+        implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    }
+
     if (loader == "fabric") {
         modImplementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
         modApi("net.fabricmc.fabric-api:fabric-api:${fabric_api_version}")
@@ -142,6 +147,9 @@ stonecutter {
             replace("vehicle.OldMinecartBehavior", "vehicle.minecart.OldMinecartBehavior")
             replace("vehicle.MinecartFurnace", "vehicle.minecart.MinecartFurnace")
             replace("vehicle.AbstractBoat", "vehicle.boat.AbstractBoat")
+            replace("net.minecraft.world.entity.monster.ZombifiedPiglin", "net.minecraft.world.entity.monster.zombie.ZombifiedPiglin")
+            replace("net/minecraft/world/entity/monster/Zombie", "net/minecraft/world/entity/monster/zombie/Zombie")
+            replace("net/minecraft/world/entity/monster/ZombifiedPiglin", "net/minecraft/world/entity/monster/zombie/ZombifiedPiglin")
             replace("net/minecraft/world/entity/vehicle/AbstractMinecart", "net/minecraft/world/entity/vehicle/minecart/AbstractMinecart")
             replace("animal.Pig", "animal.pig.Pig")
             replace("animal.Squid", "animal.squid.Squid")

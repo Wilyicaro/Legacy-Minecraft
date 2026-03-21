@@ -8,9 +8,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.Bearer;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -22,8 +24,8 @@ import java.util.function.Supplier;
 
 public class Panel extends SimpleLayoutRenderable {
     // For tooltip boxes
-    public static final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
-    public static final BiFunction<Component, Integer, MultiLineLabel> sdLabelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
+    public static final BiFunction<Component, Integer, AdvancedTextWidget> labelsCache = Util.memoize((c, i) -> new AdvancedTextWidget(null).withLines(c, i));
+    public static final BiFunction<Component, Integer, AdvancedTextWidget> sdLabelsCache = Util.memoize((c, i) -> new AdvancedTextWidget(null).withLines(c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
     protected final UIAccessor accessor;
     public ResourceLocation panelSprite = LegacySprites.SMALL_PANEL;
     public String name;
@@ -34,6 +36,10 @@ public class Panel extends SimpleLayoutRenderable {
 
     public Panel(UIAccessor accessor) {
         this.accessor = accessor;
+    }
+
+    public static AdvancedTextWidget getUILabel(Component message, int width) {
+        return (LegacyOptions.getUIMode().isSD() ? sdLabelsCache : labelsCache).apply(message, width);
     }
 
     public static Panel createPanel(Screen screen, Function<Panel, Integer> leftPosGetter, Function<Panel, Integer> topPosGetter, int width, int height) {

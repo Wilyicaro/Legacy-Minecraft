@@ -47,7 +47,11 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         FactoryGuiGraphics.of(guiGraphics).blitSprite(isHovered() ? LegacySprites.SLIDER_HANDLE_HIGHLIGHTED : LegacySprites.SLIDER_HANDLE, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
         int k = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+        //? if <1.21.11 {
         this.renderScrollingString(guiGraphics, minecraft.font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24);
+        //?} else {
+        /*this.renderScrollingStringOverContents(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE), this.getMessage().copy().withColor(k), 2);
+        *///?}
     }
 
     @Override

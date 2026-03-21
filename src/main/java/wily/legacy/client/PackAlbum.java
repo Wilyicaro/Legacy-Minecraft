@@ -38,6 +38,7 @@ import org.joml.Math;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
@@ -438,17 +439,17 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().displayName(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().displayName(), nameWidth).withPos(x + (sd ? 40 : 43), y + 8).lineSpacing(lineHeight).render(graphics, 0, 0, 0);
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().description(), descriptionWidth);
+                AdvancedTextWidget label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().description(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
-                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLines().size() - visibleLines);
                 scrollableRenderer.lineHeight = lineHeight;
                 int left = x + (sd ? 5 : 8);
-                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
+                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.withPos(left, y + 40).lineSpacing(lineHeight).render(graphics, 0, 0, 0));
                 if (background != null) {
                     if (getSelectedAlbum().backgroundSprite().isPresent())
                         FactoryGuiGraphics.of(graphics).blitSprite(background, left, y + height - descriptionFromBottom, sd ? 95 : 145, sd ? 47 : 72);

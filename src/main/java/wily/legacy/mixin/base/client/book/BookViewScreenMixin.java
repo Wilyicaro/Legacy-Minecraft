@@ -1,21 +1,19 @@
 package wily.legacy.mixin.base.client.book;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.ControlType;
@@ -89,6 +87,26 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
     //?}
 
+    @Override
+    public void bindingStateTick(BindingState state) {
+        if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()) {
+            (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
+        }
+    }
+
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+        if (ControlType.getActiveType().isKbm() && (keyEvent.isRight() || keyEvent.isLeft())) {
+            (keyEvent.isRight() ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
+            cir.setReturnValue(true);
+            return;
+        }
+        cir.setReturnValue(super.keyPressed(keyEvent));
+    }
+
+    //? if <1.21.11 {
+    @Shadow
+    public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
@@ -113,27 +131,6 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
     }
 
-    @Override
-    public void bindingStateTick(BindingState state) {
-        if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()) {
-            (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
-        }
-    }
-
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (ControlType.getActiveType().isKbm() && (keyEvent.isRight() || keyEvent.isLeft())) {
-            (keyEvent.isRight() ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
-            cir.setReturnValue(true);
-            return;
-        }
-        cir.setReturnValue(super.keyPressed(keyEvent));
-    }
-
-    //? if <1.21.11 {
-    @Shadow
-    public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
-
     @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
         if (this.cachedPageComponents.isEmpty()) {
@@ -157,7 +154,37 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(null);
     }
-    //?}
+    //?} else {
+    /*@ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 1)
+    public int changeSplitWidth(int i) {
+        return 159;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
+    public int changePageX(int i) {
+        return panel.x + panel.width - 24;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
+    public int changePageY(int i) {
+        return panel.y + 22;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 0)
+    public int changeTextX(int i) {
+        return panel.x + 20;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 1)
+    public int changeTextY(int i, @Local(ordinal = 3) int o) {
+        return panel.y + 37 + o * this.font.lineHeight;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"), index = 0)
+    public int changeMaxLines(int i) {
+        return 176 / this.font.lineHeight;
+    }
+    *///?}
 
     @Override
     public boolean isPauseScreen() {

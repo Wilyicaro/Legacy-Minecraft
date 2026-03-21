@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -9,7 +10,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RenderableVListEntry;
 import wily.legacy.util.client.LegacyFontUtil;
 
-public class LegacyButton extends Button implements RenderableVListEntry {
+public class LegacyButton extends Button/*? if >=1.21.11 {*//*.Plain*//*?}*/ implements RenderableVListEntry {
     public LegacyButton(Component message, OnPress onPress, Tooltip tooltip) {
         this(message, onPress);
         setTooltip(tooltip);
@@ -27,10 +28,19 @@ public class LegacyButton extends Button implements RenderableVListEntry {
         super(i, j, k, l, component, onPress, createNarration);
     }
 
+    //? if <1.21.11 {
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         LegacyFontUtil.applySDFont(b -> super.renderString(guiGraphics, font, i));
     }
+    //?} else {
+
+    /*@Override
+    protected void renderDefaultLabel(ActiveTextCollector activeTextCollector) {
+        LegacyFontUtil.applySDFont(b -> super.renderDefaultLabel(activeTextCollector));
+    }
+
+    *///?}
 
     public static int getDefaultHeight() {
         return LegacyOptions.getUIMode().isSD() ? 15 : 20;

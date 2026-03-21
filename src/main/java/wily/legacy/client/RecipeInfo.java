@@ -149,7 +149,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             addDecayTippedArrowRecipe(recipeAdder);
         }));
 
-        private static <T> void addDecayTippedArrowRecipe(Consumer<RecipeInfo<T>> recipeAdder) {
+        private static void addDecayTippedArrowRecipe(Consumer<RecipeInfo> recipeAdder) {
             ItemStack potion = LegacyItemUtil.createDecayPotion(Items.LINGERING_POTION);
             ItemStack result = LegacyItemUtil.createDecayTippedArrow();
             PotionContents potionContents = potion.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);

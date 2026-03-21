@@ -157,10 +157,18 @@ public class KeyboardScreen extends OverlayPanelScreen {
             setFocused(l);
     }
 
+    //? if <1.21.11 {
     @Override
     public void resize(Minecraft minecraft, int i, int j) {
         onClose();
     }
+    //?} else {
+
+    /*@Override
+    public void resize(int i, int j) {
+        onClose();
+    }
+    *///?}
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -272,10 +280,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
             FactoryScreenUtil.enableBlend();
-            renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             FactoryScreenUtil.disableBlend();
         }
 
@@ -294,7 +302,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
     }
 
-    public static abstract class ActionButton extends AbstractButton {
+    public static abstract class ActionButton extends ListButton {
         public final ControllerBinding binding;
         private final ResourceLocation iconSprite;
         public int pressTime = 0;
@@ -354,8 +362,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
             if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
                 bindingOffset = binding.getIcon().render(guiGraphics, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
 
-            if (iconSprite == null)
-                renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
+            if (iconSprite == null) {
+                int swidth = font.width(this.getMessage());
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage().getVisualOrderText(), this.getX() + i + bindingOffset + (getWidth() - swidth) / 2, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true, swidth);
+            }
             else {
                 TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
                 if (sprite == null) return;

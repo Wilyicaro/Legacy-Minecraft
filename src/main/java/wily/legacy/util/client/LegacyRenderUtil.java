@@ -316,7 +316,7 @@ public class LegacyRenderUtil {
             int r = stringWidth - q;
             double d = (double) Util.getMillis() / 1000.0;
             double e = Math.max((double) r * 0.5, 3.0);
-            double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
+            double f = Math.sin(Mth.HALF_PI * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
             double g = Mth.lerp(f, 0.0, r);
             FactoryGuiGraphics.of(guiGraphics).enableScissor(j, k, l, m);
             guiGraphics.drawString(font, charSequence, j - (int) g, p, n, shadow && CommonValue.WIDGET_TEXT_SHADOW.get());

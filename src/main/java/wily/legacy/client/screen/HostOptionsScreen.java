@@ -13,7 +13,11 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
+//? if >=1.21.11 {
+/*import net.minecraft.server.permissions.Permissions;
+*///?}
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.FactoryScreenUtil;
@@ -118,9 +122,17 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     protected void addPlayerButtons() {
         addPlayerButtons(true, (playerInfo, b) -> {
-            if (!minecraft.player.hasPermissions(2)) return;
+            if (!hasHostPermissions(minecraft.player)) return;
             minecraft.setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
         });
+    }
+
+    public static boolean hasHostPermissions(Player player) {
+        //? if <1.21.11 {
+        return player.hasPermissions(2);
+        //?} else {
+        /*return player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR);
+        *///?}
     }
 
     protected void addPlayerButtons(boolean includeLocal, BiConsumer<PlayerInfo, AbstractButton> onPress) {
@@ -154,7 +166,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addHostOptionsButton() {
-        if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
+        if (!hasHostPermissions(minecraft.player) && !minecraft.hasSingleplayerServer()) return;
         addRenderableWidget(accessor.putWidget("hostOptionsButton", Button.builder(HOST_OPTIONS, this::pressHostOptionsButton).bounds(panel.x, panel.y - 36, 250, 20).build()));
     }
 
@@ -179,7 +191,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font, title, panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false));
     }
 
-    protected abstract class PlayerButton extends AbstractButton implements RenderableVListEntry {
+    protected abstract class PlayerButton extends ListButton implements RenderableVListEntry {
         public final PlayerInfo playerInfo;
         protected RenderableVList list;
 
@@ -189,9 +201,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isHoveredOrFocused()) shouldFade = true;
-            super.renderWidget(guiGraphics, i, j, f);
+            super.renderButton(guiGraphics, i, j, f);
             drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics,
                     getX() + list.accessor.getInteger(list.name + ".playerIcon.x", 6),
                     getY() + list.accessor.getInteger(list.name + ".playerIcon.y", 5),
