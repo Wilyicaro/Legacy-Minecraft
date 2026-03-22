@@ -27,6 +27,7 @@ import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyItemAttributeDisplay;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.function.Consumer;
 
@@ -48,6 +49,7 @@ public abstract class ItemStackMixin implements DataComponentHolder {
 
     @Redirect(method = "addAttributeTooltips", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;forEachModifier(Lnet/minecraft/world/entity/EquipmentSlotGroup;Lorg/apache/commons/lang3/function/TriConsumer;)V"))
     private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> arg, Consumer<Component> consumer/*? if >=1.21.5 {*/, TooltipDisplay tooltipDisplay/*?}*/, @Nullable Player player) {
+        if (LegacyItemUtil.isSkullItem(self())) return;
         Bearer<Boolean> noSpace = Bearer.of(true);
         forEachModifier(equipmentSlotGroup, (holder, attributeModifier, display) -> {
             if (noSpace.get()) {

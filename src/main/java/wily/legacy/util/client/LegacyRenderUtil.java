@@ -484,7 +484,7 @@ public class LegacyRenderUtil {
     }
 
     public static List<Component> getTooltip(ItemStack stack) {
-        return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        return LegacyItemUtil.sanitizeTooltip(stack, stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL));
     }
 
     public static List<FormattedCharSequence> getTooltip(ItemStack stack, int width) {
