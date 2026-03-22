@@ -18,7 +18,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(SplashRenderer.class)
 public class SplashRendererMixin {
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER, remap = false))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;scale(F)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER), remap = false)
     public void renderAfterScale(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD())
             guiGraphics.pose().scale(0.75f, 0.75f);
@@ -28,7 +28,7 @@ public class SplashRendererMixin {
             guiGraphics.pose().translate(0, 8);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER, remap = false))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;translate(FF)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER), remap = false)
     public void renderAfterTranslate(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD()) {
             guiGraphics.pose().translate(-45, -30);

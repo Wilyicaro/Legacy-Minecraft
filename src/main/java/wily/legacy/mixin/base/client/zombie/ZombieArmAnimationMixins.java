@@ -17,8 +17,7 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(AbstractZombieRenderer.class)
 abstract class AbstractZombieRendererMixin {
-    //TODO: update to 1.21.11
-    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/monster/Zombie;Lnet/minecraft/client/renderer/entity/state/ZombieRenderState;F)V", at = @At("TAIL"))
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void legacy$clearAggressivePose(Zombie zombie, ZombieRenderState state, float partialTick, CallbackInfo ci) {
         if (!LegacyOptions.legacyZombieAggressionAnimation.get()) return;
         state.isAggressive = false;
@@ -27,7 +26,7 @@ abstract class AbstractZombieRendererMixin {
 
 @Mixin(ZombieVillagerRenderer.class)
 abstract class ZombieVillagerRendererMixin {
-    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/monster/ZombieVillager;Lnet/minecraft/client/renderer/entity/state/ZombieVillagerRenderState;F)V", at = @At("TAIL"))
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void legacy$clearAggressivePose(ZombieVillager zombieVillager, ZombieVillagerRenderState state, float partialTick, CallbackInfo ci) {
         if (!LegacyOptions.legacyZombieAggressionAnimation.get()) return;
         state.isAggressive = false;
@@ -36,7 +35,7 @@ abstract class ZombieVillagerRendererMixin {
 
 @Mixin(ZombifiedPiglinRenderer.class)
 abstract class ZombifiedPiglinRendererMixin {
-    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/monster/ZombifiedPiglin;Lnet/minecraft/client/renderer/entity/state/ZombifiedPiglinRenderState;F)V", at = @At("TAIL"))
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void legacy$clearAggressivePose(ZombifiedPiglin zombifiedPiglin, ZombifiedPiglinRenderState state, float partialTick, CallbackInfo ci) {
         if (!LegacyOptions.legacyZombieAggressionAnimation.get()) return;
         state.isAggressive = false;

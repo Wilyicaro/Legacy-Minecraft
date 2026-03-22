@@ -33,7 +33,6 @@ public class LegacyRegistries {
     private static final RegisterListing<Item> ITEM_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.ITEM);
     private static final RegisterListing<MenuType<?>> MENU_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.MENU);
     private static final RegisterListing<SoundEvent> SOUND_EVENT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.SOUND_EVENT);
-    private static final RegisterListing<GameRule<?>> GAME_RULE_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.GAME_RULE);
 
     public static final RegisterListing.Holder<MenuType<LegacyMerchantMenu>> MERCHANT_MENU = MENU_REGISTER.add("merchant_menu", ()->new MenuType<>(LegacyMerchantMenu::new, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> STONECUTTER_PANEL_MENU = MENU_REGISTER.add("stonecutter_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::stoneCutterMenu, FeatureFlags.VANILLA_SET));
@@ -74,7 +73,5 @@ public class LegacyRegistries {
         ITEM_REGISTER.register();
         MENU_REGISTER.register();
         SOUND_EVENT_REGISTER.register();
-        //TODO: add gamerules to this registry
-        GAME_RULE_REGISTER.register();
     }
 }
