@@ -59,7 +59,8 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
 
     @Override
     public void updateSkyBuffers() {
-        skyRenderer.close();
+        if (skyRenderer != null)
+            skyRenderer.close();
         this.skyRenderer = new SkyRenderer(/*? if >=1.21.11 {*/minecraft.getTextureManager(), minecraft.getAtlasManager()/*?}*/);
         onResourceManagerReload(minecraft.getResourceManager());
     }

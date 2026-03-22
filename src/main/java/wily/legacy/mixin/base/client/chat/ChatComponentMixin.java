@@ -49,7 +49,11 @@ public abstract class ChatComponentMixin {
     //? if >=1.21.11 {
     @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "HEAD"), cancellable = true)
     private void renderWithFont(CallbackInfo ci) {
-        if (minecraft.screen != null && !isChatFocused()) ci.cancel();
+        if (minecraft.screen != null && !isChatFocused()) {
+            ci.cancel();
+            return;
+        }
+
         if (LegacyOptions.getUIMode().isSD()) LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
     }
 

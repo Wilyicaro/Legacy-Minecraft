@@ -279,7 +279,13 @@ public class KeyboardScreen extends OverlayPanelScreen {
             renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             FactoryScreenUtil.disableBlend();
         }
-        *///?}
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
+            this.renderDefaultLabel(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE));
+        }
+        //?}
 
         public Identifier getSprite() {
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
@@ -353,7 +359,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         //? if >=1.21.11 {
         protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
             this.renderDefaultSprite(guiGraphics);
-            this.renderDefaultLabel(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE, style -> style.withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()))));
+            this.renderDefaultLabel(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE));
         }
         //?}
 

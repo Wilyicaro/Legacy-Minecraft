@@ -349,7 +349,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.fastLeavesCustomModels,
                                 LegacyOptions.displayNameTagBorder,
                                 LegacyOptions.itemLightingInHand,
-                                LegacyOptions.enhancedItemTranslucency,
+//                                LegacyOptions.enhancedItemTranslucency,
                                 LegacyOptions.loyaltyLines,
                                 LegacyOptions.merchantTradingIndicator,
                                 LegacyOptions.legacyBabyVillagerHead,

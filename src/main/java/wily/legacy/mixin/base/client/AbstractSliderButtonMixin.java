@@ -49,7 +49,7 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         int k = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
         int colorWithAlpha = k | Mth.ceil(this.alpha * 255.0f) << 24;
         //? if >=1.21.11 {
-        this.renderScrollingStringOverContents(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE, style -> style.withColor(colorWithAlpha)), this.getMessage(), 2);
+        this.renderScrollingStringOverContents(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE), this.getMessage().copy().withColor(colorWithAlpha), 2);
         //?} else {
         /*this.renderScrollingString(guiGraphics, minecraft.font, 2, colorWithAlpha);
         *///?}

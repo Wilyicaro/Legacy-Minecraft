@@ -6,6 +6,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 /// helper class to transition from 1.21.10 to 1.21.11
 public abstract class AbstractLegacyButton extends AbstractButton {
@@ -19,9 +21,8 @@ public abstract class AbstractLegacyButton extends AbstractButton {
 
     protected void renderButton(GuiGraphics guiGraphics, int i, int j, float f) {
         //? if >=1.21.11 {
-        int k = ARGB.color(this.alpha, this.active ? -1 : -6250336);
         this.renderDefaultSprite(guiGraphics);
-        this.renderString(guiGraphics, Minecraft.getInstance().font, k);
+        this.renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) | Mth.ceil(this.alpha * 255.0f) << 24);
         //?} else {
         /*super.renderWidget(guiGraphics, i, j, f);
         *///?}
@@ -33,7 +34,7 @@ public abstract class AbstractLegacyButton extends AbstractButton {
     }
 
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int k, int l) {
-        this.renderScrollingStringOverContents(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE, style -> style.withColor(l)), this.getMessage(), k);
+        this.renderScrollingStringOverContents(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE), this.getMessage().copy().withColor(k), k);
     }
     //?}
 }

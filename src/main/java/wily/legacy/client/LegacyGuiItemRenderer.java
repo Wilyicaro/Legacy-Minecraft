@@ -130,8 +130,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                     .forEachItem(
                             guiItemRenderState -> {
                                 if (LegacyGuiItemRenderState.of(guiItemRenderState).size() != size) return;
-                                if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity)
-                                    return;
+//                                if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity)
+//                                    return;
                                 if (guiItemRenderState.oversizedItemBounds() != null) {
                                     mutableBoolean2.setTrue();
                                 } else {
@@ -184,8 +184,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                         .forEachItem(
                                 guiItemRenderState -> {
                                     if (LegacyGuiItemRenderState.of(guiItemRenderState).size() != size) return;
-                                    if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity)
-                                        return;
+//                                    if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity)
+//                                        return;
                                     if (guiItemRenderState.oversizedItemBounds() != null) {
                                         TrackingItemStackRenderState trackingItemStackRenderState = guiItemRenderState.itemStackRenderState();
                                         OversizedItemRenderer oversizedItemRenderer = oversizedItemRenderers
@@ -214,7 +214,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         renderState
                 .submitBlitToCurrentLayer(
                         new BlitRenderState(
-                                opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA : RenderPipelines.GUI_TEXTURED,
+                                opacity == 1.0f /*|| !LegacyOptions.enhancedItemTranslucency.get()*/ ? RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA : RenderPipelines.GUI_TEXTURED,
                                 TextureSetup.singleTexture(this.itemsAtlasView/*? if >=1.21.11 {*/, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)/*?}*/),
                                 guiItemRenderState.pose(),
                                 guiItemRenderState.x(),
@@ -225,7 +225,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                 h,
                                 v,
                                 k,
-                                opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? 0xFFFFFFFF : ColorUtil.withAlpha(0xFFFFFF, opacity),
+                                opacity == 1.0f /*|| !LegacyOptions.enhancedItemTranslucency.get()*/ ? 0xFFFFFFFF : ColorUtil.withAlpha(0xFFFFFF, opacity),
                                 guiItemRenderState.scissorArea(),
                                 null
                         )
@@ -242,13 +242,13 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         } else {
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
         }
-        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get())
-            LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(BufferSourceWrapper.translucent(bufferSource, opacity));
+//        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get())
+//            LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(BufferSourceWrapper.translucent(bufferSource, opacity));
         RenderSystem.enableScissorForRenderTypeDraws(x, this.itemsAtlas.getHeight(0) - y - k, k, k);
         trackingItemStackRenderState.submit(poseStack, submitNodeCollector, 15728880, OverlayTexture.NO_OVERLAY, 0);
         featureRenderDispatcher.renderAllFeatures();
         bufferSource.endBatch();
-        LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(bufferSource);
+//        LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(bufferSource);
         RenderSystem.disableScissorForRenderTypeDraws();
         poseStack.popPose();
     }

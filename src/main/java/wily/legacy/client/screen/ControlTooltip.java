@@ -67,6 +67,7 @@ import net.minecraft.world.entity.animal.cow.*;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipePropertySet;
@@ -489,7 +490,7 @@ public interface ControlTooltip {
         }
         if (blockState != null && blockState.getBlock() instanceof FlowerPotBlock pot) { Block planted = /*? if <1.20.2 {*//*pot.getContent()*//*?} else {*/pot.getPotted()/*?}*/;
             if (planted != Blocks.AIR && minecraft.player.getMainHandItem().isEmpty() && minecraft.player.getOffhandItem().isEmpty())
-            return LegacyComponents.COLLECT;
+                return LegacyComponents.COLLECT;
         }
         if (blockState != null && (blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock))
             return blockState.getValue(BlockStateProperties.OPEN) ? LegacyComponents.CLOSE : LegacyComponents.OPEN;
@@ -523,14 +524,14 @@ public interface ControlTooltip {
                 return LegacyComponents.FILL;
             if (blockHit != null && !actualItem.isEmpty() && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof CampfireBlockEntity e && /*? if <1.21.2 {*//*e.getCookableRecipe(actualItem).isPresent()*//*?} else {*/minecraft.level.recipeAccess().propertySet(RecipePropertySet.FURNACE_INPUT).test(actualItem)/*?}*/)
                 return LegacyComponents.COOK;
-                   if (actualItem.is(Items.POTION) && blockState != null && LegacyItemUtil.getPotionContent(actualItem) != null && "minecraft:water".equals(LegacyItemUtil.getPotionContent(actualItem).getRegisteredName())) {
+            if (actualItem.is(Items.POTION) && blockState != null && LegacyItemUtil.getPotionContent(actualItem) != null && "minecraft:water".equals(LegacyItemUtil.getPotionContent(actualItem).getRegisteredName())) {
                 if (blockState.is(Blocks.DIRT) || blockState.is(Blocks.COARSE_DIRT) || blockState.is(Blocks.ROOTED_DIRT))
                     return LegacyComponents.MOISTEN;
             }
             if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock) {
                 Block block = blockState.getBlock();
                 boolean isEmptyBottle = actualItem.is(Items.GLASS_BOTTLE);
-                boolean isWaterBottle = actualItem.is(Items.POTION) && LegacyItemUtil.getPotionContent(actualItem) != null && "minecraft:water".equals(LegacyItemUtil.getPotionContent(actualItem).getRegisteredName());
+                boolean isWaterBottle = actualItem.is(Items.POTION) && LegacyItemUtil.getPotionContent(actualItem) != null && Potions.WATER.is(LegacyItemUtil.getPotionContent(actualItem));
                 boolean isEmptyBucket = actualItem.is(Items.BUCKET);
                 boolean isWaterBucket = actualItem.is(Items.WATER_BUCKET);
                 boolean isPowderBucket = actualItem.is(Items.POWDER_SNOW_BUCKET);
@@ -592,7 +593,7 @@ public interface ControlTooltip {
             // 3-Interactions with specific entities (Piglin barter, bucket, bucketable mobs, cow for milk)
             if (entity instanceof Piglin piglin && actualItem.is(Items.GOLD_INGOT) && !piglin.isBaby() && piglin.getOffhandItem().isEmpty())
                 return LegacyComponents.BARTER;
-                        Set<EntityType<?>> bucketable = Set.of( EntityType.AXOLOTL, EntityType.COD, EntityType.SALMON, EntityType.TROPICAL_FISH, EntityType.PUFFERFISH, EntityType.TADPOLE);
+            Set<EntityType<?>> bucketable = Set.of( EntityType.AXOLOTL, EntityType.COD, EntityType.SALMON, EntityType.TROPICAL_FISH, EntityType.PUFFERFISH, EntityType.TADPOLE);
             if (actualItem.is(Items.WATER_BUCKET) && entity != null && bucketable.contains(entity.getType()))
                 return LegacyComponents.COLLECT;
             BlockHitResult bucketHitResult;

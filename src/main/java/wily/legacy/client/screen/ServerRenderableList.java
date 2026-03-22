@@ -264,7 +264,7 @@ public class ServerRenderableList extends RenderableVList {
                     }
                 });
             }
-            super.renderWidget(guiGraphics, i, j, f);
+            super.renderButton(guiGraphics, i, j, f);
         }
 
         @Override

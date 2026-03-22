@@ -34,12 +34,12 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {
                 //~ !identifier
-                if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentItemSheet());
+                if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentBlockItemSheet());
                 //? if >=1.21.11 {
                 else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && !((RenderSetupAccessor)(Object) ((RenderTypeMixin) renderType).getState()).getTextureBindings().isEmpty())
                     return super.getBuffer(
                         RenderTypes.itemEntityTranslucentCull(
-                            ((RenderSetupAccessor)(Object) ((RenderTypeMixin) renderType).getState()).getTextureBindings().values().stream().findFirst().get().location()));
+                            ((RenderSetupAccessor)(Object) ((RenderTypeMixin) renderType).getState()).getTextureBindings().get("Sampler0").location()));
                 //?} else {
                 /*else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
                     return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
@@ -83,6 +83,7 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
 
     @Override
     public VertexConsumer getBuffer(RenderType renderType) {
-        return vertexConsumerFunction.apply(source.getBuffer(overrideRenderType == null ? renderType : overrideRenderType));
+        VertexConsumer consumer = vertexConsumerFunction.apply(source.getBuffer(overrideRenderType == null ? renderType : overrideRenderType));
+        return consumer;
     }
 }
