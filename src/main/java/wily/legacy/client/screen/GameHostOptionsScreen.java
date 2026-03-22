@@ -3,6 +3,8 @@ package wily.legacy.client.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -38,7 +40,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     protected final Map<Object, Runnable> actionsOnClose = new LinkedHashMap<>();
 
     public GameHostOptionsScreen(Screen parent, Minecraft minecraft) {
-        super(parent, s -> Panel.centered(s, LegacySprites.PANEL, 265, minecraft.player.hasPermissions(2) ? 200 : 130), HostOptionsScreen.HOST_OPTIONS);
+        super(parent, s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.hasPermissions(2), LegacyOptions.legacySettingsMenus.get())), p -> p.centered(s)), HostOptionsScreen.HOST_OPTIONS);
         getRenderableVList().layoutSpacing(l -> 2);
 
         boolean isOp =  minecraft.player.hasPermissions(2);
@@ -122,6 +124,22 @@ public class GameHostOptionsScreen extends PanelVListScreen {
 
     protected void queueHostCommand(Object key, String command) {
         queueHostAction(key, () -> runCommand(command));
+    }
+
+    protected int getPanelHeight(boolean isOp, boolean legacyMenus) {
+        int baseHeight = isOp ? 200 : 130;
+        if (!legacyMenus) return baseHeight;
+
+        int contentHeight = 16;
+        int entryCount = 0;
+        for (Renderable renderable : getRenderableVList().renderables) {
+            if (renderable instanceof LayoutElement element) {
+                contentHeight += element.getHeight();
+                entryCount++;
+            }
+        }
+        if (entryCount > 1) contentHeight += (entryCount - 1) * 2;
+        return Math.min(baseHeight, contentHeight);
     }
 
     @Override
