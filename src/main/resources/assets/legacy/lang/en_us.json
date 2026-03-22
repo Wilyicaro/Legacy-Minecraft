@@ -626,6 +626,8 @@
   "gamerule.globalMapPlayerIcon.description": "Allow player icons to be visible on all created maps.",
   "gamerule.lceMobcapLimits": "LCE Mobcap Limits",
   "gamerule.lceMobcapLimits.description": "When enabled, Legacy Console Edition mobcap limits are enforced for spawning, breeding and placement.",
+  "gamerule.lceOffhandLimits": "Legacy Offhand",
+  "gamerule.lceOffhandLimits.description": "When enabled, Legacy Console Editon offhand limits are enforced.",
   "gamerule.lceFallingBlockLimit": "LCE Falling Block Limit",
   "gamerule.lceFallingBlockLimit.description": "How many falling blocks can be active in the local area at the same time. 0 disables the limit.",
   "gamerule.legacyFlight": "Legacy Flight",
