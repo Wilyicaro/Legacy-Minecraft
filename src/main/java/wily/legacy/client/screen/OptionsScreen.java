@@ -335,7 +335,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss -> ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
-                s -> Panel.centered(s, 250, LegacyOptions.legacySettingsMenus.get() ? 118 : 222, 0, LegacyOptions.legacySettingsMenus.get() ? 0 : 24),
+                s -> Panel.centered(s, 250, LegacyOptions.legacySettingsMenus.get() ? 96 : 222, 0, LegacyOptions.legacySettingsMenus.get() ? 0 : 24),
                 new ArrayList<>(List.of(
                         o -> {
                             if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addRenderable(createRenderCloudsTickBox());
@@ -344,8 +344,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> {
                             if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
                                     LegacyOptions.customSkinAnimation,
-                                    LegacyOptions.legacyGamma,
-                                    LegacyOptions.of(mc.options.renderDistance()));
+                                    LegacyOptions.legacyGamma);
                             else o.renderableVList.addLinkedOptions(
                                     LegacyOptions.displayLegacyGamma, FactoryConfig::get,
                                     LegacyOptions.legacyGamma);
