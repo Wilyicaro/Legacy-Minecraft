@@ -145,7 +145,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> autoSaveWhenPaused = CLIENT_STORAGE.register(createBoolean("autoSaveWhenPaused",false));
     public static final FactoryConfig<Boolean> inGameTooltips = CLIENT_STORAGE.register(createBoolean("gameTooltips", true));
     public static final FactoryConfig<Boolean> tooltipBoxes = CLIENT_STORAGE.register(createBoolean("tooltipBoxes", true));
-    public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", false));
+    public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", true));
     public static final FactoryConfig<Boolean> hints = CLIENT_STORAGE.register(createBoolean("hints", true));
     public static final FactoryConfig<Boolean> flyingViewRolling = CLIENT_STORAGE.register(createBoolean("flyingViewRolling", true));
     public static final FactoryConfig<Boolean> directSaveLoad = CLIENT_STORAGE.register(createBoolean("directSaveLoad", false));
