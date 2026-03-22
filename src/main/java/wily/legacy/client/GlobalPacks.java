@@ -110,7 +110,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
-            return new Selector(i, j, k, l, LegacyComponents.GLOBAL_RESOURCE_PACKS, LegacyComponents.SHOW_RESOURCE_PACKS, Minecraft.getInstance().getResourcePackRepository(), Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
+            return new Selector(i, j, k, l, LegacyComponents.getGlobalResourcePacks(), LegacyComponents.getShowResourcePacks(), Minecraft.getInstance().getResourcePackRepository(), Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
         }
 
         public List<Pack> getDisplayPacks() {

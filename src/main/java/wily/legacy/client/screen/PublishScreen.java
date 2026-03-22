@@ -24,7 +24,6 @@ import static wily.legacy.client.screen.LoadSaveScreen.GAME_TYPES;
 public class PublishScreen extends ConfirmationScreen {
     public static final Component PORT_INFO_TEXT = Component.translatable("lanServer.port");
     public static final Component LAN_SERVER = Component.translatable("lanServer.title");
-    public static final Component PUBLISH = Component.translatable(hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
     public static final Component PORT_UNAVAILABLE = Component.translatable("lanServer.port.unavailable", 1024, 65535);
     public static final Component INVALID_PORT = Component.translatable("lanServer.port.invalid", 1024, 65535);
     protected final LegacySliderButton<GameType> gameTypeSlider;
@@ -48,6 +47,10 @@ public class PublishScreen extends ConfirmationScreen {
 
     public static boolean hasWorldHost() {
         return FactoryAPI.isModLoaded(FactoryAPI.getLoader().isForgeLike() ? "world_host" : "world-host");
+    }
+
+    public static Component getPublishComponent() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
     }
 
     public static Pair<Integer, Component> tryParsePort(String string) {

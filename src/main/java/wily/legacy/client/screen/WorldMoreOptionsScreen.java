@@ -9,7 +9,11 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -18,10 +22,13 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
+import net.minecraft.world.level.levelgen.presets.WorldPreset;
+import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -36,6 +43,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     public static final Component ENTER_SEED = Component.translatable("selectWorld.enterSeed");
     public static final Component SEED_INFO = Component.translatable("selectWorld.seedInfo");
     public static final Component ENTER_SEED_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.enterSeed.description");
+    private static final List<ResourceKey<WorldPreset>> LEGACY_BIOME_SCALE_PRESETS = List.of(WorldPresets.NORMAL, WorldPresets.LARGE_BIOMES);
     protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("createWorld.tab.world.title"), t -> rebuildWidgets()).add(LegacyTabButton.Type.RIGHT, Component.translatable("legacy.menu.game_options"), t -> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList(accessor);
@@ -45,18 +53,20 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected Runnable onClose = () -> {
     };
 
-    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
+    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            initLegacyCreateWorldOptions(parent, trustPlayers, onlineGame, biomeScale);
+        } else {
+            initDefaultCreateWorldOptions(parent, trustPlayers);
+        }
+        parent.getUiState().onChanged();
+    }
+
+    private void initDefaultCreateWorldOptions(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
         renderableVList.addCategory(ENTER_SEED);
-        EditBox editBox = new EditBox(Minecraft.getInstance().font, 0, 0, 308, 20, ENTER_SEED) {
-            protected MutableComponent createNarrationMessage() {
-                return super.createNarrationMessage().append(CommonComponents.NARRATION_SEPARATOR).append(SEED_INFO);
-            }
-        };
-        editBox.setTooltip(Tooltip.create(ENTER_SEED_DESCRIPTION));
-        editBox.setValue(parent.getUiState().getSeed());
-        editBox.setResponder(string -> parent.getUiState().setSeed(editBox.getValue()));
+        EditBox editBox = createSeedEditBox(parent);
         renderableVList.addRenderable(editBox);
         renderableVList.addCategory(SEED_INFO);
         renderableVList.addCategory(Component.translatable("selectWorld.mapType"));
@@ -67,22 +77,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 () -> CycleButton.DEFAULT_ALT_LIST_SELECTOR.getAsBoolean() ? parent.getUiState().getAltPresetList()
                         : parent.getUiState().getNormalPresetList(),
                 b -> parent.getUiState().setWorldType(b.objectValue)));
-        Button customizeButton = new LegacyButton(Component.translatable("selectWorld.customizeType"), button -> {
-            PresetEditor presetEditor = parent.getUiState().getPresetEditor();
-            if (presetEditor != null)
-                minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
-        });
-        parent.getUiState().addListener(s -> {
-            customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
-            customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
-        });
+        Button customizeButton = createCustomizeButton(parent);
         renderableVList.addRenderable(customizeButton);
         renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
         renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
         renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> {
         })));
-        TickBox hostPrivileges = new TickBox(0, 0, parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(), b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.getUiState()./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(b.selected));
-        parent.getUiState().addListener(s -> hostPrivileges.active = !s.isDebug() && !s.isHardcore());
+        TickBox hostPrivileges = createHostPrivilegesTickBox(parent);
         GameRules gameRules = parent.getUiState().getGameRules();
         Pair<Path, PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
         if (pair != null) {
@@ -111,13 +112,157 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables, gameRules, k -> k.getCategory() == value);
         }
-        parent.getUiState().onChanged();
+    }
+
+    private void initLegacyCreateWorldOptions(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
+        renderableVList.addCategory(ENTER_SEED);
+        EditBox editBox = createSeedEditBox(parent);
+        renderableVList.addRenderable(editBox);
+        renderableVList.addCategory(SEED_INFO);
+
+        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
+                b -> b.getDefaultMessage(Component.translatable("legacy.menu.selectWorld.biome_scale"), getLegacyBiomeScaleName(b.getObjectValue())),
+                b -> null,
+                biomeScale.get(),
+                () -> LEGACY_BIOME_SCALE_PRESETS,
+                b -> {
+                    biomeScale.set(b.objectValue);
+                    setWorldPreset(parent, b.objectValue);
+                },
+                biomeScale::get));
+
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
+
+        TickBox amplifiedWorld = new TickBox(0, 0, isPresetSelected(parent, WorldPresets.AMPLIFIED), b -> Component.translatable("legacy.menu.selectWorld.amplified_world"), b -> Tooltip.create(LegacyComponents.AMPLIFIED_DESCRIPTION), b -> {
+            if (b.selected) setWorldPreset(parent, WorldPresets.AMPLIFIED);
+            else setWorldPreset(parent, biomeScale.get());
+        });
+        TickBox superflatWorld = new TickBox(0, 0, isPresetSelected(parent, WorldPresets.FLAT), b -> Component.translatable("legacy.menu.selectWorld.superflat_world"), b -> Tooltip.create(LegacyComponents.FLAT_DESCRIPTION), b -> {
+            if (b.selected) setWorldPreset(parent, WorldPresets.FLAT);
+            else setWorldPreset(parent, biomeScale.get());
+        });
+        parent.getUiState().addListener(s -> {
+            amplifiedWorld.selected = isPreset(s.getWorldType().preset(), WorldPresets.AMPLIFIED);
+            superflatWorld.selected = isPreset(s.getWorldType().preset(), WorldPresets.FLAT);
+            if (!amplifiedWorld.selected && !superflatWorld.selected) {
+                biomeScale.set(getLegacyBiomeScalePreset(s.getWorldType().preset()));
+            }
+        });
+        renderableVList.addRenderable(amplifiedWorld);
+        renderableVList.addRenderable(superflatWorld);
+
+        renderableVList.addRenderable(createCustomizeButton(parent));
+        renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
+
+        GameRules gameRules = parent.getUiState().getGameRules();
+        addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
+        addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
+
+        gameRenderables.addRenderable(new TickBox(0, 0, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> null, b -> onlineGame.set(b.selected)));
+        addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
+        gameRenderables.addRenderable(createHostPrivilegesTickBox(parent));
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DAYLIGHT);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_WEATHER_CYCLE);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_KEEPINVENTORY);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOMOBSPAWNING);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_MOBGRIEFING);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOMOBLOOT);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOBLOCKDROPS);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_NATURAL_REGENERATION);
+    }
+
+    private EditBox createSeedEditBox(CreateWorldScreen parent) {
+        EditBox editBox = new EditBox(Minecraft.getInstance().font, 0, 0, 308, 20, ENTER_SEED) {
+            protected MutableComponent createNarrationMessage() {
+                return super.createNarrationMessage().append(CommonComponents.NARRATION_SEPARATOR).append(SEED_INFO);
+            }
+        };
+        editBox.setTooltip(Tooltip.create(ENTER_SEED_DESCRIPTION));
+        editBox.setValue(parent.getUiState().getSeed());
+        editBox.setResponder(string -> parent.getUiState().setSeed(editBox.getValue()));
+        return editBox;
+    }
+
+    private TickBox createHostPrivilegesTickBox(CreateWorldScreen parent) {
+        TickBox hostPrivileges = new TickBox(0, 0, parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(), b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.getUiState()./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(b.selected));
+        parent.getUiState().addListener(s -> {
+            hostPrivileges.active = !s.isDebug() && !s.isHardcore();
+        });
+        return hostPrivileges;
+    }
+
+    private Button createCustomizeButton(CreateWorldScreen parent) {
+        Component defaultMessage = LegacyOptions.legacySettingsMenus.get()
+                ? Component.translatable("legacy.menu.selectWorld.customize_superflat")
+                : Component.translatable("selectWorld.customizeType");
+        Button customizeButton = new LegacyButton(defaultMessage, button -> {
+            PresetEditor presetEditor = parent.getUiState().getPresetEditor();
+            if (presetEditor != null)
+                minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
+        });
+        parent.getUiState().addListener(s -> {
+            customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
+            customizeButton.setMessage(LegacyOptions.legacySettingsMenus.get()
+                    ? Component.translatable("legacy.menu.selectWorld.customize_superflat")
+                    : Component.translatable("selectWorld.customizeType"));
+            customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
+        });
+        return customizeButton;
+    }
+
+    private void addBooleanGameRuleOption(RenderableVList list, GameRules gameRules, GameRules.Key<GameRules.BooleanValue> key) {
+        GameRules.BooleanValue value = gameRules.getRule(key);
+        String descriptionId = key.getDescriptionId();
+        Tooltip tooltip = Tooltip.create(Component.translatable(descriptionId + ".description"));
+        list.addRenderable(new TickBox(0, 0, value.get(), b -> Component.translatable(descriptionId), b -> tooltip, b -> value.set(b.selected, null)));
+    }
+
+    private void setWorldPreset(CreateWorldScreen parent, ResourceKey<WorldPreset> presetKey) {
+        findWorldTypeEntry(parent, presetKey).ifPresent(parent.getUiState()::setWorldType);
+    }
+
+    public static ResourceKey<WorldPreset> getLegacyBiomeScalePreset(Holder<WorldPreset> preset) {
+        return preset != null && preset.is(WorldPresets.LARGE_BIOMES) ? WorldPresets.LARGE_BIOMES : WorldPresets.NORMAL;
+    }
+
+    private Component getLegacyBiomeScaleName(ResourceKey<WorldPreset> presetKey) {
+        return Component.translatable("legacy.menu.selectWorld.biome_scale." + (WorldPresets.LARGE_BIOMES.equals(presetKey) ? "large" : "medium"));
+    }
+
+    private Optional<WorldCreationUiState.WorldTypeEntry> findWorldTypeEntry(CreateWorldScreen parent, ResourceKey<WorldPreset> presetKey) {
+        return parent.getUiState().getSettings().worldgenLoadContext().lookupOrThrow(Registries.WORLD_PRESET).get(presetKey)
+                .map(WorldCreationUiState.WorldTypeEntry::new)
+                .or(() -> List.of(parent.getUiState().getNormalPresetList(), parent.getUiState().getAltPresetList()).stream()
+                        .flatMap(List::stream)
+                        .filter(entry -> isPreset(entry.preset(), presetKey))
+                        .findFirst());
+    }
+
+    private boolean isPresetSelected(CreateWorldScreen parent, ResourceKey<WorldPreset> presetKey) {
+        return isPreset(parent.getUiState().getWorldType().preset(), presetKey);
+    }
+
+    private boolean isPreset(Holder<WorldPreset> preset, ResourceKey<WorldPreset> presetKey) {
+        return preset != null && preset.is(presetKey);
     }
 
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
         tabList.setSelected(1);
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            initLegacyLoadSaveOptions(parent);
+        } else {
+            initDefaultLoadSaveOptions(parent);
+        }
+        parent.applyGameRules = (g, s) -> {
+            GameRules gameRules = parent.summary.getSettings().gameRules();
+            if (!g.equals(gameRules)) g.assignFrom(gameRules, s);
+        };
+    }
+
+    private void initDefaultLoadSaveOptions(LoadSaveScreen parent) {
         GameRules gameRules = parent.summary.getSettings().gameRules();
         LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b -> null, t -> {
             if (t.selected) parent.dimensionsToReset.add(d);
@@ -130,9 +275,29 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables, gameRules, k -> k.getCategory() == value);
         }
-        parent.applyGameRules = (g, s) -> {
-            if (!g.equals(gameRules)) g.assignFrom(gameRules, s);
-        };
+    }
+
+    private void initLegacyLoadSaveOptions(LoadSaveScreen parent) {
+        GameRules gameRules = parent.summary.getSettings().gameRules();
+        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b -> null, t -> {
+            if (t.selected) parent.dimensionsToReset.add(d);
+            else parent.dimensionsToReset.remove(d);
+        })));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, t -> parent.trustPlayers = t.selected));
+        addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
+        addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
+
+        gameRenderables.addRenderable(new TickBox(0, 0, parent.publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, b -> parent.publishScreen.publish = b.selected));
+        addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
+        gameRenderables.addRenderable(new TickBox(0, 0, parent.hostPrivileges, b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.hostPrivileges = b.selected));
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DAYLIGHT);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_WEATHER_CYCLE);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_KEEPINVENTORY);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOMOBSPAWNING);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_MOBGRIEFING);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOMOBLOOT);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOBLOCKDROPS);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_NATURAL_REGENERATION);
     }
 
     @Override
@@ -280,4 +445,5 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             screen.tryApplyNewDataPacks(packRepository, false, w -> minecraft.setScreen(this));
         }
     }
+
 }

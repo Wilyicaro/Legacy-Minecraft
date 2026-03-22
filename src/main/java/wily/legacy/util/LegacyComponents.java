@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import wily.factoryapi.FactoryAPI;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 
 public class LegacyComponents {
@@ -231,6 +232,26 @@ public class LegacyComponents {
     public static final Component UNLEASH = Component.translatable("legacy.action.unleash");
     public static final Component DETACH = Component.translatable("legacy.action.detach");
     public static final Component CLOSE = Component.translatable("legacy.action.close");
+
+    public static Component getResourceAlbums() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture_packs" : "legacy.menu.albums.resource");
+    }
+
+    public static Component getGlobalResourcePacks() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.global_packs.texture_packs" : "legacy.menu.global_packs.resource");
+    }
+
+    public static Component getShowResourcePacks() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.action.show_texture_packs" : "legacy.action.show_resource_packs");
+    }
+
+    public static Component getResourceAlbumTemplate(int repeat) {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture.template" : "legacy.menu.albums.resource.template", repeat);
+    }
+
+    public static Component getResourceAlbumTemplateDescription() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture.template.description" : "legacy.menu.albums.resource.template.description");
+    }
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);
