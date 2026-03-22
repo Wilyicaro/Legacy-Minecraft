@@ -107,6 +107,11 @@ public class LegacyOptions {
         return createBoolean(key, defaultValue, b -> {});
     }
 
+    public static FactoryConfig<Boolean> createBooleanWithTooltip(String key, boolean defaultValue) {
+        Component tooltip = Component.translatable("legacy.options." + key + ".tooltip");
+        return createBoolean(key, b -> tooltip, defaultValue);
+    }
+
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue, Consumer<Boolean> consumer) {
         return createBoolean(key, b -> null, defaultValue, consumer);
     }
@@ -167,6 +172,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> autoSaveWhenPaused = CLIENT_STORAGE.register(createBoolean("autoSaveWhenPaused",false));
     public static final FactoryConfig<Boolean> inGameTooltips = CLIENT_STORAGE.register(createBoolean("gameTooltips", true));
     public static final FactoryConfig<Boolean> tooltipBoxes = CLIENT_STORAGE.register(createBoolean("tooltipBoxes", true));
+    public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", false));
     public static final FactoryConfig<Boolean> hints = CLIENT_STORAGE.register(createBoolean("hints", true));
     public static final FactoryConfig<Boolean> flyingViewRolling = CLIENT_STORAGE.register(createBoolean("flyingViewRolling", true));
     public static final FactoryConfig<Boolean> directSaveLoad = CLIENT_STORAGE.register(createBoolean("directSaveLoad", false));
@@ -188,7 +194,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", builder -> builder.valueToComponent(Controller.Handler::getName), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), Legacy4JClient.controllerManager::updateHandler));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b -> {}));
     public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", builder -> builder.valueToComponent(v -> v.displayName), i -> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.CODEC, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
-    public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBoolean("unfocusedInputs", b -> Component.translatable("legacy.options.unfocusedInputs.tooltip"), false));
+    public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBooleanWithTooltip("unfocusedInputs",  false));
     public static final FactoryConfig<Double> leftStickDeadZone = CLIENT_STORAGE.register(createDouble("leftStickDeadZone", Function.identity(), 0.25));
     public static final FactoryConfig<Double> rightStickDeadZone = CLIENT_STORAGE.register(createDouble("rightStickDeadZone", Function.identity(), 0.34));
     public static final FactoryConfig<Double> leftTriggerDeadZone = CLIENT_STORAGE.register(createDouble("leftTriggerDeadZone", Function.identity(), 0.2));
@@ -212,6 +218,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
+    public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyZombieAggressionAnimation", false));
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));
     public static final FactoryConfig<Boolean> itemLightingInHand = CLIENT_STORAGE.register(createBoolean("itemLightingInHand",true));
     public static final FactoryConfig<Boolean> loyaltyLines = CLIENT_STORAGE.register(createBoolean("loyaltyLines",true));
@@ -295,6 +302,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> screenshotToasts = CLIENT_STORAGE.register(createBoolean("screenshotToasts", true));
     public static final FactoryConfig<Boolean> forceLegacyFlight = CLIENT_STORAGE.register(createBoolean("forceLegacyFlight", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> forceLegacySwimming = CLIENT_STORAGE.register(createBoolean("forceLegacySwimming", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> legacyFont = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyFont", true));
 
     public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

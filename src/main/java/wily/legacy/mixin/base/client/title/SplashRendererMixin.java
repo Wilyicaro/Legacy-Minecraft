@@ -4,10 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.SplashRenderer;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,11 +34,11 @@ public class SplashRendererMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     public void render(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
-        LegacyFontUtil.legacyFont = false;
+        LegacyFontUtil.disableLegacyFont();
     }
 
     @Inject(method = "render", at = @At("RETURN"))
     public void renderReturn(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
-        LegacyFontUtil.legacyFont = true;
+        LegacyFontUtil.enableLegacyFont();
     }
 }

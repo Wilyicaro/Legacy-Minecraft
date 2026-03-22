@@ -90,6 +90,7 @@ import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.FlowerPotBlockAccessor;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.mixin.base.ItemBasedSteeringAccessor;
@@ -630,7 +631,7 @@ public interface ControlTooltip {
                 return LegacyComponents.GROW;
             // 7-Equipable items (armor, saddle, lead)
             if (actualItem.getUseAnimation().equals(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK))
-                return LegacyComponents.BLOCK;
+                return actualItem.getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(minecraft.player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) ? null : LegacyComponents.BLOCK;
             boolean lookingAtEntity = minecraft.hitResult instanceof EntityHitResult;
             if (!lookingAtEntity && /* ? if <1.21.2 { *//* actualItem.getItem() instanceof Equipable e *//* ?} else { */ actualItem.has(DataComponents.EQUIPPABLE)/* ?} */ && !actualItem.is(Items.SADDLE) && !actualItem.is(Items.LEATHER_HORSE_ARMOR) && !actualItem.is(Items.IRON_HORSE_ARMOR) && !actualItem.is(Items.GOLDEN_HORSE_ARMOR) && !actualItem.is(Items.COPPER_HORSE_ARMOR) && !actualItem.is(Items.DIAMOND_HORSE_ARMOR)) {
                 EquipmentSlot slot = /* ? if <1.21.2 { *//* e.getEquipmentSlot() *//* ?} else { */ actualItem.get(DataComponents.EQUIPPABLE).slot();/* ?} */

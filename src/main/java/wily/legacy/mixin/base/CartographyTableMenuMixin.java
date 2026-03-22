@@ -74,7 +74,7 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
                 return;
             }
             if (RenameItemMenu.validateName(itemName) != null) {
-                if (!itemStack3.getHoverName().getString().equals(itemName)) {
+                if (!RenameItemMenu.getItemName(itemStack3).equals(itemName)) {
                     FactoryItemUtil.setCustomName(result, Component.literal(itemName));
                     broadcastChanges();
                 }

@@ -3,7 +3,6 @@ package wily.legacy.util.client;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Style;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.*;
@@ -40,10 +39,10 @@ public class LegacyGuiElements {
             LegacyRenderUtil.renderTopText(guiGraphics, TopMessage.medium, 37, 1.5f, TopMessage.mediumTicks);
         });
         FactoryGuiElement.SPECTATOR_HOTBAR.pre().register(guiGraphics -> {
-            LegacyFontUtil.legacyFont = false;
+            LegacyFontUtil.disableLegacyFont();
             AnimatedCharacterRenderer.render(guiGraphics);
         });
-        FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> LegacyFontUtil.legacyFont = true);
+        FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> LegacyFontUtil.enableLegacyFont());
         accessor.addStatic(UIDefinition.createBeforeInit(a -> {
             if (!LegacyMixinOptions.legacyGui.get()) return;
             a.getElements().put(FactoryGuiElement.VIGNETTE.name() + ".isVisible", () -> false);

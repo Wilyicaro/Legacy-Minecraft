@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.piston;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderGetter;
@@ -9,12 +10,15 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.piston.PistonMovingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -109,5 +113,10 @@ public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyP
         BlockEntity entity = movingBlockEntityType.create(getBlockPos(), movedState);
         entity.setLevel(level);
         setRenderingBlockEntity(entity);
+    }
+
+    @ModifyReturnValue(method = "matchesStickyCritera", at = @At("RETURN"))
+    private static boolean matchesStickyCritera(boolean original, AABB aABB, Entity entity, BlockPos blockPos) {
+        return original || entity instanceof ThrownTrident;
     }
 }

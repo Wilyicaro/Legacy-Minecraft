@@ -490,12 +490,13 @@ public class Legacy4JClient {
             knownEntities.save();
         });
         FactoryEvent.registerBuiltInPacks(registry -> {
-            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_resources"), true);
-            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_waters"), true);
-            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
             if (FactoryAPI.getLoader().isForgeLike()) {
-                registry.register("programmer_art", FactoryAPI.createLocation(MOD_ID, "programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
-                registry.register("high_contrast", FactoryAPI.createLocation(MOD_ID, "high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
             }
         });
         LegacyUIElementTypes.init();

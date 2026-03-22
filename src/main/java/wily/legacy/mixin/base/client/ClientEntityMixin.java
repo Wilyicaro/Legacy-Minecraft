@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -105,7 +106,7 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @ModifyReturnValue(method = "displayFireAnimation", at = @At("RETURN"))
     private boolean displayFireAnimation(boolean original) {
-        return original && allowDisplayFireAnimation;
+        return original && allowDisplayFireAnimation && (!((Object) this instanceof LocalPlayer player) || !player.hasEffect(MobEffects.FIRE_RESISTANCE));
     }
 
     @Override
