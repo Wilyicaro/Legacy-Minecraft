@@ -238,6 +238,7 @@
     "MerchantMixin",
     "MerchantOfferMixin",
     "MinecartFurnaceMixin",
+    "piston.AttachMixin",
     "piston.PistonBaseBlockMixin",
     "piston.PistonMovingBlockEntityMixin",
     "PlayerListMixin",
