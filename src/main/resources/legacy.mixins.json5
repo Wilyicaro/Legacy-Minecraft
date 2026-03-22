@@ -270,7 +270,10 @@
     "BaseContainerBlockEntityMixin",
     "PrepareSpawnTaskMixin",
     "PigAccessor",
-    "ItemBasedSteeringAccessor"
+    "ItemBasedSteeringAccessor",
+    "villager_spawn_egg.VillagerEggMixin",
+    "villager_spawn_egg.AssignProfessionMixin",
+    "villager_spawn_egg.ResetProfessionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
