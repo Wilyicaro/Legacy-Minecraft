@@ -77,7 +77,7 @@ public class OptionsScreen extends PanelVListScreen {
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         setupSelectorControlTooltips(renderer, this);
-        renderer.replace(6, i -> i, c -> c == null ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
+        renderer.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
     }
 
     public void updateWidgets(boolean forceMessageUpdate) {
@@ -381,6 +381,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.showAutosaveIndicator()),
                                 LegacyOptions.showVanillaRecipeBook,
                                 LegacyOptions.tooltipBoxes,
+                                LegacyOptions.hideAdvancedOptionsTooltip,
                                 LegacyOptions.of(mc.options.attackIndicator()),
                                 LegacyOptions.hudSize,
                                 LegacyOptions.hudOpacity,
