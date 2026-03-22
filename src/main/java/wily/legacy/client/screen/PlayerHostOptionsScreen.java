@@ -10,9 +10,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.PlayerInfoSync;
+import wily.legacy.network.ServerHostOptionsPayload;
 import wily.legacy.util.LegacySprites;
 
 import java.util.Arrays;
@@ -46,8 +48,14 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
             getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).mayFlySurvival(), b1 -> Component.translatable("legacy.menu.host_options.player.mayFly"), b1 -> null, b1 -> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()))));
             getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(), b1 -> Component.translatable("legacy.menu.host_options.player.disableExhaustion"), b1 -> null, b1 -> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, playerInfo.getProfile()))));
         }
-        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), (b1) -> Tooltip.create(Component.translatable("selectWorld.gameMode." + playerInfo.getGameMode().getName() + ".info")), playerInfo.getGameMode(), () -> gameTypes, b1 -> commandsOnClose.put(b1, () -> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(), playerInfo.getProfile().name())))));
-        getRenderableVList().addRenderable(new LegacyButton(0, 0, 215, 20, Component.translatable("legacy.menu.host_options.set_player_spawn"), b1 -> commandsOnClose.put(b1, () -> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().name())))));
+        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), (b1) -> Tooltip.create(Component.translatable("selectWorld.gameMode." + playerInfo.getGameMode().getName() + ".info")), playerInfo.getGameMode(), () -> gameTypes, b1 -> commandsOnClose.put(b1, () -> {
+            if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(ServerHostOptionsPayload.gameMode(b1.getObjectValue(), playerInfo.getProfile().id()));
+            else minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(), playerInfo.getProfile().name()));
+        })));
+        getRenderableVList().addRenderable(new LegacyButton(0, 0, 215, 20, Component.translatable("legacy.menu.host_options.set_player_spawn"), b1 -> commandsOnClose.put(b1, () -> {
+            if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(ServerHostOptionsPayload.playerSpawn(playerInfo.getProfile().id()));
+            else minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().name()));
+        })));
     }
 
     @Override

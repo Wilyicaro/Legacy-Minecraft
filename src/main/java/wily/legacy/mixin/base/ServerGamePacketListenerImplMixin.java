@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.item.ShieldItem;
@@ -17,20 +18,17 @@ import wily.legacy.init.LegacyGameRules;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerGamePacketListenerImplMixin {
-    @Shadow
-    @Final
-    private static Logger LOGGER;
-    @Shadow
-    public ServerPlayer player;
+    @Shadow @Final private static Logger LOGGER;
+    @Shadow public ServerPlayer player;
 
     @Inject(method = "handleRenameItem", at = @At("RETURN"))
-    public void handleRenameItem(ServerboundRenameItemPacket serverboundRenameItemPacket, CallbackInfo ci) {
-        if (this.player.containerMenu instanceof RenameItemMenu renameMenu) {
-            if (!player.containerMenu.stillValid(this.player)) {
-                LOGGER.debug("Player {} interacted with invalid menu {}", this.player, renameMenu);
+    public void handleRenameItem(ServerboundRenameItemPacket packet, CallbackInfo ci) {
+        if (player.containerMenu instanceof RenameItemMenu renameMenu) {
+            if (!player.containerMenu.stillValid(player)) {
+                LOGGER.debug("Player {} interacted with invalid menu {}", player, renameMenu);
                 return;
             }
-            renameMenu.setResultItemName(serverboundRenameItemPacket.getName());
+            renameMenu.setResultItemName(packet.getName());
         }
     }
 
