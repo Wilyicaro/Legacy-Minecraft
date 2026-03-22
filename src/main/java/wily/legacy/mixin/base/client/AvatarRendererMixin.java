@@ -9,13 +9,17 @@ import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyNameTag;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AvatarRenderer.class)
 public class AvatarRendererMixin {
@@ -28,5 +32,17 @@ public class AvatarRendererMixin {
             original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
             LegacyNameTag.NEXT_SUBMIT.setNameTagColor(null);
         } else original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V", at = @At("TAIL"))
+    private void extractRenderState(Avatar avatar, AvatarRenderState avatarRenderState, float f, CallbackInfo ci) {
+        if (!LegacyRenderUtil.suppressInventoryElytraPose) return;
+        avatarRenderState.isFallFlying = false;
+        avatarRenderState.fallFlyingTimeInTicks = 0;
+        avatarRenderState.shouldApplyFlyingYRot = false;
+        avatarRenderState.flyingYRot = 0;
+        avatarRenderState.elytraRotX = 0.2617994F;
+        avatarRenderState.elytraRotY = 0;
+        avatarRenderState.elytraRotZ = -0.2617994F;
     }
 }
