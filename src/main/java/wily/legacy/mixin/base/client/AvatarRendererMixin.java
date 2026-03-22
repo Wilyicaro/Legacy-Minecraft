@@ -25,6 +25,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 public class AvatarRendererMixin {
     @WrapOperation(method = "submitNameTag*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/CameraRenderState;)V", ordinal = 1))
     private void submitNameTag(SubmitNodeCollector instance, PoseStack poseStack, Vec3 vec3, int color, Component component, boolean b, int i, double v, CameraRenderState cameraRenderState, Operation<Void> original, AvatarRenderState avatarRenderState) {
+        if (!LegacyOptions.inGameOnlineIds.get()) return;
         if (LegacyOptions.displayNameTagBorder.get()) {
             Minecraft minecraft = Minecraft.getInstance();
             float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(avatarRenderState.nameTag.getString()) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);

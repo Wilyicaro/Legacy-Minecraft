@@ -12,10 +12,13 @@ import net.minecraft.client.gui.screens.worldselection.*;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.levelgen.presets.WorldPreset;
+import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -48,6 +51,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Final
     private static Component NAME_LABEL;
     protected Bearer<Boolean> trustPlayers = Bearer.of(true);
+    protected Bearer<ResourceKey<WorldPreset>> legacyBiomeScale = Bearer.of(WorldPresets.NORMAL);
     protected Panel panel;
     protected PublishScreen publishScreen;
     protected PackAlbum.Selector resourceAlbumSelector;
@@ -92,6 +96,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         panel = Panel.createPanel(this, p -> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (height - p.height) / 2, 245, 228);
         resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220, 45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
+        legacyBiomeScale.set(WorldMoreOptionsScreen.getLegacyBiomeScalePreset(uiState.getWorldType().preset()));
     }
 
     @Override
@@ -123,9 +128,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             difficultyButton.active = !uiState.isHardcore();
         });
 
-        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
+        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
-        addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.PUBLISH, b -> null, button -> {
+        addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, button -> {
             if (button.selected) minecraft.setScreen(publishScreen);
             button.selected = publishScreen.publish = false;
         })));

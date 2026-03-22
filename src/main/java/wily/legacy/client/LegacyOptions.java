@@ -173,6 +173,9 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inGameTooltips = CLIENT_STORAGE.register(createBoolean("gameTooltips", true));
     public static final FactoryConfig<Boolean> tooltipBoxes = CLIENT_STORAGE.register(createBoolean("tooltipBoxes", true));
     public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", false));
+    public static final FactoryConfig<Boolean> legacySettingsMenus = CLIENT_STORAGE.register(createBoolean("legacySettingsMenus", false));
+    public static final FactoryConfig<Boolean> displayGameMessages = CLIENT_STORAGE.register(createBoolean("displayGameMessages", true));
+    public static final FactoryConfig<Boolean> deathMessages = CLIENT_STORAGE.register(createBoolean("deathMessages", true));
     public static final FactoryConfig<Boolean> hints = CLIENT_STORAGE.register(createBoolean("hints", true));
     public static final FactoryConfig<Boolean> flyingViewRolling = CLIENT_STORAGE.register(createBoolean("flyingViewRolling", true));
     public static final FactoryConfig<Boolean> directSaveLoad = CLIENT_STORAGE.register(createBoolean("directSaveLoad", false));
@@ -216,6 +219,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> forceSmoothMovement = CLIENT_STORAGE.register(createBoolean("forceSmoothMovement", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> legacyCreativeBlockPlacing = CLIENT_STORAGE.register(createBoolean("legacyCreativeBlockPlacing",true));
     public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
+    public static final FactoryConfig<Boolean> customSkinAnimation = CLIENT_STORAGE.register(createBoolean("customSkinAnimation", true));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
     public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyZombieAggressionAnimation", false));
@@ -242,6 +246,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> saveCache = CLIENT_STORAGE.register(createBoolean("saveCache", true));
     public static final FactoryConfig<Boolean> autoSaveCountdown = CLIENT_STORAGE.register(createBoolean("autoSaveCountdown", false));
     public static final FactoryConfig<Boolean> displayControlTooltips = CLIENT_STORAGE.register(createBoolean("displayControlTooltips", true));
+    public static final FactoryConfig<Boolean> inGameOnlineIds = CLIENT_STORAGE.register(createBoolean("inGameOnlineIds", true));
     public static final FactoryConfig<Boolean> systemMessagesAsOverlay = CLIENT_STORAGE.register(createBoolean("systemMessagesAsOverlay", true));
     public static final FactoryConfig<Boolean> forceMixedCrafting = CLIENT_STORAGE.register(createBoolean("forceMixedCrafting", false, b -> {
         if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));

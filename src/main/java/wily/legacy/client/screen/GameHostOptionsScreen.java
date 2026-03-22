@@ -14,6 +14,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
@@ -28,6 +29,8 @@ import static wily.legacy.client.screen.LoadSaveScreen.GAME_MODEL_LABEL;
 public class GameHostOptionsScreen extends PanelVListScreen {
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, LegacyGameRules.LEGACY_FLIGHT, LegacyGameRules.LEGACY_OFFHAND_LIMITS));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE, GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION, GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+    public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_WORLD_RULES = List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING);
+    public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_OTHER_RULES = List.of(GameRules.RULE_WEATHER_CYCLE, GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION);
     public static final List<String> WEATHERS = List.of("clear", "rain", "thunder");
 
     protected final Map<String, Object> nonOpGamerules = new HashMap<>();
@@ -38,19 +41,24 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         getRenderableVList().layoutSpacing(l -> 2);
 
         boolean isOp =  minecraft.player.hasPermissions(2);
+        boolean legacyMenus = LegacyOptions.legacySettingsMenus.get();
 
         accessor.addStatic(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", isOp)));
 
         if (!isOp) {
-            for (GameRules.Key<GameRules.BooleanValue> key : PlayerInfoSync.All.NON_OP_GAMERULES)
+            List<GameRules.Key<GameRules.BooleanValue>> nonOpRules = legacyMenus ? LEGACY_OTHER_RULES : PlayerInfoSync.All.NON_OP_GAMERULES;
+            for (GameRules.Key<GameRules.BooleanValue> key : nonOpRules)
                 getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> nonOpGamerules.put(key.getId(), b1.selected)));
-            LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
-            Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
+            if (!legacyMenus) {
+                LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
+                Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
+            }
             return;
         }
         int initialWeather = minecraft.level.isThundering() ? 2 : minecraft.level.isRaining() ? 1 : 0;
 
-        for (GameRules.Key<GameRules.BooleanValue> key : WORLD_RULES)
+        List<GameRules.Key<GameRules.BooleanValue>> worldRules = legacyMenus ? LEGACY_WORLD_RULES : WORLD_RULES;
+        for (GameRules.Key<GameRules.BooleanValue> key : worldRules)
             getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> queueHostCommand(key.getId(), "gamerule %s %s".formatted(key.getId(), b1.selected))));
         getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_day"), b1 -> queueHostAction("time", () -> runHostAction(ServerHostOptionsPayload.time("day"), "time set day"))));
         getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_night"), b1 -> queueHostAction("time", () -> runHostAction(ServerHostOptionsPayload.time("night"), "time set night"))));
@@ -65,13 +73,16 @@ public class GameHostOptionsScreen extends PanelVListScreen {
             if (!Objects.equals(b1.getObjectValue(), WEATHERS.get(initialWeather)))
                 queueHostAction("weather", () -> runHostAction(ServerHostOptionsPayload.weather(b1.getObjectValue()), "weather " + b1.getObjectValue()));
         }));
-        for (GameRules.Key<GameRules.BooleanValue> key : OTHER_RULES)
+        List<GameRules.Key<GameRules.BooleanValue>> otherRules = legacyMenus ? LEGACY_OTHER_RULES : OTHER_RULES;
+        for (GameRules.Key<GameRules.BooleanValue> key : otherRules)
             getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> queueHostCommand(key.getId(), "gamerule %s %s".formatted(key.getId(), b1.selected))));
-        LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
-        Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
-        if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
-        getRenderableVList().addRenderable(createTeleportButton(true, Component.translatable("legacy.menu.host_options.teleport_player")));
-        getRenderableVList().addRenderable(createTeleportButton(false, Component.translatable("legacy.menu.host_options.teleport_me")));
+        if (!legacyMenus) {
+            LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
+            Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
+            if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
+            getRenderableVList().addRenderable(createTeleportButton(true, Component.translatable("legacy.menu.host_options.teleport_player")));
+            getRenderableVList().addRenderable(createTeleportButton(false, Component.translatable("legacy.menu.host_options.teleport_me")));
+        }
     }
 
     protected Button createTeleportButton(boolean toPlayer, Component component) {
