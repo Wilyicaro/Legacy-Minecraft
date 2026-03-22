@@ -19,6 +19,6 @@ public abstract class SlotMixin {
 
     @ModifyReturnValue(method = "mayPlace", at = @At("RETURN"))
     private boolean mayPlace(boolean original, ItemStack stack) {
-        return original && (!(container instanceof Inventory inventory) || getContainerSlot() != 40 || !LegacyGameRules.getSidedBooleanGamerule(inventory.player, LegacyGameRules.LCE_OFFHAND_LIMITS) || LegacyItemUtil.canGoInLceOffhand(stack));
+        return original && (!(container instanceof Inventory inventory) || getContainerSlot() != 40 || !LegacyGameRules.getSidedBooleanGamerule(inventory.player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) || LegacyItemUtil.canGoInLceOffhand(stack));
     }
 }

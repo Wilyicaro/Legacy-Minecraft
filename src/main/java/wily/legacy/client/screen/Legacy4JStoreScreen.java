@@ -102,7 +102,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
                 y += 12;
             }
         });
-        getRenderableVList().init("renderableVList", panel.getX() + 10, panel.getY() + 21, panelRecess.getWidth() - 20, 160);
+        getRenderableVList().init("renderableVList", panelRecess.getX() + 10, panelRecess.getY() + 21, panelRecess.getWidth() - 20, 160);
     }
 
     @Override

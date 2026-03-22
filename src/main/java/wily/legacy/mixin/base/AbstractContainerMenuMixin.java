@@ -34,7 +34,7 @@ public abstract class AbstractContainerMenuMixin {
 
     @Unique
     private static boolean isLceOffhandSlot(Slot slot, Player player) {
-        return slot.container instanceof Inventory inventory && slot.getContainerSlot() == 40 && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LCE_OFFHAND_LIMITS);
+        return slot.container instanceof Inventory inventory && slot.getContainerSlot() == 40 && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS);
     }
 
     @Inject(method = "doClick", at = @At("HEAD"), cancellable = true)
@@ -46,7 +46,7 @@ public abstract class AbstractContainerMenuMixin {
                 ci.cancel();
                 return;
             }
-            if (clickType == ClickType.SWAP && ((j == 40 && !LegacyItemUtil.canGoInLceOffhand(slot.getItem()) && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LCE_OFFHAND_LIMITS)) || (j >= 0 && j < 9 && isLceOffhandSlot(slot, player) && !LegacyItemUtil.canGoInLceOffhand(player.getInventory().getItem(j))))) {
+            if (clickType == ClickType.SWAP && ((j == 40 && !LegacyItemUtil.canGoInLceOffhand(slot.getItem()) && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS)) || (j >= 0 && j < 9 && isLceOffhandSlot(slot, player) && !LegacyItemUtil.canGoInLceOffhand(player.getInventory().getItem(j))))) {
                 ci.cancel();
                 return;
             }

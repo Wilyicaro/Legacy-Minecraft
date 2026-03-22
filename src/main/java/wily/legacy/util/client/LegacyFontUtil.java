@@ -11,7 +11,7 @@ public class LegacyFontUtil {
     public static final FontDescription MOJANGLES_11_FONT = new FontDescription.Resource(Legacy4J.createModLocation("default_11"));
     public static final Style MOJANGLES_11_STYLE = Style.EMPTY.withFont(MOJANGLES_11_FONT);
     public static final Style DEFAULT_FONT_STYLE = Style.EMPTY.withFont(FontDescription.DEFAULT);
-    public static boolean legacyFont = true;
+    private static boolean legacyFont = true;
     public static boolean forceVanillaFontShadowColor = false;
     public static FontDescription defaultFontOverride = null;
 
@@ -36,5 +36,17 @@ public class LegacyFontUtil {
 
     public static void applyDefault11If(boolean b, Consumer<Boolean> fontRender) {
         LegacyFontUtil.applyFontOverrideIf(b, LegacyFontUtil.MOJANGLES_11_FONT, fontRender);
+    }
+
+    public static boolean hasLegacyFont() {
+        return legacyFont && LegacyOptions.legacyFont.get();
+    }
+
+    public static void enableLegacyFont() {
+        legacyFont = true;
+    }
+
+    public static void disableLegacyFont() {
+        legacyFont = false;
     }
 }
