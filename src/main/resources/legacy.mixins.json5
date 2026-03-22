@@ -38,6 +38,7 @@
     "client.BaseAshSmokeParticleMixin",
     "client.BannerRendererMixin",
     "client.beacon.BeaconScreenMixin",
+    "client.beacon.BeamMixin",
     "client.BiomeAmbientSoundsHandlerMixin",
     "client.ClientBiomeMixin",
     "client.BitmapProviderMixin",
