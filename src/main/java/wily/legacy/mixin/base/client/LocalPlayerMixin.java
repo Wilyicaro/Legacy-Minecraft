@@ -70,8 +70,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     protected abstract boolean isControlledCamera();
 
     //? if >=1.21.11 {
-    protected abstract boolean hasEnoughFoodToDoExhaustiveManoeuvres();
-
     @Unique
     boolean hasEnoughFoodToSprint() {
         return hasEnoughFoodToDoExhaustiveManoeuvres();

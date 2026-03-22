@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Camera;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import org.joml.Matrix4f;
@@ -36,6 +37,10 @@ public abstract class GameRendererMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
+
+    @Shadow
+    @Final
+    private Camera mainCamera;
 
     @Shadow
     private boolean hasWorldScreenshot;
@@ -86,5 +91,17 @@ public abstract class GameRendererMixin {
                     }
                 }
         );
+    }
+
+    @Inject(method = "extractCamera", at = @At("HEAD"), cancellable = true)
+    private void onExtractCamera(float tickDelta, CallbackInfo ci) {
+        if (mainCamera == null || mainCamera.entity() == null) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderLevel", at = @At("HEAD"), cancellable = true)
+    private void guardRenderLevel(DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (minecraft.player == null) ci.cancel();
     }
 }

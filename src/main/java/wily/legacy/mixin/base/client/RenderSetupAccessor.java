@@ -10,6 +10,6 @@ import java.util.Map;
 @Mixin(RenderSetup.class)
 public interface RenderSetupAccessor {
     @Accessor("textures")
-    Map<String, RenderSetup.TextureBinding> getTextures();
+    Map<String, RenderSetup.TextureBinding> getTextureBindings();
 }
 //?}

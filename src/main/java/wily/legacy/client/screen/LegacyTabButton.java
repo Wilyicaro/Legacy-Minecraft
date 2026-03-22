@@ -135,7 +135,7 @@ public class LegacyTabButton extends AbstractButton {
             if (icon == null) {
                 int color = CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24;
                 //? if >=1.21.11 {
-                this.renderDefaultLabel(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.NONE, style -> style.withColor(color)));
+                this.renderString(guiGraphics, minecraft.font, color, false);
                 //?} else {
                 /*this.renderString(guiGraphics, minecraft.font, color);
                 *///?}
