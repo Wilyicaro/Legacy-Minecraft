@@ -30,6 +30,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, LegacyGameRules.LEGACY_FLIGHT, LegacyGameRules.LEGACY_OFFHAND_LIMITS));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE, GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION, GameRules.RULE_DO_IMMEDIATE_RESPAWN));
     public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_WORLD_RULES = List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING);
+    public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_NON_OP_RULES = List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION);
     public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_OTHER_RULES = List.of(GameRules.RULE_WEATHER_CYCLE, GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION);
     public static final List<String> WEATHERS = List.of("clear", "rain", "thunder");
 
@@ -46,7 +47,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         accessor.addStatic(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", isOp)));
 
         if (!isOp) {
-            List<GameRules.Key<GameRules.BooleanValue>> nonOpRules = legacyMenus ? LEGACY_OTHER_RULES : PlayerInfoSync.All.NON_OP_GAMERULES;
+            List<GameRules.Key<GameRules.BooleanValue>> nonOpRules = legacyMenus ? LEGACY_NON_OP_RULES : PlayerInfoSync.All.NON_OP_GAMERULES;
             for (GameRules.Key<GameRules.BooleanValue> key : nonOpRules)
                 getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> nonOpGamerules.put(key.getId(), b1.selected)));
             if (!legacyMenus) {
