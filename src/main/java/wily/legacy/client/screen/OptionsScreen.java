@@ -235,7 +235,7 @@ public class OptionsScreen extends PanelVListScreen {
                 s -> LegacyOptions.legacySettingsMenus.get()
                         ? Panel.createPanel(s,
                                 p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(162, false)),
-                                p -> p.pos(p.centeredLeftPos(s), (s.height - 162) / 2))
+                                p -> p.pos(p.centeredLeftPos(s), (s.height - 162) / 2 + 12))
                         : Panel.centered(s, 250, 162),
                 new ArrayList<>(List.of(
                         o -> {
@@ -356,7 +356,7 @@ public class OptionsScreen extends PanelVListScreen {
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
                 s -> LegacyOptions.legacySettingsMenus.get()
-                        ? Panel.createPanel(s, p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(96, true)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s)))
+                        ? Panel.createPanel(s, p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(96, true)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) - 30))
                         : Panel.centered(s, 250, 222, 0, 24),
                 new ArrayList<>(List.of(
                         o -> {
