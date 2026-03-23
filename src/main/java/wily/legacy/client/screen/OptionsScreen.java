@@ -169,7 +169,8 @@ public class OptionsScreen extends PanelVListScreen {
                             Component.translatable("legacy.menu.legacy_settings_menus_warning"),
                             Component.translatable("legacy.menu.legacy_settings_menus_warning.message"),
                             s -> {
-                                FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, true, v -> reopenLegacySettingsMenusScreen(screen));
+                                FactoryConfig.saveOptionAndConsume(LegacyOptions.displayChatIndicators, false, v ->
+                                        FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, true, v1 -> reopenLegacySettingsMenusScreen(screen)));
                             }));
                 },
                 LegacyOptions.legacySettingsMenus::get);
@@ -620,6 +621,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.chat.title"),
                                 LegacyOptions.of(mc.options.reducedDebugInfo()),
+                                LegacyOptions.displayChatIndicators,
                                 LegacyOptions.of(mc.options.chatVisibility()),
                                 LegacyOptions.of(mc.options.chatOpacity()),
                                 LegacyOptions.of(mc.options.textBackgroundOpacity()),
