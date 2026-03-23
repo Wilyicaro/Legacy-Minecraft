@@ -122,20 +122,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addRenderable(editBox);
         renderableVList.addCategory(SEED_INFO);
 
-        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
-                b -> b.getDefaultMessage(Component.translatable("legacy.menu.selectWorld.biome_scale"), getLegacyBiomeScaleName(b.getObjectValue())),
-                b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.biome_scale.description")),
-                biomeScale.get(),
-                () -> LEGACY_BIOME_SCALE_PRESETS,
-                b -> {
-                    biomeScale.set(b.objectValue);
-                    setWorldPreset(parent, b.objectValue);
-                },
-                biomeScale::get));
-
-        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
-        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
-
         TickBox amplifiedWorld = new TickBox(0, 0, isPresetSelected(parent, WorldPresets.AMPLIFIED), b -> Component.translatable("legacy.menu.selectWorld.amplified_world"), b -> Tooltip.create(LegacyComponents.AMPLIFIED_DESCRIPTION), b -> {
             if (b.selected) setWorldPreset(parent, WorldPresets.AMPLIFIED);
             else setWorldPreset(parent, biomeScale.get());
@@ -152,6 +138,20 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             }
         });
         renderableVList.addRenderable(amplifiedWorld);
+        renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> {
+        })));
+        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
+                b -> b.getDefaultMessage(Component.translatable("legacy.menu.selectWorld.biome_scale"), getLegacyBiomeScaleName(b.getObjectValue())),
+                b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.biome_scale.description")),
+                biomeScale.get(),
+                () -> LEGACY_BIOME_SCALE_PRESETS,
+                b -> {
+                    biomeScale.set(b.objectValue);
+                    setWorldPreset(parent, b.objectValue);
+                },
+                biomeScale::get));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
         renderableVList.addRenderable(superflatWorld);
 
         renderableVList.addRenderable(createCustomizeButton(parent));
@@ -218,7 +218,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         GameRules.BooleanValue value = gameRules.getRule(key);
         String descriptionId = key.getDescriptionId();
         Tooltip tooltip = Tooltip.create(Component.translatable(descriptionId + ".description"));
-        list.addRenderable(new TickBox(0, 0, value.get(), b -> Component.translatable(descriptionId), b -> tooltip, b -> value.set(b.selected, null)));
+        list.addRenderable(new TickBox(0, 0, value.get(), b -> LegacyComponents.getMenuGameRuleName(key), b -> tooltip, b -> value.set(b.selected, null)));
     }
 
     private Component getResetDimensionComponent(ResourceKey<Level> dimension) {
