@@ -30,7 +30,7 @@ public abstract class EffectRenderingInventoryScreenMixin /*? if <1.21.2 {*//*ex
 
     //?}
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    public void render(GuiGraphics guiGraphics, java.util.Collection<?> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
         ci.cancel();
         //? if <1.21.2 {
         /*super.render(guiGraphics, i, j, f);

@@ -552,11 +552,19 @@ public class Legacy4JClient {
     }
 
     public static void updateChunks() {
-        FactoryAPIClient.SECURE_EXECUTOR.execute(() -> Minecraft.getInstance().levelRenderer.allChanged());
+        FactoryAPIClient.SECURE_EXECUTOR.execute(() -> {
+            if (Minecraft.getInstance().level != null) {
+                Minecraft.getInstance().levelRenderer.allChanged();
+            }
+        });
     }
 
     public static void updateSkyShape() {
-        Minecraft.getInstance().execute(() -> ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).updateSkyBuffers());
+        Minecraft.getInstance().execute(() -> {
+            if (Minecraft.getInstance().level != null) {
+                ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).updateSkyBuffers();
+            }
+        });
     }
 
     public static void buildLegacySkyDisc(VertexConsumer consumer, float f) {

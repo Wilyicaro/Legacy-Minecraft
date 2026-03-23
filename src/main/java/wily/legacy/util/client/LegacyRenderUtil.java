@@ -382,8 +382,9 @@ public class LegacyRenderUtil {
         livingEntity.setXRot(t);
         livingEntity.yHeadRotO = u;
         livingEntity.yHeadRot = v;
-        guiGraphics.disableScissor();
          *///?}
+
+        guiGraphics.disableScissor();
     }
 
     public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, float size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
