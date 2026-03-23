@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.CreateWorldLoadingTracker;
 import wily.legacy.client.screen.LegacyLoading;
 
 @Mixin(/*? if <1.20.5 {*//*GenericDirtMessageScreen*//*?} else {*/GenericMessageScreen/*?}*/.class)
@@ -21,7 +22,16 @@ public class LegacyLoadingMessageScreenMixin extends Screen implements LegacyLoa
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyLoadingAndConnecting.get()) {
             ci.cancel();
-            getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), getTitle(), null, 0, false);
+            Component header = getTitle();
+            Component stage = null;
+            float progress = 0.0F;
+            if (CreateWorldLoadingTracker.isActive()) {
+                CreateWorldLoadingTracker.State state = CreateWorldLoadingTracker.preparing(header, null, progress);
+                header = state.header();
+                stage = state.stage();
+                progress = state.progress();
+            }
+            getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), header, stage, progress, false);
             getLoadingRenderer().render(guiGraphics, i, j, f);
         }
     }
