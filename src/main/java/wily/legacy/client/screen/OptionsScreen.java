@@ -277,7 +277,7 @@ public class OptionsScreen extends PanelVListScreen {
                             if (LegacyOptions.legacySettingsMenus.get()) {
                                 o.renderableVList.addOptions(
                                         LegacyOptions.autoSaveInterval,
-                                        LegacyOptions.of(mc.options.sensitivity()));
+                                        LegacyOptions.combinedLookSensitivity());
                             } else {
                                 o.renderableVList.addRenderables(
                                         RenderableVListScreen.openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(o, mc.getLanguageManager())).build(),

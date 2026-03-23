@@ -339,6 +339,24 @@ public class LegacyOptions {
         return (forceMixedCrafting.get() || !Legacy4JClient.hasModOnServer()) && !classicCrafting.get();
     }
 
+    public static FactoryConfig<Double> combinedLookSensitivity() {
+        FactoryConfig<Double> mouseSensitivity = of(Minecraft.getInstance().options.sensitivity());
+        return FactoryConfig.create(
+                "combinedLookSensitivity",
+                mouseSensitivity.getDisplay(),
+                mouseSensitivity.get(),
+                Bearer.of(mouseSensitivity::get, d -> {
+                    mouseSensitivity.set(d);
+                    controllerSensitivity.set(d);
+                }),
+                FactoryConfigControl.createDouble(),
+                d -> {},
+                () -> {
+                    mouseSensitivity.save();
+                    controllerSensitivity.save();
+                });
+    }
+
     public static UIMode getUIMode() {
         if (uiMode.get() == UIMode.AUTO) {
             if (LegacyRenderUtil.getStandardHeight() == 1080) return UIMode.FHD;
