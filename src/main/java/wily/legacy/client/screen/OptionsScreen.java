@@ -180,6 +180,12 @@ public class OptionsScreen extends PanelVListScreen {
         return screen;
     }
 
+    private static void showOptionsPresetWarningIfNeeded(Screen parent, Minecraft minecraft) {
+        if (!LegacyOptions.optionsPreset.get().isNone() && !LegacyOptions.optionsPreset.get().get().isApplied()) {
+            minecraft.setScreen(new OptionsPresetScreen(parent, LegacyOptions.optionsPreset.get().get()));
+        }
+    }
+
     public record Section(Component title, Panel.Constructor<OptionsScreen> panelConstructor,
                           List<Consumer<OptionsScreen>> elements, ArbitrarySupplier<Section> advancedSection,
                           BiFunction<Screen, Section, OptionsScreen> sectionBuilder) implements ScreenSection<OptionsScreen> {
@@ -379,7 +385,13 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.of(mc.options.ambientOcclusion()));
                         })),
                 () -> Section.ADVANCED_GRAPHICS, (p, s) -> {
-            if (LegacyOptions.legacySettingsMenus.get()) return new OptionsScreen(p, s);
+            if (LegacyOptions.legacySettingsMenus.get()) return new OptionsScreen(p, s) {
+                @Override
+                public void onClose() {
+                    super.onClose();
+                    showOptionsPresetWarningIfNeeded(parent, minecraft);
+                }
+            };
             GlobalPacks.Selector globalPackSelector = GlobalPacks.Selector.resources(0, 0, 230, 45, false);
             PackAlbum.Selector selector = PackAlbum.Selector.resources(0, 0, 230, 45, false);
             OptionsScreen screen = new OptionsScreen(p, s) {
@@ -389,7 +401,7 @@ public class OptionsScreen extends PanelVListScreen {
                 @Override
                 public void onClose() {
                     super.onClose();
-                    if (!LegacyOptions.optionsPreset.get().isNone() && !LegacyOptions.optionsPreset.get().get().isApplied()) minecraft.setScreen(new OptionsPresetScreen(parent, LegacyOptions.optionsPreset.get().get()));
+                    showOptionsPresetWarningIfNeeded(parent, minecraft);
                     globalPackSelector.applyChanges();
                     selector.applyChanges(true);
                 }
@@ -442,6 +454,9 @@ public class OptionsScreen extends PanelVListScreen {
                 Component.translatable("legacy.menu.settings.advanced_options", GRAPHICS.title()),
                 s -> Panel.centered(s, 250, 215, 0, 20),
                 new ArrayList<>(List.of(
+                        o -> {
+                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(LegacyOptions.optionsPreset);
+                        },
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.videoTitle"),
                                 LegacyOptions.of(createResolutionOptionInstance(o)),
