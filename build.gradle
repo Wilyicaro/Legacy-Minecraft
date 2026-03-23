@@ -119,8 +119,8 @@ dependencies {
         forgeRuntimeLibrary(sdl_dependency)
     }
 
-    api("org.apache.httpcomponents:httpcore:4.4.16")
-    api("org.apache.httpcomponents:httpclient:4.5.14")
+    api(include("org.apache.httpcomponents:httpcore:4.4.16"))
+    api(include("org.apache.httpcomponents:httpclient:4.5.14"))
 }
 
 stonecutter {
