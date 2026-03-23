@@ -105,6 +105,12 @@ public class OptionsScreen extends PanelVListScreen {
             optionsScreen.updateWidgetMessages();
     }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+    }
+
     protected int getLegacyPanelHeight(int baseHeight, boolean shrinkOnly) {
         if (!LegacyOptions.legacySettingsMenus.get()) return baseHeight;
 
