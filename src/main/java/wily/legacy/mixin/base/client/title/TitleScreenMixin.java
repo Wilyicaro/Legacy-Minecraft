@@ -33,6 +33,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.ContentManager;
+import wily.legacy.util.LegacyComponents;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
@@ -114,7 +115,10 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
+        if (LegacyOptions.legacySettingsMenus.get())
+            ControlTooltip.Renderer.of(this).add(ControlTooltip.PRESS::get, () -> LegacyComponents.SELECT);
+        else
+            ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
         if (PublishScreen.hasWorldHost())
             ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();

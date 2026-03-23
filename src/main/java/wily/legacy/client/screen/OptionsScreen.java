@@ -559,7 +559,7 @@ public class OptionsScreen extends PanelVListScreen {
                 () -> Section.ADVANCED_USER_INTERFACE));
         public static final Section ADVANCED_USER_INTERFACE = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options", USER_INTERFACE.title()),
-                USER_INTERFACE.panelConstructor(),
+                s -> Panel.centered(s, 250, 184, 0, 18),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),
