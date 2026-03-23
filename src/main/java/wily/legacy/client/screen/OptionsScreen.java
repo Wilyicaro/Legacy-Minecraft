@@ -495,7 +495,11 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> Legacy4JClient.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> o.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c))))));
         public static final Section USER_INTERFACE = add(new Section(
                 Component.translatable("legacy.menu.user_interface"),
-                s -> Panel.centered(s, 250, LegacyOptions.legacySettingsMenus.get() ? 170 : 184, 0, 18),
+                s -> LegacyOptions.legacySettingsMenus.get()
+                        ? Panel.createPanel(s,
+                                p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(170, false) - 4),
+                                p -> p.pos(p.centeredLeftPos(s), (s.height - 170) / 2 + 18))
+                        : Panel.centered(s, 250, 184, 0, 18),
                 new ArrayList<>(List.of(
                         o -> {
                             if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
