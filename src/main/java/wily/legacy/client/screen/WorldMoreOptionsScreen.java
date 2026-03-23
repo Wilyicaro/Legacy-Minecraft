@@ -159,7 +159,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
-        gameRenderables.addRenderable(new TickBox(0, 0, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> null, b -> onlineGame.set(b.selected)));
+        gameRenderables.addRenderable(new TickBox(0, 0, 200, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> null, b -> onlineGame.set(b.selected), onlineGame::get));
         addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
         gameRenderables.addRenderable(createHostPrivilegesTickBox(parent));
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DAYLIGHT);
@@ -287,7 +287,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
-        gameRenderables.addRenderable(new TickBox(0, 0, parent.publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, b -> parent.publishScreen.publish = b.selected));
+        gameRenderables.addRenderable(new TickBox(0, 0, 200, parent.publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, b -> {
+            if (b.selected) parent.publishScreen.setGameType(parent.gameTypeSlider.getObjectValue());
+            parent.publishScreen.publish = b.selected;
+        }, () -> parent.publishScreen.publish));
         addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
         gameRenderables.addRenderable(new TickBox(0, 0, parent.hostPrivileges, b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.hostPrivileges = b.selected));
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DAYLIGHT);

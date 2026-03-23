@@ -54,6 +54,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     protected Bearer<ResourceKey<WorldPreset>> legacyBiomeScale = Bearer.of(WorldPresets.NORMAL);
     protected Panel panel;
     protected PublishScreen publishScreen;
+    protected TickBox onlineTickBox;
     protected PackAlbum.Selector resourceAlbumSelector;
     @Shadow
     @Final
@@ -130,10 +131,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
         addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
-        addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, button -> {
-            if (button.selected) minecraft.setScreen(publishScreen);
-            button.selected = publishScreen.publish = false;
-        })));
+        onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, button -> {
+            if (button.selected) publishScreen.setGameType(uiState.getGameMode().gameType);
+            publishScreen.publish = button.selected;
+        }, () -> publishScreen.publish)));
         resourceAlbumSelector.setX(layoutX);
         resourceAlbumSelector.setY(panel.y + 106);
         resourceAlbumSelector.setWidth(layoutWidth);
@@ -155,6 +156,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
             LegacyClientWorldSettings.of(server.getWorldData()).setTrustPlayers(trustPlayers.get());
             server.getPlayerList().sendPlayerPermissionLevel(s);
+            publishScreen.setGameType(uiState.getGameMode().gameType);
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
         };
@@ -180,6 +182,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
+        if (onlineTickBox != null) onlineTickBox.updateValue();
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         resourceAlbumSelector.renderTooltipBox(guiGraphics, panel);
         super.render(guiGraphics, i, j, f);
