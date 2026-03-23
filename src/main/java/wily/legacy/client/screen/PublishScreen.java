@@ -113,7 +113,12 @@ public class PublishScreen extends ConfirmationScreen {
 
     public void publish(IntegratedServer server) {
         if (!publish) return;
-        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> this.minecraft.gui.getChat().addMessage(server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed")), () -> Minecraft.getInstance().player != null);
+        Minecraft minecraft = Minecraft.getInstance();
+        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> {
+            if (!server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port)) {
+                minecraft.gui.getChat().addMessage(Component.translatable("commands.publish.failed"));
+            }
+        }, () -> minecraft.player != null);
     }
 
     public void setGameType(GameType gameType) {
