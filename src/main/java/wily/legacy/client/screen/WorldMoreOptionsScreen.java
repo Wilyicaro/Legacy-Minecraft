@@ -21,6 +21,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldDataConfiguration;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
@@ -159,7 +160,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
-        gameRenderables.addRenderable(new TickBox(0, 0, 200, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> null, b -> onlineGame.set(b.selected), onlineGame::get));
+        gameRenderables.addRenderable(new TickBox(0, 0, 200, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), b -> onlineGame.set(b.selected), onlineGame::get));
         addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
         gameRenderables.addRenderable(createHostPrivilegesTickBox(parent));
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DAYLIGHT);
@@ -219,6 +220,18 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         list.addRenderable(new TickBox(0, 0, value.get(), b -> Component.translatable(descriptionId), b -> tooltip, b -> value.set(b.selected, null)));
     }
 
+    private Component getResetDimensionComponent(ResourceKey<Level> dimension) {
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            if (Level.NETHER.equals(dimension)) return Component.translatable("legacy.menu.load_save.reset_nether");
+            if (Level.END.equals(dimension)) return Component.translatable("legacy.menu.load_save.reset_end");
+        }
+        return Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(dimension));
+    }
+
+    private Tooltip getResetDimensionTooltip(ResourceKey<Level> dimension) {
+        return Tooltip.create(Component.translatable("legacy.menu.load_save.reset_" + (Level.NETHER.equals(dimension) ? "nether" : "end") + ".description"));
+    }
+
     private void setWorldPreset(CreateWorldScreen parent, ResourceKey<WorldPreset> presetKey) {
         findWorldTypeEntry(parent, presetKey).ifPresent(parent.getUiState()::setWorldType);
     }
@@ -265,7 +278,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     private void initDefaultLoadSaveOptions(LoadSaveScreen parent) {
         GameRules gameRules = parent.summary.getSettings().gameRules();
-        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b -> null, t -> {
+        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> getResetDimensionComponent(d), b -> getResetDimensionTooltip(d), t -> {
             if (t.selected) parent.dimensionsToReset.add(d);
             else parent.dimensionsToReset.remove(d);
         })));
@@ -280,7 +293,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     private void initLegacyLoadSaveOptions(LoadSaveScreen parent) {
         GameRules gameRules = parent.summary.getSettings().gameRules();
-        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b -> null, t -> {
+        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> getResetDimensionComponent(d), b -> getResetDimensionTooltip(d), t -> {
             if (t.selected) parent.dimensionsToReset.add(d);
             else parent.dimensionsToReset.remove(d);
         })));
@@ -288,7 +301,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
-        gameRenderables.addRenderable(new TickBox(0, 0, 200, parent.publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, b -> {
+        gameRenderables.addRenderable(new TickBox(0, 0, 200, parent.publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), b -> {
             if (b.selected) parent.publishScreen.setGameType(parent.gameTypeSlider.getObjectValue());
             parent.publishScreen.publish = b.selected;
         }, () -> parent.publishScreen.publish));
