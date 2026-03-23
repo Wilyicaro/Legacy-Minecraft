@@ -134,6 +134,7 @@ public class LegacyOptions {
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = FactoryConfig.<String>builder().key("lastLoadedMinecraftVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b -> {
+        syncLegacyClassicWorkstations(b);
         if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
@@ -258,6 +259,13 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
     public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerCursorAtFirstInventorySlot", FactoryConfigDisplay.createToggle(Component.translatable("legacy.options.cursorAtFirstInventorySlot")),true, b -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> systemCursor = CLIENT_STORAGE.register(createBoolean("systemCursor", false, b -> Legacy4JClient.controllerManager.updateCursorInputMode()));
+
+    private static void syncLegacyClassicWorkstations(boolean enabled) {
+        if (!legacySettingsMenus.get()) return;
+        FactoryConfig.saveOptionAndConsume(classicStonecutting, enabled, v -> {});
+        FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
+        FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
+    }
     public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", builder -> builder.valueToComponent(v -> v.displayName), i -> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, () -> ControlTooltipDisplay.values().length, ControlTooltipDisplay.CODEC, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> legacyLoadingAndConnecting = CLIENT_STORAGE.register(createBoolean("legacyLoadingAndConnecting", true));
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
