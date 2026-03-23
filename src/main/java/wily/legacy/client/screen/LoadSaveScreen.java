@@ -70,8 +70,17 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
-            if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
-            publishScreen.publish = button.selected;
+            if (LegacyOptions.legacySettingsMenus.get()) {
+                if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
+                publishScreen.publish = button.selected;
+                return;
+            }
+            if (!button.selected) {
+                publishScreen.publish = false;
+                return;
+            }
+            publishScreen.setGameType(gameTypeSlider.getObjectValue());
+            minecraft.setScreen(publishScreen);
         }, () -> publishScreen.publish);
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
