@@ -5,6 +5,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.AtmosphericFogEnvironment;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.core.BlockPos;
 import org.objectweb.asm.Opcodes;
@@ -31,6 +32,15 @@ public abstract class AtmosphericFogEnvironmentMixin {
     private void setupCloudFogOptions(FogData fogData, Entity entity, BlockPos blockPos, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (LegacyCloudAtmosphere.areLceCloudsEnabled()) {
             fogData.cloudEnd = LegacyCloudAtmosphere.getCloudFogEndBlocks(fogData.environmentalEnd);
+        }
+
+        float sunriseFogThickness = LegacyCloudAtmosphere.getSunriseFogThicknessBlend(clientLevel, deltaTracker.getGameTimeDeltaPartialTick(true));
+        if (sunriseFogThickness > 0.0f) {
+            fogData.environmentalStart *= Mth.lerp(sunriseFogThickness, 1.0f, 0.62f);
+            fogData.environmentalEnd *= Mth.lerp(sunriseFogThickness, 1.0f, 0.80f);
+            if (fogData.cloudEnd > 0.0f) {
+                fogData.cloudEnd *= Mth.lerp(sunriseFogThickness, 1.0f, 0.90f);
+            }
         }
     }
 

@@ -195,11 +195,6 @@ public abstract class CloudRendererMixin {
             legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 0);
         }
 
-        if (Math.abs(offsetX) <= 1 && Math.abs(offsetZ) <= 1) {
-            for (Direction direction : Direction.values()) {
-                legacy$encodeFace(buffer, offsetX, offsetZ, direction, 16);
-            }
-        }
     }
 
     @Unique
