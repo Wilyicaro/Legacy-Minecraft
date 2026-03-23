@@ -70,9 +70,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, button -> {
-            if (button.selected) minecraft.setScreen(publishScreen);
-            button.selected = publishScreen.publish = false;
-        });
+            if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
+            publishScreen.publish = button.selected;
+        }, () -> publishScreen.publish);
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
         (resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220, 45, !LegacyRenderUtil.hasTooltipBoxes(accessor), LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
@@ -233,6 +233,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
             applyGameRules.accept(server.getGameRules(), minecraft.getSingleplayerServer());
+            publishScreen.setGameType(gameTypeSlider.getObjectValue());
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             server.getPlayerList().sendPlayerPermissionLevel(s);
@@ -274,6 +275,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        onlineTickBox.updateValue();
         super.render(guiGraphics, i, j, f);
         if (LegacyRenderUtil.isMouseOver(i, j, panel.x + 14.5, panel.y + 10, 29, 29))
             guiGraphics.setTooltipForNextFrame(font, Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)), i, j);
