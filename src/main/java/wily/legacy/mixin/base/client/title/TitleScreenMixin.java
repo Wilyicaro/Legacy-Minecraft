@@ -49,6 +49,10 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
      *///?}
     @Unique
     private final RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
+    @Unique
+    private int legacy$lastFocusedButtonIndex = -1;
+    @Unique
+    private String legacy$lastFocusedButtonMessage;
 
     protected TitleScreenMixin(Component component) {
         super(component);
@@ -83,6 +87,29 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
          *///?}
     }
 
+    @Unique
+    private void legacy$rememberFocusedButton() {
+        if (getFocused() instanceof AbstractWidget widget) {
+            legacy$lastFocusedButtonIndex = renderableVList.renderables.indexOf(widget);
+            legacy$lastFocusedButtonMessage = widget.getMessage().getString();
+        }
+    }
+
+    @Unique
+    private void legacy$restoreFocusedButton() {
+        if (legacy$lastFocusedButtonMessage != null) {
+            for (Renderable renderable : renderableVList.renderables) {
+                if (renderable instanceof AbstractWidget widget && legacy$lastFocusedButtonMessage.equals(widget.getMessage().getString())) {
+                    renderableVList.focusRenderable(renderable);
+                    return;
+                }
+            }
+        }
+        if (legacy$lastFocusedButtonIndex >= 0 && legacy$lastFocusedButtonIndex < renderableVList.renderables.size()) {
+            renderableVList.focusRenderable(renderableVList.renderables.get(legacy$lastFocusedButtonIndex));
+        }
+    }
+
     @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
     public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
         rebuildMenuButtons();
@@ -92,9 +119,11 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
         ci.cancel();
+        legacy$rememberFocusedButton();
         rebuildMenuButtons();
         super.init();
         renderableVListInit();
+        legacy$restoreFocusedButton();
     }
 
     @Override
@@ -126,6 +155,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "removed", at = @At("RETURN"))
     public void removed(CallbackInfo ci) {
+        legacy$rememberFocusedButton();
         splash = null;
     }
 
