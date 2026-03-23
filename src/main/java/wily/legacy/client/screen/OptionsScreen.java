@@ -10,6 +10,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.input.KeyEvent;
@@ -102,6 +103,21 @@ public class OptionsScreen extends PanelVListScreen {
         }
         if (advancedOptionsScreen instanceof OptionsScreen optionsScreen)
             optionsScreen.updateWidgetMessages();
+    }
+
+    protected int getLegacyPanelHeight(int baseHeight) {
+        if (!LegacyOptions.legacySettingsMenus.get()) return baseHeight;
+
+        int contentHeight = 20;
+        int entryCount = 0;
+        for (Renderable renderable : getRenderableVList().renderables) {
+            if (renderable instanceof LayoutElement element) {
+                contentHeight += element.getHeight();
+                entryCount++;
+            }
+        }
+        if (entryCount > 1) contentHeight += (entryCount - 1) * 3;
+        return Math.min(baseHeight, contentHeight);
     }
 
     private static TickBox createRenderCloudsTickBox() {
@@ -335,7 +351,9 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss -> ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
-                s -> Panel.centered(s, 250, LegacyOptions.legacySettingsMenus.get() ? 96 : 222, 0, LegacyOptions.legacySettingsMenus.get() ? 0 : 24),
+                s -> LegacyOptions.legacySettingsMenus.get()
+                        ? Panel.createPanel(s, p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(96)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s)))
+                        : Panel.centered(s, 250, 222, 0, 24),
                 new ArrayList<>(List.of(
                         o -> {
                             if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addRenderable(createRenderCloudsTickBox());
