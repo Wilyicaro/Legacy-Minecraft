@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
@@ -262,7 +263,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
-        super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
+        super(parent,
+                s -> LegacyOptions.legacySettingsMenus.get()
+                        ? Panel.createPanel(s,
+                                p -> p.appearance(244, ((WorldMoreOptionsScreen) s).getLegacyPanelHeight(199, true)),
+                                p -> p.pos(p.centeredLeftPos(s), (s.height - 199) / 2))
+                        : Panel.centered(s, 244, 199),
+                Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
         tabList.setSelected(1);
         if (LegacyOptions.legacySettingsMenus.get()) {
@@ -282,7 +289,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (t.selected) parent.dimensionsToReset.add(d);
             else parent.dimensionsToReset.remove(d);
         })));
-        renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, t -> parent.trustPlayers = t.selected));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> parent.trustPlayers = t.selected));
         addGameRulesOptions(renderableVList, gameRules, k -> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(new TickBox(0, 0, parent.hostPrivileges, b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.hostPrivileges = b.selected));
         for (GameRules.Category value : GameRules.Category.values()) {
@@ -297,7 +304,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (t.selected) parent.dimensionsToReset.add(d);
             else parent.dimensionsToReset.remove(d);
         })));
-        renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, t -> parent.trustPlayers = t.selected));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> parent.trustPlayers = t.selected));
         addBooleanGameRuleOption(renderableVList, gameRules, GameRules.RULE_DOFIRETICK);
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
@@ -316,6 +323,21 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOBLOCKDROPS);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_NATURAL_REGENERATION);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DO_IMMEDIATE_RESPAWN);
+    }
+
+    protected int getLegacyPanelHeight(int baseHeight, boolean shrinkOnly) {
+        if (!LegacyOptions.legacySettingsMenus.get()) return baseHeight;
+
+        int contentHeight = 20;
+        int entryCount = 0;
+        for (Renderable renderable : getRenderableVList().renderables) {
+            if (renderable instanceof LayoutElement element) {
+                contentHeight += element.getHeight();
+                entryCount++;
+            }
+        }
+        if (entryCount > 1) contentHeight += (entryCount - 1) * 3;
+        return shrinkOnly ? Math.min(baseHeight, contentHeight) : Math.max(baseHeight, contentHeight);
     }
 
     @Override
@@ -394,21 +416,23 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 message = widget.getTooltip().get().message;
 
             boolean sd = LegacyOptions.getUIMode().isSD();
+            boolean compactLegacyTooltip = LegacyOptions.legacySettingsMenus.get() && !sd;
+            int tooltipContentPadding = sd ? 20 : compactLegacyTooltip ? 36 : 44;
 
             MultiLineLabel label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
 
-            int lineHeight = sd ? 8 : 12;
+            int lineHeight = sd ? 8 : compactLegacyTooltip ? 9 : 12;
 
             scrollableRenderer.lineHeight = lineHeight;
 
             if (label == null)
                 scrollableRenderer.resetScrolled();
             else
-                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - (tooltipBox.getHeight() - (sd ? 20 : 44)) / (lineHeight));
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - (tooltipBox.getHeight() - tooltipContentPadding) / lineHeight);
 
             tooltipBox.render(guiGraphics, i, j, f);
             if (label != null) {
-                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF));
+                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - tooltipContentPadding, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF));
             }
         }
     }
