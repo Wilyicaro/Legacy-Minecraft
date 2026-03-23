@@ -186,6 +186,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         resourceAlbumSelector.renderTooltipBox(guiGraphics, panel);
         super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
         UIAccessor accessor = UIAccessor.of(this);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15));

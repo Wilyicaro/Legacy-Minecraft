@@ -167,4 +167,10 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         panel.render(guiGraphics, i, j, f);
     }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+    }
 }

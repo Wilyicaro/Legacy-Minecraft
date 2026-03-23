@@ -277,6 +277,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         onlineTickBox.updateValue();
         super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
         if (LegacyRenderUtil.isMouseOver(i, j, panel.x + 14.5, panel.y + 10, 29, 29))
             guiGraphics.setTooltipForNextFrame(font, Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)), i, j);
     }

@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -124,5 +125,11 @@ public class PublishScreen extends ConfirmationScreen {
     public void setGameType(GameType gameType) {
         gameTypeSlider.setObjectValue(gameType);
         gameTypeSlider.updateMessage();
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
     }
 }
