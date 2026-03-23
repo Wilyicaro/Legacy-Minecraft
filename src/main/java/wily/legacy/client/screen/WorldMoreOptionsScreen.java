@@ -170,6 +170,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOMOBLOOT);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOBLOCKDROPS);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_NATURAL_REGENERATION);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DO_IMMEDIATE_RESPAWN);
     }
 
     private EditBox createSeedEditBox(CreateWorldScreen parent) {
@@ -301,6 +302,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOMOBLOOT);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DOBLOCKDROPS);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_NATURAL_REGENERATION);
+        addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.RULE_DO_IMMEDIATE_RESPAWN);
     }
 
     @Override
