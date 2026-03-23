@@ -11,10 +11,10 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyCloudAtmosphere;
 
 @Mixin(AtmosphericFogEnvironment.class)
 public abstract class AtmosphericFogEnvironmentMixin {
-
     @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalStart:F", ordinal = 0, opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     private void setupFogStart(FogData fogData, Entity entity, BlockPos blockPos, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (LegacyOptions.overrideTerrainFogStart.get())
@@ -23,7 +23,15 @@ public abstract class AtmosphericFogEnvironmentMixin {
 
     @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalEnd:F", ordinal = 0, opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     private void setupFogEnd(FogData fogData, Entity entity, BlockPos blockPos, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (LegacyOptions.overrideTerrainFogStart.get())
+        if (LegacyOptions.overrideTerrainFogEnd.get())
             fogData.environmentalEnd = LegacyOptions.terrainFogEnd.get().floatValue() * 16;
     }
+
+    @Inject(method = "setupFog", at = @At("TAIL"))
+    private void setupCloudFogOptions(FogData fogData, Entity entity, BlockPos blockPos, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (LegacyCloudAtmosphere.areLceCloudsEnabled()) {
+            fogData.cloudEnd = LegacyCloudAtmosphere.getCloudFogEndBlocks(fogData.environmentalEnd);
+        }
+    }
+
 }
