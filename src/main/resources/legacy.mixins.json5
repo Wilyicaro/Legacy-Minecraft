@@ -62,6 +62,7 @@
     "client.container.ContainerScreenMixin",
     "client.crafting.CraftingScreenMixin",
     "client.create_world.CreateWorldScreenMixin",
+    "client.create_world.LoadingMixin",
     "client.CyclingSlotBackgroundMixin",
     "client.CustomHeadLayerMixin",
     "client.DeathScreenMixin",

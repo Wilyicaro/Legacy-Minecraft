@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.CreateWorldLoadingTracker;
 import wily.legacy.client.screen.LegacyLoading;
 import wily.legacy.util.LegacyComponents;
 
@@ -48,6 +49,12 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             }
             if (self() instanceof ConnectScreen p) {
                 lastLoadingHeader = p.status;
+            }
+            if (CreateWorldLoadingTracker.isActive()) {
+                CreateWorldLoadingTracker.State state = self() instanceof LevelLoadingScreen ? CreateWorldLoadingTracker.loading(lastLoadingHeader, lastLoadingStage, progress) : CreateWorldLoadingTracker.preparing(lastLoadingHeader, lastLoadingStage, progress);
+                lastLoadingHeader = state.header();
+                lastLoadingStage = state.stage();
+                progress = state.progress();
             }
             getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), lastLoadingHeader, lastLoadingStage, progress, genericLoading);
             getLoadingRenderer().render(guiGraphics, i, j, f);

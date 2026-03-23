@@ -33,6 +33,7 @@ import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.screen.CreateWorldLoadingTracker;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -103,6 +104,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Override
     public void added() {
         super.added();
+        CreateWorldLoadingTracker.reset();
         OptionsScreen.setupSelectorControlTooltips(ControlTooltip.Renderer.of(this), this);
     }
 
@@ -130,7 +132,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         });
 
         addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
-        addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
+        addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> {
+            if (LegacyOptions.legacySettingsMenus.get() && LegacyOptions.legacyLoadingAndConnecting.get()) CreateWorldLoadingTracker.start();
+            this.onCreate();
+        }).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
             if (LegacyOptions.legacySettingsMenus.get()) {
                 if (button.selected) publishScreen.setGameType(uiState.getGameMode().gameType);

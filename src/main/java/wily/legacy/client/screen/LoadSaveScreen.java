@@ -234,6 +234,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             }
         });
         LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
+        if (LegacyOptions.legacySettingsMenus.get() && LegacyOptions.legacyLoadingAndConnecting.get()) {
+            CreateWorldLoadingTracker.startLoadingOnly();
+        }
         loadWorld(this, minecraft, LegacySaveCache.getLevelStorageSource(), summary);
         Legacy4JClient.serverPlayerJoinConsumer = s -> {
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
