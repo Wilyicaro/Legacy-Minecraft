@@ -53,6 +53,12 @@ public class PublishScreen extends ConfirmationScreen {
         return Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
     }
 
+    public static Tooltip getPublishTooltip() {
+        return Tooltip.create(Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost()
+                ? "legacy.menu.online.description"
+                : "menu.shareToLan.description"));
+    }
+
     public static Pair<Integer, Component> tryParsePort(String string) {
         if (string.isBlank())
             return Pair.of(HttpUtil.getAvailablePort(), null);

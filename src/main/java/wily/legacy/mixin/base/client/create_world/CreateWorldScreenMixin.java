@@ -131,7 +131,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
         addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
-        onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, button -> {
+        onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
             if (button.selected) publishScreen.setGameType(uiState.getGameMode().gameType);
             publishScreen.publish = button.selected;
         }, () -> publishScreen.publish)));
