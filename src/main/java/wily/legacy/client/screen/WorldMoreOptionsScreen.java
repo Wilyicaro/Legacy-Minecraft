@@ -123,7 +123,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
         renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
                 b -> b.getDefaultMessage(Component.translatable("legacy.menu.selectWorld.biome_scale"), getLegacyBiomeScaleName(b.getObjectValue())),
-                b -> null,
+                b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.biome_scale.description")),
                 biomeScale.get(),
                 () -> LEGACY_BIOME_SCALE_PRESETS,
                 b -> {
