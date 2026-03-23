@@ -332,7 +332,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 RenderableVListScreen.openScreenButton(LegacyComponents.RESET_KNOWN_ENTITIES_TITLE, () -> ConfirmationScreen.createResetKnownListingScreen(o, LegacyComponents.RESET_KNOWN_ENTITIES_TITLE, LegacyComponents.RESET_KNOWN_ENTITIES_MESSAGE, Legacy4JClient.knownEntities)).build()))));
         public static final Section AUDIO = add(new Section(
                 Component.translatable("legacy.menu.audio"),
-                s -> Panel.centered(s, 250, 88, 0, -30),
+                s -> Panel.centered(s, 250, 88, 0, -12),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.of(mc.options.getSoundSourceOptionInstance(SoundSource.MUSIC)),
@@ -356,7 +356,9 @@ public class OptionsScreen extends PanelVListScreen {
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
                 s -> LegacyOptions.legacySettingsMenus.get()
-                        ? Panel.createPanel(s, p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(96, true)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) - 30))
+                        ? Panel.createPanel(s,
+                                p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(96, true)),
+                                p -> p.pos(p.centeredLeftPos(s), (s.height - 88) / 2 - 30))
                         : Panel.centered(s, 250, 222, 0, 24),
                 new ArrayList<>(List.of(
                         o -> {
