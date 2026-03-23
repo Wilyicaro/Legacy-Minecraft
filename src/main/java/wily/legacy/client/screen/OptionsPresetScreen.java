@@ -25,6 +25,10 @@ public class OptionsPresetScreen extends ConfirmationScreen {
     public OptionsPresetScreen(Screen parent, OptionsPreset preset) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 130 : 175, Component.translatable("legacy.menu.options_preset", preset.nameOrEmpty()), LegacyComponents.OPTIONS_PRESET_MESSAGE, screen -> {
             ((OptionsPresetScreen)screen).preset.applyAndSave();
+            if (screen.parent instanceof OptionsScreen optionsScreen) {
+                optionsScreen.updateWidgets(true);
+                optionsScreen.updateWidgetMessages();
+            }
             screen.onClose();
         });
         renderableVLists.add(renderableVList);
