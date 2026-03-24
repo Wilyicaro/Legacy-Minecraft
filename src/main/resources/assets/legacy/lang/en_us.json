@@ -1785,6 +1785,7 @@
   "legacy.options.displayMultipleControlsFromAction": "Display Multiple Controls From Action",
   "legacy.options.displayNameTagBorder": "Display Name Tag Border",
   "legacy.options.displayRealmsButton": "Display Realms Button",
+  "legacy.options.hideExperimentalWorldWarning": "Hide Experimental World Warning",
   "legacy.options.enhancedItemTranslucency": "Enhanced Item Translucency",
   "legacy.options.enhancedPistonMovingRenderer": "Enhanced Piston Moving Renderer",
   "legacy.options.fakeAutosaveScreen": "Fake Autosave Screen",

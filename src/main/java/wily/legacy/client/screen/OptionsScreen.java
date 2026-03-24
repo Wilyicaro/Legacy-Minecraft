@@ -656,6 +656,7 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.legacyLoadingAndConnecting,
                                     LegacyOptions.legacyPanorama,
                                     LegacyOptions.displayRealmsButton,
+                                    LegacyOptions.hideExperimentalWorldWarning,
                                     LegacyOptions.fakeAutosaveScreen,
                                     LegacyOptions.fakeManualSaveScreen);
                         },
