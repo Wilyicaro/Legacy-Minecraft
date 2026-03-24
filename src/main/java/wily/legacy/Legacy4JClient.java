@@ -43,6 +43,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -233,6 +234,11 @@ public class Legacy4JClient {
                 }
             };
         } else if (screen instanceof BackupConfirmScreen s) {
+            if (LegacyOptions.hideExperimentalWorldWarning.get() && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+                Minecraft minecraft = Minecraft.getInstance();
+                minecraft.execute(() -> BackupConfirmScreenAccessor.of(s).proceed(false, false));
+                return minecraft.screen;
+            }
             return new ConfirmationScreen(Minecraft.getInstance().screen, ConfirmationScreen::getPanelWidth, () -> (LegacyOptions.getUIMode().isSD() ? 94 : 141) + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? LegacyOptions.getUIMode().isSD() ? 11 : 14 : 0), s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription(), LegacyScreen::onClose) {
                 boolean eraseCache = false;
 
@@ -251,6 +257,19 @@ public class Legacy4JClient {
             };
         }
         return screen;
+    }
+
+    private static boolean isExperimentalWorldWarning(Component... components) {
+        for (Component component : components) {
+            if (component == null) continue;
+            if (component.getContents() instanceof TranslatableContents contents) {
+                String key = contents.getKey().toLowerCase(Locale.ROOT);
+                if (key.contains("experimental") || key.contains("datapack") || key.contains("data_pack") || key.contains("dataPack")) return true;
+            }
+            String text = component.getString().toLowerCase(Locale.ROOT);
+            if (text.contains("experimental") || text.contains("data pack")) return true;
+        }
+        return false;
     }
 
     public static void preTick(Minecraft minecraft) {

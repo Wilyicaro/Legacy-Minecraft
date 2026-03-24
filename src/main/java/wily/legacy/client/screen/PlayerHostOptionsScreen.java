@@ -12,6 +12,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerHostOptionsPayload;
@@ -84,5 +85,11 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
         panel.render(guiGraphics, i, j, f);
         HostOptionsScreen.drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, panel.x + 7, panel.y + 5);
         guiGraphics.drawString(font, playerInfo.getProfile().name(), panel.x + 31, panel.y + 12, CommonColor.GRAY_TEXT.get(), false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
     }
 }

@@ -69,10 +69,19 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider = new LegacySliderButton<>(0, 0, 220, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), summary.getSettings().gameType(), () -> GAME_TYPES, b -> {});
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
-        onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> null, button -> {
-            if (button.selected) minecraft.setScreen(publishScreen);
-            button.selected = publishScreen.publish = false;
-        });
+        onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
+            if (LegacyOptions.legacySettingsMenus.get()) {
+                if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
+                publishScreen.publish = button.selected;
+                return;
+            }
+            if (!button.selected) {
+                publishScreen.publish = false;
+                return;
+            }
+            publishScreen.setGameType(gameTypeSlider.getObjectValue());
+            minecraft.setScreen(publishScreen);
+        }, () -> publishScreen.publish);
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
         (resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220, 45, !LegacyRenderUtil.hasTooltipBoxes(accessor), LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
@@ -225,6 +234,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             }
         });
         LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
+        if (LegacyOptions.legacySettingsMenus.get() && LegacyOptions.legacyLoadingAndConnecting.get()) {
+            CreateWorldLoadingTracker.startLoadingOnly();
+        }
         loadWorld(this, minecraft, LegacySaveCache.getLevelStorageSource(), summary);
         Legacy4JClient.serverPlayerJoinConsumer = s -> {
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
@@ -233,6 +245,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
             applyGameRules.accept(server.getGameRules(), minecraft.getSingleplayerServer());
+            publishScreen.setGameType(gameTypeSlider.getObjectValue());
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             server.getPlayerList().sendPlayerPermissionLevel(s);
@@ -274,7 +287,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        onlineTickBox.updateValue();
         super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
         if (LegacyRenderUtil.isMouseOver(i, j, panel.x + 14.5, panel.y + 10, 29, 29))
             guiGraphics.setTooltipForNextFrame(font, Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)), i, j);
     }
