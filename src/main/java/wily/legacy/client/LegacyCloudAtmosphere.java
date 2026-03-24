@@ -16,9 +16,9 @@ public final class LegacyCloudAtmosphere {
     private static final float TWO_PI = 6.2831855f;
     private static final float SUNRISE_SPAN = 0.4f;
     private static final int SUNRISE_DARK = 0xFFB23333;
-    private static final int SUNRISE_BRIGHT = 0xFFFFE533;
+    private static final int SUNRISE_BRIGHT = 0xFFFFFF7A;
     private static final int DEFAULT_FOG_COLOR = 0xFFC0D8FF;
-    private static final float SUNRISE_CLOUD_TINT_STRENGTH = 0.55f;
+    private static final float SUNRISE_CLOUD_TINT_STRENGTH = 1.25f;
     private static final float SUNRISE_FOG_TINT_STRENGTH = 1.35f;
 
     private LegacyCloudAtmosphere() {
@@ -33,11 +33,24 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static int getCloudDrawDistanceBlocks() {
-        return Math.max(64, Legacy4JClient.getEffectiveRenderDistance() * 16);
+        return Math.max(64, (Legacy4JClient.getEffectiveRenderDistance() + 16) * 16);
     }
 
     public static float getCloudFogEndBlocks(float environmentalEnd) {
         return Math.max(environmentalEnd, getCloudDrawDistanceBlocks());
+    }
+
+    public static float getSunriseFogThicknessBlend(ClientLevel level, float partialTick) {
+        if (!shouldUseConsoleAtmosphere(level)) {
+            return 0.0f;
+        }
+
+        int sunriseColor = getSunriseColor(level.getTimeOfDay(partialTick));
+        if (sunriseColor == 0) {
+            return 0.0f;
+        }
+
+        return Mth.clamp(Mth.sqrt(ARGB.alphaFloat(sunriseColor)) * 0.85f, 0.0f, 1.0f);
     }
 
     public static boolean shouldUseConsoleAtmosphere(ClientLevel level) {
@@ -49,11 +62,7 @@ public final class LegacyCloudAtmosphere {
             return false;
         }
 
-        if (getSunriseColor(level.getTimeOfDay(partialTick)) == 0) {
-            return false;
-        }
-
-        return getSunriseViewBlend(level, partialTick) > 0.05f;
+        return getSunriseCloudBlend(level, partialTick) > 0.02f;
     }
 
     public static int getSkyColor(ClientLevel level, Vec3 position, float partialTick) {
@@ -148,15 +157,15 @@ public final class LegacyCloudAtmosphere {
             return baseCloudColor;
         }
 
-        float viewBlend = getSunriseViewBlend(level, partialTick);
-        if (viewBlend <= 0.0f) {
+        float blend = getSunriseCloudBlend(level, partialTick);
+        if (blend <= 0.0f) {
             return baseCloudColor;
         }
 
-        float blend = ARGB.alphaFloat(sunriseColor) * SUNRISE_CLOUD_TINT_STRENGTH * viewBlend;
-        float red = Mth.lerp(blend, ARGB.redFloat(baseCloudColor), ARGB.redFloat(sunriseColor));
-        float green = Mth.lerp(blend, ARGB.greenFloat(baseCloudColor), ARGB.greenFloat(sunriseColor));
-        float blue = Mth.lerp(blend, ARGB.blueFloat(baseCloudColor), ARGB.blueFloat(sunriseColor));
+        float tintBlend = Mth.clamp(blend * SUNRISE_CLOUD_TINT_STRENGTH, 0.0f, 1.0f);
+        float red = Mth.lerp(tintBlend, ARGB.redFloat(baseCloudColor), ARGB.redFloat(sunriseColor));
+        float green = Mth.lerp(tintBlend, ARGB.greenFloat(baseCloudColor), ARGB.greenFloat(sunriseColor));
+        float blue = Mth.lerp(tintBlend, ARGB.blueFloat(baseCloudColor), ARGB.blueFloat(sunriseColor));
         return ARGB.colorFromFloat(1.0f, red, green, blue);
     }
 
@@ -191,6 +200,17 @@ public final class LegacyCloudAtmosphere {
         return 1.0f - (float) Math.pow(normalizedDistance, 0.25d);
     }
 
+    private static float getSunriseCloudBlend(ClientLevel level, float partialTick) {
+        int sunriseColor = getSunriseColor(level.getTimeOfDay(partialTick));
+        if (sunriseColor == 0) {
+            return 0.0f;
+        }
+
+        float timeWeight = Mth.clamp(Mth.sqrt(ARGB.alphaFloat(sunriseColor)) * 0.95f, 0.0f, 1.0f);
+        float directionalWeight = Mth.sqrt(getSunriseViewBlend(level, partialTick));
+        return Mth.clamp(timeWeight * (0.32f + directionalWeight * 0.68f), 0.0f, 1.0f);
+    }
+
     private static float getSunriseViewBlend(ClientLevel level, float partialTick) {
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         if (camera == null) {
@@ -210,16 +230,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     private static float getSunriseFogBlend(ClientLevel level, Camera camera, float partialTick, int sunriseColor) {
-        Vector3f look = camera.getLookVector();
-        double horizontalLength = Math.sqrt(look.x() * look.x() + look.z() * look.z());
-        if (horizontalLength < 1.0e-4d) {
-            return 0.0f;
-        }
-
-        float sunriseDirection = Mth.sin(level.getSunAngle(partialTick)) > 0.0f ? -1.0f : 1.0f;
-        float horizontalFacing = Mth.clamp((float) ((look.x() / horizontalLength) * sunriseDirection), 0.0f, 1.0f);
-        float horizonWeight = Mth.clamp((float) (1.0d - Math.abs(look.y()) * 1.1d), 0.0f, 1.0f);
         float timeWeight = Mth.sqrt(ARGB.alphaFloat(sunriseColor));
-        return Mth.clamp(timeWeight * SUNRISE_FOG_TINT_STRENGTH * Mth.sqrt(horizontalFacing) * horizonWeight, 0.0f, 1.0f);
+        return Mth.clamp(timeWeight * SUNRISE_FOG_TINT_STRENGTH, 0.0f, 1.0f);
     }
 }
