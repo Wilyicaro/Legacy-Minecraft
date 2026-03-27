@@ -58,7 +58,7 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
 - AzaleaCatgirl99 and ItzJustAPlayer for helping with the PlayStation® 5 Control Icons
 - NicSonic-_- for providing the Stadia Control Icons
 - Cjnator38 for providing the LE default font converted to JE, and the 1.21.x credits background, and helping with the 1.21.6 port
-- Cjanator38 and NicSonic for making HD Control Icons for Xbox 360, Playstation 5, Switch and Stadia
+- Cjnator38 and NicSonic for making HD Control Icons for Xbox 360, Playstation 5, Switch and Stadia
 - Androser for contributing to the controller bindings
 - pizzart for contributing with some QOL and accuracy changes
 - Nabouna32 for contributing with option tooltips and controller LED RGB options
