@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-The Legacy4J repo has some small com
+The Legacy4J repo has some small contribution requirements
 
 ### Commit Tagging
 Please adhere to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) handbook for writing your commits.
