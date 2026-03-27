@@ -1,4 +1,4 @@
-name: Bug/Glitch Report
+name: Bug Report
 title: "[Bug/Glitch]"
 description: "General template for Bugs and Glitches report"
 labels: bug
@@ -11,17 +11,17 @@ body:
     id: mod-version
     attributes:
       label: "Legacy4J Version"
-      description: "The specific used mod version"
-      placeholder: "Example 1.20.6-1.7"
+      description: "The specific mod version"
+      placeholder: "Example: 1.21.10-1.8.7"
     validations:
       required: true
   - type: input
     id: mod-loader-version
     attributes:
       label: Mod Loader Version
-      placeholder: "Example: NeoForge 20.6.98-beta or Fabric Loader 0.14.21"
+      placeholder: "Example: NeoForge 21.10.64 or Fabric Loader 0.18.5"
     validations:
-      required: false
+      required: true
  
   - type: markdown
     attributes:
@@ -30,7 +30,7 @@ body:
   - type: textarea
     id: bug-context
     attributes:
-      label: Bug/Glitch Occurrence Context
+      label: Context of the bug
     validations:
       required: true
   
@@ -38,13 +38,13 @@ body:
     id: crash-report
     attributes:
       label: Crash Report
-      description: "Paste here the link(Ex: Pastebin or mclo.gs) or the specific part of the issue if you are sure"
+      description: "Paste the link of your log here, using an applicable site (ie: mclo.gs). If you are not sure, mark N/A"
     validations:
-      required: false
+      required: true
 
   - type: textarea
-    id: whw
+    id: www
     attributes:
-      label: What happened wrong?
+      label: What went wrong?
     validations:
       required: true
