@@ -292,6 +292,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         return Tooltip.create(Component.translatable("legacy.menu.load_save.reset_" + (Level.NETHER.equals(dimension) ? "nether" : "end") + ".description"));
     }
 
+    private boolean shouldUseExpandedResetDimensionTooltip(Component message) {
+        return message != null && LegacyOptions.legacySettingsMenus.get() && (message.equals(Component.translatable("legacy.menu.load_save.reset_nether.description")) || message.equals(Component.translatable("legacy.menu.load_save.reset_end.description")));
+    }
+
     private void setWorldPreset(CreateWorldScreen parent, ResourceKey<WorldPreset> presetKey) {
         findWorldTypeEntry(parent, presetKey).ifPresent(parent.getUiState()::setWorldType);
     }
@@ -484,18 +488,28 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
             MultiLineLabel label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
 
-            int lineHeight = sd ? 8 : compactLegacyTooltip ? 9 : 12;
+            int lineHeight = sd ? 8 : 12;
+            boolean expandedResetDimensionTooltip = !sd && message != null && shouldUseExpandedResetDimensionTooltip(message);
+            if (expandedResetDimensionTooltip) {
+                tooltipContentPadding = Math.max(24, tooltipContentPadding - lineHeight);
+            }
 
             scrollableRenderer.lineHeight = lineHeight;
 
             if (label == null)
                 scrollableRenderer.resetScrolled();
-            else
+            else if (expandedResetDimensionTooltip) {
+                scrollableRenderer.resetScrolled();
+                scrollableRenderer.scrolled.max = 0;
+            } else
                 scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - (tooltipBox.getHeight() - tooltipContentPadding) / lineHeight);
 
             tooltipBox.render(guiGraphics, i, j, f);
             if (label != null) {
-                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - tooltipContentPadding, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF));
+                int tooltipX = panel.x + panel.width + 3;
+                int tooltipY = panel.y + 13;
+                int tooltipWidth = tooltipBox.width - 10;
+                scrollableRenderer.render(guiGraphics, tooltipX, tooltipY, tooltipWidth, tooltipBox.getHeight() - tooltipContentPadding, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, tooltipX, tooltipY, lineHeight, true, 0xFFFFFFFF));
             }
         }
     }
