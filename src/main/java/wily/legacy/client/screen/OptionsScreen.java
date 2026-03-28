@@ -40,7 +40,6 @@ import static wily.legacy.client.screen.ControlTooltip.getKeyIcon;
 
 public class OptionsScreen extends PanelVListScreen {
     public Screen advancedOptionsScreen;
-    private OptionHolder<OptionsPreset> lastOptionsPreset = LegacyOptions.optionsPreset.get();
 
     public OptionsScreen(Screen parent, Panel.Constructor<OptionsScreen> panelConstructor, Component component) {
         super(parent, panelConstructor.cast(), component);
@@ -111,25 +110,6 @@ public class OptionsScreen extends PanelVListScreen {
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
         if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (watchesOptionsPresetChanges()) maybeShowOptionsPresetWarning();
-    }
-
-    protected boolean watchesOptionsPresetChanges() {
-        return false;
-    }
-
-    protected void maybeShowOptionsPresetWarning() {
-        OptionHolder<OptionsPreset> currentPreset = LegacyOptions.optionsPreset.get();
-        if (currentPreset.equals(lastOptionsPreset)) return;
-        lastOptionsPreset = currentPreset;
-        if (!currentPreset.isNone() && !currentPreset.get().isApplied()) {
-            minecraft.setScreen(new OptionsPresetScreen(this, currentPreset.get()));
-        }
     }
 
     protected int getLegacyPanelHeight(int baseHeight, boolean shrinkOnly) {
@@ -420,14 +400,9 @@ public class OptionsScreen extends PanelVListScreen {
                             if (!LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
                                     LegacyOptions.of(mc.options.gamma()),
                                     LegacyOptions.of(mc.options.ambientOcclusion()));
-                        })),
+        })),
                 () -> Section.ADVANCED_GRAPHICS, (p, s) -> {
             if (LegacyOptions.legacySettingsMenus.get()) return new OptionsScreen(p, s) {
-                @Override
-                protected boolean watchesOptionsPresetChanges() {
-                    return true;
-                }
-
                 @Override
                 public void onClose() {
                     super.onClose();
@@ -439,11 +414,6 @@ public class OptionsScreen extends PanelVListScreen {
             OptionsScreen screen = new OptionsScreen(p, s) {
                 int selectorTooltipVisibility = 0;
                 boolean finishedAnimation = false;
-
-                @Override
-                protected boolean watchesOptionsPresetChanges() {
-                    return true;
-                }
 
                 @Override
                 public void onClose() {
@@ -564,12 +534,7 @@ public class OptionsScreen extends PanelVListScreen {
                 ArbitrarySupplier.empty(),
                 (p, section) -> {
                     if (!LegacyOptions.legacySettingsMenus.get()) return new OptionsScreen(p, section);
-                    return new OptionsScreen(p, section) {
-                        @Override
-                        protected boolean watchesOptionsPresetChanges() {
-                            return true;
-                        }
-                    };
+                    return new OptionsScreen(p, section);
                 });
         public static final Section USER_INTERFACE = add(new Section(
                 Component.translatable("legacy.menu.user_interface"),
