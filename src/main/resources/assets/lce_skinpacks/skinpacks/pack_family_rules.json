@@ -1,0 +1,778 @@
+{
+  "birthday": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:birthday_1"
+    ],
+    "aliases": [
+      "1st Birthday",
+      "birthday1",
+      "birthday_1"
+    ]
+  },
+  "birthday2": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:birthday_2"
+    ],
+    "bedrock_skins": [
+      "2ndbdaypsretro"
+    ],
+    "aliases": [
+      "2nd Birthday",
+      "birthday2",
+      "birthday_2",
+      "2nd-birthday-skin-pack-playstation",
+      "2ndbdaypsretro"
+    ]
+  },
+  "birthday3": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:birthday_3"
+    ],
+    "aliases": [
+      "3rd Birthday",
+      "birthday3",
+      "birthday_3"
+    ]
+  },
+  "birthday4": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:birthday_4"
+    ],
+    "aliases": [
+      "4th Birthday",
+      "birthday4",
+      "birthday_4"
+    ]
+  },
+  "birthday5": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:birthday_5"
+    ],
+    "aliases": [
+      "5th Birthday",
+      "birthday5",
+      "birthday_5"
+    ]
+  },
+  "adventuretime": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:adventure_time"
+    ],
+    "bedrock_skins": [
+      "adventure_time"
+    ],
+    "aliases": [
+      "Adventure Time",
+      "adventure_time",
+      "adventure-time-mash-up"
+    ]
+  },
+  "battleandbeasts": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:battle_beasts_1"
+    ],
+    "aliases": [
+      "Battle & the Beasts",
+      "battle_beasts_1",
+      "battle beasts 1"
+    ]
+  },
+  "battleandthebeasts2": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:battle_beasts_2"
+    ],
+    "aliases": [
+      "Battle & the Beasts 2",
+      "battle_beasts_2",
+      "battle beasts 2"
+    ]
+  },
+  "biomesettlers": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:biome_settlers_1"
+    ],
+    "aliases": [
+      "Biome Settlers 1",
+      "biome_settlers_1"
+    ]
+  },
+  "biomesettlers2": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:biome_settlers_2"
+    ],
+    "aliases": [
+      "Biome Settlers 2",
+      "biome_settlers_2"
+    ]
+  },
+  "campfiretales": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:campfire_tales"
+    ],
+    "aliases": [
+      "Campfire Tales",
+      "campfire_tales"
+    ]
+  },
+  "chinesemythology": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "ChineseMythology"
+    ],
+    "aliases": [
+      "Chinese Mythology",
+      "chinese-mythology-mash-up",
+      "ChineseMythology"
+    ]
+  },
+  "avengers": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:avengers"
+    ],
+    "bedrock_skins": [
+      "MarvelAvengers"
+    ],
+    "aliases": [
+      "Avengers",
+      "Marvel Avengers",
+      "Marvel Avengers Skin Pack",
+      "Marvel's Avengers Skin Pack",
+      "marvel-avengers-skin-pack"
+    ]
+  },
+  "marvel_guardians_of_the_galaxy": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:gotg"
+    ],
+    "bedrock_skins": [
+      "MarvelGuardiansOfTheGalaxy"
+    ],
+    "aliases": [
+      "Marvel Guardians of the Galaxy",
+      "Marvel Guardians of the Galaxy Skin Pack",
+      "marvel-guardians-of-the-galaxy-skin-pack"
+    ]
+  },
+  "marvel_spiderman": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:spiderman"
+    ],
+    "bedrock_skins": [
+      "MarvelSpiderMan"
+    ],
+    "aliases": [
+      "Marvel Spider-Man",
+      "Marvel Spider-Man Skin Pack",
+      "marvel-spider-man-skin-pack"
+    ]
+  },
+  "doctor_who_volume_1": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "drwhoi"
+    ],
+    "aliases": [
+      "Doctor Who Vol 1",
+      "Doctor Who Skins Volume I",
+      "doctor-who-skins-volume-i"
+    ]
+  },
+  "doctor_who_volume_2": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "drwhoii"
+    ],
+    "aliases": [
+      "Doctor Who Vol 2",
+      "Doctor Who Skins Volume II",
+      "doctor-who-skins-volume-ii"
+    ]
+  },
+  "egyptianmythology": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:egyptian_mythology"
+    ],
+    "bedrock_skins": [
+      "EgyptianMythology"
+    ],
+    "aliases": [
+      "Egyptian Mythology",
+      "egyptian-mythology-mash-up",
+      "EgyptianMythology"
+    ]
+  },
+  "finalfantasyxv": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:final_fantasy"
+    ],
+    "bedrock_skins": [
+      "FINALFANTASYXVSkinPack"
+    ],
+    "aliases": [
+      "Final Fantasy XV",
+      "FINAL FANTASY XV Skin Pack",
+      "final-fantasy-xv-skin-pack"
+    ]
+  },
+  "fallout": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:fallout"
+    ],
+    "bedrock_skins": [
+      "Fallout"
+    ],
+    "aliases": [
+      "Fallout",
+      "fallout-mash-up"
+    ]
+  },
+  "festivemashup": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "festive_mashup"
+    ],
+    "aliases": [
+      "Festive Mashup",
+      "Festive Mash-up",
+      "festive-mashup",
+      "festive_mashup"
+    ]
+  },
+  "festive": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:festive_pack"
+    ],
+    "bedrock_skins": [
+      "festive_skin_pack"
+    ],
+    "aliases": [
+      "Festive",
+      "Festive Skin Pack",
+      "festive_pack",
+      "festive-skin-pack",
+      "festive_skin_pack"
+    ]
+  },
+  "halloween2015": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "MashUpHalloween"
+    ],
+    "aliases": [
+      "Halloween 2015",
+      "Halloween Mash-up",
+      "halloween-mash-up"
+    ]
+  },
+  "halloween_charity": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:halloween_charity"
+    ],
+    "bedrock_skins": [
+      "hcharity"
+    ],
+    "aliases": [
+      "Halloween Charity",
+      "Halloween Charity Skin Pack",
+      "halloween-charity-skin-pack",
+      "hcharity"
+    ]
+  },
+  "halo": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:msc"
+    ],
+    "bedrock_skins": [
+      "MashUpHalo"
+    ],
+    "aliases": [
+      "Halo",
+      "Halo Mash-up",
+      "halo-mash-up",
+      "MashUpHalo"
+    ]
+  },
+  "minecon2015": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "Minecon2015"
+    ],
+    "aliases": [
+      "Minecon 2015",
+      "Minecon 2015 Skin Pack",
+      "minecon-2015-skin-pack"
+    ]
+  },
+  "minecon2016": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "Minecon2016"
+    ],
+    "aliases": [
+      "Minecon 2016",
+      "Minecon 2016 Skin Pack",
+      "minecon-2016-skin-pack"
+    ]
+  },
+  "minecon2017": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "MINECONEarth2017"
+    ],
+    "aliases": [
+      "Minecon Earth 2017",
+      "Minecon Earth 2017 Skin Pack",
+      "minecon-earth-2017-skin-pack"
+    ]
+  },
+  "littlebigplanet": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:little_big_planet"
+    ],
+    "bedrock_skins": [
+      "LittleBigPlanetMash-Up"
+    ],
+    "aliases": [
+      "LittleBigPlanet",
+      "LittleBigPlanet TM",
+      "littlebigplanet-mash-up",
+      "LittleBigPlanetMash-Up"
+    ]
+  },
+  "magic_the_gathering": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:magic"
+    ],
+    "bedrock_skins": [
+      "MagicTheGathering"
+    ],
+    "aliases": [
+      "Magic the Gathering",
+      "Magic: The Gathering",
+      "magic-the-gathering-skin-pack"
+    ]
+  },
+  "mass_effect": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:mass_effect"
+    ],
+    "bedrock_skins": [
+      "MassEffect"
+    ],
+    "aliases": [
+      "Mass Effect",
+      "mass-effect-mash-up"
+    ]
+  },
+  "mini_game_heroes": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:mgh"
+    ],
+    "bedrock_skins": [
+      "MiniGameHeroes"
+    ],
+    "aliases": [
+      "Mini Game Heroes",
+      "mini-game-heroes-skin-pack"
+    ]
+  },
+  "mini_game_masters": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:mgm"
+    ],
+    "bedrock_skins": [
+      "MiniGameMasters"
+    ],
+    "aliases": [
+      "Mini Game Masters",
+      "mini-game-masters-skin-pack"
+    ]
+  },
+  "moanna": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "MoanaCharacterPack"
+    ],
+    "aliases": [
+      "Moana",
+      "Moana Character Pack",
+      "moana-character-pack"
+    ]
+  },
+  "norsemythology": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "NorseMythology"
+    ],
+    "aliases": [
+      "Norse Mythology",
+      "norse-mythology-mash-up",
+      "NorseMythology"
+    ]
+  },
+  "pirates_of_the_caribbean": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:potc"
+    ],
+    "bedrock_skins": [
+      "PiratesOfTheCaribbean"
+    ],
+    "aliases": [
+      "Pirates of the Caribbean",
+      "pirates-of-the-caribbean"
+    ]
+  },
+  "power_rangers": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:power_rangers"
+    ],
+    "bedrock_skins": [
+      "PowerRangers"
+    ],
+    "aliases": [
+      "Power Rangers",
+      "power-rangers"
+    ]
+  },
+  "skinpack1": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:sp1"
+    ],
+    "bedrock_skins": [
+      "skinpack1",
+      "skinpack1ps"
+    ],
+    "aliases": [
+      "Skin Pack 1",
+      "sp1",
+      "skin-pack-1",
+      "skin-pack-1-playstation",
+      "skin_pack_1"
+    ]
+  },
+  "skinpack2": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:sp2"
+    ],
+    "bedrock_skins": [
+      "skinpack2",
+      "skinpack2ps"
+    ],
+    "aliases": [
+      "Skin Pack 2",
+      "sp2",
+      "skin-pack-2",
+      "skin-pack-2-playstation",
+      "skin_pack_2"
+    ]
+  },
+  "skinpack3": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:sp3"
+    ],
+    "bedrock_skins": [
+      "skinpack3",
+      "SkinPack3PS"
+    ],
+    "aliases": [
+      "Skin Pack 3",
+      "sp3",
+      "skin-pack-3",
+      "skin-pack-3-playstation",
+      "skin_pack_3"
+    ]
+  },
+  "skinpack4": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:sp4"
+    ],
+    "bedrock_skins": [
+      "skinpack4"
+    ],
+    "aliases": [
+      "Skin Pack 4",
+      "sp4",
+      "skin-pack-4",
+      "skin_pack_4"
+    ]
+  },
+  "skinpack5": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:sp5"
+    ],
+    "bedrock_skins": [
+      "skinpack5"
+    ],
+    "aliases": [
+      "Skin Pack 5",
+      "sp5",
+      "skin-pack-5",
+      "skin_pack_5"
+    ]
+  },
+  "skinpack6": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:sp6"
+    ],
+    "bedrock_skins": [
+      "skinpack6"
+    ],
+    "aliases": [
+      "Skin Pack 6",
+      "sp6",
+      "skin-pack-6",
+      "skin_pack_6"
+    ]
+  },
+  "star_wars_story": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:star_wars_solo"
+    ],
+    "bedrock_skins": [
+      "SoloAStarWarsStoryPack"
+    ],
+    "aliases": [
+      "Star Wars Story",
+      "Solo: A Star Wars Story Pack",
+      "solo-a-star-wars-story-pack"
+    ]
+  },
+  "starwarsclassic": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:star_wars_classic"
+    ],
+    "bedrock_skins": [
+      "StarWarsClassic"
+    ],
+    "aliases": [
+      "Star Wars Classic",
+      "Star Wars Classic Skin Pack",
+      "star-wars-classic-skin-pack"
+    ]
+  },
+  "star_wars_prequel": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:star_wars_prequel"
+    ],
+    "bedrock_skins": [
+      "StarWarsPrequel"
+    ],
+    "aliases": [
+      "Star Wars Prequel",
+      "Star Wars Prequel Skin Pack",
+      "star-wars-prequel-skin-pack"
+    ]
+  },
+  "star_wars_rebels": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:star_wars_rebels"
+    ],
+    "bedrock_skins": [
+      "StarWarsRebels"
+    ],
+    "aliases": [
+      "Star Wars Rebels",
+      "Star Wars Rebels Skin Pack",
+      "star-wars-rebels-skin-pack"
+    ]
+  },
+  "star_wars_sequel": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:star_wars_sequel"
+    ],
+    "bedrock_skins": [
+      "StarWarsSequelSkinPack"
+    ],
+    "aliases": [
+      "Star Wars Sequel",
+      "Star Wars Sequel Skin Pack",
+      "star-wars-sequel-skin-pack"
+    ]
+  },
+  "storymode": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:mc_storymode"
+    ],
+    "aliases": [
+      "Story Mode",
+      "mc_storymode",
+      "Minecraft Story Mode"
+    ]
+  },
+  "stranger_things": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:strangerthings"
+    ],
+    "bedrock_skins": [
+      "StrangerThings"
+    ],
+    "aliases": [
+      "Stranger Things",
+      "stranger-things-skin-pack"
+    ]
+  },
+  "summer_of_arcade": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:summer_of_arcade"
+    ],
+    "bedrock_skins": [
+      "soa"
+    ],
+    "aliases": [
+      "Summer of Arcade",
+      "Summer of Arcade Skin Pack",
+      "summer-of-arcade-skin-pack",
+      "soa"
+    ]
+  },
+  "super_mario": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:smb"
+    ],
+    "bedrock_skins": [
+      "SuperMarioBrothers"
+    ],
+    "aliases": [
+      "Super Mario",
+      "Mario Mash-up",
+      "mario-mash-up",
+      "SuperMarioBrothers"
+    ]
+  },
+  "supercuteskins": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "supercute"
+    ],
+    "aliases": [
+      "Super Cute Pack",
+      "Super Cute Skin Pack",
+      "super-cute-skin-pack",
+      "supercute"
+    ]
+  },
+  "skyrim": {
+    "preferred_source": "box_model",
+    "bedrock_skins": [
+      "Skyrim"
+    ],
+    "aliases": [
+      "The Elder Scrolls V",
+      "The Elder Scrolls V: Skyrim",
+      "Skyrim Mash-up",
+      "skyrim-mash-up"
+    ]
+  },
+  "the_incredibles": {
+    "preferred_source": "legacy_skins",
+    "legacy_skins": [
+      "legacy_skinpacks:inc"
+    ],
+    "bedrock_skins": [
+      "the_incredibles"
+    ],
+    "aliases": [
+      "Incredibles Skin Pack",
+      "The Incredibles Skin Pack",
+      "the-incredibles-skin-pack"
+    ]
+  },
+  "the_simpsons": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:simpsons"
+    ],
+    "bedrock_skins": [
+      "Simpsons"
+    ],
+    "aliases": [
+      "The Simpsons",
+      "The Simpsons Skin Pack",
+      "the-simpsons-skin-pack",
+      "simpsons"
+    ]
+  },
+  "villians": {
+    "preferred_source": "box_model",
+    "legacy_skins": [
+      "legacy_skinpacks:villains"
+    ],
+    "aliases": [
+      "Villains",
+      "villains",
+      "villians"
+    ]
+  },
+  "GreekMythology": {
+    "preferred_source": "bedrock_skins",
+    "bedrock_skins": [
+      "GreekMythology"
+    ],
+    "aliases": [
+      "greek-mythology-mash-up",
+      "GreekMythology"
+    ]
+  },
+  "StevenUniverse": {
+    "preferred_source": "bedrock_skins",
+    "bedrock_skins": [
+      "StevenUniverse"
+    ],
+    "aliases": [
+      "steven-universe-mash-up",
+      "StevenUniverse"
+    ]
+  },
+  "TheNightmareBeforeChristmas": {
+    "preferred_source": "bedrock_skins",
+    "bedrock_skins": [
+      "TheNightmareBeforeChristmas"
+    ],
+    "aliases": [
+      "the-nightmare-before-christmas",
+      "TheNightmareBeforeChristmas"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Alex",
+    "displayNameId": "custom.minecon2016.alex_5",
+    "themeName": "Minecon 2016 Cape",
+    "themeNameId": "custom.minecon2016.themetext.alex_5"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Madison Paige",
+    "displayNameId": "custom.skinpack1.madison_paige",
+    "themeName": "Heavy Rain",
+    "themeNameId": "custom.skinpack1.themetext.madison_paige"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

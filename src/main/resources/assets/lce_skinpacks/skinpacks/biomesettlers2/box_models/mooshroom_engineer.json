@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Mooshroom Engineer",
+    "displayNameId": "custom.biomesettlers2.mooshroom_engineer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,296 @@
+{
+  "meta": {
+    "displayName": "Silverfish Monger",
+    "displayNameId": "custom.villians.silverfish_monger",
+    "themeName": "Villains",
+    "themeNameId": "custom.villians.themetext.silverfish_monger"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            4.0,
+            -3.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            28
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            3.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            13
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            22
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -5.0,
+            -2.0
+          ],
+          "size": [
+            5.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            40,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -7.0,
+            0.0
+          ],
+          "size": [
+            7.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            13
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -1.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -4.0,
+            0.0
+          ],
+          "size": [
+            5.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            50,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -5.0,
+            3.0
+          ],
+          "size": [
+            6.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -6.0,
+            2.0
+          ],
+          "size": [
+            6.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.0,
+            4.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            44
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

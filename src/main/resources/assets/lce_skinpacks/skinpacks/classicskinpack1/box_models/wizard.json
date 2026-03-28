@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Wizard",
+    "displayNameId": "custom.classicskinpack1.wizard"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

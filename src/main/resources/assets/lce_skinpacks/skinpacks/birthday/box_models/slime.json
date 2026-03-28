@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Slime",
+    "displayNameId": "custom.birthday.slime"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

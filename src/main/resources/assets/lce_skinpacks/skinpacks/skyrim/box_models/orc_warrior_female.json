@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Orc Warrior Female",
+    "displayNameId": "custom.skyrim.orc_warrior_female",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.orc_warrior_female"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

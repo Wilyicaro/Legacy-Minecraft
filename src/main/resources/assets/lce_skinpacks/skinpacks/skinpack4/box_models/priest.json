@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Priest",
+    "displayNameId": "custom.skinpack4.priest"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

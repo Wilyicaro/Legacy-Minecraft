@@ -60,4 +60,16 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         return list;
     }
 
+    public static Screen buildChangeSkinOptionsScreen(Screen parent) {
+        try {
+            return CHANGE_SKIN.build(parent);
+        } catch (Throwable ignored) {
+            return new OptionsScreen(parent, new OptionsScreen.Section(
+                    Component.translatable("legacy.menu.change_skin"),
+                    s -> Panel.centered(s, 250, 150),
+                    new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets())))
+            ));
+        }
+    }
+
 }

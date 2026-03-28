@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Stray",
+    "displayNameId": "custom.biomesettlers.tundra_stray",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.tundra_stray"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Maria Hill",
+    "displayNameId": "custom.avengers.maria_hill",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "custom.avengers.themetext.maria_hill"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "displayName": "Arnim Zola",
+    "displayNameId": "custom.avengers.arnim_zola"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -5.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

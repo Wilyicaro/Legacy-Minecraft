@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Vagrant",
+    "displayNameId": "custom.skinpack3.vagrant"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

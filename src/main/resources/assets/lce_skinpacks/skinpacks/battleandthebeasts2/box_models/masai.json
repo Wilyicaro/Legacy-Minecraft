@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Masai",
+    "displayNameId": "custom.battleandthebeasts2.masai"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

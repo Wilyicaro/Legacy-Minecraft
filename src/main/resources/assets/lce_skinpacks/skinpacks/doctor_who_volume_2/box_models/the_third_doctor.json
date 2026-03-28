@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The Third Doctor",
+    "displayNameId": "custom.doctor_who_volume_2.the_third_doctor"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

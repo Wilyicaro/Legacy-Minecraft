@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Dracula",
+    "displayNameId": "custom.halloween2015.dracula"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

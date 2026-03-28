@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Scientist Danklef",
+    "displayNameId": "custom.classicskinpack1.scientist_danklef",
+    "themeName": "'Splosion Man",
+    "themeNameId": "custom.classicskinpack1.themetext.scientist_danklef"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

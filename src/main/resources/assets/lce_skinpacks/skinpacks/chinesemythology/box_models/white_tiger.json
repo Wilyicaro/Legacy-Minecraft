@@ -1,0 +1,434 @@
+{
+  "meta": {
+    "displayName": "White Tiger",
+    "displayNameId": "custom.chinesemythology.white_tiger",
+    "themeName": "Western Symbol",
+    "themeNameId": "custom.chinesemythology.themetext.white_tiger"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            -10.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -10.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -10.0,
+            1.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -10.0,
+            1.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -4.1,
+            -5.9
+          ],
+          "size": [
+            4.0,
+            5.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -10.0,
+            6.0
+          ],
+          "size": [
+            4.0,
+            5.0,
+            2.0
+          ],
+          "uv": [
+            32,
+            57
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -9.0,
+            7.0
+          ],
+          "size": [
+            2.0,
+            5.0,
+            2.0
+          ],
+          "uv": [
+            32,
+            50
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -9.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -5.1,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            10.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            12,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            8.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            37
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            20,
+            40
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            20,
+            40
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -6.0,
+            -0.5
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -4.0,
+            -0.5
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -6.0,
+            -0.5
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -4.0,
+            -0.5
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The Master",
+    "displayNameId": "custom.doctor_who_volume_1.the_master"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

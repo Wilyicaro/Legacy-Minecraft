@@ -1,0 +1,331 @@
+{
+  "name": "key:custom.adventuretime.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "finn",
+      "name": "key:custom.adventuretime.finn",
+      "texture": "skins/finn.png",
+      "order": 1
+    },
+    {
+      "id": "finn_jammies",
+      "name": "key:custom.adventuretime.finn_jammies",
+      "texture": "skins/finn_jammies.png",
+      "order": 2
+    },
+    {
+      "id": "fionna",
+      "name": "key:custom.adventuretime.fionna",
+      "texture": "skins/fionna.png",
+      "model": "slim",
+      "order": 3
+    },
+    {
+      "id": "fionna_dress",
+      "name": "key:custom.adventuretime.fionna_dress",
+      "texture": "skins/fionna_dress.png",
+      "model": "slim",
+      "order": 4
+    },
+    {
+      "id": "jake",
+      "name": "key:custom.adventuretime.jake",
+      "texture": "skins/jake.png",
+      "order": 5
+    },
+    {
+      "id": "cake",
+      "name": "key:custom.adventuretime.cake",
+      "texture": "skins/cake.png",
+      "order": 6
+    },
+    {
+      "id": "princess_bubblegum",
+      "name": "key:custom.adventuretime.princess_bubblegum",
+      "texture": "skins/princess_bubblegum.png",
+      "model": "slim",
+      "order": 7
+    },
+    {
+      "id": "prince_gumball",
+      "name": "key:custom.adventuretime.prince_gumball",
+      "texture": "skins/prince_gumball.png",
+      "model": "slim",
+      "order": 8
+    },
+    {
+      "id": "lady_rainicorn",
+      "name": "key:custom.adventuretime.lady_rainicorn",
+      "texture": "skins/lady_rainicorn.png",
+      "model": "slim",
+      "order": 9
+    },
+    {
+      "id": "ice_king",
+      "name": "key:custom.adventuretime.ice_king",
+      "texture": "skins/ice_king.png",
+      "order": 9.1
+    },
+    {
+      "id": "simon_petrikov1,
+      "name": "key:custom.adventuretime.simon_petrikov",
+      "texture": "skins/simon_petrikov.png",
+      "order": 9.3
+    },
+    {
+      "id": "ice_queen1",
+      "name": "key:custom.adventuretime.ice_queen",
+      "texture": "skins/ice_queen.png",
+      "order": 9.2,
+      "model": "slim",
+      "poses": [
+        "stiff_legs"
+      ]
+    },
+    {
+      "id": "marceline",
+      "name": "key:custom.adventuretime.marceline",
+      "texture": "skins/marceline.png",
+      "model": "slim",
+      "order": 9.4
+    },
+    {
+      "id": "marshall_lee",
+      "name": "key:custom.adventuretime.marshall_lee",
+      "texture": "skins/marshall_lee.png",
+      "order": 9.6
+    },
+    {
+      "id": "king_of_ooo",
+      "name": "key:custom.adventuretime.king_of_ooo",
+      "texture": "skins/king_of_ooo.png",
+      "order": 10
+    },
+    {
+      "id": "bmo",
+      "name": "key:custom.adventuretime.bmo",
+      "texture": "skins/bmo.png",
+      "order": 11
+    },
+    {
+      "id": "flame_princess",
+      "name": "key:custom.adventuretime.flame_princess",
+      "texture": "skins/flame_princess.png",
+      "model": "slim",
+      "order": 12
+    },
+    {
+      "id": "flame_prince",
+      "name": "key:custom.adventuretime.flame_prince",
+      "texture": "skins/flame_prince.png",
+      "order": 13
+    },
+    {
+      "id": "earl_of_lemongrab",
+      "name": "key:custom.adventuretime.earl_of_lemongrab",
+      "texture": "skins/earl_of_lemongrab.png",
+      "order": 14
+    },
+    {
+      "id": "magic_man",
+      "name": "key:custom.adventuretime.magic_man",
+      "texture": "skins/magic_man.png",
+      "order": 15
+    },
+    {
+      "id": "ricardio",
+      "name": "key:custom.adventuretime.ricardio",
+      "texture": "skins/ricardio.png",
+      "order": 16
+    },
+    {
+      "id": "gunter",
+      "name": "key:custom.adventuretime.gunter",
+      "texture": "skins/gunter.png",
+      "order": 17
+    },
+    {
+      "id": "billy",
+      "name": "key:custom.adventuretime.billy",
+      "texture": "skins/billy.png",
+      "order": 18
+    },
+    {
+      "id": "billy_young",
+      "name": "key:custom.adventuretime.billy_young",
+      "texture": "skins/billy_young.png",
+      "order": 19
+    },
+    {
+      "id": "raggedy_princess",
+      "name": "key:custom.adventuretime.raggedy_princess",
+      "texture": "skins/raggedy_princess.png",
+      "order": 20
+    },
+    {
+      "id": "emerald_princess",
+      "name": "key:custom.adventuretime.emerald_princess",
+      "texture": "skins/emerald_princess.png",
+      "order": 21
+    },
+    {
+      "id": "dr_princess",
+      "name": "key:custom.adventuretime.dr_princess",
+      "texture": "skins/dr_princess.png",
+      "order": 22
+    },
+    {
+      "id": "breakfast_princess",
+      "name": "key:custom.adventuretime.breakfast_princess",
+      "texture": "skins/breakfast_princess.png",
+      "model": "slim",
+      "order": 23
+    },
+    {
+      "id": "sir_slicer",
+      "name": "key:custom.adventuretime.sir_slicer",
+      "texture": "skins/sir_slicer.png",
+      "order": 24
+    },
+    {
+      "id": "death",
+      "name": "key:custom.adventuretime.death",
+      "texture": "skins/death.png",
+      "model": "slim",
+      "order": 25
+    },
+    {
+      "id": "the_lich",
+      "name": "key:custom.adventuretime.the_lich",
+      "texture": "skins/the_lich.png",
+      "cape": "capes/unusedinlce.png",
+      "order": 26
+    },
+    {
+      "id": "huntress_wizard",
+      "name": "key:custom.adventuretime.huntress_wizard",
+      "texture": "skins/huntress_wizard.png",
+      "cape": "capes/huntresswizard.png",
+      "model": "slim",
+      "order": 27
+    },
+    {
+      "id": "charlie",
+      "name": "key:custom.adventuretime.charlie",
+      "texture": "skins/charlie.png",
+      "model": "slim",
+      "order": 28
+    },
+    {
+      "id": "jake_jr",
+      "name": "key:custom.adventuretime.jake_jr",
+      "texture": "skins/jake_jr.png",
+      "order": 29
+    },
+    {
+      "id": "viola",
+      "name": "key:custom.adventuretime.viola",
+      "texture": "skins/viola.png",
+      "model": "slim",
+      "order": 30
+    },
+    {
+      "id": "head_marauder",
+      "name": "key:custom.adventuretime.head_marauder",
+      "texture": "skins/head_marauder.png",
+      "order": 31
+    },
+    {
+      "id": "witchadventuretime",
+      "name": "key:custom.adventuretime.witchadventuretime",
+      "texture": "skins/witch.png",
+      "order": 32
+    },
+    {
+      "id": "hunson_abadeer",
+      "name": "key:custom.adventuretime.hunson_abadeer",
+      "texture": "skins/hunson_abadeer.png",
+      "order": 33
+    },
+    {
+      "id": "grob_gob_glob_grod",
+      "name": "key:custom.adventuretime.grob_gob_glob_grod",
+      "model": "slim",
+      "texture": "skins/grob_gob_glob_grod.png",
+      "order": 34
+    },
+    {
+      "id": "frozen_yogurt_princess",
+      "name": "key:custom.adventuretime.frozen_yogurt_princess",
+      "texture": "skins/frozen_yogurt_princess.png",
+      "model": "slim",
+      "order": 35
+    },
+    {
+      "id": "gary_the_mermaid_queen",
+      "name": "key:custom.adventuretime.gary_the_mermaid_queen",
+      "texture": "skins/gary_the_mermaid_queen.png",
+      "order": 36
+    },
+    {
+      "id": "susan_strong",
+      "name": "key:custom.adventuretime.susan_strong",
+      "texture": "skins/susan_strong.png",
+      "order": 37
+    },
+    {
+      "id": "grass_finn",
+      "name": "key:custom.adventuretime.grass_finn",
+      "texture": "skins/grass_finn.png",
+      "order": 38
+    },
+    {
+      "id": "frieda",
+      "name": "key:custom.adventuretime.frieda",
+      "texture": "skins/frieda.png",
+      "model": "slim",
+      "order": 39
+    },
+    {
+      "id": "dr_gross",
+      "name": "key:custom.adventuretime.dr_gross",
+      "texture": "skins/dr_gross.png",
+      "model": "slim",
+      "order": 40
+    },
+    {
+      "id": "minerva",
+      "name": "key:custom.adventuretime.minerva",
+      "texture": "skins/minerva.png",
+      "model": "slim",
+      "order": 41
+    },
+    {
+      "id": "betty_grof",
+      "name": "key:custom.adventuretime.betty_grof",
+      "texture": "skins/betty_grof.png",
+      "model": "slim",
+      "order": 42
+    },
+    {
+      "id": "banana_guard",
+      "name": "key:custom.adventuretime.banana_guard",
+      "texture": "skins/banana_guard.png",
+      "model": "slim",
+      "order": 43
+    },
+    {
+      "id": "lumpy_space_princess",
+      "name": "key:custom.adventuretime.lumpy_space_princess",
+      "texture": "skins/lumpy_space_princess.png",
+      "order": 44
+    },
+    {
+      "id": "martin_mertens",
+      "name": "key:custom.adventuretime.martin_mertens",
+      "texture": "skins/martin_mertens.png",
+      "order": 31.5
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mingan",
+    "displayNameId": "custom.fallout.mingan",
+    "themeName": "Fallout 2",
+    "themeNameId": "custom.fallout.themetext.mingan"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

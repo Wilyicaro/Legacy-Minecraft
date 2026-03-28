@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Shakri",
+    "displayNameId": "custom.doctor_who_volume_1.shakri"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie Herobrine",
+    "displayNameId": "custom.skinpack3.zombie_herobrine",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.skinpack3.themetext.zombie_herobrine"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

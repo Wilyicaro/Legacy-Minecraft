@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Engineer",
+    "displayNameId": "custom.biomesettlers.tundra_engineer",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.tundra_engineer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

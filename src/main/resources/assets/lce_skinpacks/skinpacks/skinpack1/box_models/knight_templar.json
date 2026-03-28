@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Knight Templar",
+    "displayNameId": "custom.skinpack1.knight_templar"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

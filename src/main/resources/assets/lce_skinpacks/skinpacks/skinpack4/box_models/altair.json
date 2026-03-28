@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Altair",
+    "displayNameId": "custom.skinpack4.altair",
+    "themeName": "Assassins Creed",
+    "themeNameId": "custom.skinpack4.themetext.altair"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

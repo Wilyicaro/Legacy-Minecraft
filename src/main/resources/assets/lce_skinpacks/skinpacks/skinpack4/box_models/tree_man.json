@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Tree Man",
+    "displayNameId": "custom.skinpack4.tree_man"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

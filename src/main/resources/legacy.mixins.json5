@@ -21,6 +21,10 @@
     //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
     //?}
+    "compat.legacyskins.LegacySkinsClientMixin",
+    "compat.legacyskins.cpm.LegacySkinsCpmPreviewMixin",
+    "compat.legacyskins.cpm.LegacySkinsCpmPoseMixin",
+    "compat.legacyskins.cpm.LegacySkinsCpmRenderCollectorMixin",
     //? if fabric {
     "client.TerrainRenderContextMixin",
     //?}
@@ -196,11 +200,29 @@
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
     "client.FeatureRenderDispatcherMixin",
+    "skins.client.PlayerSkinMixin",
+    "skins.client.DisableCapeWhenElytraMixin",
+    "skins.client.SkinIdStateMixin",
+    "skins.client.AvatarSkinMixin",
+    "skins.client.BoxLayerSetupMixin",
+    "skins.client.MenuDollMixin",
+    "skins.client.UpsideDownRendererMixin",
+    "skins.client.UpsideDownMixin",
+    "skins.client.SkinTickMixin",
+    "skins.client.SkinsOptionMixin",
+    "skins.client.HelpAndOptionsChangeSkinButtonMixin",
+    "skins.client.SkipDrawAccessor",
+    "skins.client.SkipRenderMixin",
+    "skins.client.PlayerPartsMixin",
+    "skins.client.ModelOffsetsMixin",
+    "skins.client.ArmorOffsetsMixin",
+    "skins.client.ArmPoseMixin",
     "client.ScreenshotMixin",
     "client.AbstractClientPlayerMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
+    "skins.PlayerJoinMixin",
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",

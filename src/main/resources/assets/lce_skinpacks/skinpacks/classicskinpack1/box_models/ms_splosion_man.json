@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ms. 'Splosion Man",
+    "displayNameId": "custom.classicskinpack1.ms_splosion_man",
+    "themeName": "Ms. 'Splosion Man",
+    "themeNameId": "custom.classicskinpack1.themetext.ms_splosion_man"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

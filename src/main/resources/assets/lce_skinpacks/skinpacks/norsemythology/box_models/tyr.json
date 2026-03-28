@@ -1,0 +1,819 @@
+{
+  "meta": {
+    "displayName": "Tyr",
+    "displayNameId": "custom.norsemythology.tyr",
+    "themeName": "",
+    "themeNameId": "custom.norsemythology.themetext.tyr"
+  },
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -9.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            8.0
+          ],
+          "uv": [
+            42,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -9.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            8.0
+          ],
+          "uv": [
+            42,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            35,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            35,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -9.0,
+            -7.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            32,
+            53
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -9.0,
+            -7.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            32,
+            53
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            51
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            51
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            45,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            0.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            5.0
+          ],
+          "uv": [
+            51,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -10.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            5.0
+          ],
+          "uv": [
+            51,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -11.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -11.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            58
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            58
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            3.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            60
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.0,
+            3.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            60
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -12.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            25
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -12.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            25
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -7.0,
+            -7.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -7.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -7.0,
+            -7.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -7.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            46,
+            60
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            46,
+            60
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -0.9,
+            5.0,
+            -3.1
+          ],
+          "size": [
+            5.0,
+            6.0,
+            6.0
+          ],
+          "uv": [
+            16,
+            52
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            7.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.1,
+            6.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.1,
+            6.0,
+            2.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            6.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.1,
+            8.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            33
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            8.99,
+            0.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.1,
+            9.0,
+            2.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.1,
+            11.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.1,
+            11.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.02,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -3.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -3.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

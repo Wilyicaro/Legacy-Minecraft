@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "displayName": "Sir Slicer",
+    "displayNameId": "custom.adventuretime.sir_slicer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -5.0,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            6.0
+          ],
+          "uv": [
+            52,
+            26
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            3.0,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -4.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            6.0
+          ],
+          "uv": [
+            52,
+            26
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Incan",
+    "displayNameId": "custom.battleandthebeasts2.incan"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

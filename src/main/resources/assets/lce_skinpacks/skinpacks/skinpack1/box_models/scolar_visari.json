@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Scolar Visari",
+    "displayNameId": "custom.skinpack1.scolar_visari",
+    "themeName": "Killzone",
+    "themeNameId": "custom.skinpack1.themetext.scolar_visari"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

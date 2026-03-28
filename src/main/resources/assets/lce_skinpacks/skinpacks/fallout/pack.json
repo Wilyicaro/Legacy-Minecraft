@@ -1,0 +1,283 @@
+{
+  "name": "key:custom.fallout.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "vault_boy",
+      "name": "key:custom.fallout.vault_boy",
+      "texture": "skins/vault_boy.png",
+      "order": 1
+    },
+    {
+      "id": "vault_girl",
+      "name": "key:custom.fallout.vault_girl",
+      "texture": "skins/vault_girl.png",
+      "model": "slim",
+      "order": 2
+    },
+    {
+      "id": "albert_cole",
+      "name": "key:custom.fallout.albert_cole",
+      "texture": "skins/albert_cole.png",
+      "order": 3
+    },
+    {
+      "id": "natalia_dubrovhsky",
+      "name": "key:custom.fallout.natalia_dubrovhsky",
+      "texture": "skins/natalia_dubrovhsky.png",
+      "model": "slim",
+      "order": 4
+    },
+    {
+      "id": "max_stone",
+      "name": "key:custom.fallout.max_stone",
+      "texture": "skins/max_stone.png",
+      "order": 5
+    },
+    {
+      "id": "chitsa",
+      "name": "key:custom.fallout.chitsa",
+      "texture": "skins/chitsa.png",
+      "model": "slim",
+      "order": 6
+    },
+    {
+      "id": "mingan",
+      "name": "key:custom.fallout.mingan",
+      "texture": "skins/mingan.png",
+      "order": 7
+    },
+    {
+      "id": "narg",
+      "name": "key:custom.fallout.narg",
+      "texture": "skins/narg.png",
+      "order": 8
+    },
+    {
+      "id": "hakunin",
+      "name": "key:custom.fallout.hakunin",
+      "texture": "skins/hakunin.png",
+      "order": 9
+    },
+    {
+      "id": "lone_wanderer",
+      "name": "key:custom.fallout.lone_wanderer",
+      "texture": "skins/lone_wanderer.png",
+      "model": "slim",
+      "order": 10
+    },
+    {
+      "id": "lone_wanderer_2",
+      "name": "key:custom.fallout.lone_wanderer_2",
+      "texture": "skins/lone_wanderer_2.png",
+      "order": 11
+    },
+    {
+      "id": "three_dog",
+      "name": "key:custom.fallout.three_dog",
+      "texture": "skins/three_dog.png",
+      "order": 12
+    },
+    {
+      "id": "butch_deloria",
+      "name": "key:custom.fallout.butch_deloria",
+      "texture": "skins/butch_deloria.png",
+      "order": 13
+    },
+    {
+      "id": "fawkes",
+      "name": "key:custom.fallout.fawkes",
+      "texture": "skins/fawkes.png",
+      "order": 14
+    },
+    {
+      "id": "moira_brown",
+      "name": "key:custom.fallout.moira_brown",
+      "texture": "skins/moira_brown.png",
+      "model": "slim",
+      "order": 15
+    },
+    {
+      "id": "jamesfallout",
+      "name": "key:custom.fallout.jamesfallout",
+      "texture": "skins/james.png",
+      "order": 16
+    },
+    {
+      "id": "brotherhood_of_steel_paladin",
+      "name": "key:custom.fallout.brotherhood_of_steel_paladin",
+      "texture": "skins/brotherhood_of_steel_paladin.png",
+      "order": 17
+    },
+    {
+      "id": "colonel_autumn",
+      "name": "key:custom.fallout.colonel_autumn",
+      "texture": "skins/colonel_autumn.png",
+      "order": 18
+    },
+    {
+      "id": "betty_stanislaus_braun",
+      "name": "key:custom.fallout.betty_stanislaus_braun",
+      "texture": "skins/betty_stanislaus_braun.png",
+      "model": "slim",
+      "order": 19
+    },
+    {
+      "id": "clover",
+      "name": "key:custom.fallout.clover",
+      "texture": "skins/clover.png",
+      "model": "slim",
+      "order": 20
+    },
+    {
+      "id": "star_paladin_cross",
+      "name": "key:custom.fallout.star_paladin_cross",
+      "texture": "skins/star_paladin_cross.png",
+      "order": 21
+    },
+    {
+      "id": "harold",
+      "name": "key:custom.fallout.harold",
+      "texture": "skins/harold.png",
+      "order": 22
+    },
+    {
+      "id": "sole_survivor",
+      "name": "key:custom.fallout.sole_survivor",
+      "texture": "skins/sole_survivor.png",
+      "model": "slim",
+      "order": 23
+    },
+    {
+      "id": "sole_survivor_2",
+      "name": "key:custom.fallout.sole_survivor_2",
+      "texture": "skins/sole_survivor_2.png",
+      "order": 24
+    },
+    {
+      "id": "nick_valentine",
+      "name": "key:custom.fallout.nick_valentine",
+      "texture": "skins/nick_valentine.png",
+      "order": 25
+    },
+    {
+      "id": "preston_garvey",
+      "name": "key:custom.fallout.preston_garvey",
+      "texture": "skins/preston_garvey.png",
+      "order": 26
+    },
+    {
+      "id": "silver_shroud",
+      "name": "key:custom.fallout.silver_shroud",
+      "texture": "skins/silver_shroud.png",
+      "order": 27
+    },
+    {
+      "id": "hancock",
+      "name": "key:custom.fallout.hancock",
+      "texture": "skins/hancock.png",
+      "order": 28
+    },
+    {
+      "id": "piper",
+      "name": "key:custom.fallout.piper",
+      "texture": "skins/piper.png",
+      "model": "slim",
+      "order": 29
+    },
+    {
+      "id": "cait",
+      "name": "key:custom.fallout.cait",
+      "texture": "skins/cait.png",
+      "model": "slim",
+      "order": 30
+    },
+    {
+      "id": "paladin_danse",
+      "name": "key:custom.fallout.paladin_danse",
+      "texture": "skins/paladin_danse.png",
+      "order": 31
+    },
+    {
+      "id": "the_mechanist",
+      "name": "key:custom.fallout.the_mechanist",
+      "texture": "skins/the_mechanist.png",
+      "order": 32
+    },
+    {
+      "id": "super_mutant",
+      "name": "key:custom.fallout.super_mutant",
+      "texture": "skins/super_mutant.png",
+      "order": 33
+    },
+    {
+      "id": "raider",
+      "name": "key:custom.fallout.raider",
+      "texture": "skins/raider.png",
+      "model": "slim",
+      "order": 34
+    },
+    {
+      "id": "raider_2",
+      "name": "key:custom.fallout.raider_2",
+      "texture": "skins/raider_2.png",
+      "order": 35
+    },
+    {
+      "id": "jangles_the_moon_monkey",
+      "name": "key:custom.fallout.jangles_the_moon_monkey",
+      "texture": "skins/jangles_the_moon_monkey.png",
+      "order": 36
+    },
+    {
+      "id": "kellogg",
+      "name": "key:custom.fallout.kellogg",
+      "texture": "skins/kellogg.png",
+      "order": 37
+    },
+    {
+      "id": "tinker_tom",
+      "name": "key:custom.fallout.tinker_tom",
+      "texture": "skins/tinker_tom.png",
+      "order": 38
+    },
+    {
+      "id": "grognak_the_barbarian",
+      "name": "key:custom.fallout.grognak_the_barbarian",
+      "texture": "skins/grognak_the_barbarian.png",
+      "order": 39
+    },
+    {
+      "id": "grognak_the_barbarian_2",
+      "name": "key:custom.fallout.grognak_the_barbarian_2",
+      "texture": "skins/grognak_the_barbarian_2.png",
+      "model": "slim",
+      "order": 40
+    },
+    {
+      "id": "bosco",
+      "name": "key:custom.fallout.bosco",
+      "texture": "skins/bosco.png",
+      "order": 41
+    },
+    {
+      "id": "albert_cole_2",
+      "name": "key:custom.fallout.albert_cole_2",
+      "texture": "skins/albert_cole_2.png",
+      "order": 42
+    },
+    {
+      "id": "natalia_dubrovhsky_2",
+      "name": "key:custom.fallout.natalia_dubrovhsky_2",
+      "texture": "skins/natalia_dubrovhsky_2.png",
+      "model": "slim",
+      "order": 43
+    },
+    {
+      "id": "max_stone_2",
+      "name": "key:custom.fallout.max_stone_2",
+      "texture": "skins/max_stone_2.png",
+      "order": 44
+    }
+  ]
+}

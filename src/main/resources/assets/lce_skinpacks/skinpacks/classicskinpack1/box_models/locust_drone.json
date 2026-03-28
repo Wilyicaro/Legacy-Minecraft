@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Locust Drone",
+    "displayNameId": "custom.classicskinpack1.locust_drone",
+    "themeName": "Gears of War",
+    "themeNameId": "custom.classicskinpack1.themetext.locust_drone"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

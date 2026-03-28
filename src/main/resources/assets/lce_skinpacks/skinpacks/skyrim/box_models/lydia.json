@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lydia",
+    "displayNameId": "custom.skyrim.lydia",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.lydia"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

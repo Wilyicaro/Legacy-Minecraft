@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "displayName": "Ood",
+    "displayNameId": "custom.doctor_who_volume_2.ood"
+  },
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -2.1,
+      "z": 0.0
+    }
+  },
+  "hide": "HAT",
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -4.4
+          ],
+          "size": [
+            4.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -10.0,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            3.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.5,
+            -11.0,
+            -1.5
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

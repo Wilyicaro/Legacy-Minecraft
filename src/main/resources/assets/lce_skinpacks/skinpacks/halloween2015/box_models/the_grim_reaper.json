@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "displayName": "The Grim Reaper",
+    "displayNameId": "custom.halloween2015.the_grim_reaper"
+  },
+  "poses": [
+    "stiff_arms",
+    "stiff_legs"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

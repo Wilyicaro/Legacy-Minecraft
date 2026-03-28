@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Sloth",
+    "displayNameId": "custom.battleandthebeasts2.sloth"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Molly",
+    "displayNameId": "custom.skinpack5.molly",
+    "themeName": "The Walking Dead",
+    "themeNameId": "custom.skinpack5.themetext.molly"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

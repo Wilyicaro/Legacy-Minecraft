@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Sole Survivor",
+    "displayNameId": "custom.fallout.sole_survivor_2",
+    "themeName": "Fallout 4",
+    "themeNameId": "custom.fallout.themetext.sole_survivor_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

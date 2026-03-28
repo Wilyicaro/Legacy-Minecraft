@@ -1,6 +1,7 @@
 package wily.legacy.util.client;
 
 import com.google.common.collect.Ordering;
+import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.Util;
@@ -67,6 +68,13 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.Skins.client.render.boxloader.AttachSlot;
+import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
+import wily.legacy.Skins.skin.ClientSkinAssets;
+import wily.legacy.Skins.skin.ClientSkinCache;
+import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
@@ -395,7 +403,54 @@ public class LegacyRenderUtil {
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
         if (mc.player == null) return;
+        String skinId;
+        try {
+            skinId = ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName());
+        } catch (Throwable ignored) {
+            skinId = null;
+        }
+
+        if (shouldRenderBoxHeadPreview(skinId)) {
+            int x0 = x;
+            int y0 = y;
+            int x1 = x + size;
+            int y1 = y + size;
+            float centerX = (x0 + x1) / 2.0F;
+            float centerY = (y0 + y1) / 2.0F;
+            renderEntityInInventoryFollowsMouse(guiGraphics, x0, y0, x1, y1, size, 0.75F, centerX, centerY, mc.player);
+            return;
+        }
         PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
+    }
+
+    private static boolean shouldRenderBoxHeadPreview(String skinId) {
+        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return false;
+
+        SkinEntry entry = SkinPackLoader.getSkin(skinId);
+        ResourceLocation texture = ClientSkinAssets.getTexture(skinId);
+        if (texture == null && entry != null) texture = entry.texture();
+        if (texture == null) return false;
+
+        ResourceLocation modelId = modelIdFromTexture(texture);
+        BuiltBoxModel model = BoxModelManager.get(modelId);
+        if (model == null) {
+            JsonObject modelJson = ClientSkinAssets.getModelJson(skinId);
+            if (modelJson != null) BoxModelManager.registerRuntime(modelId, modelJson);
+            model = BoxModelManager.get(modelId);
+        }
+        if (model == null) return false;
+
+        boolean hasHead = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
+        boolean hasHat = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
+        return model.hides(AttachSlot.HEAD) && (hasHead || hasHat);
+    }
+
+    private static ResourceLocation modelIdFromTexture(ResourceLocation texture) {
+        String path = texture.getPath();
+        int slash = path.lastIndexOf('/');
+        if (slash != -1) path = path.substring(slash + 1);
+        if (path.endsWith(".png")) path = path.substring(0, path.length() - 4);
+        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), path);
     }
 
     public static float getAutoGuiScale() {

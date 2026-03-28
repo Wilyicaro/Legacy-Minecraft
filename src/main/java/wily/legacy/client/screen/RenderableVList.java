@@ -44,6 +44,11 @@ public class RenderableVList {
     public int listHeight;
     protected int renderablesCount;
     protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    protected int scrollArrowYOffset = -8;
+    protected int verticalScrollArrowWidth = 13;
+    protected int verticalScrollArrowHeight = 7;
+    protected int verticalScrollArrowOffsetX = 0;
+    protected int verticalScrollArrowOffsetY = 0;
     protected Function<LayoutElement, Integer> layoutSeparation = w -> LegacyOptions.getUIMode().isSD() ? 2 : 3;
 
     public RenderableVList(UIAccessor accessor) {
@@ -151,6 +156,23 @@ public class RenderableVList {
         return this;
     }
 
+    public RenderableVList scrollArrowYOffset(int scrollArrowYOffset) {
+        this.scrollArrowYOffset = scrollArrowYOffset;
+        return this;
+    }
+
+    public RenderableVList verticalScrollArrowSize(int width, int height) {
+        this.verticalScrollArrowWidth = Math.max(1, width);
+        this.verticalScrollArrowHeight = Math.max(1, height);
+        return this;
+    }
+
+    public RenderableVList verticalScrollArrowOffset(int xOffset, int yOffset) {
+        this.verticalScrollArrowOffsetX = xOffset;
+        this.verticalScrollArrowOffsetY = yOffset;
+        return this;
+    }
+
     public void focusRenderable(Renderable renderable) {
         if (renderables.isEmpty()) return;
         if (renderable instanceof GuiEventListener l && getScreen().children().contains(l)) {
@@ -198,9 +220,9 @@ public class RenderableVList {
         boolean allowScroll = this.listHeight > 0;
         if (allowScroll) accessor.getChildrenRenderables().add(((guiGraphics, i, j, f) -> {
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29, this.topPos + this.listHeight - 8);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.UP.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
             if (canScrollDown)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13, this.topPos + this.listHeight - 8);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.DOWN.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
         }));
         canScrollDown = false;
         int yDiff = 0;
@@ -212,6 +234,8 @@ public class RenderableVList {
                 access.initRenderableVListEntry(this, r);
             if (r instanceof RenderableVListEntry widget)
                 widget.initRenderable(this);
+            if (r instanceof TickBox tickBox)
+                tickBox.updateHeight();
             if (!allowScroll || !(r instanceof LayoutElement l) || yDiff + l.getHeight() + (i == renderables.size() - 1 && scrolledList.get() == 0 ? 0 : 12) <= this.listHeight) {
                 if (r instanceof LayoutElement l) {
                     boolean changeRow = forceWidth || xDiff + l.getWidth() > this.listWidth;
@@ -242,7 +266,8 @@ public class RenderableVList {
         if (forceWidth) return scroll;
         int xDiff = 0;
         int rowAmount = 0;
-        for (int i = scrolledList.get(); i < scrolledList.get() + renderablesCount; i++) {
+        int end = Math.min(renderables.size(), scrolledList.get() + renderablesCount);
+        for (int i = scrolledList.get(); i < end; i++) {
             if (renderables.get(i) instanceof LayoutElement e)
                 xDiff += (xDiff == 0 ? 0 : layoutSeparation.apply(e)) + e.getWidth();
             rowAmount += scroll;
@@ -264,6 +289,11 @@ public class RenderableVList {
                 accessor.reloadUI();
             }
         }
+    }
+
+    public void resetScroll() {
+        scrolledList.set(0);
+        canScrollDown = false;
     }
 
     public boolean isHovered(double x, double y) {

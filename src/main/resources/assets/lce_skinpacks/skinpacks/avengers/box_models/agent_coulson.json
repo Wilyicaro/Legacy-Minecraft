@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Agent Coulson",
+    "displayNameId": "custom.avengers.agent_coulson",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "custom.avengers.themetext.agent_coulson"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

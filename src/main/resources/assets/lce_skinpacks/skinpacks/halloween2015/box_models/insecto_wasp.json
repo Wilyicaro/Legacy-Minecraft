@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "Insecto Wasp",
+    "displayNameId": "custom.halloween2015.insecto_wasp"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -7.0,
+            -11.0,
+            -3.0
+          ],
+          "size": [
+            14.0,
+            4.0,
+            0.0
+          ],
+          "uv": [
+            0,
+            33
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

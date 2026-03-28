@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forsworn Shaman",
+    "displayNameId": "custom.skyrim.forsworn_shaman",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.forsworn_shaman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

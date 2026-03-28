@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Desert Tamer",
+    "displayNameId": "custom.biomesettlers.desert_tamer",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.desert_tamer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

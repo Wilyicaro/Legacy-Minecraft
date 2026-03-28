@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Albert Cole",
+    "displayNameId": "custom.fallout.albert_cole",
+    "themeName": "Fallout 1",
+    "themeNameId": "custom.fallout.themetext.albert_cole"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

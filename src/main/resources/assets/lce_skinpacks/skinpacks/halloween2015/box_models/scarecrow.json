@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Scarecrow",
+    "displayNameId": "custom.halloween2015.scarecrow"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

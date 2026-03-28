@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Orc Warrior Male",
+    "displayNameId": "custom.skyrim.orc_warrior_male",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.orc_warrior_male"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

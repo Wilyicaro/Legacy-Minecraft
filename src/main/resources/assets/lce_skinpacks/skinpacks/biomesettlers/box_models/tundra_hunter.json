@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Hunter",
+    "displayNameId": "custom.biomesettlers.tundra_hunter",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.tundra_hunter"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

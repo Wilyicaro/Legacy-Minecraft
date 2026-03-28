@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Liz Shaw",
+    "displayNameId": "custom.doctor_who_volume_2.liz_shaw"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

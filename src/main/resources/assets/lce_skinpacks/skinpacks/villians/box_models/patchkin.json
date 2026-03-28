@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Patchkin",
+    "displayNameId": "custom.villians.patchkin",
+    "themeName": "Villains",
+    "themeNameId": "custom.villians.themetext.patchkin"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

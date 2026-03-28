@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Rory",
+    "displayNameId": "custom.birthday5.rory"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

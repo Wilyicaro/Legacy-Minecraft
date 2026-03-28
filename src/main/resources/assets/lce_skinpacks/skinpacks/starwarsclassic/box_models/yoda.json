@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "displayName": "Yoda",
+    "displayNameId": "IDS_DLCSKIN00001249_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "custom.starwarsclassic.themetext.yoda"
+  },
+  "offsets": {
+    "head":         { "x": 0, "y": 13, "z": 0 },
+    "hat":          { "x": 0, "y": 13, "z": 0 },
+    "body":         { "x": 0, "y": 13, "z": 0 },
+    "right_arm":    { "x": 0, "y": 13, "z": 0 },
+    "left_arm":     { "x": 0, "y": 13, "z": 0 },
+    "right_leg":    { "x": 0, "y": 7, "z": 0 },
+    "left_leg":     { "x": 0, "y": 7, "z": 0 }
+  },
+  "hidearmour": ["helmet", "chestpiece", "leggings", "boots"],
+  "hide": [all],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            2.9,
+            -4.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.9,
+            -4.5,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.9,
+            -3.5,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -4.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.9,
+            -4.5,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.9,
+            -3.5,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -5.0,
+            -4.0
+          ],
+          "size": [
+            6.0,
+            5.0,
+            6.0
+          ],
+          "uv": [
+            2,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -6.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            35,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            6.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            44,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            44,
+            22
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            40,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

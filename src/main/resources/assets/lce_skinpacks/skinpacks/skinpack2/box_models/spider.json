@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Spider",
+    "displayNameId": "custom.skinpack2.spider",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.skinpack2.themetext.spider"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

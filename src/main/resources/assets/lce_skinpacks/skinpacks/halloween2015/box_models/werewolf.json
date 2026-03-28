@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Werewolf",
+    "displayNameId": "custom.halloween2015.werewolf"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Deep Sea Diver",
+    "displayNameId": "custom.skinpack1.deep_sea_diver"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

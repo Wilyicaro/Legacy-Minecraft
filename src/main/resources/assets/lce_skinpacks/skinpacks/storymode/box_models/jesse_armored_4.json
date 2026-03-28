@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "displayName": "Jesse Armored",
+    "displayNameId": "custom.storymode.jesse_armored_4"
+  },
+  "hide": [
+    "left_sleeve",
+    "right_sleeve",
+    "jacket",
+    "right_pants",
+    "left_pants"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.5,
+            -3.0,
+            -2.5
+          ],
+          "size": [
+            5.0,
+            5.0,
+            5.0
+          ],
+          "uv": [
+            16,
+            54
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.5,
+            -9.5,
+            -4.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            39
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.5,
+            -3.0,
+            -2.5
+          ],
+          "size": [
+            5.0,
+            5.0,
+            5.0
+          ],
+          "uv": [
+            16,
+            54
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

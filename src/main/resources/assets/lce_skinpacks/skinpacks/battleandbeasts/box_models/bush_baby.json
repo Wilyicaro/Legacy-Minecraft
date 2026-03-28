@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Bush Baby",
+    "displayNameId": "custom.battleandbeasts.bush_baby"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

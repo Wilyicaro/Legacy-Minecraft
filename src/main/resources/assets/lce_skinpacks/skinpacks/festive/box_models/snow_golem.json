@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Snow Golem",
+    "displayNameId": "custom.festive.snow_golem"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

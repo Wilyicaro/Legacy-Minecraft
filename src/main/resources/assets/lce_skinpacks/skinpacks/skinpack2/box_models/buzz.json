@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Buzz",
+    "displayNameId": "custom.skinpack2.buzz",
+    "themeName": "Gamma Bros",
+    "themeNameId": "custom.skinpack2.themetext.buzz"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

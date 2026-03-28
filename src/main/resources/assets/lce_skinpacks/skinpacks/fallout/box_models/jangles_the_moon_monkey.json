@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "displayName": "Jangles the Moon Monkey",
+    "displayNameId": "custom.fallout.jangles_the_moon_monkey",
+    "themeName": "Fallout 4",
+    "themeNameId": "custom.fallout.themetext.jangles_the_moon_monkey"
+  },
+  "offsets": {
+    "head": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "hat": {
+      "x": 0,
+      "y": 0.5,
+      "z": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "right_arm": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "left_arm": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "right_leg": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "left_leg": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "hide": [
+    "limbs"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            -8.0,
+            -1.0
+          ],
+          "size": [
+            7.0,
+            4.0,
+            0.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -9.0,
+            -8.0,
+            -1.0
+          ],
+          "size": [
+            7.0,
+            4.0,
+            0.0
+          ],
+          "uv": [
+            57,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

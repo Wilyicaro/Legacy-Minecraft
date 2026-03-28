@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Creeper Steve Boxhead",
+    "displayNameId": "custom.birthday.creeper_steve_boxhead"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

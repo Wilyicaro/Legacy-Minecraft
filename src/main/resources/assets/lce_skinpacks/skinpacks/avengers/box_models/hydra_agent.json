@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Hydra Agent",
+    "displayNameId": "custom.avengers.hydra_agent",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "custom.avengers.themetext.hydra_agent"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

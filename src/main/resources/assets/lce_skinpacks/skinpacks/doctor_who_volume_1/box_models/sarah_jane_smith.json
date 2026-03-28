@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Sarah Jane Smith",
+    "displayNameId": "custom.doctor_who_volume_1.sarah_jane_smith"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

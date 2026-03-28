@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Kratos",
+    "displayNameId": "custom.skinpack2.kratos",
+    "themeName": "God of War",
+    "themeNameId": "custom.skinpack2.themetext.kratos"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

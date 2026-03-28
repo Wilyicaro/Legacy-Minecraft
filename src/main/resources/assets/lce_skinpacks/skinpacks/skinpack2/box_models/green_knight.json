@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Green Knight",
+    "displayNameId": "custom.skinpack2.green_knight",
+    "themeName": "Castle Crashers",
+    "themeNameId": "custom.skinpack2.themetext.green_knight"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

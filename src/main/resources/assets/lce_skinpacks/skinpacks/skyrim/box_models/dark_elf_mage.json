@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Dark Elf Mage",
+    "displayNameId": "custom.skyrim.dark_elf_mage",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.dark_elf_mage"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

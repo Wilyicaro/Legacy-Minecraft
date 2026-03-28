@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Baby Ghast",
+    "displayNameId": "custom.battleandthebeasts2.baby_ghast"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Winter Steve",
+    "displayNameId": "custom.festive.winter_steve"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

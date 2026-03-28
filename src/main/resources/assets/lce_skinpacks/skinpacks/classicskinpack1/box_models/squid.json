@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Squid",
+    "displayNameId": "custom.classicskinpack1.squid",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.classicskinpack1.themetext.squid"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

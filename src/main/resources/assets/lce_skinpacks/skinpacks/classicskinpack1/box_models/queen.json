@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Queen",
+    "displayNameId": "custom.classicskinpack1.queen"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

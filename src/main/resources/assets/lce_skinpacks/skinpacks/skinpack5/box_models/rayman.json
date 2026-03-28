@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "displayName": "Rayman",
+    "displayNameId": "custom.skinpack5.rayman",
+    "themeName": "Rayman Legends",
+    "themeNameId": "custom.skinpack5.themetext.rayman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            6.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            6.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            8.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            8.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

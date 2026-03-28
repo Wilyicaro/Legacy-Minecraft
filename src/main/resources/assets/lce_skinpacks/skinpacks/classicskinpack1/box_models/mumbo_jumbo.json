@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mumbo Jumbo",
+    "displayNameId": "custom.classicskinpack1.mumbo_jumbo",
+    "themeName": "Banjo-Kazooie",
+    "themeNameId": "custom.classicskinpack1.themetext.mumbo_jumbo"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

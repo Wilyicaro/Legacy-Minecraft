@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Mole Rat",
+    "displayNameId": "custom.battleandthebeasts2.mole_rat"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Master Chief",
+    "displayNameId": "custom.classicskinpack1.master_chief",
+    "themeName": "Halo",
+    "themeNameId": "custom.classicskinpack1.themetext.master_chief"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

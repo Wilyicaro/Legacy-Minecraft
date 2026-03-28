@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Natalia Dubrovhsky",
+    "displayNameId": "custom.fallout.natalia_dubrovhsky_2",
+    "themeName": "Fallout 1",
+    "themeNameId": "custom.fallout.themetext.natalia_dubrovhsky_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}
