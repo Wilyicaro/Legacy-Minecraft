@@ -154,7 +154,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     public void onClose() {
         super.onClose();
         actionsOnClose.values().forEach(Runnable::run);
-        if (!nonOpGamerules.isEmpty())
+        if (!nonOpGamerules.isEmpty() && Legacy4JClient.hasModOnServer())
             CommonNetwork.sendToServer(new PlayerInfoSync.All(nonOpGamerules, PlayerInfoSync.All.ID_C2S));
     }
 

@@ -34,6 +34,7 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 public class LegacyOptions {
     public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
+    private static boolean suppressPlayerInfoSync = false;
 
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
             Component.translatable("key.sprint"), Component.translatable("options.key.toggleSprint"),
@@ -157,7 +158,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b -> {
         syncLegacyClassicWorkstations(b);
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
     public static final FactoryConfig<Boolean> modCraftingTabs = CLIENT_STORAGE.register(createBoolean("modCraftingTabs",false));
@@ -251,16 +252,16 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inGameOnlineIds = CLIENT_STORAGE.register(createBoolean("inGameOnlineIds", true));
     public static final FactoryConfig<Boolean> systemMessagesAsOverlay = CLIENT_STORAGE.register(createBoolean("systemMessagesAsOverlay", true));
     public static final FactoryConfig<Boolean> forceMixedCrafting = CLIENT_STORAGE.register(createBoolean("forceMixedCrafting", false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicTrading = CLIENT_STORAGE.register(createBoolean("classicTrading",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicStonecutting = CLIENT_STORAGE.register(createBoolean("classicStonecutting",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicLoom = CLIENT_STORAGE.register(createBoolean("classicLoom",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> headFollowsTheCamera = CLIENT_STORAGE.register(createBoolean("headFollowsTheCamera", true));
     public static final FactoryConfig<Boolean> fastLeavesWhenBlocked = CLIENT_STORAGE.register(createBoolean("fastLeavesWhenBlocked", true, b -> Legacy4JClient.updateChunks()));
@@ -293,6 +294,21 @@ public class LegacyOptions {
         FactoryConfig.saveOptionAndConsume(classicStonecutting, enabled, v -> {});
         FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
         FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
+    }
+
+    public static boolean canSendPlayerInfoSync() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return !suppressPlayerInfoSync && minecraft.player != null && Legacy4JClient.hasModOnServer();
+    }
+
+    public static void runWithoutPlayerInfoSync(Runnable runnable) {
+        boolean previous = suppressPlayerInfoSync;
+        suppressPlayerInfoSync = true;
+        try {
+            runnable.run();
+        } finally {
+            suppressPlayerInfoSync = previous;
+        }
     }
     public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", builder -> builder.valueToComponent(v -> v.displayName), i -> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, () -> ControlTooltipDisplay.values().length, ControlTooltipDisplay.CODEC, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> legacyLoadingAndConnecting = CLIENT_STORAGE.register(createBoolean("legacyLoadingAndConnecting", true));

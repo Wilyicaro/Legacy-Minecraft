@@ -197,10 +197,12 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty())
             minecraft.executeIfPossible(() -> s.changeStatBoard(false));
         if (minecraft.player != null) {
-            LegacyOptions.classicCrafting.set(LegacyOptions.classicCrafting.get());
-            LegacyOptions.classicTrading.set(LegacyOptions.classicTrading.get());
-            LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
-            LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
+            LegacyOptions.runWithoutPlayerInfoSync(() -> {
+                LegacyOptions.classicCrafting.set(LegacyOptions.classicCrafting.get());
+                LegacyOptions.classicTrading.set(LegacyOptions.classicTrading.get());
+                LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
+                LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
+            });
         }
     }
 
@@ -298,7 +300,12 @@ public class Legacy4JClient {
                 minecraft.setScreen(new InventoryScreen(minecraft.player));
             } else if (LegacyOptions.hasMixedCrafting()) {
                 minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
-            } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
+            } else if (hasModOnServer()) {
+                CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
+            } else {
+                minecraft.getTutorial().onOpenInventory();
+                minecraft.setScreen(new InventoryScreen(minecraft.player));
+            }
         }
         while (keyHostOptions.consumeClick()) {
             minecraft.setScreen(new HostOptionsScreen());

@@ -142,7 +142,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void startAttack(CallbackInfoReturnable<Boolean> cir) {
-        CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
+        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
     }
 
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)

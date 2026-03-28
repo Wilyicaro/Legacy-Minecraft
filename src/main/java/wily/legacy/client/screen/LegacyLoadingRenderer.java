@@ -28,7 +28,6 @@ public class LegacyLoadingRenderer implements Renderable {
     public Component loadingStage;
     public boolean genericLoading;
     public UIAccessor accessor;
-    private float lastTrackerVisibleProgress = -1.0F;
 
     public static LegacyLoadingRenderer getInstance() {
         return INSTANCE;
@@ -39,17 +38,7 @@ public class LegacyLoadingRenderer implements Renderable {
         this.accessor = accessor;
         this.loadingHeader = accessor.getElementValue("loadingHeader.component", loadingHeader, Component.class);
         this.loadingStage = accessor.getElementValue("loadingStage.component", loadingStage, Component.class);
-        float resolvedProgress = accessor.getFloat("progress", progress);
-        if (CreateWorldLoadingTracker.isActive()) {
-            if (resolvedProgress >= 0.0F) {
-                lastTrackerVisibleProgress = resolvedProgress;
-            } else if (lastTrackerVisibleProgress >= 0.0F) {
-                resolvedProgress = lastTrackerVisibleProgress;
-            }
-        } else {
-            lastTrackerVisibleProgress = resolvedProgress >= 0.0F ? resolvedProgress : -1.0F;
-        }
-        this.progress = resolvedProgress;
+        this.progress = accessor.getFloat("progress", progress);
         this.genericLoading = accessor.getBoolean("genericLoading", genericLoading);
     }
 
