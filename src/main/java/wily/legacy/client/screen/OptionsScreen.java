@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryConfigWidgets;
 import wily.factoryapi.base.client.FactoryOptions;
@@ -194,6 +195,15 @@ public class OptionsScreen extends PanelVListScreen {
                             }));
                 },
                 LegacyOptions.legacySettingsMenus::get);
+    }
+
+    private static TickBox createDisplayAdvancedOptionsTooltipTickBox() {
+        return new TickBox(0, 0, 200,
+                !LegacyOptions.hideAdvancedOptionsTooltip.get(),
+                b -> LegacyOptions.hideAdvancedOptionsTooltip.getDisplay().name(),
+                b -> FactoryConfigWidgets.getCachedTooltip(LegacyOptions.hideAdvancedOptionsTooltip.getDisplay().tooltip().apply(!b)),
+                t -> FactoryConfig.saveOptionAndConsume(LegacyOptions.hideAdvancedOptionsTooltip, !t.selected, v -> {}),
+                () -> !LegacyOptions.hideAdvancedOptionsTooltip.get());
     }
 
     private static void reopenLegacySettingsMenusScreen(OptionsScreen screen) {
@@ -584,13 +594,15 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.of(mc.options.showAutosaveIndicator()),
                                     LegacyOptions.showVanillaRecipeBook,
                                     LegacyOptions.tooltipBoxes,
-                                    LegacyOptions.hideAdvancedOptionsTooltip,
                                     LegacyOptions.of(mc.options.attackIndicator()),
                                     LegacyOptions.hudSize,
                                     LegacyOptions.hudOpacity,
                                     LegacyOptions.hudDistance,
                                     LegacyOptions.of(mc.options.guiScale()),
                                     LegacyOptions.uiMode);
+                            if (!LegacyOptions.legacySettingsMenus.get()) {
+                                o.getRenderableVList().addRenderable(createDisplayAdvancedOptionsTooltipTickBox());
+                            }
                         },
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
                         o -> {
@@ -598,10 +610,12 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.inGameOnlineIds,
                                     LegacyOptions.classicCrafting,
                                     LegacyOptions.hudSize);
-                            else o.getRenderableVList().addLinkedOptions(
-                                    LegacyOptions.legacyItemTooltips,
-                                    FactoryConfig::get,
-                                    LegacyOptions.legacyItemTooltipScaling);
+                            else {
+                                o.getRenderableVList().addLinkedOptions(
+                                        LegacyOptions.legacyItemTooltips,
+                                        FactoryConfig::get,
+                                        LegacyOptions.legacyItemTooltipScaling);
+                            }
                         },
                         o -> {
                             if (!LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
@@ -655,7 +669,11 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.legacyIntroAndReloading,
                                     LegacyOptions.legacyLoadingAndConnecting,
                                     LegacyOptions.legacyPanorama,
-                                    LegacyOptions.displayRealmsButton,
+                                    LegacyOptions.displayRealmsButton);
+                            if (FactoryAPI.isModLoaded("sodium")) {
+                                o.renderableVList.addOptions(LegacyOptions.hideSodiumSettings);
+                            }
+                            o.renderableVList.addOptions(
                                     LegacyOptions.hideExperimentalWorldWarning,
                                     LegacyOptions.fakeAutosaveScreen,
                                     LegacyOptions.fakeManualSaveScreen);

@@ -49,6 +49,7 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             }
             if (self() instanceof ConnectScreen p) {
                 lastLoadingHeader = p.status;
+                progress = -1.0F;
             }
             if (CreateWorldLoadingTracker.isActive()) {
                 CreateWorldLoadingTracker.State state = self() instanceof LevelLoadingScreen ? CreateWorldLoadingTracker.loading(lastLoadingHeader, lastLoadingStage, progress) : CreateWorldLoadingTracker.preparing(lastLoadingHeader, lastLoadingStage, progress);

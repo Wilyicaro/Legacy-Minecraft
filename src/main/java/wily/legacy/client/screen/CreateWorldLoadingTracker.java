@@ -9,43 +9,45 @@ public final class CreateWorldLoadingTracker {
     private static final long RESET_HOLD_MS = 90L;
     private static final long FINDING_SEED_RESET_HOLD_MS = 58L;
     private static final long FINDING_SEED_CYCLE_MS = 250L;
-    private static final long PREPARING_FAKE_MS = 320L;
-    private static final long LOADING_CYCLE_MS = 320L;
-    private static final long PREPARING_CHUNKS_MS = 160L;
-    private static final long FINALIZING_MS = 240L;
-    private static final int FINDING_SEED_CYCLES = 5;
-    private static final float FINDING_SEED_END_PROGRESS = 0.9F;
-    private static final float FINDING_SEED_PHASE_SPEED = 1.95F;
-    private static final float PREPARING_PHASE_SPEED = 2.6F;
-    private static final float LOADING_PHASE_SPEED = 2.75F;
-    private static final float SYNTHETIC_PHASE_SPEED = 1.35F;
-    private static final int MAX_LOADING_CYCLES = 3;
-    private static final float LOADING_RESET_PROGRESS = 0.6F;
-    private static final float[] LOADING_CYCLE_ENDS = new float[]{0.78F, 0.8F, 0.82F};
-    private static final float PREFERRED_RANGE_WEIGHT = 0.72F;
-    private static final float PREFERRED_MIN_END = 0.74F;
-    private static final float PREFERRED_MAX_END = 0.8F;
-    private static final float VARIED_MIN_END = 0.2F;
-    private static final float VARIED_MAX_END = 0.85F;
+    private static final float FINDING_SEED_END_PROGRESS = 0.82F;
+    private static final int FINDING_SEED_CYCLES = 4;
+    private static final long PREPARING_MS = 520L;
+    private static final long LOADING_MS = 900L;
+    private static final long PREPARING_CHUNKS_MS = 220L;
+    private static final long FINALIZING_MS = 260L;
+    private static final float LOADING_STAGE_END_PROGRESS = 0.84F;
+    private static final float PREPARING_CHUNKS_END_PROGRESS = 0.82F;
     private static Phase phase = Phase.NONE;
     private static long phaseStartedMillis;
+    private static float displayedProgress;
+    private static boolean findingSeed;
 
     private CreateWorldLoadingTracker() {
     }
 
     public static void start() {
-        phase = Phase.FINDING_SEED;
+        start(false);
+    }
+
+    public static void start(boolean shouldFindSeed) {
+        findingSeed = shouldFindSeed;
+        phase = shouldFindSeed ? Phase.FINDING_SEED : Phase.PREPARING;
         phaseStartedMillis = Util.getMillis();
+        displayedProgress = 0.0F;
     }
 
     public static void startLoadingOnly() {
+        findingSeed = false;
         phase = Phase.PREPARING;
         phaseStartedMillis = Util.getMillis();
+        displayedProgress = 0.0F;
     }
 
     public static void reset() {
+        findingSeed = false;
         phase = Phase.NONE;
         phaseStartedMillis = 0L;
+        displayedProgress = 0.0F;
     }
 
     public static boolean isActive() {
@@ -53,38 +55,53 @@ public final class CreateWorldLoadingTracker {
     }
 
     public static State preparing(Component header, Component stage, float rawProgress) {
-        if (!isActive()) return new State(header, stage, rawProgress);
-        State findingSeed = initialFindingSeed(header);
-        if (findingSeed != null) return findingSeed;
-        if (phase == Phase.PREPARING_CHUNKS) return synthetic(header, LegacyComponents.PREPARING_CHUNKS, PREPARING_CHUNKS_MS);
-        if (phase == Phase.FINALIZING) return synthetic(header, LegacyComponents.FINALIZING, FINALIZING_MS, 1.0F);
+        if (!isActive()) return new State(header, stage, quantize(rawProgress));
+        State findingSeedState = findingSeedStage(header);
+        if (findingSeedState != null) return findingSeedState;
+        if (phase == Phase.PREPARING_CHUNKS) {
+            return synthetic(header, LegacyComponents.PREPARING_CHUNKS, PREPARING_CHUNKS_MS, PREPARING_CHUNKS_END_PROGRESS);
+        }
+        if (phase == Phase.FINALIZING) {
+            return synthetic(header, LegacyComponents.FINALIZING, FINALIZING_MS);
+        }
         setPhase(Phase.PREPARING);
-        Component[] normalized = normalizeHeader(header, stage);
-        return new State(normalized[0], normalized[1], timed(PREPARING_FAKE_MS, variedEnd(phaseStartedMillis), PREPARING_PHASE_SPEED, rawProgress));
+        Component[] normalized = normalizeHeader(header == null ? LegacyComponents.INITIALIZING : header, stage);
+        float timeProgress = rangedProgress(PREPARING_MS);
+        float rawTarget = quantize(rawProgress);
+        return new State(normalized[0], normalized[1], advance(Math.max(timeProgress, rawTarget)));
     }
 
     public static State loading(Component header, Component stage, float rawProgress) {
-        if (!isActive()) return new State(header, stage, rawProgress);
-        State findingSeed = initialFindingSeed(header);
-        if (findingSeed != null) return findingSeed;
-        if (phase == Phase.PREPARING_CHUNKS) return synthetic(header, LegacyComponents.PREPARING_CHUNKS, PREPARING_CHUNKS_MS);
-        if (phase == Phase.FINALIZING) return synthetic(header, LegacyComponents.FINALIZING, FINALIZING_MS, 1.0F);
+        if (!isActive()) return new State(header, stage, quantize(rawProgress));
+        State findingSeedState = findingSeedStage(header);
+        if (findingSeedState != null) return findingSeedState;
+        if (phase == Phase.PREPARING_CHUNKS) {
+            return synthetic(header, LegacyComponents.PREPARING_CHUNKS, PREPARING_CHUNKS_MS, PREPARING_CHUNKS_END_PROGRESS);
+        }
+        if (phase == Phase.FINALIZING) {
+            return synthetic(header, LegacyComponents.FINALIZING, FINALIZING_MS);
+        }
         setPhase(Phase.LOADING);
-        return new State(header, stage == null ? LegacyComponents.LOADING_SPAWN_AREA : stage, loop(LOADING_CYCLE_MS, LOADING_PHASE_SPEED));
+        float timeProgress = rangedProgress(LOADING_MS, LOADING_STAGE_END_PROGRESS);
+        float rawTarget = quantize(Mth.clamp(rawProgress, 0.0F, LOADING_STAGE_END_PROGRESS));
+        return new State(header, stage == null ? LegacyComponents.LOADING_SPAWN_AREA : stage, advance(Math.max(timeProgress, rawTarget)));
     }
 
     public static boolean holdClose() {
         if (!isActive()) return false;
         long elapsed = Util.getMillis() - phaseStartedMillis;
+        if (phase == Phase.FINDING_SEED) {
+            if (elapsed < FINDING_SEED_RESET_HOLD_MS + FINDING_SEED_CYCLE_MS) return true;
+            setPhase(Phase.PREPARING_CHUNKS);
+            return true;
+        }
         if (phase != Phase.PREPARING_CHUNKS && phase != Phase.FINALIZING) {
-            phase = Phase.PREPARING_CHUNKS;
-            phaseStartedMillis = Util.getMillis();
+            setPhase(Phase.PREPARING_CHUNKS);
             return true;
         }
         if (phase == Phase.PREPARING_CHUNKS) {
             if (elapsed < PREPARING_CHUNKS_MS) return true;
-            phase = Phase.FINALIZING;
-            phaseStartedMillis = Util.getMillis();
+            setPhase(Phase.FINALIZING);
             return true;
         }
         if (elapsed < FINALIZING_MS) return true;
@@ -93,64 +110,74 @@ public final class CreateWorldLoadingTracker {
     }
 
     private static State synthetic(Component header, Component stage, long durationMs) {
-        return new State(header == null ? LegacyComponents.INITIALIZING : header, stage, timed(durationMs, variedEnd(phaseStartedMillis), SYNTHETIC_PHASE_SPEED, 0.0F));
+        return new State(header == null ? LegacyComponents.INITIALIZING : header, stage, advance(rangedProgress(durationMs)));
     }
 
     private static State synthetic(Component header, Component stage, long durationMs, float endProgress) {
-        return new State(header == null ? LegacyComponents.INITIALIZING : header, stage, timed(durationMs, endProgress, SYNTHETIC_PHASE_SPEED, 0.0F));
+        return new State(header == null ? LegacyComponents.INITIALIZING : header, stage, advance(rangedProgress(durationMs, endProgress)));
     }
 
-    private static State initialFindingSeed(Component header) {
-        if (phase != Phase.FINDING_SEED) return null;
-        long elapsed = Util.getMillis() - phaseStartedMillis;
+    private static State findingSeedStage(Component header) {
+        if (!findingSeed || phase != Phase.FINDING_SEED) return null;
         long cycleLength = FINDING_SEED_RESET_HOLD_MS + FINDING_SEED_CYCLE_MS;
-        long cycle = elapsed / cycleLength;
-        if (cycle >= FINDING_SEED_CYCLES) {
-            phase = Phase.PREPARING;
-            phaseStartedMillis = Util.getMillis();
+        long elapsed = Util.getMillis() - phaseStartedMillis;
+        if (elapsed >= cycleLength * FINDING_SEED_CYCLES) {
+            findingSeed = false;
+            setPhase(Phase.PREPARING);
             return null;
         }
-        long cycleElapsed = elapsed % cycleLength;
-        float progress = cycleElapsed < FINDING_SEED_RESET_HOLD_MS
-                ? 0.0F
-                : accelerate((cycleElapsed - FINDING_SEED_RESET_HOLD_MS) / (float) FINDING_SEED_CYCLE_MS, FINDING_SEED_PHASE_SPEED) * FINDING_SEED_END_PROGRESS;
-        return new State(header == null ? LegacyComponents.INITIALIZING : header, Component.translatable("legacy.finding_seed"), progress);
+        return new State(header == null ? LegacyComponents.INITIALIZING : header, Component.translatable("legacy.finding_seed"), loopingFindingSeedProgress());
     }
 
     private static void setPhase(Phase phase) {
         if (CreateWorldLoadingTracker.phase == phase || CreateWorldLoadingTracker.phase == Phase.FINALIZING) return;
         CreateWorldLoadingTracker.phase = phase;
         phaseStartedMillis = Util.getMillis();
+        displayedProgress = 0.0F;
     }
 
-    private static float timed(long durationMs, float endProgress, float speed, float rawProgress) {
+    private static float rangedProgress(long durationMs) {
         long elapsed = Util.getMillis() - phaseStartedMillis;
-        if (elapsed < RESET_HOLD_MS) return 0.0F;
+        if (elapsed <= RESET_HOLD_MS) return -1.0F;
         float completion = Mth.clamp((elapsed - RESET_HOLD_MS) / (float) durationMs, 0.0F, 1.0F);
-        return accelerate(Math.max(rawProgress, completion), speed) * endProgress;
+        return quantize(smoothstep(completion));
     }
 
-    private static float loop(long cycleMs, float speed) {
+    private static float rangedProgress(long durationMs, float endProgress) {
         long elapsed = Util.getMillis() - phaseStartedMillis;
-        long cycleLength = RESET_HOLD_MS + cycleMs;
-        long cycle = elapsed / cycleLength;
-        if (cycle >= MAX_LOADING_CYCLES) return LOADING_CYCLE_ENDS[LOADING_CYCLE_ENDS.length - 1];
-        long cycleElapsed = elapsed % cycleLength;
-        float cycleStart = LOADING_RESET_PROGRESS;
-        float cycleEnd = LOADING_CYCLE_ENDS[(int) cycle];
-        if (cycleElapsed < RESET_HOLD_MS) return cycleStart;
-        float completion = (cycleElapsed - RESET_HOLD_MS) / (float) cycleMs;
-        return Mth.lerp(accelerate(completion, speed), cycleStart, cycleEnd);
+        if (elapsed <= RESET_HOLD_MS) return -1.0F;
+        float completion = Mth.clamp((elapsed - RESET_HOLD_MS) / (float) durationMs, 0.0F, 1.0F);
+        return quantize(smoothstep(completion) * endProgress);
     }
 
-    private static float variedEnd(long salt) {
-        long value = salt * 1103515245L + 12345L;
-        float selector = (value & 1023L) / 1023.0F;
-        value = value * 1103515245L + 12345L;
-        float sample = (value & 1023L) / 1023.0F;
-        return selector < PREFERRED_RANGE_WEIGHT
-                ? Mth.lerp(sample, PREFERRED_MIN_END, PREFERRED_MAX_END)
-                : Mth.lerp(sample, VARIED_MIN_END, VARIED_MAX_END);
+    private static float advance(float targetProgress) {
+        if (targetProgress < 0.0F) {
+            return -1.0F;
+        }
+        displayedProgress = Math.max(displayedProgress, quantize(targetProgress));
+        return displayedProgress;
+    }
+
+    private static float loopingFindingSeedProgress() {
+        long elapsed = Util.getMillis() - phaseStartedMillis;
+        long cycleLength = FINDING_SEED_RESET_HOLD_MS + FINDING_SEED_CYCLE_MS;
+        long cycleElapsed = elapsed % cycleLength;
+        if (cycleElapsed < FINDING_SEED_RESET_HOLD_MS) {
+            displayedProgress = 0.0F;
+            return 0.0F;
+        }
+        float completion = (cycleElapsed - FINDING_SEED_RESET_HOLD_MS) / (float) FINDING_SEED_CYCLE_MS;
+        displayedProgress = quantize(smoothstep(Mth.clamp(completion, 0.0F, 1.0F)) * FINDING_SEED_END_PROGRESS);
+        return displayedProgress;
+    }
+
+    private static float quantize(float progress) {
+        float clamped = Mth.clamp(progress, 0.0F, 1.0F);
+        float stepped = (float) Math.floor(clamped * 100.0F) / 100.0F;
+        if (clamped > 0.0F && stepped <= 0.0F) {
+            return 0.01F;
+        }
+        return stepped;
     }
 
     private static Component[] normalizeHeader(Component header, Component stage) {
@@ -163,9 +190,8 @@ public final class CreateWorldLoadingTracker {
         return new Component[]{normalizedHeader, normalizedStage};
     }
 
-    private static float accelerate(float rawProgress, float speed) {
-        float boosted = Mth.clamp(rawProgress * speed, 0.0F, 1.0F);
-        return 1.0F - (1.0F - boosted) * (1.0F - boosted);
+    private static float smoothstep(float progress) {
+        return progress * progress * (3.0F - 2.0F * progress);
     }
 
     public record State(Component header, Component stage, float progress) {

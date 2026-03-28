@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -57,6 +58,12 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     protected PublishScreen publishScreen;
     protected TickBox onlineTickBox;
     protected PackAlbum.Selector resourceAlbumSelector;
+    @Unique
+    private boolean legacy$restoreAllowCommandsAfterGameModeChange;
+    @Unique
+    private boolean legacy$restoringAllowCommands;
+    @Unique
+    private boolean legacy$preservedAllowCommands;
     @Shadow
     @Final
     private WorldCreationUiState uiState;
@@ -122,8 +129,21 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         uiState.addListener(worldCreationUiState -> nameEdit.setTooltip(Tooltip.create(Component.translatable("selectWorld.targetFolder", Component.literal(worldCreationUiState.getTargetFolder()).withStyle(ChatFormatting.ITALIC)))));
         setInitialFocus(nameEdit);
         addRenderableWidget(accessor.putWidget("nameEditBox", nameEdit));
-        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, panel.y + 51, layoutWidth, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().displayName), b -> Tooltip.create(uiState.getGameMode().getInfo()), uiState.getGameMode(), () -> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b -> uiState.setGameMode(b.getObjectValue()), uiState::getGameMode)));
+        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, panel.y + 51, layoutWidth, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().displayName), b -> Tooltip.create(uiState.getGameMode().getInfo()), uiState.getGameMode(), () -> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b -> {
+            if (LegacyOptions.legacySettingsMenus.get()) {
+                legacy$preservedAllowCommands = uiState./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/();
+                legacy$restoreAllowCommandsAfterGameModeChange = true;
+            }
+            uiState.setGameMode(b.getObjectValue());
+        }, uiState::getGameMode)));
         uiState.addListener(worldCreationUiState -> gameModeButton.active = !worldCreationUiState.isDebug());
+        uiState.addListener(worldCreationUiState -> {
+            if (!legacy$restoreAllowCommandsAfterGameModeChange || legacy$restoringAllowCommands) return;
+            legacy$restoringAllowCommands = true;
+            uiState./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(legacy$preservedAllowCommands);
+            legacy$restoreAllowCommandsAfterGameModeChange = false;
+            legacy$restoringAllowCommands = false;
+        });
         LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, panel.y + 77, layoutWidth, 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(uiState.getDifficulty().getInfo()), uiState.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b -> uiState.setDifficulty(b.getObjectValue()), uiState::getDifficulty)));
         uiState.addListener(worldCreationUiState -> {
             difficultyButton.updateValue();
@@ -133,7 +153,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
         addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> {
-            if (LegacyOptions.legacySettingsMenus.get() && LegacyOptions.legacyLoadingAndConnecting.get()) CreateWorldLoadingTracker.start();
+            if (LegacyOptions.legacySettingsMenus.get() && LegacyOptions.legacyLoadingAndConnecting.get()) {
+                CreateWorldLoadingTracker.start(self().getUiState().getSeed().isBlank());
+            }
             this.onCreate();
         }).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {

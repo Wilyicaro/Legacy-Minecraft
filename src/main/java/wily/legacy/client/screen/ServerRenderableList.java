@@ -84,6 +84,7 @@ public class ServerRenderableList extends RenderableVList {
     public final ServerList servers;
     public final LanServerDetection.LanServerList lanServerList;
     protected final Minecraft minecraft;
+    protected boolean lastDisplayRealmsButton = LegacyOptions.displayRealmsButton.get();
     @Nullable
     public LanServerDetection.LanServerDetector lanServerDetector;
     public List<LanServer> lanServers;
@@ -127,6 +128,14 @@ public class ServerRenderableList extends RenderableVList {
             lanServerDetector.interrupt();
             lanServerDetector = null;
         }
+    }
+
+    public boolean syncOptionDrivenButtons() {
+        boolean displayRealmsButton = LegacyOptions.displayRealmsButton.get();
+        if (lastDisplayRealmsButton == displayRealmsButton) return false;
+        lastDisplayRealmsButton = displayRealmsButton;
+        updateServers();
+        return true;
     }
 
     private Component getMultiplayerDisabledReason() {

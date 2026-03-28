@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base;
 
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +33,12 @@ public class ServerGamePacketListenerImplMixin {
 
     @Inject(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;releaseUsingItem()V"), cancellable = true)
     private void handlePlayerAction(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
+        if (packet.getAction() == ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND
+            && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS)) {
+            ci.cancel();
+            return;
+        }
+
         if (packet.getAction() == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (player.isPassenger() || player.isShiftKeyDown()) && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem) {
             ci.cancel();
         }
