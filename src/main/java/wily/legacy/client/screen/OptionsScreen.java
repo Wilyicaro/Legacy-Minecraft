@@ -534,7 +534,13 @@ public class OptionsScreen extends PanelVListScreen {
                 ArbitrarySupplier.empty(),
                 (p, section) -> {
                     if (!LegacyOptions.legacySettingsMenus.get()) return new OptionsScreen(p, section);
-                    return new OptionsScreen(p, section);
+                    return new OptionsScreen(p, section) {
+                        @Override
+                        public void onClose() {
+                            super.onClose();
+                            showOptionsPresetWarningIfNeeded(parent, minecraft);
+                        }
+                    };
                 });
         public static final Section USER_INTERFACE = add(new Section(
                 Component.translatable("legacy.menu.user_interface"),
