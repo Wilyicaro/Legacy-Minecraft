@@ -623,7 +623,7 @@
   "gamerule.doTileDrops.description": "When enabled, blocks will drop items when destroyed.",
   "gamerule.doWeatherCycle.description": "When enabled, the weather will change naturally.",
   "gamerule.defaultMapSize": "Default Map Size",
-  "gamerule.defaultMapSize.description": "The size of maps created from empty maps.",
+  "gamerule.defaultMapSize.description": "The size of maps created from empty non-starter maps.",
   "gamerule.defaultShowArmorStandArms": "Show Armor Stand Arms",
   "gamerule.defaultShowArmorStandArms.description": "When enabled, the armor stand will show arms when placed.",
   "gamerule.fallingBlockLimit": "Falling Block Limit",
