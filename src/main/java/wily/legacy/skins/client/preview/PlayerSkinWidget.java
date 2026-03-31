@@ -122,6 +122,10 @@ public class PlayerSkinWidget extends AbstractWidget {
     public void prewarm() {
         String id = skinId.get();
         if (id == null || id.isBlank()) return;
+        if (SkinIdUtil.isAutoSelect(id)) {
+            GuiSessionSkin.prewarm();
+            return;
+        }
         SkinPreviewWarmup.enqueue(id);
     }
 
@@ -313,9 +317,6 @@ public class PlayerSkinWidget extends AbstractWidget {
                 var playerSkin = GuiSessionSkin.getSessionPlayerSkin();
                 if (playerSkin != null) {
                     GuiDollRender.renderDollInRect(guiGraphics, id, playerSkin, yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom, 165);
-                } else {
-                    SkinEntry entry = SkinPackLoader.getSkin(id);
-                    if (entry != null && entry.texture() != null) { GuiDollRender.renderDollInRect(guiGraphics, id, entry.texture(), yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom, 165); }
                 }
             } else {
                 SkinEntry entry = getCachedEntry(id);

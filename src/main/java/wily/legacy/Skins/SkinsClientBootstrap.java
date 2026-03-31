@@ -9,6 +9,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.Skins.client.util.ViewBobbingSkinOverride;
+import wily.legacy.Skins.client.gui.GuiSessionSkin;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
@@ -72,6 +73,7 @@ public final class SkinsClientBootstrap {
     private static void postTick(Minecraft minecraft) {
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
+        GuiSessionSkin.prewarm();
 
         if (!defaultSelectionChecked) {
             checkDefaultSelection(minecraft);
@@ -97,6 +99,7 @@ public final class SkinsClientBootstrap {
 
     public static void requestOpenChangeSkinScreen(Minecraft minecraft, Screen parent) {
         if (minecraft == null) return;
+        GuiSessionSkin.prewarm();
         minecraft.setScreen(createChangeSkinScreen(parent));
     }
 
