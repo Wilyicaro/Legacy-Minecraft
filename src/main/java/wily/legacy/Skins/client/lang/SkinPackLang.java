@@ -82,17 +82,8 @@ public final class SkinPackLang {
     private static String selectedLanguageCode() {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null) return "en_us";
-        Object languageManager = invokeNoArgs(mc, "getLanguageManager");
-        if (languageManager == null) return "en_us";
-
-        Object selected = invokeNoArgs(languageManager, "getSelected");
-        if (selected == null) selected = invokeNoArgs(languageManager, "getSelectedLanguage");
-        if (selected == null) return "en_us";
-
-        Object code = invokeNoArgs(selected, "getCode");
-        if (code instanceof String s && !s.isBlank()) return s;
-        if (selected instanceof String s && !s.isBlank()) return s;
-        return "en_us";
+        String selected = mc.getLanguageManager().getSelected();
+        return selected == null || selected.isBlank() ? "en_us" : selected;
     }
 
     private static void loadLocale(ResourceManager rm, String locale, Map<String, String> out) {
@@ -150,15 +141,6 @@ public final class SkinPackLang {
             return rm.listResources(root, filter);
         } catch (RuntimeException ignored) {
             return Map.of();
-        }
-    }
-
-    private static Object invokeNoArgs(Object target, String name) {
-        if (target == null || name == null || name.isBlank()) return null;
-        try {
-            return target.getClass().getMethod(name).invoke(target);
-        } catch (ReflectiveOperationException | RuntimeException ignored) {
-            return null;
         }
     }
 

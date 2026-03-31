@@ -3,6 +3,7 @@ package wily.legacy.Skins.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -12,14 +13,8 @@ import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.skin.ClientSkinAssets;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 public final class GuiDollRender {
     public static final int MENU_DOLL_ID = -0x5D011;
@@ -30,10 +25,6 @@ public final class GuiDollRender {
     private static final float SCALE_DIVISOR = 2.75F;
     private static final float CROUCH_Y_OFFSET = -0.125F;
     private static final int MIN_RENDER_SIZE = 20;
-    private static volatile GpuBufferSlice cachedGuiEntityLights;
-    private static volatile boolean triedResolveGuiEntityLights;
-    private static volatile Method cachedInventoryEntitySetup;
-    private static volatile boolean triedResolveInventoryEntitySetup;
 
     private GuiDollRender() { }
 
@@ -152,93 +143,8 @@ public final class GuiDollRender {
     }
 
     private static void applyPreviewLighting() {
-        setupInventoryEntityLighting();
-        GpuBufferSlice lights = resolveGuiEntityLights();
-        if (lights != null) {
-            try {
-                RenderSystem.setShaderLights(lights);
-            } catch (RuntimeException ignored) { }
-        }
-    }
-
-    private static void setupInventoryEntityLighting() {
-        if (!triedResolveInventoryEntitySetup) {
-            synchronized (GuiDollRender.class) {
-                if (!triedResolveInventoryEntitySetup) {
-                    triedResolveInventoryEntitySetup = true;
-                    cachedInventoryEntitySetup = null;
-                    try {
-                        Class<?> lighting = Class.forName("com.mojang.blaze3d.platform.Lighting");
-                        for (Method method : lighting.getDeclaredMethods()) {
-                            if (!Modifier.isStatic(method.getModifiers())) continue;
-                            String name = method.getName().toLowerCase(java.util.Locale.ROOT);
-                            if (!name.contains("inventory")) continue;
-                            if (!name.contains("entity") && !name.contains("entities")) continue;
-                            method.setAccessible(true);
-                            cachedInventoryEntitySetup = method;
-                            break;
-                        }
-                    } catch (ClassNotFoundException | RuntimeException ignored) { }
-                }
-            }
-        }
-
-        if (cachedInventoryEntitySetup == null) return;
-        try {
-            if (cachedInventoryEntitySetup.getParameterCount() == 0) {
-                cachedInventoryEntitySetup.invoke(null);
-                return;
-            }
-            if (cachedInventoryEntitySetup.getParameterCount() == 1 && cachedInventoryEntitySetup.getParameterTypes()[0].getName().equals("org.joml.Quaternionf")) { cachedInventoryEntitySetup.invoke(null, new Quaternionf()); }
-        } catch (ReflectiveOperationException | RuntimeException ignored) { }
-    }
-
-    private static GpuBufferSlice resolveGuiEntityLights() {
-        if (triedResolveGuiEntityLights) return cachedGuiEntityLights;
-        synchronized (GuiDollRender.class) {
-            if (triedResolveGuiEntityLights) return cachedGuiEntityLights;
-            triedResolveGuiEntityLights = true;
-            cachedGuiEntityLights = null;
-            try {
-                Class<?> lighting = Class.forName("com.mojang.blaze3d.platform.Lighting");
-                GpuBufferSlice best = null;
-                int bestScore = Integer.MIN_VALUE;
-                for (Field field : lighting.getDeclaredFields()) {
-                    if (!Modifier.isStatic(field.getModifiers())) continue;
-                    if (!GpuBufferSlice.class.isAssignableFrom(field.getType())) continue;
-                    field.setAccessible(true);
-                    Object value = field.get(null);
-                    if (!(value instanceof GpuBufferSlice slice)) continue;
-                    String name = field.getName().toLowerCase(java.util.Locale.ROOT);
-                    int score = 0;
-                    if (name.contains("entity")) score += 10;
-                    if (name.contains("inventory")) score += 10;
-                    if (name.contains("gui")) score += 6;
-                    if (name.contains("item")) score += 3;
-                    if (score > bestScore) {
-                        bestScore = score;
-                        best = slice;
-                    }
-                }
-                if (best != null) {
-                    cachedGuiEntityLights = best;
-                    return cachedGuiEntityLights;
-                }
-
-                for (Method method : lighting.getDeclaredMethods()) {
-                    if (!Modifier.isStatic(method.getModifiers())) continue;
-                    if (!GpuBufferSlice.class.isAssignableFrom(method.getReturnType())) continue;
-                    if (method.getParameterCount() != 0) continue;
-                    method.setAccessible(true);
-                    Object value = method.invoke(null);
-                    if (value instanceof GpuBufferSlice slice) {
-                        cachedGuiEntityLights = slice;
-                        return cachedGuiEntityLights;
-                    }
-                }
-            } catch (ReflectiveOperationException | RuntimeException ignored) { }
-            return cachedGuiEntityLights;
-        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc != null) mc.gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
     }
 
     private record PreviewLayout(

@@ -26,7 +26,7 @@ public final class StiffArmsPose {
 
         ArmPoseSupport.ArmState rightState = ArmPoseSupport.ArmState.capture(model.rightArm, model.rightSleeve);
         ArmPoseSupport.ArmState leftState = ArmPoseSupport.ArmState.capture(model.leftArm, model.leftSleeve);
-        ArmPoseSupport.ArmFlags blocking = ArmPoseSupport.includeModelBlocking(model, ArmPoseSupport.getShieldBlockingArms(player, true));
+        ArmPoseSupport.ArmFlags blocking = ArmPoseSupport.includeModelBlocking(state, ArmPoseSupport.getShieldBlockingArms(player, true));
 
         if (!blocking.right()) {
             model.rightArm.xRot = 0.0F;

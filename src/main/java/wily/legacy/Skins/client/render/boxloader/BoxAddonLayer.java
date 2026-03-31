@@ -19,18 +19,10 @@ import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.compat.cpm.CpmRenderCompat;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
 public class BoxAddonLayer extends RenderLayer {
-
-    private static volatile boolean triedResolveInvisible;
-    private static volatile Field cachedInvisibleField;
-    private static volatile Method cachedInvisibleMethod;
-
     public BoxAddonLayer(RenderLayerParent parent) {
         super(parent);
     }
@@ -101,44 +93,14 @@ public class BoxAddonLayer extends RenderLayer {
     }
 
     private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
-        if (!triedResolveInvisible) {
-            synchronized (BoxAddonLayer.class) {
-                if (!triedResolveInvisible) {
-                    triedResolveInvisible = true;
-                    try {
-                        cachedInvisibleField = ars.getClass().getField("isInvisible");
-                        if (cachedInvisibleField.getType() != boolean.class) cachedInvisibleField = null;
-                    } catch (Throwable ignored) {
-                        try {
-                            cachedInvisibleMethod = ars.getClass().getMethod("isInvisible");
-                            if (cachedInvisibleMethod.getReturnType() != boolean.class) cachedInvisibleMethod = null;
-                        } catch (Throwable ignored2) {
-                        }
-                    }
-                }
-            }
-        }
-
-        if (cachedInvisibleField != null) {
-            try { return cachedInvisibleField.getBoolean(ars); } catch (Throwable ignored) {}
-        }
-        if (cachedInvisibleMethod != null) {
-            try { return (boolean) cachedInvisibleMethod.invoke(ars); } catch (Throwable ignored) {}
-        }
-
-        try {
-            UUID u = a.consoleskins$getEntityUuid();
-            if (u != null) {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level != null) {
-                    Player p = mc.level.getPlayerByUUID(u);
-                    if (p != null) return p.isInvisible();
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-
-        return false;
+        if (ars.isInvisible) return true;
+        UUID u = a.consoleskins$getEntityUuid();
+        if (u == null) return false;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null) return false;
+        if (mc.level == null) return false;
+        Player p = mc.level.getPlayerByUUID(u);
+        return p != null && p.isInvisible();
     }
 
     private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {

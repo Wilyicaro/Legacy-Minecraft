@@ -1,6 +1,7 @@
 package wily.legacy.Skins.pose;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
+import wily.legacy.Skins.client.gui.GuiDollRender;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 
 import java.util.UUID;
@@ -137,7 +139,7 @@ final class ArmPoseSupport {
         return new ArmFlags(right, left);
     }
 
-    static ArmFlags includeModelBlocking(PlayerModel model, ArmFlags flags) { return flags.merge(armPoseIsBlocking(model, true), armPoseIsBlocking(model, false)); }
+    static ArmFlags includeModelBlocking(AvatarRenderState state, ArmFlags flags) { return flags.merge(armPoseIsBlocking(state, true), armPoseIsBlocking(state, false)); }
 
     private static HumanoidArm getUsedArm(Player player) {
         HumanoidArm mainArm = player.getMainArm();
@@ -215,62 +217,17 @@ final class ArmPoseSupport {
     }
 
     static float getAgeInTicks(Object state) {
-        if (state == null) return timeFallback();
-
-        float value = getFloatField(state, "ageInTicks");
-        if (!Float.isNaN(value)) return value;
-        value = getFloatField(state, "age");
-        if (!Float.isNaN(value)) return value;
-        value = getFloatField(state, "tick");
-        if (!Float.isNaN(value)) return value;
-        value = getFloatField(state, "ticks");
-        if (!Float.isNaN(value)) return value;
-        value = getFloatField(state, "time");
-        if (!Float.isNaN(value)) return value;
-
-        value = invokeFloatGetter(state, "ageInTicks");
-        if (!Float.isNaN(value)) return value;
-        value = invokeFloatGetter(state, "getAgeInTicks");
-        if (!Float.isNaN(value)) return value;
-
-        return timeFallback();
+        if (!(state instanceof AvatarRenderState avatarState)) return timeFallback();
+        if (avatarState.id == GuiDollRender.MENU_DOLL_ID) return timeFallback();
+        return avatarState.ageInTicks;
     }
 
-    private static boolean armPoseIsBlocking(PlayerModel model, boolean right) {
-        if (model == null) return false;
-        try {
-            var field = model.getClass().getDeclaredField(right ? "rightArmPose" : "leftArmPose");
-            field.setAccessible(true);
-            return isBlockPose(field.get(model));
-        } catch (ReflectiveOperationException | RuntimeException ignored) { return false; }
+    private static boolean armPoseIsBlocking(AvatarRenderState state, boolean right) {
+        if (state == null) return false;
+        return isBlockPose(right ? state.rightArmPose : state.leftArmPose);
     }
 
-    private static boolean isBlockPose(Object pose) {
-        if (pose == null) return false;
-        if (pose instanceof Enum<?> value) return "BLOCK".equals(value.name());
-        return "BLOCK".equals(String.valueOf(pose));
-    }
-
-    private static float getFloatField(Object target, String name) {
-        try {
-            var field = target.getClass().getDeclaredField(name);
-            field.setAccessible(true);
-            Object value = field.get(target);
-            if (value instanceof Float number) return number;
-            if (value instanceof Number number) return number.floatValue();
-        } catch (ReflectiveOperationException | RuntimeException ignored) { }
-        return Float.NaN;
-    }
-
-    private static float invokeFloatGetter(Object target, String name) {
-        try {
-            var method = target.getClass().getMethod(name);
-            Object value = method.invoke(target);
-            if (value instanceof Float number) return number;
-            if (value instanceof Number number) return number.floatValue();
-        } catch (ReflectiveOperationException | RuntimeException ignored) { }
-        return Float.NaN;
-    }
+    private static boolean isBlockPose(HumanoidModel.ArmPose pose) { return pose == HumanoidModel.ArmPose.BLOCK; }
 
     private static float timeFallback() { return (System.currentTimeMillis() % 1_000_000L) / 1000.0F; }
 }
