@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.util.LegacyComponents;
 
 public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         implements wily.legacy.client.controller.Controller.Event, ControlTooltip.Event, InputTypeSwitchLock {
@@ -399,9 +400,9 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> Component.literal("Select"));
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.cancel"));
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_F) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), this::favoriteActionLabel);
-        if (ConsoleSkinsClientSettings.isMinimizeTooltips()) return;
         r.add(navigateIcon, navigateLabel);
-        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> Component.literal("Advanced Options"));
+        if (LegacyOptions.hideAdvancedOptionsTooltip.get() || LegacyOptions.legacySettingsMenus.get()) return;
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> LegacyComponents.SHOW_ADVANCED_OPTIONS);
     }
 
     protected PlayerSkinWidget pickCarouselWidget(double mx, double my) {
