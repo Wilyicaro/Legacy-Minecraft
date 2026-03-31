@@ -4,15 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class DebugLog {
-
     private static final Logger LOGGER = LoggerFactory.getLogger("ConsoleSkins");
     private static final boolean ENABLED = Boolean.getBoolean("consoleskins.debug");
 
     private DebugLog() {
-    }
-
-    public static boolean enabled() {
-        return ENABLED;
     }
 
     public static void debug(String msg, Object... args) {

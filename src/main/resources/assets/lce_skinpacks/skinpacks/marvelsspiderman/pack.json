@@ -1,0 +1,224 @@
+{
+  "name": "key:custom.marvelsspiderman.pack.name",
+  "author": "4J Studios ",
+  "type": "skin",
+  "sort_index": 2955,
+  "skins": [
+    {
+      "id": "black_cat",
+      "name": "key:custom.marvelsspiderman.black_cat",
+      "texture": "skins/black_cat.png",
+      "order": 11
+    },
+    {
+      "id": "carnage",
+      "name": "key:custom.marvelsspiderman.carnage",
+      "texture": "skins/carnage.png",
+      "order": 12
+    },
+    {
+      "id": "chameleon",
+      "name": "key:custom.marvelsspiderman.chameleon",
+      "texture": "skins/chameleon.png",
+      "order": 13
+    },
+    {
+      "id": "doctor_octopus",
+      "name": "key:custom.marvelsspiderman.doctor_octopus",
+      "texture": "skins/doctor_octopus.png",
+      "order": 14
+    },
+    {
+      "id": "electro",
+      "name": "key:custom.marvelsspiderman.electro",
+      "texture": "skins/electro.png",
+      "order": 15
+    },
+    {
+      "id": "green_goblin",
+      "name": "key:custom.marvelsspiderman.green_goblin",
+      "texture": "skins/green_goblin.png",
+      "order": 16
+    },
+    {
+      "id": "gwen_stacy",
+      "name": "key:custom.marvelsspiderman.gwen_stacy",
+      "texture": "skins/gwen_stacy.png",
+      "order": 17
+    },
+    {
+      "id": "hammerhead",
+      "name": "key:custom.marvelsspiderman.hammerhead",
+      "texture": "skins/hammerhead.png",
+      "order": 18
+    },
+    {
+      "id": "iron_spider",
+      "name": "key:custom.marvelsspiderman.iron_spider",
+      "texture": "skins/iron_spider.png",
+      "order": 19
+    },
+    {
+      "id": "j_jonah_jameson",
+      "name": "key:custom.marvelsspiderman.j_jonah_jameson",
+      "texture": "skins/j_jonah_jameson.png",
+      "order": 20
+    },
+    {
+      "id": "kingpin",
+      "name": "key:custom.marvelsspiderman.kingpin",
+      "texture": "skins/kingpin.png",
+      "order": 21
+    },
+    {
+      "id": "kraven",
+      "name": "key:custom.marvelsspiderman.kraven",
+      "texture": "skins/kraven.png",
+      "order": 22,
+      "cape": "capes/kraven.png"
+    },
+    {
+      "id": "lizard",
+      "name": "key:custom.marvelsspiderman.lizard",
+      "texture": "skins/lizard.png",
+      "order": 23
+    },
+    {
+      "id": "mary_jane_watson",
+      "name": "key:custom.marvelsspiderman.mary_jane_watson",
+      "texture": "skins/mary_jane_watson.png",
+      "order": 24
+    },
+    {
+      "id": "menace",
+      "name": "key:custom.marvelsspiderman.menace",
+      "texture": "skins/menace.png",
+      "order": 25,
+      "cape": "capes/menace.png"
+    },
+    {
+      "id": "mister_negative",
+      "name": "key:custom.marvelsspiderman.mister_negative",
+      "texture": "skins/mister_negative.png",
+      "order": 26
+    },
+    {
+      "id": "morbius",
+      "name": "key:custom.marvelsspiderman.morbius",
+      "texture": "skins/morbius.png",
+      "order": 27,
+      "cape": "capes/morbius.png"
+    },
+    {
+      "id": "mysterio",
+      "name": "key:custom.marvelsspiderman.mysterio",
+      "texture": "skins/mysterio.png",
+      "order": 28,
+      "cape": "capes/mysterio.png"
+    },
+    {
+      "id": "rhino",
+      "name": "key:custom.marvelsspiderman.rhino",
+      "texture": "skins/rhino.png",
+      "order": 29
+    },
+    {
+      "id": "sandman",
+      "name": "key:custom.marvelsspiderman.sandman",
+      "texture": "skins/sandman.png",
+      "order": 30
+    },
+    {
+      "id": "scarlet_spider_classic",
+      "name": "key:custom.marvelsspiderman.scarlet_spider_classic",
+      "texture": "skins/scarlet_spider_classic.png",
+      "order": 31
+    },
+    {
+      "id": "scarlet_spider_modern",
+      "name": "key:custom.marvelsspiderman.scarlet_spider_modern",
+      "texture": "skins/scarlet_spider_modern.png",
+      "order": 32
+    },
+    {
+      "id": "scorpion",
+      "name": "key:custom.marvelsspiderman.scorpion",
+      "texture": "skins/scorpion.png",
+      "order": 33
+    },
+    {
+      "id": "shocker",
+      "name": "key:custom.marvelsspiderman.shocker",
+      "texture": "skins/shocker.png",
+      "order": 34
+    },
+    {
+      "id": "silver_sable",
+      "name": "key:custom.marvelsspiderman.silver_sable",
+      "texture": "skins/silver_sable.png",
+      "order": 35
+    },
+    {
+      "id": "spider_man",
+      "name": "key:custom.marvelsspiderman.spider_man",
+      "texture": "skins/spider_man.png",
+      "order": 1
+    },
+    {
+      "id": "spider_man_black_suit",
+      "name": "key:custom.marvelsspiderman.spider_man_black_suit",
+      "texture": "skins/spider_man_black_suit.png",
+      "order": 2
+    },
+    {
+      "id": "spider_man_future_foundation",
+      "name": "key:custom.marvelsspiderman.spider_man_future_foundation",
+      "texture": "skins/spider_man_future_foundation.png",
+      "order": 3
+    },
+    {
+      "id": "spider_man_miles_morales",
+      "name": "key:custom.marvelsspiderman.spider_man_miles_morales",
+      "texture": "skins/spider_man_miles_morales.png",
+      "order": 4
+    },
+    {
+      "id": "spider_man_2099",
+      "name": "key:custom.marvelsspiderman.spider_man_2099",
+      "texture": "skins/spider_man_2099.png",
+      "order": 5,
+      "cape": "capes/spider_man_2099.png"
+    },
+    {
+      "id": "spider_man_big_time",
+      "name": "key:custom.marvelsspiderman.spider_man_big_time",
+      "texture": "skins/spider_man_big_time.png",
+      "order": 6
+    },
+    {
+      "id": "superior_spider_man",
+      "name": "key:custom.marvelsspiderman.superior_spider_man",
+      "texture": "skins/superior_spider_man.png",
+      "order": 7
+    },
+    {
+      "id": "venom",
+      "name": "key:custom.marvelsspiderman.venom",
+      "texture": "skins/venom.png",
+      "order": 8
+    },
+    {
+      "id": "vulture",
+      "name": "key:custom.marvelsspiderman.vulture",
+      "texture": "skins/vulture.png",
+      "order": 9,
+      "cape": "capes/vulture.png"
+    },
+    {
+      "id": "aunt_may",
+      "name": "key:custom.marvelsspiderman.aunt_may",
+      "texture": "skins/aunt_may.png",
+      "order": 10
+    }
+  ]
+}

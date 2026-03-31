@@ -1,6 +1,8 @@
 {
   "name": "key:custom.supercuteskins.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 5160,
   "skins": [
     {
       "id": "woof",

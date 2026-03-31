@@ -1,25 +1,13 @@
 package wily.legacy.Skins.skin;
 
-import java.util.Locale;
-
 public final class SkinIdUtil {
-
-    private SkinIdUtil() {
-    }
-
-    public static boolean isAutoSelect(String skinId) {
-        return SkinIds.AUTO_SELECT.equals(skinId);
-    }
-
-    public static boolean isFavouritesPack(String packId) {
-        return SkinIds.PACK_FAVOURITES.equals(packId);
-    }
-
-    public static boolean containsMinecon(String packId) {
-        return packId != null && packId.toLowerCase(Locale.ROOT).contains("minecon");
-    }
-
-    public static SkinType typeOf(String skinId) {
-        return SkinType.JSON;
-    }
+    public static final String PACK_DEFAULT = "default";
+    public static final String PACK_FAVOURITES = "favourites";
+    public static final String AUTO_SELECT = "auto_select";
+    private SkinIdUtil() { }
+    public static boolean hasSkin(String skinId) { return skinId != null && !skinId.isBlank(); }
+    public static boolean isAutoSelect(String skinId) { return AUTO_SELECT.equals(skinId); }
+    public static boolean isBlankOrAutoSelect(String skinId) { return !hasSkin(skinId) || isAutoSelect(skinId); }
+    public static String normalize(String skinId) { return skinId == null ? "" : skinId; }
+    public static boolean isFavouritesPack(String packId) { return PACK_FAVOURITES.equals(packId); }
 }

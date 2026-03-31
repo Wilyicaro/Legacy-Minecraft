@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Spider-Man - Big Time",
+    "displayNameId": "custom.marvelsspiderman.spider_man_big_time",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.spider_man_big_time"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

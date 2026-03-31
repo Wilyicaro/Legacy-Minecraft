@@ -1,0 +1,297 @@
+{
+  "name": "key:custom.stevenuniverse.pack.name",
+  "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 4499,
+  "skins": [
+    {
+      "id": "steven_universe",
+      "name": "key:custom.stevenuniverse.steven_universe",
+      "texture": "skins/steven_universe.png",
+      "order": 1
+    },
+    {
+      "id": "garnet",
+      "name": "key:custom.stevenuniverse.garnet",
+      "texture": "skins/garnet.png",
+      "order": 2
+    },
+    {
+      "id": "amethyst",
+      "name": "key:custom.stevenuniverse.amethyst",
+      "texture": "skins/amethyst.png",
+      "order": 3
+    },
+    {
+      "id": "pearl",
+      "name": "key:custom.stevenuniverse.pearl",
+      "texture": "skins/pearl.png",
+      "order": 4
+    },
+    {
+      "id": "lapis_lazuli",
+      "name": "key:custom.stevenuniverse.lapis_lazuli",
+      "texture": "skins/lapis_lazuli.png",
+      "order": 5
+    },
+    {
+      "id": "peridot",
+      "name": "key:custom.stevenuniverse.peridot",
+      "texture": "skins/peridot.png",
+      "order": 6
+    },
+    {
+      "id": "connie",
+      "name": "key:custom.stevenuniverse.connie",
+      "texture": "skins/connie.png",
+      "order": 7
+    },
+    {
+      "id": "greg_universe",
+      "name": "key:custom.stevenuniverse.greg_universe",
+      "texture": "skins/greg_universe.png",
+      "order": 8
+    },
+    {
+      "id": "rose_quartz",
+      "name": "key:custom.stevenuniverse.rose_quartz",
+      "texture": "skins/rose_quartz.png",
+      "order": 9
+    },
+    {
+      "id": "ruby",
+      "name": "key:custom.stevenuniverse.ruby",
+      "texture": "skins/ruby.png",
+      "order": 10
+    },
+    {
+      "id": "sapphire",
+      "name": "key:custom.stevenuniverse.sapphire",
+      "texture": "skins/sapphire.png",
+      "order": 11
+    },
+    {
+      "id": "jasper",
+      "name": "key:custom.stevenuniverse.jasper",
+      "texture": "skins/jasper.png",
+      "order": 12
+    },
+    {
+      "id": "bismuth",
+      "name": "key:custom.stevenuniverse.bismuth",
+      "texture": "skins/bismuth.png",
+      "order": 13
+    },
+    {
+      "id": "blue_pearl",
+      "name": "key:custom.stevenuniverse.blue_pearl",
+      "texture": "skins/blue_pearl.png",
+      "order": 14
+    },
+    {
+      "id": "white_pearl",
+      "name": "key:custom.stevenuniverse.white_pearl",
+      "texture": "skins/white_pearl.png",
+      "order": 15
+    },
+    {
+      "id": "yellow_pearl",
+      "name": "key:custom.stevenuniverse.yellow_pearl",
+      "texture": "skins/yellow_pearl.png",
+      "order": 16
+    },
+    {
+      "id": "aquamarine",
+      "name": "key:custom.stevenuniverse.aquamarine",
+      "texture": "skins/aquamarine.png",
+      "order": 17
+    },
+    {
+      "id": "topaz",
+      "name": "key:custom.stevenuniverse.topaz",
+      "texture": "skins/topaz.png",
+      "order": 18
+    },
+    {
+      "id": "padparadscha",
+      "name": "key:custom.stevenuniverse.padparadscha",
+      "texture": "skins/padparadscha.png",
+      "order": 19
+    },
+    {
+      "id": "emerald",
+      "name": "key:custom.stevenuniverse.emerald",
+      "texture": "skins/emerald.png",
+      "order": 20
+    },
+    {
+      "id": "rutile_twins",
+      "name": "key:custom.stevenuniverse.rutile_twins",
+      "texture": "skins/rutile_twins.png",
+      "order": 21
+    },
+    {
+      "id": "holly_blue_agate",
+      "name": "key:custom.stevenuniverse.holly_blue_agate",
+      "texture": "skins/holly_blue_agate.png",
+      "order": 22
+    },
+    {
+      "id": "zircon_prosecution",
+      "name": "key:custom.stevenuniverse.zircon_prosecution",
+      "texture": "skins/zircon_prosecution.png",
+      "order": 23
+    },
+    {
+      "id": "zircon_defense",
+      "name": "key:custom.stevenuniverse.zircon_defense",
+      "texture": "skins/zircon_defense.png",
+      "order": 24
+    },
+    {
+      "id": "stevonnie",
+      "name": "key:custom.stevenuniverse.stevonnie",
+      "texture": "skins/stevonnie.png",
+      "order": 25
+    },
+    {
+      "id": "opal",
+      "name": "key:custom.stevenuniverse.opal",
+      "texture": "skins/opal.png",
+      "order": 26
+    },
+    {
+      "id": "sardonyx",
+      "name": "key:custom.stevenuniverse.sardonyx",
+      "texture": "skins/sardonyx.png",
+      "order": 27
+    },
+    {
+      "id": "sugilite",
+      "name": "key:custom.stevenuniverse.sugilite",
+      "texture": "skins/sugilite.png",
+      "order": 28
+    },
+    {
+      "id": "rainbow_quartz",
+      "name": "key:custom.stevenuniverse.rainbow_quartz",
+      "texture": "skins/rainbow_quartz.png",
+      "order": 29
+    },
+    {
+      "id": "smoky_quartz",
+      "name": "key:custom.stevenuniverse.smoky_quartz",
+      "texture": "skins/smoky_quartz.png",
+      "order": 30
+    },
+    {
+      "id": "malachite",
+      "name": "key:custom.stevenuniverse.malachite",
+      "texture": "skins/malachite.png",
+      "order": 31
+    },
+    {
+      "id": "alexandrite",
+      "name": "key:custom.stevenuniverse.alexandrite",
+      "texture": "skins/alexandrite.png",
+      "order": 32
+    },
+    {
+      "id": "rhodonite",
+      "name": "key:custom.stevenuniverse.rhodonite",
+      "texture": "skins/rhodonite.png",
+      "order": 33
+    },
+    {
+      "id": "flourite",
+      "name": "key:custom.stevenuniverse.flourite",
+      "texture": "skins/flourite.png",
+      "order": 34
+    },
+    {
+      "id": "sadie",
+      "name": "key:custom.stevenuniverse.sadie",
+      "texture": "skins/sadie.png",
+      "order": 35
+    },
+    {
+      "id": "lars",
+      "name": "key:custom.stevenuniverse.lars",
+      "texture": "skins/lars.png",
+      "order": 36
+    },
+    {
+      "id": "lars_revived",
+      "name": "key:custom.stevenuniverse.lars_revived",
+      "texture": "skins/lars_revived.png",
+      "order": 37
+    },
+    {
+      "id": "onion",
+      "name": "key:custom.stevenuniverse.onion",
+      "texture": "skins/onion.png",
+      "order": 38
+    },
+    {
+      "id": "sour_cream",
+      "name": "key:custom.stevenuniverse.sour_cream",
+      "texture": "skins/sour_cream.png",
+      "order": 39
+    },
+    {
+      "id": "jenny_pizza",
+      "name": "key:custom.stevenuniverse.jenny_pizza",
+      "texture": "skins/jenny_pizza.png",
+      "order": 40,
+      "model": "slim"
+    },
+    {
+      "id": "buck_dewey",
+      "name": "key:custom.stevenuniverse.buck_dewey",
+      "texture": "skins/buck_dewey.png",
+      "order": 41
+    },
+    {
+      "id": "jamie",
+      "name": "key:custom.stevenuniverse.jamie",
+      "texture": "skins/jamie.png",
+      "order": 42
+    },
+    {
+      "id": "ronaldo",
+      "name": "key:custom.stevenuniverse.ronaldo",
+      "texture": "skins/ronaldo.png",
+      "order": 43
+    },
+    {
+      "id": "white_diamond",
+      "name": "key:custom.stevenuniverse.white_diamond",
+      "texture": "skins/white_diamond.png",
+      "order": 44
+    },
+    {
+      "id": "pink_diamond",
+      "name": "key:custom.stevenuniverse.pink_diamond",
+      "texture": "skins/pink_diamond.png",
+      "order": 45
+    },
+    {
+      "id": "blue_diamond",
+      "name": "key:custom.stevenuniverse.blue_diamond",
+      "texture": "skins/blue_diamond.png",
+      "order": 46
+    },
+    {
+      "id": "yellow_diamond",
+      "name": "key:custom.stevenuniverse.yellow_diamond",
+      "texture": "skins/yellow_diamond.png",
+      "order": 47
+    },
+    {
+      "id": "watermelon_steven",
+      "name": "key:custom.stevenuniverse.watermelon_steven",
+      "texture": "skins/watermelon_steven.png",
+      "order": 48
+    }
+  ]
+}

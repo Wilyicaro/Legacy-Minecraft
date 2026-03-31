@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lizard Man",
+    "displayNameId": "custom.halloweencharity.lizard_man",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.lizard_man"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

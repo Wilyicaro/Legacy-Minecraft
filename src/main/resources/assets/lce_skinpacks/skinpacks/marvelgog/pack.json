@@ -1,0 +1,159 @@
+{
+  "name": "key:custom.MarvelGOG.pack.name",
+  "author": "4J Studios ",
+  "type": "skin",
+  "sort_index": 2950,
+  "skins": [
+    {
+      "id": "star_lord",
+      "name": "key:custom.MarvelGOG.star_lord",
+      "texture": "skins/star_lord.png",
+      "order": 1
+    },
+    {
+      "id": "rocket",
+      "name": "key:custom.MarvelGOG.rocket",
+      "texture": "skins/rocket.png",
+      "order": 2
+    },
+    {
+      "id": "groot",
+      "name": "key:custom.MarvelGOG.groot",
+      "texture": "skins/groot.png",
+      "order": 3
+    },
+    {
+      "id": "yondu",
+      "name": "key:custom.MarvelGOG.yondu",
+      "texture": "skins/yondu.png",
+      "order": 4
+    },
+    {
+      "id": "ronan_the_accuser",
+      "name": "key:custom.MarvelGOG.ronan_the_accuser",
+      "texture": "skins/ronan_the_accuser.png",
+      "order": 5,
+      "cape": "capes/ronan_the_accuser.png"
+    },
+    {
+      "id": "nebula",
+      "name": "key:custom.MarvelGOG.nebula",
+      "texture": "skins/nebula.png",
+      "order": 6
+    },
+    {
+      "id": "sakaaran_warrior",
+      "name": "key:custom.MarvelGOG.sakaaran_warrior",
+      "texture": "skins/sakaaran_warrior.png",
+      "order": 7
+    },
+    {
+      "id": "korath",
+      "name": "key:custom.MarvelGOG.korath",
+      "texture": "skins/korath.png",
+      "order": 8
+    },
+    {
+      "id": "the_collector",
+      "name": "key:custom.MarvelGOG.the_collector",
+      "texture": "skins/the_collector.png",
+      "order": 9,
+      "cape": "capes/the_collector.png"
+    },
+    {
+      "id": "carina",
+      "name": "key:custom.MarvelGOG.carina",
+      "texture": "skins/carina.png",
+      "order": 10
+    },
+    {
+      "id": "star_lord_comics",
+      "name": "key:custom.MarvelGOG.star_lord_comics",
+      "texture": "skins/star_lord_comics.png",
+      "order": 11
+    },
+    {
+      "id": "adam_warlock",
+      "name": "key:custom.MarvelGOG.adam_warlock",
+      "texture": "skins/adam_warlock.png",
+      "order": 12,
+      "cape": "capes/adam_warlock.png"
+    },
+    {
+      "id": "angela",
+      "name": "key:custom.MarvelGOG.angela",
+      "texture": "skins/angela.png",
+      "order": 13,
+      "cape": "capes/angela.png"
+    },
+    {
+      "id": "charlie_27",
+      "name": "key:custom.MarvelGOG.charlie_27",
+      "texture": "skins/charlie_27.png",
+      "order": 14
+    },
+    {
+      "id": "death",
+      "name": "key:custom.MarvelGOG.death",
+      "texture": "skins/death.png",
+      "order": 15
+    },
+    {
+      "id": "jason_of_sparta",
+      "name": "key:custom.MarvelGOG.jason_of_sparta",
+      "texture": "skins/jason_of_sparta.png",
+      "order": 16
+    },
+    {
+      "id": "major_victory",
+      "name": "key:custom.MarvelGOG.major_victory",
+      "texture": "skins/major_victory.png",
+      "order": 17,
+      "cape": "capes/major_victory.png"
+    },
+    {
+      "id": "mantis",
+      "name": "key:custom.MarvelGOG.mantis",
+      "texture": "skins/mantis.png",
+      "order": 18
+    },
+    {
+      "id": "nova",
+      "name": "key:custom.MarvelGOG.nova",
+      "texture": "skins/nova.png",
+      "order": 19
+    },
+    {
+      "id": "quasar",
+      "name": "key:custom.MarvelGOG.quasar",
+      "texture": "skins/quasar.png",
+      "order": 20,
+      "cape": "capes/quasar.png"
+    },
+    {
+      "id": "thanos",
+      "name": "key:custom.MarvelGOG.thanos",
+      "texture": "skins/thanos.png",
+      "order": 21
+    },
+    {
+      "id": "wraith",
+      "name": "key:custom.MarvelGOG.wraith",
+      "texture": "skins/wraith.png",
+      "order": 22,
+      "cape": "capes/wraith.png"
+    },
+    {
+      "id": "drax",
+      "name": "key:custom.MarvelGOG.drax",
+      "texture": "skins/drax.png",
+      "order": 23
+    },
+    {
+      "id": "gamora",
+      "name": "key:custom.MarvelGOG.gamora",
+      "texture": "skins/gamora.png",
+      "order": 24
+    }
+  ]
+}

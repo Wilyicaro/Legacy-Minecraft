@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mara",
+    "displayNameId": "custom.halloweencharity.mara",
+    "themeName": "Ska Studios",
+    "themeNameId": "custom.halloweencharity.themetext.mara"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

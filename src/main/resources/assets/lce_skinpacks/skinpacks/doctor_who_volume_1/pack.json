@@ -1,6 +1,8 @@
 {
   "name": "key:custom.doctor_who_volume_1.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 1500,
   "skins": [
     {
       "id": "the_eleventh_doctor",

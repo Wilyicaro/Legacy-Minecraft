@@ -5,6 +5,6 @@ public record CubeDef(
         float[] origin,
         float[] size,
         float inflate,
-        boolean mirror
-) {
-}
+        boolean mirror,
+        Boolean visible
+) { }

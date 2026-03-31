@@ -1,6 +1,8 @@
 {
   "name": "key:custom.festivemashup.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 2000,
   "skins": [
     {
       "id": "xmas_herobrine",

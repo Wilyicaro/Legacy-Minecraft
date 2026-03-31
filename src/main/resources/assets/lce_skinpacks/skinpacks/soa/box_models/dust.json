@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Dust",
+    "displayNameId": "custom.soa.dust",
+    "themeName": "Dust: An Elysian Tail",
+    "themeNameId": "custom.soa.themetext.dust"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

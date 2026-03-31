@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Liara T'Soni",
+    "displayNameId": "custom.masseffect.liara_tsoni",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.liara_tsoni"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

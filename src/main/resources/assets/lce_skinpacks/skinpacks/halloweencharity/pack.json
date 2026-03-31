@@ -1,0 +1,356 @@
+﻿{
+    "name":  "key:custom.halloweencharity.pack.name",
+    "author":  "4J Studios ",
+    "type":  "skin",
+    "sort_index":  2350,
+    "skins":  [
+                  {
+                      "id":  "charity_the_grim_reaper",
+                      "name":  "key:custom.halloweencharity.charity_the_grim_reaper",
+                      "texture":  "skins/charity_the_grim_reaper.png",
+                      "order":  1,
+                      "cape":  "capes/charity_the_grim_reaper.png",
+                      "pose":  "STIFF_ARMS"
+                  },
+                  {
+                      "id":  "charity_devil",
+                      "name":  "key:custom.halloweencharity.charity_devil",
+                      "texture":  "skins/charity_devil.png",
+                      "order":  2,
+                      "cape":  "capes/charity_devil.png"
+                  },
+                  {
+                      "id":  "charity_dracula",
+                      "name":  "key:custom.halloweencharity.charity_dracula",
+                      "texture":  "skins/charity_dracula.png",
+                      "order":  3,
+                      "cape":  "capes/charity_dracula.png"
+                  },
+                  {
+                      "id":  "frankenstein",
+                      "name":  "key:custom.halloweencharity.frankenstein",
+                      "texture":  "skins/frankenstein.png",
+                      "order":  4
+                  },
+                  {
+                      "id":  "charity_mummy",
+                      "name":  "key:custom.halloweencharity.charity_mummy",
+                      "texture":  "skins/charity_mummy.png",
+                      "order":  5,
+                      "poses":  [
+                                    "zombie_arms"
+                                ]
+                  },
+                  {
+                      "id":  "charity_werewolf",
+                      "name":  "key:custom.halloweencharity.charity_werewolf",
+                      "texture":  "skins/charity_werewolf.png",
+                      "order":  6
+                  },
+                  {
+                      "id":  "charity_ghost",
+                      "name":  "key:custom.halloweencharity.charity_ghost",
+                      "texture":  "skins/charity_ghost.png",
+                      "order":  7,
+                      "poses":  [
+                                    "zombie_arms",
+                                    "stiff_legs"
+                                ]
+                  },
+                  {
+                      "id":  "charity_evil_wizard",
+                      "name":  "key:custom.halloweencharity.charity_evil_wizard",
+                      "texture":  "skins/charity_evil_wizard.png",
+                      "order":  8,
+                      "cape":  "capes/charity_evil_wizard.png"
+                  },
+                  {
+                      "id":  "charity_bride_of_dracula",
+                      "name":  "key:custom.halloweencharity.charity_bride_of_dracula",
+                      "texture":  "skins/charity_bride_of_dracula.png",
+                      "order":  9
+                  },
+                  {
+                      "id":  "charity_bride_of_frankenstein",
+                      "name":  "key:custom.halloweencharity.charity_bride_of_frankenstein",
+                      "texture":  "skins/charity_bride_of_frankenstein.png",
+                      "order":  10,
+                      "cape":  "capes/charity_bride_of_frankenstein.png"
+                  },
+                  {
+                      "id":  "charity_ghoul",
+                      "name":  "key:custom.halloweencharity.charity_ghoul",
+                      "texture":  "skins/charity_ghoul.png",
+                      "order":  11
+                  },
+                  {
+                      "id":  "charity_scary_clown",
+                      "name":  "key:custom.halloweencharity.charity_scary_clown",
+                      "texture":  "skins/charity_scary_clown.png",
+                      "order":  12
+                  },
+                  {
+                      "id":  "evil_lemmy",
+                      "name":  "key:custom.halloweencharity.evil_lemmy",
+                      "texture":  "skins/evil_lemmy.png",
+                      "order":  13
+                  },
+                  {
+                      "id":  "evil_max",
+                      "name":  "key:custom.halloweencharity.evil_max",
+                      "texture":  "skins/evil_max.png",
+                      "order":  14
+                  },
+                  {
+                      "id":  "zombie_jack_lumber",
+                      "name":  "key:custom.halloweencharity.zombie_jack_lumber",
+                      "texture":  "skins/zombie_jack_lumber.png",
+                      "order":  15
+                  },
+                  {
+                      "id":  "charity_evil_robot",
+                      "name":  "key:custom.halloweencharity.charity_evil_robot",
+                      "texture":  "skins/charity_evil_robot.png",
+                      "order":  16
+                  },
+                  {
+                      "id":  "dracula_2",
+                      "name":  "key:custom.halloweencharity.dracula_2",
+                      "texture":  "skins/dracula_2.png",
+                      "order":  17
+                  },
+                  {
+                      "id":  "frankenstein_2",
+                      "name":  "key:custom.halloweencharity.frankenstein_2",
+                      "texture":  "skins/frankenstein_2.png",
+                      "order":  18
+                  },
+                  {
+                      "id":  "pumpkin",
+                      "name":  "key:custom.halloweencharity.pumpkin",
+                      "texture":  "skins/pumpkin.png",
+                      "order":  19
+                  },
+                  {
+                      "id":  "skeleton",
+                      "name":  "key:custom.halloweencharity.skeleton",
+                      "texture":  "skins/skeleton.png",
+                      "order":  20
+                  },
+                  {
+                      "id":  "mummy_2",
+                      "name":  "key:custom.halloweencharity.mummy_2",
+                      "texture":  "skins/mummy_2.png",
+                      "order":  21
+                  },
+                  {
+                      "id":  "wolfman",
+                      "name":  "key:custom.halloweencharity.wolfman",
+                      "texture":  "skins/wolfman.png",
+                      "order":  22
+                  },
+                  {
+                      "id":  "cyborg_pumpkinhead",
+                      "name":  "key:custom.halloweencharity.cyborg_pumpkinhead",
+                      "texture":  "skins/cyborg_pumpkinhead.png",
+                      "order":  23
+                  },
+                  {
+                      "id":  "mara",
+                      "name":  "key:custom.halloweencharity.mara",
+                      "texture":  "skins/mara.png",
+                      "order":  24
+                  },
+                  {
+                      "id":  "captain_zombie",
+                      "name":  "key:custom.halloweencharity.captain_zombie",
+                      "texture":  "skins/captain_zombie.png",
+                      "order":  25,
+                      "cape":  "capes/captain_zombie.png"
+                  },
+                  {
+                      "id":  "the_gunstringer",
+                      "name":  "key:custom.halloweencharity.the_gunstringer",
+                      "texture":  "skins/the_gunstringer.png",
+                      "order":  26
+                  },
+                  {
+                      "id":  "ms_splosion_man_mask",
+                      "name":  "key:custom.halloweencharity.ms_splosion_man_mask",
+                      "texture":  "skins/ms_splosion_man_mask.png",
+                      "order":  27
+                  },
+                  {
+                      "id":  "skelly",
+                      "name":  "key:custom.halloweencharity.skelly",
+                      "texture":  "skins/skelly.png",
+                      "order":  28
+                  },
+                  {
+                      "id":  "splodeton",
+                      "name":  "key:custom.halloweencharity.splodeton",
+                      "texture":  "skins/splodeton.png",
+                      "order":  29
+                  },
+                  {
+                      "id":  "happy_zombie_cleric",
+                      "name":  "key:custom.halloweencharity.happy_zombie_cleric",
+                      "texture":  "skins/happy_zombie_cleric.png",
+                      "order":  30
+                  },
+                  {
+                      "id":  "happy_zombie_mage",
+                      "name":  "key:custom.halloweencharity.happy_zombie_mage",
+                      "texture":  "skins/happy_zombie_mage.png",
+                      "order":  31
+                  },
+                  {
+                      "id":  "happy_zombie_warrior",
+                      "name":  "key:custom.halloweencharity.happy_zombie_warrior",
+                      "texture":  "skins/happy_zombie_warrior.png",
+                      "order":  32
+                  },
+                  {
+                      "id":  "zombie_businessman",
+                      "name":  "key:custom.halloweencharity.zombie_businessman",
+                      "texture":  "skins/zombie_businessman.png",
+                      "order":  33
+                  },
+                  {
+                      "id":  "cyclops",
+                      "name":  "key:custom.halloweencharity.cyclops",
+                      "texture":  "skins/cyclops.png",
+                      "order":  34
+                  },
+                  {
+                      "id":  "evil_clown",
+                      "name":  "key:custom.halloweencharity.evil_clown",
+                      "texture":  "skins/evil_clown.png",
+                      "order":  35
+                  },
+                  {
+                      "id":  "evil_robot_2",
+                      "name":  "key:custom.halloweencharity.evil_robot_2",
+                      "texture":  "skins/evil_robot_2.png",
+                      "order":  36
+                  },
+                  {
+                      "id":  "vampire_girl",
+                      "name":  "key:custom.halloweencharity.vampire_girl",
+                      "texture":  "skins/vampire_girl.png",
+                      "order":  37
+                  },
+                  {
+                      "id":  "grey",
+                      "name":  "key:custom.halloweencharity.grey",
+                      "texture":  "skins/grey.png",
+                      "order":  38
+                  },
+                  {
+                      "id":  "headless_horseman",
+                      "name":  "key:custom.halloweencharity.headless_horseman",
+                      "texture":  "skins/headless_horseman.png",
+                      "order":  39,
+                      "cape":  "capes/headless_horseman.png"
+                  },
+                  {
+                      "id":  "lizard_man",
+                      "name":  "key:custom.halloweencharity.lizard_man",
+                      "texture":  "skins/lizard_man.png",
+                      "order":  40
+                  },
+                  {
+                      "id":  "charity_scarecrow",
+                      "name":  "key:custom.halloweencharity.charity_scarecrow",
+                      "texture":  "skins/charity_scarecrow.png",
+                      "order":  41
+                  },
+                  {
+                      "id":  "scary_nom",
+                      "name":  "key:custom.halloweencharity.scary_nom",
+                      "texture":  "skins/scary_nom.png",
+                      "order":  42
+                  },
+                  {
+                      "id":  "charity_mad_scientist",
+                      "name":  "key:custom.halloweencharity.charity_mad_scientist",
+                      "texture":  "skins/charity_mad_scientist.png",
+                      "order":  43
+                  },
+                  {
+                      "id":  "skeleton_2",
+                      "name":  "key:custom.halloweencharity.skeleton_2",
+                      "texture":  "skins/skeleton_2.png",
+                      "order":  44
+                  },
+                  {
+                      "id":  "witch_doctor",
+                      "name":  "key:custom.halloweencharity.witch_doctor",
+                      "texture":  "skins/witch_doctor.png",
+                      "order":  45
+                  },
+                  {
+                      "id":  "charity_zombie",
+                      "name":  "key:custom.halloweencharity.charity_zombie",
+                      "texture":  "skins/charity_zombie.png",
+                      "order":  46,
+                      "poses":  [
+                                    "zombie_arms"
+                                ]
+                  },
+                  {
+                      "id":  "hatty",
+                      "name":  "key:custom.halloweencharity.hatty",
+                      "texture":  "skins/hatty.png",
+                      "order":  47
+                  },
+                  {
+                      "id":  "charity_gregg_the_grim_reaper",
+                      "name":  "key:custom.halloweencharity.charity_gregg_the_grim_reaper",
+                      "texture":  "skins/charity_gregg_the_grim_reaper.png",
+                      "order":  48
+                  },
+                  {
+                      "id":  "charity_ancient_mummy",
+                      "name":  "key:custom.halloweencharity.charity_ancient_mummy",
+                      "texture":  "skins/charity_ancient_mummy.png",
+                      "order":  49
+                  },
+                  {
+                      "id":  "charity_zippy_zombie",
+                      "name":  "key:custom.halloweencharity.charity_zippy_zombie",
+                      "texture":  "skins/charity_zippy_zombie.png",
+                      "order":  50
+                  },
+                  {
+                      "id":  "mining_unit_010",
+                      "name":  "key:custom.halloweencharity.mining_unit_010",
+                      "texture":  "skins/mining_unit_010.png",
+                      "order":  51
+                  },
+                  {
+                      "id":  "jacko",
+                      "name":  "key:custom.halloweencharity.jacko",
+                      "texture":  "skins/jacko.png",
+                      "order":  52
+                  },
+                  {
+                      "id":  "bonny",
+                      "name":  "key:custom.halloweencharity.bonny",
+                      "texture":  "skins/bonny.png",
+                      "order":  53
+                  },
+                  {
+                      "id":  "charity_vampire",
+                      "name":  "key:custom.halloweencharity.charity_vampire",
+                      "texture":  "skins/charity_vampire.png",
+                      "order":  54
+                  },
+                  {
+                      "id":  "zombie_lonestar",
+                      "name":  "key:custom.halloweencharity.zombie_lonestar",
+                      "texture":  "skins/zombie_lonestar.png",
+                      "order":  55
+                  }
+              ]
+}

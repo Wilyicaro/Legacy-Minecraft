@@ -1,0 +1,648 @@
+{
+  "meta": {
+    "displayName": "Flourite",
+    "displayNameId": "custom.stevenuniverse.flourite"
+  },
+  "offsets": {
+    "body": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "head": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "hat": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "left_arm": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "right_arm": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "left_sleeve": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "right_sleeve": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "left_leg": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "right_leg": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "left_pants": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "right_pants": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "jacket": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    }
+  },
+  "texture": {
+    "width": 128,
+    "height": 128,
+    "scale": 2,
+    "path": "lce_skinpacks:skinpacks/stevenuniverse/box_textures/flourite.png"
+  },
+  "hide": [
+    "right_arm",
+    "left_arm",
+    "body",
+    "right_leg",
+    "left_leg",
+    "right_sleeve",
+    "left_sleeve",
+    "right_pants",
+    "left_pants",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -6.0,
+            -3.4,
+            -3.5
+          ],
+          "size": [
+            2.0,
+            4.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            104
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            4.0,
+            -3.4,
+            -3.5
+          ],
+          "size": [
+            2.0,
+            4.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            104
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            -1.0,
+            -3.5,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            4,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            13.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            1.8,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            104,
+            98
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            4.0,
+            1.8,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            104,
+            98
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -0.2,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            4.0,
+            -0.2,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.2,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            13.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            1.0,
+            -2.2,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            13.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            14.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            14.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "LEG1"
+        }
+      ]
+    },
+    {
+      "name": "jacket_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            13.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            66
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "JACKET"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            13.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            66
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            13.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            66
+          ],
+          "inflate": 0.25,
+          "mirror": true,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "pants0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            14.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            68
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "PANTS0"
+        }
+      ]
+    },
+    {
+      "name": "pants1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            14.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            68
+          ],
+          "inflate": 0.25,
+          "mirror": true,
+          "sourcePart": "PANTS1"
+        }
+      ]
+    },
+    {
+      "name": "legging0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -4.1,
+            2.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            112,
+            56
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "LEGGING0"
+        }
+      ]
+    },
+    {
+      "name": "legging1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            2.1,
+            2.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            112,
+            56
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEGGING1"
+        }
+      ]
+    },
+    {
+      "name": "boot0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.1,
+            7.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            7.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            106
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "BOOT0"
+        },
+        {
+          "origin": [
+            -4.1,
+            10.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            112,
+            68
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "BOOT0"
+        },
+        {
+          "origin": [
+            -4.1,
+            10.0,
+            3.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            112,
+            80
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "BOOT0"
+        }
+      ]
+    },
+    {
+      "name": "boot1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.9,
+            7.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            7.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            106
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "BOOT1"
+        },
+        {
+          "origin": [
+            2.1,
+            10.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            112,
+            68
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "BOOT1"
+        },
+        {
+          "origin": [
+            2.1,
+            10.0,
+            3.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            112,
+            80
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "BOOT1"
+        }
+      ]
+    }
+  ]
+}

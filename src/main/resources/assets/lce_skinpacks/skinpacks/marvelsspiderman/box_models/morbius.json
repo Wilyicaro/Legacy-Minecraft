@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Morbius",
+    "displayNameId": "custom.marvelsspiderman.morbius",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.morbius"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

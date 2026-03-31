@@ -12,23 +12,11 @@ import wily.legacy.Skins.skin.SkinSyncClient;
 public abstract class SkinTickMixin {
     @Unique
     private boolean legacy4j$wasInLevel = false;
-
     @Inject(method = "tick", at = @At("TAIL"))
     private void legacy4j$skinsTick(CallbackInfo ci) {
         Minecraft mc = (Minecraft) (Object) this;
-
-        try {
-            SkinSyncClient.postTick(mc);
-        } catch (Throwable ignored) {
-        }
-
         boolean inLevel = mc.level != null;
-        if (legacy4j$wasInLevel && !inLevel) {
-            try {
-                SkinSyncClient.onClientDisconnect();
-            } catch (Throwable ignored) {
-            }
-        }
+        if (legacy4j$wasInLevel && !inLevel) { SkinSyncClient.onClientDisconnect(); }
         legacy4j$wasInLevel = inLevel;
     }
 }

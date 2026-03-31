@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie Jack Lumber",
+    "displayNameId": "custom.halloweencharity.zombie_jack_lumber",
+    "themeName": "Owlchemy Labs",
+    "themeNameId": "custom.halloweencharity.themetext.zombie_jack_lumber"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

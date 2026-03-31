@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mordin Solus",
+    "displayNameId": "custom.masseffect.mordin_solus",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.mordin_solus"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "displayName": "Ghast Glider",
+    "displayNameId": "custom.minigamemasters.ghast_glider"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -3.0
+          ],
+          "size": [
+            2.0,
+            11.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            0.0,
+            -3.0
+          ],
+          "size": [
+            2.0,
+            11.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    }
+  ]
+}

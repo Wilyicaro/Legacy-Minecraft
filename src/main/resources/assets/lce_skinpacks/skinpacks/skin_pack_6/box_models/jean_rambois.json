@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Jean Rambois",
+    "displayNameId": "custom.skin_pack_6.jean_rambois",
+    "themeName": "Super Time Force",
+    "themeNameId": "custom.skin_pack_6.themetext.jean_rambois"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

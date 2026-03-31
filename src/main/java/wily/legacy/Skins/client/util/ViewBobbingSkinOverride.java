@@ -3,68 +3,26 @@ package wily.legacy.Skins.client.util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.world.entity.player.Player;
-import wily.legacy.Skins.client.render.ViewBobbingConfig;
+import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.skin.ClientSkinCache;
+
 public final class ViewBobbingSkinOverride {
-    private static Boolean savedUserBobView = null;
-    private static boolean forcing = false;
+    private static Boolean savedUserBobView;
+    private static boolean forcing;
 
     private ViewBobbingSkinOverride() {
     }
 
     public static void tick(Minecraft minecraft) {
         if (minecraft == null) return;
-
-        Options options;
-        try {
-            options = minecraft.options;
-        } catch (Throwable t) {
-            return;
-        }
+        Options options = minecraft.options;
         if (options == null) return;
 
-        boolean animationsEnabled;
-        try {
-            animationsEnabled = ConsoleSkinsClientSettings.isSkinAnimations();
-        } catch (Throwable t) {
-            animationsEnabled = true;
+        if (shouldForceOff(minecraft)) {
+            forceOff(options);
+            return;
         }
-
-        boolean shouldForceOff = false;
-        try {
-            Player p = minecraft.player;
-            if (animationsEnabled && minecraft.level != null && p != null) {
-                String skinId = ClientSkinCache.get(p.getUUID());
-                shouldForceOff = ViewBobbingConfig.isViewBobbingDisabled(skinId);
-            }
-        } catch (Throwable ignored) {
-            shouldForceOff = false;
-        }
-
-        try {
-            if (shouldForceOff) {
-                if (!forcing) {
-                    try {
-                        savedUserBobView = options.bobView().get();
-                    } catch (Throwable ignored) {
-                        savedUserBobView = null;
-                    }
-                    forcing = true;
-                }
-                try {
-                    if (options.bobView().get()) options.bobView().set(false);
-                } catch (Throwable ignored) {
-                }
-            } else if (forcing) {
-                try {
-                    if (savedUserBobView != null) options.bobView().set(savedUserBobView);
-                } catch (Throwable ignored) {
-                }
-                forcing = false;
-                savedUserBobView = null;
-            }
-        } catch (Throwable ignored) {
-        }
+        restore(options);
     }
 
     public static void reset(Minecraft minecraft) {
@@ -72,11 +30,32 @@ public final class ViewBobbingSkinOverride {
             savedUserBobView = null;
             return;
         }
-        try {
-            if (minecraft != null && minecraft.options != null && savedUserBobView != null) {
-                minecraft.options.bobView().set(savedUserBobView);
-            }
-        } catch (Throwable ignored) {
+        restore(minecraft != null ? minecraft.options : null);
+    }
+
+    private static boolean shouldForceOff(Minecraft minecraft) {
+        if (minecraft.level == null || !ConsoleSkinsClientSettings.isSkinAnimations()) return false;
+        Player player = minecraft.player;
+        if (player == null) return false;
+        String skinId = ClientSkinCache.get(player.getUUID());
+        return SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.DISABLE_VIEW_BOBBING, skinId)
+                || SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
+    }
+
+    private static void forceOff(Options options) {
+        if (options == null) return;
+        if (!forcing) {
+            savedUserBobView = options.bobView().get();
+            forcing = true;
+        }
+        if (options.bobView().get()) {
+            options.bobView().set(false);
+        }
+    }
+
+    private static void restore(Options options) {
+        if (options != null && savedUserBobView != null) {
+            options.bobView().set(savedUserBobView);
         }
         forcing = false;
         savedUserBobView = null;

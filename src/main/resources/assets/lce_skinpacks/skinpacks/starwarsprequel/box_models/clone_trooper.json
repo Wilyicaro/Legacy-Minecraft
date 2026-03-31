@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "displayName": "Clone Trooper",
+    "displayNameId": "custom.starwarsprequel.clone_trooper",
+    "themeName": "Phase I",
+    "themeNameId": "custom.starwarsprequel.themetext.clone_trooper"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -8.5,
+            -4.4
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -2.1,
+            -4.5
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -8.5,
+            -3.4
+          ],
+          "size": [
+            2.0,
+            2.0,
+            8.0
+          ],
+          "uv": [
+            33,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -1.1,
+            -4.5
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            45,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -6.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -6.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "hat"
+  ]
+}

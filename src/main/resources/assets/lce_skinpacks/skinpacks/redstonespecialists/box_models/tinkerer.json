@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tinkerer",
+    "displayNameId": "custom.redstonespecialists.tinkerer",
+    "themeName": "Redstone",
+    "themeNameId": "custom.redstonespecialists.themetext.tinkerer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

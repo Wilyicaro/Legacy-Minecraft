@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Skeleton",
+    "displayNameId": "custom.halloweencharity.skeleton_2",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.skeleton_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

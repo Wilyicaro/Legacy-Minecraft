@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Husk",
+    "displayNameId": "custom.masseffect.husk",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.husk"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

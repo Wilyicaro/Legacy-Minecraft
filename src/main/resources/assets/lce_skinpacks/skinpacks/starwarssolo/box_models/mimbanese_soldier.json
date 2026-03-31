@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mimbanese Soldier",
+    "displayNameId": "custom.starwarssolo.mimbanese_soldier",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00007221_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

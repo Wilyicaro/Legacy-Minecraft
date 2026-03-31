@@ -1,6 +1,8 @@
 {
   "name": "key:custom.biomesettlers.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 1000,
   "skins": [
     {
       "id": "desert_archer",

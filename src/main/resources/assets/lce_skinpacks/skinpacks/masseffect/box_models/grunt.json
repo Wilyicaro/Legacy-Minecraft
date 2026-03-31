@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Grunt",
+    "displayNameId": "custom.masseffect.grunt",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.grunt"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

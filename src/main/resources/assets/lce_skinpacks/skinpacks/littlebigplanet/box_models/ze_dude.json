@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "displayName": "Ze Dude",
+    "displayNameId": "custom.littlebigplanet.ze_dude",
+    "themeName": "LittleBigPlanet™",
+    "themeNameId": "custom.littlebigplanet.themetext.ze_dude"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            -11.0,
+            -0.9
+          ],
+          "size": [
+            6.0,
+            6.0,
+            6.0
+          ],
+          "uv": [
+            34,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -11.0,
+            -0.9
+          ],
+          "size": [
+            6.0,
+            6.0,
+            6.0
+          ],
+          "uv": [
+            34,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -10.0,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            6.0,
+            6.0
+          ],
+          "uv": [
+            34,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "HAT"
+  ]
+}

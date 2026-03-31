@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Thane Krios",
+    "displayNameId": "custom.masseffect.thane_krios",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.thane_krios"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Star-Lord (Comics)",
+    "displayNameId": "custom.MarvelGOG.star_lord_comics",
+    "themeName": "Guardians of the Galaxy",
+    "themeNameId": "custom.MarvelGOG.themetext.star_lord_comics"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

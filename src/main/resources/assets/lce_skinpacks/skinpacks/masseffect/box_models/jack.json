@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Jack",
+    "displayNameId": "custom.masseffect.jack",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.jack"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

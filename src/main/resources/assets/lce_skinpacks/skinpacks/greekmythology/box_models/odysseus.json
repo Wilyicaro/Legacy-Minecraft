@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Odysseus",
+    "displayNameId": "custom.greekmythology.odysseus"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

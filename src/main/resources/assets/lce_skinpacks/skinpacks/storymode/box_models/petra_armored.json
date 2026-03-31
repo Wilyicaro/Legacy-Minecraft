@@ -3,15 +3,10 @@
     "displayName": "Petra Armored",
     "displayNameId": "custom.storymode.petra_armored"
   },
-  "mirror_limbs": true,
-  "hide": [
-    "jacket",
-    "left_arm",
-    "left_leg"
-  ],
   "texture": {
     "width": 64,
-    "height": 64
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/storymode/box_textures/petra_armored.png"
   },
   "bones": [
     {
@@ -206,24 +201,6 @@
       "cubes": [
         {
           "origin": [
-            -1.0,
-            -2.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            40,
-            16
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        },
-        {
-          "origin": [
             -1.5,
             -2.5,
             -2.5
@@ -238,67 +215,7 @@
             32
           ],
           "inflate": 0.01,
-          "mirror": false
-        }
-      ]
-    },
-    {
-      "name": "body_addon",
-      "attach": "BODY",
-      "cubes": [
-        {
-          "origin": [
-            -1.0,
-            -2.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            40,
-            32
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        },
-        {
-          "origin": [
-            -2.0,
-            0.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            0,
-            32
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        },
-        {
-          "origin": [
-            -4.0,
-            -6.6,
-            -4.0
-          ],
-          "size": [
-            8.0,
-            8.0,
-            8.0
-          ],
-          "uv": [
-            32,
-            0
-          ],
-          "inflate": 0.01,
-          "mirror": false
+          "mirror": true
         }
       ]
     },
@@ -327,28 +244,32 @@
       ]
     },
     {
-      "name": "left_leg_addon",
-      "attach": "LEFT_LEG",
+      "name": "hat_addon",
+      "attach": "HAT",
       "cubes": [
         {
           "origin": [
-            -2.0,
-            0.0,
-            -2.0
+            -4.0,
+            -6.6,
+            -4.0
           ],
           "size": [
-            4.0,
-            12.0,
-            4.0
+            8.0,
+            8.0,
+            8.0
           ],
           "uv": [
-            0,
-            16
+            32,
+            0
           ],
           "inflate": 0.01,
           "mirror": false
         }
       ]
     }
+  ],
+  "hide": [
+    "hat",
+    "jacket"
   ]
 }

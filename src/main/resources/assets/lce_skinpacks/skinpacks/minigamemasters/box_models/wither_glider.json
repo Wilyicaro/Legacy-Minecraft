@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Wither Glider",
+    "displayNameId": "custom.minigamemasters.wither_glider"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

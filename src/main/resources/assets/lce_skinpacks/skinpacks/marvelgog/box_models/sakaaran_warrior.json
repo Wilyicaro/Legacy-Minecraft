@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Sakaaran Warrior",
+    "displayNameId": "custom.MarvelGOG.sakaaran_warrior",
+    "themeName": "Guardians of the Galaxy",
+    "themeNameId": "custom.MarvelGOG.themetext.sakaaran_warrior"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

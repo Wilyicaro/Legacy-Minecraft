@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Variant",
+    "displayNameId": "custom.soa.variant",
+    "themeName": "Hybrid",
+    "themeNameId": "custom.soa.themetext.variant"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

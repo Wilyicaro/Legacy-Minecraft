@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Evil Max",
+    "displayNameId": "custom.halloweencharity.evil_max",
+    "themeName": "Press Play",
+    "themeNameId": "custom.halloweencharity.themetext.evil_max"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

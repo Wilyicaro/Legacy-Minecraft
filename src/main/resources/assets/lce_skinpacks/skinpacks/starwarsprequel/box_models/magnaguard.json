@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "displayName": "MagnaGuard",
+    "displayNameId": "custom.starwarsprequel.magnaguard"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -7.9,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            7.0,
+            6.0
+          ],
+          "uv": [
+            2,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -8.9,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            44,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -0.9,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            20,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.9,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            26,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.9,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "head",
+    "hat"
+  ]
+}

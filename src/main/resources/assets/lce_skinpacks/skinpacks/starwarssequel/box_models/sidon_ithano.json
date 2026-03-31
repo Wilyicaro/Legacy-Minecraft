@@ -1,0 +1,304 @@
+{
+  "meta": {
+    "displayName": "Sidon Ithano",
+    "displayNameId": "custom.starwarssequel.sidon_ithano",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00006819_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/starwarssequel/box_textures/sidon_ithano.png"
+  },
+  "hide": [
+    "left_arm",
+    "left_leg",
+    "left_sleeve",
+    "left_pants",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -7.0,
+            -4.0,
+            3.0
+          ],
+          "size": [
+            14.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            52
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            -7.0,
+            -4.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            7.0
+          ],
+          "uv": [
+            12,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            4.0,
+            -4.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            7.0
+          ],
+          "uv": [
+            12,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            -1.0,
+            -9.0,
+            -4.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            64
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    },
+    {
+      "name": "jacket_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "JACKET"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "pants1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "PANTS1"
+        }
+      ]
+    },
+    {
+      "name": "pants0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            48
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "PANTS0"
+        }
+      ]
+    }
+  ]
+}

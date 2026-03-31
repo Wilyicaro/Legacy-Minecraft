@@ -1,0 +1,397 @@
+{
+  "meta": {
+    "displayName": "Eve Silva Paragorica",
+    "displayNameId": "custom.littlebigplanet.eve_silva_paragorica",
+    "themeName": "LittleBigPlanet™",
+    "themeNameId": "custom.littlebigplanet.themetext.eve_silva_paragorica"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -1.5,
+            -11.5,
+            0.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -1.0,
+            -5.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            51,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            51,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -1.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -1.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            51,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            55,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            51,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -1.0,
+            -5.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            51,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            -5.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            51,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            5.0,
+            3.0
+          ],
+          "uv": [
+            17,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            12.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            17,
+            27
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            8.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            17,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            18,
+            26
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            3.0
+          ],
+          "uv": [
+            2,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            3.0
+          ],
+          "uv": [
+            18,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            3.0
+          ],
+          "uv": [
+            41,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            3.0
+          ],
+          "uv": [
+            33,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "BODY",
+    "ARMS",
+    "LEGS"
+  ]
+}

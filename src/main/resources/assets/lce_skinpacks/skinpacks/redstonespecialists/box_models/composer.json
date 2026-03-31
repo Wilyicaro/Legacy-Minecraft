@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Composer",
+    "displayNameId": "custom.redstonespecialists.composer",
+    "themeName": "Redstone",
+    "themeNameId": "custom.redstonespecialists.themetext.composer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

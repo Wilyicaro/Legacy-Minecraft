@@ -21,10 +21,6 @@
     //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
     //?}
-    "compat.legacyskins.LegacySkinsClientMixin",
-    "compat.legacyskins.cpm.LegacySkinsCpmPreviewMixin",
-    "compat.legacyskins.cpm.LegacySkinsCpmPoseMixin",
-    "compat.legacyskins.cpm.LegacySkinsCpmRenderCollectorMixin",
     //? if fabric {
     "client.TerrainRenderContextMixin",
     //?}
@@ -180,6 +176,7 @@
     "client.AbstractWidgetAccessor",
     "client.WaterFogEnvironmentMixin",
     "client.GuiEntityRenderStateMixin",
+    "client.GuiEntityRendererMixin",
     "client.GuiRendererMixin",
     "client.bosshealth.EndDragonFightMixin",
     "client.bosshealth.WitherBossMixin",
@@ -211,12 +208,15 @@
     "skins.client.SkinTickMixin",
     "skins.client.SkinsOptionMixin",
     "skins.client.HelpAndOptionsChangeSkinButtonMixin",
+    "skins.client.LivingEntityRendererAccessor",
+    "skins.client.ModelPartAccessor",
     "skins.client.SkipDrawAccessor",
     "skins.client.SkipRenderMixin",
     "skins.client.PlayerPartsMixin",
     "skins.client.ModelOffsetsMixin",
     "skins.client.ArmorOffsetsMixin",
     "skins.client.ArmPoseMixin",
+    "skins.client.LegPoseMixin",
     "client.ScreenshotMixin",
     "client.AbstractClientPlayerMixin"
   ],

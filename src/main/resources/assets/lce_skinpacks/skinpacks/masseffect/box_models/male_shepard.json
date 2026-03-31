@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Male Shepard",
+    "displayNameId": "custom.masseffect.male_shepard",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.male_shepard"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "James Vega",
+    "displayNameId": "custom.masseffect.james_vega",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.james_vega"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

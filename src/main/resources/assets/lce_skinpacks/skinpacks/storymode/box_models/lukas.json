@@ -3,9 +3,6 @@
     "displayName": "Lukas",
     "displayNameId": "custom.storymode.lukas"
   },
-  "hide": [
-    "jacket"
-  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -53,5 +50,8 @@
         }
       ]
     }
+  ],
+  "hide": [
+    "jacket"
   ]
 }

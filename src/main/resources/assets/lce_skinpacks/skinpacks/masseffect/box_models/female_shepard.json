@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Female Shepard",
+    "displayNameId": "custom.masseffect.female_shepard",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.female_shepard"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

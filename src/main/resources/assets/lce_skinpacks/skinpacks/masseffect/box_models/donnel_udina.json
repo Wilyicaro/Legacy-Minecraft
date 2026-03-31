@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Donnel Udina",
+    "displayNameId": "custom.masseffect.donnel_udina",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.donnel_udina"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

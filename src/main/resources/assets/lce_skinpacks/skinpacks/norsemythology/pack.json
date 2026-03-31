@@ -1,6 +1,8 @@
 {
   "name": "key:custom.norsemythology.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 3300,
   "skins": [
     {
       "id": "odin",

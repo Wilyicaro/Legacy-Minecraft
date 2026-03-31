@@ -1,0 +1,446 @@
+{
+  "meta": {
+    "displayName": "Gotal",
+    "displayNameId": "custom.starwarsrebels.gotal"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "hat"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            0.5,
+            -11.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            26,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.5,
+            -13.0,
+            -1.5
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.5,
+            -13.0,
+            -1.5
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.5,
+            -11.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            26,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -0.1,
+            -4.0
+          ],
+          "size": [
+            8.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.9,
+            -8.9,
+            -3.1
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.1,
+            -8.9,
+            -3.1
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            33,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -7.0,
+            -3.1
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            13
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -7.0,
+            -3.1
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            13
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            -4.1
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            1,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -8.9,
+            -4.1
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            1,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            56,
+            25
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -2.1,
+            0.0,
+            -2.1
+          ],
+          "size": [
+            4.0,
+            2.0,
+            0.0
+          ],
+          "uv": [
+            34,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -2.1,
+            0.0,
+            2.1
+          ],
+          "size": [
+            4.0,
+            2.0,
+            0.0
+          ],
+          "uv": [
+            42,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -2.1,
+            1.0,
+            -2.1
+          ],
+          "size": [
+            0.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            38,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -2.1,
+            1.0,
+            0.1
+          ],
+          "size": [
+            0.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            38,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            10.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            21
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -3.0,
+            10.0,
+            0.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            21
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -1.0,
+            9.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            21
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            10.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            21
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            2.0,
+            10.0,
+            0.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            21
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            0.0,
+            9.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            21
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    }
+  ]
+}

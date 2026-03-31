@@ -1,6 +1,8 @@
 {
   "name": "key:custom.birthday4.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 150,
   "skins": [
     {
       "id": "wolf_tshirt_steve",

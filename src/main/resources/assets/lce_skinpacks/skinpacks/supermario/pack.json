@@ -1,0 +1,277 @@
+{
+  "name": "key:custom.supermario.pack.name",
+  "author": "4J Studios ",
+  "type": "mashup",
+  "sort_index": 3995,
+  "skins": [
+    {
+      "id": "mario",
+      "name": "key:custom.supermario.mario",
+      "texture": "skins/mario.png",
+      "order": 1
+    },
+    {
+      "id": "mario_with_fludd",
+      "name": "key:custom.supermario.mario_with_fludd",
+      "texture": "skins/mario_with_fludd.png",
+      "order": 2
+    },
+    {
+      "id": "luigi",
+      "name": "key:custom.supermario.luigi",
+      "texture": "skins/luigi.png",
+      "order": 3,
+      "model": "slim"
+    },
+    {
+      "id": "luigi_with_poltergust",
+      "name": "key:custom.supermario.luigi_with_poltergust",
+      "texture": "skins/luigi_with_poltergust.png",
+      "order": 4,
+      "model": "slim"
+    },
+    {
+      "id": "peach",
+      "name": "key:custom.supermario.peach",
+      "texture": "skins/peach.png",
+      "order": 5,
+      "model": "slim"
+    },
+    {
+      "id": "yoshi",
+      "name": "key:custom.supermario.yoshi",
+      "texture": "skins/yoshi.png",
+      "order": 6,
+      "model": "slim"
+    },
+    {
+      "id": "bowser",
+      "name": "key:custom.supermario.bowser",
+      "texture": "skins/bowser.png",
+      "order": 7
+    },
+    {
+      "id": "super_mario_toad",
+      "name": "custom.supermario.super_mario_toad",
+      "texture": "skins/super_mario_toad.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "donkey_kong",
+      "name": "key:custom.supermario.donkey_kong",
+      "texture": "skins/donkey_kong.png",
+      "order": 9
+    },
+    {
+      "id": "diddy_kong",
+      "name": "key:custom.supermario.diddy_kong",
+      "texture": "skins/diddy_kong.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "daisy",
+      "name": "key:custom.supermario.daisy",
+      "texture": "skins/daisy.png",
+      "order": 11,
+      "model": "slim"
+    },
+    {
+      "id": "wario",
+      "name": "key:custom.supermario.wario",
+      "texture": "skins/wario.png",
+      "order": 12
+    },
+    {
+      "id": "waluigi",
+      "name": "key:custom.supermario.waluigi",
+      "texture": "skins/waluigi.png",
+      "order": 13,
+      "model": "slim"
+    },
+    {
+      "id": "petey_piranha",
+      "name": "key:custom.supermario.petey_piranha",
+      "texture": "skins/petey_piranha.png",
+      "order": 14,
+      "model": "slim"
+    },
+    {
+      "id": "lemmy",
+      "name": "key:custom.supermario.lemmy",
+      "texture": "skins/lemmy.png",
+      "order": 15,
+      "model": "slim"
+    },
+    {
+      "id": "wendy",
+      "name": "key:custom.supermario.wendy",
+      "texture": "skins/wendy.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "morton",
+      "name": "key:custom.supermario.morton",
+      "texture": "skins/morton.png",
+      "order": 17,
+      "model": "slim"
+    },
+    {
+      "id": "larry",
+      "name": "key:custom.supermario.larry",
+      "texture": "skins/larry.png",
+      "order": 18,
+      "model": "slim"
+    },
+    {
+      "id": "iggy",
+      "name": "key:custom.supermario.iggy",
+      "texture": "skins/iggy.png",
+      "order": 19,
+      "model": "slim"
+    },
+    {
+      "id": "roy",
+      "name": "key:custom.supermario.roy",
+      "texture": "skins/roy.png",
+      "order": 20,
+      "model": "slim"
+    },
+    {
+      "id": "ludwig",
+      "name": "key:custom.supermario.ludwig",
+      "texture": "skins/ludwig.png",
+      "order": 21,
+      "model": "slim"
+    },
+    {
+      "id": "rosalina",
+      "name": "key:custom.supermario.rosalina",
+      "texture": "skins/rosalina.png",
+      "order": 22,
+      "model": "slim"
+    },
+    {
+      "id": "toadette",
+      "name": "key:custom.supermario.toadette",
+      "texture": "skins/toadette.png",
+      "order": 23,
+      "model": "slim"
+    },
+    {
+      "id": "birdo",
+      "name": "key:custom.supermario.birdo",
+      "texture": "skins/birdo.png",
+      "order": 24,
+      "model": "slim"
+    },
+    {
+      "id": "dr_mario",
+      "name": "key:custom.supermario.dr_mario",
+      "texture": "skins/dr_mario.png",
+      "order": 25
+    },
+    {
+      "id": "kamek",
+      "name": "key:custom.supermario.kamek",
+      "texture": "skins/kamek.png",
+      "order": 26,
+      "model": "slim"
+    },
+    {
+      "id": "koopa_troopa",
+      "name": "key:custom.supermario.koopa_troopa",
+      "texture": "skins/koopa_troopa.png",
+      "order": 27,
+      "model": "slim"
+    },
+    {
+      "id": "shy_guy",
+      "name": "key:custom.supermario.shy_guy",
+      "texture": "skins/shy_guy.png",
+      "order": 28,
+      "model": "slim"
+    },
+    {
+      "id": "hammer_bro",
+      "name": "key:custom.supermario.hammer_bro",
+      "texture": "skins/hammer_bro.png",
+      "order": 29,
+      "model": "slim"
+    },
+    {
+      "id": "boom_boom",
+      "name": "key:custom.supermario.boom_boom",
+      "texture": "skins/boom_boom.png",
+      "order": 30,
+      "model": "slim"
+    },
+    {
+      "id": "kitsune_luigi",
+      "name": "key:custom.supermario.kitsune_luigi",
+      "texture": "skins/kitsune_luigi.png",
+      "order": 31,
+      "model": "slim"
+    },
+    {
+      "id": "dry_bones",
+      "name": "key:custom.supermario.dry_bones",
+      "texture": "skins/dry_bones.png",
+      "order": 32,
+      "model": "slim"
+    },
+    {
+      "id": "bowser_jr",
+      "name": "key:custom.supermario.bowser_jr",
+      "texture": "skins/bowser_jr.png",
+      "order": 33,
+      "model": "slim"
+    },
+    {
+      "id": "fire_mario",
+      "name": "key:custom.supermario.fire_mario",
+      "texture": "skins/fire_mario.png",
+      "order": 34
+    },
+    {
+      "id": "tanooki_mario",
+      "name": "key:custom.supermario.tanooki_mario",
+      "texture": "skins/tanooki_mario.png",
+      "order": 35
+    },
+    {
+      "id": "boomerang_mario",
+      "name": "key:custom.supermario.boomerang_mario",
+      "texture": "skins/boomerang_mario.png",
+      "order": 36
+    },
+    {
+      "id": "propeller_mario",
+      "name": "key:custom.supermario.propeller_mario",
+      "texture": "skins/propeller_mario.png",
+      "order": 37
+    },
+    {
+      "id": "cat_mario",
+      "name": "key:custom.supermario.cat_mario",
+      "texture": "skins/cat_mario.png",
+      "order": 38
+    },
+    {
+      "id": "cat_peach",
+      "name": "key:custom.supermario.cat_peach",
+      "texture": "skins/cat_peach.png",
+      "order": 39,
+      "model": "slim"
+    },
+    {
+      "id": "captain_toad",
+      "name": "key:custom.supermario.captain_toad",
+      "texture": "skins/captain_toad.png",
+      "order": 40,
+      "model": "slim"
+    }
+  ]
+}

@@ -3,15 +3,10 @@
     "displayName": "Ellegaard",
     "displayNameId": "custom.storymode.ellegaard"
   },
-  "hide": [
-    "jacket",
-    "left_arm",
-    "left_leg",
-    "hat"
-  ],
   "texture": {
     "width": 64,
-    "height": 64
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/storymode/box_textures/ellegaard.png"
   },
   "bones": [
     {
@@ -613,54 +608,10 @@
           "mirror": false
         }
       ]
-    },
-    {
-      "name": "left_arm_addon",
-      "attach": "LEFT_ARM",
-      "cubes": [
-        {
-          "origin": [
-            -1.0,
-            -2.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            40,
-            16
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        }
-      ]
-    },
-    {
-      "name": "left_leg_addon",
-      "attach": "LEFT_LEG",
-      "cubes": [
-        {
-          "origin": [
-            -2.0,
-            0.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            0,
-            16
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        }
-      ]
     }
+  ],
+  "hide": [
+    "hat",
+    "jacket"
   ]
 }

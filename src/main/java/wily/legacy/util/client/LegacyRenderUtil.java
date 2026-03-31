@@ -1,7 +1,6 @@
 package wily.legacy.util.client;
 
 import com.google.common.collect.Ordering;
-import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.Util;
@@ -69,12 +68,9 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.Skins.client.render.boxloader.AttachSlot;
-import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
-import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
@@ -424,33 +420,17 @@ public class LegacyRenderUtil {
     }
 
     private static boolean shouldRenderBoxHeadPreview(String skinId) {
-        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return false;
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return false;
 
-        SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation texture = ClientSkinAssets.getTexture(skinId);
-        if (texture == null && entry != null) texture = entry.texture();
-        if (texture == null) return false;
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
+        if (resolved == null) return false;
 
-        ResourceLocation modelId = modelIdFromTexture(texture);
-        BuiltBoxModel model = BoxModelManager.get(modelId);
-        if (model == null) {
-            JsonObject modelJson = ClientSkinAssets.getModelJson(skinId);
-            if (modelJson != null) BoxModelManager.registerRuntime(modelId, modelJson);
-            model = BoxModelManager.get(modelId);
-        }
+        var model = resolved.boxModel();
         if (model == null) return false;
 
         boolean hasHead = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
         boolean hasHat = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
         return model.hides(AttachSlot.HEAD) && (hasHead || hasHat);
-    }
-
-    private static ResourceLocation modelIdFromTexture(ResourceLocation texture) {
-        String path = texture.getPath();
-        int slash = path.lastIndexOf('/');
-        if (slash != -1) path = path.substring(slash + 1);
-        if (path.endsWith(".png")) path = path.substring(0, path.length() - 4);
-        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), path);
     }
 
     public static float getAutoGuiScale() {

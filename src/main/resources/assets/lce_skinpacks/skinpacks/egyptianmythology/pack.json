@@ -1,0 +1,240 @@
+{
+  "name": "key:custom.egyptianmythology.pack.name",
+  "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 1700,
+  "skins": [
+    {
+      "id": "horus",
+      "name": "key:custom.egyptianmythology.horus",
+      "texture": "skins/horus.png",
+      "order": 1
+    },
+    {
+      "id": "ra",
+      "name": "key:custom.egyptianmythology.ra",
+      "texture": "skins/ra.png",
+      "order": 2
+    },
+    {
+      "id": "anubis",
+      "name": "key:custom.egyptianmythology.anubis",
+      "texture": "skins/anubis.png",
+      "order": 3
+    },
+    {
+      "id": "bastet",
+      "name": "key:custom.egyptianmythology.bastet",
+      "texture": "skins/bastet.png",
+      "order": 4,
+      "model": "slim"
+    },
+    {
+      "id": "bes",
+      "name": "key:custom.egyptianmythology.bes",
+      "texture": "skins/bes.png",
+      "order": 5
+    },
+    {
+      "id": "khonsu",
+      "name": "key:custom.egyptianmythology.khonsu",
+      "texture": "skins/khonsu.png",
+      "order": 6
+    },
+    {
+      "id": "amun",
+      "name": "key:custom.egyptianmythology.amun",
+      "texture": "skins/amun.png",
+      "order": 7
+    },
+    {
+      "id": "osiris",
+      "name": "key:custom.egyptianmythology.osiris",
+      "texture": "skins/osiris.png",
+      "order": 8
+    },
+    {
+      "id": "thoth",
+      "name": "key:custom.egyptianmythology.thoth",
+      "texture": "skins/thoth.png",
+      "order": 9
+    },
+    {
+      "id": "hathor",
+      "name": "key:custom.egyptianmythology.hathor",
+      "texture": "skins/hathor.png",
+      "order": 10
+    },
+    {
+      "id": "sekhmet",
+      "name": "key:custom.egyptianmythology.sekhmet",
+      "texture": "skins/sekhmet.png",
+      "order": 11
+    },
+    {
+      "id": "geb",
+      "name": "key:custom.egyptianmythology.geb",
+      "texture": "skins/geb.png",
+      "order": 12
+    },
+    {
+      "id": "mut",
+      "name": "key:custom.egyptianmythology.mut",
+      "texture": "skins/mut.png",
+      "order": 13
+    },
+    {
+      "id": "isis",
+      "name": "key:custom.egyptianmythology.isis",
+      "texture": "skins/isis.png",
+      "order": 14
+    },
+    {
+      "id": "set",
+      "name": "key:custom.egyptianmythology.set",
+      "texture": "skins/set.png",
+      "order": 15
+    },
+    {
+      "id": "maat",
+      "name": "key:custom.egyptianmythology.maat",
+      "texture": "skins/maat.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "serket",
+      "name": "key:custom.egyptianmythology.serket",
+      "texture": "skins/serket.png",
+      "order": 17
+    },
+    {
+      "id": "khepri",
+      "name": "key:custom.egyptianmythology.khepri",
+      "texture": "skins/khepri.png",
+      "order": 18
+    },
+    {
+      "id": "ptah",
+      "name": "key:custom.egyptianmythology.ptah",
+      "texture": "skins/ptah.png",
+      "order": 19
+    },
+    {
+      "id": "apep",
+      "name": "key:custom.egyptianmythology.apep",
+      "texture": "skins/apep.png",
+      "order": 20
+    },
+    {
+      "id": "ammut",
+      "name": "key:custom.egyptianmythology.ammut",
+      "texture": "skins/ammut.png",
+      "order": 21
+    },
+    {
+      "id": "sobek",
+      "name": "key:custom.egyptianmythology.sobek",
+      "texture": "skins/sobek.png",
+      "order": 22
+    },
+    {
+      "id": "heka",
+      "name": "key:custom.egyptianmythology.heka",
+      "texture": "skins/heka.png",
+      "order": 23
+    },
+    {
+      "id": "tutankhamun",
+      "name": "key:custom.egyptianmythology.tutankhamun",
+      "texture": "skins/tutankhamun.png",
+      "order": 24
+    },
+    {
+      "id": "ramesses_ii",
+      "name": "key:custom.egyptianmythology.ramesses_ii",
+      "texture": "skins/ramesses_ii.png",
+      "order": 25
+    },
+    {
+      "id": "nefertari",
+      "name": "key:custom.egyptianmythology.nefertari",
+      "texture": "skins/nefertari.png",
+      "order": 26
+    },
+    {
+      "id": "cleopatra",
+      "name": "key:custom.egyptianmythology.cleopatra",
+      "texture": "skins/cleopatra.png",
+      "order": 27
+    },
+    {
+      "id": "akhenaten",
+      "name": "key:custom.egyptianmythology.akhenaten",
+      "texture": "skins/akhenaten.png",
+      "order": 28
+    },
+    {
+      "id": "nefertiti",
+      "name": "key:custom.egyptianmythology.nefertiti",
+      "texture": "skins/nefertiti.png",
+      "order": 29
+    },
+    {
+      "id": "thutmose_iii",
+      "name": "key:custom.egyptianmythology.thutmose_iii",
+      "texture": "skins/thutmose_iii.png",
+      "order": 30
+    },
+    {
+      "id": "hatshepsut",
+      "name": "key:custom.egyptianmythology.hatshepsut",
+      "texture": "skins/hatshepsut.png",
+      "order": 31
+    },
+    {
+      "id": "king_khufu",
+      "name": "key:custom.egyptianmythology.king_khufu",
+      "texture": "skins/king_khufu.png",
+      "order": 32
+    },
+    {
+      "id": "merneith",
+      "name": "key:custom.egyptianmythology.merneith",
+      "texture": "skins/merneith.png",
+      "order": 33
+    },
+    {
+      "id": "seer",
+      "name": "key:custom.egyptianmythology.seer",
+      "texture": "skins/seer.png",
+      "order": 34,
+      "model": "slim"
+    },
+    {
+      "id": "ba",
+      "name": "key:custom.egyptianmythology.ba",
+      "texture": "skins/ba.png",
+      "order": 35
+    },
+    {
+      "id": "ancient_mummy",
+      "name": "key:custom.egyptianmythology.ancient_mummy",
+      "texture": "skins/ancient_mummy.png",
+      "order": 36,
+      "model": "slim"
+    },
+    {
+      "id": "sphinx",
+      "name": "key:custom.egyptianmythology.sphinx",
+      "texture": "skins/sphinx.png",
+      "order": 37
+    },
+    {
+      "id": "hieracosphinx",
+      "name": "key:custom.egyptianmythology.hieracosphinx",
+      "texture": "skins/hieracosphinx.png",
+      "order": 38
+    }
+  ]
+}

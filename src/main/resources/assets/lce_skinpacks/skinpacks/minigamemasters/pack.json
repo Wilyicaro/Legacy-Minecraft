@@ -1,0 +1,203 @@
+{
+  "name": "key:custom.minigamemasters.pack.name",
+  "author": "4J Studios ",
+  "type": "skin",
+  "sort_index": 2910,
+  "skins": [
+    {
+      "id": "blaze_battler",
+      "name": "key:custom.minigamemasters.blaze_battler",
+      "texture": "skins/blaze_battler.png",
+      "order": 1
+    },
+    {
+      "id": "blaze_glider",
+      "name": "key:custom.minigamemasters.blaze_glider",
+      "texture": "skins/blaze_glider.png",
+      "order": 2
+    },
+    {
+      "id": "blaze_tumbler",
+      "name": "key:custom.minigamemasters.blaze_tumbler",
+      "texture": "skins/blaze_tumbler.png",
+      "order": 3,
+      "model": "slim"
+    },
+    {
+      "id": "creeper_battler",
+      "name": "key:custom.minigamemasters.creeper_battler",
+      "texture": "skins/creeper_battler.png",
+      "order": 4,
+      "model": "slim"
+    },
+    {
+      "id": "creeper_glider",
+      "name": "key:custom.minigamemasters.creeper_glider",
+      "texture": "skins/creeper_glider.png",
+      "order": 5
+    },
+    {
+      "id": "creeper_tumbler",
+      "name": "key:custom.minigamemasters.creeper_tumbler",
+      "texture": "skins/creeper_tumbler.png",
+      "order": 6,
+      "model": "slim"
+    },
+    {
+      "id": "end_battler",
+      "name": "key:custom.minigamemasters.end_battler",
+      "texture": "skins/end_battler.png",
+      "order": 7,
+      "model": "slim"
+    },
+    {
+      "id": "end_glider",
+      "name": "key:custom.minigamemasters.end_glider",
+      "texture": "skins/end_glider.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "end_tumbler",
+      "name": "key:custom.minigamemasters.end_tumbler",
+      "texture": "skins/end_tumbler.png",
+      "order": 9
+    },
+    {
+      "id": "ghast_battler",
+      "name": "key:custom.minigamemasters.ghast_battler",
+      "texture": "skins/ghast_battler.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "ghast_glider",
+      "name": "key:custom.minigamemasters.ghast_glider",
+      "texture": "skins/ghast_glider.png",
+      "order": 11,
+      "model": "slim"
+    },
+    {
+      "id": "ghast_tumbler",
+      "name": "key:custom.minigamemasters.ghast_tumbler",
+      "texture": "skins/ghast_tumbler.png",
+      "order": 12
+    },
+    {
+      "id": "guardian_battler",
+      "name": "key:custom.minigamemasters.guardian_battler",
+      "texture": "skins/guardian_battler.png",
+      "order": 13,
+      "model": "slim"
+    },
+    {
+      "id": "guardian_glider",
+      "name": "key:custom.minigamemasters.guardian_glider",
+      "texture": "skins/guardian_glider.png",
+      "order": 14
+    },
+    {
+      "id": "guardian_tumbler",
+      "name": "key:custom.minigamemasters.guardian_tumbler",
+      "texture": "skins/guardian_tumbler.png",
+      "order": 15,
+      "model": "slim"
+    },
+    {
+      "id": "pig_battler",
+      "name": "key:custom.minigamemasters.pig_battler",
+      "texture": "skins/pig_battler.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "pig_glider",
+      "name": "key:custom.minigamemasters.pig_glider",
+      "texture": "skins/pig_glider.png",
+      "order": 17,
+      "model": "slim"
+    },
+    {
+      "id": "pig_tumbler",
+      "name": "key:custom.minigamemasters.pig_tumbler",
+      "texture": "skins/pig_tumbler.png",
+      "order": 18
+    },
+    {
+      "id": "squid_battler",
+      "name": "key:custom.minigamemasters.squid_battler",
+      "texture": "skins/squid_battler.png",
+      "order": 19
+    },
+    {
+      "id": "squid_glider",
+      "name": "key:custom.minigamemasters.squid_glider",
+      "texture": "skins/squid_glider.png",
+      "order": 20,
+      "model": "slim"
+    },
+    {
+      "id": "squid_tumbler",
+      "name": "key:custom.minigamemasters.squid_tumbler",
+      "texture": "skins/squid_tumbler.png",
+      "order": 21
+    },
+    {
+      "id": "wither_battler",
+      "name": "key:custom.minigamemasters.wither_battler",
+      "texture": "skins/wither_battler.png",
+      "order": 22
+    },
+    {
+      "id": "wither_glider",
+      "name": "key:custom.minigamemasters.wither_glider",
+      "texture": "skins/wither_glider.png",
+      "order": 23,
+      "model": "slim"
+    },
+    {
+      "id": "wither_tumbler",
+      "name": "key:custom.minigamemasters.wither_tumbler",
+      "texture": "skins/wither_tumbler.png",
+      "order": 24
+    },
+    {
+      "id": "wolf_battler",
+      "name": "key:custom.minigamemasters.wolf_battler",
+      "texture": "skins/wolf_battler.png",
+      "order": 25
+    },
+    {
+      "id": "wolf_glider",
+      "name": "key:custom.minigamemasters.wolf_glider",
+      "texture": "skins/wolf_glider.png",
+      "order": 26
+    },
+    {
+      "id": "wolf_tumbler",
+      "name": "key:custom.minigamemasters.wolf_tumbler",
+      "texture": "skins/wolf_tumbler.png",
+      "order": 27,
+      "model": "slim"
+    },
+    {
+      "id": "zombie_battler",
+      "name": "key:custom.minigamemasters.zombie_battler",
+      "texture": "skins/zombie_battler.png",
+      "order": 28
+    },
+    {
+      "id": "zombie_glider",
+      "name": "key:custom.minigamemasters.zombie_glider",
+      "texture": "skins/zombie_glider.png",
+      "order": 29
+    },
+    {
+      "id": "zombie_tumbler",
+      "name": "key:custom.minigamemasters.zombie_tumbler",
+      "texture": "skins/zombie_tumbler.png",
+      "order": 30,
+      "model": "slim"
+    }
+  ]
+}

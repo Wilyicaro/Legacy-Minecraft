@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Senator Palpatine",
+    "displayNameId": "custom.starwarsprequel.senator_palpatine"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

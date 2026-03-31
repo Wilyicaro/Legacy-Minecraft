@@ -1,6 +1,8 @@
 {
   "name": "key:custom.campfiretales.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 1200,
   "skins": [
     {
       "id": "the_sham",

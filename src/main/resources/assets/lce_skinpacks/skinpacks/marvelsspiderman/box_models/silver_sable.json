@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "displayName": "Silver Sable",
+    "displayNameId": "custom.marvelsspiderman.silver_sable",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.silver_sable"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            1.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    }
+  ]
+}

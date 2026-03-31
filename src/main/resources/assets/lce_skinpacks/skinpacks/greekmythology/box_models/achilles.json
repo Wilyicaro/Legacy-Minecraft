@@ -1,0 +1,279 @@
+{
+  "meta": {
+    "displayName": "Achilles",
+    "displayNameId": "custom.greekmythology.achilles"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -10.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            2.0,
+            6.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            1.0,
+            6.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            -4.9
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            -5.9
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -12.0,
+            -4.9
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -12.0,
+            -5.9
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            3.1
+          ],
+          "size": [
+            2.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            5.1
+          ],
+          "size": [
+            2.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            28,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -8.0,
+            4.1
+          ],
+          "size": [
+            2.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            53,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -5.0,
+            4.1
+          ],
+          "size": [
+            2.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            53,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            4.1
+          ],
+          "size": [
+            2.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            53,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            1.0
+          ],
+          "size": [
+            3.0,
+            0.0,
+            6.0
+          ],
+          "uv": [
+            50,
+            35
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            1.0,
+            9.0,
+            2.0
+          ],
+          "size": [
+            3.0,
+            0.0,
+            6.0
+          ],
+          "uv": [
+            50,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            0.5,
+            6.5,
+            1.0
+          ],
+          "size": [
+            0.0,
+            5.0,
+            6.0
+          ],
+          "uv": [
+            58,
+            -6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    }
+  ]
+}

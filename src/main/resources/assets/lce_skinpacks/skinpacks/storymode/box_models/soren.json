@@ -3,17 +3,10 @@
     "displayName": "Soren",
     "displayNameId": "custom.storymode.soren"
   },
-  "hide": [
-    "hat",
-    "left_sleeve",
-    "right_sleeve",
-    "jacket",
-    "right_pants",
-    "left_pants"
-  ],
   "texture": {
     "width": 64,
-    "height": 64
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/storymode/box_textures/soren.png"
   },
   "bones": [
     {
@@ -561,6 +554,62 @@
           "mirror": false
         }
       ]
+    },
+    {
+      "name": "right_sleeve_addon",
+      "attach": "RIGHT_SLEEVE",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_pants_addon",
+      "attach": "RIGHT_PANTS",
+      "cubes": [
+        {
+          "origin": [
+            -2.1,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
     }
+  ],
+  "hide": [
+    "hat",
+    "right_sleeve",
+    "left_sleeve",
+    "right_pants",
+    "jacket",
+    "left_pants"
   ]
 }

@@ -10,13 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class DisableCapeWhenElytraMixin {
-
     @Inject(method = "isCapeLoaded", at = @At("HEAD"), cancellable = true, require = 0)
     private void consoleskins$disableCapeWhenElytra(CallbackInfoReturnable<Boolean> cir) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
-        try {
-            if (player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) cir.setReturnValue(false);
-        } catch (Throwable ignored) {
-        }
+        if (player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) cir.setReturnValue(false);
     }
 }

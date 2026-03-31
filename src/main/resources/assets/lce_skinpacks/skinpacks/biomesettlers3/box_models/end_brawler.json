@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "displayName": "End Brawler",
+    "displayNameId": "custom.biomesettlers3.end_brawler"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            10.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            2.0,
+            10.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            -3.0
+          ],
+          "size": [
+            5.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            3.0,
+            4.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            52,
+            28
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            2.0
+          ],
+          "size": [
+            5.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            10.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -3.0,
+            10.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -4.0,
+            4.0,
+            -3.0
+          ],
+          "size": [
+            5.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -4.0,
+            4.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            52,
+            28
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -4.0,
+            4.0,
+            2.0
+          ],
+          "size": [
+            5.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        }
+      ]
+    }
+  ]
+}

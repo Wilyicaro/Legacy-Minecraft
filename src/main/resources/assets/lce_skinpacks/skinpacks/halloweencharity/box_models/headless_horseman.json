@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Headless Horseman",
+    "displayNameId": "custom.halloweencharity.headless_horseman",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.headless_horseman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

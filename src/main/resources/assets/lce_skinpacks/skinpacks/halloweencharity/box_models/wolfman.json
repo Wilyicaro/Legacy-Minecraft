@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Wolfman",
+    "displayNameId": "custom.halloweencharity.wolfman",
+    "themeName": "Army of Trolls",
+    "themeNameId": "custom.halloweencharity.themetext.wolfman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

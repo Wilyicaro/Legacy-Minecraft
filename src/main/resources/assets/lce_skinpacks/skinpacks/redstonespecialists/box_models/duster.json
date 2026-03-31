@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Duster",
+    "displayNameId": "custom.redstonespecialists.duster",
+    "themeName": "Redstone",
+    "themeNameId": "custom.redstonespecialists.themetext.duster"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

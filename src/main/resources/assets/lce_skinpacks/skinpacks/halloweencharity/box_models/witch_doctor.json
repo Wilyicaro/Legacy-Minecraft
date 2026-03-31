@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Witch Doctor",
+    "displayNameId": "custom.halloweencharity.witch_doctor",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.witch_doctor"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

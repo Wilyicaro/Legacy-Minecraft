@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Hondo Ohnaka",
+    "displayNameId": "custom.starwarsprequel.hondo_ohnaka"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

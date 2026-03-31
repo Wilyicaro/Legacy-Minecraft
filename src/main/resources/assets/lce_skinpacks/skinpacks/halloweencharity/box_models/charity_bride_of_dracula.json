@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Bride of Dracula",
+                 "displayNameId":  "custom.halloweencharity.charity_bride_of_dracula",
+                 "themeName":  "4J Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_bride_of_dracula"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

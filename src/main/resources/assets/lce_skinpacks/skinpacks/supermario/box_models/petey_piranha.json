@@ -1,0 +1,371 @@
+{
+  "meta": {
+    "displayName": "Petey Piranha",
+    "displayNameId": "custom.supermario.petey_piranha"
+  },
+  "offsets": {
+    "head": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "right_arm": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "left_arm": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "body": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "hat": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    }
+  },
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "CHESTPLATE": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    }
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "head",
+    "right_arm",
+    "left_arm",
+    "body",
+    "right_leg",
+    "left_leg",
+    "hat",
+    "right_sleeve",
+    "left_sleeve",
+    "right_pants",
+    "left_pants",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -3.0
+          ],
+          "size": [
+            8.0,
+            11.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            2.0
+          ],
+          "size": [
+            8.0,
+            11.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            27
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -5.0,
+            -11.9,
+            2.1
+          ],
+          "size": [
+            10.0,
+            2.0,
+            0.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -9.9,
+            2.1
+          ],
+          "size": [
+            2.0,
+            10.0,
+            0.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -7.0,
+            -9.9,
+            2.1
+          ],
+          "size": [
+            2.0,
+            10.0,
+            0.0
+          ],
+          "uv": [
+            60,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -0.9,
+            2.1
+          ],
+          "size": [
+            10.0,
+            3.0,
+            0.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            5.0,
+            10.0,
+            8.0
+          ],
+          "uv": [
+            36,
+            46
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.1,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            5.0,
+            10.0,
+            8.0
+          ],
+          "uv": [
+            8,
+            46
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.5,
+            -9.0,
+            -4.5
+          ],
+          "size": [
+            6.0,
+            8.0,
+            5.0
+          ],
+          "uv": [
+            32,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.5,
+            -9.0,
+            -4.5
+          ],
+          "size": [
+            6.0,
+            8.0,
+            5.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.9,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

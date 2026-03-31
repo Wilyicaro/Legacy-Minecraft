@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "displayName": "Skinny Zombie",
+    "displayNameId": "custom.soa.skinny_zombie",
+    "themeName": "Deadlight",
+    "themeNameId": "custom.soa.themetext.skinny_zombie"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "poses": [
+    "zombie_arms"
+  ],
+  "bones": []
+}

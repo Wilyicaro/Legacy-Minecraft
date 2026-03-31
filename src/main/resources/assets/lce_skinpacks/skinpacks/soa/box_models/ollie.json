@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ollie",
+    "displayNameId": "custom.soa.ollie",
+    "themeName": "Tony Hawk's Pro Skater HD",
+    "themeNameId": "custom.soa.themetext.ollie"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,189 @@
+{
+  "meta": {
+    "displayName": "Combatcarl",
+    "displayNameId": "custom.toystory.combatcarl"
+  },
+  "texture": {
+    "width": 128,
+    "height": 160,
+    "scale": 2,
+    "path": "lce_skinpacks:skinpacks/toystory/box_textures/combatcarl.png"
+  },
+  "bones": [
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            64,
+            128
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            128
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            96,
+            128
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "legging1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            2.1,
+            0.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            32,
+            96
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEGGING1"
+        }
+      ]
+    }
+  ]
+}

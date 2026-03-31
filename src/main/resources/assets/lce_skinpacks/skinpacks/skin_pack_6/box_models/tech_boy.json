@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tech Boy",
+    "displayNameId": "custom.skin_pack_6.tech_boy",
+    "themeName": "Trials Fusion",
+    "themeNameId": "custom.skin_pack_6.themetext.tech_boy"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

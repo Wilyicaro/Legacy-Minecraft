@@ -1,0 +1,1111 @@
+{
+  "meta": {
+    "displayName": "Avacyn",
+    "displayNameId": "custom.magicthegathering.avacyn"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/magicthegathering/box_textures/avacyn.png"
+  },
+  "hide": [
+    "right_arm",
+    "left_arm",
+    "right_sleeve",
+    "left_sleeve"
+  ],
+  "bones": [
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_sleeve_addon",
+      "attach": "LEFT_SLEEVE",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    },
+    {
+      "name": "right_sleeve_addon",
+      "attach": "RIGHT_SLEEVE",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            0.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            4.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            4,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            9.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            9.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            4.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            4,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            0.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -10.0,
+            -3.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            8.0,
+            -3.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            1.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -8.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -7.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -5.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -5.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -5.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -7.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -5.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -5.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -8.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -14.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -14.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -11.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -13.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            40,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -13.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -11.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            49,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -8.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            59
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            6.0,
+            -8.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            54
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -10.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            51
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -10.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -12.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            39
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            47
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            7.0,
+            -11.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            45
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            6.0,
+            -12.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -15.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -15.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -14.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            37
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -14.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -7.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -7.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.5,
+            -3.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            20.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.5,
+            -3.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            20.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            34
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.5,
+            -3.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.5,
+            -3.0,
+            5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -3.0,
+            6.0
+          ],
+          "size": [
+            6.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            34,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            8.0,
+            -1.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            11.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            4.0,
+            10.0,
+            6.0
+          ],
+          "size": [
+            6.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            48,
+            51
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            -8.0,
+            -3.0,
+            6.0
+          ],
+          "size": [
+            6.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            20,
+            49
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -10.0,
+            -1.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            11.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -10.0,
+            10.0,
+            6.0
+          ],
+          "size": [
+            6.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            48,
+            58
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

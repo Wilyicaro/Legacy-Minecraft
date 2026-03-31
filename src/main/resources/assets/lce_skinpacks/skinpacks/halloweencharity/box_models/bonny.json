@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Bonny",
+    "displayNameId": "custom.halloweencharity.bonny",
+    "themeName": "Tequila Works",
+    "themeNameId": "custom.halloweencharity.themetext.bonny"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

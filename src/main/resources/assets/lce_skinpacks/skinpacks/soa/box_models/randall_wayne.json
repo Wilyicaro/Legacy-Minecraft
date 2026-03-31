@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Randall Wayne",
+    "displayNameId": "custom.soa.randall_wayne",
+    "themeName": "Deadlight",
+    "themeNameId": "custom.soa.themetext.randall_wayne"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "displayName": "Hawke Male",
+    "displayNameId": "custom.skin_pack_6.hawke_male",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skin_pack_6.themetext.hawke_male"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.9,
+            -2.9,
+            0.1
+          ],
+          "size": [
+            4.0,
+            5.0,
+            3.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.9,
+            -2.9,
+            -2.9
+          ],
+          "size": [
+            4.0,
+            5.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -3.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -0.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            1.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

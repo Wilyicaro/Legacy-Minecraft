@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Mad Scientist",
+                 "displayNameId":  "custom.halloweencharity.charity_mad_scientist",
+                 "themeName":  "Climax Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_mad_scientist"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

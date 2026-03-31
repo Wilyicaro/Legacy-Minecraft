@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Squid Battler",
+    "displayNameId": "custom.minigamemasters.squid_battler"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

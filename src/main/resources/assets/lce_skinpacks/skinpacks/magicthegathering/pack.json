@@ -1,0 +1,98 @@
+{
+  "name": "key:custom.magicthegathering.pack.name",
+  "author": "4J Studios ",
+  "type": "skin",
+  "sort_index": 2600,
+  "skins": [
+    {
+      "id": "liliana",
+      "name": "key:custom.magicthegathering.liliana",
+      "texture": "skins/liliana.png",
+      "order": 1
+    },
+    {
+      "id": "nicol_bolas",
+      "name": "key:custom.magicthegathering.nicol_bolas",
+      "texture": "skins/nicol_bolas.png",
+      "order": 2
+    },
+    {
+      "id": "nissa",
+      "name": "key:custom.magicthegathering.nissa",
+      "texture": "skins/nissa.png",
+      "order": 3
+    },
+    {
+      "id": "saheeli_rai",
+      "name": "key:custom.magicthegathering.saheeli_rai",
+      "texture": "skins/saheeli_rai.png",
+      "order": 4
+    },
+    {
+      "id": "samut",
+      "name": "key:custom.magicthegathering.samut",
+      "texture": "skins/samut.png",
+      "order": 5
+    },
+    {
+      "id": "tamiyo",
+      "name": "key:custom.magicthegathering.tamiyo",
+      "texture": "skins/tamiyo.png",
+      "order": 6
+    },
+    {
+      "id": "tezzeret",
+      "name": "key:custom.magicthegathering.tezzeret",
+      "texture": "skins/tezzeret.png",
+      "order": 7
+    },
+    {
+      "id": "ajani",
+      "name": "key:custom.magicthegathering.ajani",
+      "texture": "skins/ajani.png",
+      "order": 8
+    },
+    {
+      "id": "avacyn",
+      "name": "key:custom.magicthegathering.avacyn",
+      "texture": "skins/avacyn.png",
+      "order": 9
+    },
+    {
+      "id": "chandra",
+      "name": "key:custom.magicthegathering.chandra",
+      "texture": "skins/chandra.png",
+      "order": 10
+    },
+    {
+      "id": "dovin_baan",
+      "name": "key:custom.magicthegathering.dovin_baan",
+      "texture": "skins/dovin_baan.png",
+      "order": 11
+    },
+    {
+      "id": "emrakul",
+      "name": "key:custom.magicthegathering.emrakul",
+      "texture": "skins/emrakul.png",
+      "order": 12
+    },
+    {
+      "id": "gideon",
+      "name": "key:custom.magicthegathering.gideon",
+      "texture": "skins/gideon.png",
+      "order": 13
+    },
+    {
+      "id": "hazoret",
+      "name": "key:custom.magicthegathering.hazoret",
+      "texture": "skins/hazoret.png",
+      "order": 14
+    },
+    {
+      "id": "jace",
+      "name": "key:custom.magicthegathering.jace",
+      "texture": "skins/jace.png",
+      "order": 15
+    }
+  ]
+}

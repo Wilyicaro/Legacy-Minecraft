@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Skeleton",
+    "displayNameId": "custom.halloweencharity.skeleton",
+    "themeName": "Army of Trolls",
+    "themeNameId": "custom.halloweencharity.themetext.skeleton"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

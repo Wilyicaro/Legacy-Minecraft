@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "displayName": "Quiggold",
+    "displayNameId": "custom.starwarssequel.quiggold",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00006818_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/starwarssequel/box_textures/quiggold.png"
+  },
+  "hide": [
+    "head",
+    "left_arm",
+    "left_leg",
+    "hat",
+    "left_sleeve",
+    "left_pants",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -4.4
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.2,
+            -8.2,
+            -4.7
+          ],
+          "size": [
+            4.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            0.3,
+            -8.2,
+            -4.7
+          ],
+          "size": [
+            4.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 1
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            64
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.9,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            -0.4,
+            10.0,
+            -0.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            56
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    },
+    {
+      "name": "headwear_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -4.4
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.5,
+          "mirror": false,
+          "sourcePart": "HEADWEAR"
+        }
+      ]
+    },
+    {
+      "name": "jacket_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "JACKET"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "pants1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            8,
+            48
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "PANTS1"
+        }
+      ]
+    }
+  ]
+}

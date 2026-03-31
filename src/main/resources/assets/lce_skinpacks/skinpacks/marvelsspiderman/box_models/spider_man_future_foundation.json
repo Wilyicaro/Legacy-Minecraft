@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Spider-Man - Future Foundation",
+    "displayNameId": "custom.marvelsspiderman.spider_man_future_foundation",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.spider_man_future_foundation"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

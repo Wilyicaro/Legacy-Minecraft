@@ -5,6 +5,6 @@ import java.util.List;
 public record BoneDef(
         String name,
         AttachSlot attach,
-        List<CubeDef> cubes
-) {
-}
+        List<CubeDef> cubes,
+        Boolean visible
+) { }

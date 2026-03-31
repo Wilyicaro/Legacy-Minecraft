@@ -67,8 +67,11 @@ public class BoxAddonLayer extends RenderLayer {
         }
         if (built == null) return;
 
+        ResourceLocation boxTexture = a.consoleskins$getCachedBoxTexture();
+        if (boxTexture == null) boxTexture = texture;
+
         final BuiltBoxModel baked = built;
-        final ResourceLocation texFinal = texture;
+        final ResourceLocation texFinal = boxTexture;
 
         collector.submitCustomGeometry(
                 poseStack,
@@ -80,18 +83,19 @@ public class BoxAddonLayer extends RenderLayer {
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);
 
-                    renderSlot(pm.head, baked.get(AttachSlot.HEAD), ps, vc, packedLight);
-                    renderHat(pm, baked.get(AttachSlot.HAT), ps, vc, packedLight);
-                    renderSlot(pm.body, baked.get(AttachSlot.BODY), ps, vc, packedLight);
-                    renderSlot(pm.jacket, baked.get(AttachSlot.JACKET), ps, vc, packedLight);
-                    renderSlot(pm.rightArm, baked.get(AttachSlot.RIGHT_ARM), ps, vc, packedLight);
-                    renderSlot(pm.leftArm, baked.get(AttachSlot.LEFT_ARM), ps, vc, packedLight);
-                    renderSlot(pm.rightSleeve, baked.get(AttachSlot.RIGHT_SLEEVE), ps, vc, packedLight);
-                    renderSlot(pm.leftSleeve, baked.get(AttachSlot.LEFT_SLEEVE), ps, vc, packedLight);
-                    renderSlot(pm.rightLeg, baked.get(AttachSlot.RIGHT_LEG), ps, vc, packedLight);
-                    renderSlot(pm.leftLeg, baked.get(AttachSlot.LEFT_LEG), ps, vc, packedLight);
-                    renderSlot(pm.rightPants, baked.get(AttachSlot.RIGHT_PANTS), ps, vc, packedLight);
-                    renderSlot(pm.leftPants, baked.get(AttachSlot.LEFT_PANTS), ps, vc, packedLight);
+                    float partScale = baked.partScale();
+                    renderSlot(pm.head, baked.get(AttachSlot.HEAD), ps, vc, packedLight, partScale);
+                    renderHat(pm, baked.get(AttachSlot.HAT), ps, vc, packedLight, partScale);
+                    renderSlot(pm.body, baked.get(AttachSlot.BODY), ps, vc, packedLight, partScale);
+                    renderSlot(pm.jacket, baked.get(AttachSlot.JACKET), ps, vc, packedLight, partScale);
+                    renderSlot(pm.rightArm, baked.get(AttachSlot.RIGHT_ARM), ps, vc, packedLight, partScale);
+                    renderSlot(pm.leftArm, baked.get(AttachSlot.LEFT_ARM), ps, vc, packedLight, partScale);
+                    renderSlot(pm.rightSleeve, baked.get(AttachSlot.RIGHT_SLEEVE), ps, vc, packedLight, partScale);
+                    renderSlot(pm.leftSleeve, baked.get(AttachSlot.LEFT_SLEEVE), ps, vc, packedLight, partScale);
+                    renderSlot(pm.rightLeg, baked.get(AttachSlot.RIGHT_LEG), ps, vc, packedLight, partScale);
+                    renderSlot(pm.leftLeg, baked.get(AttachSlot.LEFT_LEG), ps, vc, packedLight, partScale);
+                    renderSlot(pm.rightPants, baked.get(AttachSlot.RIGHT_PANTS), ps, vc, packedLight, partScale);
+                    renderSlot(pm.leftPants, baked.get(AttachSlot.LEFT_PANTS), ps, vc, packedLight, partScale);
                 }
         );
     }
@@ -137,19 +141,21 @@ public class BoxAddonLayer extends RenderLayer {
         return false;
     }
 
-    private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light) {
+    private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
         if (parts == null || parts.isEmpty()) return;
         ps.pushPose();
         limb.translateAndRotate(ps);
+        if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
         for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
         ps.popPose();
     }
 
-    private static void renderHat(PlayerModel pm, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light) {
+    private static void renderHat(PlayerModel pm, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
         if (parts == null || parts.isEmpty()) return;
         ps.pushPose();
         if (isHatChildLike(pm)) pm.head.translateAndRotate(ps);
         pm.hat.translateAndRotate(ps);
+        if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
         for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
         ps.popPose();
     }

@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "displayName": "Luke Skywalker",
+    "displayNameId": "custom.starwarssequel.luke_skywalker_sequel",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00006825_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/starwarssequel/box_textures/luke_skywalker_sequel.png"
+  },
+  "hide": [
+    "left_leg",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            64
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "jacket_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "JACKET"
+        }
+      ]
+    }
+  ]
+}

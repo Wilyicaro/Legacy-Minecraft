@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Prometheus",
+    "displayNameId": "custom.greekmythology.prometheus"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Hammerhead",
+    "displayNameId": "custom.marvelsspiderman.hammerhead",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.hammerhead"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

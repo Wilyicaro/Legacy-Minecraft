@@ -1,6 +1,8 @@
 {
   "name": "key:custom.battleandthebeasts2.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 900,
   "skins": [
     {
       "id": "baby_ghast",

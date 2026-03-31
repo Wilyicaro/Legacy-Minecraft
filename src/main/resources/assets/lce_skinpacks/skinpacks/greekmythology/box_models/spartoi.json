@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "displayName": "Spartoi",
+    "displayNameId": "custom.greekmythology.spartoi"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            8.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            3.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -2.0,
+            7.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            3.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            -1.0,
+            7.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -2.0,
+            8.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -2.0,
+            0.1,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            -1.0,
+            8.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            -1.0,
+            0.1,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    }
+  ]
+}

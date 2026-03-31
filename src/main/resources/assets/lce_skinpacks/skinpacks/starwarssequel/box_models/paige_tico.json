@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Paige Tico",
+    "displayNameId": "custom.starwarssequel.paige_tico",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00006833_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

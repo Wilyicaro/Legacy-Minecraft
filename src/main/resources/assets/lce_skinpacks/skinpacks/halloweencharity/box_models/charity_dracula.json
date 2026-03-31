@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Dracula",
+                 "displayNameId":  "custom.halloweencharity.charity_dracula",
+                 "themeName":  "4J Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_dracula"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

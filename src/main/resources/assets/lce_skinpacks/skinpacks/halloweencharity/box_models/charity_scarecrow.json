@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Scarecrow",
+                 "displayNameId":  "custom.halloweencharity.charity_scarecrow",
+                 "themeName":  "Climax Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_scarecrow"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

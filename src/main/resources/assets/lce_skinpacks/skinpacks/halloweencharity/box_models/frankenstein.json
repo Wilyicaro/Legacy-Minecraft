@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Frankenstein",
+    "displayNameId": "custom.halloweencharity.frankenstein",
+    "themeName": "4J Studios",
+    "themeNameId": "custom.halloweencharity.themetext.frankenstein"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

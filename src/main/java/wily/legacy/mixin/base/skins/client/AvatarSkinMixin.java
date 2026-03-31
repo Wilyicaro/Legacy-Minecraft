@@ -1,11 +1,9 @@
 package wily.legacy.mixin.base.skins.client;
 
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.client.compat.bedrockskins.BedrockSkinsCompat;
 import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
-import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.Skins.skin.SkinIdUtil;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.resources.ResourceLocation;
@@ -19,147 +17,45 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarSkinMixin {
-
     @Inject(method = "extractRenderState", at = @At("RETURN"), require = 0)
     private void consoleskins$patchStateSkin(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
         if (avatar == null || state == null) return;
         consoleskins$applySkinToState(avatar, state);
     }
-
     @Unique
     private static void consoleskins$applySkinToState(Avatar avatar, AvatarRenderState state) {
-        try {
-            if (state instanceof RenderStateSkinIdAccess access) {
-                consoleskins$clearSkinState(access);
-            }
-
-            if (BedrockSkinsCompat.isBedrockPreviewPlayer(avatar)) {
-                BedrockSkinsCompat.applyPreviewRenderState(avatar, state);
-                return;
-            }
-
-            String name = null;
-            try {
-                name = avatar.getScoreboardName();
-            } catch (Throwable ignored) {
-            }
-
-            String skinId = null;
-            if (name != null && !name.isBlank()) {
-                skinId = ClientSkinCache.getByName(name);
-            }
-
-            if (skinId == null || skinId.isBlank()) {
-                try {
-                    skinId = ClientSkinCache.get(avatar.getUUID());
-                } catch (Throwable ignored) {
-                }
-            }
-
-            if (skinId == null || skinId.isBlank()) return;
-            if ("auto_select".equals(skinId)) return;
-            if (BedrockSkinsCompat.isBedrockSkinId(skinId)) return;
-
-            if (state instanceof RenderStateSkinIdAccess a) {
-                a.consoleskins$setSkinId(skinId);
-                try {
-                    a.consoleskins$setEntityUuid(avatar.getUUID());
-                } catch (Throwable ignored) {
-                }
-                try {
-                    boolean moving = false;
-                    float speedSq = 0.0F;
-                    try {
-                        var v = avatar.getDeltaMovement();
-                        if (v != null) {
-                            speedSq = (float) (v.x * v.x + v.z * v.z);
-                            moving = speedSq > 1.0E-4;
-                        }
-                    } catch (Throwable ignored2) {
-                    }
-                    a.consoleskins$setMoving(moving);
-                    a.consoleskins$setMoveSpeedSq(speedSq);
-                } catch (Throwable ignored) {
-                }
-                try {
-                    boolean sitting = false;
-                    try {
-                        sitting = avatar.isPassenger();
-                    } catch (Throwable ignored2) {
-                    }
-                    try {
-                        sitting = sitting || avatar.getPose() == Pose.SITTING;
-                    } catch (Throwable ignored2) {
-                    }
-                    a.consoleskins$setSitting(sitting);
-                } catch (Throwable ignored) {
-                }
-
-                try {
-                    boolean using = false;
-                    boolean blocking = false;
-                    try {
-                        using = avatar.isUsingItem();
-                    } catch (Throwable ignored2) {
-                    }
-                    try {
-                        blocking = avatar.isBlocking();
-                    } catch (Throwable ignored2) {
-                    }
-                    a.consoleskins$setUsingItem(using);
-                    a.consoleskins$setBlocking(blocking);
-                } catch (Throwable ignored) {
-                }
-            }
-
-            SkinEntry entry = SkinPackLoader.getSkin(skinId);
-
-            if (state instanceof RenderStateSkinIdAccess acc) {
-                acc.consoleskins$setCachedEntry(entry);
-
-                ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
-                if (tex == null && entry != null) tex = entry.texture();
-                acc.consoleskins$setCachedTexture(tex);
-
-                if (tex != null) {
-                    ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(tex);
-                    acc.consoleskins$setCachedModelId(modelId);
-
-                    wily.legacy.Skins.client.render.boxloader.BuiltBoxModel boxModel =
-                            wily.legacy.Skins.client.render.boxloader.BoxModelManager.get(modelId);
-                    if (boxModel == null) {
-                        com.google.gson.JsonObject mj = ClientSkinAssets.getModelJson(skinId);
-                        if (mj != null) {
-                            wily.legacy.Skins.client.render.boxloader.BoxModelManager.registerRuntime(modelId, mj);
-                            boxModel = wily.legacy.Skins.client.render.boxloader.BoxModelManager.get(modelId);
-                        }
-                    }
-                    acc.consoleskins$setCachedBoxModel(boxModel);
-                }
-            }
-
-            boolean wantCape = entry != null && entry.cape() != null;
-            if (wantCape) {
-                try {
-                    if (avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) wantCape = false;
-                } catch (Throwable ignored) {
-                }
-            }
-
-            state.showCape = wantCape;
-
-            PlayerSkin cachedSkin = ClientSkinAssets.getCachedPlayerSkin(skinId, entry, wantCape);
-            if (cachedSkin == null) return;
-
-            state.skin = cachedSkin;
-        } catch (Throwable ignored) {
-        }
+        if (!(state instanceof RenderStateSkinIdAccess access)) return;
+        consoleskins$clearSkinState(access);
+        String skinId = consoleskins$resolveSkinId(avatar);
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        access.consoleskins$setSkinId(skinId);
+        access.consoleskins$setEntityUuid(avatar.getUUID());
+        var movement = avatar.getDeltaMovement();
+        float speedSq = movement == null ? 0.0F : (float) (movement.x * movement.x + movement.z * movement.z);
+        access.consoleskins$setMoving(speedSq > 1.0E-4F);
+        access.consoleskins$setMoveSpeedSq(speedSq);
+        access.consoleskins$setSitting(avatar.isPassenger() || avatar.getPose() == Pose.SITTING);
+        access.consoleskins$setUsingItem(avatar.isUsingItem());
+        access.consoleskins$setBlocking(avatar.isBlocking());
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(
+                skinId,
+                access.consoleskins$getCachedTexture(),
+                access.consoleskins$getCachedModelId(),
+                access.consoleskins$getCachedBoxModel()
+        );
+        ResourceLocation texture = resolved == null ? null : resolved.texture();
+        access.consoleskins$setCachedTexture(texture);
+        access.consoleskins$setCachedBoxTexture(resolved == null ? null : resolved.boxTexture());
+        access.consoleskins$setCachedModelId(resolved == null ? null : resolved.modelId());
+        access.consoleskins$setCachedBoxModel(resolved == null ? null : resolved.boxModel());
+        boolean showCape = resolved != null && resolved.entry() != null && resolved.entry().cape() != null && !avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA);
+        state.showCape = showCape;
+        PlayerSkin cachedSkin = ClientSkinAssets.getCachedPlayerSkin(skinId, resolved == null ? null : resolved.entry(), showCape);
+        if (cachedSkin != null) { state.skin = cachedSkin; }
     }
-
     @Unique
     private static void consoleskins$clearSkinState(RenderStateSkinIdAccess access) {
         if (access == null) return;
@@ -170,19 +66,18 @@ public abstract class AvatarSkinMixin {
         access.consoleskins$setSitting(false);
         access.consoleskins$setUsingItem(false);
         access.consoleskins$setBlocking(false);
-        access.consoleskins$setCachedEntry(null);
         access.consoleskins$setCachedTexture(null);
+        access.consoleskins$setCachedBoxTexture(null);
         access.consoleskins$setCachedModelId(null);
         access.consoleskins$setCachedBoxModel(null);
     }
-
-    @Inject(
-            method = "getTextureLocation(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)Lnet/minecraft/resources/ResourceLocation;",
-            at = @At("RETURN"),
-            cancellable = true,
-            require = 0
-    )
-    private void consoleskins$overrideAvatarTexture(AvatarRenderState state, CallbackInfoReturnable<ResourceLocation> cir) {
-
+    @Unique
+    private static String consoleskins$resolveSkinId(Avatar avatar) {
+        String name = avatar.getScoreboardName();
+        if (name != null && !name.isBlank()) {
+            String skinId = ClientSkinCache.getByName(name);
+            if (skinId != null && !skinId.isBlank()) return skinId;
+        }
+        return ClientSkinCache.get(avatar.getUUID());
     }
 }

@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "displayName": "Ninjor",
+    "displayNameId": "custom.powerrangers.ninjor"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "head",
+    "hat",
+    "right_sleeve",
+    "left_sleeve"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -6.0,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            6.0,
+            6.0
+          ],
+          "uv": [
+            0,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            -2.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            -0.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            0.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -4.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        }
+      ]
+    }
+  ]
+}

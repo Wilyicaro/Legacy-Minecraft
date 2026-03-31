@@ -5,7 +5,6 @@ public enum ArmorSlot {
     CHESTPLATE,
     LEGGINGS,
     BOOTS;
-
     public static ArmorSlot fromString(String key) {
         if (key == null) return null;
         String k = key.trim();
@@ -17,11 +16,8 @@ public enum ArmorSlot {
         if (u.equals("FEET") || u.equals("BOOTS") || u.equals("SHOES")) return BOOTS;
         try {
             return ArmorSlot.valueOf(u);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        } catch (IllegalArgumentException ignored) { return null; }
     }
-
     public static ArmorSlot fromEquipmentSlot(net.minecraft.world.entity.EquipmentSlot slot) {
         if (slot == null) return null;
         return switch (slot) {

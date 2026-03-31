@@ -1,0 +1,241 @@
+{
+  "name": "key:custom.littlebigplanet.pack.name",
+  "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 2500,
+  "skins": [
+    {
+      "id": "sackboy",
+      "name": "key:custom.littlebigplanet.sackboy",
+      "texture": "skins/sackboy.png",
+      "order": 1
+    },
+    {
+      "id": "sackboy_steve",
+      "name": "key:custom.littlebigplanet.sackboy_steve",
+      "texture": "skins/sackboy_steve.png",
+      "order": 2
+    },
+    {
+      "id": "marvin_disco_dancer",
+      "name": "key:custom.littlebigplanet.marvin_disco_dancer",
+      "texture": "skins/marvin_disco_dancer.png",
+      "order": 3
+    },
+    {
+      "id": "rock_sackgirl",
+      "name": "key:custom.littlebigplanet.rock_sackgirl",
+      "texture": "skins/rock_sackgirl.png",
+      "order": 4
+    },
+    {
+      "id": "groom_sackboy",
+      "name": "key:custom.littlebigplanet.groom_sackboy",
+      "texture": "skins/groom_sackboy.png",
+      "order": 5
+    },
+    {
+      "id": "bride_sackgirl",
+      "name": "key:custom.littlebigplanet.bride_sackgirl",
+      "texture": "skins/bride_sackgirl.png",
+      "cape": "capes/the_bride_sackgirl.png",
+      "order": 6
+    },
+    {
+      "id": "fairy_sackgirl",
+      "name": "key:custom.littlebigplanet.fairy_sackgirl",
+      "texture": "skins/fairy_sackgirl.png",
+      "cape": "capes/fairy_sackgirl.png",
+      "order": 7
+    },
+    {
+      "id": "ninja_sackboy",
+      "name": "key:custom.littlebigplanet.ninja_sackboy",
+      "texture": "skins/ninja_sackboy.png",
+      "order": 8
+    },
+    {
+      "id": "yukiko_school_girl",
+      "name": "key:custom.littlebigplanet.yukiko_school_girl",
+      "texture": "skins/yukiko_school_girl.png",
+      "order": 9
+    },
+    {
+      "id": "dragon_sackboy",
+      "name": "key:custom.littlebigplanet.dragon_sackboy",
+      "texture": "skins/dragon_sackboy.png",
+      "cape": "capes/dragon_sackboy.png",
+      "order": 10
+    },
+    {
+      "id": "devil_sackboy",
+      "name": "key:custom.littlebigplanet.devil_sackboy",
+      "texture": "skins/devil_sackboy.png",
+      "order": 11
+    },
+    {
+      "id": "dinosaur_sackgirl",
+      "name": "key:custom.littlebigplanet.dinosaur_sackgirl",
+      "texture": "skins/dinosaur_sackgirl.png",
+      "order": 12
+    },
+    {
+      "id": "neon_sackgirl",
+      "name": "key:custom.littlebigplanet.neon_sackgirl",
+      "texture": "skins/neon_sackgirl.png",
+      "order": 13
+    },
+    {
+      "id": "lion_sackboy",
+      "name": "key:custom.littlebigplanet.lion_sackboy",
+      "texture": "skins/lion_sackboy.png",
+      "order": 14
+    },
+    {
+      "id": "sackbot",
+      "name": "key:custom.littlebigplanet.sackbot",
+      "texture": "skins/sackbot.png",
+      "order": 15
+    },
+    {
+      "id": "the_king",
+      "name": "key:custom.littlebigplanet.the_king",
+      "texture": "skins/the_king.png",
+      "order": 16
+    },
+    {
+      "id": "the_queen",
+      "name": "key:custom.littlebigplanet.the_queen",
+      "texture": "skins/the_queen.png",
+      "order": 17
+    },
+    {
+      "id": "the_great_magician",
+      "name": "key:custom.littlebigplanet.the_great_magician",
+      "texture": "skins/the_great_magician.png",
+      "order": 18
+    },
+    {
+      "id": "ze_dude",
+      "name": "key:custom.littlebigplanet.ze_dude",
+      "texture": "skins/ze_dude.png",
+      "order": 19
+    },
+    {
+      "id": "sheriff_zapata",
+      "name": "key:custom.littlebigplanet.sheriff_zapata",
+      "texture": "skins/sheriff_zapata.png",
+      "order": 20
+    },
+    {
+      "id": "the_terrible_oni",
+      "name": "key:custom.littlebigplanet.the_terrible_oni",
+      "texture": "skins/the_terrible_oni.png",
+      "order": 21
+    },
+    {
+      "id": "shopkeeper",
+      "name": "key:custom.littlebigplanet.shopkeeper",
+      "texture": "skins/shopkeeper.png",
+      "order": 22
+    },
+    {
+      "id": "marianne_noisette",
+      "name": "key:custom.littlebigplanet.marianne_noisette",
+      "texture": "skins/marianne_noisette.png",
+      "order": 23
+    },
+    {
+      "id": "victoria_von_bathysphere",
+      "name": "key:custom.littlebigplanet.victoria_von_bathysphere",
+      "texture": "skins/victoria_von_bathysphere.png",
+      "order": 24
+    },
+    {
+      "id": "clive_handforth",
+      "name": "key:custom.littlebigplanet.clive_handforth",
+      "texture": "skins/clive_handforth.png",
+      "order": 25
+    },
+    {
+      "id": "avalon_centrifuge",
+      "name": "key:custom.littlebigplanet.avalon_centrifuge",
+      "texture": "skins/avalon_centrifuge.png",
+      "order": 26
+    },
+    {
+      "id": "eve_silva_paragorica",
+      "name": "key:custom.littlebigplanet.eve_silva_paragorica",
+      "texture": "skins/eve_silva_paragorica.png",
+      "order": 27
+    },
+    {
+      "id": "the_newton_good",
+      "name": "key:custom.littlebigplanet.the_newton_good",
+      "texture": "skins/the_newton_good.png",
+      "cape": "capes/the_newton_evil.png",
+      "order": 28
+    },
+    {
+      "id": "marlon_random",
+      "name": "key:custom.littlebigplanet.marlon_random",
+      "texture": "skins/marlon_random.png",
+      "order": 29
+    },
+    {
+      "id": "captain_pud",
+      "name": "key:custom.littlebigplanet.captain_pud",
+      "texture": "skins/captain_pud.png",
+      "order": 30
+    },
+    {
+      "id": "papal_mache",
+      "name": "key:custom.littlebigplanet.papal_mache",
+      "texture": "skins/papal_mache.png",
+      "order": 31
+    },
+    {
+      "id": "pinky_buflooms",
+      "name": "key:custom.littlebigplanet.pinky_buflooms",
+      "texture": "skins/pinky_buflooms.png",
+      "order": 32
+    },
+    {
+      "id": "nana_pud",
+      "name": "key:custom.littlebigplanet.nana_pud",
+      "texture": "skins/nana_pud.png",
+      "order": 33
+    },
+    {
+      "id": "zom_zom",
+      "name": "key:custom.littlebigplanet.zom_zom",
+      "texture": "skins/zom_zom.png",
+      "order": 34
+    },
+    {
+      "id": "small_toggle",
+      "name": "key:custom.littlebigplanet.small_toggle",
+      "texture": "skins/small_toggle.png",
+      "order": 35
+    },
+    {
+      "id": "toggle",
+      "name": "key:custom.littlebigplanet.toggle",
+      "texture": "skins/toggle.png",
+      "order": 36
+    },
+    {
+      "id": "the_newton_evil",
+      "name": "key:custom.littlebigplanet.the_newton_evil",
+      "texture": "skins/the_newton_evil.png",
+      "cape": "capes/the_newton_evil.png",
+      "order": 37
+    },
+    {
+      "id": "sackgirl",
+      "name": "key:custom.littlebigplanet.sackgirl",
+      "texture": "skins/sackgirl.png",
+      "order": 38
+    }
+  ]
+}

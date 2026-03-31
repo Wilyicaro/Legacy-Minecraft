@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "displayName": "Siren",
+    "displayNameId": "custom.greekmythology.siren"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            8.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -4.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -8.0,
+            -3.0,
+            7.0
+          ],
+          "size": [
+            2.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -10.0,
+            -1.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -2.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            8.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -4.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            6.0,
+            -3.0,
+            7.0
+          ],
+          "size": [
+            2.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            8.0,
+            -1.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

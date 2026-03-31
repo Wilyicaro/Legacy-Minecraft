@@ -3,14 +3,6 @@
     "displayName": "Ivor",
     "displayNameId": "custom.storymode.ivor"
   },
-  "hide": [
-    "hat",
-    "left_sleeve",
-    "right_sleeve",
-    "jacket",
-    "right_pants",
-    "left_pants"
-  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -581,8 +573,8 @@
       ]
     },
     {
-      "name": "body_addon",
-      "attach": "BODY",
+      "name": "right_pants_addon",
+      "attach": "RIGHT_PANTS",
       "cubes": [
         {
           "origin": [
@@ -600,9 +592,17 @@
             48
           ],
           "inflate": 0.01,
-          "mirror": false
+          "mirror": true
         }
       ]
     }
+  ],
+  "hide": [
+    "hat",
+    "right_sleeve",
+    "left_sleeve",
+    "right_pants",
+    "jacket",
+    "left_pants"
   ]
 }

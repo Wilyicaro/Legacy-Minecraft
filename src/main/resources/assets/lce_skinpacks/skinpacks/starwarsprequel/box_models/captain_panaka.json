@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "displayName": "Captain Panaka",
+    "displayNameId": "custom.starwarsprequel.captain_panaka"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -8.9,
+            0.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -8.9,
+            0.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -6.9,
+            -4.9
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "hat"
+  ],
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -1.1,
+      "z": 0.0
+    }
+  }
+}

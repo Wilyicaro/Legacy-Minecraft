@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface SkipDrawAccessor {
     @Accessor("skipDraw")
     boolean consoleskins$getSkipDraw();
-
     @Accessor("skipDraw")
     void consoleskins$setSkipDraw(boolean value);
 }

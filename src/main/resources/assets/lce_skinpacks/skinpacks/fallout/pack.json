@@ -1,6 +1,8 @@
 {
   "name": "key:custom.fallout.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 1900,
   "skins": [
     {
       "id": "vault_boy",

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Death",
+    "displayNameId": "custom.MarvelGOG.death",
+    "themeName": "Guardians of the Galaxy",
+    "themeNameId": "custom.MarvelGOG.themetext.death"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

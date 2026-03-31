@@ -1,6 +1,8 @@
 {
   "name": "key:custom.battleandbeasts.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 800,
   "skins": [
     {
       "id": "enderman_in_a_suit",

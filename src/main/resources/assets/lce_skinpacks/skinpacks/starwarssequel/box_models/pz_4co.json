@@ -1,0 +1,197 @@
+{
+  "meta": {
+    "displayName": "PZ-4CO",
+    "displayNameId": "custom.starwarssequel.pz_4co",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00006828_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/starwarssequel/box_textures/pz_4co.png"
+  },
+  "hide": [
+    "left_sleeve",
+    "left_pants"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -14.0,
+            -7.0
+          ],
+          "size": [
+            3.0,
+            8.0,
+            5.0
+          ],
+          "uv": [
+            48,
+            51
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -14.0,
+            -7.0
+          ],
+          "size": [
+            3.0,
+            8.0,
+            5.0
+          ],
+          "uv": [
+            48,
+            51
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            -4.0,
+            -13.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            54,
+            44
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -13.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            54,
+            44
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "pants1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "PANTS1"
+        }
+      ]
+    },
+    {
+      "name": "pants0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "PANTS0"
+        }
+      ]
+    }
+  ]
+}

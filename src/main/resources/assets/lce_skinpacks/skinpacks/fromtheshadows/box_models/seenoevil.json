@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "displayName": "Seenoevil",
+    "displayNameId": "custom.fromtheshadows.seenoevil"
+  },
+  "texture": {
+    "width": 128,
+    "height": 160,
+    "scale": 2,
+    "path": "lce_skinpacks:skinpacks/fromtheshadows/box_textures/seenoevil.png"
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -5.0,
+            -4.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            8.0
+          ],
+          "uv": [
+            88,
+            108
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -5.0,
+            -4.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            8.0
+          ],
+          "uv": [
+            88,
+            108
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.5,
+            -8.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            48,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            1.5,
+            -8.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            48,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            -3.5,
+            -10.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        },
+        {
+          "origin": [
+            1.5,
+            -10.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            64,
+            128
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "jacket_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            64
+          ],
+          "inflate": 0.26,
+          "mirror": false,
+          "sourcePart": "JACKET"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            96,
+            128
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            80,
+            64
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "belt_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            8.0,
+            2.5
+          ],
+          "size": [
+            3.0,
+            7.0,
+            0.0
+          ],
+          "uv": [
+            92,
+            96
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 6,
+          "sourcePart": "BELT"
+        }
+      ],
+      "visible": false
+    }
+  ],
+  "hide": [
+    "jacket"
+  ]
+}

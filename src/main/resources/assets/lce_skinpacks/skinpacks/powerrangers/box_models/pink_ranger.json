@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Pink Ranger",
+    "displayNameId": "custom.powerrangers.pink_ranger"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

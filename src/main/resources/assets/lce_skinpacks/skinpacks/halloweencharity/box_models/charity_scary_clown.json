@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Scary Clown",
+                 "displayNameId":  "custom.halloweencharity.charity_scary_clown",
+                 "themeName":  "4J Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_scary_clown"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

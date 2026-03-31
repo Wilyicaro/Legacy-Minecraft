@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "displayName": "Carina Smyth",
+    "displayNameId": "custom.piratesofthecaribbean.carina_smyth",
+    "themeName": "",
+    "themeNameId": "IDS_SKINS_DLCSKIN00007341_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/piratesofthecaribbean/box_textures/carina_smyth.png"
+  },
+  "bones": [
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": true,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "pants1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": true,
+          "sourcePart": "PANTS1"
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "left_arm",
+    "right_leg",
+    "left_sleeve",
+    "left_pants"
+  ]
+}

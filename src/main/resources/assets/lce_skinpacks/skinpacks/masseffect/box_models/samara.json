@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Samara",
+    "displayNameId": "custom.masseffect.samara",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.samara"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

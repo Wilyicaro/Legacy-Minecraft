@@ -1,6 +1,8 @@
 {
   "name": "key:custom.minecon2016.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 2900,
   "skins": [
     {
       "id": "steve_11",
@@ -96,9 +98,9 @@
       "order": 11
     },
     {
-      "id": "ocean_engineer",
-      "name": "key:custom.minecon2016.ocean_engineer",
-      "texture": "skins/ocean_engineer.png",
+      "id": "ocean_engineer_minecon2016",
+      "name": "key:custom.minecon2016.ocean_engineer_minecon2016",
+      "texture": "skins/ocean_engineer_minecon2016.png",
       "order": 12
     }
   ]

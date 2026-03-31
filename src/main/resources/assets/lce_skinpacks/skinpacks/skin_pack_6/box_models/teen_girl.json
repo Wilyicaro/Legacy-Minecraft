@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Teen Girl",
+    "displayNameId": "custom.skin_pack_6.teen_girl"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

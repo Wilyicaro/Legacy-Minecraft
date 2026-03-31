@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Helen Of Troy",
+    "displayNameId": "custom.greekmythology.helen_of_troy"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

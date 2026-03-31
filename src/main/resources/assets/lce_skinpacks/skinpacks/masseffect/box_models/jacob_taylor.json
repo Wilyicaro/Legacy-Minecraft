@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Jacob Taylor",
+    "displayNameId": "custom.masseffect.jacob_taylor",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.jacob_taylor"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

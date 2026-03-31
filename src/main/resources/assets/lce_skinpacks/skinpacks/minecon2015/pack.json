@@ -1,6 +1,8 @@
 {
   "name": "key:custom.minecon2015.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 2800,
   "skins": [
     {
       "id": "steve_11",

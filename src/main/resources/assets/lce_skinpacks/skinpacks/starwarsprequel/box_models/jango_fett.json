@@ -1,0 +1,345 @@
+{
+  "meta": {
+    "displayName": "Jango Fett",
+    "displayNameId": "custom.starwarsprequel.jango_fett"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -3.0,
+            4.1
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.5,
+            -5.0,
+            4.6
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.5,
+            -8.0,
+            4.6
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -7.0,
+            4.1
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            8.0,
+            6.0,
+            3.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            1.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.5,
+            1.0,
+            5.5
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            38,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            42,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            6.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            36,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            6.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            36,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            6.0
+          ],
+          "uv": [
+            3,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -10.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.9,
+            -10.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            2.9,
+            5.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            15
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.9,
+            2.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 4,
+          "sourcePart": "LEG0"
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            1.9,
+            2.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 4,
+          "sourcePart": "LEG1"
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "hat"
+  ],
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -1.1,
+      "z": 0.0
+    }
+  }
+}

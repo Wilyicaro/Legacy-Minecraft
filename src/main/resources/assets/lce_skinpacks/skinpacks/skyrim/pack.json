@@ -1,6 +1,8 @@
 {
   "name": "key:custom.skyrim.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 4900,
   "skins": [
     {
       "id": "dragonborn_male",

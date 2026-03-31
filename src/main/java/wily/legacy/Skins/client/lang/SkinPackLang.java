@@ -5,22 +5,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public final class SkinPackLang {
-
     private static volatile Map<String, String> EXTRA = Map.of();
 
     private SkinPackLang() {
@@ -29,6 +31,34 @@ public final class SkinPackLang {
     public static String get(String key) {
         Map<String, String> m = EXTRA;
         return m.get(key);
+    }
+
+    public static String translate(String key, String fallback) {
+        String value = translateOrNull(key);
+        return value != null ? value : fallback;
+    }
+
+    public static String translateMaybeKey(String value, String fallback) {
+        if (value == null || value.isBlank()) return fallback;
+        String key = value.startsWith("key:") ? value.substring(4) : value;
+        String translated = translateOrNull(key);
+        if (translated != null) return translated;
+        int split = key.lastIndexOf('_');
+        if (split > 0) {
+            boolean digits = true;
+            for (int i = split + 1; i < key.length(); i++) {
+                char c = key.charAt(i);
+                if (c < '0' || c > '9') {
+                    digits = false;
+                    break;
+                }
+            }
+            if (digits) {
+                translated = translateOrNull(key.substring(0, split));
+                if (translated != null) return translated;
+            }
+        }
+        return value.startsWith("key:") ? fallback : value;
     }
 
     public static void reload(ResourceManager rm) {
@@ -50,89 +80,57 @@ public final class SkinPackLang {
     }
 
     private static String selectedLanguageCode() {
-        try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc == null) return "en_us";
-            Object lm;
-            try {
-                lm = mc.getClass().getMethod("getLanguageManager").invoke(mc);
-            } catch (Throwable t) {
-                lm = null;
-            }
-            if (lm == null) return "en_us";
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null) return "en_us";
+        Object languageManager = invokeNoArgs(mc, "getLanguageManager");
+        if (languageManager == null) return "en_us";
 
-            Object selected;
-            try {
-                selected = lm.getClass().getMethod("getSelected").invoke(lm);
-            } catch (Throwable t) {
-                try {
-                    selected = lm.getClass().getMethod("getSelectedLanguage").invoke(lm);
-                } catch (Throwable t2) {
-                    selected = null;
-                }
-            }
-            if (selected == null) return "en_us";
+        Object selected = invokeNoArgs(languageManager, "getSelected");
+        if (selected == null) selected = invokeNoArgs(languageManager, "getSelectedLanguage");
+        if (selected == null) return "en_us";
 
-            try {
-                Object code = selected.getClass().getMethod("getCode").invoke(selected);
-                if (code instanceof String s && !s.isBlank()) return s;
-            } catch (Throwable ignored) {
-            }
-            if (selected instanceof String s && !s.isBlank()) return s;
-        } catch (Throwable ignored) {
-        }
+        Object code = invokeNoArgs(selected, "getCode");
+        if (code instanceof String s && !s.isBlank()) return s;
+        if (selected instanceof String s && !s.isBlank()) return s;
         return "en_us";
     }
 
     private static void loadLocale(ResourceManager rm, String locale, Map<String, String> out) {
-        try {
-            Map<ResourceLocation, Resource> res = new java.util.HashMap<>();
-            try {
-                res.putAll(rm.listResources("skinpacks", rl -> {
-                    String p = rl.getPath();
-                    return p.contains("/lang/") && p.endsWith(".json");
-                }));
-            } catch (Throwable ignored) {
-            }
-            try {
-                res.putAll(rm.listResources("default_skinpacks", rl -> {
-                    String p = rl.getPath();
-                    return p.contains("/lang/") && p.endsWith(".json");
-                }));
-            } catch (Throwable ignored) {
-            }
+        Map<ResourceLocation, Resource> packLang = new HashMap<>();
+        packLang.putAll(listResources(rm, "skinpacks", rl -> {
+            String path = rl.getPath();
+            return path.contains("/lang/") && path.endsWith(".json");
+        }));
+        packLang.putAll(listResources(rm, "default_skinpacks", rl -> {
+            String path = rl.getPath();
+            return path.contains("/lang/") && path.endsWith(".json");
+        }));
 
-            Map<ResourceLocation, Resource> vanilla = rm.listResources("lang", rl -> {
-                String p = rl.getPath();
-                return p.equals("lang/" + locale + ".json") || (p.startsWith("lang/" + locale + ".") && p.endsWith(".json"));
-            });
+        Map<ResourceLocation, Resource> vanilla = listResources(rm, "lang", rl -> {
+            String path = rl.getPath();
+            return path.equals("lang/" + locale + ".json") || (path.startsWith("lang/" + locale + ".") && path.endsWith(".json"));
+        });
+        if (packLang.isEmpty() && vanilla.isEmpty()) return;
 
-            if (res.isEmpty() && vanilla.isEmpty()) return;
+        ArrayList<ResourceLocation> keys = new ArrayList<>();
+        keys.addAll(packLang.keySet());
+        keys.addAll(vanilla.keySet());
+        keys.sort(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
 
-            ArrayList<ResourceLocation> keys = new ArrayList<>();
-            keys.addAll(res.keySet());
-            keys.addAll(vanilla.keySet());
-            keys.sort(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
-
-            for (ResourceLocation rl : keys) {
-                Resource r = res.get(rl);
-                if (r == null) r = vanilla.get(rl);
-                if (r == null) continue;
-                JsonObject obj = readObj(r);
-                if (obj == null) continue;
-                for (Map.Entry<String, JsonElement> e : obj.entrySet()) {
-                    String k = e.getKey();
-                    if (k == null || k.isBlank()) continue;
-                    JsonElement v = e.getValue();
-                    if (v == null || !v.isJsonPrimitive()) continue;
-                    try {
-                        String s = v.getAsString();
-                        if (s != null && !s.isEmpty()) out.put(k, s);
-                    } catch (Throwable ignored) {
-                    }
+        for (ResourceLocation rl : keys) {
+            Resource resource = packLang.get(rl);
+            if (resource == null) resource = vanilla.get(rl);
+            if (resource == null) continue;
+            JsonObject obj = readObj(resource);
+            if (obj == null) continue;
+            for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+                String key = entry.getKey();
+                if (key == null || key.isBlank()) continue;
+                String value = stringValue(entry.getValue());
+                if (value != null && !value.isEmpty()) {
+                    out.put(key, value);
                 }
             }
-        } catch (Throwable ignored) {
         }
     }
 
@@ -142,8 +140,42 @@ public final class SkinPackLang {
             jr.setLenient(true);
             JsonElement e = JsonParser.parseReader(jr);
             return e != null && e.isJsonObject() ? e.getAsJsonObject() : null;
-        } catch (Throwable ignored) {
+        } catch (IOException | RuntimeException ignored) {
             return null;
         }
+    }
+
+    private static Map<ResourceLocation, Resource> listResources(ResourceManager rm, String root, java.util.function.Predicate<ResourceLocation> filter) {
+        try {
+            return rm.listResources(root, filter);
+        } catch (RuntimeException ignored) {
+            return Map.of();
+        }
+    }
+
+    private static Object invokeNoArgs(Object target, String name) {
+        if (target == null || name == null || name.isBlank()) return null;
+        try {
+            return target.getClass().getMethod(name).invoke(target);
+        } catch (ReflectiveOperationException | RuntimeException ignored) {
+            return null;
+        }
+    }
+
+    private static String stringValue(JsonElement element) {
+        if (element == null || !element.isJsonPrimitive()) return null;
+        try {
+            return element.getAsString();
+        } catch (RuntimeException ignored) {
+            return null;
+        }
+    }
+
+    private static String translateOrNull(String key) {
+        if (key == null || key.isBlank()) return null;
+        String extra = get(key);
+        if (extra != null && !extra.isEmpty() && !extra.equals(key)) return extra;
+        String value = I18n.get(key);
+        return value == null || value.isEmpty() || value.equals(key) ? null : value;
     }
 }

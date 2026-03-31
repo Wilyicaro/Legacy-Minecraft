@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Devil",
+                 "displayNameId":  "custom.halloweencharity.charity_devil",
+                 "themeName":  "4J Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_devil"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

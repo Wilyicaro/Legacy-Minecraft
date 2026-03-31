@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Isabela",
+    "displayNameId": "custom.skin_pack_6.isabela",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skin_pack_6.themetext.isabela"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

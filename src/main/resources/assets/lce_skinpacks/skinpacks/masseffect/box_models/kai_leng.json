@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Kai Leng",
+    "displayNameId": "custom.masseffect.kai_leng",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.kai_leng"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

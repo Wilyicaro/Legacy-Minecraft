@@ -1,0 +1,164 @@
+{
+  "name": "key:custom.moana.pack.name",
+  "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 3000,
+  "skins": [
+    {
+      "id": "moana",
+      "name": "key:custom.moana.moana",
+      "texture": "skins/moana.png",
+      "order": 1,
+      "model": "slim"
+    },
+    {
+      "id": "maui",
+      "name": "key:custom.moana.maui",
+      "texture": "skins/maui.png",
+      "order": 2
+    },
+    {
+      "id": "tamatoa",
+      "name": "key:custom.moana.tamatoa",
+      "texture": "skins/tamatoa.png",
+      "order": 3
+    },
+    {
+      "id": "pua",
+      "name": "key:custom.moana.pua",
+      "texture": "skins/pua.png",
+      "order": 4
+    },
+    {
+      "id": "gramma_tala",
+      "name": "key:custom.moana.gramma_tala",
+      "texture": "skins/gramma_tala.png",
+      "order": 5
+    },
+    {
+      "id": "heihei",
+      "name": "key:custom.moana.heihei",
+      "texture": "skins/heihei.png",
+      "order": 6
+    },
+    {
+      "id": "ocean",
+      "name": "key:custom.moana.ocean",
+      "texture": "skins/ocean.png",
+      "order": 7
+    },
+    {
+      "id": "sina",
+      "name": "key:custom.moana.sina",
+      "texture": "skins/sina.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "chief_tui",
+      "name": "key:custom.moana.chief_tui",
+      "texture": "skins/chief_tui.png",
+      "order": 9
+    },
+    {
+      "id": "matai_vasa",
+      "name": "key:custom.moana.matai_vasa",
+      "texture": "skins/matai_vasa.png",
+      "order": 10
+    },
+    {
+      "id": "kakamora_1",
+      "name": "key:custom.moana.kakamora_1",
+      "texture": "skins/kakamora_1.png",
+      "order": 11
+    },
+    {
+      "id": "kakamora_2",
+      "name": "key:custom.moana.kakamora_2",
+      "texture": "skins/kakamora_2.png",
+      "order": 12
+    },
+    {
+      "id": "kakamora_3",
+      "name": "key:custom.moana.kakamora_3",
+      "texture": "skins/kakamora_3.png",
+      "order": 13
+    },
+    {
+      "id": "kakamora_chief",
+      "name": "key:custom.moana.kakamora_chief",
+      "texture": "skins/kakamora_chief.png",
+      "order": 14
+    },
+    {
+      "id": "villager_female",
+      "name": "key:custom.moana.villager_female",
+      "texture": "skins/villager_female.png",
+      "order": 15,
+      "model": "slim"
+    },
+    {
+      "id": "voyager_female",
+      "name": "key:custom.moana.voyager_female",
+      "texture": "skins/voyager_female.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "villager_male",
+      "name": "key:custom.moana.villager_male",
+      "texture": "skins/villager_male.png",
+      "order": 17
+    },
+    {
+      "id": "voyager_male",
+      "name": "key:custom.moana.voyager_male",
+      "texture": "skins/voyager_male.png",
+      "order": 18
+    },
+    {
+      "id": "voyager_moana",
+      "name": "key:custom.moana.voyager_moana",
+      "texture": "skins/voyager_moana.png",
+      "order": 19,
+      "model": "slim"
+    },
+    {
+      "id": "half_shark_maui",
+      "name": "key:custom.moana.half_shark_maui",
+      "texture": "skins/half_shark_maui.png",
+      "order": 20
+    },
+    {
+      "id": "spirit_gramma_tala",
+      "name": "key:custom.moana.spirit_gramma_tala",
+      "texture": "skins/spirit_gramma_tala.png",
+      "order": 21,
+      "model": "slim"
+    },
+    {
+      "id": "fish_monster",
+      "name": "key:custom.moana.fish_monster",
+      "texture": "skins/fish_monster.png",
+      "order": 22
+    },
+    {
+      "id": "sloth_monster",
+      "name": "key:custom.moana.sloth_monster",
+      "texture": "skins/sloth_monster.png",
+      "order": 23
+    },
+    {
+      "id": "hawk_maui",
+      "name": "key:custom.moana.hawk_maui",
+      "texture": "skins/hawk_maui.png",
+      "order": 24
+    },
+    {
+      "id": "bioluminescent_tamatoa",
+      "name": "key:custom.moana.bioluminescent_tamatoa",
+      "texture": "skins/bioluminescent_tamatoa.png",
+      "order": 25
+    }
+  ]
+}

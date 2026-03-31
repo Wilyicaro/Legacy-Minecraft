@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "displayName": "Creeper Battler",
+    "displayNameId": "custom.minigamemasters.creeper_battler"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            44
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            40
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            54,
+            24
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            44
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            40
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            -1.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            2.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            54,
+            24
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            2.0,
+            2.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            54,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            -3.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            -3.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 {
   "name": "key:custom.birthday3.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 200,
   "skins": [
     {
       "id": "jens",

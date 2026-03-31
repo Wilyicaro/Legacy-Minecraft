@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "displayName": "Harpy",
+    "displayNameId": "custom.greekmythology.harpy"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "right_pants",
+    "left_pants"
+  ],
+  "bones": [
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.9,
+            6.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            3.0,
+            8.0
+          ],
+          "uv": [
+            -2,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -1.9,
+            3.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            3.0,
+            6.0
+          ],
+          "uv": [
+            2,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        },
+        {
+          "origin": [
+            -1.9,
+            0.9,
+            0.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            45
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM0"
+        }
+      ]
+    },
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            0.9,
+            6.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            3.0,
+            8.0
+          ],
+          "uv": [
+            -2,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            0.9,
+            3.9,
+            -0.9
+          ],
+          "size": [
+            1.0,
+            3.0,
+            6.0
+          ],
+          "uv": [
+            2,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        },
+        {
+          "origin": [
+            0.9,
+            0.9,
+            0.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            45
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "ARM1"
+        }
+      ]
+    }
+  ]
+}

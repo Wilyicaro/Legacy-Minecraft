@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Urdnot Wrex",
+    "displayNameId": "custom.masseffect.urdnot_wrex",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.urdnot_wrex"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

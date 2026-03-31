@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Scarlet Spider (Modern)",
+    "displayNameId": "custom.marvelsspiderman.scarlet_spider_modern",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.scarlet_spider_modern"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

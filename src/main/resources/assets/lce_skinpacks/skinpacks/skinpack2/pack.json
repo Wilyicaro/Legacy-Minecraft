@@ -1,6 +1,8 @@
 {
   "name": "key:custom.skinpack2.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 3800,
   "skins": [
     {
       "id": "enderman",

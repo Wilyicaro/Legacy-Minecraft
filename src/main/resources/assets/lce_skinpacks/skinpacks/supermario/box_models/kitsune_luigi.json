@@ -1,0 +1,278 @@
+{
+  "meta": {
+    "displayName": "Kitsune Luigi",
+    "displayNameId": "custom.supermario.kitsune_luigi"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "right_arm",
+    "left_arm",
+    "hat",
+    "right_pants",
+    "left_pants",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -9.0,
+            -4.0
+          ],
+          "size": [
+            8.0,
+            1.0,
+            8.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -9.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            9.0,
+            6.0
+          ],
+          "uv": [
+            0,
+            35
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -9.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            9.0,
+            6.0
+          ],
+          "uv": [
+            0,
+            35
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -12.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -12.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -4.0
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -7.0,
+            -6.0
+          ],
+          "size": [
+            8.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            4.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            6.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            50
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            10.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            2,
+            60
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            3.0,
+            3.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            15,
+            41
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            41,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            33,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

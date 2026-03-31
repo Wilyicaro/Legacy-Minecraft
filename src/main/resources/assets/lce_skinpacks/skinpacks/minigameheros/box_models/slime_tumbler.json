@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "displayName": "Slime Tumbler",
+    "displayNameId": "custom.minigameheros.slime_tumbler"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/minigameheros/box_textures/slime_tumbler.png"
+  },
+  "hide": [
+    "left_pants"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -10.0,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            2.0,
+            6.0
+          ],
+          "uv": [
+            0,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

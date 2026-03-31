@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Skins.client.render.boxloader.AttachSlot;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
-import wily.legacy.Skins.client.render.SkinPoseRegistry;
+import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
@@ -27,7 +27,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Skins.client.compat.bedrockskins.BedrockSkinsCompat;
 
 @Mixin(AvatarRenderer.class)
 public abstract class PlayerRendererMixin extends LivingEntityRenderer {
@@ -43,7 +42,6 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
 
         String skinId = ClientSkinCache.get(mc.player.getUUID());
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
-        if (BedrockSkinsCompat.isBedrockSkinId(skinId)) return;
 
         if (SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.HIDE_HAND, skinId)) {
             ci.cancel();
@@ -83,9 +81,11 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         var parts = built.get(slot);
         if (parts == null || parts.isEmpty()) return;
 
-        final ResourceLocation texFinal = texture;
+        ResourceLocation boxTexture = BoxModelManager.getTexture(modelId);
+        if (boxTexture == null) boxTexture = texture;
+        final ResourceLocation texFinal = boxTexture;
         final var partsFinal = parts;
-
+        final float partScale = built.partScale();
         submitNodeCollector.submitCustomGeometry(
                 poseStack,
                 RenderType.entityCutoutNoCull(texFinal),
@@ -94,6 +94,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
                     ps.last().set(pose);
                     ps.pushPose();
                     modelPart.translateAndRotate(ps);
+                    if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
                     for (ModelPart p : partsFinal) p.render(ps, vc, packedLight, OverlayTexture.NO_OVERLAY);
                     ps.popPose();
                 }

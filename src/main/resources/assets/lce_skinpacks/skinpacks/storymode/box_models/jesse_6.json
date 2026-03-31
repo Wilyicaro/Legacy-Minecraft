@@ -3,14 +3,6 @@
     "displayName": "Jesse",
     "displayNameId": "custom.storymode.jesse_6"
   },
-  "hide": [
-    "hat",
-    "jacket",
-    "left_sleeve",
-    "right_sleeve",
-    "left_pants",
-    "right_pants"
-  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -490,5 +482,13 @@
         }
       ]
     }
+  ],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
   ]
 }

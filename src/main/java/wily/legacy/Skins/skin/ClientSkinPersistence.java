@@ -1,8 +1,6 @@
 package wily.legacy.Skins.skin;
 
-import net.minecraft.client.Minecraft;
-import wily.legacy.Skins.util.LegacySkinsPaths;
-
+import wily.legacy.Skins.util.SkinPaths;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,14 +9,8 @@ import java.util.UUID;
 
 public final class ClientSkinPersistence {
     private static final String FILE_NAME = "selected_skin.txt";
-
-    private ClientSkinPersistence() {
-    }
-
-    private static Path filePath() {
-        return LegacySkinsPaths.resolve(FILE_NAME, "consoleskins/" + FILE_NAME);
-    }
-
+    private ClientSkinPersistence() { }
+    private static Path filePath() { return SkinPaths.resolve(FILE_NAME); }
     public static void save(UUID userProfileId, String skinId) {
         if (userProfileId == null) return;
         Path p = filePath();
@@ -30,10 +22,8 @@ public final class ClientSkinPersistence {
             }
             String data = userProfileId + "\n" + skinId + "\n";
             Files.writeString(p, data, StandardCharsets.UTF_8);
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) { }
     }
-
     public static String load(UUID expectedUserProfileId) {
         if (expectedUserProfileId == null) return null;
         Path p = filePath();
@@ -46,8 +36,6 @@ public final class ClientSkinPersistence {
             if (!expectedUserProfileId.equals(fileUser)) return null;
             String skinId = lines[1].trim();
             return skinId.isBlank() ? null : skinId;
-        } catch (Throwable ignored) {
-            return null;
-        }
+        } catch (IOException | IllegalArgumentException ignored) { return null; }
     }
 }

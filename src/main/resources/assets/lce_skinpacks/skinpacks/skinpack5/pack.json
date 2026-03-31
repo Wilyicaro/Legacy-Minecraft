@@ -1,6 +1,8 @@
 {
   "name": "key:custom.skinpack5.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 3950,
   "skins": [
     {
       "id": "german_soldier",

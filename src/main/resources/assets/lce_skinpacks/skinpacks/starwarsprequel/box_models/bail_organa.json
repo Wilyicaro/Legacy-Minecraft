@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Bail Organa",
+    "displayNameId": "custom.starwarsprequel.bail_organa"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

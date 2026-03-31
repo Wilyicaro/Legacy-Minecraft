@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Zippy Zombie",
+                 "displayNameId":  "custom.halloweencharity.charity_zippy_zombie",
+                 "themeName":  "Rare",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_zippy_zombie"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

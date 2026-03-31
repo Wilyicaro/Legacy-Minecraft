@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Knight",
+    "displayNameId": "custom.soa.knight",
+    "themeName": "Wreckateer",
+    "themeNameId": "custom.soa.themetext.knight"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

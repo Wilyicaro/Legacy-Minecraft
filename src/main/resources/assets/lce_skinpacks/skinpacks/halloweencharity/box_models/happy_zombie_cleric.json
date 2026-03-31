@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Happy Zombie Cleric",
+    "displayNameId": "custom.halloweencharity.happy_zombie_cleric",
+    "themeName": "Toylogic",
+    "themeNameId": "custom.halloweencharity.themetext.happy_zombie_cleric"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

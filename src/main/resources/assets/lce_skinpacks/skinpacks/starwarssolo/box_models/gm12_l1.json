@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "displayName": "GM12-L1",
+    "displayNameId": "custom.starwarssolo.gm12_l1",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00007230_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/starwarssolo/box_textures/gm12_l1.png"
+  },
+  "hide": [
+    "left_arm",
+    "left_sleeve"
+  ],
+  "bones": [
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            48
+          ],
+          "inflate": 0.25,
+          "mirror": true,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "bodyarmor_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -0.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            10.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "BODYARMOR"
+        },
+        {
+          "origin": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            10.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "BODYARMOR"
+        }
+      ],
+      "visible": false
+    }
+  ]
+}

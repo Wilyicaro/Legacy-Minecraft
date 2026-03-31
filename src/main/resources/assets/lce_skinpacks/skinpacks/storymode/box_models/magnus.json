@@ -50,5 +50,8 @@
         }
       ]
     }
+  ],
+  "hide": [
+    "left_sleeve"
   ]
 }

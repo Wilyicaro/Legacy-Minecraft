@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ronan the Accuser",
+    "displayNameId": "custom.MarvelGOG.ronan_the_accuser",
+    "themeName": "Guardians of the Galaxy",
+    "themeNameId": "custom.MarvelGOG.themetext.ronan_the_accuser"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

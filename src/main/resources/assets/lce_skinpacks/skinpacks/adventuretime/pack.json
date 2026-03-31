@@ -1,6 +1,8 @@
 {
   "name": "key:custom.adventuretime.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 1000,
   "skins": [
     {
       "id": "finn",

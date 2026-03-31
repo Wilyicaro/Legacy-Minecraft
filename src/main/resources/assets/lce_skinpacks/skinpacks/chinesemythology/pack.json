@@ -1,6 +1,8 @@
 {
   "name": "key:custom.chinesemythology.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 1300,
   "skins": [
     {
       "id": "sun_wukong",

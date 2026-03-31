@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Evil Wizard",
+                 "displayNameId":  "custom.halloweencharity.charity_evil_wizard",
+                 "themeName":  "4J Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_evil_wizard"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

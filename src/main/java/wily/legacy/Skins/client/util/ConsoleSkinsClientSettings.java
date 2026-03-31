@@ -1,8 +1,6 @@
 package wily.legacy.Skins.client.util;
 
-import net.minecraft.client.Minecraft;
-import wily.legacy.Skins.client.screen.changeskin.SkinPackViewFilter;
-import wily.legacy.Skins.util.LegacySkinsPaths;
+import wily.legacy.Skins.util.SkinPaths;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,13 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class ConsoleSkinsClientSettings {
-    private static final String FILE_NAME = "consoleskins_client_options.txt";
-
     private static final boolean DEFAULT_SMOOTH_PREVIEW_SCROLL = false;
     private static final boolean DEFAULT_SKIN_ANIMATIONS = true;
     private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
     private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
-    private static final boolean DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS = false;
     private static final boolean DEFAULT_MINIMIZE_TOOLTIPS = false;
     private static final boolean DEFAULT_SKIN_SELECTION_INITIALIZED = false;
     private static volatile boolean loaded;
@@ -25,11 +20,9 @@ public final class ConsoleSkinsClientSettings {
     private static volatile boolean skinAnimations = DEFAULT_SKIN_ANIMATIONS;
     private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
     private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
-    private static volatile boolean hideDuplicateExternalLegacyPacks = DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS;
     private static volatile boolean minimizeTooltips = DEFAULT_MINIMIZE_TOOLTIPS;
     private static volatile boolean skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
     private static volatile String lastUsedCustomPackId;
-    private static volatile String lastSkinPackViewFilter;
 
     private ConsoleSkinsClientSettings() {
     }
@@ -78,17 +71,6 @@ public final class ConsoleSkinsClientSettings {
         saveQuiet();
     }
 
-    public static boolean isHideDuplicateExternalLegacyPacks() {
-        ensureLoaded();
-        return hideDuplicateExternalLegacyPacks;
-    }
-
-    public static void setHideDuplicateExternalLegacyPacks(boolean enabled) {
-        ensureLoaded();
-        hideDuplicateExternalLegacyPacks = enabled;
-        saveQuiet();
-    }
-
     public static boolean isMinimizeTooltips() {
         ensureLoaded();
         return minimizeTooltips;
@@ -122,34 +104,15 @@ public final class ConsoleSkinsClientSettings {
         saveQuiet();
     }
 
-    public static SkinPackViewFilter getLastSkinPackViewFilter() {
-        ensureLoaded();
-        if (lastSkinPackViewFilter == null || lastSkinPackViewFilter.isBlank()) return SkinPackViewFilter.DEFAULT;
-        try {
-            return SkinPackViewFilter.valueOf(lastSkinPackViewFilter);
-        } catch (IllegalArgumentException ignored) {
-            return SkinPackViewFilter.DEFAULT;
-        }
-    }
-
-    public static void setLastSkinPackViewFilter(SkinPackViewFilter filter) {
-        ensureLoaded();
-        SkinPackViewFilter resolved = filter == null ? SkinPackViewFilter.DEFAULT : filter;
-        lastSkinPackViewFilter = resolved.name();
-        saveQuiet();
-    }
-
     public static void resetToDefaults() {
         ensureLoaded();
         smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
         skinAnimations = DEFAULT_SKIN_ANIMATIONS;
         hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
         tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
-        hideDuplicateExternalLegacyPacks = DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS;
         minimizeTooltips = DEFAULT_MINIMIZE_TOOLTIPS;
         skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
         lastUsedCustomPackId = null;
-        lastSkinPackViewFilter = SkinPackViewFilter.DEFAULT.name();
         saveQuiet();
     }
 
@@ -161,16 +124,13 @@ public final class ConsoleSkinsClientSettings {
 
     private static void loadQuiet() {
         try {
-
             smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
             skinAnimations = DEFAULT_SKIN_ANIMATIONS;
             hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
             tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
-            hideDuplicateExternalLegacyPacks = DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS;
             minimizeTooltips = DEFAULT_MINIMIZE_TOOLTIPS;
             skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
             lastUsedCustomPackId = null;
-            lastSkinPackViewFilter = SkinPackViewFilter.DEFAULT.name();
 
             Path cfg = resolveConfigFile();
             if (cfg == null || !Files.isRegularFile(cfg)) return;
@@ -208,13 +168,6 @@ public final class ConsoleSkinsClientSettings {
                         continue;
                     }
 
-                    if (k.equalsIgnoreCase("hide_duplicate_external_legacy_packs") || k.equalsIgnoreCase("hideDuplicateExternalLegacyPacks")
-                            || k.equalsIgnoreCase("hide_duplicate_legacy_packs") || k.equalsIgnoreCase("hideDuplicateLegacyPacks")
-                            || k.equalsIgnoreCase("hide_duplicate_external_packs") || k.equalsIgnoreCase("hideDuplicateExternalPacks")) {
-                        hideDuplicateExternalLegacyPacks = parseBool(v, DEFAULT_HIDE_DUPLICATE_EXTERNAL_LEGACY_PACKS);
-                        continue;
-                    }
-
                     if (k.equalsIgnoreCase("minimize_tooltips") || k.equalsIgnoreCase("minimizeTooltips")
                             || k.equalsIgnoreCase("minimize_change_skin_tooltips") || k.equalsIgnoreCase("minimizeChangeSkinTooltips")) {
                         minimizeTooltips = parseBool(v, DEFAULT_MINIMIZE_TOOLTIPS);
@@ -231,14 +184,9 @@ public final class ConsoleSkinsClientSettings {
                         lastUsedCustomPackId = v == null || v.isBlank() ? null : v.trim();
                         continue;
                     }
-
-                    if (k.equalsIgnoreCase("last_skin_pack_view_filter") || k.equalsIgnoreCase("lastSkinPackViewFilter")
-                            || k.equalsIgnoreCase("last_change_skin_filter") || k.equalsIgnoreCase("lastChangeSkinFilter")) {
-                        lastSkinPackViewFilter = v == null || v.isBlank() ? SkinPackViewFilter.DEFAULT.name() : v.trim();
-                    }
                 }
             }
-        } catch (Throwable ignored) {
+        } catch (IOException | RuntimeException ignored) {
         }
     }
 
@@ -261,17 +209,15 @@ public final class ConsoleSkinsClientSettings {
                     + "skin_animations=" + skinAnimations + "\n"
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
-                    + "hide_duplicate_external_legacy_packs=" + hideDuplicateExternalLegacyPacks + "\n"
                     + "minimize_tooltips=" + minimizeTooltips + "\n"
                     + "skin_selection_initialized=" + skinSelectionInitialized + "\n"
-                    + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n"
-                    + "last_skin_pack_view_filter=" + (lastSkinPackViewFilter == null ? SkinPackViewFilter.DEFAULT.name() : lastSkinPackViewFilter) + "\n";
+                    + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n";
             Files.writeString(cfg, out, StandardCharsets.UTF_8);
-        } catch (Throwable ignored) {
+        } catch (IOException | RuntimeException ignored) {
         }
     }
 
     private static Path resolveConfigFile() {
-        return LegacySkinsPaths.resolve("client_options.txt", FILE_NAME);
+        return SkinPaths.resolve("client_options.txt");
     }
 }

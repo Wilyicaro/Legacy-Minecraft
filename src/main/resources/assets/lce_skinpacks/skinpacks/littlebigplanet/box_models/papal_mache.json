@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "displayName": "Papal Mache",
+    "displayNameId": "custom.littlebigplanet.papal_mache",
+    "themeName": "LittleBigPlanet™",
+    "themeNameId": "custom.littlebigplanet.themetext.papal_mache"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -7.0,
+            1.0
+          ],
+          "size": [
+            6.0,
+            8.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -6.0,
+            1.1
+          ],
+          "size": [
+            2.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.9,
+            -6.0,
+            1.1
+          ],
+          "size": [
+            2.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            6,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -7.9,
+            1.1
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            14,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.3
+          ],
+          "size": [
+            8.0,
+            18.0,
+            0.0
+          ],
+          "uv": [
+            48,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            4.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            4.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            18,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            10.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            10.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ],
+  "hide": [
+    "ARMS",
+    "HAT",
+    "HEAD"
+  ]
+}

@@ -2,14 +2,15 @@ package wily.legacy.Skins;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.server.packs.PackType;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.FactoryEvent;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.Skins.client.compat.ExternalSkinProviders;
-import wily.legacy.Skins.client.compat.bedrockskins.BedrockSkinsCompat;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.Skins.client.util.ViewBobbingSkinOverride;
+import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
-import wily.legacy.Skins.skin.SkinPackReloadListener;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.skin.SkinSyncClient;
 
@@ -17,146 +18,112 @@ public final class SkinsClientBootstrap {
     private SkinsClientBootstrap() {
     }
 
-    private static final SkinPackReloadListener SKIN_PACK_RELOAD_LISTENER = new SkinPackReloadListener();
-    private static volatile boolean reloadListenerRegistered = false;
+    private static final net.minecraft.server.packs.resources.ResourceManagerReloadListener SKIN_PACK_RELOAD_LISTENER = new net.minecraft.server.packs.resources.ResourceManagerReloadListener() {
+        @Override
+        public void onResourceManagerReload(net.minecraft.server.packs.resources.ResourceManager manager) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc != null) {
+                mc.execute(() -> {
+                    ClientSkinAssets.clearPreviewCaches();
+                    SkinPreviewWarmup.clear();
+                    BoxModelManager.reload(manager);
+                    SkinPackLoader.loadPacks(manager);
+                });
+                return;
+            }
+            ClientSkinAssets.clearPreviewCaches();
+            SkinPreviewWarmup.clear();
+            BoxModelManager.reload(manager);
+            SkinPackLoader.loadPacks(manager);
+        }
+
+        @Override
+        public String getName() {
+            return "legacy:skins";
+        }
+    };
     private static volatile boolean packPreloadStarted = false;
     private static volatile boolean defaultSelectionChecked = false;
 
     public static void initClient() {
         SkinSyncClient.initClient();
-        ExternalSkinProviders.logCapabilitiesOnce();
 
         Legacy4JClient.whenResetOptions.add(ConsoleSkinsClientSettings::resetToDefaults);
 
         Legacy4JClient.whenResetOptions.add(() -> {
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                ExternalSkinProviders.clearAllSelectedSkins();
-                SkinPackLoader.setLastUsedCustomPackId(null);
-                SkinSyncClient.requestSetSkin(mc, "");
-                ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
-            } catch (Throwable ignored) {
-            }
+            Minecraft mc = Minecraft.getInstance();
+            SkinPackLoader.setLastUsedCustomPackId(null);
+            SkinSyncClient.requestSetSkin(mc, "");
+            ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
         });
 
-        FactoryAPIClient.setup(m -> {
-            try {
-                SkinSyncClient.ensureInitialSkinLoaded(m);
-            } catch (Throwable ignored) {
-            }
-        });
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, SKIN_PACK_RELOAD_LISTENER);
+        FactoryAPIClient.setup(SkinSyncClient::ensureInitialSkinLoaded);
 
         FactoryAPIClient.postTick(SkinsClientBootstrap::postTick);
 
         FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p -> {
             SkinSyncClient.onClientDisconnect();
-            try {
-                ViewBobbingSkinOverride.reset(Minecraft.getInstance());
-            } catch (Throwable ignored) {
-            }
+            ViewBobbingSkinOverride.reset(Minecraft.getInstance());
         });
         FactoryAPIClient.PlayerEvent.JOIN_EVENT.register(p -> SkinSyncClient.onClientJoin());
     }
 
     private static void postTick(Minecraft minecraft) {
-
-        if (!reloadListenerRegistered) {
-            try {
-                if (minecraft != null) {
-                    Object rm = minecraft.getResourceManager();
-                    if (rm != null) {
-                        try {
-                            java.lang.reflect.Method m = rm.getClass().getMethod(
-                                    "registerReloadListener",
-                                    net.minecraft.server.packs.resources.PreparableReloadListener.class
-                            );
-                            m.invoke(rm, SKIN_PACK_RELOAD_LISTENER);
-                            reloadListenerRegistered = true;
-                        } catch (NoSuchMethodException ignored) {
-                        }
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-
-        BedrockSkinsCompat.redirectLegacyScreenIfNeeded(minecraft);
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
 
         if (!defaultSelectionChecked) {
-            try {
-                if (minecraft != null && minecraft.getUser() != null) {
-                    if (!ConsoleSkinsClientSettings.isSkinSelectionInitialized()) {
-                        java.util.UUID uid = minecraft.getUser().getProfileId();
-                        String existing = null;
-                        try {
-                            existing = wily.legacy.Skins.skin.ClientSkinCache.get(uid);
-                        } catch (Throwable ignored) {
-                        }
-                        if (existing == null || existing.isBlank()) {
-                            try {
-                                existing = wily.legacy.Skins.skin.ClientSkinPersistence.load(uid);
-                            } catch (Throwable ignored) {
-                            }
-                        }
-                        if (existing == null || existing.isBlank()) {
-                            existing = ExternalSkinProviders.getCurrentSelectedSkinId();
-                        }
-                        if (existing == null || existing.isBlank()) {
-                            SkinPackLoader.setLastUsedCustomPackId(null);
-                            SkinSyncClient.requestSetSkin(minecraft, "");
-                        }
-                        ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
-                    }
-                    defaultSelectionChecked = true;
-                }
-            } catch (Throwable ignored) {
-            }
+            checkDefaultSelection(minecraft);
         }
 
         if (!packPreloadStarted) {
-            try {
-                if (!SkinPackLoader.isLoaded() && minecraft != null && minecraft.getResourceManager() != null) {
-                    packPreloadStarted = true;
-                    try {
-                        SkinPackLoader.ensureLoaded();
-                    } catch (Throwable ignored) {
-                    }
-                    try {
-                        BoxModelManager.reload(minecraft.getResourceManager());
-                    } catch (Throwable ignored) {
-                    }
-                    if (!SkinPackLoader.isLoaded()) {
-                        packPreloadStarted = false;
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
+            preloadPacks(minecraft);
         }
     }
 
     public static Screen createChangeSkinScreen(Screen parent) {
-        try {
-            SkinPackLoader.ensureLoaded();
-        } catch (Throwable ignored) {
-        }
+        SkinPackLoader.ensureLoaded();
 
         try {
             if (ConsoleSkinsClientSettings.isTu3ChangeSkinScreen()) {
                 return new wily.legacy.Skins.client.screen.TU3ChangeSkinScreen(parent);
             }
             return new wily.legacy.Skins.client.screen.ChangeSkinScreen(parent);
-        } catch (Throwable ignored) {
+        } catch (RuntimeException ex) {
             return parent;
         }
     }
 
     public static void requestOpenChangeSkinScreen(Minecraft minecraft, Screen parent) {
-        try {
-            if (minecraft == null) return;
-            minecraft.setScreen(createChangeSkinScreen(parent));
-        } catch (Throwable ignored) {
+        if (minecraft == null) return;
+        minecraft.setScreen(createChangeSkinScreen(parent));
+    }
+
+    private static void checkDefaultSelection(Minecraft minecraft) {
+        if (minecraft == null || minecraft.getUser() == null) return;
+        if (!ConsoleSkinsClientSettings.isSkinSelectionInitialized()) {
+            java.util.UUID userId = minecraft.getUser().getProfileId();
+            String existing = wily.legacy.Skins.skin.ClientSkinCache.get(userId);
+            if (existing == null || existing.isBlank()) {
+                existing = wily.legacy.Skins.skin.ClientSkinPersistence.load(userId);
+            }
+            if (existing == null || existing.isBlank()) {
+                SkinPackLoader.setLastUsedCustomPackId(null);
+                SkinSyncClient.requestSetSkin(minecraft, "");
+            }
+            ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
+        }
+        defaultSelectionChecked = true;
+    }
+
+    private static void preloadPacks(Minecraft minecraft) {
+        if (minecraft == null || minecraft.getResourceManager() == null || SkinPackLoader.isLoaded()) return;
+        packPreloadStarted = true;
+        SkinPackLoader.ensureLoaded();
+        BoxModelManager.reload(minecraft.getResourceManager());
+        if (!SkinPackLoader.isLoaded()) {
+            packPreloadStarted = false;
         }
     }
 }

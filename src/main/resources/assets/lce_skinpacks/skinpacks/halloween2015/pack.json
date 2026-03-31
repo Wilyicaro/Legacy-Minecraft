@@ -1,6 +1,8 @@
 {
   "name": "key:custom.halloween2015.pack.name",
   "author": "4J Studios",
+  "type": "mashup",
+  "sort_index": 2400,
   "skins": [
     {
       "id": "vampire",

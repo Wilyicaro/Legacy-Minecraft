@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Captain Zombie",
+    "displayNameId": "custom.halloweencharity.captain_zombie",
+    "themeName": "Twisted Pixel Games",
+    "themeNameId": "custom.halloweencharity.themetext.captain_zombie"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -3,9 +3,6 @@
     "displayName": "Petra",
     "displayNameId": "custom.storymode.petra"
   },
-  "hide": [
-    "jacket"
-  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -198,8 +195,8 @@
       ]
     },
     {
-      "name": "body_addon",
-      "attach": "BODY",
+      "name": "hat_addon",
+      "attach": "HAT",
       "cubes": [
         {
           "origin": [
@@ -221,5 +218,9 @@
         }
       ]
     }
+  ],
+  "hide": [
+    "hat",
+    "jacket"
   ]
 }

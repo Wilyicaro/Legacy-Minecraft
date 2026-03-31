@@ -1,0 +1,279 @@
+{
+  "name": "key:custom.skin_pack_6.pack.name",
+  "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 3960,
+  "skins": [
+    {
+      "id": "jago",
+      "name": "key:custom.skin_pack_6.jago",
+      "texture": "skins/jago.png",
+      "order": 1
+    },
+    {
+      "id": "sabrewulf",
+      "name": "key:custom.skin_pack_6.sabrewulf",
+      "texture": "skins/sabrewulf.png",
+      "order": 2
+    },
+    {
+      "id": "glacius",
+      "name": "key:custom.skin_pack_6.glacius",
+      "texture": "skins/glacius.png",
+      "order": 3
+    },
+    {
+      "id": "thunder",
+      "name": "key:custom.skin_pack_6.thunder",
+      "texture": "skins/thunder.png",
+      "order": 4
+    },
+    {
+      "id": "sadira",
+      "name": "key:custom.skin_pack_6.sadira",
+      "texture": "skins/sadira.png",
+      "order": 5
+    },
+    {
+      "id": "orchid",
+      "name": "key:custom.skin_pack_6.orchid",
+      "texture": "skins/orchid.png",
+      "order": 6
+    },
+    {
+      "id": "spinal",
+      "name": "key:custom.skin_pack_6.spinal",
+      "texture": "skins/spinal.png",
+      "order": 7
+    },
+    {
+      "id": "fulgore",
+      "name": "key:custom.skin_pack_6.fulgore",
+      "texture": "skins/fulgore.png",
+      "order": 8
+    },
+    {
+      "id": "horse_man",
+      "name": "key:custom.skin_pack_6.horse_man",
+      "texture": "skins/horse_man.png",
+      "order": 9
+    },
+    {
+      "id": "villager_priest",
+      "name": "key:custom.skin_pack_6.villager_priest",
+      "texture": "skins/villager_priest.png",
+      "order": 10
+    },
+    {
+      "id": "villager_butcher",
+      "name": "key:custom.skin_pack_6.villager_butcher",
+      "texture": "skins/villager_butcher.png",
+      "order": 11
+    },
+    {
+      "id": "villager_librarian",
+      "name": "key:custom.skin_pack_6.villager_librarian",
+      "texture": "skins/villager_librarian.png",
+      "order": 12
+    },
+    {
+      "id": "villager_blacksmith",
+      "name": "key:custom.skin_pack_6.villager_blacksmith",
+      "texture": "skins/villager_blacksmith.png",
+      "order": 13
+    },
+    {
+      "id": "villager_zombie",
+      "name": "key:custom.skin_pack_6.villager_zombie",
+      "texture": "skins/villager_zombie.png",
+      "order": 14
+    },
+    {
+      "id": "hawke_female",
+      "name": "key:custom.skin_pack_6.hawke_female",
+      "texture": "skins/hawke_female.png",
+      "order": 15
+    },
+    {
+      "id": "hawke_male",
+      "name": "key:custom.skin_pack_6.hawke_male",
+      "texture": "skins/hawke_male.png",
+      "order": 16
+    },
+    {
+      "id": "flemeth",
+      "name": "key:custom.skin_pack_6.flemeth",
+      "texture": "skins/flemeth.png",
+      "order": 17
+    },
+    {
+      "id": "varric_tethras",
+      "name": "key:custom.skin_pack_6.varric_tethras",
+      "texture": "skins/varric_tethras.png",
+      "order": 18
+    },
+    {
+      "id": "fenris",
+      "name": "key:custom.skin_pack_6.fenris",
+      "texture": "skins/fenris.png",
+      "order": 19
+    },
+    {
+      "id": "isabela",
+      "name": "key:custom.skin_pack_6.isabela",
+      "texture": "skins/isabela.png",
+      "order": 20
+    },
+    {
+      "id": "merrill",
+      "name": "key:custom.skin_pack_6.merrill",
+      "texture": "skins/merrill.png",
+      "order": 21
+    },
+    {
+      "id": "marcus_campbell",
+      "name": "key:custom.skin_pack_6.marcus_campbell",
+      "texture": "skins/marcus_campbell.png",
+      "order": 22
+    },
+    {
+      "id": "maya_torres",
+      "name": "key:custom.skin_pack_6.maya_torres",
+      "texture": "skins/maya_torres.png",
+      "order": 23
+    },
+    {
+      "id": "ed_jones",
+      "name": "key:custom.skin_pack_6.ed_jones",
+      "texture": "skins/ed_jones.png",
+      "order": 24
+    },
+    {
+      "id": "shark_hoodie_guy",
+      "name": "key:custom.skin_pack_6.shark_hoodie_guy",
+      "texture": "skins/shark_hoodie_guy.png",
+      "order": 25
+    },
+    {
+      "id": "doc_hanson",
+      "name": "key:custom.skin_pack_6.doc_hanson",
+      "texture": "skins/doc_hanson.png",
+      "order": 26
+    },
+    {
+      "id": "jean_rambois",
+      "name": "key:custom.skin_pack_6.jean_rambois",
+      "texture": "skins/jean_rambois.png",
+      "order": 27
+    },
+    {
+      "id": "aimy_mckillin",
+      "name": "key:custom.skin_pack_6.aimy_mckillin",
+      "texture": "skins/aimy_mckillin.png",
+      "order": 28
+    },
+    {
+      "id": "jef_leppard",
+      "name": "key:custom.skin_pack_6.jef_leppard",
+      "texture": "skins/jef_leppard.png",
+      "order": 29
+    },
+    {
+      "id": "shieldy_blockerson",
+      "name": "key:custom.skin_pack_6.shieldy_blockerson",
+      "texture": "skins/shieldy_blockerson.png",
+      "cape": "capes/shieldy_blockerson.png",
+      "order": 30
+    },
+    {
+      "id": "commander_repeatski",
+      "name": "key:custom.skin_pack_6.commander_repeatski",
+      "texture": "skins/commander_repeatski.png",
+      "order": 31
+    },
+    {
+      "id": "zackasaurus",
+      "name": "key:custom.skin_pack_6.zackasaurus",
+      "texture": "skins/zackasaurus.png",
+      "order": 32
+    },
+    {
+      "id": "teen_girl",
+      "name": "key:custom.skin_pack_6.teen_girl",
+      "texture": "skins/teen_girl.png",
+      "order": 33
+    },
+    {
+      "id": "teen_boy",
+      "name": "key:custom.skin_pack_6.teen_boy",
+      "texture": "skins/teen_boy.png",
+      "order": 34
+    },
+    {
+      "id": "us_soldier",
+      "name": "key:custom.skin_pack_6.us_soldier",
+      "texture": "skins/us_soldier.png",
+      "order": 35
+    },
+    {
+      "id": "british_special_forces",
+      "name": "key:custom.skin_pack_6.british_special_forces",
+      "texture": "skins/british_special_forces.png",
+      "order": 36
+    },
+    {
+      "id": "us_special_forces",
+      "name": "key:custom.skin_pack_6.us_special_forces",
+      "texture": "skins/us_special_forces.png",
+      "order": 37
+    },
+    {
+      "id": "russian_special_forces",
+      "name": "key:custom.skin_pack_6.russian_special_forces",
+      "texture": "skins/russian_special_forces.png",
+      "order": 38
+    },
+    {
+      "id": "modern_pirate",
+      "name": "key:custom.skin_pack_6.modern_pirate",
+      "texture": "skins/modern_pirate.png",
+      "order": 39
+    },
+    {
+      "id": "anarchist_rioter",
+      "name": "key:custom.skin_pack_6.anarchist_rioter",
+      "texture": "skins/anarchist_rioter.png",
+      "order": 40
+    },
+    {
+      "id": "rebel_fighter",
+      "name": "key:custom.skin_pack_6.rebel_fighter",
+      "texture": "skins/rebel_fighter.png",
+      "order": 41
+    },
+    {
+      "id": "republican_guard",
+      "name": "key:custom.skin_pack_6.republican_guard",
+      "texture": "skins/republican_guard.png",
+      "order": 42
+    },
+    {
+      "id": "faith",
+      "name": "key:custom.skin_pack_6.faith",
+      "texture": "skins/faith.png",
+      "order": 43
+    },
+    {
+      "id": "tech_boy",
+      "name": "key:custom.skin_pack_6.tech_boy",
+      "texture": "skins/tech_boy.png",
+      "order": 44
+    },
+    {
+      "id": "dirt_runner",
+      "name": "key:custom.skin_pack_6.dirt_runner",
+      "texture": "skins/dirt_runner.png",
+      "order": 45
+    }
+  ]
+}

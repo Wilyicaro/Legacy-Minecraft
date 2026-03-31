@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "J. Jonah Jameson",
+    "displayNameId": "custom.marvelsspiderman.j_jonah_jameson",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.j_jonah_jameson"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

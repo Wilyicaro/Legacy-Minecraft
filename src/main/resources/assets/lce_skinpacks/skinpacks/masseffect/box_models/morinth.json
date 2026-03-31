@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Morinth",
+    "displayNameId": "custom.masseffect.morinth",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.morinth"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

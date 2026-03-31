@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "displayName": "Commandant Aresko",
+    "displayNameId": "custom.starwarsrebels.commandant_aresko"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "hat"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -7.5,
+            -4.9
+          ],
+          "size": [
+            6.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            44,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -4.0
+          ],
+          "size": [
+            6.0,
+            2.0,
+            7.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -2.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            0.0,
+            8.0
+          ],
+          "uv": [
+            -2,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            0.0,
+            8.0
+          ],
+          "uv": [
+            -2,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            3.0
+          ],
+          "size": [
+            6.0,
+            0.0,
+            1.0
+          ],
+          "uv": [
+            17,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

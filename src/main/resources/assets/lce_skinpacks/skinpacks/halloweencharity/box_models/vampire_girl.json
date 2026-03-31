@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Vampire Girl",
+    "displayNameId": "custom.halloweencharity.vampire_girl",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.vampire_girl"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

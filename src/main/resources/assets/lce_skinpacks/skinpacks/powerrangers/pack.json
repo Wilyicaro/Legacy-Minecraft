@@ -1,0 +1,135 @@
+{
+  "name": "key:custom.powerrangers.pack.name",
+  "author": "4J Studios ",
+  "type": "skin",
+  "sort_index": 3400,
+  "skins": [
+    {
+      "id": "red_ranger",
+      "name": "key:custom.powerrangers.red_ranger",
+      "texture": "skins/red_ranger.png",
+      "order": 1
+    },
+    {
+      "id": "black_ranger",
+      "name": "key:custom.powerrangers.black_ranger",
+      "texture": "skins/black_ranger.png",
+      "order": 2
+    },
+    {
+      "id": "blue_ranger",
+      "name": "key:custom.powerrangers.blue_ranger",
+      "texture": "skins/blue_ranger.png",
+      "order": 3
+    },
+    {
+      "id": "pink_ranger",
+      "name": "key:custom.powerrangers.pink_ranger",
+      "texture": "skins/pink_ranger.png",
+      "order": 4,
+      "model": "slim"
+    },
+    {
+      "id": "yellow_ranger",
+      "name": "key:custom.powerrangers.yellow_ranger",
+      "texture": "skins/yellow_ranger.png",
+      "order": 5,
+      "model": "slim"
+    },
+    {
+      "id": "green_ranger",
+      "name": "key:custom.powerrangers.green_ranger",
+      "texture": "skins/green_ranger.png",
+      "order": 6
+    },
+    {
+      "id": "white_ranger",
+      "name": "key:custom.powerrangers.white_ranger",
+      "texture": "skins/white_ranger.png",
+      "order": 7
+    },
+    {
+      "id": "alpha_5",
+      "name": "key:custom.powerrangers.alpha_5",
+      "texture": "skins/alpha_5.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "rita_repulsa",
+      "name": "key:custom.powerrangers.rita_repulsa",
+      "texture": "skins/rita_repulsa.png",
+      "order": 9,
+      "model": "slim"
+    },
+    {
+      "id": "lord_zedd",
+      "name": "key:custom.powerrangers.lord_zedd",
+      "texture": "skins/lord_zedd.png",
+      "order": 10
+    },
+    {
+      "id": "goldar",
+      "name": "key:custom.powerrangers.goldar",
+      "texture": "skins/goldar.png",
+      "order": 11
+    },
+    {
+      "id": "scorpina",
+      "name": "key:custom.powerrangers.scorpina",
+      "texture": "skins/scorpina.png",
+      "order": 12,
+      "model": "slim"
+    },
+    {
+      "id": "putty",
+      "name": "key:custom.powerrangers.putty",
+      "texture": "skins/putty.png",
+      "order": 13
+    },
+    {
+      "id": "rito_revolto",
+      "name": "key:custom.powerrangers.rito_revolto",
+      "texture": "skins/rito_revolto.png",
+      "order": 14
+    },
+    {
+      "id": "ninjor",
+      "name": "key:custom.powerrangers.ninjor",
+      "texture": "skins/ninjor.png",
+      "order": 15
+    },
+    {
+      "id": "red_ranger_w_dragon_shield",
+      "name": "key:custom.powerrangers.red_ranger_w_dragon_shield",
+      "texture": "skins/red_ranger_w_dragon_shield.png",
+      "order": 16
+    },
+    {
+      "id": "black_ranger_w_dragon_shield",
+      "name": "key:custom.powerrangers.black_ranger_w_dragon_shield",
+      "texture": "skins/black_ranger_w_dragon_shield.png",
+      "order": 17
+    },
+    {
+      "id": "megazord",
+      "name": "key:custom.powerrangers.megazord",
+      "texture": "skins/megazord.png",
+      "order": 18,
+      "model": "slim"
+    },
+    {
+      "id": "bulk",
+      "name": "key:custom.powerrangers.bulk",
+      "texture": "skins/bulk.png",
+      "order": 19
+    },
+    {
+      "id": "skull",
+      "name": "key:custom.powerrangers.skull",
+      "texture": "skins/skull.png",
+      "order": 20,
+      "model": "slim"
+    }
+  ]
+}

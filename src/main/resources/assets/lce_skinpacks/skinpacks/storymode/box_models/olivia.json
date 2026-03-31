@@ -3,14 +3,6 @@
     "displayName": "Olivia",
     "displayNameId": "custom.storymode.olivia"
   },
-  "hide": [
-    "hat",
-    "jacket",
-    "left_sleeve",
-    "right_sleeve",
-    "left_pants",
-    "right_pants"
-  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -616,5 +608,13 @@
         }
       ]
     }
+  ],
+  "hide": [
+    "hat",
+    "right_sleeve",
+    "left_sleeve",
+    "jacket",
+    "left_pants",
+    "right_pants"
   ]
 }

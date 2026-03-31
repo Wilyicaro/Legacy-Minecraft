@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cerberus Assault Trooper",
+    "displayNameId": "custom.masseffect.cerberus_assault_trooper",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.cerberus_assault_trooper"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Aria T'Loak",
+    "displayNameId": "custom.masseffect.aria_tloak",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.aria_tloak"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

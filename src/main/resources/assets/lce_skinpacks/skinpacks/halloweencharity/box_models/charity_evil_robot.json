@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Evil Robot",
+                 "displayNameId":  "custom.halloweencharity.charity_evil_robot",
+                 "themeName":  "Mojang",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_evil_robot"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

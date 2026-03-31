@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Pumpkin",
+    "displayNameId": "custom.halloweencharity.pumpkin",
+    "themeName": "Army of Trolls",
+    "themeNameId": "custom.halloweencharity.themetext.pumpkin"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

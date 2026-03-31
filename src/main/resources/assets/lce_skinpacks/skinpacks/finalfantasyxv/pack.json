@@ -1,0 +1,273 @@
+{
+  "name": "key:custom.finalfantasyxv.pack.name",
+  "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 1800,
+  "skins": [
+    {
+      "id": "noctis_lucis_caelum",
+      "name": "key:custom.finalfantasyxv.noctis_lucis_caelum",
+      "texture": "skins/noctis_lucis_caelum.png",
+      "order": 1,
+      "model": "slim"
+    },
+    {
+      "id": "ignis_scientia",
+      "name": "key:custom.finalfantasyxv.ignis_scientia",
+      "texture": "skins/ignis_scientia.png",
+      "order": 2
+    },
+    {
+      "id": "prompto_argentum",
+      "name": "key:custom.finalfantasyxv.prompto_argentum",
+      "texture": "skins/prompto_argentum.png",
+      "order": 3,
+      "model": "slim"
+    },
+    {
+      "id": "gladiolus_amicitia",
+      "name": "key:custom.finalfantasyxv.gladiolus_amicitia",
+      "texture": "skins/gladiolus_amicitia.png",
+      "order": 4
+    },
+    {
+      "id": "cindy_aurum",
+      "name": "key:custom.finalfantasyxv.cindy_aurum",
+      "texture": "skins/cindy_aurum.png",
+      "order": 5,
+      "model": "slim"
+    },
+    {
+      "id": "cid_sophiar",
+      "name": "key:custom.finalfantasyxv.cid_sophiar",
+      "texture": "skins/cid_sophiar.png",
+      "order": 6
+    },
+    {
+      "id": "regis_lucis_caelum",
+      "name": "key:custom.finalfantasyxv.regis_lucis_caelum",
+      "texture": "skins/regis_lucis_caelum.png",
+      "order": 7
+    },
+    {
+      "id": "cor_leonis",
+      "name": "key:custom.finalfantasyxv.cor_leonis",
+      "texture": "skins/cor_leonis.png",
+      "order": 8
+    },
+    {
+      "id": "ardyn_izunia",
+      "name": "key:custom.finalfantasyxv.ardyn_izunia",
+      "texture": "skins/ardyn_izunia.png",
+      "order": 9
+    },
+    {
+      "id": "gentiana",
+      "name": "key:custom.finalfantasyxv.gentiana",
+      "texture": "skins/gentiana.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "lunafreya_nox_fleuret",
+      "name": "key:custom.finalfantasyxv.lunafreya_nox_fleuret",
+      "texture": "skins/lunafreya_nox_fleuret.png",
+      "order": 11,
+      "model": "slim"
+    },
+    {
+      "id": "ravus_nox_fleuret",
+      "name": "key:custom.finalfantasyxv.ravus_nox_fleuret",
+      "texture": "skins/ravus_nox_fleuret.png",
+      "order": 12
+    },
+    {
+      "id": "iris_amicitia",
+      "name": "key:custom.finalfantasyxv.iris_amicitia",
+      "texture": "skins/iris_amicitia.png",
+      "order": 13
+    },
+    {
+      "id": "emperor_iedolas_aldercapt",
+      "name": "key:custom.finalfantasyxv.emperor_iedolas_aldercapt",
+      "texture": "skins/emperor_iedolas_aldercapt.png",
+      "order": 14
+    },
+    {
+      "id": "magitek_trooper_mt1",
+      "name": "key:custom.finalfantasyxv.magitek_trooper_mt1",
+      "texture": "skins/magitek_trooper_mt1.png",
+      "order": 15
+    },
+    {
+      "id": "magitek_trooper_mt2",
+      "name": "key:custom.finalfantasyxv.magitek_trooper_mt2",
+      "texture": "skins/magitek_trooper_mt2.png",
+      "order": 16
+    },
+    {
+      "id": "loqi_tummelt",
+      "name": "key:custom.finalfantasyxv.loqi_tummelt",
+      "texture": "skins/loqi_tummelt.png",
+      "order": 17
+    },
+    {
+      "id": "caligo_ulldor",
+      "name": "key:custom.finalfantasyxv.caligo_ulldor",
+      "texture": "skins/caligo_ulldor.png",
+      "order": 18
+    },
+    {
+      "id": "aranea_highwind",
+      "name": "key:custom.finalfantasyxv.aranea_highwind",
+      "texture": "skins/aranea_highwind.png",
+      "order": 19,
+      "model": "slim"
+    },
+    {
+      "id": "biggs_callux",
+      "name": "key:custom.finalfantasyxv.biggs_callux",
+      "texture": "skins/biggs_callux.png",
+      "order": 20
+    },
+    {
+      "id": "wedge_kincaid",
+      "name": "key:custom.finalfantasyxv.wedge_kincaid",
+      "texture": "skins/wedge_kincaid.png",
+      "order": 21
+    },
+    {
+      "id": "verstael_besithia",
+      "name": "key:custom.finalfantasyxv.verstael_besithia",
+      "texture": "skins/verstael_besithia.png",
+      "order": 22
+    },
+    {
+      "id": "titan",
+      "name": "key:custom.finalfantasyxv.titan",
+      "texture": "skins/titan.png",
+      "order": 23
+    },
+    {
+      "id": "ramuh",
+      "name": "key:custom.finalfantasyxv.ramuh",
+      "texture": "skins/ramuh.png",
+      "order": 24
+    },
+    {
+      "id": "shiva",
+      "name": "key:custom.finalfantasyxv.shiva",
+      "texture": "skins/shiva.png",
+      "order": 25,
+      "model": "slim"
+    },
+    {
+      "id": "ifrit",
+      "name": "key:custom.finalfantasyxv.ifrit",
+      "texture": "skins/ifrit.png",
+      "order": 26
+    },
+    {
+      "id": "bahamut",
+      "name": "key:custom.finalfantasyxv.bahamut",
+      "texture": "skins/bahamut.png",
+      "order": 27
+    },
+    {
+      "id": "leviathan",
+      "name": "key:custom.finalfantasyxv.leviathan",
+      "texture": "skins/leviathan.png",
+      "order": 28
+    },
+    {
+      "id": "ronin",
+      "name": "key:custom.finalfantasyxv.ronin",
+      "texture": "skins/ronin.png",
+      "order": 29
+    },
+    {
+      "id": "iron_giant",
+      "name": "key:custom.finalfantasyxv.iron_giant",
+      "texture": "skins/iron_giant.png",
+      "order": 30
+    },
+    {
+      "id": "red_iron_giant",
+      "name": "key:custom.finalfantasyxv.red_iron_giant",
+      "texture": "skins/red_iron_giant.png",
+      "order": 31
+    },
+    {
+      "id": "mindflayer",
+      "name": "key:custom.finalfantasyxv.mindflayer",
+      "texture": "skins/mindflayer.png",
+      "order": 32
+    },
+    {
+      "id": "goblin",
+      "name": "key:custom.finalfantasyxv.goblin",
+      "texture": "skins/goblin.png",
+      "order": 33
+    },
+    {
+      "id": "reaper",
+      "name": "key:custom.finalfantasyxv.reaper",
+      "texture": "skins/reaper.png",
+      "order": 34
+    },
+    {
+      "id": "cactuar",
+      "name": "key:custom.finalfantasyxv.cactuar",
+      "texture": "skins/cactuar.png",
+      "order": 35
+    },
+    {
+      "id": "tonberry",
+      "name": "key:custom.finalfantasyxv.tonberry",
+      "texture": "skins/tonberry.png",
+      "order": 36
+    },
+    {
+      "id": "moogle_doll",
+      "name": "key:custom.finalfantasyxv.moogle_doll",
+      "texture": "skins/moogle_doll.png",
+      "order": 37
+    },
+    {
+      "id": "hobgoblin",
+      "name": "key:custom.finalfantasyxv.hobgoblin",
+      "texture": "skins/hobgoblin.png",
+      "order": 38
+    },
+    {
+      "id": "necromancer",
+      "name": "key:custom.finalfantasyxv.necromancer",
+      "texture": "skins/necromancer.png",
+      "order": 39
+    },
+    {
+      "id": "daemon_ravus",
+      "name": "key:custom.finalfantasyxv.daemon_ravus",
+      "texture": "skins/daemon_ravus.png",
+      "order": 40
+    },
+    {
+      "id": "gilgamesh",
+      "name": "key:custom.finalfantasyxv.gilgamesh",
+      "texture": "skins/gilgamesh.png",
+      "order": 41
+    },
+    {
+      "id": "chocobo_costume",
+      "name": "key:custom.finalfantasyxv.chocobo_costume",
+      "texture": "skins/chocobo_costume.png",
+      "order": 42
+    },
+    {
+      "id": "crows_nest_kenny",
+      "name": "key:custom.finalfantasyxv.crows_nest_kenny",
+      "texture": "skins/crows_nest_kenny.png",
+      "order": 43
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+﻿{
+    "meta":  {
+                 "displayName":  "Werewolf",
+                 "displayNameId":  "custom.halloweencharity.charity_werewolf",
+                 "themeName":  "4J Studios",
+                 "themeNameId":  "custom.halloweencharity.themetext.charity_werewolf"
+             },
+    "texture":  {
+                    "width":  64,
+                    "height":  64
+                },
+    "bones":  [
+
+              ]
+}

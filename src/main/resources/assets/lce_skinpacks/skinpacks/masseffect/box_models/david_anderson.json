@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "David Anderson",
+    "displayNameId": "custom.masseffect.david_anderson",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.david_anderson"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

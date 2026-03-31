@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zaeed Massani",
+    "displayNameId": "custom.masseffect.zaeed_massani",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.zaeed_massani"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

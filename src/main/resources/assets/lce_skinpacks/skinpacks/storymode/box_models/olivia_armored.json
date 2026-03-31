@@ -3,67 +3,12 @@
     "displayName": "Olivia Armored",
     "displayNameId": "custom.storymode.olivia_armored"
   },
-  "hide": [
-    "hat",
-    "jacket",
-    "left_sleeve",
-    "right_sleeve",
-    "left_pants",
-    "right_pants"
-  ],
   "texture": {
     "width": 64,
-    "height": 64
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/storymode/box_textures/olivia_armored.png"
   },
   "bones": [
-    {
-      "name": "left_arm_addon",
-      "attach": "LEFT_ARM",
-      "cubes": [
-        {
-          "origin": [
-            -1.0,
-            -2.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            40,
-            16
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        }
-      ]
-    },
-    {
-      "name": "left_leg_addon",
-      "attach": "LEFT_LEG",
-      "cubes": [
-        {
-          "origin": [
-            -2.0,
-            0.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            0,
-            16
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        }
-      ]
-    },
     {
       "name": "head_addon",
       "attach": "HEAD",
@@ -413,8 +358,8 @@
       ]
     },
     {
-      "name": "body_addon",
-      "attach": "BODY",
+      "name": "right_sleeve_addon",
+      "attach": "RIGHT_SLEEVE",
       "cubes": [
         {
           "origin": [
@@ -433,25 +378,13 @@
           ],
           "inflate": 0.01,
           "mirror": false
-        },
-        {
-          "origin": [
-            -1.0,
-            -2.0,
-            -2.0
-          ],
-          "size": [
-            4.0,
-            12.0,
-            4.0
-          ],
-          "uv": [
-            0,
-            32
-          ],
-          "inflate": 0.01,
-          "mirror": false
-        },
+        }
+      ]
+    },
+    {
+      "name": "right_pants_addon",
+      "attach": "RIGHT_PANTS",
+      "cubes": [
         {
           "origin": [
             -2.1,
@@ -468,9 +401,16 @@
             48
           ],
           "inflate": 0.01,
-          "mirror": false
+          "mirror": true
         }
       ]
     }
+  ],
+  "hide": [
+    "hat",
+    "right_sleeve",
+    "right_pants",
+    "jacket",
+    "left_pants"
   ]
 }

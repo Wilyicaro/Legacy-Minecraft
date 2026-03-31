@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Yellow Ranger",
+    "displayNameId": "custom.powerrangers.yellow_ranger"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

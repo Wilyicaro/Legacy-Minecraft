@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie Lonestar",
+    "displayNameId": "custom.halloweencharity.zombie_lonestar",
+    "themeName": "Ronimo Games",
+    "themeNameId": "custom.halloweencharity.themetext.zombie_lonestar"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

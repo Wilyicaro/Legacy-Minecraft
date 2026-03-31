@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Argonaut 2",
+    "displayNameId": "custom.greekmythology.argonaut_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

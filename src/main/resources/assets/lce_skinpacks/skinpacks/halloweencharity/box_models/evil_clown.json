@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Evil Clown",
+    "displayNameId": "custom.halloweencharity.evil_clown",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.evil_clown"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

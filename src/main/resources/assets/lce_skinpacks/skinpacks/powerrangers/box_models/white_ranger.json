@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "displayName": "White Ranger",
+    "displayNameId": "custom.powerrangers.white_ranger"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "arm1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": true,
+          "armorMask": 2,
+          "sourcePart": "ARM1"
+        }
+      ]
+    },
+    {
+      "name": "arm0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "ARM0"
+        }
+      ]
+    }
+  ]
+}

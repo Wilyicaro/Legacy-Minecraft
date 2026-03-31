@@ -1,6 +1,8 @@
 {
   "name": "key:custom.storymode.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 4500,
   "skins": [
     {
       "id": "jesse",
@@ -21,9 +23,9 @@
       "order": 3
     },
     {
-      "id": "axel",
+      "id": "axel_storymode",
       "name": "key:custom.storymode.axel",
-      "texture": "skins/axel.png",
+      "texture": "skins/axel_storymode.png",
       "order": 4
     },
     {

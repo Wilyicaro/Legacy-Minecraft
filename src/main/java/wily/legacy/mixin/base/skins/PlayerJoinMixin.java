@@ -12,13 +12,10 @@ import wily.legacy.Skins.SkinsBootstrap;
 
 @Mixin(PlayerList.class)
 public class PlayerJoinMixin {
-
     @Inject(method = "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/network/CommonListenerCookie;)V",
             at = @At("TAIL"), require = 0)
     private void legacy4j$skins$afterPlaceNewPlayer(Connection connection, ServerPlayer player,
                                                     CommonListenerCookie cookie, CallbackInfo ci) {
-        if (player != null) {
-            SkinsBootstrap.handleServerPlayerJoin(player);
-        }
+        if (player != null) { SkinsBootstrap.handleServerPlayerJoin(player); }
     }
 }

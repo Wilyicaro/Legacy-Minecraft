@@ -1,0 +1,477 @@
+{
+  "meta": {
+    "displayName": "Chopper",
+    "displayNameId": "custom.starwarsrebels.chopper"
+  },
+  "hidearmour": [
+    "helmet",
+    "chestpiece",
+    "leggings",
+    "boots"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "hide": [
+    "head",
+    "right_arm",
+    "left_arm",
+    "body",
+    "right_leg",
+    "left_leg",
+    "hat"
+  ],
+  "poses": [
+    "stiff_legs",
+    "disable_view_bobbing"
+  ],
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            8.0,
+            -3.0
+          ],
+          "size": [
+            8.0,
+            13.0,
+            6.0
+          ],
+          "uv": [
+            0,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            8.0,
+            -4.0
+          ],
+          "size": [
+            6.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            8.0,
+            3.0
+          ],
+          "size": [
+            6.0,
+            13.0,
+            1.0
+          ],
+          "uv": [
+            42,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.5,
+            4.1,
+            -1.5
+          ],
+          "size": [
+            3.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            28,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.5,
+            3.0,
+            -0.5
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            38,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            6.0,
+            -2.5
+          ],
+          "size": [
+            6.0,
+            1.0,
+            5.0
+          ],
+          "uv": [
+            1,
+            26
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.5,
+            7.0,
+            -3.0
+          ],
+          "size": [
+            7.0,
+            1.0,
+            6.0
+          ],
+          "uv": [
+            12,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            7.9,
+            -4.5
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.1,
+            7.9,
+            -4.5
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "leg1_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            3.0,
+            -2.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            53,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            3.0,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            5.0
+          ],
+          "uv": [
+            56,
+            -3
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            3.0,
+            3.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            3.0
+          ],
+          "uv": [
+            28,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            2.0,
+            -2.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            4,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            3.0,
+            9.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            5.0
+          ],
+          "uv": [
+            54,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            3.0,
+            10.0,
+            -3.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            46,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        },
+        {
+          "origin": [
+            3.0,
+            10.0,
+            1.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            47,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG1"
+        }
+      ]
+    },
+    {
+      "name": "leg0_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -5.0,
+            -2.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -5.0,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            5.0
+          ],
+          "uv": [
+            38,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -5.0,
+            3.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            3.0
+          ],
+          "uv": [
+            28,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            4,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -6.0,
+            9.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            5.0
+          ],
+          "uv": [
+            54,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -6.0,
+            10.0,
+            -3.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            46,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        },
+        {
+          "origin": [
+            -6.0,
+            10.0,
+            1.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            47,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "sourcePart": "LEG0"
+        }
+      ]
+    }
+  ]
+}

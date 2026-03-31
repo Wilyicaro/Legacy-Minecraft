@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "displayName": "Jace",
+    "displayNameId": "custom.magicthegathering.jace"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/magicthegathering/box_textures/jace.png"
+  },
+  "bones": []
+}

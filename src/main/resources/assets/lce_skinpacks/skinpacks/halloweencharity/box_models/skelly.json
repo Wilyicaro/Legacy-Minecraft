@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Skelly",
+    "displayNameId": "custom.halloweencharity.skelly",
+    "themeName": "Twisted Pixel Games",
+    "themeNameId": "custom.halloweencharity.themetext.skelly"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

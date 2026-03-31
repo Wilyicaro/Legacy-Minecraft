@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Miranda Lawson",
+    "displayNameId": "custom.masseffect.miranda_lawson",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.miranda_lawson"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

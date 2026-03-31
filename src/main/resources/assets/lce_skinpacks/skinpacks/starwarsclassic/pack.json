@@ -1,6 +1,8 @@
 {
   "name": "key:custom.starwarsclassic.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 4100,
   "skins": [
     {
       "id": "luke_skywalker",

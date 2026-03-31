@@ -2,6 +2,7 @@
   "name": "key:custom.birthday5.pack.name",
   "type": "skin",
   "author": "4J Studios",
+  "sort_index": 100,
   "skins": [
     {
       "id": "chris_vdk",

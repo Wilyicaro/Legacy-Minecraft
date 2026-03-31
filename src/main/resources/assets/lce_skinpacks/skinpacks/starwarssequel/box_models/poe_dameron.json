@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "displayName": "Poe Dameron",
+    "displayNameId": "custom.starwarssequel.poe_dameron",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00006802_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 80,
+    "path": "lce_skinpacks:skinpacks/starwarssequel/box_textures/poe_dameron.png"
+  },
+  "hide": [
+    "right_sleeve",
+    "left_sleeve",
+    "jacket"
+  ],
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -9.0,
+            -4.0
+          ],
+          "size": [
+            5.0,
+            1.0,
+            7.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 1
+        }
+      ]
+    },
+    {
+      "name": "jacket_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            32
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "JACKET"
+        }
+      ]
+    },
+    {
+      "name": "sleeve0_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            48
+          ],
+          "inflate": 0.25,
+          "mirror": false,
+          "sourcePart": "SLEEVE0"
+        }
+      ]
+    },
+    {
+      "name": "sleeve1_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            48,
+            48
+          ],
+          "inflate": 0.25,
+          "mirror": true,
+          "sourcePart": "SLEEVE1"
+        }
+      ]
+    },
+    {
+      "name": "bodyarmor_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            2.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "BODYARMOR"
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false,
+          "armorMask": 2,
+          "sourcePart": "BODYARMOR"
+        }
+      ],
+      "visible": false
+    }
+  ]
+}

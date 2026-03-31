@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Fenris",
+    "displayNameId": "custom.skin_pack_6.fenris",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skin_pack_6.themetext.fenris"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

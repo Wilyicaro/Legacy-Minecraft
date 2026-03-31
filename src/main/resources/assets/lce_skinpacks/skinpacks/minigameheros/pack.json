@@ -1,0 +1,202 @@
+{
+  "name": "key:custom.minigameheros.pack.name",
+  "author": "4J Studios ",
+  "type": "skin",
+  "sort_index": 2905,
+  "skins": [
+    {
+      "id": "bat_battler",
+      "name": "key:custom.minigameheros.bat_battler",
+      "texture": "skins/bat_battler.png",
+      "order": 1,
+      "model": "slim"
+    },
+    {
+      "id": "bat_tumbler",
+      "name": "key:custom.minigameheros.bat_tumbler",
+      "texture": "skins/bat_tumbler.png",
+      "order": 2,
+      "model": "slim"
+    },
+    {
+      "id": "bat_glider",
+      "name": "key:custom.minigameheros.bat_glider",
+      "texture": "skins/bat_glider.png",
+      "order": 3
+    },
+    {
+      "id": "llama_battler",
+      "name": "key:custom.minigameheros.llama_battler",
+      "texture": "skins/llama_battler.png",
+      "order": 4
+    },
+    {
+      "id": "llama_tumbler",
+      "name": "key:custom.minigameheros.llama_tumbler",
+      "texture": "skins/llama_tumbler.png",
+      "order": 5,
+      "model": "slim"
+    },
+    {
+      "id": "llama_glider",
+      "name": "key:custom.minigameheros.llama_glider",
+      "texture": "skins/llama_glider.png",
+      "order": 6
+    },
+    {
+      "id": "elder_guardian_battler",
+      "name": "key:custom.minigameheros.elder_guardian_battler",
+      "texture": "skins/elder_guardian_battler.png",
+      "order": 7
+    },
+    {
+      "id": "elder_guardian_tumbler",
+      "name": "key:custom.minigameheros.elder_guardian_tumbler",
+      "texture": "skins/elder_guardian_tumbler.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "elder_guardian_glider",
+      "name": "key:custom.minigameheros.elder_guardian_glider",
+      "texture": "skins/elder_guardian_glider.png",
+      "order": 9,
+      "model": "slim"
+    },
+    {
+      "id": "cat_battler",
+      "name": "key:custom.minigameheros.cat_battler",
+      "texture": "skins/cat_battler.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "cat_tumbler",
+      "name": "key:custom.minigameheros.cat_tumbler",
+      "texture": "skins/cat_tumbler.png",
+      "order": 11
+    },
+    {
+      "id": "cat_glider",
+      "name": "key:custom.minigameheros.cat_glider",
+      "texture": "skins/cat_glider.png",
+      "order": 12,
+      "model": "slim"
+    },
+    {
+      "id": "horse_battler",
+      "name": "key:custom.minigameheros.horse_battler",
+      "texture": "skins/horse_battler.png",
+      "order": 13
+    },
+    {
+      "id": "horse_tumbler",
+      "name": "key:custom.minigameheros.horse_tumbler",
+      "texture": "skins/horse_tumbler.png",
+      "order": 14,
+      "model": "slim"
+    },
+    {
+      "id": "horse_glider",
+      "name": "key:custom.minigameheros.horse_glider",
+      "texture": "skins/horse_glider.png",
+      "order": 15
+    },
+    {
+      "id": "spider_battler",
+      "name": "key:custom.minigameheros.spider_battler",
+      "texture": "skins/spider_battler.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "spider_tumbler",
+      "name": "key:custom.minigameheros.spider_tumbler",
+      "texture": "skins/spider_tumbler.png",
+      "order": 17
+    },
+    {
+      "id": "spider_glider",
+      "name": "key:custom.minigameheros.spider_glider",
+      "texture": "skins/spider_glider.png",
+      "order": 18,
+      "model": "slim"
+    },
+    {
+      "id": "magma_cube_battler",
+      "name": "key:custom.minigameheros.magma_cube_battler",
+      "texture": "skins/magma_cube_battler.png",
+      "order": 19
+    },
+    {
+      "id": "magma_cube_tumbler",
+      "name": "key:custom.minigameheros.magma_cube_tumbler",
+      "texture": "skins/magma_cube_tumbler.png",
+      "order": 20,
+      "model": "slim"
+    },
+    {
+      "id": "magma_cube_glider",
+      "name": "key:custom.minigameheros.magma_cube_glider",
+      "texture": "skins/magma_cube_glider.png",
+      "order": 21
+    },
+    {
+      "id": "cow_battler",
+      "name": "key:custom.minigameheros.cow_battler",
+      "texture": "skins/cow_battler.png",
+      "order": 22
+    },
+    {
+      "id": "cow_tumbler",
+      "name": "key:custom.minigameheros.cow_tumbler",
+      "texture": "skins/cow_tumbler.png",
+      "order": 23,
+      "model": "slim"
+    },
+    {
+      "id": "cow_glider",
+      "name": "key:custom.minigameheros.cow_glider",
+      "texture": "skins/cow_glider.png",
+      "order": 24,
+      "model": "slim"
+    },
+    {
+      "id": "slime_battler",
+      "name": "key:custom.minigameheros.slime_battler",
+      "texture": "skins/slime_battler.png",
+      "order": 25
+    },
+    {
+      "id": "slime_tumbler",
+      "name": "key:custom.minigameheros.slime_tumbler",
+      "texture": "skins/slime_tumbler.png",
+      "order": 26
+    },
+    {
+      "id": "slime_glider",
+      "name": "key:custom.minigameheros.slime_glider",
+      "texture": "skins/slime_glider.png",
+      "order": 27,
+      "model": "slim"
+    },
+    {
+      "id": "villager_battler",
+      "name": "key:custom.minigameheros.villager_battler",
+      "texture": "skins/villager_battler.png",
+      "order": 28
+    },
+    {
+      "id": "villager_tumbler",
+      "name": "key:custom.minigameheros.villager_tumbler",
+      "texture": "skins/villager_tumbler.png",
+      "order": 29
+    },
+    {
+      "id": "villager_glider",
+      "name": "key:custom.minigameheros.villager_glider",
+      "texture": "skins/villager_glider.png",
+      "order": 30
+    }
+  ]
+}

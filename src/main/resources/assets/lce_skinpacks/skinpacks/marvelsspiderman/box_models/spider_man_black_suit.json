@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Spider-Man - Black suit",
+    "displayNameId": "custom.marvelsspiderman.spider_man_black_suit",
+    "themeName": "Marvel Spider-Man",
+    "themeNameId": "custom.marvelsspiderman.themetext.spider_man_black_suit"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

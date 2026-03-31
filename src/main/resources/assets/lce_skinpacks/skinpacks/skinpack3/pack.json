@@ -1,6 +1,8 @@
 {
   "name": "key:custom.skinpack3.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 3900,
   "skins": [
     {
       "id": "zombie_pigman",

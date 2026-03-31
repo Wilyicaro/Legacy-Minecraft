@@ -1,6 +1,8 @@
 {
   "name": "key:custom.birthday2.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 300,
   "skins": [
     {
       "id": "party_plastic_steve",

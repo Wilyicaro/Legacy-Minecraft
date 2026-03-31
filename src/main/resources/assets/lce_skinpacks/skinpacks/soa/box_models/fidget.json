@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Fidget",
+    "displayNameId": "custom.soa.fidget",
+    "themeName": "Dust: An Elysian Tail",
+    "themeNameId": "custom.soa.themetext.fidget"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

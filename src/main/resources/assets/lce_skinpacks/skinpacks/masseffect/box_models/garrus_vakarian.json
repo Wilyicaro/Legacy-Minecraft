@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "displayName": "Garrus Vakarian",
+    "displayNameId": "custom.masseffect.garrus_vakarian",
+    "themeName": "Mass Effect",
+    "themeNameId": "custom.masseffect.themetext.garrus_vakarian"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            -8.0,
+            4.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -8.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.0,
+            4.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -8.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -8.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

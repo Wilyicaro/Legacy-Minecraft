@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cyclops",
+    "displayNameId": "custom.halloweencharity.cyclops",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.cyclops"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

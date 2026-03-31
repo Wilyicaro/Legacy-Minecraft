@@ -1,0 +1,349 @@
+{
+  "name": "key:custom.strangerthings.pack.name",
+  "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 4501,
+  "skins": [
+    {
+      "id": "lucas",
+      "name": "key:custom.strangerthings.lucas",
+      "texture": "skins/lucas.png",
+      "order": 1
+    },
+    {
+      "id": "mike",
+      "name": "key:custom.strangerthings.mike",
+      "texture": "skins/mike.png",
+      "order": 2,
+      "model": "slim"
+    },
+    {
+      "id": "eleven_pink_dress",
+      "name": "key:custom.strangerthings.eleven_pink_dress",
+      "texture": "skins/eleven_pink_dress.png",
+      "order": 3,
+      "model": "slim"
+    },
+    {
+      "id": "dustin",
+      "name": "key:custom.strangerthings.dustin",
+      "texture": "skins/dustin.png",
+      "order": 4
+    },
+    {
+      "id": "will",
+      "name": "key:custom.strangerthings.will",
+      "texture": "skins/will.png",
+      "order": 5,
+      "model": "slim"
+    },
+    {
+      "id": "demogorgon_face_closed",
+      "name": "key:custom.strangerthings.demogorgon_face_closed",
+      "texture": "skins/demogorgon_face_closed.png",
+      "order": 6
+    },
+    {
+      "id": "hopper",
+      "name": "key:custom.strangerthings.hopper",
+      "texture": "skins/hopper.png",
+      "order": 7
+    },
+    {
+      "id": "eleven_lab_gown",
+      "name": "key:custom.strangerthings.eleven_lab_gown",
+      "texture": "skins/eleven_lab_gown.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "joyce_festive_lights",
+      "name": "key:custom.strangerthings.joyce_festive_lights",
+      "texture": "skins/joyce_festive_lights.png",
+      "order": 9,
+      "model": "slim"
+    },
+    {
+      "id": "jonathan",
+      "name": "key:custom.strangerthings.jonathan",
+      "texture": "skins/jonathan.png",
+      "order": 10
+    },
+    {
+      "id": "nancy",
+      "name": "key:custom.strangerthings.nancy",
+      "texture": "skins/nancy.png",
+      "order": 11,
+      "model": "slim"
+    },
+    {
+      "id": "steve_harrington",
+      "name": "key:custom.strangerthings.steve_harrington",
+      "texture": "skins/steve_harrington.png",
+      "order": 12
+    },
+    {
+      "id": "barb",
+      "name": "key:custom.strangerthings.barb",
+      "texture": "skins/barb.png",
+      "order": 13,
+      "model": "slim"
+    },
+    {
+      "id": "hazmat",
+      "name": "key:custom.strangerthings.hazmat",
+      "texture": "skins/hazmat.png",
+      "order": 14
+    },
+    {
+      "id": "eleven_tank_suit",
+      "name": "key:custom.strangerthings.eleven_tank_suit",
+      "texture": "skins/eleven_tank_suit.png",
+      "order": 15,
+      "model": "slim"
+    },
+    {
+      "id": "dr_brenner",
+      "name": "key:custom.strangerthings.dr_brenner",
+      "texture": "skins/dr_brenner.png",
+      "order": 16
+    },
+    {
+      "id": "mr_clarke",
+      "name": "key:custom.strangerthings.mr_clarke",
+      "texture": "skins/mr_clarke.png",
+      "order": 17,
+      "model": "slim"
+    },
+    {
+      "id": "terry_ives",
+      "name": "key:custom.strangerthings.terry_ives",
+      "texture": "skins/terry_ives.png",
+      "order": 18,
+      "model": "slim"
+    },
+    {
+      "id": "eleven_blonde_wig",
+      "name": "key:custom.strangerthings.eleven_blonde_wig",
+      "texture": "skins/eleven_blonde_wig.png",
+      "order": 19,
+      "model": "slim"
+    },
+    {
+      "id": "demogorgon",
+      "name": "key:custom.strangerthings.demogorgon",
+      "texture": "skins/demogorgon.png",
+      "order": 20,
+      "model": "slim"
+    },
+    {
+      "id": "barb_upside_down",
+      "name": "key:custom.strangerthings.barb_upside_down",
+      "texture": "skins/barb_upside_down.png",
+      "order": 21,
+      "model": "slim"
+    },
+    {
+      "id": "will_upside_down",
+      "name": "key:custom.strangerthings.will_upside_down",
+      "texture": "skins/will_upside_down.png",
+      "order": 22,
+      "model": "slim"
+    },
+    {
+      "id": "ghostbuster_will",
+      "name": "key:custom.strangerthings.ghostbuster_will",
+      "texture": "skins/ghostbuster_will.png",
+      "order": 23,
+      "model": "slim"
+    },
+    {
+      "id": "ghostbuster_mike",
+      "name": "key:custom.strangerthings.ghostbuster_mike",
+      "texture": "skins/ghostbuster_mike.png",
+      "order": 24,
+      "model": "slim"
+    },
+    {
+      "id": "ghostbuster_dustin",
+      "name": "key:custom.strangerthings.ghostbuster_dustin",
+      "texture": "skins/ghostbuster_dustin.png",
+      "order": 25
+    },
+    {
+      "id": "ghostbuster_lucas",
+      "name": "key:custom.strangerthings.ghostbuster_lucas",
+      "texture": "skins/ghostbuster_lucas.png",
+      "order": 26
+    },
+    {
+      "id": "max",
+      "name": "key:custom.strangerthings.max",
+      "texture": "skins/max.png",
+      "order": 27,
+      "model": "slim"
+    },
+    {
+      "id": "billy",
+      "name": "key:custom.strangerthings.billy",
+      "texture": "skins/billy.png",
+      "order": 28
+    },
+    {
+      "id": "eleven_runaway",
+      "name": "key:custom.strangerthings.eleven_runaway",
+      "texture": "skins/eleven_runaway.png",
+      "order": 29,
+      "model": "slim"
+    },
+    {
+      "id": "hopper_blue_jacket",
+      "name": "key:custom.strangerthings.hopper_blue_jacket",
+      "texture": "skins/hopper_blue_jacket.png",
+      "order": 30
+    },
+    {
+      "id": "joyce",
+      "name": "key:custom.strangerthings.joyce",
+      "texture": "skins/joyce.png",
+      "order": 31,
+      "model": "slim"
+    },
+    {
+      "id": "jonathan_2",
+      "name": "key:custom.strangerthings.jonathan_2",
+      "texture": "skins/jonathan_2.png",
+      "order": 32
+    },
+    {
+      "id": "nancy_2",
+      "name": "key:custom.strangerthings.nancy_2",
+      "texture": "skins/nancy_2.png",
+      "order": 33,
+      "model": "slim"
+    },
+    {
+      "id": "bob_newby",
+      "name": "key:custom.strangerthings.bob_newby",
+      "texture": "skins/bob_newby.png",
+      "order": 34
+    },
+    {
+      "id": "maury_bauman",
+      "name": "key:custom.strangerthings.maury_bauman",
+      "texture": "skins/maury_bauman.png",
+      "order": 35
+    },
+    {
+      "id": "dr_sam_owens",
+      "name": "key:custom.strangerthings.dr_sam_owens",
+      "texture": "skins/dr_sam_owens.png",
+      "order": 36
+    },
+    {
+      "id": "hopper_gown",
+      "name": "key:custom.strangerthings.hopper_gown",
+      "texture": "skins/hopper_gown.png",
+      "order": 37
+    },
+    {
+      "id": "kali",
+      "name": "key:custom.strangerthings.kali",
+      "texture": "skins/kali.png",
+      "order": 38,
+      "model": "slim"
+    },
+    {
+      "id": "eleven_punk",
+      "name": "key:custom.strangerthings.eleven_punk",
+      "texture": "skins/eleven_punk.png",
+      "order": 39,
+      "model": "slim"
+    },
+    {
+      "id": "funshine",
+      "name": "key:custom.strangerthings.funshine",
+      "texture": "skins/funshine.png",
+      "order": 40
+    },
+    {
+      "id": "axel",
+      "name": "key:custom.strangerthings.axel",
+      "texture": "skins/axel.png",
+      "order": 41
+    },
+    {
+      "id": "dottie",
+      "name": "key:custom.strangerthings.dottie",
+      "texture": "skins/dottie.png",
+      "order": 42,
+      "model": "slim"
+    },
+    {
+      "id": "mick",
+      "name": "key:custom.strangerthings.mick",
+      "texture": "skins/mick.png",
+      "order": 43,
+      "model": "slim"
+    },
+    {
+      "id": "max_tunnel_bandit",
+      "name": "key:custom.strangerthings.max_tunnel_bandit",
+      "texture": "skins/max_tunnel_bandit.png",
+      "order": 44,
+      "model": "slim"
+    },
+    {
+      "id": "mike_tunnel_bandit",
+      "name": "key:custom.strangerthings.mike_tunnel_bandit",
+      "texture": "skins/mike_tunnel_bandit.png",
+      "order": 45,
+      "model": "slim"
+    },
+    {
+      "id": "dustin_tunnel_bandit",
+      "name": "key:custom.strangerthings.dustin_tunnel_bandit",
+      "texture": "skins/dustin_tunnel_bandit.png",
+      "order": 46
+    },
+    {
+      "id": "lucas_tunnel_bandit",
+      "name": "key:custom.strangerthings.lucas_tunnel_bandit",
+      "texture": "skins/lucas_tunnel_bandit.png",
+      "order": 47
+    },
+    {
+      "id": "steve_tunnel_bandit",
+      "name": "key:custom.strangerthings.steve_tunnel_bandit",
+      "texture": "skins/steve_tunnel_bandit.png",
+      "order": 48
+    },
+    {
+      "id": "eleven_snow_ball",
+      "name": "key:custom.strangerthings.eleven_snow_ball",
+      "texture": "skins/eleven_snow_ball.png",
+      "order": 49,
+      "model": "slim"
+    },
+    {
+      "id": "nancy_snow_ball",
+      "name": "key:custom.strangerthings.nancy_snow_ball",
+      "texture": "skins/nancy_snow_ball.png",
+      "order": 50,
+      "model": "slim"
+    },
+    {
+      "id": "mike_snow_ball",
+      "name": "key:custom.strangerthings.mike_snow_ball",
+      "texture": "skins/mike_snow_ball.png",
+      "order": 51,
+      "model": "slim"
+    },
+    {
+      "id": "dustin_snow_ball",
+      "name": "key:custom.strangerthings.dustin_snow_ball",
+      "texture": "skins/dustin_snow_ball.png",
+      "order": 52
+    }
+  ]
+}

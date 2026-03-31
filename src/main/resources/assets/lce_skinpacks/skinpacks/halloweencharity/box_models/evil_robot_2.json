@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Evil Robot",
+    "displayNameId": "custom.halloweencharity.evil_robot_2",
+    "themeName": "Climax Studios",
+    "themeNameId": "custom.halloweencharity.themetext.evil_robot_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

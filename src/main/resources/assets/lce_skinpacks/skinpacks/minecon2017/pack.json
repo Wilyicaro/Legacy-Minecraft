@@ -1,6 +1,8 @@
 {
   "name": "key:custom.minecon2017.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 2300,
   "skins": [
     {
       "id": "cakeminecon2017",

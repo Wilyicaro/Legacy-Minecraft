@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "displayName": "Slime Battler",
+    "displayNameId": "custom.minigameheros.slime_battler"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            -4.0
+          ],
+          "size": [
+            6.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.99,
+            5.0,
+            1.99
+          ],
+          "size": [
+            5.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            -3.99,
+            5.0,
+            -2.99
+          ],
+          "size": [
+            5.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        },
+        {
+          "origin": [
+            -3.99,
+            5.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            52,
+            27
+          ],
+          "inflate": 0.01,
+          "mirror": true
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.01,
+            5.0,
+            1.99
+          ],
+          "size": [
+            5.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.01,
+            5.0,
+            -2.99
+          ],
+          "size": [
+            5.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.99,
+            5.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            52,
+            27
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

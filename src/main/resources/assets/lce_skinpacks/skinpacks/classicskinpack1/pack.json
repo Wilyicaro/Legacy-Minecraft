@@ -1,6 +1,8 @@
 {
   "name": "key:custom.classicskinpack1.pack.name",
   "author": "4J Studios",
+  "type": "skin",
+  "sort_index": 1400,
   "skins": [
     {
       "id": "creeper",

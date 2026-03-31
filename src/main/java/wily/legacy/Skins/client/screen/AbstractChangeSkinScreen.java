@@ -7,85 +7,45 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.Skins.client.compat.ExternalSkinProviders;
-import wily.legacy.Skins.client.compat.legacy4j.ControlsCompat;
-import wily.legacy.Skins.client.screen.changeskin.ChangeSkinActions;
-import wily.legacy.Skins.client.screen.changeskin.ChangeSkinLayoutMetrics;
-import wily.legacy.Skins.client.screen.changeskin.ChangeSkinPackList;
-import wily.legacy.Skins.client.screen.changeskin.SkinPackViewFilter;
-import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
-import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
-import wily.legacy.Skins.client.util.SkinPreviewWarmup;
-import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinPack;
-import wily.legacy.Skins.skin.SkinPackLoader;
-import wily.legacy.Skins.skin.SkinPackSourceKind;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.Skins.client.changeskin.*;
+import wily.legacy.Skins.client.changeskin.ChangeSkinActions.ChangeSkinLayoutMetrics;
+import wily.legacy.Skins.client.preview.*;
+import wily.legacy.Skins.client.util.*;
+import wily.legacy.Skins.skin.*;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.InputTypeSwitchLock;
-import wily.legacy.client.screen.Panel;
-import wily.legacy.client.screen.PanelVListScreen;
-import wily.legacy.client.screen.RenderableVList;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.*;
+import wily.legacy.client.screen.*;
 
 public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         implements wily.legacy.client.controller.Controller.Event, ControlTooltip.Event, InputTypeSwitchLock {
-    protected record ChangeSkinScreenLayout(
-            boolean compact480,
-            int basePanelWidth,
-            int basePanelHeight,
-            int baseTooltipWidth,
-            int previewBoxMinSize,
-            int previewBoxBaseSize,
-            int previewBoxXOffset,
-            int previewBoxMaxInset,
-            int previewBoxRightInset,
-            int previewBoxYOffset,
-            int previewBoxTopInset,
-            int previewBoxBottomInset,
-            int tooltipGroupMargin,
-            int tooltipYOffset,
-            int tooltipHeightInset,
-            float bigTextScale,
-            float bigTextMinScale,
-            float smallTextScale,
-            float smallTextMinScale,
-            ChangeSkinLayoutMetrics widgetMetrics
-    ) {
+    protected record ChangeSkinScreenLayout(boolean compact480, int basePanelWidth, int basePanelHeight, int baseTooltipWidth,
+                                            int previewBoxMinSize, int previewBoxBaseSize, int previewBoxXOffset, int previewBoxMaxInset,
+                                            int previewBoxRightInset, int previewBoxYOffset, int previewBoxTopInset, int previewBoxBottomInset,
+                                            int tooltipGroupMargin, int tooltipYOffset, int tooltipHeightInset,
+                                            float bigTextScale, float bigTextMinScale, float smallTextScale, float smallTextMinScale,
+                                            ChangeSkinLayoutMetrics widgetMetrics) {
         static final ChangeSkinScreenLayout DEFAULT = new ChangeSkinScreenLayout(
-                false,
-                166, 262, 360,
-                22, 104,
-                30, 18, 6,
-                8, 4, 4,
-                6, 16, 9,
-                1.42f, 0.65f,
-                1.00f, 0.60f,
+                false, 166, 262, 360,
+                22, 104, 30, 18, 6,
+                8, 4, 4, 6, 16, 9,
+                1.42f, 0.65f, 1.00f, 0.60f,
                 ChangeSkinLayoutMetrics.DEFAULT
         );
 
         static final ChangeSkinScreenLayout SD_480 = new ChangeSkinScreenLayout(
-                true,
-                150, 198, 286,
-                18, 72,
-                22, 14, 6,
-                6, 4, 4,
-                4, 12, 8,
-                1.14f, 0.56f,
-                0.88f, 0.52f,
+                true, 150, 198, 286,
+                18, 72, 22, 14, 6,
+                6, 4, 4, 4, 12, 8,
+                1.14f, 0.56f, 0.88f, 0.52f,
                 ChangeSkinLayoutMetrics.SD_480
         );
     }
@@ -93,30 +53,19 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     @Override
     public void tick() {
         super.tick();
-        boolean windowActive = true;
-        try {
-            windowActive = minecraft == null || minecraft.isWindowActive();
-        } catch (Throwable ignored) {
+        int reloadVersion = SkinPackLoader.getReloadVersion();
+        if (reloadVersion != seenPackReloadVersion) {
+            seenPackReloadVersion = reloadVersion;
+            handleSkinPackReload();
+            return;
         }
-        if (windowActive && !lastWindowActive) {
-            onWindowRegainedFocus();
-        }
+        boolean windowActive = minecraft == null || minecraft.isWindowActive();
+        if (windowActive && !lastWindowActive) { onWindowRegainedFocus(); }
         lastWindowActive = windowActive;
         int budget = 2;
-        try {
-            if (actions != null && actions.isPendingSwap()) budget = 6;
-            else if (queuedCarouselSteps > 0 || holdingOuterCarousel || carouselAnimating()) budget = 3;
-        } catch (Throwable ignored) {
-        }
-        try {
-            SkinPreviewWarmup.pump(minecraft, budget);
-        } catch (Throwable ignored) {
-        }
+        if (queuedCarouselSteps > 0 || outerCarouselHold.active() || carouselAnimating()) budget = 3;
+        SkinPreviewWarmup.pump(minecraft, budget);
     }
-
-    protected static final int BASE_TOOLTIP_WIDTH = 400;
-    protected static final int BASE_PANEL_WIDTH   = 180;
-    protected static final int BASE_PANEL_HEIGHT  = 290;
 
     protected final Minecraft minecraft;
 
@@ -126,42 +75,26 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected final ChangeSkinActions  actions;
 
     protected float uiScale   = 1f;
-    protected int tooltipWidth = BASE_TOOLTIP_WIDTH;
+    protected int tooltipWidth = ChangeSkinScreenLayout.DEFAULT.baseTooltipWidth();
     protected ChangeSkinScreenLayout layoutProfile = ChangeSkinScreenLayout.DEFAULT;
     protected boolean sdMode;
 
     protected final Map<ResourceLocation, int[]> packIconDims = new HashMap<>();
-
-    protected boolean stickUpHeld, stickDownHeld;
-
-    protected boolean leftStickUpHeld, leftStickDownHeld;
-
-    protected boolean shiftHeld, pHeld, enterHeld;
-
+    protected boolean stickUpHeld, stickDownHeld, leftStickUpHeld, leftStickDownHeld, shiftHeld, pHeld, enterHeld;
     protected boolean firstOpen = true;
-
-    protected boolean draggingCenterDoll;
-    protected boolean centerDragMoved;
-    protected double  centerDragStartX, centerDragStartY;
-
-    protected float   keptCenterRotX, keptCenterRotY;
-    protected int     keptCenterPoseMode;
-    protected boolean keptCenterPunchLoop;
-
-    protected int     queuedCarouselSteps;
-    protected int     queuedCarouselDir;
-    protected boolean queuedCarouselSound;
-
-    protected boolean holdingOuterCarousel;
-    protected int     holdingOuterDir;
-    protected long    holdingOuterStartAt, holdingOuterNextAt;
-
+    protected boolean draggingCenterDoll, centerDragMoved, queuedCarouselSound;
+    protected double centerDragStartX, centerDragStartY;
+    protected int queuedCarouselSteps, queuedCarouselDir;
+    protected final HoldRepeat outerCarouselHold = new HoldRepeat();
     protected PlayerSkinWidgetList playerSkinWidgetList;
-    protected boolean lastWindowActive = true;
+    protected boolean lastWindowActive;
+    protected int seenPackReloadVersion;
 
     protected AbstractChangeSkinScreen(Screen parent) {
         super(parent, s -> {
-            ChangeSkinScreenLayout layout = resolveScreenLayout();
+            ChangeSkinScreenLayout layout = LegacyOptions.getUIMode().isSD()
+                    ? ChangeSkinScreenLayout.SD_480
+                    : ChangeSkinScreenLayout.DEFAULT;
             float scale = computeScale(s.width, s.height, layout);
             return Panel.centered(s,
                     () -> Math.max(1, Math.round(layout.basePanelWidth() * scale)),
@@ -175,7 +108,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
         renderableVList.layoutSpacing(l -> 2);
 
-        packList = new ChangeSkinPackList(this::playClick, () -> {});
+        packList = new ChangeSkinPackList(this::playClick);
 
         actions = new ChangeSkinActions(minecraft, packList, new ChangeSkinActions.Host() {
             @Override public PlayerSkinWidgetList getPlayerSkinWidgetList()              { return playerSkinWidgetList; }
@@ -183,7 +116,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                 playerSkinWidgetList = list;
                 onWidgetListCreated(list);
             }
-            @Override public PlayerSkinWidget addSkinWidget(PlayerSkinWidget w)         { return addRenderableWidget(w); }
+            @Override public void addSkinWidget(PlayerSkinWidget w)                     { addRenderableWidget(w); }
             @Override public Panel             getTooltipBox()                          { return tooltipBox; }
             @Override public Panel             getPanel()                               { return panel; }
             @Override public Screen            getScreen()                              { return AbstractChangeSkinScreen.this; }
@@ -191,11 +124,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             @Override public ChangeSkinLayoutMetrics getLayoutMetrics()                 { return layoutProfile.widgetMetrics(); }
         });
 
-        try {
-            SkinPackLoader.ensureLoaded();
-        } catch (Throwable ignored) {}
+        SkinPackLoader.ensureLoaded();
 
         packList.initFromLoader();
+        seenPackReloadVersion = SkinPackLoader.getReloadVersion();
     }
 
     protected abstract Panel createTooltipBox();
@@ -206,71 +138,37 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected abstract boolean insideScrollRegion(double mx, double my);
 
-    protected boolean isInCarouselBounds(double mx, double my) {
-        return true;
-    }
+    protected void playClick() { actions.playClick(); }
+
+    protected boolean isInCarouselBounds(double mx, double my) { return true; }
 
     protected abstract boolean handlePackListStepNavigation(int key);
 
+    protected void handleSkinPackReload() {
+        syncCenterPreviewState();
+        packIconDims.clear();
+        SkinPreviewWarmup.clear();
+        packList.refreshPackIdsIfNeeded();
+        rebuildWidgets();
+    }
+
     protected void onWindowRegainedFocus() {
         PlayerSkinWidget.clearCarouselClip();
-        ExternalSkinProviders.resetPreviewCaches();
-        try {
-            if (actions != null && !actions.isPendingSwap() && playerSkinWidgetList != null) {
-                skinPack();
-            }
-        } catch (Throwable ignored) {
-        }
+        if (playerSkinWidgetList != null) { skinPack(); }
     }
 
     protected void focusPackListItem(Object item) {
-        RenderableVList vList = getRenderableVList();
-        if (vList == null || item == null) return;
-        try {
-            String[] names = {"setFocused", "focus", "focusRenderable", "ensureVisible", "scrollTo"};
-            for (String n : names)
-                for (java.lang.reflect.Method m : vList.getClass().getMethods()) {
-                    if (!m.getName().equals(n)) continue;
-                    Class<?>[] p = m.getParameterTypes();
-                    if (p.length == 1 && p[0].isAssignableFrom(item.getClass())) {
-                        m.invoke(vList, item);
-                        return;
-                    }
-                }
-            int idx = item instanceof ChangeSkinPackList.PackButton pb ? pb.getPackIndex() : packList.getFocusedPackIndex();
-            String[] idxNames = {"scrollToIndex", "focusIndex", "setFocusedIndex", "scrollTo"};
-            for (String n : idxNames)
-                for (java.lang.reflect.Method m : vList.getClass().getMethods()) {
-                    if (!m.getName().equals(n)) continue;
-                    Class<?>[] p = m.getParameterTypes();
-                    if (p.length == 1 && (p[0] == int.class || p[0] == Integer.class)) {
-                        m.invoke(vList, idx);
-                        return;
-                    }
-                }
-        } catch (Throwable ignored) {}
+        if (item instanceof ChangeSkinPackList.PackButton button && children().contains(button)) { setFocused(button); }
     }
 
-    protected int sc(int v) {
-        return Math.round(v * uiScale);
-    }
+    protected int sc(int v) { return Math.round(v * uiScale); }
 
-    protected static ChangeSkinScreenLayout resolveScreenLayout() {
-        return LegacyOptions.getUIMode().isSD() ? ChangeSkinScreenLayout.SD_480 : ChangeSkinScreenLayout.DEFAULT;
-    }
-
-    protected ChangeSkinScreenLayout resolveRuntimeLayout() {
-        return sdMode ? ChangeSkinScreenLayout.SD_480 : ChangeSkinScreenLayout.DEFAULT;
-    }
-
-    protected ChangeSkinScreenLayout resolveFitReferenceLayout() {
-        return resolveRuntimeLayout();
-    }
+    protected ChangeSkinScreenLayout resolveRuntimeLayout() { return sdMode ? ChangeSkinScreenLayout.SD_480 : ChangeSkinScreenLayout.DEFAULT; }
 
     protected void refreshSharedLayout() {
         sdMode = LegacyOptions.getUIMode().isSD();
         layoutProfile = resolveRuntimeLayout();
-        uiScale = computeScale(width, height, resolveFitReferenceLayout());
+        uiScale = computeScale(width, height, layoutProfile);
         tooltipWidth = Math.max(1, Math.round(layoutProfile.baseTooltipWidth() * uiScale));
     }
 
@@ -281,44 +179,28 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         panel.pos((width - panelWidth) / 2, (height - panelHeight) / 2);
     }
 
-    protected boolean isCompact480() {
-        return sdMode;
-    }
+    protected boolean isCompact480() { return sdMode; }
 
-    protected ChangeSkinLayoutMetrics getLayoutMetrics() {
-        return layoutProfile.widgetMetrics();
-    }
+    protected ChangeSkinLayoutMetrics getLayoutMetrics() { return layoutProfile.widgetMetrics(); }
 
-    protected int tooltipContentTop() {
-        return panel.y + sc(getLayoutMetrics().tooltipTopOffset());
-    }
+    protected int tooltipContentTop() { return panel.y + sc(getLayoutMetrics().tooltipTopOffset()); }
 
-    protected int tooltipContentRight() {
-        return tooltipBox.x + tooltipBox.getWidth() - sc(getLayoutMetrics().tooltipWidthTrim());
-    }
+    protected int tooltipContentRight() { return tooltipBox.x + tooltipBox.getWidth() - sc(getLayoutMetrics().tooltipWidthTrim()); }
 
     protected int tooltipContentBottom() {
         ChangeSkinLayoutMetrics metrics = getLayoutMetrics();
         return tooltipContentTop() + tooltipBox.getHeight() - sc(metrics.tooltipHeightTrim() + metrics.tooltipFooterHeight() - metrics.tooltipHeightRecover());
     }
 
-    protected float bigTextScale() {
-        return Math.max(layoutProfile.bigTextMinScale(), layoutProfile.bigTextScale() * uiScale);
-    }
+    protected float bigTextScale() { return Math.max(layoutProfile.bigTextMinScale(), layoutProfile.bigTextScale() * uiScale); }
 
-    protected float smallTextScale() {
-        return Math.max(layoutProfile.smallTextMinScale(), layoutProfile.smallTextScale() * uiScale);
-    }
+    protected float smallTextScale() { return Math.max(layoutProfile.smallTextMinScale(), layoutProfile.smallTextScale() * uiScale); }
 
     protected static int controlTooltipFooterReserve() {
         float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2.0f;
         float hudDiff = 1.0f - hudDistance;
         float tooltipTopOffset = 29.0f - (15.0f - ControlType.getActiveType().iconHeight()) / 2.0f - 16.0f * hudDiff;
         return Math.max(24, Math.round(tooltipTopOffset + 12.0f));
-    }
-
-    protected static float computeScale(int w, int h) {
-        return computeScale(w, h, resolveScreenLayout());
     }
 
     protected static float computeScale(int w, int h, ChangeSkinScreenLayout layout) {
@@ -350,14 +232,12 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         try {
             Resource r = minecraft.getResourceManager().getResource(icon).orElse(null);
             if (r != null) {
-                try (var in = r.open()) {
-                    NativeImage img = NativeImage.read(in);
+                try (var in = r.open(); NativeImage img = NativeImage.read(in)) {
                     w = img.getWidth();
                     h = img.getHeight();
-                    img.close();
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (IOException | RuntimeException ignored) {}
         int[] out = {Math.max(1, w), Math.max(1, h)};
         packIconDims.put(icon, out);
         return out;
@@ -389,48 +269,93 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void skinPack(int i) {
-        captureCenterPreviewState();
+        syncCenterPreviewState();
         actions.skinPack(i);
         onAfterSkinPackChanged();
     }
 
     protected void skinPack() {
-        captureCenterPreviewState();
+        syncCenterPreviewState();
         actions.skinPack();
         onAfterSkinPackChanged();
     }
 
-    protected void selectSkin()              { actions.selectSkin(); }
-    protected void favorite()                { actions.favorite(); }
-    protected void playClick()               { actions.playClick(); }
-    protected void openLegacyChangeSkinScreen() { actions.openLegacyChangeSkinScreen(); }
+    protected PlayerSkinWidget getCenterWidget() { return playerSkinWidgetList == null ? null : playerSkinWidgetList.getCenter(); }
 
-    protected int resolveSelectedSkinIndex() {
-        UUID self = minecraft.player != null ? minecraft.player.getUUID()
-                  : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
-        String selectedId = self != null ? ClientSkinCache.get(self) : null;
-        if (selectedId == null || selectedId.isBlank()) return 0;
+    protected String currentAppliedSkinId() {
+        UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+        return self == null ? null : ClientSkinCache.get(self);
+    }
 
-        SkinPack focused = actions.getFocusedPack();
-        if (focused != null && focused.skins() != null) {
-            int limit = Math.min(100, focused.skins().size());
-            for (int i = 0; i < limit; i++) {
-                SkinEntry se = focused.skins().get(i);
-                if (se != null && selectedId.equals(se.id())) return i;
-            }
+    protected Component favoriteActionLabel() {
+        PlayerSkinWidget center = getCenterWidget();
+        String skinId = center == null ? null : center.skinId.get();
+        return skinId != null && FavoritesStore.isFavorite(skinId)
+                ? Component.literal("Remove Favorite")
+                : Component.literal("Add Favorite");
+    }
+
+    protected int resolveFocusedPackSkinIndex(String skinId) {
+        if (skinId == null || skinId.isBlank()) return 0;
+        SkinPack focused = packList.getFocusedPack();
+        if (focused == null || focused.skins() == null) return 0;
+        int limit = Math.min(100, focused.skins().size());
+        for (int i = 0; i < limit; i++) {
+            SkinEntry entry = focused.skins().get(i);
+            if (entry != null && skinId.equals(entry.id())) return i;
         }
         return 0;
     }
 
-    protected ResourceLocation getFocusedPackIcon() { return actions.getFocusedPackIcon(); }
-    protected SkinPack         getFocusedPack()     { return actions.getFocusedPack(); }
+    protected void focusInitialPack() {
+        String selectedId = currentAppliedSkinId();
+        if (selectedId != null && !selectedId.isBlank()) {
+            String sourcePackId = SkinPackLoader.getSourcePackId(selectedId);
+            if (sourcePackId != null) {
+                packList.focusPackId(sourcePackId, false);
+                return;
+            }
+        }
+
+        String preferredDefaultPackId = SkinPackLoader.getPreferredDefaultPackId();
+        String focusId = preferredDefaultPackId != null ? preferredDefaultPackId : SkinPackLoader.getLastUsedCustomPackId();
+        if (focusId != null) packList.focusPackId(focusId, false);
+    }
+
+    protected boolean focusPackIndex(int index, boolean requestFocus) {
+        int count = packList.getPackCount();
+        if (count <= 1) return false;
+        int target = Math.floorMod(index, count);
+        ChangeSkinPackList.PackButton button = packList.getButtonForIndex(target);
+        if (button == null) return false;
+        packList.setFocusedPackIndex(target, true);
+        if (requestFocus) {
+            setFocused(button);
+            focusPackListItem(button);
+        }
+        return true;
+    }
+
+    protected boolean focusRelativePack(int delta, boolean requestFocus) { return delta != 0 && focusPackIndex(packList.getFocusedPackIndex() + delta, requestFocus); }
+
+    protected boolean applyQueuedPackChange() {
+        if (!packList.consumeQueuedChangePack()) return false;
+        stopHoldingOuterCarousel();
+        cancelQueuedCarousel();
+        skinPack(resolveFocusedPackSkinIndex(currentAppliedSkinId()));
+        return true;
+    }
+
+    private void sortCarouselBy(int offset) {
+        playerSkinWidgetList.setCenterRotation(0, 0);
+        playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + offset);
+    }
 
     protected boolean control(boolean left, boolean right) {
         if (!(left || right) || playerSkinWidgetList == null) return false;
         if (playerSkinWidgetList.widgets.stream().anyMatch(w -> w.progress <= 1f)) return true;
-        playerSkinWidgetList.setCenterRotation(0, 0);
-        playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + (left ? -1 : 0) + (right ? 1 : 0));
-        playClick();
+        sortCarouselBy((left ? -1 : 0) + (right ? 1 : 0));
+        actions.playClick();
         return true;
     }
 
@@ -442,118 +367,41 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     @Override
-    public boolean legacy$lockInputTypeSwitch() {
-        return carouselAnimating();
-    }
+    public boolean legacy$lockInputTypeSwitch() { return carouselAnimating(); }
 
     protected PlayerSkinWidget getControllableCenterPreview() {
-        if (playerSkinWidgetList == null || playerSkinWidgetList.element3 == null) return null;
-        if (actions != null && actions.isPendingSwap()) return null;
-        PlayerSkinWidget center = playerSkinWidgetList.element3;
+        PlayerSkinWidget center = getCenterWidget();
+        if (center == null) return null;
         if (!center.visible || center.isInterpolating()) return null;
         return center;
     }
 
     protected void syncCenterPreviewState(PlayerSkinWidget center) {
         if (center == null || playerSkinWidgetList == null) return;
-        keptCenterRotX = center.getRotationX();
-        keptCenterRotY = center.getRotationY();
-        playerSkinWidgetList.setCenterRotation(keptCenterRotX, keptCenterRotY);
-        keptCenterPoseMode = center.getPoseMode();
-        keptCenterPunchLoop = center.isPunchLoop();
-        playerSkinWidgetList.setCenterPose(keptCenterPoseMode, keptCenterPunchLoop);
+        playerSkinWidgetList.setCenterRotation(center.getRotationX(), center.getRotationY());
+        playerSkinWidgetList.setCenterPose(center.getPoseMode(), center.isPunchLoop());
     }
 
-    protected void captureCenterPreviewState() {
-        if (playerSkinWidgetList == null) return;
-        syncCenterPreviewState(playerSkinWidgetList.element3);
-    }
+    protected void syncCenterPreviewState() { syncCenterPreviewState(getCenterWidget()); }
 
-    protected boolean rotateCenterPreview(double dragX, double dragY) {
+    private boolean updateCenterPreview(boolean playClick, Consumer<PlayerSkinWidget> action) {
         PlayerSkinWidget center = getControllableCenterPreview();
         if (center == null) return false;
-        center.applyDrag(dragX, dragY);
+        action.accept(center);
         syncCenterPreviewState(center);
+        if (playClick) actions.playClick();
         return true;
     }
 
-    protected boolean toggleCenterPosePreview() {
-        PlayerSkinWidget center = getControllableCenterPreview();
-        if (center == null) return false;
-        center.togglePose();
-        syncCenterPreviewState(center);
-        playClick();
-        return true;
-    }
+    protected boolean rotateCenterPreview(double dragX, double dragY) { return updateCenterPreview(false, center -> center.applyDrag(dragX, dragY)); }
 
-    protected boolean toggleCenterPunchPreview() {
-        PlayerSkinWidget center = getControllableCenterPreview();
-        if (center == null) return false;
-        center.togglePunch();
-        syncCenterPreviewState(center);
-        playClick();
-        return true;
-    }
-
-    protected boolean cycleCenterPosePreview() {
-        PlayerSkinWidget center = getControllableCenterPreview();
-        if (center == null) return false;
-        if (center.getPoseMode() == 1) center.setPoseMode(0, true, false);
-        else center.togglePose();
-        syncCenterPreviewState(center);
-        playClick();
-        return true;
-    }
-
-    protected boolean cycleCenterPunchPreview() {
-        PlayerSkinWidget center = getControllableCenterPreview();
-        if (center == null) return false;
-        if (center.isPunchLoop()) center.setPoseMode(1, false, false);
-        else center.togglePunch();
-        syncCenterPreviewState(center);
-        playClick();
-        return true;
-    }
-
-    protected boolean cyclePackFilterView() {
-        if (!canUsePackFilter()) return false;
-        if (packList == null || !packList.cycleViewFilter()) return false;
-        stopHoldingOuterCarousel();
-        cancelQueuedCarousel();
-        draggingCenterDoll = false;
-        getRenderableVList().resetScroll();
-        playClick();
-        rebuildWidgets();
-        return true;
-    }
-
-    protected boolean canUsePackFilter() {
-        try {
-            return SkinPackViewFilter.hasAdditionalPackProvider();
-        } catch (Throwable ignored) {
-        }
-        return false;
-    }
-
-    protected Component currentPackFilterLabel() {
-        SkinPackViewFilter filter = packList != null ? packList.getViewFilter() : SkinPackViewFilter.DEFAULT;
-        return Component.literal("Filter: " + filter.label());
-    }
-
-    protected boolean showExpandedControlTooltips() {
-        return !ConsoleSkinsClientSettings.isMinimizeTooltips();
-    }
-
-    protected boolean recenterCenterPreview() {
-        PlayerSkinWidget center = getControllableCenterPreview();
-        if (center == null) return false;
-        center.recenterView();
-        syncCenterPreviewState(center);
-        playClick();
-        return true;
-    }
-
-    protected void addPreviewControlTooltips(ControlTooltip.Renderer r) {
+    protected void addCommonControlTooltips(ControlTooltip.Renderer r, Supplier<ControlTooltip.Icon> navigateIcon, Supplier<Component> navigateLabel) {
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> Component.literal("Select"));
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.cancel"));
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_F) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), this::favoriteActionLabel);
+        if (ConsoleSkinsClientSettings.isMinimizeTooltips()) return;
+        r.add(navigateIcon, navigateLabel);
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> Component.literal("Advanced Options"));
     }
 
     protected PlayerSkinWidget pickCarouselWidget(double mx, double my) {
@@ -581,25 +429,21 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected void pumpQueuedCarousel() {
         if (queuedCarouselSteps <= 0) return;
-        if (actions != null && actions.isPendingSwap()) return;
         if (carouselAnimating()) return;
         if (playerSkinWidgetList == null) { cancelQueuedCarousel(); return; }
-        if (queuedCarouselSound) { queuedCarouselSound = false; playClick(); }
-        playerSkinWidgetList.setCenterRotation(0, 0);
-        playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + queuedCarouselDir);
+        if (queuedCarouselSound) { queuedCarouselSound = false; actions.playClick(); }
+        sortCarouselBy(queuedCarouselDir);
         if (--queuedCarouselSteps <= 0) cancelQueuedCarousel();
     }
 
     protected boolean startQueuedCarousel(int offset) {
         if (playerSkinWidgetList == null) return false;
-        if (actions != null && actions.isPendingSwap()) return false;
         if (carouselAnimating()) return false;
         int abs = Math.abs(offset);
         if (abs == 0) return false;
         if (abs == 1) {
-            playerSkinWidgetList.setCenterRotation(0, 0);
-            playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + offset);
-            playClick();
+            sortCarouselBy(offset);
+            actions.playClick();
             return true;
         }
         queuedCarouselDir   = offset > 0 ? 1 : -1;
@@ -609,30 +453,14 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return true;
     }
 
-    protected void startHoldingOuterCarousel(int dir) {
-        holdingOuterCarousel = true;
-        holdingOuterDir      = dir < 0 ? -1 : 1;
-        long now             = net.minecraft.Util.getMillis();
-        holdingOuterStartAt  = now;
-        holdingOuterNextAt   = now + 220L;
-    }
+    protected void startHoldingOuterCarousel(int dir) { outerCarouselHold.start(dir); }
 
-    protected void stopHoldingOuterCarousel() {
-        holdingOuterCarousel = false;
-        holdingOuterDir      = 0;
-        holdingOuterStartAt  = holdingOuterNextAt = 0L;
-    }
+    protected void stopHoldingOuterCarousel() { outerCarouselHold.stop(); }
 
     protected void pumpHoldingOuterCarousel() {
-        if (!holdingOuterCarousel) return;
-        if (actions != null && actions.isPendingSwap()) return;
-        if (queuedCarouselSteps > 0 || carouselAnimating()) return;
-        long now = net.minecraft.Util.getMillis();
-        if (now < holdingOuterNextAt) return;
-        startQueuedCarousel(holdingOuterDir);
-        long held  = now - holdingOuterStartAt;
-        long delay = held < 700L ? 120L : 80L;
-        holdingOuterNextAt = now + delay;
+        if (!outerCarouselHold.ready() || queuedCarouselSteps > 0 || carouselAnimating()) return;
+        startQueuedCarousel(outerCarouselHold.dir());
+        outerCarouselHold.step();
     }
 
     @Override
@@ -649,13 +477,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         boolean queuedPackChange = packList.consumeQueuedChangePack();
         if (firstOpen) {
             firstOpen = false;
-            skinPack(resolveSelectedSkinIndex());
-            actions.warmupFavouritesPack();
+            skinPack(resolveFocusedPackSkinIndex(currentAppliedSkinId()));
         } else if (queuedPackChange) {
             skinPack(0);
-        } else if (playerSkinWidgetList != null) {
-            skinPack(playerSkinWidgetList.index);
-        }
+        } else if (playerSkinWidgetList != null) { skinPack(playerSkinWidgetList.index); }
     }
 
     @Override
@@ -666,24 +491,23 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             if (!enterHeld) enterHeld = true;
             return true;
         }
-        if (key == InputConstants.KEY_F) { favorite(); return true; }
+        if (key == InputConstants.KEY_F) { actions.favorite(); return true; }
 
         if (key == InputConstants.KEY_LSHIFT || key == InputConstants.KEY_RSHIFT) {
             if (!shiftHeld) {
                 shiftHeld = true;
-                toggleCenterPosePreview();
+                updateCenterPreview(true, PlayerSkinWidget::togglePose);
             }
             return true;
         }
         if (key == InputConstants.KEY_P) {
             if (!pHeld) {
                 pHeld = true;
-                toggleCenterPunchPreview();
+                updateCenterPreview(true, PlayerSkinWidget::togglePunch);
             }
             return true;
         }
-        if (key == InputConstants.KEY_T) { return cyclePackFilterView(); }
-        if (key == InputConstants.KEY_O) { openLegacyChangeSkinScreen(); return true; }
+        if (key == InputConstants.KEY_O) { actions.openLegacyChangeSkinScreen(); return true; }
 
         if (handlePackListStepNavigation(key)) return true;
 
@@ -699,7 +523,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     public boolean keyReleased(KeyEvent e) {
         int key = InputConstants.getKey(e).getValue();
         if (key == InputConstants.KEY_RETURN) {
-            if (enterHeld) { enterHeld = false; selectSkin(); }
+            if (enterHeld) { enterHeld = false; actions.selectSkin(); }
             return true;
         }
         if (key == InputConstants.KEY_LSHIFT || key == InputConstants.KEY_RSHIFT) { shiftHeld = false; return true; }
@@ -711,20 +535,16 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         double mx = e.x(), my = e.y();
         PlayerSkinWidget hit = pickCarouselWidget(mx, my);
         if (hit == null) return false;
-
-        if (actions != null && actions.isPendingSwap()) return true;
         if (carouselAnimating()) return true;
 
         if (e.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
-
-            recenterCenterPreview();
+            updateCenterPreview(true, PlayerSkinWidget::recenterView);
             return true;
         }
         if (e.button() != InputConstants.MOUSE_BUTTON_LEFT) return true;
 
         int off = hit.slotOffset;
         if (off == 0) {
-
             stopHoldingOuterCarousel();
             draggingCenterDoll  = true;
             centerDragMoved     = false;
@@ -742,15 +562,13 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         if (draggingCenterDoll && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-            PlayerSkinWidget center = playerSkinWidgetList != null ? playerSkinWidgetList.element3 : null;
+            PlayerSkinWidget center = getCenterWidget();
             if (center != null && center.visible && !center.isInterpolating()) {
                 if (!centerDragMoved) {
                     if (Math.abs(event.x() - centerDragStartX) > 2.0 || Math.abs(event.y() - centerDragStartY) > 2.0)
                         centerDragMoved = true;
                 }
-                if (centerDragMoved) {
-                    rotateCenterPreview(-dragX, 0);
-                }
+                if (centerDragMoved) { rotateCenterPreview(-dragX, 0); }
                 return true;
             }
         }
@@ -759,13 +577,13 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && holdingOuterCarousel)
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && outerCarouselHold.active())
             stopHoldingOuterCarousel();
 
         if (draggingCenterDoll && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             draggingCenterDoll = false;
 
-            if (!centerDragMoved) selectSkin();
+            if (!centerDragMoved) actions.selectSkin();
             centerDragMoved = false;
             return true;
         }
@@ -781,8 +599,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
         if (playerSkinWidgetList == null) return false;
         if (!insideScrollRegion(d, e) && pickCarouselWidget(d, e) == null) return false;
-
-        if (actions != null && actions.isPendingSwap()) return true;
         if (draggingCenterDoll) return true;
         if (carouselAnimating()) return true;
 
@@ -790,28 +606,22 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return true;
     }
 
+    private static boolean buttonOnce(BindingState state, ControllerBinding binding) { return state != null && state.is(binding) && state.onceClick(true); }
+
     protected boolean handleSharedBindingState(BindingState state) {
-        if (ControlsCompat.squareOnce(state)) { favorite(); return true; }
+        if (buttonOnce(state, ControllerBinding.LEFT_BUTTON)) { actions.favorite(); return true; }
 
-        if (!ControlType.getActiveType().isKbm() && ControlsCompat.triangleOnce(state)) {
-            openLegacyChangeSkinScreen();
+        if (!ControlType.getActiveType().isKbm() && buttonOnce(state, ControllerBinding.UP_BUTTON)) {
+            actions.openLegacyChangeSkinScreen();
             return true;
         }
 
-        if (!ControlType.getActiveType().isKbm() && ControlsCompat.r3Once(state)) {
-            recenterCenterPreview();
+        if (!ControlType.getActiveType().isKbm() && buttonOnce(state, ControllerBinding.RIGHT_STICK_BUTTON)) {
+            updateCenterPreview(true, PlayerSkinWidget::recenterView);
             return true;
         }
 
-        if (!ControlType.getActiveType().isKbm()
-                && state != null
-                && state.is(ControllerBinding.BACK)
-                && state.onceClick(true)) {
-            return cyclePackFilterView();
-        }
-
-        if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null
-                && state != null && state.is(ControllerBinding.RIGHT_STICK)
+        if (getCenterWidget() != null && state != null && state.is(ControllerBinding.RIGHT_STICK)
                 && state instanceof BindingState.Axis stick) {
             PlayerSkinWidget center = getControllableCenterPreview();
             if (center != null) {
@@ -822,7 +632,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                     if (sy <= -triggerY) {
                         if (!stickUpHeld) {
                             stickUpHeld = true;
-                            cycleCenterPunchPreview();
+                            updateCenterPreview(true, preview -> {
+                                if (preview.isPunchLoop()) preview.setPoseMode(1, false, false);
+                                else preview.togglePunch();
+                            });
                         }
                         state.block();
                         return true;
@@ -830,7 +643,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                     if (sy >= triggerY) {
                         if (!stickDownHeld) {
                             stickDownHeld = true;
-                            cycleCenterPosePreview();
+                            updateCenterPreview(true, preview -> {
+                                if (preview.getPoseMode() == 1) preview.setPoseMode(0, true, false);
+                                else preview.togglePose();
+                            });
                         }
                         state.block();
                         return true;
@@ -853,42 +669,9 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected boolean sharedTick() {
-
-        if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null) {
-            PlayerSkinWidget center = playerSkinWidgetList.element3;
-            if (!center.isInterpolating()) {
-                syncCenterPreviewState(center);
-            }
-        }
-
-        try { actions.tick(); } catch (Throwable ignored) {}
-
-        if (packList.consumeQueuedChangePack()) {
-            stopHoldingOuterCarousel();
-            cancelQueuedCarousel();
-
-            captureCenterPreviewState();
-
-            int idx = 0;
-            UUID self = minecraft.player != null ? minecraft.player.getUUID()
-                      : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
-            String selectedId = self != null ? ClientSkinCache.get(self) : null;
-            if (selectedId != null && !selectedId.isBlank()) {
-                SkinPack focused = actions.getFocusedPack();
-                if (focused != null && focused.skins() != null) {
-                    int limit = Math.min(100, focused.skins().size());
-                    for (int i = 0; i < limit; i++) {
-                        SkinEntry se = focused.skins().get(i);
-                        if (se != null && selectedId.equals(se.id())) { idx = i; break; }
-                    }
-                }
-            }
-
-            skinPack(idx);
-            return true;
-        }
-
-        return false;
+        PlayerSkinWidget center = getCenterWidget();
+        if (center != null && !center.isInterpolating()) syncCenterPreviewState(center);
+        return applyQueuedPackChange();
     }
 
     @Override
@@ -902,33 +685,31 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         super.removed();
     }
 
-    protected static void blitSprite(GuiGraphics g, ResourceLocation id, int x, int y, int w, int h) {
-        g.blitSprite(RenderPipelines.GUI_TEXTURED, id, x, y, w, h);
-    }
+    protected static boolean inside(double mx, double my, int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
 
-    protected static boolean inside(double mx, double my, int x, int y, int w, int h) {
-        return mx >= x && mx < x + w && my >= y && my < y + h;
-    }
+    protected static void blitSprite(GuiGraphics g, ResourceLocation id, int x, int y, int w, int h) { FactoryGuiGraphics.of(g).blitSprite(id, x, y, w, h); }
 
-    protected void drawBigCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
-        float scale = bigTextScale();
-        int   yAdj  = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
-        var   pose  = g.pose();
+    protected void drawBigCentered(GuiGraphics g, Component text, int centerX, int y, int color) { drawScaledCentered(g, text, centerX, y, color, bigTextScale()); }
+
+    protected void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) { drawScaledCentered(g, text, centerX, y, color, smallTextScale()); }
+
+    private void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
+        int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
+        var pose = g.pose();
         pose.pushMatrix();
         pose.translate((float) centerX, (float) yAdj);
         pose.scale(scale, scale);
         g.drawCenteredString(minecraft.font, text, 0, 0, color);
         pose.popMatrix();
     }
-
-    protected void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
-        float scale = smallTextScale();
-        int   yAdj  = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
-        var   pose  = g.pose();
-        pose.pushMatrix();
-        pose.translate((float) centerX, (float) yAdj);
-        pose.scale(scale, scale);
-        g.drawCenteredString(minecraft.font, text, 0, 0, color);
-        pose.popMatrix();
+    protected static final class HoldRepeat {
+        private int dir;
+        private long startAt, nextAt;
+        boolean active() { return dir != 0; }
+        int dir() { return dir; }
+        void start(int dir) { this.dir = dir < 0 ? -1 : 1; long now = net.minecraft.Util.getMillis(); startAt = now; nextAt = now + 220L; }
+        void stop() { dir = 0; startAt = 0L; nextAt = 0L; }
+        boolean ready() { return active() && net.minecraft.Util.getMillis() >= nextAt; }
+        void step() { long now = net.minecraft.Util.getMillis(); nextAt = now + (now - startAt < 700L ? 120L : 80L); }
     }
 }
