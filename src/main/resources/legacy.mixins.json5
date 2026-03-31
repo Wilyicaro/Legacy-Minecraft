@@ -209,6 +209,7 @@
     "skins.client.SkinsOptionMixin",
     "skins.client.HelpAndOptionsChangeSkinButtonMixin",
     "skins.client.LivingEntityRendererAccessor",
+    "skins.client.HumanoidArmorLayerAccessor",
     "skins.client.ModelPartAccessor",
     "skins.client.SkipDrawAccessor",
     "skins.client.SkipRenderMixin",

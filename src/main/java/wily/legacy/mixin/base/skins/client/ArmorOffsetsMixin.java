@@ -1,10 +1,11 @@
 package wily.legacy.mixin.base.skins.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.ResourceLocation;
@@ -23,115 +24,62 @@ import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
-import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 @Mixin(HumanoidArmorLayer.class)
 public abstract class ArmorOffsetsMixin {
-    @Unique private static final ThreadLocal<EquipmentSlot> consoleskins$currentSlot = new ThreadLocal<>();
-    @Unique private static final ThreadLocal<float[]> consoleskins$currentOffset = new ThreadLocal<>();
     @Unique private static final ThreadLocal<Boolean> consoleskins$posePushed = new ThreadLocal<>();
     @Unique private static final ThreadLocal<Boolean> consoleskins$layerActive = new ThreadLocal<>();
     @Unique
-    private static Field consoleskins$rendererField;
-    @Unique
     private Set<ModelPart> consoleskins$cachedArmorParts;
     @Unique
-    private boolean consoleskins$cachedArmorPartsFailed;
-    @Unique
-    private RenderLayerParent<?, ?> consoleskins$getRenderer() {
-        try {
-            Field field = consoleskins$rendererField;
-            if (field == null) {
-                Class<?> type = ((Object) this).getClass();
-                outer:
-                while (type != null && type != Object.class) {
-                    for (Field candidate : type.getDeclaredFields()) {
-                        if (RenderLayerParent.class.isAssignableFrom(candidate.getType())) {
-                            candidate.setAccessible(true);
-                            consoleskins$rendererField = candidate;
-                            field = candidate;
-                            break outer;
-                        }
-                    }
-                    type = type.getSuperclass();
-                }
-            }
-            if (field != null) return (RenderLayerParent<?, ?>) field.get(this);
-        } catch (ReflectiveOperationException | RuntimeException ignored) { }
-        return null;
-    }
-    @Unique
     private HumanoidModel<?> consoleskins$getParentHumanoidModel() {
-        RenderLayerParent<?, ?> renderer = consoleskins$getRenderer();
-        if (renderer == null) return null;
         try {
-            Object model = renderer.getModel();
+            Object model = ((HumanoidArmorLayer<?, ?, ?>) (Object) this).getParentModel();
             return model instanceof HumanoidModel<?> humanoidModel ? humanoidModel : null;
         } catch (RuntimeException ignored) { return null; }
     }
     @Unique
-    private static void consoleskins$collectParts(Object obj, int depth, Set<ModelPart> out, Set<Object> visited) {
-        if (obj == null || depth > 3 || !visited.add(obj)) return;
-        Class<?> type = obj.getClass();
-        while (type != null && type != Object.class) {
-            for (Field field : type.getDeclaredFields()) {
-                if (field.isSynthetic()) continue;
-                Class<?> fieldType = field.getType();
-                if (fieldType.isPrimitive() || fieldType == String.class || fieldType == Class.class) continue;
-                try {
-                    field.setAccessible(true);
-                    Object value = field.get(obj);
-                    if (value == null) continue;
-                    if (value instanceof ModelPart modelPart) {
-                        out.add(modelPart);
-                        if (depth < 3) consoleskins$collectParts(modelPart, depth + 1, out, visited);
-                    } else if (value instanceof java.util.Map<?, ?> map) {
-                        for (Object child : map.values()) {
-                            if (child instanceof ModelPart modelPart) {
-                                out.add(modelPart);
-                                if (depth < 3) consoleskins$collectParts(modelPart, depth + 1, out, visited);
-                            }
-                        }
-                    } else if (depth < 2) { consoleskins$collectParts(value, depth + 1, out, visited); }
-                } catch (ReflectiveOperationException | RuntimeException ignored) { }
-            }
-            type = type.getSuperclass();
-        }
+    private Set<ModelPart> consoleskins$getArmorParts() {
+        Set<ModelPart> armorParts = consoleskins$cachedArmorParts;
+        if (armorParts != null) return armorParts;
+        java.util.LinkedHashSet<ModelPart> parts = new java.util.LinkedHashSet<>();
+        HumanoidArmorLayerAccessor<?, ?, ?> accessor = (HumanoidArmorLayerAccessor<?, ?, ?>) this;
+        consoleskins$collectArmorParts(parts, accessor.consoleskins$getModelSet());
+        consoleskins$collectArmorParts(parts, accessor.consoleskins$getBabyModelSet());
+        armorParts = Set.copyOf(parts);
+        consoleskins$cachedArmorParts = armorParts;
+        return armorParts;
     }
     @Unique
-    private void consoleskins$collectArmorOnlyParts(Set<ModelPart> out, Set<Object> visited) {
-        RenderLayerParent<?, ?> renderer = consoleskins$getRenderer();
-        Object playerModel = null;
-        try {
-            if (renderer != null) playerModel = renderer.getModel();
-        } catch (RuntimeException ignored) { }
-        Set<ModelPart> playerParts = new HashSet<>();
-        if (playerModel != null) consoleskins$collectParts(playerModel, 0, playerParts, new HashSet<>());
-        Class<?> type = ((Object) this).getClass();
-        while (type != null && type != Object.class) {
-            for (Field field : type.getDeclaredFields()) {
-                if (field.isSynthetic()) continue;
-                if (RenderLayerParent.class.isAssignableFrom(field.getType())) continue;
-                Class<?> fieldType = field.getType();
-                if (fieldType.isPrimitive() || fieldType == String.class || fieldType == Class.class) continue;
-                try {
-                    field.setAccessible(true);
-                    Object value = field.get(this);
-                    if (value == null || value == renderer || value == playerModel) continue;
-                    consoleskins$collectParts(value, 0, out, visited);
-                } catch (ReflectiveOperationException | RuntimeException ignored) { }
-            }
-            type = type.getSuperclass();
+    private static void consoleskins$collectArmorParts(Set<ModelPart> out, ArmorModelSet<?> modelSet) {
+        if (modelSet == null) return;
+        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.head());
+        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.chest());
+        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.legs());
+        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.feet());
+    }
+    @Unique
+    private static void consoleskins$collectModelParts(Set<ModelPart> out, HumanoidModel<?> model) {
+        if (model == null) return;
+        out.add(model.head);
+        out.add(model.body);
+        out.add(model.rightArm);
+        out.add(model.leftArm);
+        out.add(model.rightLeg);
+        out.add(model.leftLeg);
+        if (model instanceof PlayerModel playerModel) {
+            out.add(playerModel.hat);
+            out.add(playerModel.jacket);
+            out.add(playerModel.leftSleeve);
+            out.add(playerModel.rightSleeve);
+            out.add(playerModel.leftPants);
+            out.add(playerModel.rightPants);
         }
-        out.removeAll(playerParts);
     }
     private static void consoleskins$clearContext() {
-        consoleskins$currentSlot.remove();
-        consoleskins$currentOffset.remove();
         consoleskins$posePushed.remove();
         consoleskins$layerActive.remove();
     }
@@ -152,18 +100,8 @@ public abstract class ArmorOffsetsMixin {
                                                ItemStack item, EquipmentSlot slot, int packedLight,
                                                HumanoidRenderState renderState, CallbackInfo ci) {
         if (!consoleskins$tryEnterLayer()) return;
-        Set<ModelPart> armorParts = consoleskins$cachedArmorParts;
-        if (armorParts == null && !consoleskins$cachedArmorPartsFailed) {
-            try {
-                Set<ModelPart> parts = new HashSet<>();
-                consoleskins$collectArmorOnlyParts(parts, new HashSet<>());
-                armorParts = Set.copyOf(parts);
-                consoleskins$cachedArmorParts = armorParts;
-            } catch (RuntimeException ignored) { consoleskins$cachedArmorPartsFailed = true; }
-        }
+        Set<ModelPart> armorParts = consoleskins$getArmorParts();
         if (armorParts != null && !armorParts.isEmpty()) { for (ModelPart part : armorParts) consoleskins$setForceRender(part, true); }
-        consoleskins$currentSlot.set(slot);
-        consoleskins$currentOffset.remove();
         consoleskins$posePushed.set(Boolean.FALSE);
         if (poseStack == null || slot == null) return;
         if (!(renderState instanceof RenderStateSkinIdAccess access)) return;
@@ -194,7 +132,6 @@ public abstract class ArmorOffsetsMixin {
         if (armorOffsets == null || armorOffsets.isEmpty()) return;
         float[] offset = armorOffsets.get(armorSlot);
         if (offset == null || (offset[0] == 0 && offset[1] == 0 && offset[2] == 0)) return;
-        consoleskins$currentOffset.set(new float[]{offset[0], offset[1], offset[2]});
         if (slot == EquipmentSlot.HEAD) {
             float x = offset[0];
             float y = offset[1];
