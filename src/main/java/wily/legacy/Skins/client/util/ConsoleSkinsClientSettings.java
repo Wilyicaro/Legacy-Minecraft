@@ -10,13 +10,11 @@ import java.nio.file.Path;
 
 public final class ConsoleSkinsClientSettings {
     private static final boolean DEFAULT_SMOOTH_PREVIEW_SCROLL = false;
-    private static final boolean DEFAULT_SKIN_ANIMATIONS = true;
     private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
     private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
     private static final boolean DEFAULT_SKIN_SELECTION_INITIALIZED = false;
     private static volatile boolean loaded;
     private static volatile boolean smoothPreviewScroll;
-    private static volatile boolean skinAnimations = DEFAULT_SKIN_ANIMATIONS;
     private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
     private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
     private static volatile boolean skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
@@ -33,17 +31,6 @@ public final class ConsoleSkinsClientSettings {
     public static void setSmoothPreviewScroll(boolean enabled) {
         ensureLoaded();
         smoothPreviewScroll = enabled;
-        saveQuiet();
-    }
-
-    public static boolean isSkinAnimations() {
-        ensureLoaded();
-        return skinAnimations;
-    }
-
-    public static void setSkinAnimations(boolean enabled) {
-        ensureLoaded();
-        skinAnimations = enabled;
         saveQuiet();
     }
 
@@ -94,7 +81,6 @@ public final class ConsoleSkinsClientSettings {
     public static void resetToDefaults() {
         ensureLoaded();
         smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
-        skinAnimations = DEFAULT_SKIN_ANIMATIONS;
         hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
         tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
         skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
@@ -111,7 +97,6 @@ public final class ConsoleSkinsClientSettings {
     private static void loadQuiet() {
         try {
             smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
-            skinAnimations = DEFAULT_SKIN_ANIMATIONS;
             hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
             tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
             skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
@@ -132,11 +117,6 @@ public final class ConsoleSkinsClientSettings {
 
                     if (k.equalsIgnoreCase("smooth_preview_scroll") || k.equalsIgnoreCase("smoothPreviewScroll")) {
                         smoothPreviewScroll = parseBool(v, DEFAULT_SMOOTH_PREVIEW_SCROLL);
-                        continue;
-                    }
-
-                    if (k.equalsIgnoreCase("skin_animations") || k.equalsIgnoreCase("skinAnimations") || k.equalsIgnoreCase("enable_skin_animations")) {
-                        skinAnimations = parseBool(v, DEFAULT_SKIN_ANIMATIONS);
                         continue;
                     }
 
@@ -185,7 +165,6 @@ public final class ConsoleSkinsClientSettings {
             Files.createDirectories(cfg.getParent());
             String out = "# ConsoleSkins client options (dont mind the typos)\n"
                     + "smooth_preview_scroll=" + smoothPreviewScroll + "\n"
-                    + "skin_animations=" + skinAnimations + "\n"
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
                     + "skin_selection_initialized=" + skinSelectionInitialized + "\n"

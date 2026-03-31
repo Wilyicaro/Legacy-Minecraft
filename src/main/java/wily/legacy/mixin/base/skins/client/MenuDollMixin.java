@@ -17,7 +17,7 @@ import wily.legacy.Skins.pose.StiffArmsPose;
 import wily.legacy.Skins.pose.SyncLegsPose;
 import wily.legacy.Skins.pose.WeepingStatuePose;
 import wily.legacy.Skins.pose.ZombieArmsPose;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(PlayerModel.class)
 public abstract class MenuDollMixin {
@@ -27,6 +27,7 @@ public abstract class MenuDollMixin {
         PlayerModel self = (PlayerModel) (Object) this;
         String skinId = state instanceof RenderStateSkinIdAccess access ? access.consoleskins$getSkinId() : null;
         boolean stiffLegs = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
+        boolean customAnimation = LegacyOptions.customSkinAnimation.get();
         if (state.id == GuiDollRender.MENU_DOLL_ID) {
             ModelPart head = self.head;
             head.xRot = 0.0F;
@@ -44,8 +45,7 @@ public abstract class MenuDollMixin {
             self.leftArm.xRot -= swing;
             self.rightLeg.xRot -= swing;
             self.leftLeg.xRot += swing;
-            if (ConsoleSkinsClientSettings.isSkinAnimations()
-                    && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_ARMS, skinId)) {
+            if (customAnimation && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_ARMS, skinId)) {
                 self.rightArm.xRot -= swing;
                 self.leftArm.xRot += swing;
                 self.rightSleeve.xRot = self.rightArm.xRot;
@@ -55,9 +55,8 @@ public abstract class MenuDollMixin {
                 self.leftSleeve.yRot = self.leftArm.yRot;
                 self.leftSleeve.zRot = self.leftArm.zRot;
             }
-            if (stiffLegs) consoleskins$applyStiffLegs(self, state);
-        } else if (stiffLegs) { consoleskins$applyStiffLegs(self, state); }
-        if (!ConsoleSkinsClientSettings.isSkinAnimations()) return;
+        } else if (customAnimation && stiffLegs) { consoleskins$applyStiffLegs(self, state); }
+        if (!customAnimation) return;
         if (ZombieArmsPose.shouldApply(state)) { ZombieArmsPose.apply(self, state); }
         if (IdleSitPose.shouldApply(state)) {
             if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.SWIMMING || state.pose == Pose.FALL_FLYING) { IdleSitPose.apply(self); }

@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.client.gui.GuiDollRender;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(AvatarRenderer.class)
 public abstract class UpsideDownMixin {
     @Inject(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At("TAIL"), require = 0)
     private void consoleskins$setupRotations(AvatarRenderState state, PoseStack poseStack, float f, float g, CallbackInfo ci) {
-        if (!ConsoleSkinsClientSettings.isSkinAnimations()) return;
+        if (!LegacyOptions.customSkinAnimation.get()) return;
         if (!(state instanceof RenderStateSkinIdAccess a)) return;
         String skinId = a.consoleskins$getSkinId();
         if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.UPSIDE_DOWN, skinId)) return;

@@ -5,6 +5,7 @@ import net.minecraft.client.Options;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.skin.ClientSkinCache;
+import wily.legacy.client.LegacyOptions;
 
 public final class ViewBobbingSkinOverride {
     private static Boolean savedUserBobView;
@@ -34,7 +35,7 @@ public final class ViewBobbingSkinOverride {
     }
 
     private static boolean shouldForceOff(Minecraft minecraft) {
-        if (minecraft.level == null || !ConsoleSkinsClientSettings.isSkinAnimations()) return false;
+        if (minecraft.level == null || !LegacyOptions.customSkinAnimation.get()) return false;
         Player player = minecraft.player;
         if (player == null) return false;
         String skinId = ClientSkinCache.get(player.getUUID());

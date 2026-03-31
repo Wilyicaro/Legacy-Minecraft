@@ -7,7 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.HelpAndOptionsScreen;
+import wily.legacy.client.screen.LegacyConfigWidgets;
 import wily.legacy.client.screen.TickBox;
 import java.util.List;
 
@@ -33,15 +35,15 @@ public class SkinsOptionMixin {
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setSmoothPreviewScroll(t.selected)
         ));
-        list.add(2, new TickBox(
-                0,
-                0,
-                ConsoleSkinsClientSettings.isSkinAnimations(),
-                b -> Component.translatable("legacy.menu.change_skin.skin_animations"),
-                b -> null,
-                t -> ConsoleSkinsClientSettings.setSkinAnimations(t.selected)
-        ));
-        int idx = Math.min(3, list.size());
+        int idx = 2;
+        if (!LegacyOptions.legacySettingsMenus.get()) {
+            AbstractWidget widget = LegacyConfigWidgets.createWidget(LegacyOptions.customSkinAnimation);
+            if (widget != null) {
+                list.add(idx, widget);
+                idx++;
+            }
+        }
+        idx = Math.min(idx, list.size());
         list.add(idx, new TickBox(
                 0,
                 0,

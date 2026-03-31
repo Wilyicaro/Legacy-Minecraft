@@ -12,11 +12,13 @@ import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.pose.ZombieArmsPose;
 import wily.legacy.Skins.skin.SkinIdUtil;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(PlayerModel.class)
 public abstract class ArmPoseMixin {
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$syncArmsPose(AvatarRenderState state, CallbackInfo ci) {
+        if (!LegacyOptions.customSkinAnimation.get()) return;
         if (!(state instanceof RenderStateSkinIdAccess a)) return;
         String skinId = a.consoleskins$getSkinId();
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
