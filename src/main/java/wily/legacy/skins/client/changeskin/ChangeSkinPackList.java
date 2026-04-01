@@ -20,7 +20,8 @@ public final class ChangeSkinPackList {
     private static final String FESTIVE_PACK_ID = "festive";
     private static final Component NO_PACKS = Component.translatable("consoleskins.pack.none");
 
-    private final Runnable clickSound;
+    private final Runnable focusSound;
+    private final Runnable pressSound;
     private final List<String> basePackIds = new ArrayList<>();
     private final List<String> packIds = new ArrayList<>();
 
@@ -28,7 +29,10 @@ public final class ChangeSkinPackList {
     private int focusedPackIndex;
     private boolean queuedChangePack;
 
-    public ChangeSkinPackList(Runnable clickSound) { this.clickSound = clickSound; }
+    public ChangeSkinPackList(Runnable focusSound, Runnable pressSound) {
+        this.focusSound = focusSound;
+        this.pressSound = pressSound;
+    }
 
     public void initFromLoader() {
         SkinPackLoader.ensureLoaded();
@@ -82,7 +86,17 @@ public final class ChangeSkinPackList {
         if (wrapped == focusedPackIndex) return;
         focusedPackIndex = wrapped;
         queuedChangePack = true;
-        if (playSound) clickSound.run();
+        if (playSound) focusSound.run();
+    }
+
+    public void pressPackIndex(int index) {
+        if (packIds.isEmpty()) {
+            focusedPackIndex = 0;
+            return;
+        }
+        focusedPackIndex = wrapIndex(index);
+        queuedChangePack = true;
+        pressSound.run();
     }
 
     public void focusPackId(String packId, boolean playSound) {
@@ -183,7 +197,7 @@ public final class ChangeSkinPackList {
 
         public PackButton(ChangeSkinPackList owner, int packIndex, Component message, int height) {
             super(0, 0, 0, height, message, button -> {
-                if (packIndex >= 0) owner.setFocusedPackIndex(packIndex, true);
+                if (packIndex >= 0) owner.pressPackIndex(packIndex);
             }, DEFAULT_NARRATION);
             this.owner = owner;
             this.packIndex = packIndex;

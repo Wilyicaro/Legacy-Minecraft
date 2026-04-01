@@ -7,11 +7,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.server.packs.resources.Resource;
 import wily.legacy.Skins.SkinsClientBootstrap;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Skins.client.changeskin.*;
@@ -26,7 +25,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.client.LegacySoundUtil;
 
 public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         implements wily.legacy.client.controller.Controller.Event, ControlTooltip.Event, InputTypeSwitchLock {
@@ -120,7 +121,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
         renderableVList.layoutSpacing(l -> 2);
 
-        packList = new ChangeSkinPackList(this::playClick);
+        packList = new ChangeSkinPackList(this::playFocusSound, this::playPressSound);
 
         SkinPackLoader.ensureLoaded();
 
@@ -162,12 +163,23 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             };
         }
         minecraft.setScreen(built);
-        playClick();
+        playPressSound();
     }
 
-    protected void playClick() {
-        if (minecraft == null || minecraft.getSoundManager() == null) return;
-        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+    protected void playFocusSound() {
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f, true);
+    }
+
+    protected void playScrollSound() {
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(), 1.0f);
+    }
+
+    protected void playPressSound() {
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.ACTION.get(), 1.0f);
+    }
+
+    protected void playClickSound() {
+        LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
     }
 
     protected void selectSkin() {
@@ -177,7 +189,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         String skinId = SkinIdUtil.isAutoSelect(selectedId) ? "" : selectedId;
         rememberLastUsedCustomPack(selectedId, skinId);
         SkinSyncClient.requestSetSkin(minecraft, skinId);
-        playClick();
+        playClickSound();
     }
 
     protected void favoriteSkin() {
@@ -204,7 +216,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             else targetIndex = Math.max(0, Math.min(targetIndex, size - 1));
             skinPack(targetIndex);
         }
-        playClick();
+        playClickSound();
     }
 
     private List<String> collectPackSkinIds(SkinPack pack) {
@@ -500,10 +512,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         packList.setFocusedPackIndex(target, true);
         if (requestFocus) {
             ChangeSkinPackList.PackButton button = findPackButton(target);
-            if (button != null) {
-                setFocused(button);
-                focusPackListItem(button);
-            }
+            if (button != null) focusPackListItem(button);
         }
         return true;
     }
@@ -527,7 +536,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (!(left || right) || playerSkinWidgetList == null) return false;
         if (playerSkinWidgetList.widgets.stream().anyMatch(w -> w.progress <= 1f)) return true;
         sortCarouselBy((left ? -1 : 0) + (right ? 1 : 0));
-        playClick();
+        playScrollSound();
         return true;
     }
 
@@ -561,7 +570,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (center == null) return false;
         action.accept(center);
         syncCenterPreviewState(center);
-        if (playClick) playClick();
+        if (playClick) playPressSound();
         return true;
     }
 
@@ -603,7 +612,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (queuedCarouselSteps <= 0) return;
         if (carouselAnimating()) return;
         if (playerSkinWidgetList == null) { cancelQueuedCarousel(); return; }
-        if (queuedCarouselSound) { queuedCarouselSound = false; playClick(); }
+        if (queuedCarouselSound) { queuedCarouselSound = false; playScrollSound(); }
         sortCarouselBy(queuedCarouselDir);
         if (--queuedCarouselSteps <= 0) cancelQueuedCarousel();
     }
@@ -615,7 +624,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (abs == 0) return false;
         if (abs == 1) {
             sortCarouselBy(offset);
-            playClick();
+            playScrollSound();
             return true;
         }
         queuedCarouselDir   = offset > 0 ? 1 : -1;

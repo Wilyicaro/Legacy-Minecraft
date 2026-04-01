@@ -175,34 +175,13 @@ public class RenderableVList {
 
     public void focusRenderable(Renderable renderable) {
         if (renderables.isEmpty()) return;
-        if (renderable instanceof GuiEventListener l && getScreen().children().contains(l)) {
+        int index = renderables.indexOf(renderable);
+        if (index < 0) return;
+        revealRenderable(index);
+        Renderable target = index < renderables.size() ? renderables.get(index) : renderable;
+        if (target instanceof GuiEventListener l && getScreen().children().contains(l)) {
             getScreen().setFocused(l);
             return;
-        }
-        if (scrolledList.get() > 0) {
-            scrolledList.set(0);
-            accessor.reloadUI();
-        }
-        if (renderables.get(0) instanceof GuiEventListener l && getScreen().getFocused() != l)
-            getScreen().setFocused(l);
-        while (getScreen().getFocused() != renderable) {
-            if (forceWidth) {
-                ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.DOWN);
-                if (isInvalidFocus(path, true)) {
-                    if (canScrollDown)
-                        while (canScrollDown && isInvalidFocus(getDirectionalNextFocusPath(ScreenDirection.DOWN), true))
-                            mouseScrolled(true);
-                    else break;
-                } else getScreen().setFocused(path.component());
-            } else {
-                GuiEventListener listener = getNextHorizontalRenderable();
-                if (listener == null) {
-                    ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.RIGHT);
-                    if (isInvalidFocus(path, true)) {
-                        break;
-                    } else getScreen().setFocused(path.component());
-                } else getScreen().setFocused(listener);
-            }
         }
     }
 
@@ -289,6 +268,18 @@ public class RenderableVList {
                 accessor.reloadUI();
             }
         }
+    }
+
+    public void revealRenderable(Renderable renderable) {
+        if (renderable == null) return;
+        revealRenderable(renderables.indexOf(renderable));
+    }
+
+    private void revealRenderable(int index) {
+        if (listHeight <= 0) return;
+        if (index < 0) return;
+        while (index < scrolledList.get() && scrolledList.get() > 0) mouseScrolled(false);
+        while (index >= scrolledList.get() + renderablesCount && canScrollDown) mouseScrolled(true);
     }
 
     public void resetScroll() {
