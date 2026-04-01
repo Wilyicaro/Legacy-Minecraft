@@ -5,15 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+
+import java.util.*;
+import java.util.function.*;
 
 final class BoxModelJsonSupport {
     private BoxModelJsonSupport() { }
@@ -68,9 +62,9 @@ final class BoxModelJsonSupport {
         map.put(normalized, merged);
     }
     static EnumSet<AttachSlot> parseHideSlots(JsonElement el) { return parseEnumFlags(el, AttachSlot.class, BoxModelJsonSupport::addHideToken); }
-    static EnumMap<AttachSlot, float[]> parseOffsets(JsonElement el) { return parseVecMap(el, AttachSlot.class, AttachSlot::fromString); }
-    static EnumMap<AttachSlot, float[]> parseScales(JsonElement el) { return parseScaleMap(el, AttachSlot.class, AttachSlot::fromString); }
-    static EnumMap<ArmorSlot, float[]> parseArmorOffsets(JsonElement el) { return parseVecMap(el, ArmorSlot.class, ArmorSlot::fromString); }
+    static EnumMap<AttachSlot, float[]> parseOffsets(JsonElement el) { return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseVec3); }
+    static EnumMap<AttachSlot, float[]> parseScales(JsonElement el) { return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseScale3); }
+    static EnumMap<ArmorSlot, float[]> parseArmorOffsets(JsonElement el) { return parseMap(el, ArmorSlot.class, ArmorSlot::fromString, BoxModelJsonSupport::parseVec3); }
     static EnumSet<ArmorSlot> parseArmorHideSlots(JsonElement el) { return parseEnumFlags(el, ArmorSlot.class, BoxModelJsonSupport::addArmorHideToken); }
     static float[] parseVec3(JsonElement el) {
         if (el == null || el.isJsonNull()) return null;
@@ -224,28 +218,15 @@ final class BoxModelJsonSupport {
             if (isTrue(obj, upper) || isTrue(obj, lower)) out.add(value);
         }
     }
-    private static <E extends Enum<E>> EnumMap<E, float[]> parseVecMap(JsonElement el, Class<E> type, Function<String, E> parser) {
+    private static <E extends Enum<E>> EnumMap<E, float[]> parseMap(JsonElement el, Class<E> type, Function<String, E> parser, Function<JsonElement, float[]> valueParser) {
         if (el == null || el.isJsonNull() || !el.isJsonObject()) return null;
         EnumMap<E, float[]> out = new EnumMap<>(type);
         try {
             for (Map.Entry<String, JsonElement> entry : el.getAsJsonObject().entrySet()) {
                 E slot = parser.apply(entry.getKey());
                 if (slot == null) continue;
-                float[] vec = parseVec3(entry.getValue());
-                if (vec != null) out.put(slot, vec);
-            }
-        } catch (RuntimeException ignored) { }
-        return out;
-    }
-    private static <E extends Enum<E>> EnumMap<E, float[]> parseScaleMap(JsonElement el, Class<E> type, Function<String, E> parser) {
-        if (el == null || el.isJsonNull() || !el.isJsonObject()) return null;
-        EnumMap<E, float[]> out = new EnumMap<>(type);
-        try {
-            for (Map.Entry<String, JsonElement> entry : el.getAsJsonObject().entrySet()) {
-                E slot = parser.apply(entry.getKey());
-                if (slot == null) continue;
-                float[] scale = parseScale3(entry.getValue());
-                if (scale != null) out.put(slot, scale);
+                float[] value = valueParser.apply(entry.getValue());
+                if (value != null) out.put(slot, value);
             }
         } catch (RuntimeException ignored) { }
         return out;
