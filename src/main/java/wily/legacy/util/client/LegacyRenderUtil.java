@@ -420,17 +420,7 @@ public class LegacyRenderUtil {
     }
 
     private static boolean shouldRenderBoxHeadPreview(String skinId) {
-        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return false;
-
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
-        if (resolved == null) return false;
-
-        var model = resolved.boxModel();
-        if (model == null) return false;
-
-        boolean hasHead = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
-        boolean hasHat = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
-        return model.hides(AttachSlot.HEAD) && (hasHead || hasHat);
+        return !SkinIdUtil.isBlankOrAutoSelect(skinId) && ClientSkinAssets.hasHeadBox(ClientSkinAssets.resolveSkin(skinId));
     }
 
     public static float getAutoGuiScale() {

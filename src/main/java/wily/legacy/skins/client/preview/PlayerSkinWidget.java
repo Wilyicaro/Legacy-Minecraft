@@ -126,7 +126,7 @@ public class PlayerSkinWidget extends AbstractWidget {
             GuiSessionSkin.prewarm();
             return;
         }
-        SkinPreviewWarmup.enqueue(id);
+        ClientSkinAssets.enqueuePreviewWarmup(id);
     }
 
     public boolean isInterpolating() { return targetRotationX != Float.NEGATIVE_INFINITY; }
@@ -358,21 +358,13 @@ public class PlayerSkinWidget extends AbstractWidget {
                     if (theme != null && (theme.isBlank() || theme.equals(label))) theme = null;
                 }
 
-                String showName = font == null || label == null || label.isBlank()
-                        ? ""
-                        : font.width(label) <= maxPx
-                            ? label
-                            : font.plainSubstrByWidth(label, Math.max(0, maxPx - font.width("..."))) + "...";
+                String showName = SkinTextUtil.clip(font, label, maxPx);
 
                 if (theme == null) {
                     int textY = plateY + (plateH - font.lineHeight) / 2;
                     guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal(showName), plateX + plateW / 2, textY, 0xFFFFFFFF);
                 } else {
-                    String showTheme = font == null || theme == null || theme.isBlank()
-                            ? ""
-                            : font.width(theme) <= maxPx
-                                ? theme
-                                : font.plainSubstrByWidth(theme, Math.max(0, maxPx - font.width("..."))) + "...";
+                    String showTheme = SkinTextUtil.clip(font, theme, maxPx);
 
                     int totalH = font.lineHeight * 2;
                     int baseY = plateY + (plateH - totalH) / 2;

@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import wily.legacy.Skins.client.changeskin.ChangeSkinPackList;
 import wily.legacy.Skins.client.preview.*;
 import wily.legacy.Skins.skin.*;
+import wily.legacy.Skins.client.util.SkinTextUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -61,9 +62,6 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     @Override
-    protected void onWidgetListCreated(PlayerSkinWidgetList list) {}
-
-    @Override
     protected void onAfterSkinPackChanged() { applyTu3CarouselTuning(); }
 
     @Override
@@ -72,9 +70,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public void renderableVListInit() {
         packList.refreshPackIdsIfNeeded();
-        packList.populateInto(getRenderableVList());
-        getRenderableVList().scrollArrowYOffset(0);
-        getRenderableVList().init("consoleskins.packList.tu3.hidden", -100000, -100000, 1, 1);
+        getRenderableVList().renderables.clear();
     }
 
     @Override
@@ -82,7 +78,6 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         refreshSharedLayout();
         refreshTu3Layout();
         renderableVList.layoutSpacing(l -> 0);
-        packList.applyUiScale(uiScale);
 
         panel.init();
         tooltipBox.init("tooltipBox");
@@ -130,13 +125,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         tu3TabLeftW = w;          tu3TabMidW = w;              tu3TabRightW = w + extra;
     }
 
-    private String tu3PackNameAt(int idx) {
-        idx = Math.floorMod(idx, Math.max(1, packList.getPackCount()));
-        ChangeSkinPackList.PackButton b = packList.getButtonForIndex(idx);
-        if (b == null || b.getMessage() == null) return "";
-        String s = b.getMessage().getString();
-        return s == null ? "" : s;
-    }
+    private String tu3PackNameAt(int idx) { return packList.getWrappedLabelString(idx); }
 
     private int tu3MidExtra() { return Math.max(1, sc(tu3Layout.midExtra())); }
 
@@ -162,16 +151,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void renderTu3TabLabel(GuiGraphics g, int x, int w, int y, String label, int color) {
-        if (label == null) label = "";
         int maxPx = Math.max(1, w - sc(tu3Layout.tabLabelWidthTrim()));
-        String show = label;
-        show = show.replace("\u00E2\u20AC\u00A6", "...");
-        if (minecraft.font.width(show) > maxPx) {
-            int ellW = minecraft.font.width("…");
-            show = minecraft.font.plainSubstrByWidth(show, Math.max(0, maxPx - ellW)) + "…";
-        }
-        show = show.replace("\u00E2\u20AC\u00A6", "...");
-        g.drawCenteredString(minecraft.font, Component.literal(show), x + Math.max(1, w) / 2, y, color);
+        g.drawCenteredString(minecraft.font, Component.literal(SkinTextUtil.clip(minecraft.font, label, maxPx)), x + Math.max(1, w) / 2, y, color);
     }
 
     private void applyTu3CarouselTuning() {

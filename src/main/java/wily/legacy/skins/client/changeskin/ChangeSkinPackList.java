@@ -1,30 +1,28 @@
 package wily.legacy.Skins.client.changeskin;
 
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
+import wily.legacy.Skins.client.util.SkinTextUtil;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.Component;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.screen.RenderableVList;
-
 public final class ChangeSkinPackList {
     private static final String FESTIVE_MASHUP_PACK_ID = "festivemashup";
     private static final String FESTIVE_PACK_ID = "festive";
+    private static final Component NO_PACKS = Component.translatable("consoleskins.pack.none");
 
     private final Runnable clickSound;
-
     private final List<String> basePackIds = new ArrayList<>();
-
     private final List<String> packIds = new ArrayList<>();
-    private final List<PackButton> packButtons = new ArrayList<>();
 
     private int buttonHeight = 20;
     private int focusedPackIndex;
@@ -36,79 +34,51 @@ public final class ChangeSkinPackList {
         SkinPackLoader.ensureLoaded();
         setBasePackIds(collectPackIds(), null);
         String preferred = resolvePreferredDefaultPackId(packIds);
-        int preferredIndex = preferred == null ? -1 : packIds.indexOf(preferred);
-        focusedPackIndex = preferredIndex >= 0 ? preferredIndex : 0;
+        focusedPackIndex = preferred == null ? 0 : Math.max(0, packIds.indexOf(preferred));
         queuedChangePack = false;
-        ensureButtons();
-    }
-
-    public void applyUiScale(float uiScale) {
-        int h = LegacyOptions.getUIMode().isSD() ? 18 : Math.max(1, Math.round(20f * uiScale));
-        applyResolvedButtonHeight(h);
     }
 
     public void applyResolvedButtonHeight(int resolvedHeight) {
         buttonHeight = Math.max(10, resolvedHeight);
-        for (PackButton b : packButtons) b.applyHeight(buttonHeight);
     }
+
+    public int getButtonHeight() { return buttonHeight; }
 
     public void refreshPackIdsIfNeeded() {
         SkinPackLoader.ensureLoaded();
         List<String> currentBase = collectPackIds();
-
-        if (currentBase.equals(basePackIds)) {
-            refreshButtonLabels();
-            return;
-        }
-
+        if (currentBase.equals(basePackIds)) return;
         setBasePackIds(currentBase, getFocusedPackId());
         queuedChangePack = true;
-        ensureButtons();
-    }
-
-    public void populateInto(RenderableVList vList) {
-        vList.renderables.clear();
-        if (packButtons.isEmpty()) ensureButtons();
-        for (PackButton b : packButtons) vList.addRenderable(b);
     }
 
     public boolean consumeQueuedChangePack() {
-        boolean q = queuedChangePack;
+        boolean queued = queuedChangePack;
         queuedChangePack = false;
-        return q;
+        return queued;
     }
 
     public int getFocusedPackIndex() { return focusedPackIndex; }
 
     public int getPackCount() { return packIds.size(); }
 
-    public PackButton getButtonForIndex(int idx) {
-        if (idx < 0 || idx >= packButtons.size()) return null;
-        return packButtons.get(idx);
-    }
+    public Component getLabelForIndex(int index) { return getLabel(index, false); }
 
-    private int wrapIndex(int idx) {
-        int n = packIds.size();
-        return n <= 0 ? 0 : Math.floorMod(idx, n);
-    }
+    public Component getWrappedLabelForIndex(int index) { return getLabel(index, true); }
 
-    private String getFocusedPackId() {
-        if (packIds.isEmpty()) return null;
-        int idx = wrapIndex(focusedPackIndex);
-        return packIds.get(idx);
-    }
+    public String getWrappedLabelString(int index) { return getWrappedLabelForIndex(index).getString(); }
 
     public SkinPack getFocusedPack() {
-        String id = getFocusedPackId();
-        return id == null ? null : resolvePack(id);
+        String packId = getFocusedPackId();
+        return packId == null || packId.isBlank() ? null : SkinPackLoader.getPacks().get(packId);
     }
 
-    public void setFocusedPackIndex(int idx, boolean playSound) {
+    public void setFocusedPackIndex(int index, boolean playSound) {
         if (packIds.isEmpty()) {
             focusedPackIndex = 0;
             return;
         }
-        int wrapped = wrapIndex(idx);
+        int wrapped = wrapIndex(index);
         if (wrapped == focusedPackIndex) return;
         focusedPackIndex = wrapped;
         queuedChangePack = true;
@@ -117,33 +87,22 @@ public final class ChangeSkinPackList {
 
     public void focusPackId(String packId, boolean playSound) {
         if (packId == null || packIds.isEmpty()) return;
-        int idx = packIds.indexOf(packId);
-        if (idx >= 0) setFocusedPackIndex(idx, playSound);
+        int index = packIds.indexOf(packId);
+        if (index >= 0) setFocusedPackIndex(index, playSound);
     }
 
-    private void rebuildDisplayOrder(String preserveFocusedId) {
-        packIds.clear();
-        packIds.addAll(basePackIds);
-        normalizeSpecialPackOrder(packIds);
+    private int wrapIndex(int index) {
+        return packIds.isEmpty() ? 0 : Math.floorMod(index, packIds.size());
+    }
 
-        String bump = SkinPackLoader.getLastUsedCustomPackId();
-        String pinnedDefaultPackId = resolvePreferredDefaultPackId(packIds);
-        if (bump != null && packIds.contains(bump) && !bump.equals(pinnedDefaultPackId)) {
-            packIds.remove(bump);
+    private String getFocusedPackId() {
+        return packIds.isEmpty() ? null : packIds.get(wrapIndex(focusedPackIndex));
+    }
 
-            int insertAt = 1;
-        int favIdx = packIds.indexOf(SkinIdUtil.PACK_FAVOURITES);
-            if (favIdx >= 0) insertAt = favIdx + 1;
-
-            if (insertAt < 0) insertAt = 0;
-            if (insertAt > packIds.size()) insertAt = packIds.size();
-            packIds.add(insertAt, bump);
-        }
-
-        if (preserveFocusedId != null) {
-            int idx = packIds.indexOf(preserveFocusedId);
-            focusedPackIndex = idx >= 0 ? idx : 0;
-        } else { if (focusedPackIndex >= packIds.size()) focusedPackIndex = 0; }
+    private Component getLabel(int index, boolean wrap) {
+        if (packIds.isEmpty()) return wrap ? NO_PACKS : Component.empty();
+        int resolved = wrap ? wrapIndex(index) : index;
+        return resolved < 0 || resolved >= packIds.size() ? Component.empty() : labelForPackId(packIds.get(resolved));
     }
 
     private void setBasePackIds(List<String> ids, String preserveFocusedId) {
@@ -153,41 +112,30 @@ public final class ChangeSkinPackList {
         if (focusedPackIndex >= packIds.size()) focusedPackIndex = 0;
     }
 
-    private void ensureButtons() {
-        packButtons.clear();
-        if (packIds.isEmpty()) {
-            packButtons.add(new PackButton(-1, Component.translatable("consoleskins.pack.none")));
+    private void rebuildDisplayOrder(String preserveFocusedId) {
+        packIds.clear();
+        packIds.addAll(basePackIds);
+        normalizeSpecialPackOrder(packIds);
+
+        String lastUsedCustomPackId = SkinPackLoader.getLastUsedCustomPackId();
+        String preferredDefaultPackId = resolvePreferredDefaultPackId(packIds);
+        if (lastUsedCustomPackId != null && packIds.contains(lastUsedCustomPackId) && !lastUsedCustomPackId.equals(preferredDefaultPackId)) {
+            packIds.remove(lastUsedCustomPackId);
+            int insertAt = Math.max(1, packIds.indexOf(SkinIdUtil.PACK_FAVOURITES) + 1);
+            packIds.add(Math.min(insertAt, packIds.size()), lastUsedCustomPackId);
+        }
+
+        if (preserveFocusedId == null) {
+            if (focusedPackIndex >= packIds.size()) focusedPackIndex = 0;
             return;
         }
-        for (int i = 0; i < packIds.size(); i++) { packButtons.add(new PackButton(i, labelForPackIndex(i))); }
+        int preservedIndex = packIds.indexOf(preserveFocusedId);
+        focusedPackIndex = preservedIndex >= 0 ? preservedIndex : 0;
     }
 
-    private void refreshButtonLabels() {
-        if (packIds.isEmpty()) {
-            if (packButtons.isEmpty()) ensureButtons();
-            return;
-        }
-        if (packButtons.size() != packIds.size()) {
-            ensureButtons();
-            return;
-        }
-        for (int i = 0; i < packButtons.size(); i++) {
-            packButtons.get(i).packIndex = i;
-            packButtons.get(i).setMessage(labelForPackIndex(i));
-        }
-    }
-
-    private Component labelForPackIndex(int i) {
-        if (i < 0 || i >= packIds.size()) return Component.empty();
-        String id = packIds.get(i);
-        SkinPack pack = resolvePack(id);
-        if (pack == null) return Component.literal(id);
-        return Component.literal(SkinPackLoader.nameString(pack.name(), id));
-    }
-
-    private SkinPack resolvePack(String packId) {
-        if (packId == null || packId.isBlank()) return null;
-        return SkinPackLoader.getPacks().get(packId);
+    private Component labelForPackId(String packId) {
+        SkinPack pack = packId == null || packId.isBlank() ? null : SkinPackLoader.getPacks().get(packId);
+        return pack == null ? Component.literal(String.valueOf(packId)) : Component.literal(SkinPackLoader.nameString(pack.name(), packId));
     }
 
     private List<String> collectPackIds() {
@@ -206,11 +154,10 @@ public final class ChangeSkinPackList {
         String preferredDefaultPackId = resolvePreferredDefaultPackId(ids);
         ids.removeIf(SkinIdUtil.PACK_FAVOURITES::equals);
         ids.removeIf(SkinIdUtil.PACK_DEFAULT::equals);
-        if (preferredDefaultPackId != null && !SkinIdUtil.PACK_DEFAULT.equals(preferredDefaultPackId)) { ids.removeIf(preferredDefaultPackId::equals); }
-
+        if (preferredDefaultPackId != null && !SkinIdUtil.PACK_DEFAULT.equals(preferredDefaultPackId)) ids.removeIf(preferredDefaultPackId::equals);
         int insertAt = 0;
-        if (preferredDefaultPackId != null && SkinPackLoader.getPacks().containsKey(preferredDefaultPackId)) { ids.add(insertAt++, preferredDefaultPackId); }
-        if (SkinPackLoader.getPacks().containsKey(SkinIdUtil.PACK_FAVOURITES)) { ids.add(insertAt, SkinIdUtil.PACK_FAVOURITES); }
+        if (preferredDefaultPackId != null && SkinPackLoader.getPacks().containsKey(preferredDefaultPackId)) ids.add(insertAt++, preferredDefaultPackId);
+        if (SkinPackLoader.getPacks().containsKey(SkinIdUtil.PACK_FAVOURITES)) ids.add(insertAt, SkinIdUtil.PACK_FAVOURITES);
     }
 
     private String resolvePreferredDefaultPackId(List<String> ids) {
@@ -218,87 +165,59 @@ public final class ChangeSkinPackList {
         if (preferred != null && ids != null && ids.contains(preferred)) return preferred;
         if (ids == null) return null;
         for (String packId : ids) {
-            if (packId == null || packId.isBlank()) continue;
-            if (SkinIdUtil.PACK_FAVOURITES.equals(packId)) continue;
+            if (packId == null || packId.isBlank() || SkinIdUtil.PACK_FAVOURITES.equals(packId)) continue;
             return packId;
         }
         return null;
     }
 
     private void restoreCuratedFestivePack(List<String> ids) {
-        if (ids == null || ids.contains(FESTIVE_PACK_ID)) return;
-        if (!SkinPackLoader.getPacks().containsKey(FESTIVE_PACK_ID)) return;
-
+        if (ids == null || ids.contains(FESTIVE_PACK_ID) || !SkinPackLoader.getPacks().containsKey(FESTIVE_PACK_ID)) return;
         int mashupIndex = ids.indexOf(FESTIVE_MASHUP_PACK_ID);
-        if (mashupIndex < 0) {
-            ids.add(FESTIVE_PACK_ID);
-            return;
-        }
-        ids.add(mashupIndex + 1, FESTIVE_PACK_ID);
+        ids.add(mashupIndex < 0 ? ids.size() : mashupIndex + 1, FESTIVE_PACK_ID);
     }
 
-    public final class PackButton extends Button {
-        private int packIndex;
+    public static final class PackButton extends Button {
+        private final ChangeSkinPackList owner;
+        private final int packIndex;
 
-        private PackButton(int packIndex, Component msg) {
-            super(
-                    0,
-                    0,
-                    0,
-                    buttonHeight,
-                    msg,
-                    b -> {
-                        if (!(b instanceof PackButton pb)) return;
-                        if (pb.packIndex >= 0) setFocusedPackIndex(pb.packIndex, true);
-                    },
-                    DEFAULT_NARRATION
-            );
+        public PackButton(ChangeSkinPackList owner, int packIndex, Component message, int height) {
+            super(0, 0, 0, height, message, button -> {
+                if (packIndex >= 0) owner.setFocusedPackIndex(packIndex, true);
+            }, DEFAULT_NARRATION);
+            this.owner = owner;
             this.packIndex = packIndex;
             this.active = packIndex >= 0;
         }
-
-        private void applyHeight(int h) { this.height = h; }
 
         public int getPackIndex() { return packIndex; }
 
         @Override
         public void setFocused(boolean focused) {
-            boolean wasFocused = this.isFocused();
+            boolean wasFocused = isFocused();
             super.setFocused(focused);
-            if (!wasFocused && focused && packIndex >= 0 && focusedPackIndex != packIndex) { setFocusedPackIndex(packIndex, false); }
+            if (!wasFocused && focused && packIndex >= 0 && owner.focusedPackIndex != packIndex) owner.setFocusedPackIndex(packIndex, false);
         }
 
         @Override
-        public boolean isHoveredOrFocused() { return (packIndex >= 0 && packIndex == focusedPackIndex) || super.isHoveredOrFocused(); }
+        public boolean isHoveredOrFocused() { return packIndex >= 0 && owner.focusedPackIndex == packIndex || super.isHoveredOrFocused(); }
 
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(graphics, mouseX, mouseY, partialTick);
-            if (!ControlType.getActiveType().isKbm() && this.isFocused() && packIndex >= 0 && focusedPackIndex != packIndex) { setFocusedPackIndex(packIndex, false); }
+            if (!ControlType.getActiveType().isKbm() && isFocused() && packIndex >= 0 && owner.focusedPackIndex != packIndex) owner.setFocusedPackIndex(packIndex, false);
         }
 
         @Override
-        public void renderString(GuiGraphics graphics, net.minecraft.client.gui.Font font, int color) {
-            Component message = getMessage();
-            if (message == null) return;
-
-            int maxTextWidth = Math.max(0, getWidth() - TEXT_MARGIN * 2);
-            String visibleText = message.getString();
-            if (maxTextWidth > 0 && font.width(visibleText) > maxTextWidth) {
-                int dotsWidth = font.width("...");
-                int clippedWidth = Math.max(0, maxTextWidth - dotsWidth);
-                visibleText = font.plainSubstrByWidth(visibleText, clippedWidth) + "...";
-            }
-
-            float textScale = buttonHeight < 20 && LegacyOptions.getUIMode().isSD() ? 0.92f : 1.0f;
+        public void renderString(GuiGraphics graphics, Font font, int color) {
+            String visibleText = SkinTextUtil.clip(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
+            float textScale = height < 20 && LegacyOptions.getUIMode().isSD() ? 0.92f : 1.0f;
             int centerX = getX() + getWidth() / 2;
-            float scaledHeight = font.lineHeight * textScale;
-            float textY = getY() + (getHeight() - scaledHeight) / 2.0f;
+            float textY = getY() + (getHeight() - font.lineHeight * textScale) / 2.0f;
             if (textScale == 1.0f) {
                 graphics.drawCenteredString(font, visibleText, centerX, Math.round(textY), color);
                 return;
             }
-
             graphics.pose().pushMatrix();
             graphics.pose().translate(centerX, textY);
             graphics.pose().scale(textScale, textScale);

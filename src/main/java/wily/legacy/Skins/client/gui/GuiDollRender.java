@@ -38,10 +38,26 @@ public final class GuiDollRender {
     }
 
     public static void renderDollInRect(GuiGraphics gui, String selectionId, ResourceLocation skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
-        if (gui == null) return;
-        PreviewSkin previewSkin = resolvePreviewSkin(selectionId, skinTexture);
-        if (previewSkin == null) return;
-        submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(previewSkin.skin(), selectionId, previewSkin.texture(), previewSkin.boxTexture(), previewSkin.modelId(), previewSkin.boxModel(), previewSkin.bboxHeight(), previewSkin.bboxWidth(), yawOffset, crouching, attackTime, previewSkin.showCape()));
+        if (gui == null || skinTexture == null) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc != null) mc.getTextureManager().getTexture(skinTexture);
+
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(selectionId, skinTexture, null, null);
+        var entry = resolved == null ? null : resolved.entry();
+        boolean showCape = ClientSkinAssets.hasCape(resolved);
+        ClientAsset.Texture body = new ClientAsset.ResourceTexture(skinTexture, skinTexture);
+        ClientAsset.Texture cape = body;
+        if (showCape && entry != null && entry.cape() != null) {
+            if (mc != null) mc.getTextureManager().getTexture(entry.cape());
+            cape = new ClientAsset.ResourceTexture(entry.cape(), entry.cape());
+        }
+        var built = resolved == null ? null : resolved.boxModel();
+        float bboxHeight = built == null ? BASE_BBOX_HEIGHT : Math.max(BASE_BBOX_HEIGHT, built.bboxHeight());
+        float bboxWidth = built == null ? BASE_BBOX_WIDTH : Math.max(BASE_BBOX_WIDTH, built.bboxWidth());
+        ResourceLocation resolvedTexture = resolved != null && resolved.texture() != null ? resolved.texture() : skinTexture;
+        ResourceLocation resolvedBoxTexture = resolved != null && resolved.boxTexture() != null ? resolved.boxTexture() : resolvedTexture;
+        PlayerSkin skin = PlayerSkin.insecure(body, cape, body, ClientSkinAssets.resolveModelType(selectionId, resolved));
+        submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, yawOffset, crouching, attackTime, showCape));
     }
 
     private static void submit(GuiGraphics gui, int left, int right, PreviewLayout layout, AvatarRenderState state) {
@@ -99,40 +115,6 @@ public final class GuiDollRender {
         );
     }
 
-    private static PreviewSkin resolvePreviewSkin(String selectionId, ResourceLocation skinTexture) {
-        if (skinTexture == null) return null;
-        warmTexture(skinTexture);
-
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(selectionId, skinTexture, null, null);
-        var entry = resolved == null ? null : resolved.entry();
-        var built = resolved == null ? null : resolved.boxModel();
-        float bboxHeight = BASE_BBOX_HEIGHT;
-        float bboxWidth = BASE_BBOX_WIDTH;
-        if (built != null) {
-            bboxHeight = Math.max(bboxHeight, built.bboxHeight());
-            bboxWidth = Math.max(bboxWidth, built.bboxWidth());
-        }
-
-        boolean showCape = ClientSkinAssets.hasCape(resolved);
-        ClientAsset.Texture body = new ClientAsset.ResourceTexture(skinTexture, skinTexture);
-        ClientAsset.Texture cape = body;
-        if (showCape) {
-            ResourceLocation capeTexture = entry.cape();
-            warmTexture(capeTexture);
-            cape = new ClientAsset.ResourceTexture(capeTexture, capeTexture);
-        }
-
-        PlayerSkin skin = PlayerSkin.insecure(body, cape, body, ClientSkinAssets.resolveModelType(selectionId, resolved));
-        ResourceLocation resolvedTexture = resolved == null || resolved.texture() == null ? skinTexture : resolved.texture();
-        ResourceLocation resolvedBoxTexture = resolved == null || resolved.boxTexture() == null ? resolvedTexture : resolved.boxTexture();
-        return new PreviewSkin(skin, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, showCape);
-    }
-
-    private static void warmTexture(ResourceLocation texture) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc != null) mc.getTextureManager().getTexture(texture);
-    }
-
     private static void applyPreviewLighting() {
         Minecraft mc = Minecraft.getInstance();
         if (mc != null) mc.gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
@@ -146,6 +128,4 @@ public final class GuiDollRender {
             int expandedTop,
             int expandedBottom
     ) { }
-
-    private record PreviewSkin(PlayerSkin skin, ResourceLocation texture, ResourceLocation boxTexture, ResourceLocation modelId, wily.legacy.Skins.client.render.boxloader.BuiltBoxModel boxModel, float bboxHeight, float bboxWidth, boolean showCape) { }
 }

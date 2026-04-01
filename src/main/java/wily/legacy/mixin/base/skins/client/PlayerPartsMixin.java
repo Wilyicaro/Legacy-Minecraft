@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,10 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.client.render.PlayerModelParts;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.client.render.boxloader.AttachSlot;
+import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.compat.cpm.CpmRenderCompat;
+import java.util.EnumMap;
 import java.util.*;
 
 @Mixin(PlayerModel.class)
@@ -25,12 +28,23 @@ public abstract class PlayerPartsMixin {
     @Unique private String consoleskins$specBoxHeadSkinId;
     @Unique private List<ModelPart.Cube> consoleskins$specHeadCubesBackup, consoleskins$specHatCubesBackup;
     @Unique private Map<String, ModelPart> consoleskins$specHeadChildrenBackup, consoleskins$specHatChildrenBackup;
+    @Unique private final float[][] consoleskins$prevOffsets = new float[PlayerModelParts.ALL.length][];
     private static void consoleskins$resetPart(ModelPart part) { consoleskins$setSkipDraw(part, false); }
     private static void consoleskins$hidePart(ModelPart part) { consoleskins$setSkipDraw(part, true); }
     private static void consoleskins$setSkipDraw(ModelPart part, boolean skip) {
         if (part == null) return;
         part.visible = true;
         ((SkipDrawAccessor) (Object) part).consoleskins$setSkipDraw(skip);
+    }
+    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("HEAD"), require = 0)
+    private void consoleskins$undoVisualOffsets(AvatarRenderState state, CallbackInfo ci) {
+        PlayerModel self = (PlayerModel) (Object) this;
+        for (int i = 0; i < PlayerModelParts.ALL.length; i++) {
+            AttachSlot slot = PlayerModelParts.ALL[i];
+            consoleskins$applyOffset(self, slot, consoleskins$prevOffsets[i], -1.0F);
+            consoleskins$prevOffsets[i] = null;
+            consoleskins$resetScale(self, slot);
+        }
     }
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$hidePartsForBoxModels(AvatarRenderState state, CallbackInfo ci) {
@@ -51,13 +65,9 @@ public abstract class PlayerPartsMixin {
         }
         consoleskins$resetAllParts(self);
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(
-                skinId,
-                access == null ? null : access.consoleskins$getCachedTexture(),
-                access == null ? null : access.consoleskins$getCachedModelId(),
-                access == null ? null : access.consoleskins$getCachedBoxModel()
-        );
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(access);
         if (resolved == null) return;
+        consoleskins$applyVisualOffsets(self, resolved.modelId());
         BuiltBoxModel model = resolved.boxModel();
         if (model == null) return;
         consoleskins$hidePair(self, model, AttachSlot.HEAD, AttachSlot.HAT);
@@ -88,17 +98,13 @@ public abstract class PlayerPartsMixin {
             return;
         }
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
-        BuiltBoxModel model = resolved == null ? null : resolved.boxModel();
-        if (model == null) {
+        if (!ClientSkinAssets.hasHeadBox(resolved)) {
             consoleskins$uninstallSpectatorBoxHead(self);
             return;
         }
+        BuiltBoxModel model = resolved.boxModel();
         boolean hasHeadParts = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
         boolean hasHatParts = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
-        if (!model.hides(AttachSlot.HEAD) || (!hasHeadParts && !hasHatParts)) {
-            consoleskins$uninstallSpectatorBoxHead(self);
-            return;
-        }
         if (consoleskins$specBoxHeadInstalled && skinId.equals(consoleskins$specBoxHeadSkinId)) {
             consoleskins$setSkipDraw(self.head, false);
             consoleskins$setSkipDraw(self.hat, false);
@@ -150,6 +156,44 @@ public abstract class PlayerPartsMixin {
     }
     @Unique
     private static void consoleskins$removeChildrenWithPrefix(Map<String, ModelPart> parts, String prefix) { parts.keySet().removeIf(key -> key.startsWith(prefix)); }
+    @Unique
+    private void consoleskins$applyVisualOffsets(PlayerModel self, ResourceLocation modelId) {
+        if (modelId == null) return;
+        EnumMap<AttachSlot, float[]> offsets = BoxModelManager.getOffsets(modelId);
+        EnumMap<AttachSlot, float[]> scales = BoxModelManager.getScales(modelId);
+        if ((offsets == null || offsets.isEmpty()) && (scales == null || scales.isEmpty())) return;
+        for (int i = 0; i < PlayerModelParts.ALL.length; i++) {
+            AttachSlot slot = PlayerModelParts.ALL[i];
+            float[] offset = offsets == null ? null : offsets.get(slot);
+            consoleskins$applyOffset(self, slot, offset, 1.0F);
+            consoleskins$prevOffsets[i] = offset == null ? null : offset.clone();
+            consoleskins$applyScale(self, slot, scales == null ? null : scales.get(slot));
+        }
+    }
+    @Unique
+    private static void consoleskins$applyOffset(PlayerModel self, AttachSlot slot, float[] offset, float scale) {
+        var part = PlayerModelParts.get(self, slot);
+        if (part == null || offset == null) return;
+        part.x += offset[0] * scale;
+        part.y += offset[1] * scale;
+        part.z += offset[2] * scale;
+    }
+    @Unique
+    private static void consoleskins$applyScale(PlayerModel self, AttachSlot slot, float[] scale) {
+        var part = PlayerModelParts.get(self, slot);
+        if (part == null || scale == null || scale.length < 3) return;
+        part.xScale = scale[0];
+        part.yScale = scale[1];
+        part.zScale = scale[2];
+    }
+    @Unique
+    private static void consoleskins$resetScale(PlayerModel self, AttachSlot slot) {
+        var part = PlayerModelParts.get(self, slot);
+        if (part == null) return;
+        part.xScale = 1.0F;
+        part.yScale = 1.0F;
+        part.zScale = 1.0F;
+    }
     @Unique
     private static boolean consoleskins$isSpectator(UUID uuid) {
         if (uuid == null) return false;

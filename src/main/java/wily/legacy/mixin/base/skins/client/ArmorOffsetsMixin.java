@@ -26,58 +26,29 @@ import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.Set;
 
 @Mixin(HumanoidArmorLayer.class)
 public abstract class ArmorOffsetsMixin {
     @Unique private static final ThreadLocal<Boolean> consoleskins$posePushed = new ThreadLocal<>();
     @Unique private static final ThreadLocal<Boolean> consoleskins$layerActive = new ThreadLocal<>();
     @Unique
-    private Set<ModelPart> consoleskins$cachedArmorParts;
-    @Unique
     private HumanoidModel<?> consoleskins$getParentHumanoidModel() {
-        try {
-            Object model = ((HumanoidArmorLayer<?, ?, ?>) (Object) this).getParentModel();
-            return model instanceof HumanoidModel<?> humanoidModel ? humanoidModel : null;
-        } catch (RuntimeException ignored) { return null; }
+        Object model = ((HumanoidArmorLayer<?, ?, ?>) (Object) this).getParentModel();
+        return model instanceof HumanoidModel<?> humanoidModel ? humanoidModel : null;
     }
     @Unique
-    private Set<ModelPart> consoleskins$getArmorParts() {
-        Set<ModelPart> armorParts = consoleskins$cachedArmorParts;
-        if (armorParts != null) return armorParts;
-        java.util.LinkedHashSet<ModelPart> parts = new java.util.LinkedHashSet<>();
+    private HumanoidModel<?> consoleskins$getArmorModel(EquipmentSlot slot, HumanoidRenderState renderState) {
+        if (slot == null || renderState == null) return null;
         HumanoidArmorLayerAccessor<?, ?, ?> accessor = (HumanoidArmorLayerAccessor<?, ?, ?>) this;
-        consoleskins$collectArmorParts(parts, accessor.consoleskins$getModelSet());
-        consoleskins$collectArmorParts(parts, accessor.consoleskins$getBabyModelSet());
-        armorParts = Set.copyOf(parts);
-        consoleskins$cachedArmorParts = armorParts;
-        return armorParts;
-    }
-    @Unique
-    private static void consoleskins$collectArmorParts(Set<ModelPart> out, ArmorModelSet<?> modelSet) {
-        if (modelSet == null) return;
-        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.head());
-        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.chest());
-        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.legs());
-        consoleskins$collectModelParts(out, (HumanoidModel<?>) modelSet.feet());
-    }
-    @Unique
-    private static void consoleskins$collectModelParts(Set<ModelPart> out, HumanoidModel<?> model) {
-        if (model == null) return;
-        out.add(model.head);
-        out.add(model.body);
-        out.add(model.rightArm);
-        out.add(model.leftArm);
-        out.add(model.rightLeg);
-        out.add(model.leftLeg);
-        if (model instanceof PlayerModel playerModel) {
-            out.add(playerModel.hat);
-            out.add(playerModel.jacket);
-            out.add(playerModel.leftSleeve);
-            out.add(playerModel.rightSleeve);
-            out.add(playerModel.leftPants);
-            out.add(playerModel.rightPants);
-        }
+        ArmorModelSet<?> modelSet = renderState.isBaby ? accessor.consoleskins$getBabyModelSet() : accessor.consoleskins$getModelSet();
+        if (modelSet == null) return null;
+        return switch (slot) {
+            case HEAD -> (HumanoidModel<?>) modelSet.head();
+            case CHEST -> (HumanoidModel<?>) modelSet.chest();
+            case LEGS -> (HumanoidModel<?>) modelSet.legs();
+            case FEET -> (HumanoidModel<?>) modelSet.feet();
+            default -> null;
+        };
     }
     private static void consoleskins$clearContext() {
         consoleskins$posePushed.remove();
@@ -90,6 +61,24 @@ public abstract class ArmorOffsetsMixin {
         return true;
     }
     @Unique
+    private static void consoleskins$setForceRender(HumanoidModel<?> model, boolean value) {
+        if (model == null) return;
+        consoleskins$setForceRender(model.head, value);
+        consoleskins$setForceRender(model.body, value);
+        consoleskins$setForceRender(model.rightArm, value);
+        consoleskins$setForceRender(model.leftArm, value);
+        consoleskins$setForceRender(model.rightLeg, value);
+        consoleskins$setForceRender(model.leftLeg, value);
+        if (model instanceof PlayerModel playerModel) {
+            consoleskins$setForceRender(playerModel.hat, value);
+            consoleskins$setForceRender(playerModel.jacket, value);
+            consoleskins$setForceRender(playerModel.leftSleeve, value);
+            consoleskins$setForceRender(playerModel.rightSleeve, value);
+            consoleskins$setForceRender(playerModel.leftPants, value);
+            consoleskins$setForceRender(playerModel.rightPants, value);
+        }
+    }
+    @Unique
     private static void consoleskins$setForceRender(ModelPart part, boolean value) {
         try {
             ((ModelPartSkipRenderOverrideAccess) (Object) part).consoleskins$setForceRender(value);
@@ -100,19 +89,14 @@ public abstract class ArmorOffsetsMixin {
                                                ItemStack item, EquipmentSlot slot, int packedLight,
                                                HumanoidRenderState renderState, CallbackInfo ci) {
         if (!consoleskins$tryEnterLayer()) return;
-        Set<ModelPart> armorParts = consoleskins$getArmorParts();
-        if (armorParts != null && !armorParts.isEmpty()) { for (ModelPart part : armorParts) consoleskins$setForceRender(part, true); }
         consoleskins$posePushed.set(Boolean.FALSE);
+        HumanoidModel<?> armorModel = consoleskins$getArmorModel(slot, renderState);
+        consoleskins$setForceRender(armorModel, true);
         if (poseStack == null || slot == null) return;
         if (!(renderState instanceof RenderStateSkinIdAccess access)) return;
         String skinId = access.consoleskins$getSkinId();
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(
-                skinId,
-                access.consoleskins$getCachedTexture(),
-                access.consoleskins$getCachedModelId(),
-                access.consoleskins$getCachedBoxModel()
-        );
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(access);
         ResourceLocation modelId = resolved == null ? null : resolved.modelId();
         if (modelId == null) return;
         ArmorSlot armorSlot = ArmorSlot.fromEquipmentSlot(slot);
@@ -124,7 +108,7 @@ public abstract class ArmorOffsetsMixin {
         if (ConsoleSkinsClientSettings.isHideArmorOnAllBoxSkins() && hasBoxModel) hideArmor = true;
         else if (armorHide != null && armorHide.contains(armorSlot)) hideArmor = true;
         if (hideArmor) {
-            if (armorParts != null) { for (ModelPart part : armorParts) consoleskins$setForceRender(part, false); }
+            consoleskins$setForceRender(armorModel, false);
             consoleskins$clearContext();
             ci.cancel();
             return;

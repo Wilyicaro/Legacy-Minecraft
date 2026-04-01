@@ -40,12 +40,7 @@ public abstract class AvatarSkinMixin {
         access.consoleskins$setSitting(avatar.isPassenger() || avatar.getPose() == Pose.SITTING);
         access.consoleskins$setUsingItem(avatar.isUsingItem());
         access.consoleskins$setBlocking(avatar.isBlocking());
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(
-                skinId,
-                access.consoleskins$getCachedTexture(),
-                access.consoleskins$getCachedModelId(),
-                access.consoleskins$getCachedBoxModel()
-        );
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(access);
         access.consoleskins$setCachedTexture(resolved == null ? null : resolved.texture());
         access.consoleskins$setCachedBoxTexture(resolved == null ? null : resolved.boxTexture());
         access.consoleskins$setCachedModelId(resolved == null ? null : resolved.modelId());

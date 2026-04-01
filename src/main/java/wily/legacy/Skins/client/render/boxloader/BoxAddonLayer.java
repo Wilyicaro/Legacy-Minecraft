@@ -37,12 +37,7 @@ public class BoxAddonLayer extends RenderLayer {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(
-                skinId,
-                a.consoleskins$getCachedTexture(),
-                a.consoleskins$getCachedModelId(),
-                a.consoleskins$getCachedBoxModel()
-        );
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(a);
         ResourceLocation texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
 

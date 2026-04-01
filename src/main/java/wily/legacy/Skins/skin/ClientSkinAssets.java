@@ -15,13 +15,17 @@ import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
+import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.Skins.client.render.boxloader.AttachSlot;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.util.DebugLog;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class ClientSkinAssets {
     public record ResolvedSkin(SkinEntry entry, ResourceLocation texture, ResourceLocation boxTexture, ResourceLocation modelId, BuiltBoxModel boxModel) {}
@@ -33,8 +37,19 @@ public final class ClientSkinAssets {
     private static final Map<String, PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, PlayerSkin> SKIN_CACHE_CAPE = new ConcurrentHashMap<>();
     private static final Map<ResourceLocation, ResourceLocation> MODEL_ID_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentLinkedQueue<String> PREVIEW_QUEUE = new ConcurrentLinkedQueue<>();
+    private static final Set<String> QUEUED_PREVIEWS = ConcurrentHashMap.newKeySet();
     private ClientSkinAssets() { }
     public static ResolvedSkin resolveSkin(String skinId) { return resolveSkin(skinId, null, null, null); }
+    public static ResolvedSkin resolveSkin(RenderStateSkinIdAccess access) {
+        if (access == null) return null;
+        return resolveSkin(
+                access.consoleskins$getSkinId(),
+                access.consoleskins$getCachedTexture(),
+                access.consoleskins$getCachedModelId(),
+                access.consoleskins$getCachedBoxModel()
+        );
+    }
     public static ResolvedSkin resolveSkin(String skinId, ResourceLocation texture, ResourceLocation modelId, BuiltBoxModel boxModel) {
         skinId = SkinIdUtil.isBlankOrAutoSelect(skinId) ? null : skinId;
         SkinEntry entry = skinId == null ? null : SkinPackLoader.getSkin(skinId);
@@ -101,6 +116,28 @@ public final class ClientSkinAssets {
     public static PlayerModelType resolveModelType(String skinId, ResolvedSkin resolved) {
         return resolveModelType(skinId, resolved == null ? null : resolved.entry());
     }
+    public static void clearPreviewWarmup() {
+        PREVIEW_QUEUE.clear();
+        QUEUED_PREVIEWS.clear();
+    }
+    public static void enqueuePreviewWarmup(String skinId) {
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId) || !QUEUED_PREVIEWS.add(skinId)) return;
+        PREVIEW_QUEUE.add(skinId);
+    }
+    public static void pumpPreviewWarmup(Minecraft client, int budget) {
+        if (client == null || budget <= 0) return;
+        for (int i = 0; i < budget; i++) {
+            String skinId = PREVIEW_QUEUE.poll();
+            if (skinId == null) return;
+            QUEUED_PREVIEWS.remove(skinId);
+            warmPreview(client, skinId);
+        }
+    }
+    public static boolean hasHeadBox(ResolvedSkin resolved) {
+        BuiltBoxModel model = resolved == null ? null : resolved.boxModel();
+        return model != null && model.hides(AttachSlot.HEAD)
+                && (hasParts(model.get(AttachSlot.HEAD)) || hasParts(model.get(AttachSlot.HAT)));
+    }
     public static AssetData resolveAssetData(Minecraft client, String skinId) {
         byte[] texture = TEXTURE_BYTES.get(skinId);
         byte[] model = MODEL_BYTES.get(skinId);
@@ -166,6 +203,7 @@ public final class ClientSkinAssets {
         Minecraft client = Minecraft.getInstance();
         TextureManager manager = client != null ? client.getTextureManager() : null;
         for (ResourceLocation texture : TEXTURES.values()) { releaseTexture(manager, texture); }
+        clearPreviewWarmup();
         TEXTURES.clear();
         MODELS.clear();
         TEXTURE_BYTES.clear();
@@ -195,6 +233,16 @@ public final class ClientSkinAssets {
         Boolean slim = getSlimFlag(skinId);
         if (slim != null) { return slim ? PlayerModelType.SLIM : PlayerModelType.WIDE; }
         return entry != null && entry.slimArms() ? PlayerModelType.SLIM : PlayerModelType.WIDE;
+    }
+    private static boolean hasParts(java.util.List<?> parts) { return parts != null && !parts.isEmpty(); }
+    private static void warmPreview(Minecraft client, String skinId) {
+        ResolvedSkin resolved = resolveSkin(skinId);
+        if (resolved == null) return;
+        warmTexture(client, resolved.texture());
+        warmTexture(client, resolved.boxTexture());
+        SkinEntry entry = resolved.entry();
+        warmTexture(client, entry == null ? null : entry.cape());
+        resolvePlayerSkin(skinId, resolved, hasCape(resolved));
     }
     private static void registerRuntimePoses(String skinId, JsonObject obj) {
         if (skinId == null || skinId.isBlank() || obj == null) return;
@@ -269,6 +317,9 @@ public final class ClientSkinAssets {
             DebugLog.debug("Failed to read skin asset {}", id);
             return new byte[0];
         }
+    }
+    private static void warmTexture(Minecraft client, ResourceLocation id) {
+        if (client != null && id != null) client.getTextureManager().getTexture(id);
     }
     private static ResourceLocation runtimeTextureId(String skinId) { return ResourceLocation.fromNamespaceAndPath("legacy", "runtime_skins/" + skinId); }
     private static void releaseTexture(TextureManager manager, ResourceLocation id) {

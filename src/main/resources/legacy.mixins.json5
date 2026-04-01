@@ -213,7 +213,6 @@
     "skins.client.SkipDrawAccessor",
     "skins.client.SkipRenderMixin",
     "skins.client.PlayerPartsMixin",
-    "skins.client.ModelOffsetsMixin",
     "skins.client.ArmorOffsetsMixin",
     "skins.client.ArmPoseMixin",
     "skins.client.LegPoseMixin",

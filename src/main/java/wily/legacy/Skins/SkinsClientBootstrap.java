@@ -9,7 +9,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.HelpAndOptionsScreen;
 import wily.legacy.client.screen.ScreenSection;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
-import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.Skins.client.util.ViewBobbingSkinOverride;
 import wily.legacy.Skins.client.gui.GuiSessionSkin;
 import wily.legacy.Skins.skin.ClientSkinAssets;
@@ -30,14 +29,14 @@ public final class SkinsClientBootstrap {
             if (mc != null) {
                 mc.execute(() -> {
                     ClientSkinAssets.clearPreviewCaches();
-                    SkinPreviewWarmup.clear();
+                    ClientSkinAssets.clearPreviewWarmup();
                     BoxModelManager.reload(manager);
                     SkinPackLoader.loadPacks(manager);
                 });
                 return;
             }
             ClientSkinAssets.clearPreviewCaches();
-            SkinPreviewWarmup.clear();
+            ClientSkinAssets.clearPreviewWarmup();
             BoxModelManager.reload(manager);
             SkinPackLoader.loadPacks(manager);
         }

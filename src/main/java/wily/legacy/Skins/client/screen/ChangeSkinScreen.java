@@ -5,9 +5,9 @@ import java.util.Locale;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import wily.legacy.Skins.client.changeskin.*;
-import wily.legacy.Skins.client.changeskin.ChangeSkinActions.ChangeSkinLayoutMetrics;
 import wily.legacy.Skins.client.preview.*;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.Skins.client.util.SkinTextUtil;
 import wily.legacy.Skins.skin.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -206,7 +206,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         });
 
         packList.refreshPackIdsIfNeeded();
-        packList.populateInto(getRenderableVList());
+        getRenderableVList().renderables.clear();
+        if (packList.getPackCount() == 0) {
+            getRenderableVList().addRenderable(new ChangeSkinPackList.PackButton(packList, -1, packList.getWrappedLabelForIndex(0), packList.getButtonHeight()));
+        } else for (int i = 0; i < packList.getPackCount(); i++) {
+            getRenderableVList().addRenderable(new ChangeSkinPackList.PackButton(packList, i, packList.getLabelForIndex(i), packList.getButtonHeight()));
+        }
 
         int x        = panel.x + sc(normalLayout.packListInsetX());
         int w        = Math.max(1, panel.width - sc(normalLayout.packListWidthTrim()));
@@ -255,7 +260,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void syncPackFocus() {
-        ChangeSkinPackList.PackButton target = packList.getButtonForIndex(packList.getFocusedPackIndex());
+        ChangeSkinPackList.PackButton target = findPackButton(packList.getFocusedPackIndex());
         if (target == null) return;
         var f = getFocused();
         if ((f == null || f == getRenderableVList() || f instanceof ChangeSkinPackList.PackButton) && f != target)
@@ -283,8 +288,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int holder = Math.max(1, sc(normalLayout.actionHolderSize()));
         int iconX  = tooltipBox.x + tooltipBox.getWidth() - sc(normalLayout.actionHolderXOffset());
         int iconY  = panel.y + tooltipBox.getHeight() - sc(normalLayout.actionHolderBaseY());
-        if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderTopOffset()), holder, holder)) { actions.selectSkin(); return true; }
-        if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderGap()), holder, holder)) { actions.favorite(); return true; }
+        if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderTopOffset()), holder, holder)) { selectSkin(); return true; }
+        if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderGap()), holder, holder)) { favoriteSkin(); return true; }
 
         return super.mouseClicked(e, bl);
     }
@@ -384,10 +389,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
                 float scale = bigTextScale();
                 int maxUnscaled = (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / scale);
-                String show = theme;
-                show = show.replace("\u00E2\u20AC\u00A6", "...");
-                if (minecraft.font.width(show) > maxUnscaled) { int ellW = minecraft.font.width("…"); show = minecraft.font.plainSubstrByWidth(show, Math.max(0, maxUnscaled - ellW)) + "…"; }
-                show = show.replace("\u00E2\u20AC\u00A6", "...");
+                String show = SkinTextUtil.clip(minecraft.font, theme, maxUnscaled);
                 int themeY = skinNameY + (int) (minecraft.font.lineHeight * scale) + sc(normalLayout.themeTextGap());
                 drawBigCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF);
             }
