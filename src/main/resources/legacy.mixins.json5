@@ -207,7 +207,6 @@
     "skins.client.UpsideDownMixin",
     "skins.client.SkinTickMixin",
     "skins.client.SkinsOptionMixin",
-    "skins.client.HelpAndOptionsChangeSkinButtonMixin",
     "skins.client.LivingEntityRendererAccessor",
     "skins.client.HumanoidArmorLayerAccessor",
     "skins.client.ModelPartAccessor",
@@ -223,7 +222,6 @@
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
-    "skins.PlayerJoinMixin",
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",

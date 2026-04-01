@@ -15,9 +15,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
-import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.compat.cpm.CpmRenderCompat;
 import java.util.List;
 import java.util.UUID;
@@ -39,28 +37,19 @@ public class BoxAddonLayer extends RenderLayer {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        ResourceLocation texture = a.consoleskins$getCachedTexture();
-        if (texture == null) {
-            SkinEntry entry = SkinPackLoader.getSkin(skinId);
-            texture = ClientSkinAssets.getTexture(skinId);
-            if (texture == null && entry != null) texture = entry.texture();
-        }
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(
+                skinId,
+                a.consoleskins$getCachedTexture(),
+                a.consoleskins$getCachedModelId(),
+                a.consoleskins$getCachedBoxModel()
+        );
+        ResourceLocation texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
 
-        BuiltBoxModel built = a.consoleskins$getCachedBoxModel();
-        if (built == null) {
-            ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(texture);
-            built = BoxModelManager.get(modelId);
-            if (built == null) {
-                var mj = ClientSkinAssets.getModelJson(skinId);
-                if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
-                built = BoxModelManager.get(modelId);
-            }
-        }
+        BuiltBoxModel built = resolved == null ? null : resolved.boxModel();
         if (built == null) return;
 
-        ResourceLocation boxTexture = a.consoleskins$getCachedBoxTexture();
-        if (boxTexture == null) boxTexture = texture;
+        ResourceLocation boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
 
         final BuiltBoxModel baked = built;
         final ResourceLocation texFinal = boxTexture;

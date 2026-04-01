@@ -117,8 +117,6 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         panel.size(1, layoutH);
         tooltipBox.pos(layoutX, layoutY);
         tooltipBox.size(layoutW + off23, layoutH + off90);
-
-        if (firstOpen) focusInitialPack();
     }
 
     private void computeTu3Tabs() {
@@ -224,21 +222,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     protected boolean handlePackListStepNavigation(int key) {
-        boolean kbm  = ControlType.getActiveType().isKbm();
-        boolean up   = key == InputConstants.KEY_UP;
-        boolean down = key == InputConstants.KEY_DOWN;
-        if (!(up || down)) return false;
-
-        if (!kbm) return true;
-
-        var f = getFocused();
-        if (!(f == null || f == getRenderableVList() || f instanceof ChangeSkinPackList.PackButton)) return false;
-
-        int count = packList.getPackCount();
-        if (count <= 1) return true;
-        focusRelativePack(up ? -1 : 1, true);
-        applyQueuedPackChange();
-        return true;
+        return handlePackListStepNavigation(key, false, false, true, true);
     }
 
     @Override
@@ -305,11 +289,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public void tick() {
         super.tick();
-
-        if (sharedTick()) return;
-
-        pumpQueuedCarousel();
-        pumpHoldingOuterCarousel();
+        tickScreenTail();
     }
 
     @Override

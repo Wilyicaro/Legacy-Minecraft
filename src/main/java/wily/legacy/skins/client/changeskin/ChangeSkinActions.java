@@ -1,24 +1,18 @@
 package wily.legacy.Skins.client.changeskin;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import wily.legacy.Skins.SkinsClientBootstrap;
 import wily.legacy.Skins.client.preview.PlayerSkinWidget;
 import wily.legacy.Skins.client.preview.PlayerSkinWidgetList;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.client.util.SkinPreviewWarmup;
-import wily.legacy.Skins.skin.FavoritesStore;
+import wily.legacy.Skins.skin.SkinDataStore;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSyncClient;
-import wily.legacy.client.screen.HelpAndOptionsScreen;
-import wily.legacy.client.screen.LegacyScreen;
-import wily.legacy.client.screen.OptionsScreen;
 import wily.legacy.client.screen.Panel;
 
 import java.util.ArrayList;
@@ -42,7 +36,7 @@ public final class ChangeSkinActions {
 
         void setPlayerSkinWidgetList(PlayerSkinWidgetList list);
 
-        void addSkinWidget(PlayerSkinWidget widget);
+        List<PlayerSkinWidget> getSkinWidgetPool();
 
         Panel getTooltipBox();
 
@@ -51,15 +45,12 @@ public final class ChangeSkinActions {
         float getUiScale();
 
         ChangeSkinLayoutMetrics getLayoutMetrics();
-
-        Screen getScreen();
     }
 
-    private static final int MAX_SKINS_PER_PACK = 100, WIDGET_POOL_SIZE = 9, BASE_W = 106, BASE_H = 150, FAV_PREWARM_COUNT = 24;
+    private static final int MAX_SKINS_PER_PACK = 100, BASE_W = 106, BASE_H = 150, FAV_PREWARM_COUNT = 24;
     private final Minecraft minecraft;
     private final ChangeSkinPackList packList;
     private final Host host;
-    private final List<PlayerSkinWidget> widgetPool = new ArrayList<>(WIDGET_POOL_SIZE);
 
     public ChangeSkinActions(Minecraft minecraft, ChangeSkinPackList packList, Host host) {
         this.minecraft = minecraft;
@@ -69,15 +60,25 @@ public final class ChangeSkinActions {
 
     public void skinPack(int index) {
         SkinPack pack = packList.getFocusedPack();
-        warmupPackIcon(pack);
+        ResourceLocation icon = pack == null ? null : pack.icon();
+        if (icon != null && minecraft != null) minecraft.getTextureManager().getTexture(icon);
 
         List<String> ids = collectPackSkinIds(pack);
         if (ids.isEmpty()) {
-            clearCurrentList();
+            PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
+            if (list != null) {
+                list.setSkinIds(List.of(), true);
+                list.sortForIndex(0, true);
+            }
             return;
         }
 
-        if (isFavouritesPack(pack)) { warmIds(ids, FAV_PREWARM_COUNT); }
+        if (pack != null && SkinIdUtil.isFavouritesPack(pack.id())) {
+            for (int i = 0; i < Math.min(FAV_PREWARM_COUNT, ids.size()); i++) {
+                String id = ids.get(i);
+                if (id != null && !id.isBlank()) SkinPreviewWarmup.enqueue(id);
+            }
+        }
 
         applySkinIds(ids, index);
         warmupVisibleTextures(host.getPlayerSkinWidgetList());
@@ -93,7 +94,9 @@ public final class ChangeSkinActions {
     }
 
     public void selectSkin() {
-        String selectedId = getSelectedSkinId();
+        PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
+        PlayerSkinWidget center = list == null ? null : list.getCenter();
+        String selectedId = center == null ? null : center.skinId.get();
         if (selectedId == null) return;
 
         String skinId = SkinIdUtil.isAutoSelect(selectedId) ? "" : selectedId;
@@ -103,21 +106,22 @@ public final class ChangeSkinActions {
     }
 
     public void favorite() {
-        String skinId = getSelectedSkinId();
+        PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
+        PlayerSkinWidget center = list == null ? null : list.getCenter();
+        String skinId = center == null ? null : center.skinId.get();
         if (skinId == null) return;
 
-        PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
         int previousIndex = list != null ? list.index : 0;
 
-        FavoritesStore.toggle(skinId);
+        SkinDataStore.toggleFavorite(skinId);
         SkinPackLoader.rebuildFavouritesPack();
 
         SkinPack focused = packList.getFocusedPack();
-        if (isFavouritesPack(focused)) {
+        if (focused != null && SkinIdUtil.isFavouritesPack(focused.id())) {
             int targetIndex = previousIndex;
             List<SkinEntry> skins = focused.skins();
             int size = skins == null ? 0 : skins.size();
-            if (FavoritesStore.isFavorite(skinId) && skins != null) {
+            if (SkinDataStore.isFavorite(skinId) && skins != null) {
                 for (int i = 0; i < size; i++) {
                     SkinEntry entry = skins.get(i);
                     if (entry != null && skinId.equals(entry.id())) {
@@ -136,43 +140,9 @@ public final class ChangeSkinActions {
         playClick();
     }
 
-    private boolean isFavouritesPack(SkinPack pack) { return pack != null && SkinIdUtil.isFavouritesPack(pack.id()); }
-
     public void playClick() {
         if (minecraft == null || minecraft.getSoundManager() == null) return;
         minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
-    }
-
-    public void openLegacyChangeSkinScreen() {
-        if (minecraft == null) return;
-        Screen skinScreen = host.getScreen();
-        Screen rootParent = skinScreen instanceof LegacyScreen legacyScreen && legacyScreen.parent != null
-                ? legacyScreen.parent
-                : skinScreen;
-        boolean wasTu3 = ConsoleSkinsClientSettings.isTu3ChangeSkinScreen();
-        Screen built = HelpAndOptionsScreen.buildChangeSkinOptionsScreen(skinScreen);
-        if (built instanceof OptionsScreen optionsScreen) {
-            optionsScreen.onClose = screen -> {
-                boolean wantTu3 = ConsoleSkinsClientSettings.isTu3ChangeSkinScreen();
-                if (wantTu3 != wasTu3) { SkinsClientBootstrap.requestOpenChangeSkinScreen(minecraft, rootParent); }
-            };
-        }
-        minecraft.setScreen(built);
-        playClick();
-    }
-
-    private void warmupPackIcon(SkinPack pack) {
-        if (pack == null) return;
-        ResourceLocation icon = pack.icon();
-        if (icon == null || minecraft == null) return;
-        minecraft.getTextureManager().getTexture(icon);
-    }
-
-    private void clearCurrentList() {
-        PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
-        if (list == null) return;
-        list.setSkinIds(List.of(), true);
-        list.sortForIndex(0, true);
     }
 
     private List<String> collectPackSkinIds(SkinPack pack) {
@@ -188,23 +158,7 @@ public final class ChangeSkinActions {
         return ids;
     }
 
-    private void ensureWidgetPool() {
-        while (widgetPool.size() < WIDGET_POOL_SIZE) {
-            PlayerSkinWidget widget = new PlayerSkinWidget(BASE_W, BASE_H);
-            widget.invisible();
-            widget.resetPose();
-            widgetPool.add(widget);
-        }
-
-        Screen screen = host.getScreen();
-        for (PlayerSkinWidget widget : widgetPool) {
-            if (!screen.children().contains(widget)) { host.addSkinWidget(widget); }
-        }
-    }
-
     private void applySkinIds(List<String> ids, int index) {
-        ensureWidgetPool();
-
         float uiScale = host.getUiScale();
         if (uiScale <= 0f) uiScale = 1f;
         ChangeSkinLayoutMetrics layoutMetrics = host.getLayoutMetrics();
@@ -240,7 +194,7 @@ public final class ChangeSkinActions {
 
         PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
         if (list == null) {
-            list = new PlayerSkinWidgetList(originX, originY, widgetPool);
+            list = new PlayerSkinWidgetList(originX, originY, host.getSkinWidgetPool());
             host.setPlayerSkinWidgetList(list);
         } else { list.setOrigin(originX, originY); }
 
@@ -251,27 +205,11 @@ public final class ChangeSkinActions {
 
     private void warmupVisibleTextures(PlayerSkinWidgetList list) {
         if (list == null) return;
-        for (int offset : new int[]{0, -1, 1, -2, 2, -3, 3}) { touchTextureForId(list.getVisible(offset)); }
-    }
-
-    private void warmIds(List<String> ids, int limit) {
-        for (int i = 0; i < Math.min(limit, ids.size()); i++) { warmId(ids.get(i)); }
-    }
-
-    private void warmId(String id) {
-        if (id == null || id.isBlank()) return;
-        SkinPreviewWarmup.enqueue(id);
-    }
-
-    private void touchTextureForId(PlayerSkinWidget widget) {
-        if (widget == null) return;
-        warmId(widget.skinId.get());
-    }
-
-    private String getSelectedSkinId() {
-        PlayerSkinWidgetList list = host.getPlayerSkinWidgetList();
-        PlayerSkinWidget center = list == null ? null : list.getCenter();
-        return center == null ? null : center.skinId.get();
+        for (int offset : new int[]{0, -1, 1, -2, 2, -3, 3}) {
+            PlayerSkinWidget widget = list.getVisible(offset);
+            String id = widget == null ? null : widget.skinId.get();
+            if (id != null && !id.isBlank()) SkinPreviewWarmup.enqueue(id);
+        }
     }
 
     private void rememberLastUsedCustomPack(String selectedId, String skinId) {

@@ -10,6 +10,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import wily.legacy.Skins.SkinsClientBootstrap;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Skins.client.changeskin.*;
 import wily.legacy.Skins.client.changeskin.ChangeSkinActions.ChangeSkinLayoutMetrics;
@@ -87,6 +88,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected double centerDragStartX, centerDragStartY;
     protected int queuedCarouselSteps, queuedCarouselDir;
     protected final HoldRepeat outerCarouselHold = new HoldRepeat();
+    protected final List<PlayerSkinWidget> previewWidgets = new ArrayList<>(9);
     protected PlayerSkinWidgetList playerSkinWidgetList;
     protected boolean lastWindowActive;
     protected int seenPackReloadVersion;
@@ -117,10 +119,9 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                 playerSkinWidgetList = list;
                 onWidgetListCreated(list);
             }
-            @Override public void addSkinWidget(PlayerSkinWidget w)                     { addRenderableWidget(w); }
+            @Override public List<PlayerSkinWidget> getSkinWidgetPool()                 { return previewWidgets; }
             @Override public Panel             getTooltipBox()                          { return tooltipBox; }
             @Override public Panel             getPanel()                               { return panel; }
-            @Override public Screen            getScreen()                              { return AbstractChangeSkinScreen.this; }
             @Override public float             getUiScale()                             { return uiScale; }
             @Override public ChangeSkinLayoutMetrics getLayoutMetrics()                 { return layoutProfile.widgetMetrics(); }
         });
@@ -139,11 +140,65 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected abstract boolean insideScrollRegion(double mx, double my);
 
+    protected void ensurePreviewWidgets() {
+        while (previewWidgets.size() < 9) {
+            PlayerSkinWidget widget = new PlayerSkinWidget(106, 150);
+            widget.invisible();
+            widget.resetPose();
+            previewWidgets.add(widget);
+        }
+        if (playerSkinWidgetList == null) {
+            playerSkinWidgetList = new PlayerSkinWidgetList(0, 0, previewWidgets);
+            onWidgetListCreated(playerSkinWidgetList);
+        }
+    }
+
+    protected void attachPreviewWidgets() {
+        ensurePreviewWidgets();
+        for (PlayerSkinWidget widget : previewWidgets) addRenderableWidget(widget);
+    }
+
+    protected void openChangeSkinOptionsScreen() {
+        if (minecraft == null) return;
+        Screen rootParent = parent != null ? parent : this;
+        boolean wasTu3 = ConsoleSkinsClientSettings.isTu3ChangeSkinScreen();
+        Screen built = HelpAndOptionsScreen.buildChangeSkinOptionsScreen(this);
+        if (built instanceof OptionsScreen optionsScreen) {
+            optionsScreen.onClose = screen -> {
+                if (ConsoleSkinsClientSettings.isTu3ChangeSkinScreen() != wasTu3) {
+                    SkinsClientBootstrap.requestOpenChangeSkinScreen(minecraft, rootParent);
+                }
+            };
+        }
+        minecraft.setScreen(built);
+        playClick();
+    }
+
     protected void playClick() { actions.playClick(); }
 
     protected boolean isInCarouselBounds(double mx, double my) { return true; }
 
     protected abstract boolean handlePackListStepNavigation(int key);
+
+    protected boolean handlePackListStepNavigation(int key, boolean allowWasd, boolean guardArrowsOnly, boolean applyQueuedChange, boolean requireKeyboard) {
+        boolean kbm = ControlType.getActiveType().isKbm();
+        boolean upArrow = key == InputConstants.KEY_UP;
+        boolean downArrow = key == InputConstants.KEY_DOWN;
+        boolean up = upArrow || allowWasd && kbm && key == InputConstants.KEY_W;
+        boolean down = downArrow || allowWasd && kbm && key == InputConstants.KEY_S;
+        if (!(up || down)) return false;
+        if (requireKeyboard && !kbm) return true;
+        if ((!guardArrowsOnly || upArrow || downArrow) && !packListNavigationAllowed()) return false;
+        if (packList.getPackCount() <= 1) return true;
+        focusRelativePack(up ? -1 : 1, true);
+        if (applyQueuedChange) applyQueuedPackChange();
+        return true;
+    }
+
+    protected boolean packListNavigationAllowed() {
+        Object focused = getFocused();
+        return focused == null || focused == getRenderableVList() || focused instanceof ChangeSkinPackList.PackButton;
+    }
 
     protected void handleSkinPackReload() {
         syncCenterPreviewState();
@@ -270,12 +325,14 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void skinPack(int i) {
+        ensurePreviewWidgets();
         syncCenterPreviewState();
         actions.skinPack(i);
         onAfterSkinPackChanged();
     }
 
     protected void skinPack() {
+        ensurePreviewWidgets();
         syncCenterPreviewState();
         actions.skinPack();
         onAfterSkinPackChanged();
@@ -291,7 +348,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected Component favoriteActionLabel() {
         PlayerSkinWidget center = getCenterWidget();
         String skinId = center == null ? null : center.skinId.get();
-        return skinId != null && FavoritesStore.isFavorite(skinId)
+        return skinId != null && SkinDataStore.isFavorite(skinId)
                 ? Component.literal("Remove Favorite")
                 : Component.literal("Add Favorite");
     }
@@ -464,24 +521,48 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         outerCarouselHold.step();
     }
 
-    @Override
-    protected void init() {
-        super.init();
+    protected boolean tickScreenTail() {
+        if (sharedTick()) return true;
+        pumpQueuedCarousel();
+        pumpHoldingOuterCarousel();
+        return false;
+    }
 
-        ChangeSkinPackList.PackButton b = packList.getButtonForIndex(packList.getFocusedPackIndex());
-        if (b != null && children().contains(b))
-            setFocused(b);
-        else
-            for (var c : children())
-                if (c instanceof ChangeSkinPackList.PackButton pb) { setFocused(pb); break; }
+    protected void restorePackButtonFocus() {
+        ChangeSkinPackList.PackButton button = packList.getButtonForIndex(packList.getFocusedPackIndex());
+        if (button != null && children().contains(button)) {
+            setFocused(button);
+            return;
+        }
+        for (var child : children()) {
+            if (child instanceof ChangeSkinPackList.PackButton buttonChild) {
+                setFocused(buttonChild);
+                return;
+            }
+        }
+    }
 
+    protected void refreshSkinPackState() {
         boolean queuedPackChange = packList.consumeQueuedChangePack();
         if (firstOpen) {
             firstOpen = false;
             skinPack(resolveFocusedPackSkinIndex(currentAppliedSkinId()));
-        } else if (queuedPackChange) {
+            return;
+        }
+        if (queuedPackChange) {
             skinPack(0);
-        } else if (playerSkinWidgetList != null) { skinPack(playerSkinWidgetList.index); }
+            return;
+        }
+        if (playerSkinWidgetList != null) skinPack(playerSkinWidgetList.index);
+    }
+
+    @Override
+    protected void init() {
+        if (firstOpen) focusInitialPack();
+        super.init();
+        attachPreviewWidgets();
+        restorePackButtonFocus();
+        refreshSkinPackState();
     }
 
     @Override
@@ -508,7 +589,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             }
             return true;
         }
-        if (key == InputConstants.KEY_O) { actions.openLegacyChangeSkinScreen(); return true; }
+        if (key == InputConstants.KEY_O) { openChangeSkinOptionsScreen(); return true; }
 
         if (handlePackListStepNavigation(key)) return true;
 
@@ -613,7 +694,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (buttonOnce(state, ControllerBinding.LEFT_BUTTON)) { actions.favorite(); return true; }
 
         if (!ControlType.getActiveType().isKbm() && buttonOnce(state, ControllerBinding.UP_BUTTON)) {
-            actions.openLegacyChangeSkinScreen();
+            openChangeSkinOptionsScreen();
             return true;
         }
 

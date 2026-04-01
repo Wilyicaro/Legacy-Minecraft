@@ -9,13 +9,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Skins.client.render.boxloader.AttachSlot;
-import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinPackLoader;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -48,24 +45,11 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
             return;
         }
 
-        SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation texture = ClientSkinAssets.getTexture(skinId);
-        if (texture == null && entry != null) texture = entry.texture();
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
+        ResourceLocation texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
 
-        String path = texture.getPath();
-        int slash = path.lastIndexOf('/');
-        if (slash != -1) path = path.substring(slash + 1);
-        if (path.endsWith(".png")) path = path.substring(0, path.length() - 4);
-
-        ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), path);
-
-        BuiltBoxModel built = BoxModelManager.get(modelId);
-        if (built == null) {
-            var mj = ClientSkinAssets.getModelJson(skinId);
-            if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
-            built = BoxModelManager.get(modelId);
-        }
+        BuiltBoxModel built = resolved == null ? null : resolved.boxModel();
         if (built == null) return;
 
         EntityModel m = getModel();
@@ -81,8 +65,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         var parts = built.get(slot);
         if (parts == null || parts.isEmpty()) return;
 
-        ResourceLocation boxTexture = BoxModelManager.getTexture(modelId);
-        if (boxTexture == null) boxTexture = texture;
+        ResourceLocation boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
         final ResourceLocation texFinal = boxTexture;
         final var partsFinal = parts;
         final float partScale = built.partScale();

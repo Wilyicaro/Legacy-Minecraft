@@ -81,7 +81,6 @@ public final class SkinPackLoader {
     }
     public static void rebuildFavouritesPack() {
         ensureLoaded();
-        FavoritesStore.ensureLoaded();
         LinkedHashMap<String, SkinPack> basePacks = new LinkedHashMap<>(PACKS);
         basePacks.remove(SkinIdUtil.PACK_FAVOURITES);
         LinkedHashMap<String, SkinPack> orderedPacks = withFavourites(basePacks, SKINS_BY_ID);
@@ -112,8 +111,6 @@ public final class SkinPackLoader {
         SkinPackLang.reload(rm);
         SkinPoseRegistry.beginReload();
         if (LAST_USED_CUSTOM_PACK_ID == null) { LAST_USED_CUSTOM_PACK_ID = ConsoleSkinsClientSettings.getLastUsedCustomPackId(); }
-        FavoritesStore.ensureLoaded();
-        PackExclusions.reload();
         PackLoadState state = new PackLoadState();
         try {
             Map<ResourceLocation, Resource> jsons = listPackJsonResources(rm);
@@ -123,7 +120,7 @@ public final class SkinPackLoader {
                 String packId = parsePackId(path);
                 if (packId == null || packId.isEmpty()) continue;
                 if (state.packs.containsKey(packId)) continue;
-                if (PackExclusions.isExcluded(packId)) continue;
+                if (SkinDataStore.isExcludedPack(packId)) continue;
                 JsonObject json = SkinPackJson.readObject(jsons.get(rl));
                 if (json == null) continue;
                 String prefix = path.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
@@ -174,7 +171,7 @@ public final class SkinPackLoader {
     }
     private static LinkedHashMap<String, SkinPack> withFavourites(Map<String, SkinPack> base, Map<String, SkinEntry> skinsById) {
         ArrayList<SkinEntry> fav = new ArrayList<>();
-        for (String id : FavoritesStore.getFavorites()) {
+        for (String id : SkinDataStore.getFavorites()) {
             SkinEntry e = skinsById.get(id);
             if (e != null) fav.add(e);
         }

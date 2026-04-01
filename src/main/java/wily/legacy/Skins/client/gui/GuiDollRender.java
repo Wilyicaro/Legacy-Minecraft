@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.skin.ClientSkinAssets;
@@ -114,27 +113,19 @@ public final class GuiDollRender {
             bboxWidth = Math.max(bboxWidth, built.bboxWidth());
         }
 
-        boolean showCape = false;
+        boolean showCape = ClientSkinAssets.hasCape(resolved);
         ClientAsset.Texture body = new ClientAsset.ResourceTexture(skinTexture, skinTexture);
         ClientAsset.Texture cape = body;
-        if (entry != null && entry.cape() != null) {
+        if (showCape) {
             ResourceLocation capeTexture = entry.cape();
             warmTexture(capeTexture);
             cape = new ClientAsset.ResourceTexture(capeTexture, capeTexture);
-            showCape = true;
         }
 
-        PlayerSkin skin = PlayerSkin.insecure(body, cape, body, resolveModelType(selectionId, resolved));
+        PlayerSkin skin = PlayerSkin.insecure(body, cape, body, ClientSkinAssets.resolveModelType(selectionId, resolved));
         ResourceLocation resolvedTexture = resolved == null || resolved.texture() == null ? skinTexture : resolved.texture();
         ResourceLocation resolvedBoxTexture = resolved == null || resolved.boxTexture() == null ? resolvedTexture : resolved.boxTexture();
         return new PreviewSkin(skin, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, showCape);
-    }
-
-    private static PlayerModelType resolveModelType(String selectionId, ClientSkinAssets.ResolvedSkin resolved) {
-        var entry = resolved == null ? null : resolved.entry();
-        Boolean slim = entry != null ? entry.slimArms() : null;
-        if (slim == null && selectionId != null) { slim = ClientSkinAssets.getSlimFlag(selectionId); }
-        return Boolean.TRUE.equals(slim) ? PlayerModelType.SLIM : PlayerModelType.WIDE;
     }
 
     private static void warmTexture(ResourceLocation texture) {

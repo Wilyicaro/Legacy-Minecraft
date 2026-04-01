@@ -234,26 +234,11 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         tooltipBox.init("tooltipBox");
         lastLayoutWidth = width;
         lastLayoutHeight = height;
-
-        if (firstOpen) focusInitialPack();
     }
 
     @Override
     protected boolean handlePackListStepNavigation(int key) {
-        boolean kbm  = ControlType.getActiveType().isKbm();
-        boolean up   = (kbm && key == InputConstants.KEY_W) || key == InputConstants.KEY_UP;
-        boolean down = (kbm && key == InputConstants.KEY_S) || key == InputConstants.KEY_DOWN;
-        if (!(up || down)) return false;
-
-        if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
-            var f = getFocused();
-            if (!(f == null || f == getRenderableVList() || f instanceof ChangeSkinPackList.PackButton)) return false;
-        }
-
-        int count = packList.getPackCount();
-        if (count <= 1) return true;
-        focusRelativePack(up ? -1 : 1, true);
-        return true;
+        return handlePackListStepNavigation(key, true, true, false, false);
     }
 
     @Override
@@ -263,22 +248,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
         if (item instanceof ChangeSkinPackList.PackButton btn) {
             if (btn.getPackIndex() < 0) return;
-            if (children().contains(btn)) { setFocused(btn); return; }
-
-            int target = btn.getPackIndex(), min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-            for (var c : children()) {
-                if (c instanceof ChangeSkinPackList.PackButton pb && pb.getPackIndex() >= 0) {
-                    if (pb.getPackIndex() < min) min = pb.getPackIndex();
-                    if (pb.getPackIndex() > max) max = pb.getPackIndex();
-                }
-            }
-
-            boolean down = (min == Integer.MAX_VALUE) || (target > max) || (target >= min && target <= max);
-            if (target < min && min != Integer.MAX_VALUE) down = false;
-
-            int guard = Math.max(8, packList.getPackCount() + 4);
-            for (int t = 0; t < guard && !children().contains(btn); t++) vList.mouseScrolled(down);
-            if (children().contains(btn)) setFocused(btn);
+            vList.focusRenderable(btn);
             return;
         }
         super.focusPackListItem(item);
@@ -341,9 +311,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void tick() {
         super.tick();
         syncPackFocus();
-        if (sharedTick()) return; 
-        pumpQueuedCarousel();
-        pumpHoldingOuterCarousel();
+        if (tickScreenTail()) return;
         pumpHoldingPackStick();
     }
 
@@ -384,7 +352,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
                 g.pose().popMatrix();
             }
-            if (selected != null && FavoritesStore.isFavorite(selected)) {
+            if (selected != null && SkinDataStore.isFavorite(selected)) {
                 int iconY = iconBaseY + sc(normalLayout.actionHolderGap());
                 int heartSize = Math.max(1, holder - 8);
                 int heartX = iconX + Math.round((holder - heartSize) / 2.0f);

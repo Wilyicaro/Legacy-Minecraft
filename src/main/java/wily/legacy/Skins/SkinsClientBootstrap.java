@@ -6,14 +6,18 @@ import net.minecraft.server.packs.PackType;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryEvent;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.screen.HelpAndOptionsScreen;
+import wily.legacy.client.screen.ScreenSection;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.Skins.client.util.ViewBobbingSkinOverride;
 import wily.legacy.Skins.client.gui.GuiSessionSkin;
 import wily.legacy.Skins.skin.ClientSkinAssets;
+import wily.legacy.Skins.skin.SkinDataStore;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.skin.SkinSyncClient;
+import wily.legacy.Skins.util.DebugLog;
 
 public final class SkinsClientBootstrap {
     private SkinsClientBootstrap() {
@@ -48,6 +52,17 @@ public final class SkinsClientBootstrap {
 
     public static void initClient() {
         SkinSyncClient.initClient();
+        HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+            @Override
+            public net.minecraft.network.chat.Component title() {
+                return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+            }
+
+            @Override
+            public Screen build(Screen parent) {
+                return createChangeSkinScreen(parent);
+            }
+        };
 
         Legacy4JClient.whenResetOptions.add(ConsoleSkinsClientSettings::resetToDefaults);
 
@@ -59,14 +74,7 @@ public final class SkinsClientBootstrap {
         });
 
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, SKIN_PACK_RELOAD_LISTENER);
-        FactoryAPIClient.setup(SkinSyncClient::ensureInitialSkinLoaded);
-
         FactoryAPIClient.postTick(SkinsClientBootstrap::postTick);
-
-        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p -> {
-            SkinSyncClient.onClientDisconnect();
-            ViewBobbingSkinOverride.reset(Minecraft.getInstance());
-        });
         FactoryAPIClient.PlayerEvent.JOIN_EVENT.register(p -> SkinSyncClient.onClientJoin());
     }
 
@@ -93,6 +101,7 @@ public final class SkinsClientBootstrap {
             }
             return new wily.legacy.Skins.client.screen.ChangeSkinScreen(parent);
         } catch (RuntimeException ex) {
+            DebugLog.debug("Failed to create change skin screen {}", ex.toString());
             return parent;
         }
     }
@@ -108,9 +117,7 @@ public final class SkinsClientBootstrap {
         if (!ConsoleSkinsClientSettings.isSkinSelectionInitialized()) {
             java.util.UUID userId = minecraft.getUser().getProfileId();
             String existing = wily.legacy.Skins.skin.ClientSkinCache.get(userId);
-            if (existing == null || existing.isBlank()) {
-                existing = wily.legacy.Skins.skin.ClientSkinPersistence.load(userId);
-            }
+            if (existing == null || existing.isBlank()) existing = SkinDataStore.getSelectedSkin(userId);
             if (existing == null || existing.isBlank()) {
                 SkinPackLoader.setLastUsedCustomPackId(null);
                 SkinSyncClient.requestSetSkin(minecraft, "");

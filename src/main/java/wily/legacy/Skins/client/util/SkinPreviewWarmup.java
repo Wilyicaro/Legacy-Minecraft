@@ -44,16 +44,11 @@ public final class SkinPreviewWarmup {
         warmTexture(mc, resolved.boxTexture());
         var entry = resolved.entry();
         warmTexture(mc, entry != null ? entry.cape() : null);
-        warmCachedSkin(id, resolved);
+        ClientSkinAssets.resolvePlayerSkin(id, resolved, ClientSkinAssets.hasCape(resolved));
     }
 
     private static void warmTexture(Minecraft mc, ResourceLocation texture) {
         if (mc == null || texture == null) return;
         mc.getTextureManager().getTexture(texture);
-    }
-
-    private static void warmCachedSkin(String id, ClientSkinAssets.ResolvedSkin resolved) {
-        var entry = resolved.entry();
-        ClientSkinAssets.getCachedPlayerSkin(id, entry, entry != null && entry.cape() != null);
     }
 }

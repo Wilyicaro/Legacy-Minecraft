@@ -7,52 +7,50 @@ import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.legacy.Skins.skin.SkinSync;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class SkinsBootstrap {
+    private static final Map<UUID, Integer> PENDING_JOIN_SYNC = new ConcurrentHashMap<>();
+
     private SkinsBootstrap() {
     }
 
-    private static final java.util.concurrent.ConcurrentHashMap<UUID, Long> LAST_JOIN_SYNC_MS =
-            new java.util.concurrent.ConcurrentHashMap<>();
-
     public static void initCommon() {
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(SkinsBootstrap::onServerPlayerJoin);
-    }
-
-    private static void runLater(MinecraftServer server, int ticks, Runnable task) {
-        if (server == null || task == null) return;
-        if (ticks <= 0) {
-            server.execute(task);
-        } else {
-            server.execute(() -> runLater(server, ticks - 1, task));
-        }
+        FactoryEvent.afterServerTick(SkinsBootstrap::processPendingJoinSync);
+        FactoryEvent.serverStopping(server -> PENDING_JOIN_SYNC.clear());
     }
 
     private static void onServerPlayerJoin(ServerPlayer joining) {
-        handleServerPlayerJoin(joining);
-    }
-
-    public static void handleServerPlayerJoin(ServerPlayer joining) {
         MinecraftServer server = FactoryAPIPlatform.getEntityServer(joining);
         if (server == null) return;
+        PENDING_JOIN_SYNC.put(joining.getUUID(), FactoryAPI.getLoader().isForgeLike() ? 20 : 2);
+    }
 
-        long now = System.currentTimeMillis();
-        long last = LAST_JOIN_SYNC_MS.getOrDefault(joining.getUUID(), 0L);
-        if (now - last < 1_000L) return;
-        LAST_JOIN_SYNC_MS.put(joining.getUUID(), now);
-
-        int delayTicks = FactoryAPI.getLoader().isForgeLike() ? 20 : 2;
-        runLater(server, delayTicks, () -> {
-            SkinSync.sendSnapshotTo(joining, server);
-            SkinSync.requestSkin(joining);
-
-            for (ServerPlayer p : server.getPlayerList().getPlayers()) {
-                if (p == null) continue;
-                if (SkinSync.getServerSkinId(p.getUUID()) == null) {
-                    SkinSync.requestSkin(p);
-                }
+    private static void processPendingJoinSync(MinecraftServer server) {
+        Iterator<Map.Entry<UUID, Integer>> iterator = PENDING_JOIN_SYNC.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Integer> entry = iterator.next();
+            int ticks = entry.getValue() - 1;
+            if (ticks > 0) {
+                entry.setValue(ticks);
+                continue;
             }
-        });
+            iterator.remove();
+            ServerPlayer joining = server.getPlayerList().getPlayer(entry.getKey());
+            if (joining != null) syncJoin(server, joining);
+        }
+    }
+
+    private static void syncJoin(MinecraftServer server, ServerPlayer joining) {
+        SkinSync.sendSnapshotTo(joining, server);
+        SkinSync.requestSkin(joining);
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            if (player == null || SkinSync.getServerSkinId(player.getUUID()) != null) continue;
+            SkinSync.requestSkin(player);
+        }
     }
 }

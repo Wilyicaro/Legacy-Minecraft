@@ -46,14 +46,13 @@ public abstract class AvatarSkinMixin {
                 access.consoleskins$getCachedModelId(),
                 access.consoleskins$getCachedBoxModel()
         );
-        ResourceLocation texture = resolved == null ? null : resolved.texture();
-        access.consoleskins$setCachedTexture(texture);
+        access.consoleskins$setCachedTexture(resolved == null ? null : resolved.texture());
         access.consoleskins$setCachedBoxTexture(resolved == null ? null : resolved.boxTexture());
         access.consoleskins$setCachedModelId(resolved == null ? null : resolved.modelId());
         access.consoleskins$setCachedBoxModel(resolved == null ? null : resolved.boxModel());
-        boolean showCape = resolved != null && resolved.entry() != null && resolved.entry().cape() != null && !avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA);
+        boolean showCape = ClientSkinAssets.shouldShowCape(resolved, avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA));
         state.showCape = showCape;
-        PlayerSkin cachedSkin = ClientSkinAssets.getCachedPlayerSkin(skinId, resolved == null ? null : resolved.entry(), showCape);
+        PlayerSkin cachedSkin = ClientSkinAssets.resolvePlayerSkin(skinId, resolved, showCape);
         if (cachedSkin != null) { state.skin = cachedSkin; }
     }
     @Unique
