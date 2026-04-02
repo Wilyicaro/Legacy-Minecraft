@@ -121,7 +121,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
         renderableVList.layoutSpacing(l -> 2);
 
-        packList = new ChangeSkinPackList(this::playFocusSound, this::playPackSelectionSound);
+        packList = new ChangeSkinPackList(this::playFocusSound, this::playPressSound);
 
         SkinPackLoader.ensureLoaded();
 
@@ -176,10 +176,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected void playPressSound() {
         LegacySoundUtil.playSimpleUISound(LegacyRegistries.ACTION.get(), 1.0f);
-    }
-
-    protected void playPackSelectionSound() {
-        LegacySoundUtil.playSimpleUISound(LegacyRegistries.PACK_SELECTION.get(), 1.0f);
     }
 
     protected void playClickSound() {
@@ -515,12 +511,8 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         int target = Math.floorMod(index, count);
         packList.setFocusedPackIndex(target, true);
         if (requestFocus) {
-            RenderableVList list = getRenderableVList();
-            if (target >= 0 && target < list.renderables.size()) list.focusRenderable(list.renderables.get(target));
-            else {
-                ChangeSkinPackList.PackButton button = findPackButton(target);
-                if (button != null) focusPackListItem(button);
-            }
+            ChangeSkinPackList.PackButton button = findPackButton(target);
+            if (button != null) focusPackListItem(button);
         }
         return true;
     }
@@ -710,14 +702,14 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (key == InputConstants.KEY_LSHIFT || key == InputConstants.KEY_RSHIFT) {
             if (!shiftHeld) {
                 shiftHeld = true;
-                updateCenterPreview(false, PlayerSkinWidget::togglePose);
+                updateCenterPreview(true, PlayerSkinWidget::togglePose);
             }
             return true;
         }
         if (key == InputConstants.KEY_P) {
             if (!pHeld) {
                 pHeld = true;
-                updateCenterPreview(false, PlayerSkinWidget::togglePunch);
+                updateCenterPreview(true, PlayerSkinWidget::togglePunch);
             }
             return true;
         }
@@ -752,7 +744,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (carouselAnimating()) return true;
 
         if (e.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
-            updateCenterPreview(false, PlayerSkinWidget::recenterView);
+            updateCenterPreview(true, PlayerSkinWidget::recenterView);
             return true;
         }
         if (e.button() != InputConstants.MOUSE_BUTTON_LEFT) return true;
@@ -809,12 +801,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (g == 0) return false;
 
         RenderableVList vList = getRenderableVListAt(d, e);
-        if (vList == getRenderableVList()) {
-            if (!packListNavigationAllowed() || packList.getPackCount() <= 1) return true;
-            focusRelativePack(g > 0 ? -1 : 1, true);
-            applyQueuedPackChange();
-            return true;
-        }
         if (vList != null) { vList.mouseScrolled(g); return true; }
 
         if (playerSkinWidgetList == null) return false;
@@ -837,7 +823,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         }
 
         if (!ControlType.getActiveType().isKbm() && buttonOnce(state, ControllerBinding.RIGHT_STICK_BUTTON)) {
-            updateCenterPreview(false, PlayerSkinWidget::recenterView);
+            updateCenterPreview(true, PlayerSkinWidget::recenterView);
             return true;
         }
 
@@ -852,7 +838,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                     if (sy <= -triggerY) {
                         if (!stickUpHeld) {
                             stickUpHeld = true;
-                            updateCenterPreview(false, preview -> {
+                            updateCenterPreview(true, preview -> {
                                 if (preview.isPunchLoop()) preview.setPoseMode(1, false, false);
                                 else preview.togglePunch();
                             });
@@ -863,7 +849,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                     if (sy >= triggerY) {
                         if (!stickDownHeld) {
                             stickDownHeld = true;
-                            updateCenterPreview(false, preview -> {
+                            updateCenterPreview(true, preview -> {
                                 if (preview.getPoseMode() == 1) preview.setPoseMode(0, true, false);
                                 else preview.togglePose();
                             });
@@ -913,7 +899,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) { drawScaledCentered(g, text, centerX, y, color, smallTextScale()); }
 
-    protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
+    private void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         var pose = g.pose();
         pose.pushMatrix();

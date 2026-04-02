@@ -34,13 +34,6 @@
       }
     ]
   },
-  "random.pack_selection": {
-    "sounds": [
-      {
-        "name": "legacy:pack_selection"
-      }
-    ]
-  },
   "random.shift_lock": {
     "sounds": [
       {

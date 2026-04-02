@@ -21,9 +21,6 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(PlayerModel.class)
 public abstract class MenuDollMixin {
-    private static final float MENU_WALK_SPEED = 3.45F;
-    private static final float MENU_WALK_SWING = 0.096F;
-
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
     private void consoleskins$menuDollFixHeadSpin(AvatarRenderState state, CallbackInfo ci) {
         if (state == null) return;
@@ -42,17 +39,21 @@ public abstract class MenuDollMixin {
             hat.zRot = 0.0F;
             if (state.isCrouching) { head.yRot = 0.15F; }
             float t = (System.currentTimeMillis() % 1_000_000L) / 1000.0F;
-            float swing = (float) Math.sin(t * MENU_WALK_SPEED) * MENU_WALK_SWING;
+            float speed = 3.0F;
+            float swing = (float) Math.sin(t * speed) * 0.084F;
             self.rightArm.xRot += swing;
             self.leftArm.xRot -= swing;
             self.rightLeg.xRot -= swing;
             self.leftLeg.xRot += swing;
-            consoleskins$syncArmLayers(self);
-            consoleskins$syncLegLayers(self);
             if (customAnimation && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_ARMS, skinId)) {
                 self.rightArm.xRot -= swing;
                 self.leftArm.xRot += swing;
-                consoleskins$syncArmLayers(self);
+                self.rightSleeve.xRot = self.rightArm.xRot;
+                self.rightSleeve.yRot = self.rightArm.yRot;
+                self.rightSleeve.zRot = self.rightArm.zRot;
+                self.leftSleeve.xRot = self.leftArm.xRot;
+                self.leftSleeve.yRot = self.leftArm.yRot;
+                self.leftSleeve.zRot = self.leftArm.zRot;
             }
         } else if (customAnimation && stiffLegs) { consoleskins$applyStiffLegs(self, state); }
         if (!customAnimation) return;
@@ -69,37 +70,6 @@ public abstract class MenuDollMixin {
         if (WeepingStatuePose.shouldApply(state)) { WeepingStatuePose.apply(self, state); }
         if (SyncLegsPose.shouldApply(state)) { SyncLegsPose.apply(self); }
     }
-
-    private static void consoleskins$syncArmLayers(PlayerModel model) {
-        model.rightSleeve.xRot = model.rightArm.xRot;
-        model.rightSleeve.yRot = model.rightArm.yRot;
-        model.rightSleeve.zRot = model.rightArm.zRot;
-        model.rightSleeve.x = model.rightArm.x;
-        model.rightSleeve.y = model.rightArm.y;
-        model.rightSleeve.z = model.rightArm.z;
-        model.leftSleeve.xRot = model.leftArm.xRot;
-        model.leftSleeve.yRot = model.leftArm.yRot;
-        model.leftSleeve.zRot = model.leftArm.zRot;
-        model.leftSleeve.x = model.leftArm.x;
-        model.leftSleeve.y = model.leftArm.y;
-        model.leftSleeve.z = model.leftArm.z;
-    }
-
-    private static void consoleskins$syncLegLayers(PlayerModel model) {
-        model.rightPants.xRot = model.rightLeg.xRot;
-        model.rightPants.yRot = model.rightLeg.yRot;
-        model.rightPants.zRot = model.rightLeg.zRot;
-        model.rightPants.x = model.rightLeg.x;
-        model.rightPants.y = model.rightLeg.y;
-        model.rightPants.z = model.rightLeg.z;
-        model.leftPants.xRot = model.leftLeg.xRot;
-        model.leftPants.yRot = model.leftLeg.yRot;
-        model.leftPants.zRot = model.leftLeg.zRot;
-        model.leftPants.x = model.leftLeg.x;
-        model.leftPants.y = model.leftLeg.y;
-        model.leftPants.z = model.leftLeg.z;
-    }
-
     private static void consoleskins$applyStiffLegs(PlayerModel model, AvatarRenderState state) {
         if (model == null) return;
         boolean sitting = state != null && (state.pose == Pose.SITTING || state.hasPose(Pose.SITTING)
@@ -128,6 +98,15 @@ public abstract class MenuDollMixin {
             model.rightLeg.z = 0.0F;
             model.leftLeg.z = 0.0F;
         }
-        consoleskins$syncLegLayers(model);
+        model.rightPants.xRot = model.rightLeg.xRot;
+        model.rightPants.yRot = model.rightLeg.yRot;
+        model.rightPants.zRot = model.rightLeg.zRot;
+        model.rightPants.x = model.rightLeg.x;
+        model.rightPants.z = model.rightLeg.z;
+        model.leftPants.xRot = model.leftLeg.xRot;
+        model.leftPants.yRot = model.leftLeg.yRot;
+        model.leftPants.zRot = model.leftLeg.zRot;
+        model.leftPants.x = model.leftLeg.x;
+        model.leftPants.z = model.leftLeg.z;
     }
 }

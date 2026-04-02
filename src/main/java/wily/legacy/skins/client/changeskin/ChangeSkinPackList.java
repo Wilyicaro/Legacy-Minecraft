@@ -3,7 +3,6 @@ package wily.legacy.Skins.client.changeskin;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Skins.client.util.SkinTextUtil;
 import wily.legacy.Skins.skin.SkinIdUtil;
@@ -215,16 +214,12 @@ public final class ChangeSkinPackList {
         }
 
         @Override
-        public boolean isHoveredOrFocused() { return packIndex >= 0 && owner.focusedPackIndex == packIndex; }
+        public boolean isHoveredOrFocused() { return packIndex >= 0 && owner.focusedPackIndex == packIndex || super.isHoveredOrFocused(); }
 
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(graphics, mouseX, mouseY, partialTick);
             if (!ControlType.getActiveType().isKbm() && isFocused() && packIndex >= 0 && owner.focusedPackIndex != packIndex) owner.setFocusedPackIndex(packIndex, false);
-        }
-
-        @Override
-        public void playDownSound(SoundManager soundManager) {
         }
 
         @Override

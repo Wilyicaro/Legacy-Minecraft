@@ -29,11 +29,10 @@ public class PlayerSkinWidgetList {
     private static final float[] SLOT_SCALE_MUL = new float[]{1f, 0.8f, 0.6375f, 0.508333f, 0.404167f};
     private static final float[] SLOT_DX_MUL = new float[]{0f, 1f, 1.808f, 2.460f, 2.989f};
     private static final float[] SLOT_DY_MUL = new float[]{0f, 30f / 294f, 53f / 294f, 72f / 294f, 87f / 294f};
+    private static final int[] VISIBLE_OFFSETS = new int[]{0, -1, 1, -2, 2, -3, 3, -4, 4};
     private float uiScale = 1f;
     private float carouselScaleMultiplier = 1f;
     private float carouselSpacingMultiplier = 1f;
-    private int visibleRadius = VISIBLE_RADIUS;
-    private int renderRadius = VISIBLE_RADIUS;
     private final ArrayList<PlayerSkinWidget> ring = new ArrayList<>();
     private boolean forceInstantNextLayout;
     private boolean avoidRepeatsWhenFew;
@@ -81,14 +80,6 @@ public class PlayerSkinWidgetList {
         this.carouselSpacingMultiplier = spacingMultiplier <= 0f ? 1f : spacingMultiplier;
     }
 
-    public void setVisibleRadius(int radius) {
-        this.visibleRadius = Mth.clamp(radius, 1, VISIBLE_RADIUS);
-    }
-
-    public void setRenderRadius(int radius) {
-        this.renderRadius = Mth.clamp(radius, 1, VISIBLE_RADIUS);
-    }
-
     public void setAvoidRepeatsWhenFew(boolean enabled, int threshold) {
         this.avoidRepeatsWhenFew = enabled;
         this.avoidRepeatsThreshold = Math.max(1, threshold);
@@ -109,11 +100,6 @@ public class PlayerSkinWidgetList {
     }
 
     public PlayerSkinWidget getCenter() { return getVisible(0); }
-
-    public int getCenterAnchorX() {
-        float centerScale = getCenterScale();
-        return resolveSlotCenterX(0, getDefaultCenterX(centerScale), getSlotSpacing());
-    }
 
     public void setSkinIds(List<String> skinIds, boolean instant) {
         this.skinIds = skinIds == null ? List.of() : skinIds;
@@ -140,7 +126,7 @@ public class PlayerSkinWidgetList {
 
     private SlotLayout computeSlot(int offset) {
         int abs = Math.abs(offset);
-        if (abs > visibleRadius) return null;
+        if (abs > VISIBLE_RADIUS) return null;
 
         float centerScale = getCenterScale();
         float scale = centerScale * SLOT_SCALE_MUL[abs];
@@ -232,7 +218,7 @@ public class PlayerSkinWidgetList {
             if (sparse && (offset < sparseStart || offset > sparseEnd)) {
                 id = null;
             } else if (avoid) {
-                if (Math.abs(offset) > visibleRadius) id = null;
+                if (Math.abs(offset) >= VISIBLE_RADIUS) id = null;
                 else id = avoidIds[offset + 4];
             } else {
                 int skinIndex = Math.floorMod(this.index + offset, n);
@@ -277,7 +263,6 @@ public class PlayerSkinWidgetList {
     private void setupSlot(PlayerSkinWidget w, int offset) {
         int prevOffset = w.slotOffset;
         w.slotOffset = offset;
-        w.renderRadius = renderRadius;
 
         SlotLayout fin = computeSlot(offset);
         if (fin == null) {
@@ -288,16 +273,16 @@ public class PlayerSkinWidgetList {
 
         int currentX = w.getX();
         int warp = Math.max(1, Math.round(120 * uiScale));
-        int wrapThreshold = Math.max(warp, fin.step() * visibleRadius);
+        int wrapThreshold = Math.max(warp, fin.step() * VISIBLE_RADIUS);
         int n = skinIds == null ? 0 : skinIds.size();
         boolean sparse = isSparseCarousel(n);
         boolean wrapCross = sparse && w.visible && lastShiftDir != 0 && prevOffset != 0 && offset != 0
                 && Integer.signum(prevOffset) != Integer.signum(offset);
         boolean wrap = w.visible && (Math.abs(currentX - fin.x()) > wrapThreshold || wrapCross);
-        boolean doPreSnap = wrap && lastShiftDir != 0 && Math.abs(prevOffset) <= visibleRadius - 1;
+        boolean doPreSnap = wrap && lastShiftDir != 0 && Math.abs(prevOffset) <= VISIBLE_RADIUS - 1;
         if (doPreSnap) {
             int midOffset = prevOffset + lastShiftDir;
-            if (Math.abs(midOffset) <= visibleRadius) {
+            if (Math.abs(midOffset) <= VISIBLE_RADIUS) {
                 SlotLayout mid = computeSlot(midOffset);
                 if (mid != null) {
                     w.visible();
