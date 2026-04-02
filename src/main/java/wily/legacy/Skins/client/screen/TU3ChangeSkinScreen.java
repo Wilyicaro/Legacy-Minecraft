@@ -304,9 +304,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void addControlTooltips(ControlTooltip.Renderer r) {
         addCommonControlTooltips(
                 r,
-                () -> ControlType.getActiveType().isKbm()
-                        ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
-                        : ControllerBinding.LEFT_STICK.bindingState.getIcon(),
+                ControlTooltip.POINTER_MOVEMENT::get,
                 () -> Component.literal("Navigate")
         );
     }

@@ -78,6 +78,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private SkinEntry cachedEntry;
     private final int originalWidth, originalHeight;
     public int slotOffset;
+    public int renderRadius = 4;
     private float rotationX, rotationY, prevPosX, prevPosY, prevRotationX, prevRotationY, prevScale;
     private float targetRotationX = Float.NEGATIVE_INFINITY, targetRotationY = Float.NEGATIVE_INFINITY, targetPosX = Float.NEGATIVE_INFINITY,
             targetPosY = Float.NEGATIVE_INFINITY;
@@ -288,7 +289,7 @@ public class PlayerSkinWidget extends AbstractWidget {
             }
 
             int absOffset = Math.abs(this.slotOffset);
-            if (absOffset >= 4 && progress > 1f) return;
+            if (absOffset > renderRadius && progress > 1f) return;
 
             int left = this.getX();
             int top = this.getY();
