@@ -54,7 +54,7 @@ public final class ClientSkinAssets {
         skinId = SkinIdUtil.isBlankOrAutoSelect(skinId) ? null : skinId;
         SkinEntry entry = skinId == null ? null : SkinPackLoader.getSkin(skinId);
         if (texture == null) texture = resolveTexture(skinId, entry);
-        if (modelId == null) modelId = getModelIdFromTexture(texture);
+        if (modelId == null) modelId = entry != null && entry.modelId() != null ? entry.modelId() : getModelIdFromTexture(texture);
         if (boxModel == null) boxModel = resolveBoxModel(skinId, modelId);
         if (entry == null && texture == null && modelId == null && boxModel == null) return null;
         ResourceLocation boxTexture = modelId == null ? texture : BoxModelManager.getTexture(modelId);
@@ -288,24 +288,16 @@ public final class ClientSkinAssets {
     }
     private static ResourceLocation resolveModelLocation(Minecraft client, String skinId, SkinEntry entry) {
         if (client == null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
-        if (entry != null && entry.texture() != null) {
-            ResourceLocation packModel = resolvePackModelLocation(entry.texture(), skinId);
+        if (entry != null) {
+            ResourceLocation modelId = entry.modelId();
+            if (modelId != null) {
+                ResourceLocation jsonId = BoxModelManager.getJsonLocation(modelId);
+                if (jsonId != null && client.getResourceManager().getResource(jsonId).isPresent()) return jsonId;
+            }
+            ResourceLocation packModel = SkinIdUtil.modelLocation(entry.texture());
             if (packModel != null && client.getResourceManager().getResource(packModel).isPresent()) return packModel;
-            ResourceLocation localModel = ResourceLocation.fromNamespaceAndPath(entry.texture().getNamespace(), "box_models/" + skinId + ".json");
-            if (client.getResourceManager().getResource(localModel).isPresent()) return localModel;
         }
         return ResourceLocation.fromNamespaceAndPath("legacy", "box_models/" + skinId + ".json");
-    }
-    private static ResourceLocation resolvePackModelLocation(ResourceLocation texture, String skinId) {
-        if (texture == null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
-        String path = texture.getPath();
-        int index = path.indexOf("skinpacks/");
-        if (index < 0) return null;
-        String after = path.substring(index + "skinpacks/".length());
-        int slash = after.indexOf('/');
-        if (slash <= 0) return null;
-        String folder = after.substring(0, slash);
-        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), "skinpacks/" + folder + "/box_models/" + skinId + ".json");
     }
     private static byte[] loadBytes(Minecraft client, ResourceLocation id) {
         if (client == null || id == null) return new byte[0];

@@ -351,11 +351,15 @@ public class PlayerSkinWidget extends AbstractWidget {
                 String theme = null;
                 if (!SkinIdUtil.isAutoSelect(id)) {
                     SkinEntry themeEntry = getCachedEntry(id);
-                    String ns = themeEntry != null && themeEntry.texture() != null ? themeEntry.texture().getNamespace() : SkinSync.ASSET_NS;
-                    ResourceLocation texture = themeEntry != null && themeEntry.texture() != null
-                            ? themeEntry.texture()
-                            : ResourceLocation.fromNamespaceAndPath(ns, id);
-                    theme = BoxModelManager.getThemeText(ClientSkinAssets.getModelIdFromTexture(texture));
+                    ResourceLocation modelId = themeEntry == null ? null : themeEntry.modelId();
+                    if (modelId == null) {
+                        String ns = themeEntry != null && themeEntry.texture() != null ? themeEntry.texture().getNamespace() : SkinSync.ASSET_NS;
+                        ResourceLocation texture = themeEntry != null && themeEntry.texture() != null
+                                ? themeEntry.texture()
+                                : ResourceLocation.fromNamespaceAndPath(ns, id);
+                        modelId = ClientSkinAssets.getModelIdFromTexture(texture);
+                    }
+                    theme = BoxModelManager.getThemeText(modelId);
                     if (theme != null && (theme.isBlank() || theme.equals(label))) theme = null;
                 }
 

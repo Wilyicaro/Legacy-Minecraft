@@ -101,6 +101,23 @@ public final class BoxModelManager {
         }
     }
 
+    public static void registerAlias(ResourceLocation id, ResourceLocation jsonId) {
+        if (id == null || jsonId == null) return;
+        ensureInitialized();
+        JSON_INDEX.put(id, jsonId);
+        SKINPACK_MODELS.add(id);
+        indexKeys(id.getNamespace(), id, false);
+        CACHE.remove(id);
+        LOADED.remove(id);
+        LOAD_LOCKS.remove(id);
+    }
+
+    public static ResourceLocation getJsonLocation(ResourceLocation id) {
+        if (id == null) return null;
+        ensureInitialized();
+        return JSON_INDEX.get(id);
+    }
+
     private static void clearState() {
         CACHE.clear();
         RUNTIME.clear();

@@ -443,8 +443,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             float labelScale = bigTextScale() * LABEL_SCALE_BUMP;
             drawScaledCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF, labelScale);
 
-            String ns = entry != null && entry.texture() != null ? entry.texture().getNamespace() : SkinSync.ASSET_NS;
-            ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(ns, skinId);
+            ResourceLocation modelId = entry == null ? null : entry.modelId();
+            if (modelId == null && entry != null && entry.texture() != null) modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
 
             String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {

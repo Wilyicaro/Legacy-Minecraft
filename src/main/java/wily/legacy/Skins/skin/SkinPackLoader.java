@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import wily.legacy.Skins.client.lang.SkinPackLang;
+import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
 import wily.legacy.Skins.util.DebugLog;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -198,7 +200,6 @@ public final class SkinPackLoader {
                                        ResourceManager rm,
                                        PackLoadState state) {
         if (state == null) return;
-        collectPoseTagsFromPackJson(namespace, json);
         String name = SkinPackJson.string(json.get("name"));
         if (name == null || name.isBlank()) name = packId;
         name = SkinPackLang.translateMaybeKey(name, packId);
@@ -208,6 +209,8 @@ public final class SkinPackLoader {
         if (type == null) type = "";
         JsonArray skins = json.getAsJsonArray("skins");
         ArrayList<SkinEntryWithIndex> tmp = new ArrayList<>();
+        LinkedHashSet<String> usedSkinIds = new LinkedHashSet<>(state.skinsById.keySet());
+        LinkedHashMap<String, List<String>> skinIdsBySourceId = new LinkedHashMap<>();
         if (skins != null) {
             for (int i = 0; i < skins.size(); i++) {
                 JsonElement e = skins.get(i);
@@ -216,9 +219,10 @@ public final class SkinPackLoader {
                 String skinId = SkinPackJson.string(o.get("id"));
                 String texPath = SkinPackJson.string(o.get("texture"));
                 if (skinId == null || skinId.isBlank() || texPath == null || texPath.isBlank()) continue;
+                String sourceId = skinId;
                 String skinName = SkinPackJson.string(o.get("name"));
-                if (skinName == null || skinName.isBlank()) skinName = skinId;
-                skinName = SkinPackLang.translateMaybeKey(skinName, skinId);
+                if (skinName == null || skinName.isBlank()) skinName = sourceId;
+                skinName = SkinPackLang.translateMaybeKey(skinName, sourceId);
                 int order = SkinPackJson.integer(o.get("order"), i + 1);
                 String capePath = SkinPackJson.string(o.get("cape"));
                 boolean slimArms = SkinPackJson.bool(o.get("slim"), false);
@@ -236,20 +240,26 @@ public final class SkinPackLoader {
                     if (m.equals("wide") || m.equals("default") || m.equals("steve")) slimArms = false;
                 }
                 if (!modelExplicit && SkinIdUtil.PACK_DEFAULT.equals(packId)) {
-                    String sidLower = skinId.toLowerCase(Locale.ROOT);
+                    String sidLower = sourceId.toLowerCase(Locale.ROOT);
                     String tpLower = texPath.toLowerCase(Locale.ROOT);
                     if (sidLower.contains("alex") || tpLower.contains("alex")) slimArms = true;
                 }
-                collectPoseTagsFromSkinJson(o, skinId);
                 ResourceLocation texture = texPath.startsWith(SKINPACKS_PREFIX) || texPath.startsWith(DEFAULT_SKINPACKS_PREFIX)
                         ? ResourceLocation.fromNamespaceAndPath(namespace, texPath)
                         : ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + texPath);
+                String loadedSkinId = SkinIdUtil.uniqueLoadedSkinId(packId, sourceId, usedSkinIds);
+                usedSkinIds.add(loadedSkinId);
+                ResourceLocation modelId = SkinIdUtil.modelId(texture.getNamespace(), loadedSkinId);
+                ResourceLocation modelLocation = SkinIdUtil.modelLocation(texture);
+                if (modelId != null && modelLocation != null) BoxModelManager.registerAlias(modelId, modelLocation);
                 ResourceLocation cape = null;
                 if (capePath != null && !capePath.isBlank()) {
                     if (capePath.startsWith(SKINPACKS_PREFIX) || capePath.startsWith(DEFAULT_SKINPACKS_PREFIX)) cape = ResourceLocation.fromNamespaceAndPath(namespace, capePath);
                     else cape = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + capePath);
                 }
-                tmp.add(new SkinEntryWithIndex(new SkinEntry(skinId, skinName, texture, cape, slimArms, order), i));
+                collectPoseTagsFromSkinJson(o, loadedSkinId);
+                skinIdsBySourceId.computeIfAbsent(sourceId, ignored -> new ArrayList<>()).add(loadedSkinId);
+                tmp.add(new SkinEntryWithIndex(new SkinEntry(loadedSkinId, sourceId, skinName, texture, modelId, cape, slimArms, order), i));
             }
         }
         tmp.sort(Comparator.comparingInt((SkinEntryWithIndex w) -> w.entry.order()).thenComparingInt(w -> w.index));
@@ -261,6 +271,7 @@ public final class SkinPackLoader {
             state.packBySkin.putIfAbsent(entry.id(), packId);
         }
         if (entries.isEmpty()) return;
+        collectPoseTagsFromPackJson(namespace, json, skinIdsBySourceId);
         ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/pack.png");
         if (rm.getResource(icon).isEmpty()) {
             ResourceLocation alt = ResourceLocation.fromNamespaceAndPath(namespace, DEFAULT_SKINPACKS_PREFIX + packFolder + "/pack.png");
@@ -290,14 +301,14 @@ public final class SkinPackLoader {
             return;
         }
     }
-    private static void collectPoseTagsFromPackJson(String namespace, JsonObject packObj) {
+    private static void collectPoseTagsFromPackJson(String namespace, JsonObject packObj, Map<String, List<String>> skinIdsBySourceId) {
         if (packObj == null) return;
         JsonObject poses = poseObject(packObj);
         if (poses == null) return;
         for (Map.Entry<String, JsonElement> e : poses.entrySet()) {
             SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(e.getKey());
             if (tag == null) continue;
-            collectPoseSelectors(e.getValue(), selector -> SkinPoseRegistry.addSelector(tag, selector, namespace));
+            collectPoseSelectors(e.getValue(), selector -> addPackPoseSelector(tag, selector, namespace, skinIdsBySourceId));
         }
     }
     private static void collectPoseTagsFromSkinJson(JsonObject skinObj, String skinId) {
@@ -330,6 +341,32 @@ public final class SkinPackLoader {
         }
         String selector = SkinPackJson.string(value);
         if (selector != null) consumer.accept(selector);
+    }
+
+    private static void addPackPoseSelector(SkinPoseRegistry.PoseTag tag,
+                                            String selector,
+                                            String namespace,
+                                            Map<String, List<String>> skinIdsBySourceId) {
+        String sourceId = exactSourceId(selector, namespace);
+        if (sourceId != null && skinIdsBySourceId != null) {
+            List<String> ids = skinIdsBySourceId.get(sourceId);
+            if (ids != null && !ids.isEmpty()) {
+                for (String id : ids) SkinPoseRegistry.addSelector(tag, id, null);
+                return;
+            }
+        }
+        SkinPoseRegistry.addSelector(tag, selector, namespace);
+    }
+
+    private static String exactSourceId(String selector, String namespace) {
+        if (selector == null) return null;
+        String value = selector.trim();
+        if (value.isEmpty() || value.indexOf('*') >= 0 || value.indexOf('?') >= 0) return null;
+        int split = value.indexOf(':');
+        if (split < 0) return value;
+        if (namespace == null || namespace.isBlank()) return null;
+        if (split == namespace.length() && value.startsWith(namespace + ":")) return value.substring(split + 1);
+        return null;
     }
     private record SkinEntryWithIndex(SkinEntry entry, int index) { }
     private record LoadedPack(SkinPack pack, int sortIndex, boolean hasSort, int insertIndex) { }
