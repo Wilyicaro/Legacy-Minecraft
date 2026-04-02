@@ -25,12 +25,16 @@ import wily.legacy.util.client.LegacyRenderUtil;
 public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float NORMAL_CAROUSEL_BASE_SCALE = 0.935f;
     private static final float NORMAL_CAROUSEL_BASE_SPACING = 80f;
+    private static final float NORMAL_DOLL_SCALE_BUMP = 1.05f;
+    private static final float LABEL_SCALE_BUMP = 1.04f;
+    private static final float HEADER_SCALE_BUMP = 1.06f;
     private static final int PACK_LIST_VISIBLE_ROWS = 6;
     private static final int PACK_LIST_FOOTER_RESERVE = 12;
+    private static final float HD_MENU_SCALE = 1.10f;
     private static final ChangeSkinScreenLayout HD_LAYOUT = new ChangeSkinScreenLayout(
-            false, 180, 290, 400,
-            24, 112, 34, 20, 7,
-            10, 5, 5, 5, 18, 10,
+            false, hd(180), hd(290), hd(400),
+            hd(24), hd(112), hd(34), hd(20), hd(7),
+            hd(10), hd(5), hd(5), hd(5), hd(18), hd(10),
             1.485f, 0.65f, 1.045f, 0.60f,
             ChangeSkinLayoutMetrics.DEFAULT
     );
@@ -50,13 +54,19 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 10, 7, 5, 16, 80, 14, 60,
                 1, 59, 55, 55, 5, 20, 18, 40,
                 5, 16, 14, 80, 24, 50, 60, 3, 30,
-                7, 129, 14, 140, 11, 22, 136, 8, 2, 8,
+                12, 137, 24, 147, 16, 32, 140, 20, 2, 8,
                 5, 18, 49, 26, 6, 12, 27, 8, 10
         );
     }
 
-    private static final int BEACON_CHECK_TEXTURE_SIZE = 28, BEACON_CHECK_VISIBLE_X = 3, BEACON_CHECK_VISIBLE_Y = 4,
-            BEACON_CHECK_VISIBLE_W = 24, BEACON_CHECK_VISIBLE_H = 20, SELECTION_ICON_SIZE = 16, PACK_BUTTON_BASE_HEIGHT = 20;
+    private static final int BEACON_CHECK_TEXTURE_SIZE = 28, BEACON_CHECK_VISIBLE_W = 24, BEACON_CHECK_VISIBLE_H = 20,
+            HEART_TEXTURE_SIZE = 9, SELECTION_ICON_SIZE = 16, PACK_BUTTON_BASE_HEIGHT = 20;
+    private static final float BEACON_CHECK_CENTER_X = 14.0f;
+    private static final float BEACON_CHECK_CENTER_Y = 12.5f;
+    private static final float TICK_HOLDER_OFFSET_X = 1.0f / 118.0f;
+    private static final float TICK_HOLDER_OFFSET_Y = -3.0f / 117.0f;
+    private static final float HEART_HOLDER_OFFSET_X = -0.5f / 118.0f;
+    private static final float HEART_HOLDER_OFFSET_Y = -2.0f / 117.0f;
     private static final ResourceLocation SKIN_PANEL = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_panel"),
             PANEL_FILLER = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/panel_filler"),
             PACK_NAME_BOX = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/pack_name_box"),
@@ -73,6 +83,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private int lastLayoutHeight = -1;
 
     public ChangeSkinScreen(Screen parent) { super(parent); }
+
+    private static int hd(int value) { return Math.max(1, Math.round(value * HD_MENU_SCALE)); }
 
     @Override
     protected ChangeSkinScreenLayout resolveRuntimeLayout() { return isCompact480() ? ChangeSkinScreenLayout.DEFAULT : HD_LAYOUT; }
@@ -91,7 +103,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         float spacingMultiplier = getLayoutMetrics().carouselOffset() / NORMAL_CAROUSEL_BASE_SPACING;
         if (scaleMultiplier <= 0f) scaleMultiplier = 1f;
         if (spacingMultiplier <= 0f) spacingMultiplier = 1f;
+        scaleMultiplier *= 1.10f * NORMAL_DOLL_SCALE_BUMP;
+        spacingMultiplier *= 1.16f;
 
+        playerSkinWidgetList.setRenderRadius(2);
         playerSkinWidgetList.setCarouselTuning(scaleMultiplier, spacingMultiplier);
         if (relayout) playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index, true);
     }
@@ -110,9 +125,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private int adjustPackListHeight(int height) {
-        if (!isCompact480()) return height;
         int visibleRowsHeight = resolvedPackRowHeight * PACK_LIST_VISIBLE_ROWS;
         return Math.max(1, Math.min(height, visibleRowsHeight + PACK_LIST_FOOTER_RESERVE));
+    }
+
+    private int centerTextX() {
+        if (playerSkinWidgetList != null) return playerSkinWidgetList.getCenterAnchorX();
+        return tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
     }
 
     @Override
@@ -182,45 +201,73 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderableVListInit() {
-        addRenderableOnly((g, i, j, f) ->
-                blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL,
-                        panel.x + sc(normalLayout.packFrameInsetX()), panel.y + sc(normalLayout.packFrameTop()), panel.width - sc(normalLayout.packFrameWidthTrim()), panel.height - sc(normalLayout.packFrameBottomTrim())));
+        int frameX = panel.x + sc(normalLayout.packFrameInsetX());
+        int frameY = panel.y + sc(normalLayout.packFrameTop());
+        int frameW = Math.max(1, panel.width - sc(normalLayout.packFrameWidthTrim()));
+        int frameH = Math.max(1, panel.height - sc(normalLayout.packFrameBottomTrim()));
+        int arrowWidth = isCompact480() ? 11 : 14;
+        int arrowHeight = isCompact480() ? 5 : 7;
+        int arrowOffsetX = isCompact480() ? 0 : -2;
+        int arrowOffsetY = isCompact480() ? 8 : -2;
+        int arrowTop = frameY + frameH - sc(6) - arrowHeight;
+        int x = frameX + sc(4);
+        int w = Math.max(1, frameW - sc(8));
+
+        packList.refreshPackIdsIfNeeded();
+        int visibleRows = PACK_LIST_VISIBLE_ROWS;
+        int maxListBottom = arrowTop - sc(4);
+        int rowHeight = Math.max(10, resolvedPackRowHeight);
+        int h = rowHeight * visibleRows + PACK_LIST_FOOTER_RESERVE;
+        int y = maxListBottom - rowHeight * visibleRows;
+        int packFrameRenderX = frameX - sc(2);
+        int packFrameRenderY = y - sc(4);
+        int packFrameRenderW = frameW + sc(4);
+        int packFrameRenderH = frameY + frameH - packFrameRenderY;
+        int packIconTop = panel.y + sc(normalLayout.skinPanelTop());
+        int packIconBottom = packFrameRenderY;
+        int packIconAvailableHeight = Math.max(1, packIconBottom - packIconTop);
+        int packIconSize = Math.max(1, Math.round(Math.min(panel.width - sc(12), packIconAvailableHeight) * 0.8925f));
+        int packIconY = packIconTop + Math.max(0, (packIconAvailableHeight - packIconSize) / 2) - sc(3);
+        int packIconX = panel.x + Math.max(0, (panel.width - packIconSize) / 2);
 
         addRenderableOnly((g, i, j, f) ->
-                blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL,
-                        previewBoxX(), previewBoxY(), previewBoxSize(), previewBoxSize()));
+                blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, packIconX, packIconY, packIconSize, packIconSize));
 
         addRenderableOnly((g, i, j, f) -> {
             SkinPack pack = packList.getFocusedPack();
             ResourceLocation icon = pack == null ? null : pack.icon();
             if (icon == null) return;
-            int inner = Math.max(1, previewBoxSize() - 2);
-            int[] d   = packIconDims(icon);
-            float scale = Math.min(inner / (float) d[0], inner / (float) d[1]);
-            float cx = previewBoxX() + 1 + inner / 2f, cy = previewBoxY() + 1 + inner / 2f;
+            int innerInset = 2;
+            int innerX = packIconX + innerInset;
+            int innerY = packIconY + innerInset;
+            int innerSize = Math.max(1, packIconSize - innerInset * 2);
+            int[] d = packIconDims(icon);
+            float scale = Math.min(innerSize / (float) d[0], innerSize / (float) d[1]);
+            scale += 1f / Math.max(d[0], d[1]);
+            float cx = innerX + innerSize / 2f;
+            float cy = innerY + innerSize / 2f;
             var pose = g.pose();
             pose.pushMatrix();
-            pose.translate(cx, cy); pose.scale(scale, scale); pose.translate(-d[0] / 2f, -d[1] / 2f);
+            pose.translate(cx, cy);
+            pose.scale(scale, scale);
+            pose.translate(-d[0] / 2f, -d[1] / 2f);
             g.blit(RenderPipelines.GUI_TEXTURED, icon, 0, 0, 0, 0, d[0], d[1], d[0], d[1]);
             pose.popMatrix();
         });
 
-        packList.refreshPackIdsIfNeeded();
+        addRenderableOnly((g, i, j, f) ->
+                blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, packFrameRenderX, packFrameRenderY, packFrameRenderW, packFrameRenderH));
+
+        packList.applyResolvedButtonHeight(rowHeight);
         getRenderableVList().renderables.clear();
         if (packList.getPackCount() == 0) {
             getRenderableVList().addRenderable(new ChangeSkinPackList.PackButton(packList, -1, packList.getWrappedLabelForIndex(0), packList.getButtonHeight()));
         } else for (int i = 0; i < packList.getPackCount(); i++) {
             getRenderableVList().addRenderable(new ChangeSkinPackList.PackButton(packList, i, packList.getLabelForIndex(i), packList.getButtonHeight()));
         }
-
-        int x        = panel.x + sc(normalLayout.packListInsetX());
-        int w        = Math.max(1, panel.width - sc(normalLayout.packListWidthTrim()));
-        int minY     = previewBoxY() + previewBoxSize() + sc(normalLayout.previewListGap());
-        int y        = Math.max(panel.y + sc(normalLayout.packListTop()), minY);
-        int h        = adjustPackListHeight(Math.max(1, panel.y + panel.height - sc(normalLayout.packListBottomInset()) - y));
-        getRenderableVList().verticalScrollArrowSize(isCompact480() ? 13 : 16, isCompact480() ? 7 : 9);
-        getRenderableVList().verticalScrollArrowOffset(isCompact480() ? 0 : -5, isCompact480() ? 8 : -2);
-        getRenderableVList().scrollArrowYOffset(-normalLayout.scrollArrowOffset() - sc(normalLayout.scrollArrowOffset()));
+        getRenderableVList().verticalScrollArrowSize(arrowWidth, arrowHeight);
+        getRenderableVList().verticalScrollArrowOffset(arrowOffsetX, arrowOffsetY);
+        getRenderableVList().scrollArrowYOffset(arrowTop - (y + h) - arrowOffsetY);
         getRenderableVList().init("consoleskins.packList", x, y, w, h);
     }
 
@@ -324,10 +371,17 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
 
+        int packNameX = tooltipBox.x - sc(normalLayout.packNameInsetX());
+        int packNameY = panel.y + sc(normalLayout.packNameTop());
+        int packNameW = Math.max(1, tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim()));
+        int packNameH = Math.max(1, sc(normalLayout.packNameHeight()));
+        int packNameRenderH = packNameH + Math.max(1, Math.round(packNameH * 0.10f)) + sc(6);
+
         blitSprite(g, SKIN_PANEL, tooltipBox.x - sc(normalLayout.skinPanelInsetX()), panel.y + sc(normalLayout.skinPanelTop()), Math.max(1, tooltipBox.getWidth()), Math.max(1, tooltipBox.getHeight() - sc(2)));
         blitSprite(g, PANEL_FILLER, tooltipBox.x - sc(normalLayout.panelFillerInsetX()), panel.y + sc(normalLayout.panelFillerTop()) + tooltipBox.getHeight() - sc(normalLayout.panelFillerBottomTrim()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.panelFillerWidthTrim())), Math.max(1, sc(normalLayout.panelFillerHeight())));
         blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, tooltipBox.x - sc(normalLayout.infoPanelInsetX()), panel.y + tooltipBox.getHeight() - sc(normalLayout.infoPanelBottomTrim()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.infoPanelWidthTrim())), Math.max(1, sc(normalLayout.infoPanelHeight())));
-        blitSprite(g, PACK_NAME_BOX, tooltipBox.x - sc(normalLayout.packNameInsetX()), panel.y + sc(normalLayout.packNameTop()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())), Math.max(1, sc(normalLayout.packNameHeight())));
+        blitSprite(g, PACK_NAME_BOX, packNameX, packNameY, packNameW, packNameRenderH);
+        g.fill(packNameX, packNameY, packNameX + packNameW, packNameY + packNameRenderH, 0x66000000);
         blitSprite(g, SKIN_BOX, tooltipBox.x - sc(normalLayout.skinBoxInsetX()), panel.y + sc(normalLayout.skinBoxTop()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.skinBoxWidthTrim())), Math.max(1, tooltipBox.getHeight() - sc(normalLayout.skinBoxBottomTrim())));
 
         int holder    = Math.max(1, sc(normalLayout.actionHolderSize()));
@@ -345,25 +399,31 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
             if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
                 int iconY = iconBaseY + sc(normalLayout.actionHolderTopOffset());
-                float drawW = Math.max(1, sc(SELECTION_ICON_SIZE));
-                float drawH = Math.max(1, Math.round(drawW * (BEACON_CHECK_VISIBLE_H / (float) BEACON_CHECK_VISIBLE_W)));
-                float scaleX = drawW / BEACON_CHECK_VISIBLE_W;
-                float scaleY = drawH / BEACON_CHECK_VISIBLE_H;
-                float drawX = iconX + (holder - drawW) / 2.0f;
-                float drawY = iconY + (holder - drawH) / 2.0f;
+                float targetSize = Math.max(1f, sc(SELECTION_ICON_SIZE) * 0.8f + 2.0f);
+                float scale = Math.min(targetSize / BEACON_CHECK_VISIBLE_W, targetSize / BEACON_CHECK_VISIBLE_H);
+                float centerX = iconX + holder / 2.0f + holder * TICK_HOLDER_OFFSET_X;
+                float centerY = iconY + holder / 2.0f + holder * TICK_HOLDER_OFFSET_Y;
                 g.pose().pushMatrix();
-                g.pose().translate(drawX - BEACON_CHECK_VISIBLE_X * scaleX, drawY - BEACON_CHECK_VISIBLE_Y * scaleY);
-                g.pose().scale(scaleX, scaleY);
+                g.pose().translate(centerX - BEACON_CHECK_CENTER_X * scale, centerY - BEACON_CHECK_CENTER_Y * scale);
+                g.pose().scale(scale, scale);
                 g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
                 g.pose().popMatrix();
             }
             if (selected != null && SkinDataStore.isFavorite(selected)) {
                 int iconY = iconBaseY + sc(normalLayout.actionHolderGap());
-                int heartSize = Math.max(1, holder - 8);
-                int heartX = iconX + Math.round((holder - heartSize) / 2.0f);
-                int heartY = iconY + Math.round((holder - heartSize) / 2.0f);
-                blitSprite(g, HEART_CONTAINER, heartX, heartY, heartSize, heartSize);
-                blitSprite(g, HEART_FULL, heartX, heartY, heartSize, heartSize);
+                float heartSize = Math.max(1f, holder - 8f);
+                float heartScaleX = heartSize / HEART_TEXTURE_SIZE;
+                float heartScaleY = (heartSize + 1.0f) / HEART_TEXTURE_SIZE;
+                float centerX = iconX + holder / 2.0f + holder * HEART_HOLDER_OFFSET_X;
+                float centerY = iconY + holder / 2.0f + holder * HEART_HOLDER_OFFSET_Y;
+                float heartX = centerX - (HEART_TEXTURE_SIZE * heartScaleX) / 2.0f;
+                float heartY = centerY - (HEART_TEXTURE_SIZE * heartScaleY) / 2.0f - 0.5f;
+                g.pose().pushMatrix();
+                g.pose().translate(heartX, heartY);
+                g.pose().scale(heartScaleX, heartScaleY);
+                blitSprite(g, HEART_CONTAINER, 0, 0, HEART_TEXTURE_SIZE, HEART_TEXTURE_SIZE);
+                blitSprite(g, HEART_FULL, 0, 0, HEART_TEXTURE_SIZE, HEART_TEXTURE_SIZE);
+                g.pose().popMatrix();
             }
         }
 
@@ -378,28 +438,30 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             String    skinId = center.skinId.get();
             SkinEntry entry  = skinId == null ? null : SkinPackLoader.getSkin(skinId);
             String    name   = entry == null ? String.valueOf(skinId) : entry.name();
-            int mid       = tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
+            int mid       = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
-            drawBigCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF);
+            float labelScale = bigTextScale() * LABEL_SCALE_BUMP;
+            drawScaledCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF, labelScale);
 
             String ns = entry != null && entry.texture() != null ? entry.texture().getNamespace() : SkinSync.ASSET_NS;
             ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(ns, skinId);
 
             String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
-                float scale = bigTextScale();
+                float scale = labelScale;
                 int maxUnscaled = (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / scale);
                 String show = SkinTextUtil.clip(minecraft.font, theme, maxUnscaled);
                 int themeY = skinNameY + (int) (minecraft.font.lineHeight * scale) + sc(normalLayout.themeTextGap());
-                drawBigCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF);
+                drawScaledCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF, scale);
             }
         }
 
         SkinPack pack = packList.getFocusedPack();
-        int packMid = tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
-        int packMetaY = panel.y + sc(normalLayout.packTitleTop()) + (int) (minecraft.font.lineHeight * bigTextScale()) + sc(normalLayout.packMetaGap());
+        int packMid = centerTextX();
+        float headerScale = bigTextScale() * HEADER_SCALE_BUMP;
+        int packMetaY = panel.y + sc(normalLayout.packTitleTop()) + (int) (minecraft.font.lineHeight * headerScale) + sc(normalLayout.packMetaGap());
         if (pack != null) {
-            drawBigCentered(g, Component.literal(SkinPackLoader.nameString(pack.name(), pack.id())), packMid, panel.y + sc(normalLayout.packTitleTop()), 0xFFFFFFFF);
+            drawScaledCentered(g, Component.literal(SkinPackLoader.nameString(pack.name(), pack.id())), packMid, panel.y + sc(normalLayout.packTitleTop()), 0xFFFFFFFF, headerScale);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);
@@ -415,9 +477,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void addControlTooltips(ControlTooltip.Renderer r) {
         addCommonControlTooltips(
                 r,
-                () -> ControlType.getActiveType().isKbm()
-                        ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_W), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_S), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
-                        : ControllerBinding.LEFT_STICK.bindingState.getIcon(),
+                ControlTooltip.POINTER_MOVEMENT::get,
                 () -> Component.literal("Navigate")
         );
     }
