@@ -11,6 +11,7 @@ out vec4 fragColor;
 const float CLOUD_EDGE_FADE_DISTANCE = 8.0f * 16.0f;
 const float CLOUD_WARM_ALPHA_FADE_STRENGTH = 0.28f;
 const float CLOUD_WARM_TINT_STRENGTH = 0.78f;
+const float CLOUD_WARM_INNER_TINT_STRENGTH = 0.22f;
 
 void main() {
     if (FogCloudsEnd <= 0.0) {
@@ -24,8 +25,11 @@ void main() {
     float distanceFade = linear_fog_value(vertexDistance, fadeStart, cloudFogEnd);
     color.rgb = mix(color.rgb, outerBandColor.rgb, distanceFade);
     float warmTint = smoothstep(0.06f, 0.22f, FogColor.r - FogColor.b);
-    float sunsetBlend = distanceFade * warmTint * CLOUD_WARM_TINT_STRENGTH;
+    float innerBlend = (1.0f - distanceFade) * warmTint * CLOUD_WARM_INNER_TINT_STRENGTH;
+    color.rgb = mix(color.rgb, FogColor.rgb, innerBlend);
+    float sunsetBlend = distanceFade * distanceFade * warmTint * CLOUD_WARM_TINT_STRENGTH;
     color.rgb = mix(color.rgb, FogColor.rgb, sunsetBlend);
+    color.a = mix(color.a, outerBandColor.a, distanceFade);
     color.a *= 1.0f - distanceFade * CLOUD_WARM_ALPHA_FADE_STRENGTH;
     fragColor = color;
 }

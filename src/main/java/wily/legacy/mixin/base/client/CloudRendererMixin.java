@@ -29,9 +29,7 @@ public abstract class CloudRendererMixin {
     @Unique
     private static final float CLOUD_LAYER_HEIGHT = 4.0f;
     @Unique
-    private static final int INSIDE_FACE_SIDE_RADIUS = 1;
-    @Unique
-    private static final int INSIDE_FACE_VERTICAL_RADIUS = 2;
+    private static final int INSIDE_FACE_RADIUS = 1;
     @Unique
     private boolean legacy$lastLceCloudState;
     @Unique
@@ -136,21 +134,20 @@ public abstract class CloudRendererMixin {
         int width = textureData.legacy$getWidth();
         int height = textureData.legacy$getHeight();
 
-        int effectiveCloudRadius = cloudRadius + LegacyCloudAtmosphere.getCloudRadiusExtensionCells();
         if (fancyClouds) {
-            for (int offsetZ = -effectiveCloudRadius; offsetZ <= effectiveCloudRadius; offsetZ++) {
-                for (int offsetX = -effectiveCloudRadius; offsetX <= effectiveCloudRadius; offsetX++) {
+            for (int offsetZ = -cloudRadius; offsetZ <= cloudRadius; offsetZ++) {
+                for (int offsetX = -cloudRadius; offsetX <= cloudRadius; offsetX++) {
                     legacy$tryBuildSquareCell(buffer, cellX, cellZ, true, true, offsetX, width, offsetZ, height, cells);
                 }
             }
-            for (int offsetZ = -effectiveCloudRadius; offsetZ <= effectiveCloudRadius; offsetZ++) {
-                for (int offsetX = -effectiveCloudRadius; offsetX <= effectiveCloudRadius; offsetX++) {
+            for (int offsetZ = -cloudRadius; offsetZ <= cloudRadius; offsetZ++) {
+                for (int offsetX = -cloudRadius; offsetX <= cloudRadius; offsetX++) {
                     legacy$tryBuildSquareCell(buffer, cellX, cellZ, true, false, offsetX, width, offsetZ, height, cells);
                 }
             }
         } else {
-            for (int offsetZ = -effectiveCloudRadius; offsetZ <= effectiveCloudRadius; offsetZ++) {
-                for (int offsetX = -effectiveCloudRadius; offsetX <= effectiveCloudRadius; offsetX++) {
+            for (int offsetZ = -cloudRadius; offsetZ <= cloudRadius; offsetZ++) {
+                for (int offsetX = -cloudRadius; offsetX <= cloudRadius; offsetX++) {
                     legacy$tryBuildSquareCell(buffer, cellX, cellZ, false, false, offsetX, width, offsetZ, height, cells);
                 }
             }
@@ -199,7 +196,7 @@ public abstract class CloudRendererMixin {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 0);
             }
 
-            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_VERTICAL_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_VERTICAL_RADIUS) {
+            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.UP, 16);
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 16);
             }
@@ -220,7 +217,7 @@ public abstract class CloudRendererMixin {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 0);
             }
 
-            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_SIDE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_SIDE_RADIUS) {
+            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 16);
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.SOUTH, 16);
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.WEST, 16);

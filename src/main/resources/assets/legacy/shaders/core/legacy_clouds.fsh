@@ -22,6 +22,7 @@ void main() {
     float fadeStart = max(0.0f, cloudFogEnd - CLOUD_EDGE_FADE_DISTANCE);
     float distanceFade = linear_fog_value(vertexDistance, fadeStart, cloudFogEnd);
     color.rgb = mix(color.rgb, outerBandColor.rgb, distanceFade);
+    color.a = mix(color.a, outerBandColor.a, distanceFade);
     color.a *= 1.0f - distanceFade * CLOUD_ALPHA_FADE_STRENGTH;
     fragColor = color;
 }

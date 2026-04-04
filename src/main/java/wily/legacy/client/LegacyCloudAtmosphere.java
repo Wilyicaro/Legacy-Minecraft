@@ -37,26 +37,16 @@ public final class LegacyCloudAtmosphere {
     private static final class FogTuning {
         private static final int DEFAULT_COLOR = 0xFFC0D8FF;
         private static final float SUNRISE_TINT_STRENGTH = 0.96f;
-        private static final float SKY_BLEND_SCALE = 0.07f;
-        private static final float SUNRISE_BLEND_BOOST = 1.22f;
 
         private FogTuning() {
         }
     }
 
     private static final class CloudTintTuning {
-        private static final float SUNRISE_TINT_STRENGTH = 0.2f;
-        private static final float SUN_FACING_HIGHLIGHT_WHITEN_STRENGTH = 0.14f;
-        private static final float LEGACY_HEIGHT_TINT_BOOST = 1.35f;
-        private static final float LEGACY_HEIGHT_WARM_START = 104.0f;
-        private static final float LEGACY_HEIGHT_WARM_END = 152.0f;
-        private static final float LEGACY_HEIGHT_WARM_TINT_BOOST = 0.25f;
-        private static final float LEGACY_HEIGHT_SKY_BLEND_REDUCTION = 0.45f;
-        private static final float NORMAL_WARM_VIEW_THRESHOLD = 0.48f;
-        private static final float LEGACY_HEIGHT_WARM_VIEW_THRESHOLD = 0.42f;
-        private static final float TINT_MIN_VIEW_BLEND = 0.45f;
-        private static final float TINT_VIEW_START = 0.55f;
-        private static final float TINT_VIEW_END = 0.9f;
+        private static final float NORMAL_WARM_VIEW_THRESHOLD = 0.2f;
+        private static final float LEGACY_HEIGHT_WARM_VIEW_THRESHOLD = 0.16f;
+        private static final float CLOUD_DIRECTIONAL_TINT_STRENGTH = 0.28f;
+        private static final float CLOUD_DIRECTIONAL_TINT_COLOR_MIX = 0.45f;
 
         private CloudTintTuning() {
         }
@@ -77,10 +67,6 @@ public final class LegacyCloudAtmosphere {
         return Math.max(64, (Legacy4JClient.getEffectiveRenderDistance() + CloudGeometry.FADE_EXTENSION_CHUNKS) * 16);
     }
 
-    public static int getCloudRadiusExtensionCells() {
-        return Mth.ceil((CloudGeometry.FADE_EXTENSION_CHUNKS * 16.0f) / 12.0f);
-    }
-
     public static float getCloudFogEndBlocks(ClientLevel level, double cameraY, float environmentalEnd) {
         float cloudFogEnd = Math.max(environmentalEnd, getCloudDrawDistanceBlocks());
         if (shouldUseConsoleAtmosphere(level) && isInsideCloudLayer(level, cameraY)) {
@@ -97,14 +83,15 @@ public final class LegacyCloudAtmosphere {
         if (!shouldUseConsoleAtmosphere(level)) {
             return false;
         }
-        if (getSunriseColor(level.getTimeOfDay(partialTick)) == 0) {
+        float sampledPartialTick = partialTick - Mth.floor(partialTick);
+        if (getSunriseColor(level.getTimeOfDay(sampledPartialTick)) == 0) {
             return false;
         }
 
         float warmViewThreshold = areLegacyCloudHeightAndTextureEnabled()
             ? CloudTintTuning.LEGACY_HEIGHT_WARM_VIEW_THRESHOLD
             : CloudTintTuning.NORMAL_WARM_VIEW_THRESHOLD;
-        return getSunriseCloudViewBlend(level, partialTick) > warmViewThreshold;
+        return getSunriseCloudViewBlend(level, sampledPartialTick) > warmViewThreshold;
     }
 
     public static boolean isInsideCloudLayer(ClientLevel level, double cameraY) {
@@ -174,35 +161,23 @@ public final class LegacyCloudAtmosphere {
             return baseCloudColor;
         }
 
-        float viewBlend = getSunriseCloudViewBlend(level, partialTick);
-        if (viewBlend <= CloudTintTuning.TINT_MIN_VIEW_BLEND) {
-            return baseCloudColor;
-        }
-
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         if (camera == null) {
             return baseCloudColor;
         }
 
-        int warmTintColor = getCloudWarmTintColor(level, camera, partialTick, sunriseColor);
-        float normalizedViewBlend = smoothstep(CloudTintTuning.TINT_VIEW_START, CloudTintTuning.TINT_VIEW_END, viewBlend);
-        normalizedViewBlend *= normalizedViewBlend;
+        float directionalBlend = getSunriseFogBlend(level, camera, partialTick, sunriseColor);
+        if (directionalBlend <= 0.0f) {
+            return baseCloudColor;
+        }
 
-        float legacyHeightTintBoost = areLegacyCloudHeightAndTextureEnabled() ? CloudTintTuning.LEGACY_HEIGHT_TINT_BOOST : 1.0f;
-        float tintBlend = ARGB.alphaFloat(sunriseColor) * CloudTintTuning.SUNRISE_TINT_STRENGTH * normalizedViewBlend * legacyHeightTintBoost;
-        tintBlend = Mth.clamp(tintBlend, 0.0f, 1.0f);
-
-        float targetRed = ARGB.redFloat(warmTintColor);
-        float targetGreen = ARGB.greenFloat(warmTintColor);
-        float targetBlue = ARGB.blueFloat(warmTintColor);
-        float highlightWhitenBlend = normalizedViewBlend * CloudTintTuning.SUN_FACING_HIGHLIGHT_WHITEN_STRENGTH;
-        targetRed = Mth.lerp(highlightWhitenBlend, targetRed, 1.0f);
-        targetGreen = Mth.lerp(highlightWhitenBlend, targetGreen, 0.985f);
-        targetBlue = Mth.lerp(highlightWhitenBlend, targetBlue, 0.95f);
-
-        float red = Mth.lerp(tintBlend, ARGB.redFloat(baseCloudColor), targetRed);
-        float green = Mth.lerp(tintBlend, ARGB.greenFloat(baseCloudColor), targetGreen);
-        float blue = Mth.lerp(tintBlend, ARGB.blueFloat(baseCloudColor), targetBlue);
+        float tintBlend = directionalBlend * ARGB.alphaFloat(sunriseColor) * CloudTintTuning.CLOUD_DIRECTIONAL_TINT_STRENGTH;
+        float redTarget = Mth.lerp(CloudTintTuning.CLOUD_DIRECTIONAL_TINT_COLOR_MIX, ARGB.redFloat(baseCloudColor), ARGB.redFloat(sunriseColor));
+        float greenTarget = Mth.lerp(CloudTintTuning.CLOUD_DIRECTIONAL_TINT_COLOR_MIX, ARGB.greenFloat(baseCloudColor), ARGB.greenFloat(sunriseColor));
+        float blueTarget = Mth.lerp(CloudTintTuning.CLOUD_DIRECTIONAL_TINT_COLOR_MIX, ARGB.blueFloat(baseCloudColor), ARGB.blueFloat(sunriseColor));
+        float red = Mth.lerp(tintBlend, ARGB.redFloat(baseCloudColor), redTarget);
+        float green = Mth.lerp(tintBlend, ARGB.greenFloat(baseCloudColor), greenTarget);
+        float blue = Mth.lerp(tintBlend, ARGB.blueFloat(baseCloudColor), blueTarget);
         return ARGB.colorFromFloat(1.0f, red, green, blue);
     }
 
@@ -242,59 +217,6 @@ public final class LegacyCloudAtmosphere {
         return areLegacyCloudHeightAndTextureEnabled()
             ? CloudGeometry.LEGACY_HEIGHT
             : (float) level.dimensionType().cloudHeight().orElse((int) CloudGeometry.LEGACY_HEIGHT);
-    }
-
-    private static int getCloudWarmTintColor(ClientLevel level, Camera camera, float partialTick, int sunriseColor) {
-        float[] rgb = getDimensionFogRgb(level, partialTick);
-        float cloudHeight = getCloudHeight(level);
-        float legacyHeightWarmBias = Mth.clamp(
-            (cloudHeight - CloudTintTuning.LEGACY_HEIGHT_WARM_START) / (CloudTintTuning.LEGACY_HEIGHT_WARM_END - CloudTintTuning.LEGACY_HEIGHT_WARM_START),
-            0.0f,
-            1.0f
-        );
-
-        float sunriseBlend = getSunriseFogBlend(level, camera, partialTick, sunriseColor);
-        sunriseBlend *= FogTuning.SUNRISE_BLEND_BOOST + legacyHeightWarmBias * CloudTintTuning.LEGACY_HEIGHT_WARM_TINT_BOOST;
-        sunriseBlend = Mth.clamp(sunriseBlend, 0.0f, 1.0f);
-        if (sunriseBlend > 0.0f) {
-            rgb[0] = Mth.lerp(sunriseBlend, rgb[0], ARGB.redFloat(sunriseColor));
-            rgb[1] = Mth.lerp(sunriseBlend, rgb[1], ARGB.greenFloat(sunriseColor));
-            rgb[2] = Mth.lerp(sunriseBlend, rgb[2], ARGB.blueFloat(sunriseColor));
-        }
-
-        int renderDistanceChunks = Math.max(4, Legacy4JClient.getEffectiveRenderDistance());
-        int skyColor = getSkyColor(level, camera.getPosition(), partialTick);
-        float skyBlend = getFogToSkyBlendFactor(renderDistanceChunks) * FogTuning.SKY_BLEND_SCALE;
-        skyBlend *= 1.0f - legacyHeightWarmBias * CloudTintTuning.LEGACY_HEIGHT_SKY_BLEND_REDUCTION;
-        rgb[0] += (ARGB.redFloat(skyColor) - rgb[0]) * skyBlend;
-        rgb[1] += (ARGB.greenFloat(skyColor) - rgb[1]) * skyBlend;
-        rgb[2] += (ARGB.blueFloat(skyColor) - rgb[2]) * skyBlend;
-
-        applyWeatherDamping(rgb, level.getRainLevel(partialTick));
-        applyThunderDamping(rgb, level.getThunderLevel(partialTick));
-
-        return ARGB.colorFromFloat(1.0f, rgb[0], rgb[1], rgb[2]);
-    }
-
-    private static float getSunriseViewBlend(ClientLevel level, float partialTick) {
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        if (camera == null) {
-            return 0.0f;
-        }
-
-        float horizontalFacing = getSunriseHorizontalFacing(level, camera, partialTick);
-        if (horizontalFacing <= 0.0f) {
-            return 0.0f;
-        }
-
-        Vector3f look = camera.getLookVector();
-        float horizonWeight = Mth.clamp((float) (1.0d - Math.abs(look.y()) * 1.35d), 0.0f, 1.0f);
-        return Mth.sqrt(horizontalFacing) * Mth.sqrt(horizonWeight);
-    }
-
-    private static float smoothstep(float edge0, float edge1, float value) {
-        float t = Mth.clamp((value - edge0) / (edge1 - edge0), 0.0f, 1.0f);
-        return t * t * (3.0f - 2.0f * t);
     }
 
     private static float getSunriseFogBlend(ClientLevel level, Camera camera, float partialTick, int sunriseColor) {
