@@ -33,7 +33,8 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 
 public class LegacyOptions {
-    public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
+    public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(option -> create(option));
+    private static boolean suppressPlayerInfoSync = false;
 
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
             Component.translatable("key.sprint"), Component.translatable("options.key.toggleSprint"),
@@ -66,6 +67,19 @@ public class LegacyOptions {
 
     public static <T> FactoryConfig<T> of(OptionInstance<T> optionInstance) {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
+    }
+
+    public static FactoryConfig<Double> ofSound(OptionInstance<Double> optionInstance, String captionKey) {
+        return FactoryConfig.create(
+                OptionInstanceAccessor.of(optionInstance).getKey(),
+                FactoryConfigDisplay.<Double>percentBuilder()
+                        .tooltip(v -> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v)))
+                        .build(Component.translatable(captionKey)),
+                OptionInstanceAccessor.of(optionInstance).defaultValue(),
+                Bearer.of(optionInstance::get, optionInstance::set),
+                FactoryConfigControl.createDouble(),
+                v -> {},
+                VANILLA_STORAGE_ACCESS);
     }
 
     public static <T> FactoryConfig<T> create(OptionInstance<T> optionInstance) {

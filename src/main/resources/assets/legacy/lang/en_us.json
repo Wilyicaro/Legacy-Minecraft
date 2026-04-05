@@ -1291,6 +1291,7 @@
   "legacy.menu.albums.texture.template": "Texture Pack Album %s",
   "legacy.menu.albums.texture.template.description": "An album saved with the texture packs that were selected in the Texture Packs Screen! You can edit it in the resource_assorts.json file in the game directory.",
   "legacy.menu.audio": "Audio",
+  "legacy.menu.sound": "Sound",
   "legacy.menu.autoSave_countdown": "Autosaving in %s...",
   "legacy.menu.autoSave_message": "This game has a level autosave feature. When you see the icon above displayed, the game is saving your data.\n\nPlease do not turn off your device while this icon is on-screen.",
   "legacy.menu.change_skin": "Change Skin",
