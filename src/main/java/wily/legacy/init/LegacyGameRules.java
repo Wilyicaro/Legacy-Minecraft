@@ -47,10 +47,9 @@ public class LegacyGameRules {
     public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
         if (!entity.level().isClientSide())
             return FactoryAPIPlatform.getEntityServer(entity).getGameRules().getBoolean(key);
-        if (Legacy4JClient.hasModOnServer())
-            return Legacy4JClient.gameRules.getBoolean(key);
         FactoryConfig<Boolean> option = FORCED_GAMERULES_MAP.get(key);
-        return option != null && option.get();
+        if (option != null && option.get()) return true;
+        return Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules.getBoolean(key);
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){
