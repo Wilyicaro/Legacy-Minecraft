@@ -335,6 +335,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> screenshotToasts = CLIENT_STORAGE.register(createBoolean("screenshotToasts", true));
     public static final FactoryConfig<Boolean> forceLegacyFlight = CLIENT_STORAGE.register(createBoolean("forceLegacyFlight", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> forceLegacySwimming = CLIENT_STORAGE.register(createBoolean("forceLegacySwimming", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacyShieldControls = CLIENT_STORAGE.register(createBoolean("forceLegacyShieldControls", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacyOffhandLimits = CLIENT_STORAGE.register(createBoolean("forceLegacyOffhandLimits", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> legacyFont = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyFont", true));
 
     public static int getTerrainFogStart() {

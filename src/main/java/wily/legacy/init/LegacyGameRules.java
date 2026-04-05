@@ -30,7 +30,11 @@ public class LegacyGameRules {
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_MOBCAP_LIMITS = GameRules.register("legacyMobcapLimits", GameRules.Category.MOBS, GameRules.BooleanValue.create(false));
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_OFFHAND_LIMITS = GameRules.register("legacyOffhandLimits", GameRules.Category.PLAYER, GameRules.BooleanValue.create(false, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_OFFHAND_LIMITS, booleanValue, server)));
 
-    protected static final Map<GameRules.Key<GameRules.BooleanValue>, FactoryConfig<Boolean>> FORCED_GAMERULES_MAP = Map.of(LEGACY_SWIMMING, LegacyOptions.forceLegacySwimming, LEGACY_FLIGHT, LegacyOptions.forceLegacyFlight);
+    protected static final Map<GameRules.Key<GameRules.BooleanValue>, FactoryConfig<Boolean>> FORCED_GAMERULES_MAP = Map.of(
+            LEGACY_SWIMMING, LegacyOptions.forceLegacySwimming,
+            LEGACY_FLIGHT, LegacyOptions.forceLegacyFlight,
+            LEGACY_SHIELD_CONTROLS, LegacyOptions.forceLegacyShieldControls,
+            LEGACY_OFFHAND_LIMITS, LegacyOptions.forceLegacyOffhandLimits);
 
     public static GameRules.Key<GameRules.BooleanValue> getTntExplodes() {
         return GameRules.RULE_TNT_EXPLODES;
@@ -43,10 +47,10 @@ public class LegacyGameRules {
     public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
         if (!entity.level().isClientSide())
             return FactoryAPIPlatform.getEntityServer(entity).getGameRules().getBoolean(key);
-        else if (Legacy4JClient.hasModOnServer())
+        if (Legacy4JClient.hasModOnServer())
             return Legacy4JClient.gameRules.getBoolean(key);
-        else
-            return FORCED_GAMERULES_MAP.containsKey(key) && FORCED_GAMERULES_MAP.get(key).get();
+        FactoryConfig<Boolean> option = FORCED_GAMERULES_MAP.get(key);
+        return option != null && option.get();
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){

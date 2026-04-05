@@ -313,7 +313,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.mapsWithCoords,
                                 LegacyOptions.vanillaTutorial,
                                 LegacyOptions.forceLegacyFlight,
-                                LegacyOptions.forceLegacySwimming),
+                                LegacyOptions.forceLegacySwimming,
+                                LegacyOptions.forceLegacyShieldControls,
+                                LegacyOptions.forceLegacyOffhandLimits),
                         o -> {
                             if (mc.level == null)
                                 LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(c, b -> c.sync())));

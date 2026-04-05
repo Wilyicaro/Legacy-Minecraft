@@ -1797,6 +1797,8 @@
   "legacy.options.lceClouds": "Legacy Clouds",
   "legacy.options.flyingViewRolling": "Flying View Rolling",
   "legacy.options.forceLegacyFlight": "Force Legacy Flight on Vanilla Servers",
+  "legacy.options.forceLegacyShieldControls": "Force Legacy Shield on Vanilla Servers",
+  "legacy.options.forceLegacyOffhandLimits": "Force Legacy Offhand on Vanilla Servers",
   "legacy.options.forceLegacySwimming": "Force Legacy Swimming on Vanilla Servers",
   "legacy.options.forceMixedCrafting": "Force Mixed Crafting",
   "legacy.options.forceSmoothMovement": "Force Smooth Movement",
