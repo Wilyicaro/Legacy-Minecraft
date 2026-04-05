@@ -44,6 +44,18 @@ public abstract class PlayerMixin extends LivingEntity {
         cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
     }
 
+    @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
+    protected void causeFallDamage(double d, float f, net.minecraft.world.damagesource.DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
+        if (!getAbilities().mayfly || isSpectator()) return;
+        int damage = calculateFallDamage(d, f);
+        if (damage > 0) {
+            var sounds = getFallSounds();
+            playSound(damage > 4 ? sounds.big() : sounds.small(), 1.0f, 1.0f);
+            playBlockFallSound();
+        }
+        cir.setReturnValue(false);
+    }
+
     @Inject(method = "resetAttackStrengthTicker", at = @At(value = "HEAD"), cancellable = true)
     protected void resetAttackStrengthTicker(CallbackInfo ci) {
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) ci.cancel();
