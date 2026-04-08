@@ -1,98 +1,60 @@
 package wily.legacy.client;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.storage.LevelResource;
-import wily.legacy.Legacy4J;
+import wily.factoryapi.base.config.FactoryConfig;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.function.Function;
 
 public class ConduitRotationCache {
-    private static final Gson GSON = new Gson();
-    private static final Map<String, Integer> rotations = new HashMap<>();
-    private static String worldId;
+    private static final FactoryConfig.StorageHandler STORAGE = new FactoryConfig.StorageHandler().withFile("legacy/conduit_rotations.json");
+    private static final Codec<Map<String, Integer>> CODEC = Codec.unboundedMap(Codec.STRING, Codec.INT).xmap(HashMap::new, Function.identity());
+    private static final FactoryConfig<Map<String, Integer>> rotations = STORAGE.register(FactoryConfig.create("rotations", null, () -> CODEC, new HashMap<>(), v -> {}, STORAGE));
+    private static boolean loaded;
 
     public static void clear() {
-        rotations.clear();
-        worldId = null;
+        loaded = false;
     }
 
     public static void remember(ClientLevel level, BlockPos pos, float yRot) {
-        load(level);
-        rotations.put(key(level, pos), rotationFromYaw(yRot));
-        save();
+        load();
+        Map<String, Integer> map = new HashMap<>(rotations.get());
+        map.put(key(level, pos), rotationFromYaw(yRot));
+        rotations.set(map);
+        rotations.save();
     }
 
     public static Integer get(ClientLevel level, BlockPos pos) {
-        load(level);
-        return rotations.get(key(level, pos));
+        load();
+        return rotations.get().get(key(level, pos));
+    }
+
+    private static void load() {
+        if (loaded) return;
+        STORAGE.load();
+        loaded = true;
     }
 
     private static String key(ClientLevel level, BlockPos pos) {
-        return level.dimension().location() + ":" + pos.asLong();
+        return worldId() + "|" + level.dimension().location() + ":" + pos.asLong();
     }
 
-    private static int rotationFromYaw(float yRot) {
-        return (int) Math.floor(yRot * 16.0F / 360.0F + 0.5D) & 15;
-    }
-
-    private static void load(ClientLevel level) {
-        String id = worldId(level);
-        if (Objects.equals(worldId, id)) return;
-        worldId = id;
-        rotations.clear();
-        if (id == null) return;
-        Path path = path(id);
-        if (!Files.exists(path)) return;
-        try (Reader reader = Files.newBufferedReader(path)) {
-            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-            root.entrySet().forEach(e -> rotations.put(e.getKey(), e.getValue().getAsInt()));
-        } catch (IOException e) {
-            Legacy4J.LOGGER.warn("Failed to load conduit rotations", e);
-        }
-    }
-
-    private static void save() {
-        if (worldId == null) return;
-        Path path = path(worldId);
-        JsonObject root = new JsonObject();
-        rotations.forEach(root::addProperty);
-        try {
-            Files.createDirectories(path.getParent());
-            try (Writer writer = Files.newBufferedWriter(path)) {
-                GSON.toJson(root, writer);
-            }
-        } catch (IOException e) {
-            Legacy4J.LOGGER.warn("Failed to save conduit rotations", e);
-        }
-    }
-
-    private static String worldId(ClientLevel level) {
+    private static String worldId() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer() != null) {
             return "local:" + minecraft.getSingleplayerServer().getWorldPath(LevelResource.ROOT).normalize();
         }
         ServerData server = minecraft.getCurrentServer();
-        return server == null ? null : "server:" + server.ip;
+        return server == null ? "unknown" : "server:" + server.ip;
     }
 
-    private static Path path(String worldId) {
-        Minecraft minecraft = Minecraft.getInstance();
-        String name = UUID.nameUUIDFromBytes(worldId.getBytes(StandardCharsets.UTF_8)).toString() + ".json";
-        return minecraft.gameDirectory.toPath().resolve("legacy").resolve("conduit_rotations").resolve(name);
+    private static int rotationFromYaw(float yRot) {
+        return (int)Math.floor(yRot * 16.0F / 360.0F + 0.5D) & 15;
     }
 }
