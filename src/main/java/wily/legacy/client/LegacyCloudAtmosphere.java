@@ -10,16 +10,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
-import wily.legacy.Legacy4JClient;
 
 public final class LegacyCloudAtmosphere {
     private static final float TWO_PI = 6.2831855f;
 
     private static final class CloudGeometry {
         private static final float LEGACY_HEIGHT = 128.0f;
-        private static final float LEGACY_LAYER_HEIGHT = 4.0f;
-        private static final int FADE_EXTENSION_CHUNKS = 8;
-        private static final float IN_CLOUD_FOG_END_BLOCKS = 24.0f;
+        private static final int DRAW_DISTANCE_CHUNKS = 14;
 
         private CloudGeometry() {
         }
@@ -64,15 +61,11 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static int getCloudDrawDistanceBlocks() {
-        return Math.max(64, (Legacy4JClient.getEffectiveRenderDistance() + CloudGeometry.FADE_EXTENSION_CHUNKS) * 16);
+        return CloudGeometry.DRAW_DISTANCE_CHUNKS * 16;
     }
 
-    public static float getCloudFogEndBlocks(ClientLevel level, double cameraY, float environmentalEnd) {
-        float cloudFogEnd = Math.max(environmentalEnd, getCloudDrawDistanceBlocks());
-        if (shouldUseConsoleAtmosphere(level) && isInsideCloudLayer(level, cameraY)) {
-            return Math.min(cloudFogEnd, CloudGeometry.IN_CLOUD_FOG_END_BLOCKS);
-        }
-        return cloudFogEnd;
+    public static float getCloudFogEndBlocks(float environmentalEnd) {
+        return Math.max(environmentalEnd, getCloudDrawDistanceBlocks());
     }
 
     public static boolean shouldUseConsoleAtmosphere(ClientLevel level) {
@@ -92,11 +85,6 @@ public final class LegacyCloudAtmosphere {
             ? CloudTintTuning.LEGACY_HEIGHT_WARM_VIEW_THRESHOLD
             : CloudTintTuning.NORMAL_WARM_VIEW_THRESHOLD;
         return getSunriseCloudViewBlend(level, sampledPartialTick) > warmViewThreshold;
-    }
-
-    public static boolean isInsideCloudLayer(ClientLevel level, double cameraY) {
-        float cloudHeight = getCloudHeight(level);
-        return cameraY >= cloudHeight && cameraY <= cloudHeight + CloudGeometry.LEGACY_LAYER_HEIGHT;
     }
 
     public static int getSkyColor(ClientLevel level, Vec3 position, float partialTick) {

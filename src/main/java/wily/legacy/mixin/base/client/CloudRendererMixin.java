@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CloudRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -108,11 +107,6 @@ public abstract class CloudRendererMixin {
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private float legacy$useLegacyCloudHeight(float cloudHeight) {
         return LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : cloudHeight;
-    }
-
-    @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true)
-    private Vec3 legacy$widenCloudBand(Vec3 cameraPosition) {
-        return cameraPosition;
     }
 
     @Inject(method = "buildMesh", at = @At("HEAD"), cancellable = true)
@@ -285,19 +279,5 @@ public abstract class CloudRendererMixin {
     @Unique
     private static boolean legacy$isWestEmpty(long cellData) {
         return (cellData & 1L) != 0L;
-    }
-
-    @Unique
-    private static boolean legacy$isCellEmpty(int pixel) {
-        return ARGB.alpha(pixel) < 10;
-    }
-
-    @Unique
-    private static long legacy$packCellData(int pixel, boolean northEmpty, boolean eastEmpty, boolean southEmpty, boolean westEmpty) {
-        return ((long) pixel << 4)
-            | ((northEmpty ? 1L : 0L) << 3)
-            | ((eastEmpty ? 1L : 0L) << 2)
-            | ((southEmpty ? 1L : 0L) << 1)
-            | (westEmpty ? 1L : 0L);
     }
 }
