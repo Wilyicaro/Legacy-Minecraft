@@ -28,6 +28,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -175,6 +178,13 @@ public abstract class MinecraftMixin {
             rightClickDelay = -1;
     }
 
+    @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;", shift = At.Shift.AFTER))
+    private void rememberConduitRotation(CallbackInfo ci, @Local InteractionHand hand, @Local BlockHitResult hit) {
+        if (!(player.getItemInHand(hand).getItem() instanceof BlockItem blockItem) || blockItem.getBlock() != Blocks.CONDUIT) return;
+        BlockPlaceContext context = new BlockPlaceContext(player, hand, player.getItemInHand(hand), hit);
+        if (level.getBlockState(context.getClickedPos()).is(Blocks.CONDUIT)) ConduitRotationCache.remember(level, context.getClickedPos(), player.getYRot());
+    }
+
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSleeping()Z"))
     private boolean tick(boolean original) {
         return false;
@@ -205,6 +215,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void disconnectFadeMusic(CallbackInfo ci) {
+        ConduitRotationCache.clear();
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
 
