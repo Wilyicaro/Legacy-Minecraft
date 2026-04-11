@@ -68,8 +68,30 @@ public abstract class MenuDollMixin {
         if (stiffLegs) consoleskins$applyStiffLegs(self, state);
         if (!ZombieArmsPose.shouldApply(state) && StiffArmsPose.shouldApply(state)) { StiffArmsPose.apply(self, state); }
         if (WeepingStatuePose.shouldApply(state)) { WeepingStatuePose.apply(self, state); }
+        if (consoleskins$shouldSyncArms(state, skinId)) { consoleskins$applySyncArms(self); }
         if (SyncLegsPose.shouldApply(state)) { SyncLegsPose.apply(self); }
     }
+
+    private static boolean consoleskins$shouldSyncArms(AvatarRenderState state, String skinId) {
+        if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.SYNC_ARMS, skinId)) return false;
+        return state != null && state.id == GuiDollRender.MENU_DOLL_ID;
+    }
+
+    private static void consoleskins$applySyncArms(PlayerModel model) {
+        float xRot = model.leftArm.xRot;
+        float yRot = -model.leftArm.yRot;
+        float zRot = -model.leftArm.zRot;
+        model.rightArm.xRot = xRot;
+        model.rightArm.yRot = yRot;
+        model.rightArm.zRot = zRot;
+        model.rightSleeve.xRot = xRot;
+        model.rightSleeve.yRot = yRot;
+        model.rightSleeve.zRot = zRot;
+        model.leftSleeve.xRot = model.leftArm.xRot;
+        model.leftSleeve.yRot = model.leftArm.yRot;
+        model.leftSleeve.zRot = model.leftArm.zRot;
+    }
+
     private static void consoleskins$applyStiffLegs(PlayerModel model, AvatarRenderState state) {
         if (model == null) return;
         boolean sitting = state != null && (state.pose == Pose.SITTING || state.hasPose(Pose.SITTING)

@@ -14,9 +14,18 @@ import net.minecraft.world.item.ShieldItem;
 import wily.legacy.Skins.client.gui.GuiDollRender;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 final class ArmPoseSupport {
+    private static volatile java.lang.reflect.Field cachedRightArmPoseField;
+    private static volatile java.lang.reflect.Field cachedLeftArmPoseField;
+    private static volatile boolean triedResolveArmPoseFields;
+    private static final String[] AGE_FIELD_NAMES = {"ageInTicks", "age", "tick", "ticks", "time"};
+    private static final String[] AGE_METHOD_NAMES = {"ageInTicks", "getAgeInTicks"};
+    private static final Map<Class<?>, AgeAccessor> cachedAgeAccessors = new ConcurrentHashMap<>();
+
     private ArmPoseSupport() { }
 
     record ArmState(
@@ -102,6 +111,19 @@ final class ArmPoseSupport {
         ArmFlags merge(boolean right, boolean left) { return new ArmFlags(this.right || right, this.left || left); }
     }
 
+    record AgeAccessor(java.lang.reflect.Field field, java.lang.reflect.Method method) {
+        static final AgeAccessor NONE = new AgeAccessor(null, null);
+
+        float read(Object target) {
+            try {
+                Object value = field != null ? field.get(target) : method != null ? method.invoke(target) : null;
+                if (value instanceof Float number) return number;
+                if (value instanceof Number number) return number.floatValue();
+            } catch (ReflectiveOperationException | RuntimeException ignored) { }
+            return Float.NaN;
+        }
+    }
+
     static Player getPlayer(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return null;
         UUID uuid = access.consoleskins$getEntityUuid();
@@ -139,7 +161,7 @@ final class ArmPoseSupport {
         return new ArmFlags(right, left);
     }
 
-    static ArmFlags includeModelBlocking(AvatarRenderState state, ArmFlags flags) { return flags.merge(armPoseIsBlocking(state, true), armPoseIsBlocking(state, false)); }
+    static ArmFlags includeModelBlocking(PlayerModel model, ArmFlags flags) { return flags.merge(armPoseIsBlocking(model, true), armPoseIsBlocking(model, false)); }
 
     private static HumanoidArm getUsedArm(Player player) {
         HumanoidArm mainArm = player.getMainArm();
@@ -217,17 +239,62 @@ final class ArmPoseSupport {
     }
 
     static float getAgeInTicks(Object state) {
+        if (state == null) return timeFallback();
         if (!(state instanceof AvatarRenderState avatarState)) return timeFallback();
         if (avatarState.id == GuiDollRender.MENU_DOLL_ID) return timeFallback();
-        return avatarState.ageInTicks;
+        float value = cachedAgeAccessors.computeIfAbsent(state.getClass(), ArmPoseSupport::resolveAgeAccessor).read(state);
+        return Float.isNaN(value) ? timeFallback() : value;
     }
 
-    private static boolean armPoseIsBlocking(AvatarRenderState state, boolean right) {
-        if (state == null) return false;
-        return isBlockPose(right ? state.rightArmPose : state.leftArmPose);
+    private static boolean armPoseIsBlocking(PlayerModel model, boolean right) {
+        if (model == null) return false;
+        java.lang.reflect.Field field = resolveArmPoseField(right);
+        if (field == null) return false;
+        try {
+            return isBlockPose((HumanoidModel.ArmPose) field.get(model));
+        } catch (IllegalAccessException | RuntimeException ignored) {
+            return false;
+        }
     }
 
     private static boolean isBlockPose(HumanoidModel.ArmPose pose) { return pose == HumanoidModel.ArmPose.BLOCK; }
+
+    private static AgeAccessor resolveAgeAccessor(Class<?> type) {
+        for (String name : AGE_FIELD_NAMES) {
+            try {
+                java.lang.reflect.Field field = type.getDeclaredField(name);
+                field.setAccessible(true);
+                return new AgeAccessor(field, null);
+            } catch (ReflectiveOperationException | RuntimeException ignored) { }
+        }
+        for (String name : AGE_METHOD_NAMES) {
+            try {
+                java.lang.reflect.Method method = type.getMethod(name);
+                method.setAccessible(true);
+                return new AgeAccessor(null, method);
+            } catch (ReflectiveOperationException | RuntimeException ignored) { }
+        }
+        return AgeAccessor.NONE;
+    }
+
+    private static java.lang.reflect.Field resolveArmPoseField(boolean right) {
+        if (!triedResolveArmPoseFields) {
+            synchronized (ArmPoseSupport.class) {
+                if (!triedResolveArmPoseFields) {
+                    triedResolveArmPoseFields = true;
+                    try {
+                        cachedRightArmPoseField = PlayerModel.class.getDeclaredField("rightArmPose");
+                        cachedRightArmPoseField.setAccessible(true);
+                    } catch (ReflectiveOperationException ignored) { }
+                    try {
+                        cachedLeftArmPoseField = PlayerModel.class.getDeclaredField("leftArmPose");
+                        cachedLeftArmPoseField.setAccessible(true);
+                    } catch (ReflectiveOperationException ignored) { }
+                }
+            }
+        }
+        return right ? cachedRightArmPoseField : cachedLeftArmPoseField;
+    }
 
     private static float timeFallback() { return (System.currentTimeMillis() % 1_000_000L) / 1000.0F; }
 }
