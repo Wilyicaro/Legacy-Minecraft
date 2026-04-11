@@ -21,6 +21,10 @@ public abstract class ItemPickupParticleMixin extends Particle implements Legacy
     @Shadow
     private double targetY;
     @Shadow
+    protected abstract void saveOldPosition();
+    @Shadow
+    protected abstract void updatePosition();
+    @Shadow
     @Final
     private Entity target;
     @Unique
@@ -46,7 +50,7 @@ public abstract class ItemPickupParticleMixin extends Particle implements Legacy
     }
 
     @Inject(method = "updatePosition", at = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/ItemPickupParticle;targetY:D", shift = At.Shift.AFTER))
-    private void updatePosition(CallbackInfo ci) {
+    private void updatePositionLegacy(CallbackInfo ci) {
         if (LegacyOptions.legacyItemPickup.get()) targetY = target.getY();
     }
 
@@ -55,6 +59,8 @@ public abstract class ItemPickupParticleMixin extends Particle implements Legacy
         if (LegacyOptions.legacyItemPickup.get()) {
             ci.cancel();
             ++this.life;
+            this.saveOldPosition();
+            this.updatePosition();
             if (this.life == lifetime) {
                 this.remove();
             }

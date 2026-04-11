@@ -58,7 +58,7 @@ public abstract class ChatComponentMixin {
             int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
             guiGraphics.fill(lx - 4 - safeZone, mx, lx + n + 4 + 4 + safeZone, nx, ARGB.color(hx * h, CommonColor.CHAT_BACKGROUND.get().intValue()));
             GuiMessageTag guiMessageTag = line.tag();
-            if (guiMessageTag != null) {
+            if (LegacyOptions.displayChatIndicators.get() && guiMessageTag != null) {
                 int p = ARGB.color(hx * g, guiMessageTag.indicatorColor());
                 guiGraphics.fill(lx - 4 - safeZone, mx, lx - 2 - safeZone, nx, p);
                 if (ox == q && guiMessageTag.icon() != null) {
@@ -104,6 +104,11 @@ public abstract class ChatComponentMixin {
     @ModifyExpressionValue(method = "getMessageTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
     private double changeMessageTagXPos(double original) {
         return original + Math.round(LegacyRenderUtil.getChatSafeZone());
+    }
+
+    @Inject(method = "getMessageTagAt", at = @At("HEAD"), cancellable = true)
+    private void getMessageTagAt(double d, double e, CallbackInfoReturnable<GuiMessageTag> cir) {
+        if (!LegacyOptions.displayChatIndicators.get()) cir.setReturnValue(null);
     }
 
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)

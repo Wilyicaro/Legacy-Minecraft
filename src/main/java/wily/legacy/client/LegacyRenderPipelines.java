@@ -13,31 +13,35 @@ public class LegacyRenderPipelines {
     public static final RenderPipeline LEGACY_FLAT_CLOUDS = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/flat_clouds"))
-                    .withVertexShader("core/rendertype_clouds")
+                    .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader(Legacy4J.createModLocation("core/legacy_clouds"))
+                    .withDepthWrite(true)
                     .withCull(false)
                     .build()
     );
     public static final RenderPipeline LEGACY_CLOUDS = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/clouds"))
-                    .withVertexShader("core/rendertype_clouds")
+                    .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader(Legacy4J.createModLocation("core/legacy_clouds"))
+                    .withDepthWrite(true)
                     .build()
     );
     public static final RenderPipeline LEGACY_WARM_FLAT_CLOUDS = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/warm_flat_clouds"))
-                    .withVertexShader("core/rendertype_clouds")
+                    .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader(Legacy4J.createModLocation("core/legacy_clouds_warm"))
+                    .withDepthWrite(true)
                     .withCull(false)
                     .build()
     );
     public static final RenderPipeline LEGACY_WARM_CLOUDS = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/warm_clouds"))
-                    .withVertexShader("core/rendertype_clouds")
+                    .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader(Legacy4J.createModLocation("core/legacy_clouds_warm"))
+                    .withDepthWrite(true)
                     .build()
     );
     public static final RenderPipeline GAMMA = RenderPipelinesAccessor.register(

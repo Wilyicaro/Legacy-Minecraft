@@ -1,8 +1,10 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Blocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -61,6 +63,14 @@ public abstract class OptionsMixin {
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILnet/minecraft/client/KeyMapping$Category;Ljava/util/function/BooleanSupplier;Z)V", ordinal = 1), index = 4)
     protected BooleanSupplier initKeyAttack(BooleanSupplier booleanSupplier) {
         return () -> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleAttack.get() && Legacy4JClient.controllerManager.isControllerTheLastInput();
+    }
+
+    @ModifyReturnValue(method = "getFinalSoundSourceVolume", at = @At("RETURN"))
+    private float getFinalSoundSourceVolume(float original, SoundSource soundSource) {
+        if (soundSource == SoundSource.MUSIC || soundSource == SoundSource.RECORDS) {
+            return ((Options) (Object) this).getSoundSourceVolume(soundSource);
+        }
+        return original;
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
