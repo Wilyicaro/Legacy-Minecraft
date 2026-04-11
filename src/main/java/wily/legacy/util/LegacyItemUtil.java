@@ -98,7 +98,16 @@ public class LegacyItemUtil {
     }
 
     public static boolean canGoInLceOffhand(ItemStack stack) {
-        return stack.isEmpty() || stack.is(LCE_OFFHAND);
+        return stack.isEmpty() || stack.is(LCE_OFFHAND) || canGoInLocalOffhand(stack);
+    }
+
+    private static boolean canGoInLocalOffhand(ItemStack stack) {
+        return stack.is(ItemTags.ARROWS)
+                || stack.is(Items.FIREWORK_ROCKET)
+                || stack.is(Items.FILLED_MAP)
+                || stack.is(Items.NAUTILUS_SHELL)
+                || stack.is(Items.SHIELD)
+                || stack.is(Items.TOTEM_OF_UNDYING);
     }
 
     public static Holder<Potion> getPotionContent(ItemStack itemStack) {
