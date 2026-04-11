@@ -21,7 +21,8 @@ public class LegacyLoadingMessageScreenMixin extends Screen implements LegacyLoa
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyLoadingAndConnecting.get()) {
             ci.cancel();
-            getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), getTitle(), null, 0, false);
+            Component header = getTitle();
+            getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), header, null, 0.0F, false);
             getLoadingRenderer().render(guiGraphics, i, j, f);
         }
     }

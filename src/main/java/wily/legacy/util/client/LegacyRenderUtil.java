@@ -175,7 +175,7 @@ public class LegacyRenderUtil {
     }
 
     public static void renderUsername(GuiGraphics graphics) {
-        if (mc.level != null || !LegacyOptions.getUIMode().isFHD()) return;
+        if (mc.level != null || !LegacyOptions.getUIMode().isFHD() || LegacyOptions.legacySettingsMenus.get()) return;
         String username = MCAccount.isOfflineUser() ? I18n.get("legacy.menu.offline_user", mc.getUser().getName()) : mc.getUser().getName();
         graphics.drawString(mc.font, username, graphics.guiWidth() - 33 - mc.font.width(username), graphics.guiHeight() - 27, 0xFFFFFFFF);
     }

@@ -47,7 +47,9 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.screen.*;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerPlayerMissHitPayload;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -133,11 +135,15 @@ public abstract class MinecraftMixin {
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
+        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !LegacyItemUtil.canGoInLceOffhand(player.getMainHandItem())) {
+            while (options.keySwapOffhand.consumeClick()) {
+            }
+        }
     }
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void startAttack(CallbackInfoReturnable<Boolean> cir) {
-        CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
+        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
     }
 
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)

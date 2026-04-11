@@ -138,7 +138,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     @Override
     protected void init() {
-        CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
+        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
         super.init();
         addHostOptionsButton();
     }

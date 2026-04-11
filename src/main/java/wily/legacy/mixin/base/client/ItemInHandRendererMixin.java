@@ -28,8 +28,9 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
-    private static final int LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS = 6;
-    private static final float LEGACY_TRIDENT_FIRST_PERSON_EXTRA_RAISE_TICKS = 2.75F;
+    private static final int LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS = 4;
+    private static final float LEGACY_TRIDENT_FIRST_PERSON_EXTRA_RAISE_TICKS = 0.75F;
+    private static final float LEGACY_TRIDENT_FIRST_PERSON_POSE_Y_OFFSET = 0.125F;
 
     @Shadow
     @Final
@@ -163,6 +164,7 @@ public abstract class ItemInHandRendererMixin {
         this.applyItemArmTransform(poseStack, humanoidArm, equipProgress);
         float useTicks = (float) itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float) abstractClientPlayer.getUseItemRemainingTicks() - partialTick + 1.0F);
         float progress = getLegacyTridentFirstPersonProgress(useTicks);
+        poseStack.translate(0.0F, LEGACY_TRIDENT_FIRST_PERSON_POSE_Y_OFFSET, 0.0F);
         poseStack.translate(armDirection * -0.5F * progress, 0.7F * progress, 0.1F * progress);
         poseStack.mulPose(Axis.XP.rotationDegrees(-55.0F * progress));
         poseStack.mulPose(Axis.YP.rotationDegrees(armDirection * 35.3F * progress));

@@ -3,7 +3,12 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
+//? if fabric || >=1.21 && neoforge {
+import wily.legacy.client.screen.compat.SodiumCompat;
+//?}
 
 
 import java.util.List;
@@ -16,11 +21,23 @@ public class SettingsScreen extends RenderableVListScreen {
     protected SettingsScreen(Screen parent) {
         super(parent, Component.translatable("legacy.menu.settings"), r -> {
         });
-        SETTINGS_BUTTONS.forEach(f -> renderableVList.addRenderable(f.apply(this)));
+        for (OptionsScreen.Section section : OptionsScreen.Section.list) {
+            if (shouldHideSection(section)) continue;
+            renderableVList.addRenderable(section.createButtonBuilder(this).build());
+        }
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.reset_defaults"), () -> new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_settings"), Component.translatable("legacy.menu.reset_message"), b1 -> {
             Legacy4JClient.resetOptions(minecraft);
             b1.onClose();
         })).build());
+    }
+
+    private static boolean shouldHideSection(OptionsScreen.Section section) {
+        if (!LegacyOptions.legacySettingsMenus.get() && !LegacyOptions.hideSodiumSettings.get()) return false;
+        //? if fabric || >=1.21 && neoforge {
+        return FactoryAPI.isModLoaded("sodium") && section == SodiumCompat.SODIUM;
+        //?} else {
+        /*return false;*/
+        //?}
     }
 
 }
