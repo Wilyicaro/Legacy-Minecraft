@@ -13,12 +13,14 @@ public final class ConsoleSkinsClientSettings {
     private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
     private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
     private static final boolean DEFAULT_SKIN_SELECTION_INITIALIZED = false;
+    private static final String DEFAULT_CLOUD_RELAY_URL = "https://legacy4j-skins-relay.creepereater201.workers.dev";
     private static volatile boolean loaded;
     private static volatile boolean smoothPreviewScroll;
     private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
     private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
     private static volatile boolean skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
     private static volatile String lastUsedCustomPackId;
+    private static volatile String cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
 
     private ConsoleSkinsClientSettings() {
     }
@@ -78,6 +80,17 @@ public final class ConsoleSkinsClientSettings {
         saveQuiet();
     }
 
+    public static String getCloudRelayUrl() {
+        ensureLoaded();
+        return cloudRelayUrl;
+    }
+
+    public static void setCloudRelayUrl(String url) {
+        ensureLoaded();
+        cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
+        saveQuiet();
+    }
+
     public static void resetToDefaults() {
         ensureLoaded();
         smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
@@ -85,6 +98,7 @@ public final class ConsoleSkinsClientSettings {
         tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
         skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
         lastUsedCustomPackId = null;
+        cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
         saveQuiet();
     }
 
@@ -101,9 +115,17 @@ public final class ConsoleSkinsClientSettings {
             tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
             skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
             lastUsedCustomPackId = null;
+            cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
 
             Path cfg = resolveConfigFile();
-            if (cfg == null || !Files.isRegularFile(cfg)) return;
+            if (cfg == null) return;
+            if (!Files.isRegularFile(cfg)) {
+                saveQuiet();
+                return;
+            }
+
+            boolean sawCloudRelayUrl = false;
+            boolean needsSave = false;
 
             try (BufferedReader br = Files.newBufferedReader(cfg, StandardCharsets.UTF_8)) {
                 String line;
@@ -143,8 +165,18 @@ public final class ConsoleSkinsClientSettings {
                         lastUsedCustomPackId = v == null || v.isBlank() ? null : v.trim();
                         continue;
                     }
+
+                    if (k.equalsIgnoreCase("cloud_relay_url") || k.equalsIgnoreCase("cloudRelayUrl")
+                            || k.equalsIgnoreCase("vanilla_cloud_relay_url") || k.equalsIgnoreCase("vanillaCloudRelayUrl")) {
+                        sawCloudRelayUrl = true;
+                        if (!DEFAULT_CLOUD_RELAY_URL.equals(normalizeUrl(v))) needsSave = true;
+                    }
                 }
             }
+
+            cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
+            if (!sawCloudRelayUrl) needsSave = true;
+            if (needsSave) saveQuiet();
         } catch (IOException | RuntimeException ignored) {
         }
     }
@@ -168,10 +200,18 @@ public final class ConsoleSkinsClientSettings {
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
                     + "skin_selection_initialized=" + skinSelectionInitialized + "\n"
-                    + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n";
+                    + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n"
+                    + "cloud_relay_url=" + (cloudRelayUrl == null ? "" : cloudRelayUrl) + "\n";
             Files.writeString(cfg, out, StandardCharsets.UTF_8);
         } catch (IOException | RuntimeException ignored) {
         }
+    }
+
+    private static String normalizeUrl(String url) {
+        if (url == null) return DEFAULT_CLOUD_RELAY_URL;
+        String value = url.trim();
+        while (value.endsWith("/")) value = value.substring(0, value.length() - 1);
+        return value.isEmpty() ? DEFAULT_CLOUD_RELAY_URL : value;
     }
 
     private static Path resolveConfigFile() {

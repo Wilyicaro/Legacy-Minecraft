@@ -25,20 +25,26 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     }));
     public static final OptionsScreen.Section CHANGE_SKIN_OPTIONS = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets()))));
     public static ScreenSection<?> CHANGE_SKIN = CHANGE_SKIN_OPTIONS;
-
-    private static Screen createControlsScreen(Screen parent) {
-        return new RenderableVListScreen(parent, Component.translatable("controls.title"), r -> r.addRenderables(
-                openScreenButton(Component.translatable("controls.keybinds.title"), () -> new LegacyKeyMappingScreen(r.getScreen())).build(),
-                openScreenButton(Component.translatable("legacy.options.selectedController"), () -> new ControllerMappingScreen(r.getScreen())).build()
-        ));
-    }
-
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
         });
         renderableVList.addRenderable(CHANGE_SKIN.createButtonBuilder(this).build());
         renderableVList.addRenderable(HOW_TO_PLAY.createButtonBuilder(this).build());
-        renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> createControlsScreen(this)).build());
+        renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> new RenderableVListScreen(this, Component.translatable("controls.title"), r -> r.addRenderables(Button.builder(Component.translatable("options.mouse_settings.title"), button -> this.minecraft.setScreen(
+                new OptionsScreen(r.getScreen(), new OptionsScreen.Section(
+                        Component.translatable("options.mouse_settings.title"),
+                        s -> Panel.centered(s, 250, 130),
+                        new ArrayList<>(List.of(
+                                o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.sensitivity()), 2),
+                                o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.mouseWheelSensitivity()), 2),
+                                o -> o.renderableVList.addOptions(
+                                        LegacyOptions.of(minecraft.options.invertMouseX()),
+                                        LegacyOptions.of(minecraft.options.invertMouseY()),
+                                        LegacyOptions.of(minecraft.options.discreteMouseScroll()),
+                                        LegacyOptions.of(minecraft.options.touchscreen()),
+                                        LegacyOptions.cursorAtFirstInventorySlot,
+                                        LegacyOptions.systemCursor
+                                ))))))).build(), Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(r.getScreen()))).build(), Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(r.getScreen()))).build()))).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"), () -> new SettingsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new RenderableVListScreen(this, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new WinScreen(false, () -> this.minecraft.setScreen(r.getScreen()))).build(), Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(), Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()))).build());
     }

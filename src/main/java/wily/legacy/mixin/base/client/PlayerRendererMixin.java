@@ -25,6 +25,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
+import java.util.Map;
+
 @Mixin(AvatarRenderer.class)
 public abstract class PlayerRendererMixin extends LivingEntityRenderer {
 
@@ -69,6 +72,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         final ResourceLocation texFinal = boxTexture;
         final var partsFinal = parts;
         final float partScale = built.partScale();
+        final ModelPart modelPartSnapshot = snapshotPart(modelPart);
         submitNodeCollector.submitCustomGeometry(
                 poseStack,
                 RenderType.entityCutoutNoCull(texFinal),
@@ -76,7 +80,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);
                     ps.pushPose();
-                    modelPart.translateAndRotate(ps);
+                    modelPartSnapshot.translateAndRotate(ps);
                     if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
                     for (ModelPart p : partsFinal) p.render(ps, vc, packedLight, OverlayTexture.NO_OVERLAY);
                     ps.popPose();
@@ -89,5 +93,21 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     @Redirect(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;isFallFlying:Z"))
     private boolean render(AvatarRenderState instance) {
         return instance.isFallFlying && instance.hasPose(Pose.FALL_FLYING);
+    }
+
+    private static ModelPart snapshotPart(ModelPart part) {
+        ModelPart snapshot = new ModelPart(List.of(), Map.of());
+        if (part == null) return snapshot;
+        snapshot.visible = part.visible;
+        snapshot.x = part.x;
+        snapshot.y = part.y;
+        snapshot.z = part.z;
+        snapshot.xRot = part.xRot;
+        snapshot.yRot = part.yRot;
+        snapshot.zRot = part.zRot;
+        snapshot.xScale = part.xScale;
+        snapshot.yScale = part.yScale;
+        snapshot.zScale = part.zScale;
+        return snapshot;
     }
 }

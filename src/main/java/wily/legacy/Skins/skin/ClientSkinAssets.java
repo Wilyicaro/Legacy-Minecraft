@@ -68,11 +68,12 @@ public final class ClientSkinAssets {
     public static BuiltBoxModel resolveBoxModel(String skinId, ResourceLocation modelId) {
         if (modelId == null) return null;
         BuiltBoxModel model = BoxModelManager.get(modelId);
-        if (model != null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return model;
+        if (model != null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return model == null ? null : model.copy();
         JsonObject json = MODELS.get(skinId);
         if (json == null) return null;
         BoxModelManager.registerRuntime(modelId, json);
-        return BoxModelManager.get(modelId);
+        BuiltBoxModel runtimeModel = BoxModelManager.get(modelId);
+        return runtimeModel == null ? null : runtimeModel.copy();
     }
     public static Boolean getSlimFlag(String skinId) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;

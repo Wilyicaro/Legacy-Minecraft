@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Skins.client.util.ViewBobbingSkinOverride;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,7 +28,8 @@ public final class SkinSyncClient {
             onRequestSkinUpload();
         }
         if (connected && tickSnapshotRequest()) {
-            CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
+            if (SkinCloudSyncClient.isActive(client)) SkinCloudSyncClient.requestSnapshot(client, true);
+            else CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
         }
         if (connected && !STATE.sessionAnnounced) onRequestSkinUpload();
         if (!connected) return;
@@ -81,6 +83,10 @@ public final class SkinSyncClient {
             STATE.pendingUpload = true;
             return;
         }
+        if (SkinCloudSyncClient.isActive(client)) {
+            sendSelection(client, resolveSelectedSkinId(client));
+            return;
+        }
         sendSelection(client, resolveSelectedSkinId(client));
     }
 
@@ -97,6 +103,11 @@ public final class SkinSyncClient {
     }
 
     public static void onSyncSkin(UUID uuid, String skinId) { ClientSkinCache.set(uuid, skinId); }
+
+    static void onCloudSnapshot(Map<UUID, String> skins) {
+        if (skins == null || skins.isEmpty()) return;
+        skins.forEach(ClientSkinCache::set);
+    }
 
     private static UUID getUserId(Minecraft client) { return client == null || client.getUser() == null ? null : client.getUser().getProfileId(); }
 
@@ -140,17 +151,27 @@ public final class SkinSyncClient {
     private static void refreshKnownPlayerNames(Minecraft client) {
         if (client == null || client.level == null || ++STATE.scanTick < State.SCAN_INTERVAL) return;
         STATE.scanTick = 0;
+        boolean missingSkin = false;
         for (var player : client.level.players()) {
             if (player == null) continue;
             String skinId = ClientSkinCache.get(player.getUUID());
-            if (!SkinIdUtil.hasSkin(skinId) || skinId.equals(STATE.lastApplied.put(player.getUUID(), skinId))) continue;
+            if (!SkinIdUtil.hasSkin(skinId)) {
+                missingSkin = true;
+                continue;
+            }
+            if (skinId.equals(STATE.lastApplied.put(player.getUUID(), skinId))) continue;
             ClientSkinCache.setName(player.getScoreboardName(), skinId);
         }
+        if (missingSkin && SkinCloudSyncClient.isActive(client)) SkinCloudSyncClient.requestSnapshot(client, false);
     }
 
     private static void sendSelection(Minecraft client, String skinId) {
         String id = SkinIdUtil.normalize(skinId);
         STATE.sessionAnnounced = true;
+        if (SkinCloudSyncClient.isActive(client)) {
+            SkinCloudSyncClient.submitSelection(client, id);
+            return;
+        }
         CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));
         sendAssets(client, id);
     }
