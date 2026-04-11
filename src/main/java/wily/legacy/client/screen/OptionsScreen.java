@@ -361,7 +361,7 @@ public class OptionsScreen extends PanelVListScreen {
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.of(mc.options.getSoundSourceOptionInstance(SoundSource.MUSIC)),
-                                LegacyOptions.of(mc.options.getSoundSourceOptionInstance(SoundSource.MASTER)),
+                                LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(SoundSource.MASTER), "legacy.menu.sound"),
                                 LegacyOptions.caveSounds, LegacyOptions.minecartSounds))),
                 () -> Section.ADVANCED_AUDIO));
         public static final Section ADVANCED_AUDIO = new Section(

@@ -69,6 +69,19 @@ public class LegacyOptions {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
     }
 
+    public static FactoryConfig<Double> ofSound(OptionInstance<Double> optionInstance, String captionKey) {
+        return FactoryConfig.create(
+                OptionInstanceAccessor.of(optionInstance).getKey(),
+                FactoryConfigDisplay.<Double>percentBuilder()
+                        .tooltip(v -> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v)))
+                        .build(Component.translatable(captionKey)),
+                OptionInstanceAccessor.of(optionInstance).defaultValue(),
+                Bearer.of(optionInstance::get, optionInstance::set),
+                FactoryConfigControl.createDouble(),
+                v -> {},
+                VANILLA_STORAGE_ACCESS);
+    }
+
     public static <T> FactoryConfig<T> create(OptionInstance<T> optionInstance) {
         FactoryConfigControl<T> control;
         if (optionInstance.values().equals(OptionInstance.BOOLEAN_VALUES)) {
