@@ -26,8 +26,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float NORMAL_CAROUSEL_BASE_SCALE = 0.935f;
     private static final float NORMAL_CAROUSEL_BASE_SPACING = 80f;
     private static final float NORMAL_DOLL_SCALE_BUMP = 1.05f;
-    private static final float LABEL_SCALE_BUMP = 1.04f;
-    private static final float HEADER_SCALE_BUMP = 1.06f;
+    private static final float NORMAL_TEXT_SCALE = 1.5f;
+    private static final float PACK_TYPE_TEXT_SCALE = 0.75f;
     private static final int PACK_LIST_VISIBLE_ROWS = 6;
     private static final int PACK_LIST_FOOTER_RESERVE = 12;
     private static final float HD_MENU_SCALE = 1.10f;
@@ -132,6 +132,16 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private int centerTextX() {
         if (playerSkinWidgetList != null) return playerSkinWidgetList.getCenterAnchorX();
         return tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
+    }
+
+    private void drawScaledCenteredShadow(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
+        int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
+        var pose = g.pose();
+        pose.pushMatrix();
+        pose.translate((float) centerX, (float) yAdj);
+        pose.scale(scale, scale);
+        g.drawCenteredString(minecraft.font, text, 0, 0, color);
+        pose.popMatrix();
     }
 
     @Override
@@ -441,35 +451,36 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             String    name   = entry == null ? String.valueOf(skinId) : entry.name();
             int mid       = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
-            float labelScale = bigTextScale() * LABEL_SCALE_BUMP;
-            drawScaledCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF, labelScale);
+            int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / NORMAL_TEXT_SCALE));
+            drawScaledCenteredShadow(g, Component.literal(SkinTextUtil.clip(minecraft.font, name, maxNameWidth)), mid, skinNameY, 0xFFFFFFFF, NORMAL_TEXT_SCALE);
 
             ResourceLocation modelId = entry == null ? null : entry.modelId();
             if (modelId == null && entry != null && entry.texture() != null) modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
 
             String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
-                float scale = labelScale;
-                int maxUnscaled = (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / scale);
-                String show = SkinTextUtil.clip(minecraft.font, theme, maxUnscaled);
-                int themeY = skinNameY + (int) (minecraft.font.lineHeight * scale) + sc(normalLayout.themeTextGap());
-                drawScaledCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF, scale);
+                int maxThemeWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / NORMAL_TEXT_SCALE));
+                String show = SkinTextUtil.clip(minecraft.font, theme, maxThemeWidth);
+                int themeY = skinNameY + (int) (minecraft.font.lineHeight * NORMAL_TEXT_SCALE) + sc(normalLayout.themeTextGap());
+                drawScaledCenteredShadow(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF, NORMAL_TEXT_SCALE);
             }
         }
 
         SkinPack pack = packList.getFocusedPack();
         int packMid = centerTextX();
-        float headerScale = bigTextScale() * HEADER_SCALE_BUMP;
-        int packMetaY = panel.y + sc(normalLayout.packTitleTop()) + (int) (minecraft.font.lineHeight * headerScale) + sc(normalLayout.packMetaGap());
+        int packTitleY = panel.y + sc(normalLayout.packTitleTop());
+        int packMetaY = packTitleY + (int) (minecraft.font.lineHeight * NORMAL_TEXT_SCALE) + sc(normalLayout.packMetaGap());
         if (pack != null) {
-            drawScaledCentered(g, Component.literal(SkinPackLoader.nameString(pack.name(), pack.id())), packMid, panel.y + sc(normalLayout.packTitleTop()), 0xFFFFFFFF, headerScale);
+            int maxPackWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())) / NORMAL_TEXT_SCALE));
+            String packName = SkinTextUtil.clip(minecraft.font, SkinPackLoader.nameString(pack.name(), pack.id()), maxPackWidth);
+            drawScaledCenteredShadow(g, Component.literal(packName), packMid, packTitleY, 0xFFFFFFFF, NORMAL_TEXT_SCALE);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);
                 Component label = null;
                 if (k.equals("skin"))   label = Component.translatable("legacy.skinpack.type.skin");
                 if (k.equals("mashup")) label = Component.translatable("legacy.skinpack.type.mashup");
-                if (label != null) { drawSmallCentered(g, label, packMid, packMetaY, 0xCCFFFFFF); }
+                if (label != null) { drawScaledCenteredShadow(g, label, packMid, packMetaY, 0xCCFFFFFF, PACK_TYPE_TEXT_SCALE); }
             }
         }
     }

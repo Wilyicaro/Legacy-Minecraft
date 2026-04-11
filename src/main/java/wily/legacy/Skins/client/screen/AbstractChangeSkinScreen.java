@@ -919,11 +919,13 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
+        int textWidth = minecraft.font.width(text);
+        int textX = -textWidth / 2;
         var pose = g.pose();
         pose.pushMatrix();
         pose.translate((float) centerX, (float) yAdj);
         pose.scale(scale, scale);
-        g.drawCenteredString(minecraft.font, text, 0, 0, color);
+        g.drawString(minecraft.font, text, textX, 0, color, false);
         pose.popMatrix();
     }
     protected static final class HoldRepeat {
