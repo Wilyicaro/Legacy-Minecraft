@@ -244,12 +244,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             int[] d = packIconDims(icon);
             float scale = Math.min(innerSize / (float) d[0], innerSize / (float) d[1]);
             scale += 1f / Math.max(d[0], d[1]);
+            float scaleY = scale + 0.25f / d[1];
             float cx = innerX + innerSize / 2f;
-            float cy = innerY + innerSize / 2f;
+            float cy = innerY + innerSize / 2f - 0.125f;
             var pose = g.pose();
             pose.pushMatrix();
             pose.translate(cx, cy);
-            pose.scale(scale, scale);
+            pose.scale(scale, scaleY);
             pose.translate(-d[0] / 2f, -d[1] / 2f);
             g.blit(RenderPipelines.GUI_TEXTURED, icon, 0, 0, 0, 0, d[0], d[1], d[0], d[1]);
             pose.popMatrix();

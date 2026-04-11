@@ -25,6 +25,14 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     }));
     public static final OptionsScreen.Section CHANGE_SKIN_OPTIONS = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets()))));
     public static ScreenSection<?> CHANGE_SKIN = CHANGE_SKIN_OPTIONS;
+
+    private static Screen createControlsScreen(Screen parent) {
+        return new RenderableVListScreen(parent, Component.translatable("controls.title"), r -> r.addRenderables(
+                openScreenButton(Component.translatable("controls.keybinds.title"), () -> new LegacyKeyMappingScreen(r.getScreen())).build(),
+                openScreenButton(Component.translatable("legacy.options.selectedController"), () -> new ControllerMappingScreen(r.getScreen())).build()
+        ));
+    }
+
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
         });
