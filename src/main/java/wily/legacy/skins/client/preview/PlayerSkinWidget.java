@@ -330,7 +330,7 @@ public class PlayerSkinWidget extends AbstractWidget {
                 if (!SkinIdUtil.isAutoSelect(id)) {
                     SkinEntry e = getCachedEntry(id);
                     if (e != null) { label = SkinPackLoader.nameString(e.name(), id); }
-                } else { label = "Current Skin"; }
+                } else { label = "Auto Selected"; }
                 if (label == null) label = "";
 
                 int plateW = CENTER_NAME_PLATE_W;
