@@ -90,12 +90,13 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             case DEFAULT_GAME_MODE -> {
                 GameType gameType = gameTypeFromValue(value);
                 server.getCommands().performPrefixedCommand(source, "defaultgamemode " + gameType.getName());
+                CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), PlayerInfoSync.All.fromPlayerList(server));
                 sp.displayClientMessage(Component.translatable("commands.defaultgamemode.success", gameType.getLongDisplayName()), false);
             }
             case GAME_MODE -> {
                 ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
                 GameType gameType = gameTypeFromValue(value);
-                if (affectPlayer != null && affectPlayer.gameMode.changeGameModeForPlayer(gameType)) {
+                if (affectPlayer != null && affectPlayer.setGameMode(gameType)) {
                     affectPlayer.displayClientMessage(Component.translatable("legacy.menu.host_options.message.game_mode_changed"), false);
                     if (sp == affectPlayer) sp.displayClientMessage(Component.translatable("commands.gamemode.success.self", gameType.getLongDisplayName()), false);
                     else sp.displayClientMessage(Component.translatable("commands.gamemode.success.other", affectPlayer.getDisplayName(), gameType.getLongDisplayName()), false);

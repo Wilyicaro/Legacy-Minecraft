@@ -26,6 +26,7 @@
     //?}
     "client.SectionOcclusionGraphMixin",
     "client.LevelEventHandlerMixin",
+    "client.DragonEggBlockMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
     "client.AbstractButtonMixin",
     "client.AbstractContainerScreenMixin",
@@ -58,6 +59,7 @@
     "client.ClientPacketListenerMixin",
     "client.ClientPrimaryLevelDataMixin",
     "client.ClientTextTooltipMixin",
+    "client.ConduitBlockEntityRendererMixin",
     "client.ContainerEventHandlerMixin",
     "client.container.ContainerScreenMixin",
     "client.crafting.CraftingScreenMixin",
@@ -221,6 +223,7 @@
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
+    "CarpetBlockMixin",
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",

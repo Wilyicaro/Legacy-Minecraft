@@ -194,6 +194,9 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void tick() {
         super.tick();
+        if (serverRenderableList.syncOptionDrivenButtons()) {
+            rebuildWidgets();
+        }
         List<LevelSummary> summaries = saveRenderableList.pollLevelsIgnoreErrors();
         if (summaries != saveRenderableList.currentlyDisplayedLevels) {
             saveRenderableList.fillLevels("", summaries);

@@ -12,6 +12,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerHostOptionsPayload;
@@ -41,12 +42,18 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         getRenderableVList().addRenderable(new TickBox(0, 0, initialVisibility, b1 -> Component.translatable("legacy.menu.host_options.player.invisible"), b1 -> null, b1 -> {
             if (initialVisibility != b1.selected) {
-                commandsOnClose.put(b1, () -> CommonNetwork.sendToServer(PlayerInfoSync.invisibility(b1.selected, playerInfo.getProfile())));
+                commandsOnClose.put(b1, () -> {
+                    if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.invisibility(b1.selected, playerInfo.getProfile()));
+                });
             } else commandsOnClose.remove(b1);
         }));
         if (playerInfo.getGameMode().isSurvival()) {
-            getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).mayFlySurvival(), b1 -> Component.translatable("legacy.menu.host_options.player.mayFly"), b1 -> null, b1 -> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()))));
-            getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(), b1 -> Component.translatable("legacy.menu.host_options.player.disableExhaustion"), b1 -> null, b1 -> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, playerInfo.getProfile()))));
+            getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).mayFlySurvival(), b1 -> Component.translatable("legacy.menu.host_options.player.mayFly"), b1 -> null, b1 -> {
+                if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()));
+            }));
+            getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(), b1 -> Component.translatable("legacy.menu.host_options.player.disableExhaustion"), b1 -> null, b1 -> {
+                if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, playerInfo.getProfile()));
+            }));
         }
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), (b1) -> Tooltip.create(Component.translatable("selectWorld.gameMode." + playerInfo.getGameMode().getName() + ".info")), playerInfo.getGameMode(), () -> gameTypes, b1 -> commandsOnClose.put(b1, () -> {
             if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(ServerHostOptionsPayload.gameMode(b1.getObjectValue(), playerInfo.getProfile().id()));
@@ -84,5 +91,11 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
         panel.render(guiGraphics, i, j, f);
         HostOptionsScreen.drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, panel.x + 7, panel.y + 5);
         guiGraphics.drawString(font, playerInfo.getProfile().name(), panel.x + 31, panel.y + 12, CommonColor.GRAY_TEXT.get(), false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
     }
 }

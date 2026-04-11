@@ -42,6 +42,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -83,6 +84,7 @@ public class ServerRenderableList extends RenderableVList {
     public final ServerList servers;
     public final LanServerDetection.LanServerList lanServerList;
     protected final Minecraft minecraft;
+    protected boolean lastDisplayRealmsButton = LegacyOptions.displayRealmsButton.get();
     @Nullable
     public LanServerDetection.LanServerDetector lanServerDetector;
     public List<LanServer> lanServers;
@@ -128,6 +130,14 @@ public class ServerRenderableList extends RenderableVList {
         }
     }
 
+    public boolean syncOptionDrivenButtons() {
+        boolean displayRealmsButton = LegacyOptions.displayRealmsButton.get();
+        if (lastDisplayRealmsButton == displayRealmsButton) return false;
+        lastDisplayRealmsButton = displayRealmsButton;
+        updateServers();
+        return true;
+    }
+
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {
             return null;
@@ -149,7 +159,8 @@ public class ServerRenderableList extends RenderableVList {
         addIconButton(this, Legacy4J.createModLocation("creation_list/add_server"), Component.translatable("legacy.menu.add_server"), c -> this.minecraft.setScreen(new ServerEditScreen(getScreen(PlayGameScreen.class), new ServerData(I18n.get("selectServer.defaultName"), "", /*? if >1.20.1 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), true)));
         Component component = this.getMultiplayerDisabledReason();
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
-        addIconButton(this, Legacy4J.createModLocation("creation_list/realms"), Component.translatable("menu.online"), b -> minecraft.setScreen(new RealmsMainScreen(getScreen())), tooltip);
+        if (LegacyOptions.displayRealmsButton.get())
+            addIconButton(this, Legacy4J.createModLocation("creation_list/realms"), Component.translatable("menu.online"), b -> minecraft.setScreen(new RealmsMainScreen(getScreen())), tooltip);
         for (int i = 0; i < servers.size(); i++) {
             addRenderable(new ServerButton(0, 0, 0, 30, i));
         }

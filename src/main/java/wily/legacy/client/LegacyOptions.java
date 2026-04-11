@@ -34,6 +34,7 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 public class LegacyOptions {
     public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
+    private static boolean suppressPlayerInfoSync = false;
 
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
             Component.translatable("key.sprint"), Component.translatable("options.key.toggleSprint"),
@@ -66,6 +67,19 @@ public class LegacyOptions {
 
     public static <T> FactoryConfig<T> of(OptionInstance<T> optionInstance) {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
+    }
+
+    public static FactoryConfig<Double> ofSound(OptionInstance<Double> optionInstance, String captionKey) {
+        return FactoryConfig.create(
+                OptionInstanceAccessor.of(optionInstance).getKey(),
+                FactoryConfigDisplay.<Double>percentBuilder()
+                        .tooltip(v -> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v)))
+                        .build(Component.translatable(captionKey)),
+                OptionInstanceAccessor.of(optionInstance).defaultValue(),
+                Bearer.of(optionInstance::get, optionInstance::set),
+                FactoryConfigControl.createDouble(),
+                v -> {},
+                VANILLA_STORAGE_ACCESS);
     }
 
     public static <T> FactoryConfig<T> create(OptionInstance<T> optionInstance) {
@@ -156,7 +170,8 @@ public class LegacyOptions {
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = FactoryConfig.<String>builder().key("lastLoadedMinecraftVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
+        syncLegacyClassicWorkstations(b);
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
     public static final FactoryConfig<Boolean> modCraftingTabs = CLIENT_STORAGE.register(createBoolean("modCraftingTabs",false));
@@ -186,6 +201,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> caveSounds = CLIENT_STORAGE.register(createBoolean("caveSounds", true));
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
+    public static final FactoryConfig<Boolean> displayChatIndicators = CLIENT_STORAGE.register(createBoolean("displayChatIndicators", true));
     public static final FactoryConfig<Boolean> legacyItemTooltips = CLIENT_STORAGE.register(createBoolean("legacyItemTooltips", true));
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
@@ -211,7 +227,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> terrainFogStart = CLIENT_STORAGE.register(createInteger("terrainFogStart", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", Math.min(i, Minecraft.getInstance().options.renderDistance().get()))), 2, ()-> Minecraft.getInstance().options.renderDistance().get(), 4, d -> {}));
     public static final FactoryConfig<Boolean> overrideTerrainFogEnd = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogEnd", true));
     public static final FactoryConfig<Integer> terrainFogEnd = CLIENT_STORAGE.register(createInteger("terrainFogEnd", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", i)), 2, () -> 32, 16, d -> {}));
-    public static final FactoryConfig<Boolean> lceClouds = CLIENT_STORAGE.register(FactoryConfig.createBoolean("lceClouds", FactoryConfigDisplay.createToggle(Component.literal("LCE Clouds")), true, b -> reloadCloudRendering(), CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> lceClouds = CLIENT_STORAGE.register(createBoolean("lceClouds", true, b -> reloadCloudRendering()));
     public static final FactoryConfig<Boolean> legacyCloudHeightAndTexture = CLIENT_STORAGE.register(createBoolean("legacyCloudHeightAndTexture", b -> Component.translatable("legacy.options.legacyCloudHeightAndTexture.tooltip"), false, b -> reloadCloudRendering()));
     public static final FactoryConfig<OptionHolder<ControlType>> selectedControlType = CLIENT_STORAGE.register(FactoryConfig.create("controlType", FactoryConfigDisplay.<OptionHolder<ControlType>>builder().valueToComponent(i -> i.isAuto() ? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().nameOrEmpty()) : i.get().nameOrEmpty()).build(optionName("controlType")), new FactoryConfigControl.FromInt<>(ControlType.OPTION_CODEC, i -> i == 0 || Legacy4JClient.controlTypesManager.map().size() < i ? OptionHolder.auto() : OptionHolder.of(Legacy4JClient.controlTypesManager.map().getByIndex(i - 1)), s1-> 1 + Legacy4JClient.controlTypesManager.map().indexOf(s1.get()), ()-> Legacy4JClient.controlTypesManager.map().size() + 1), OptionHolder.auto(), v-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Difficulty> createWorldDifficulty = CLIENT_STORAGE.register(FactoryConfig.create("createWorldDifficulty", FactoryConfigDisplay.<Difficulty>builder().tooltip(Difficulty::getInfo).valueToComponent(Difficulty::getDisplayName).build(Component.translatable("options.difficulty")), new FactoryConfigControl.FromInt<>(Difficulty::byId, Difficulty::getId, ()->Difficulty.values().length), Difficulty.NORMAL, d -> {}, CLIENT_STORAGE));
@@ -249,16 +265,16 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inGameOnlineIds = CLIENT_STORAGE.register(createBoolean("inGameOnlineIds", true));
     public static final FactoryConfig<Boolean> systemMessagesAsOverlay = CLIENT_STORAGE.register(createBoolean("systemMessagesAsOverlay", true));
     public static final FactoryConfig<Boolean> forceMixedCrafting = CLIENT_STORAGE.register(createBoolean("forceMixedCrafting", false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicTrading = CLIENT_STORAGE.register(createBoolean("classicTrading",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicStonecutting = CLIENT_STORAGE.register(createBoolean("classicStonecutting",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicLoom = CLIENT_STORAGE.register(createBoolean("classicLoom",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> headFollowsTheCamera = CLIENT_STORAGE.register(createBoolean("headFollowsTheCamera", true));
     public static final FactoryConfig<Boolean> fastLeavesWhenBlocked = CLIENT_STORAGE.register(createBoolean("fastLeavesWhenBlocked", true, b -> Legacy4JClient.updateChunks()));
@@ -279,9 +295,34 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> mapsWithCoords = CLIENT_STORAGE.register(createBoolean("mapsWithCoords", true));
     public static final FactoryConfig<Boolean> menusWithBackground = CLIENT_STORAGE.register(createBoolean("menusWithBackground", false));
     public static final FactoryConfig<Boolean> legacyPanorama = CLIENT_STORAGE.register(createBoolean("legacyPanorama", true));
+    public static final FactoryConfig<Boolean> displayRealmsButton = CLIENT_STORAGE.register(createBoolean("displayRealmsButton", true));
+    public static final FactoryConfig<Boolean> hideSodiumSettings = CLIENT_STORAGE.register(createBoolean("hideSodiumSettings", false));
+    public static final FactoryConfig<Boolean> hideExperimentalWorldWarning = CLIENT_STORAGE.register(createBoolean("hideExperimentalWorldWarning", false));
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
     public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerCursorAtFirstInventorySlot", FactoryConfigDisplay.createToggle(Component.translatable("legacy.options.cursorAtFirstInventorySlot")),true, b -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> systemCursor = CLIENT_STORAGE.register(createBoolean("systemCursor", false, b -> Legacy4JClient.controllerManager.updateCursorInputMode()));
+
+    private static void syncLegacyClassicWorkstations(boolean enabled) {
+        if (!legacySettingsMenus.get()) return;
+        FactoryConfig.saveOptionAndConsume(classicStonecutting, enabled, v -> {});
+        FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
+        FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
+    }
+
+    public static boolean canSendPlayerInfoSync() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return !suppressPlayerInfoSync && minecraft.player != null && Legacy4JClient.hasModOnServer();
+    }
+
+    public static void runWithoutPlayerInfoSync(Runnable runnable) {
+        boolean previous = suppressPlayerInfoSync;
+        suppressPlayerInfoSync = true;
+        try {
+            runnable.run();
+        } finally {
+            suppressPlayerInfoSync = previous;
+        }
+    }
     public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", builder -> builder.valueToComponent(v -> v.displayName), i -> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, () -> ControlTooltipDisplay.values().length, ControlTooltipDisplay.CODEC, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> legacyLoadingAndConnecting = CLIENT_STORAGE.register(createBoolean("legacyLoadingAndConnecting", true));
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
@@ -307,6 +348,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> screenshotToasts = CLIENT_STORAGE.register(createBoolean("screenshotToasts", true));
     public static final FactoryConfig<Boolean> forceLegacyFlight = CLIENT_STORAGE.register(createBoolean("forceLegacyFlight", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> forceLegacySwimming = CLIENT_STORAGE.register(createBoolean("forceLegacySwimming", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacyShieldControls = CLIENT_STORAGE.register(createBoolean("forceLegacyShieldControls", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacyOffhandLimits = CLIENT_STORAGE.register(createBoolean("forceLegacyOffhandLimits", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> legacyFont = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyFont", true));
 
     public static int getTerrainFogStart() {
@@ -328,6 +371,24 @@ public class LegacyOptions {
 
     public static boolean hasMixedCrafting() {
         return (forceMixedCrafting.get() || !Legacy4JClient.hasModOnServer()) && !classicCrafting.get();
+    }
+
+    public static FactoryConfig<Double> combinedLookSensitivity() {
+        FactoryConfig<Double> mouseSensitivity = of(Minecraft.getInstance().options.sensitivity());
+        return FactoryConfig.create(
+                "combinedLookSensitivity",
+                mouseSensitivity.getDisplay(),
+                mouseSensitivity.get(),
+                Bearer.of(mouseSensitivity::get, d -> {
+                    mouseSensitivity.set(d);
+                    controllerSensitivity.set(d);
+                }),
+                FactoryConfigControl.createDouble(),
+                d -> {},
+                () -> {
+                    mouseSensitivity.save();
+                    controllerSensitivity.save();
+                });
     }
 
     public static UIMode getUIMode() {

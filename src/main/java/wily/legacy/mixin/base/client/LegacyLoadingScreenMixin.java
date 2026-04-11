@@ -48,6 +48,7 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             }
             if (self() instanceof ConnectScreen p) {
                 lastLoadingHeader = p.status;
+                progress = -1.0F;
             }
             getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), lastLoadingHeader, lastLoadingStage, progress, genericLoading);
             getLoadingRenderer().render(guiGraphics, i, j, f);

@@ -25,4 +25,5 @@ public abstract class ClientLevelCloudColorMixin {
         ClientLevel level = (ClientLevel) (Object) this;
         cir.setReturnValue(LegacyCloudAtmosphere.getSunriseCloudColor(level, partialTick, cir.getReturnValueI()));
     }
+
 }

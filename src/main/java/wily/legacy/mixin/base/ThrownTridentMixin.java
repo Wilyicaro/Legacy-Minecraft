@@ -29,7 +29,10 @@ public abstract class ThrownTridentMixin extends AbstractArrow {
         }
         setNoPhysics(true);
     }
-
+    /**
+     * @author creepereater201
+     * @reason Prevents thrown tridents from despawning after 60s
+     */
     @Overwrite
     public void tickDespawn() {
     }
