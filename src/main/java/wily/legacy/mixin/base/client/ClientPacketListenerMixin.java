@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyDragonEggTeleportParticles;
 import wily.legacy.client.ConduitRotationCache;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
@@ -33,6 +34,8 @@ import wily.legacy.inventory.LegacyMerchantMenu;
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
     @Shadow
     private LevelLoadTracker levelLoadTracker;
+    @Shadow
+    private ClientLevel level;
 
     protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
@@ -65,6 +68,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     @Inject(method = "handlePlayerInfoRemove", at = @At("RETURN"))
     public void handlePlayerInfoUpdate(ClientboundPlayerInfoRemovePacket clientboundPlayerInfoRemovePacket, CallbackInfo ci) {
         Legacy4JClient.onClientPlayerInfoChange();
+    }
+
+    @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;setServerVerifiedBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V"))
+    public void handleDragonEggTeleportBlockUpdate(ClientboundBlockUpdatePacket clientboundBlockUpdatePacket, CallbackInfo ci) {
+        LegacyDragonEggTeleportParticles.handleBlockUpdate(level, clientboundBlockUpdatePacket.getPos(), level.getBlockState(clientboundBlockUpdatePacket.getPos()), clientboundBlockUpdatePacket.getBlockState());
     }
 
     @WrapWithCondition(method = /*? if <1.21.2 {*//*"handleContainerSetSlot"*//*?} else {*/"handleSetCursorItem"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
