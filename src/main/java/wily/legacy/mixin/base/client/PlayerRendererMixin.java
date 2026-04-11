@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Pose;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -35,10 +36,16 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         super(context, entityModel, f);
     }
 
+    @Shadow
+    public abstract AvatarRenderState createRenderState();
+
     @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModelPart(Lnet/minecraft/client/model/geom/ModelPart;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/RenderType;IILnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"), cancellable = true, require = 0)
     private void renderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null || mc.player == null) return;
+        AvatarRenderState state = createRenderState();
+        state.swimAmount = mc.player.getSwimAmount(mc.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+        getModel().setupAnim(state);
 
         String skinId = ClientSkinCache.get(mc.player.getUUID());
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
