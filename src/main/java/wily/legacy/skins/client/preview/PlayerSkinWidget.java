@@ -56,6 +56,7 @@ public class PlayerSkinWidget extends AbstractWidget {
 
         String applied = ClientSkinCache.get(self);
         if (applied == null) applied = SkinSync.getServerSkinId(self);
+        if (applied == null || applied.isBlank()) applied = SkinDataStore.getSelectedSkin(self);
         if (applied == null) applied = "";
 
         if (SkinIdUtil.isAutoSelect(previewId)) { return applied.isBlank(); }

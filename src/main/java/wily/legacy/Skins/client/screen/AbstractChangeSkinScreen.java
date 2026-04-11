@@ -471,7 +471,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected String currentAppliedSkinId() {
         UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
-        return self == null ? null : ClientSkinCache.get(self);
+        if (self == null) return null;
+        String applied = ClientSkinCache.get(self);
+        if (SkinIdUtil.hasSkin(applied)) return applied;
+        applied = SkinDataStore.getSelectedSkin(self);
+        return SkinIdUtil.hasSkin(applied) ? applied : "";
     }
 
     protected Component favoriteActionLabel() {
