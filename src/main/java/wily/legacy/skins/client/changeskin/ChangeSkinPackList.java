@@ -230,7 +230,7 @@ public final class ChangeSkinPackList {
         @Override
         public void renderString(GuiGraphics graphics, Font font, int color) {
             String visibleText = SkinTextUtil.clip(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
-            float textScale = height < 20 && LegacyOptions.getUIMode().isSD() ? 0.92f : 1.0f;
+            float textScale = height < 20 && LegacyOptions.getUIMode().isSD() ? 0.84f : 1.0f;
             int centerX = getX() + getWidth() / 2;
             float textY = getY() + (getHeight() - font.lineHeight * textScale) / 2.0f;
             if (textScale == 1.0f) {

@@ -26,9 +26,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float NORMAL_CAROUSEL_BASE_SCALE = 0.935f;
     private static final float NORMAL_CAROUSEL_BASE_SPACING = 80f;
     private static final float NORMAL_DOLL_SCALE_BUMP = 1.05f;
-    private static final float NORMAL_TEXT_SCALE = 1.5f;
-    private static final float PACK_TYPE_TEXT_SCALE = 0.75f;
+    private static final float COMPACT_DOLL_SCALE_MULTIPLIER = 0.85f;
+    private static final float COMPACT_CAROUSEL_SPACING_MULTIPLIER = 0.78f;
     private static final int PACK_LIST_VISIBLE_ROWS = 6;
+    private static final int COMPACT_PACK_LIST_VISIBLE_ROWS = 5;
     private static final int PACK_LIST_FOOTER_RESERVE = 12;
     private static final float HD_MENU_SCALE = 1.10f;
     private static final ChangeSkinScreenLayout HD_LAYOUT = new ChangeSkinScreenLayout(
@@ -104,18 +105,22 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (scaleMultiplier <= 0f) scaleMultiplier = 1f;
         if (spacingMultiplier <= 0f) spacingMultiplier = 1f;
         scaleMultiplier *= 1.10f * NORMAL_DOLL_SCALE_BUMP;
+        if (isCompact480()) scaleMultiplier *= COMPACT_DOLL_SCALE_MULTIPLIER;
         spacingMultiplier *= 1.16f;
+        if (isCompact480()) spacingMultiplier *= COMPACT_CAROUSEL_SPACING_MULTIPLIER;
 
         playerSkinWidgetList.setRenderRadius(2);
         playerSkinWidgetList.setCarouselTuning(scaleMultiplier, spacingMultiplier);
         if (relayout) playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index, true);
     }
 
+    private int visiblePackRows() { return isCompact480() ? COMPACT_PACK_LIST_VISIBLE_ROWS : PACK_LIST_VISIBLE_ROWS; }
+
     private int resolvePackRowHeight() {
         int scaledHeight = Math.max(10, Math.round(PACK_BUTTON_BASE_HEIGHT * uiScale));
         int availableHeight = resolvePackListAvailableHeight();
-        int fittedHeight = Math.max(10, (availableHeight - PACK_LIST_FOOTER_RESERVE) / PACK_LIST_VISIBLE_ROWS);
-        if (isCompact480()) return Math.min(scaledHeight, fittedHeight);
+        int fittedHeight = Math.max(10, (availableHeight - PACK_LIST_FOOTER_RESERVE) / visiblePackRows());
+        if (isCompact480()) return fittedHeight;
         return Math.min(fittedHeight, Math.max(18, scaledHeight));
     }
 
@@ -125,7 +130,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private int adjustPackListHeight(int height) {
-        int visibleRowsHeight = resolvedPackRowHeight * PACK_LIST_VISIBLE_ROWS;
+        int visibleRowsHeight = resolvedPackRowHeight * visiblePackRows();
         return Math.max(1, Math.min(height, visibleRowsHeight + PACK_LIST_FOOTER_RESERVE));
     }
 
@@ -133,6 +138,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (playerSkinWidgetList != null) return playerSkinWidgetList.getCenterAnchorX();
         return tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
     }
+
+    private int compactPreviewBackgroundInset() { return isCompact480() ? sc(8) : 0; }
+
+    private float mainTextScale() { return bigTextScale(); }
+
+    private float packTypeTextScale() { return Math.min(1.0f, smallTextScale()); }
 
     private void drawScaledCenteredShadow(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
@@ -199,6 +210,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private int carouselClipLeft() {
         int clipLeft = tooltipBox.x + sc(getLayoutMetrics().carouselClipInset());
+        if (isCompact480()) clipLeft += sc(6);
         if (!isCompact480()) clipLeft += sc(3);
         return clipLeft;
     }
@@ -224,13 +236,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int w = Math.max(1, frameW - sc(8));
 
         packList.refreshPackIdsIfNeeded();
-        int visibleRows = PACK_LIST_VISIBLE_ROWS;
+        int visibleRows = visiblePackRows();
         int maxListBottom = arrowTop - sc(4);
         int rowHeight = Math.max(10, resolvedPackRowHeight);
         int h = rowHeight * visibleRows + PACK_LIST_FOOTER_RESERVE;
         int y = maxListBottom - rowHeight * visibleRows;
         int packFrameRenderX = frameX - sc(2);
-        int packFrameRenderY = y - sc(4);
+        int packFrameRenderY = isCompact480() ? y - sc(3) : y - sc(4);
         int packFrameRenderW = frameW + sc(4);
         int packFrameRenderH = frameY + frameH - packFrameRenderY;
         int packIconTop = panel.y + sc(normalLayout.skinPanelTop());
@@ -388,12 +400,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int packNameH = Math.max(1, sc(normalLayout.packNameHeight()));
         int packNameRenderH = packNameH + Math.max(1, Math.round(packNameH * 0.10f)) + sc(6);
 
-        blitSprite(g, SKIN_PANEL, tooltipBox.x - sc(normalLayout.skinPanelInsetX()), panel.y + sc(normalLayout.skinPanelTop()), Math.max(1, tooltipBox.getWidth()), Math.max(1, tooltipBox.getHeight() - sc(2)));
+        int compactPreviewInset = compactPreviewBackgroundInset();
+        blitSprite(g, SKIN_PANEL, tooltipBox.x - sc(normalLayout.skinPanelInsetX()) - compactPreviewInset, panel.y + sc(normalLayout.skinPanelTop()), Math.max(1, tooltipBox.getWidth() + compactPreviewInset), Math.max(1, tooltipBox.getHeight() - sc(2)));
         blitSprite(g, PANEL_FILLER, tooltipBox.x - sc(normalLayout.panelFillerInsetX()), panel.y + sc(normalLayout.panelFillerTop()) + tooltipBox.getHeight() - sc(normalLayout.panelFillerBottomTrim()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.panelFillerWidthTrim())), Math.max(1, sc(normalLayout.panelFillerHeight())));
         blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, tooltipBox.x - sc(normalLayout.infoPanelInsetX()), panel.y + tooltipBox.getHeight() - sc(normalLayout.infoPanelBottomTrim()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.infoPanelWidthTrim())), Math.max(1, sc(normalLayout.infoPanelHeight())));
         blitSprite(g, PACK_NAME_BOX, packNameX, packNameY, packNameW, packNameRenderH);
         g.fill(packNameX, packNameY, packNameX + packNameW, packNameY + packNameRenderH, 0x66000000);
-        blitSprite(g, SKIN_BOX, tooltipBox.x - sc(normalLayout.skinBoxInsetX()), panel.y + sc(normalLayout.skinBoxTop()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.skinBoxWidthTrim())), Math.max(1, tooltipBox.getHeight() - sc(normalLayout.skinBoxBottomTrim())));
+        blitSprite(g, SKIN_BOX, tooltipBox.x - sc(normalLayout.skinBoxInsetX()) - compactPreviewInset, panel.y + sc(normalLayout.skinBoxTop()), Math.max(1, tooltipBox.getWidth() - sc(normalLayout.skinBoxWidthTrim()) + compactPreviewInset), Math.max(1, tooltipBox.getHeight() - sc(normalLayout.skinBoxBottomTrim())));
 
         int holder    = Math.max(1, sc(normalLayout.actionHolderSize()));
         int iconX     = tooltipBox.x + tooltipBox.getWidth() - sc(normalLayout.actionHolderXOffset());
@@ -448,39 +461,41 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (center != null) {
             String    skinId = center.skinId.get();
             SkinEntry entry  = skinId == null ? null : SkinPackLoader.getSkin(skinId);
-            String    name   = entry == null ? String.valueOf(skinId) : entry.name();
+            String    name   = SkinIdUtil.isAutoSelect(skinId) ? "Auto Selected" : entry == null ? String.valueOf(skinId) : entry.name();
             int mid       = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
-            int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / NORMAL_TEXT_SCALE));
-            drawScaledCenteredShadow(g, Component.literal(SkinTextUtil.clip(minecraft.font, name, maxNameWidth)), mid, skinNameY, 0xFFFFFFFF, NORMAL_TEXT_SCALE);
+            float mainTextScale = mainTextScale();
+            int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
+            drawScaledCenteredShadow(g, Component.literal(SkinTextUtil.clip(minecraft.font, name, maxNameWidth)), mid, skinNameY, 0xFFFFFFFF, mainTextScale);
 
             ResourceLocation modelId = entry == null ? null : entry.modelId();
             if (modelId == null && entry != null && entry.texture() != null) modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
 
             String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
-                int maxThemeWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / NORMAL_TEXT_SCALE));
+                int maxThemeWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
                 String show = SkinTextUtil.clip(minecraft.font, theme, maxThemeWidth);
-                int themeY = skinNameY + (int) (minecraft.font.lineHeight * NORMAL_TEXT_SCALE) + sc(normalLayout.themeTextGap());
-                drawScaledCenteredShadow(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF, NORMAL_TEXT_SCALE);
+                int themeY = skinNameY + (int) (minecraft.font.lineHeight * mainTextScale) + sc(normalLayout.themeTextGap());
+                drawScaledCenteredShadow(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF, mainTextScale);
             }
         }
 
         SkinPack pack = packList.getFocusedPack();
         int packMid = centerTextX();
         int packTitleY = panel.y + sc(normalLayout.packTitleTop());
-        int packMetaY = packTitleY + (int) (minecraft.font.lineHeight * NORMAL_TEXT_SCALE) + sc(normalLayout.packMetaGap());
+        float mainTextScale = mainTextScale();
+        int packMetaY = packTitleY + (int) (minecraft.font.lineHeight * mainTextScale) + sc(normalLayout.packMetaGap());
         if (pack != null) {
-            int maxPackWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())) / NORMAL_TEXT_SCALE));
+            int maxPackWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())) / mainTextScale));
             String packName = SkinTextUtil.clip(minecraft.font, SkinPackLoader.nameString(pack.name(), pack.id()), maxPackWidth);
-            drawScaledCenteredShadow(g, Component.literal(packName), packMid, packTitleY, 0xFFFFFFFF, NORMAL_TEXT_SCALE);
+            drawScaledCenteredShadow(g, Component.literal(packName), packMid, packTitleY, 0xFFFFFFFF, mainTextScale);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);
                 Component label = null;
                 if (k.equals("skin"))   label = Component.translatable("legacy.skinpack.type.skin");
                 if (k.equals("mashup")) label = Component.translatable("legacy.skinpack.type.mashup");
-                if (label != null) { drawScaledCenteredShadow(g, label, packMid, packMetaY, 0xCCFFFFFF, PACK_TYPE_TEXT_SCALE); }
+                if (label != null) { drawScaledCenteredShadow(g, label, packMid, packMetaY, 0xCCFFFFFF, packTypeTextScale()); }
             }
         }
     }

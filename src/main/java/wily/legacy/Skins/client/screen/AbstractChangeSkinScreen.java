@@ -702,6 +702,15 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     @Override
+    public void repositionElements() {
+        syncCenterPreviewState();
+        super.repositionElements();
+        ensurePreviewWidgets();
+        restorePackButtonFocus();
+        refreshSkinPackState();
+    }
+
+    @Override
     public boolean keyPressed(KeyEvent e) {
         int key = InputConstants.getKey(e).getValue();
 
