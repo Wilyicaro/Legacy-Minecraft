@@ -197,12 +197,10 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty())
             minecraft.executeIfPossible(() -> s.changeStatBoard(false));
         if (minecraft.player != null) {
-            LegacyOptions.runWithoutPlayerInfoSync(() -> {
-                LegacyOptions.classicCrafting.set(LegacyOptions.classicCrafting.get());
-                LegacyOptions.classicTrading.set(LegacyOptions.classicTrading.get());
-                LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
-                LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
-            });
+            LegacyOptions.classicCrafting.set(LegacyOptions.classicCrafting.get());
+            LegacyOptions.classicTrading.set(LegacyOptions.classicTrading.get());
+            LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
+            LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
         }
     }
 
