@@ -54,7 +54,7 @@ public class LegacyLoadingRenderer implements Renderable {
         int width = guiGraphics.guiWidth();
         int height = guiGraphics.guiHeight();
         ArbitrarySupplier<ResourceLocation> fontOverride = accessor.getElement("fontOverride", ResourceLocation.class);
-        int steppedProgress = progress < 0 ? -1 : Math.max(0, Math.min(100, Math.round(progress * 100.0f)));
+        int steppedProgress = progress < 0 ? -1 : Math.clamp(Math.round(progress * 100.0f), 0, 100);
 
         if (!genericLoading) {
             if (steppedProgress >= 0) {
@@ -62,8 +62,7 @@ public class LegacyLoadingRenderer implements Renderable {
                 int loadingBarY = accessor.getInteger("loadingBar.y", height / 2 + 15);
                 if (loadingStage != null) {
                     LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
-                        int stageWidth = minecraft.font.width(loadingStage);
-                        int stageX = accessor.getInteger("loadingStage.x", loadingBarX + (320 - stageWidth) / 2);
+                        int stageX = accessor.getInteger("loadingStage.x", loadingBarX + 1);
                         int stageY = accessor.getInteger("loadingStage.y", loadingBarY - 10);
                         guiGraphics.drawString(minecraft.font, loadingStage, stageX, stageY, CommonColor.STAGE_TEXT.get());
                     });

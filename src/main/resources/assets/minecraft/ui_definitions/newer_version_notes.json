@@ -35,7 +35,7 @@
             "text1": {
               "type": "draw_multiline_string",
               "component": {
-                "baseDir": "legacy:changelog"
+                "baseDir": "minecraft:changelog"
               },
               "shadow": false,
               "color": "${commonColor.inventory_gray_text}",
@@ -98,7 +98,7 @@
               "type": "draw_multiline_string",
               "component": {
                 "text": "",
-                "baseDir": "legacy:changelog",
+                "baseDir": "minecraft:changelog",
                 "font": "legacy:default_11"
               },
               "shadow": false,
