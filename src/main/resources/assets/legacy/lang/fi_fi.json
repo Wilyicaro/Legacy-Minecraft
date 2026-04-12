@@ -638,7 +638,7 @@
   "gamerule.legacyMobcapLimits": "Legacy Mobcap Limits",
   "gamerule.legacyMobcapLimits.description": "When enabled, Legacy Console Edition mobcap limits are enforced for spawning, breeding and placement.",
   "gamerule.legacyOffhandLimits": "Legacy Offhand",
-  "gamerule.legacyOffhandLimits.description": "When enabled, Legacy Console Editon offhand limits are enforced.",
+  "gamerule.legacyOffhandLimits.description": "When enabled, Legacy Console Edition offhand limits are enforced.",
   "gamerule.legacyShieldControls": "Legacy Shield Blocking",
   "gamerule.legacyShieldControls.description": "When enabled, shields automatically block while players are crouching or riding.",
   "gamerule.legacySwimming": "Perinteinen Uinti",
