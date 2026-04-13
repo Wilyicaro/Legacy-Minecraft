@@ -3,6 +3,7 @@ package wily.legacy.mixin.base.skins.client;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,13 +11,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.client.gui.GuiDollRender;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.pose.IdleSitPose;
-import wily.legacy.Skins.pose.SkiingPose;
-import wily.legacy.Skins.pose.SkinPoseRegistry;
-import wily.legacy.Skins.pose.StiffArmsPose;
-import wily.legacy.Skins.pose.SyncLegsPose;
-import wily.legacy.Skins.pose.WeepingStatuePose;
-import wily.legacy.Skins.pose.ZombieArmsPose;
+import wily.legacy.Skins.pose.*;
+import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(PlayerModel.class)
@@ -57,7 +53,8 @@ public abstract class MenuDollMixin {
             }
         } else if (customAnimation && stiffLegs) { consoleskins$applyStiffLegs(self, state); }
         if (!customAnimation) return;
-        if (ZombieArmsPose.shouldApply(state)) { ZombieArmsPose.apply(self, state); }
+        boolean zombieArms = ZombieArmsPose.shouldApply(state);
+        if (zombieArms) ZombieArmsPose.apply(self, state);
         if (IdleSitPose.shouldApply(state)) {
             if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.SWIMMING || state.pose == Pose.FALL_FLYING) { IdleSitPose.apply(self); }
         }
@@ -68,7 +65,10 @@ public abstract class MenuDollMixin {
         if (stiffLegs) consoleskins$applyStiffLegs(self, state);
         if (!ZombieArmsPose.shouldApply(state) && StiffArmsPose.shouldApply(state)) { StiffArmsPose.apply(self, state); }
         if (WeepingStatuePose.shouldApply(state)) { WeepingStatuePose.apply(self, state); }
-        if (consoleskins$shouldSyncArms(state, skinId)) { consoleskins$applySyncArms(self); }
+        if (!zombieArms) {
+            if (consoleskins$shouldSyncArms(state, skinId)) consoleskins$applyMenuSyncArms(self);
+            else consoleskins$applySyncArms(self, state, skinId);
+        }
         if (SyncLegsPose.shouldApply(state)) { SyncLegsPose.apply(self); }
     }
 
@@ -77,7 +77,7 @@ public abstract class MenuDollMixin {
         return state != null && state.id == GuiDollRender.MENU_DOLL_ID;
     }
 
-    private static void consoleskins$applySyncArms(PlayerModel model) {
+    private static void consoleskins$applyMenuSyncArms(PlayerModel model) {
         float xRot = model.leftArm.xRot;
         float yRot = -model.leftArm.yRot;
         float zRot = -model.leftArm.zRot;
@@ -91,7 +91,18 @@ public abstract class MenuDollMixin {
         model.leftSleeve.yRot = model.leftArm.yRot;
         model.leftSleeve.zRot = model.leftArm.zRot;
     }
-
+    private static void consoleskins$applySyncArms(PlayerModel model, AvatarRenderState state, String skinId) {
+        if (model == null || state == null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.SYNC_ARMS, skinId)) return;
+        if (state.pose != Pose.STANDING && state.pose != Pose.CROUCHING || state.attackTime > 0.0F) return;
+        if (!(state instanceof RenderStateSkinIdAccess access) || access.consoleskins$isUsingItem() || access.consoleskins$isBlocking()) return;
+        float speedSq = access.consoleskins$getMoveSpeedSq();
+        if (!access.consoleskins$isMoving() && speedSq <= 1.0E-4F) return;
+        float factor = access.consoleskins$isMoving() ? 1.0F : Mth.clamp(speedSq * 120.0F, 0.0F, 1.0F);
+        if (factor <= 0.01F) return;
+        model.rightArm.xRot += (model.leftArm.xRot - model.rightArm.xRot) * factor;
+        model.rightSleeve.xRot = model.rightArm.xRot;
+    }
     private static void consoleskins$applyStiffLegs(PlayerModel model, AvatarRenderState state) {
         if (model == null) return;
         boolean sitting = state != null && (state.pose == Pose.SITTING || state.hasPose(Pose.SITTING)

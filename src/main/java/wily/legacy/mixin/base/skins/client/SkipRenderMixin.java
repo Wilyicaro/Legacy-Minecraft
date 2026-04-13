@@ -18,24 +18,20 @@ public abstract class SkipRenderMixin implements ModelPartSkipRenderOverrideAcce
     @Unique private boolean consoleskins$forceRender;
     @Override public boolean consoleskins$getForceRender() { return consoleskins$forceRender; }
     @Override public void consoleskins$setForceRender(boolean v) { consoleskins$forceRender = v; }
+    @Unique
+    private void consoleskins$applyForceRender() {
+        if (!consoleskins$forceRender) return;
+        skipDraw = false;
+        visible = true;
+    }
     @Inject(
         method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V",
         at = @At("HEAD"), cancellable = false, require = 0
     )
-    private void consoleskins$applyForceRender4(PoseStack ps, VertexConsumer vc, int light, int overlay, CallbackInfo ci) {
-        if (consoleskins$forceRender) {
-            skipDraw = false;
-            visible  = true;
-        }
-    }
+    private void consoleskins$applyForceRender4(PoseStack ps, VertexConsumer vc, int light, int overlay, CallbackInfo ci) { consoleskins$applyForceRender(); }
     @Inject(
         method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V",
         at = @At("HEAD"), cancellable = false, require = 0
     )
-    private void consoleskins$applyForceRender5(PoseStack ps, VertexConsumer vc, int light, int overlay, int color, CallbackInfo ci) {
-        if (consoleskins$forceRender) {
-            skipDraw = false;
-            visible  = true;
-        }
-    }
+    private void consoleskins$applyForceRender5(PoseStack ps, VertexConsumer vc, int light, int overlay, int color, CallbackInfo ci) { consoleskins$applyForceRender(); }
 }

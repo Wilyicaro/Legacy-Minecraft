@@ -1,16 +1,12 @@
 package wily.legacy.Skins.skin;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
 public final class SkinSync {
     public static final String ASSET_NS = Legacy4J.MOD_ID;
     public static final int ASSET_TEXTURE = 0;
@@ -62,7 +58,7 @@ public final class SkinSync {
                 && SERVER_ASSETS.containsKey(assetKey(skinId, ASSET_MODEL));
     }
     public static void requestSkin(ServerPlayer player) {
-        if (player != null) { CommonNetwork.sendToPlayer(player, new RequestSkinS2C()); }
+        if (player != null) CommonNetwork.sendToPlayer(player, new RequestSkinS2C());
     }
     public static void sendSnapshotTo(ServerPlayer requester, MinecraftServer server) {
         if (requester == null || server == null) return;
@@ -120,8 +116,7 @@ public final class SkinSync {
         public static final CommonNetwork.Identifier<RequestSnapshotC2S> ID =
                 CommonNetwork.Identifier.create(Legacy4J.createModLocation("request_snapshot_c2s"), (CommonNetwork.PlayBuf b) -> new RequestSnapshotC2S(b));
         public RequestSnapshotC2S(CommonNetwork.PlayBuf buf) { this(); }
-        @Override
-        public void encode(CommonNetwork.PlayBuf buf) { }
+        @Override public void encode(CommonNetwork.PlayBuf buf) { }
         @Override
         public void apply(Context context) {
             if (!(context.player() instanceof ServerPlayer requester)) return;
@@ -136,11 +131,7 @@ public final class SkinSync {
         public static final CommonNetwork.Identifier<SyncSkinS2C> ID =
                 CommonNetwork.Identifier.create(Legacy4J.createModLocation("sync_skin_s2c"), SyncSkinS2C::new);
         public SyncSkinS2C(CommonNetwork.PlayBuf buf) { this(buf.get().readUUID(), readSkinId(buf)); }
-        @Override
-        public void encode(CommonNetwork.PlayBuf buf) {
-            buf.get().writeUUID(uuid);
-            writeSkinId(buf, skinId);
-        }
+        @Override public void encode(CommonNetwork.PlayBuf buf) { buf.get().writeUUID(uuid); writeSkinId(buf, skinId); }
         @Override
         public void apply(Context context) {
             Minecraft mc = Minecraft.getInstance();
@@ -210,8 +201,7 @@ public final class SkinSync {
         public static final CommonNetwork.Identifier<RequestSkinS2C> ID =
                 CommonNetwork.Identifier.create(Legacy4J.createModLocation("request_skin_s2c"), (CommonNetwork.PlayBuf b) -> new RequestSkinS2C(b));
         public RequestSkinS2C(CommonNetwork.PlayBuf buf) { this(); }
-        @Override
-        public void encode(CommonNetwork.PlayBuf buf) { }
+        @Override public void encode(CommonNetwork.PlayBuf buf) { }
         @Override
         public void apply(Context context) {
             Minecraft mc = Minecraft.getInstance();

@@ -1,5 +1,4 @@
 package wily.legacy.Skins.skin;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,19 +9,12 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import wily.legacy.Skins.client.lang.SkinPackLang;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.pose.SkinPoseRegistry;
-import wily.legacy.Skins.util.DebugLog;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import wily.legacy.Skins.util.DebugLog;
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.*;
 import java.util.function.Consumer;
-
 public final class SkinPackLoader {
     private static final Object LOCK = new Object();
     private static volatile Map<String, SkinPack> PACKS = Map.of();
@@ -31,38 +23,50 @@ public final class SkinPackLoader {
     private static volatile boolean loaded;
     private static volatile int reloadVersion;
     private static volatile String LAST_USED_CUSTOM_PACK_ID;
+    private static volatile String REQUESTED_FOCUS_PACK_ID;
+    private static volatile String REQUESTED_FOCUS_SKIN_ID;
+    private static volatile String REQUESTED_EDIT_PACK_ID;
+    private static volatile String REQUESTED_REORDER_PACK_ID;
     private static final ResourceLocation DEFAULT_PACK_ICON = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "skinpacks/default/pack.png");
     private static final String SKINPACKS_PREFIX = "skinpacks/";
     private static final String DEFAULT_SKINPACKS_PREFIX = "default_skinpacks/";
     private static final String PACK_JSON_SUFFIX = "/pack.json";
+    private static final String[] RESOURCE_ROOTS = {"skinpacks", "default_skinpacks"};
     private SkinPackLoader() { }
     public static Map<String, SkinPack> getPacks() {
         ensureLoaded();
         return PACKS;
     }
-    public static SkinEntry getSkin(String id) {
-        if (loaded) return SKINS_BY_ID.get(id);
-        ensureLoaded();
-        return SKINS_BY_ID.get(id);
-    }
-    public static String getSourcePackId(String skinId) {
-        ensureLoaded();
-        return PACK_BY_SKIN.get(skinId);
-    }
+    public static SkinEntry getSkin(String id) { if (!loaded) ensureLoaded(); return SKINS_BY_ID.get(id); }
+    public static String getSourcePackId(String skinId) { ensureLoaded(); return PACK_BY_SKIN.get(skinId); }
     public static String getLastUsedCustomPackId() { return LAST_USED_CUSTOM_PACK_ID; }
+    public static void requestFocusPack(String packId) { REQUESTED_FOCUS_PACK_ID = requestId(packId); }
+    public static String consumeRequestedFocusPackId() {
+        String packId = REQUESTED_FOCUS_PACK_ID;
+        REQUESTED_FOCUS_PACK_ID = null;
+        return packId;
+    }
+    public static void requestFocusSkin(String skinId) { REQUESTED_FOCUS_SKIN_ID = requestId(skinId); }
+    public static String consumeRequestedFocusSkinId() {
+        String skinId = REQUESTED_FOCUS_SKIN_ID;
+        REQUESTED_FOCUS_SKIN_ID = null;
+        return skinId;
+    }
+    public static void requestEditPack(String packId) { REQUESTED_EDIT_PACK_ID = requestId(packId); }
+    public static String consumeRequestedEditPackId() {
+        String packId = REQUESTED_EDIT_PACK_ID;
+        REQUESTED_EDIT_PACK_ID = null;
+        return packId;
+    }
+    public static void requestReorderPack(String packId) { REQUESTED_REORDER_PACK_ID = requestId(packId); }
+    public static String consumeRequestedReorderPackId() {
+        String packId = REQUESTED_REORDER_PACK_ID;
+        REQUESTED_REORDER_PACK_ID = null;
+        return packId;
+    }
     public static void setLastUsedCustomPackId(String packId) {
-        if (packId == null || packId.isBlank()) {
-            LAST_USED_CUSTOM_PACK_ID = null;
-            ConsoleSkinsClientSettings.setLastUsedCustomPackId(null);
-            return;
-        }
-        if (SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.isFavouritesPack(packId)) {
-            LAST_USED_CUSTOM_PACK_ID = null;
-            ConsoleSkinsClientSettings.setLastUsedCustomPackId(null);
-            return;
-        }
-        LAST_USED_CUSTOM_PACK_ID = packId;
-        ConsoleSkinsClientSettings.setLastUsedCustomPackId(packId);
+        if (packId == null || packId.isBlank() || SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.isFavouritesPack(packId)) packId = null;
+        storeLastUsedCustomPackId(packId);
     }
     public static void ensureLoaded() {
         if (loaded) return;
@@ -80,6 +84,46 @@ public final class SkinPackLoader {
         Map<String, SkinPack> packs = PACKS;
         if (packs.containsKey(SkinIdUtil.PACK_DEFAULT)) return SkinIdUtil.PACK_DEFAULT;
         return packs.keySet().stream().findFirst().orElse(null);
+    }
+    static int nextCustomPackSortIndex() {
+        int maxSort = 5900;
+        for (SkinPack pack : PACKS.values()) {
+            if (pack == null || !pack.hasSort()) continue;
+            maxSort = Math.max(maxSort, pack.sortIndex());
+        }
+        return ((maxSort / 10) + 1) * 10;
+    }
+    private static String requestId(String id) {
+        return id == null || id.isBlank() ? null : id;
+    }
+    private static void storeLastUsedCustomPackId(String packId) {
+        LAST_USED_CUSTOM_PACK_ID = packId;
+        ConsoleSkinsClientSettings.setLastUsedCustomPackId(packId);
+    }
+    public static void saveCustomPackOrder(Minecraft minecraft, List<String> orderedPackIds) throws IOException {
+        if (minecraft == null) throw new IOException("Minecraft is not available");
+        if (orderedPackIds == null || orderedPackIds.isEmpty()) return;
+        ArrayList<SkinPack> orderedPacks = new ArrayList<>();
+        for (String packId : orderedPackIds) {
+            SkinPack pack = PACKS.get(packId);
+            if (pack == null || SkinIdUtil.PACK_DEFAULT.equals(pack.id()) || SkinIdUtil.PACK_FAVOURITES.equals(pack.id())) continue;
+            orderedPacks.add(pack);
+        }
+        ArrayList<SkinPack> pending = new ArrayList<>();
+        Integer leftRank = null;
+        boolean wroteAny = false;
+        for (SkinPack pack : orderedPacks) {
+            if (pack.editable()) {
+                pending.add(pack);
+                continue;
+            }
+            if (!pack.hasSort()) continue;
+            wroteAny |= writeCustomPackSorts(minecraft, pending, leftRank, sortRank(pack));
+            pending.clear();
+            leftRank = sortRank(pack);
+        }
+        wroteAny |= writeCustomPackSorts(minecraft, pending, leftRank, null);
+        if (!wroteAny) throw new IOException("There were no editable skin packs to reorder");
     }
     public static void rebuildFavouritesPack() {
         ensureLoaded();
@@ -141,10 +185,51 @@ public final class SkinPackLoader {
         }
     }
     private static boolean isClientThread(Minecraft client) { return client == null || client.isSameThread(); }
+
+    private static boolean writeCustomPackSorts(Minecraft minecraft, List<SkinPack> packs, Integer leftRank, Integer rightRank) throws IOException {
+        List<Integer> ranks = assignSortRanks(leftRank, rightRank, packs.size());
+        boolean wroteAny = false;
+        for (int i = 0; i < packs.size(); i++) {
+            Path packJson = CustomSkinPackStore.packJsonPath(minecraft, packs.get(i).id());
+            if (!Files.isRegularFile(packJson)) continue;
+            JsonObject root = SkinPackFiles.readJson(packJson);
+            int rank = ranks.get(i);
+            root.addProperty("sort_index", Math.floorDiv(rank, 1000));
+            root.addProperty("sort_sub_index", Math.floorMod(rank, 1000));
+            root.addProperty("editable", true);
+            SkinPackFiles.writeJson(packJson, root);
+            wroteAny = true;
+        }
+        return wroteAny;
+    }
+    private static List<Integer> assignSortRanks(Integer leftRank, Integer rightRank, int count) throws IOException {
+        ArrayList<Integer> values = new ArrayList<>(count);
+        if (count <= 0) return values;
+        if (leftRank == null && rightRank == null) {
+            int rank = 6_000_000;
+            for (int i = 0; i < count; i++, rank += 100) values.add(rank);
+            return values;
+        }
+        if (leftRank == null) {
+            int start = rightRank - count * 100;
+            for (int i = 0; i < count; i++) values.add(start + i * 100);
+            return values;
+        }
+        if (rightRank == null) {
+            int value = leftRank + 100;
+            for (int i = 0; i < count; i++, value += 100) values.add(value);
+            return values;
+        }
+        int gap = rightRank - leftRank - 1;
+        if (gap < count) throw new IOException("There isn't enough room to place that Skinpack there");
+        int step = Math.max(1, (rightRank - leftRank) / (count + 1));
+        for (int i = 1; i <= count; i++) values.add(leftRank + step * i);
+        return values;
+    }
+    private static int sortRank(SkinPack pack) { return pack.sortIndex() * 1000 + pack.sortSubIndex(); }
     private static Map<ResourceLocation, Resource> listPackJsonResources(ResourceManager rm) {
         HashMap<ResourceLocation, Resource> jsons = new HashMap<>();
-        addPackJsonResources(jsons, rm, "skinpacks");
-        addPackJsonResources(jsons, rm, "default_skinpacks");
+        for (String root : RESOURCE_ROOTS) addPackJsonResources(jsons, rm, root);
         return jsons;
     }
     private static void addPackJsonResources(Map<ResourceLocation, Resource> jsons, ResourceManager rm, String root) {
@@ -160,7 +245,6 @@ public final class SkinPackLoader {
         return ids;
     }
     private static String parsePackId(String path) {
-        if (path == null) return null;
         String id = parsePackIdForPrefix(path, SKINPACKS_PREFIX);
         return id != null ? id : parsePackIdForPrefix(path, DEFAULT_SKINPACKS_PREFIX);
     }
@@ -180,7 +264,7 @@ public final class SkinPackLoader {
         ResourceLocation favIcon = DEFAULT_PACK_ICON;
         SkinPack def = base.get(SkinIdUtil.PACK_DEFAULT);
         if (def != null && def.icon() != null) { favIcon = def.icon(); }
-        SkinPack favPack = new SkinPack(SkinIdUtil.PACK_FAVOURITES, "key:legacy.favorites.pack", "", "", favIcon, fav);
+        SkinPack favPack = new SkinPack(SkinIdUtil.PACK_FAVOURITES, "key:legacy.favorites.pack", "", "", favIcon, fav, false, Integer.MIN_VALUE, true, 0);
         LinkedHashMap<String, SkinPack> out = new LinkedHashMap<>();
         if (def != null) out.put(SkinIdUtil.PACK_DEFAULT, def);
         out.put(SkinIdUtil.PACK_FAVOURITES, favPack);
@@ -207,6 +291,8 @@ public final class SkinPackLoader {
         if (author == null) author = "";
         String type = SkinPackJson.string(json.get("type"));
         if (type == null) type = "";
+        boolean editable = SkinPackJson.bool(json.get("editable"), false);
+        if (!editable) editable = CustomSkinPackStore.isCustomPack(Minecraft.getInstance(), packId);
         JsonArray skins = json.getAsJsonArray("skins");
         ArrayList<SkinEntryWithIndex> tmp = new ArrayList<>();
         LinkedHashSet<String> usedSkinIds = new LinkedHashSet<>(state.skinsById.keySet());
@@ -270,7 +356,8 @@ public final class SkinPackLoader {
             state.skinsById.putIfAbsent(entry.id(), entry);
             state.packBySkin.putIfAbsent(entry.id(), packId);
         }
-        if (entries.isEmpty()) return;
+        boolean allowEmpty = SkinPackJson.bool(json.get("allow_empty"), false);
+        if (entries.isEmpty() && !allowEmpty) return;
         collectPoseTagsFromPackJson(namespace, json, skinIdsBySourceId);
         ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/pack.png");
         if (rm.getResource(icon).isEmpty()) {
@@ -284,20 +371,21 @@ public final class SkinPackLoader {
                     ? SkinPackJson.integer(json.get("sort_index"), 0)
                     : SkinPackJson.integer(json.get("sort"), 0)
                 : 0;
-        state.packs.put(packId, new LoadedPack(new SkinPack(packId, name, author, type, icon, entries), sort, has, state.nextInsertIndex++));
+        Integer sortSub = null;
+        if (json.has("sort_sub_index")) sortSub = SkinPackJson.integer(json.get("sort_sub_index"), 0);
+        else if (json.has("sort_sub")) sortSub = SkinPackJson.integer(json.get("sort_sub"), 0);
+        state.packs.put(packId, new LoadedPack(new SkinPack(packId, name, author, type, icon, entries, editable, sort, has, sortSub == null ? 0 : sortSub), sort, has, sortSub, state.nextInsertIndex++));
     }
     private static void applyBuiltinAutoSelection(Map<String, SkinPack> ordered) {
         if (LAST_USED_CUSTOM_PACK_ID != null) {
             if (ordered.containsKey(LAST_USED_CUSTOM_PACK_ID)) return;
-            LAST_USED_CUSTOM_PACK_ID = null;
-            ConsoleSkinsClientSettings.setLastUsedCustomPackId(null);
+            storeLastUsedCustomPackId(null);
         }
         if (ordered == null || ordered.isEmpty()) return;
         for (String packId : ordered.keySet()) {
             if (packId == null || packId.isBlank()) continue;
             if (SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.PACK_FAVOURITES.equals(packId)) continue;
-            LAST_USED_CUSTOM_PACK_ID = packId;
-            ConsoleSkinsClientSettings.setLastUsedCustomPackId(packId);
+            storeLastUsedCustomPackId(packId);
             return;
         }
     }
@@ -342,7 +430,6 @@ public final class SkinPackLoader {
         String selector = SkinPackJson.string(value);
         if (selector != null) consumer.accept(selector);
     }
-
     private static void addPackPoseSelector(SkinPoseRegistry.PoseTag tag,
                                             String selector,
                                             String namespace,
@@ -357,19 +444,16 @@ public final class SkinPackLoader {
         }
         SkinPoseRegistry.addSelector(tag, selector, namespace);
     }
-
     private static String exactSourceId(String selector, String namespace) {
         if (selector == null) return null;
         String value = selector.trim();
         if (value.isEmpty() || value.indexOf('*') >= 0 || value.indexOf('?') >= 0) return null;
         int split = value.indexOf(':');
         if (split < 0) return value;
-        if (namespace == null || namespace.isBlank()) return null;
-        if (split == namespace.length() && value.startsWith(namespace + ":")) return value.substring(split + 1);
-        return null;
+        return namespace == null || namespace.isBlank() || split != namespace.length() || !value.startsWith(namespace + ":") ? null : value.substring(split + 1);
     }
     private record SkinEntryWithIndex(SkinEntry entry, int index) { }
-    private record LoadedPack(SkinPack pack, int sortIndex, boolean hasSort, int insertIndex) { }
+    private record LoadedPack(SkinPack pack, int sortIndex, boolean hasSort, Integer sortSubIndex, int insertIndex) { }
     private static final class PackLoadState {
         private final LinkedHashMap<String, LoadedPack> packs = new LinkedHashMap<>();
         private final LinkedHashMap<String, SkinEntry> skinsById = new LinkedHashMap<>();
@@ -383,11 +467,42 @@ public final class SkinPackLoader {
             LoadedPack leftPack = left.getValue();
             LoadedPack rightPack = right.getValue();
             if (leftPack.hasSort() != rightPack.hasSort()) return leftPack.hasSort() ? -1 : 1;
+            if (!leftPack.hasSort()) return Integer.compare(leftPack.insertIndex(), rightPack.insertIndex());
             if (leftPack.sortIndex() != rightPack.sortIndex()) return Integer.compare(leftPack.sortIndex(), rightPack.sortIndex());
             return Integer.compare(leftPack.insertIndex(), rightPack.insertIndex());
         });
+
         LinkedHashMap<String, SkinPack> ordered = new LinkedHashMap<>(entries.size());
-        for (Map.Entry<String, LoadedPack> entry : entries) { ordered.put(entry.getKey(), entry.getValue().pack()); }
+        ArrayList<Map.Entry<String, LoadedPack>> bucket = new ArrayList<>();
+        for (Map.Entry<String, LoadedPack> entry : entries) {
+            LoadedPack pack = entry.getValue();
+            if (!pack.hasSort()) {
+                flushSortedBucket(ordered, bucket);
+                ordered.put(entry.getKey(), pack.pack());
+                continue;
+            }
+            if (!bucket.isEmpty() && bucket.getFirst().getValue().sortIndex() != pack.sortIndex()) {
+                flushSortedBucket(ordered, bucket);
+            }
+            bucket.add(entry);
+        }
+        flushSortedBucket(ordered, bucket);
         return ordered;
     }
+    private static void flushSortedBucket(LinkedHashMap<String, SkinPack> ordered, ArrayList<Map.Entry<String, LoadedPack>> bucket) {
+        if (bucket.isEmpty()) return;
+        ArrayList<ResolvedPack> resolved = new ArrayList<>(bucket.size());
+        int nextSubIndex = 0;
+        for (Map.Entry<String, LoadedPack> entry : bucket) {
+            LoadedPack loadedPack = entry.getValue();
+            int sortSubIndex = loadedPack.sortSubIndex() == null ? nextSubIndex : loadedPack.sortSubIndex();
+            nextSubIndex = Math.max(nextSubIndex, sortSubIndex + 100);
+            SkinPack pack = loadedPack.pack();
+            resolved.add(new ResolvedPack(entry.getKey(), new SkinPack(pack.id(), pack.name(), pack.author(), pack.type(), pack.icon(), pack.skins(), pack.editable(), loadedPack.sortIndex(), true, sortSubIndex), loadedPack.insertIndex()));
+        }
+        resolved.sort(Comparator.comparingInt((ResolvedPack pack) -> pack.pack().sortSubIndex()).thenComparingInt(ResolvedPack::insertIndex));
+        for (ResolvedPack pack : resolved) ordered.put(pack.id(), pack.pack());
+        bucket.clear();
+    }
+    private record ResolvedPack(String id, SkinPack pack, int insertIndex) { }
 }

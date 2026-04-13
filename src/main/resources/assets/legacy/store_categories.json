@@ -1,0 +1,11 @@
+[
+  {
+    "id": "community_skinpacks",
+    "title": {
+      "translate": "legacy.menu.community_skinpacks"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JCustomSkinpacksTest/refs/heads/main/index.json",
+    "targetDirectoryName": "resourcepacks/Legacy Downloaded Skinpacks/assets/lce_skinpacks/skinpacks",
+    "requiresResourceReload": true
+  }
+]

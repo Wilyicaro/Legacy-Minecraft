@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.Skins.skin.DownloadedSkinPackStore;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
@@ -21,6 +22,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
@@ -79,6 +81,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
                 minecraft.setScreen(new PackActionScreen(this, pack, category));
             } else {
+                if (!prepareDownloadTarget()) return;
                 ContentManager.downloadPack(pack, category.targetDirectoryName(), () -> needsReload = true);
             }
         }) {
@@ -91,6 +94,18 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 }
             }
         }); 
+    }
+
+    private boolean prepareDownloadTarget() {
+        if (!DownloadedSkinPackStore.managesTargetDirectory(category.targetDirectoryName())) return true;
+        try {
+            DownloadedSkinPackStore.enableResourcePack(minecraft);
+            return true;
+        } catch (IOException e) {
+            String message = e.getMessage();
+            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
+            return false;
+        }
     }
 
     @Override

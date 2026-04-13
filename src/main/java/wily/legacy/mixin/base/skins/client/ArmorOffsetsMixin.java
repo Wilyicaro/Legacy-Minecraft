@@ -18,11 +18,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.client.render.boxloader.ArmorSlot;
-import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.Skins.client.render.boxloader.*;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
-import wily.legacy.Skins.skin.ClientSkinAssets;
-import wily.legacy.Skins.skin.SkinIdUtil;
+import wily.legacy.Skins.skin.*;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -80,9 +78,7 @@ public abstract class ArmorOffsetsMixin {
     }
     @Unique
     private static void consoleskins$setForceRender(ModelPart part, boolean value) {
-        try {
-            ((ModelPartSkipRenderOverrideAccess) (Object) part).consoleskins$setForceRender(value);
-        } catch (RuntimeException ignored) { }
+        if (part != null) ((ModelPartSkipRenderOverrideAccess) (Object) part).consoleskins$setForceRender(value);
     }
     @Inject(method = "renderArmorPiece", at = @At("HEAD"), require = 0, cancellable = true)
     private void consoleskins$pushArmorOffsets(PoseStack poseStack, SubmitNodeCollector nodeCollector,
@@ -161,11 +157,7 @@ public abstract class ArmorOffsetsMixin {
     private void consoleskins$popArmorOffsets(PoseStack poseStack, SubmitNodeCollector nodeCollector,
                                               ItemStack item, EquipmentSlot slot, int packedLight,
                                               HumanoidRenderState renderState, CallbackInfo ci) {
-        if (poseStack != null) {
-            try {
-                if (Boolean.TRUE.equals(consoleskins$posePushed.get())) poseStack.popPose();
-            } catch (RuntimeException ignored) { }
-        }
+        if (poseStack != null && Boolean.TRUE.equals(consoleskins$posePushed.get())) poseStack.popPose();
         consoleskins$clearContext();
     }
 }

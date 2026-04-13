@@ -2,7 +2,6 @@ package wily.legacy.Skins.client.render.boxloader;
 
 import net.minecraft.client.model.geom.ModelPart;
 import wily.legacy.mixin.base.skins.client.ModelPartAccessor;
-import wily.legacy.mixin.base.skins.client.SkipDrawAccessor;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -62,7 +61,7 @@ public final class BuiltBoxModel {
         copy.xScale = source.xScale;
         copy.yScale = source.yScale;
         copy.zScale = source.zScale;
-        ((SkipDrawAccessor) (Object) copy).consoleskins$setSkipDraw(((SkipDrawAccessor) (Object) source).consoleskins$getSkipDraw());
+        ((ModelPartAccessor) (Object) copy).consoleskins$setSkipDraw(sourceAccess.consoleskins$getSkipDraw());
         return copy;
     }
 }

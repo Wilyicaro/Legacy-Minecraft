@@ -26,15 +26,15 @@ import java.util.*;
 public abstract class PlayerPartsMixin {
     @Unique private boolean consoleskins$specBoxHeadInstalled;
     @Unique private String consoleskins$specBoxHeadSkinId;
-    @Unique private List<ModelPart.Cube> consoleskins$specHeadCubesBackup, consoleskins$specHatCubesBackup;
     @Unique private Map<String, ModelPart> consoleskins$specHeadChildrenBackup, consoleskins$specHatChildrenBackup;
+    @Unique private boolean consoleskins$specHeadSkipDrawBackup, consoleskins$specHatSkipDrawBackup;
     @Unique private final float[][] consoleskins$prevOffsets = new float[PlayerModelParts.ALL.length][];
     private static void consoleskins$resetPart(ModelPart part) { consoleskins$setSkipDraw(part, false); }
     private static void consoleskins$hidePart(ModelPart part) { consoleskins$setSkipDraw(part, true); }
     private static void consoleskins$setSkipDraw(ModelPart part, boolean skip) {
         if (part == null) return;
         part.visible = true;
-        ((SkipDrawAccessor) (Object) part).consoleskins$setSkipDraw(skip);
+        ((ModelPartAccessor) (Object) part).consoleskins$setSkipDraw(skip);
     }
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("HEAD"), require = 0)
     private void consoleskins$undoVisualOffsets(AvatarRenderState state, CallbackInfo ci) {
@@ -106,23 +106,19 @@ public abstract class PlayerPartsMixin {
         boolean hasHeadParts = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
         boolean hasHatParts = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
         if (consoleskins$specBoxHeadInstalled && skinId.equals(consoleskins$specBoxHeadSkinId)) {
-            consoleskins$setSkipDraw(self.head, false);
-            consoleskins$setSkipDraw(self.hat, false);
+            consoleskins$setSkipDraw(self.head, true);
+            consoleskins$setSkipDraw(self.hat, true);
             return;
         }
         consoleskins$uninstallSpectatorBoxHead(self);
-        consoleskins$setSkipDraw(self.head, false);
-        consoleskins$setSkipDraw(self.hat, false);
         ModelPartAccessor head = (ModelPartAccessor) (Object) self.head;
         ModelPartAccessor hat = (ModelPartAccessor) (Object) self.hat;
-        consoleskins$specHeadCubesBackup = head.consoleskins$getCubes();
-        consoleskins$specHatCubesBackup = hat.consoleskins$getCubes();
-        consoleskins$specHeadChildrenBackup = head.consoleskins$getChildren();
-        consoleskins$specHatChildrenBackup = hat.consoleskins$getChildren();
-        head.consoleskins$setCubes(List.of());
-        hat.consoleskins$setCubes(List.of());
-        HashMap<String, ModelPart> headChildren = new HashMap<>(consoleskins$specHeadChildrenBackup);
-        HashMap<String, ModelPart> hatChildren = new HashMap<>(consoleskins$specHatChildrenBackup);
+        consoleskins$specHeadSkipDrawBackup = head.consoleskins$getSkipDraw();
+        consoleskins$specHatSkipDrawBackup = hat.consoleskins$getSkipDraw();
+        consoleskins$specHeadChildrenBackup = new HashMap<>(head.consoleskins$getChildren());
+        consoleskins$specHatChildrenBackup = new HashMap<>(hat.consoleskins$getChildren());
+        Map<String, ModelPart> headChildren = head.consoleskins$getChildren();
+        Map<String, ModelPart> hatChildren = hat.consoleskins$getChildren();
         consoleskins$removeChildrenWithPrefix(headChildren, "consoleskins$spec_head_");
         consoleskins$removeChildrenWithPrefix(hatChildren, "consoleskins$spec_hat_");
         if (hasHeadParts) {
@@ -133,8 +129,8 @@ public abstract class PlayerPartsMixin {
             int index = 0;
             for (ModelPart part : model.get(AttachSlot.HAT)) { hatChildren.put("consoleskins$spec_hat_" + index++, part); }
         }
-        head.consoleskins$setChildren(headChildren);
-        hat.consoleskins$setChildren(hatChildren);
+        consoleskins$setSkipDraw(self.head, true);
+        consoleskins$setSkipDraw(self.hat, true);
         consoleskins$specBoxHeadInstalled = true;
         consoleskins$specBoxHeadSkinId = skinId;
     }
@@ -143,14 +139,16 @@ public abstract class PlayerPartsMixin {
         if (!consoleskins$specBoxHeadInstalled) return;
         ModelPartAccessor head = (ModelPartAccessor) (Object) self.head;
         ModelPartAccessor hat = (ModelPartAccessor) (Object) self.hat;
-        head.consoleskins$setCubes(consoleskins$specHeadCubesBackup);
-        hat.consoleskins$setCubes(consoleskins$specHatCubesBackup);
-        head.consoleskins$setChildren(consoleskins$specHeadChildrenBackup);
-        hat.consoleskins$setChildren(consoleskins$specHatChildrenBackup);
-        consoleskins$specHeadCubesBackup = null;
-        consoleskins$specHatCubesBackup = null;
+        head.consoleskins$getChildren().clear();
+        head.consoleskins$getChildren().putAll(consoleskins$specHeadChildrenBackup);
+        hat.consoleskins$getChildren().clear();
+        hat.consoleskins$getChildren().putAll(consoleskins$specHatChildrenBackup);
+        consoleskins$setSkipDraw(self.head, consoleskins$specHeadSkipDrawBackup);
+        consoleskins$setSkipDraw(self.hat, consoleskins$specHatSkipDrawBackup);
         consoleskins$specHeadChildrenBackup = null;
         consoleskins$specHatChildrenBackup = null;
+        consoleskins$specHeadSkipDrawBackup = false;
+        consoleskins$specHatSkipDrawBackup = false;
         consoleskins$specBoxHeadInstalled = false;
         consoleskins$specBoxHeadSkinId = null;
     }

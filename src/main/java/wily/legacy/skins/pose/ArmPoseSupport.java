@@ -1,5 +1,4 @@
 package wily.legacy.Skins.pose;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -17,7 +16,6 @@ import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 final class ArmPoseSupport {
     private static volatile java.lang.reflect.Field cachedRightArmPoseField;
     private static volatile java.lang.reflect.Field cachedLeftArmPoseField;
@@ -28,49 +26,13 @@ final class ArmPoseSupport {
 
     private ArmPoseSupport() { }
 
-    record ArmState(
-            float armX,
-            float armY,
-            float armZ,
-            float armXRot,
-            float armYRot,
-            float armZRot,
-            float armXScale,
-            float armYScale,
-            float armZScale,
-            float sleeveX,
-            float sleeveY,
-            float sleeveZ,
-            float sleeveXRot,
-            float sleeveYRot,
-            float sleeveZRot,
-            float sleeveXScale,
-            float sleeveYScale,
-            float sleeveZScale
-    ) {
+    record ArmState(float armX, float armY, float armZ, float armXRot, float armYRot, float armZRot, float armXScale, float armYScale, float armZScale,
+                    float sleeveX, float sleeveY, float sleeveZ, float sleeveXRot, float sleeveYRot, float sleeveZRot, float sleeveXScale,
+                    float sleeveYScale, float sleeveZScale) {
         static ArmState capture(ModelPart arm, ModelPart sleeve) {
-            return new ArmState(
-                    arm.x,
-                    arm.y,
-                    arm.z,
-                    arm.xRot,
-                    arm.yRot,
-                    arm.zRot,
-                    arm.xScale,
-                    arm.yScale,
-                    arm.zScale,
-                    sleeve.x,
-                    sleeve.y,
-                    sleeve.z,
-                    sleeve.xRot,
-                    sleeve.yRot,
-                    sleeve.zRot,
-                    sleeve.xScale,
-                    sleeve.yScale,
-                    sleeve.zScale
-            );
+            return new ArmState(arm.x, arm.y, arm.z, arm.xRot, arm.yRot, arm.zRot, arm.xScale, arm.yScale, arm.zScale, sleeve.x, sleeve.y, sleeve.z,
+                    sleeve.xRot, sleeve.yRot, sleeve.zRot, sleeve.xScale, sleeve.yScale, sleeve.zScale);
         }
-
         void restore(ModelPart arm, ModelPart sleeve) {
             arm.x = armX;
             arm.y = armY;
@@ -91,7 +53,6 @@ final class ArmPoseSupport {
             sleeve.yScale = sleeveYScale;
             sleeve.zScale = sleeveZScale;
         }
-
         void syncSleeve(ModelPart arm, ModelPart sleeve) {
             sleeve.x = arm.x;
             sleeve.y = arm.y;
@@ -104,10 +65,8 @@ final class ArmPoseSupport {
             sleeve.zScale = arm.zScale;
         }
     }
-
     record ArmFlags(boolean right, boolean left) {
         static final ArmFlags NONE = new ArmFlags(false, false);
-
         ArmFlags merge(boolean right, boolean left) { return new ArmFlags(this.right || right, this.left || left); }
     }
 
@@ -123,7 +82,6 @@ final class ArmPoseSupport {
             return Float.NaN;
         }
     }
-
     static Player getPlayer(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return null;
         UUID uuid = access.consoleskins$getEntityUuid();
@@ -132,7 +90,6 @@ final class ArmPoseSupport {
         if (minecraft == null || minecraft.level == null) return null;
         return minecraft.level.getPlayerByUUID(uuid);
     }
-
     static ArmFlags getShieldBlockingArms(Player player, boolean lenient) {
         if (player == null || !player.isUsingItem()) return ArmFlags.NONE;
         var useItem = player.getUseItem();
@@ -145,7 +102,6 @@ final class ArmPoseSupport {
         HumanoidArm usedArm = getUsedArm(player);
         return new ArmFlags(usedArm == HumanoidArm.RIGHT, usedArm == HumanoidArm.LEFT);
     }
-
     static ArmFlags getHoldingArms(Player player) {
         if (player == null) return ArmFlags.NONE;
         HumanoidArm mainArm = player.getMainArm();
@@ -161,14 +117,13 @@ final class ArmPoseSupport {
         return new ArmFlags(right, left);
     }
 
-    static ArmFlags includeModelBlocking(PlayerModel model, ArmFlags flags) { return flags.merge(armPoseIsBlocking(model, true), armPoseIsBlocking(model, false)); }
+    static ArmFlags includeModelBlocking(AvatarRenderState state, ArmFlags flags) { return flags.merge(armPoseIsBlocking(state, true), armPoseIsBlocking(state, false)); }
 
     private static HumanoidArm getUsedArm(Player player) {
         HumanoidArm mainArm = player.getMainArm();
         if (player.getUsedItemHand() == InteractionHand.MAIN_HAND) return mainArm;
         return mainArm == HumanoidArm.RIGHT ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
     }
-
     static void applyIdleSway(PlayerModel model,
                               float ageInTicks,
                               float attackTime,
@@ -196,48 +151,37 @@ final class ArmPoseSupport {
             model.leftArm.yRot -= yaw;
         }
     }
-
     static void applyAttackSwing(PlayerModel model, AvatarRenderState state, float attackTime) {
         if (attackTime <= 0.0F) return;
-
         HumanoidArm arm = state.attackArm;
         if (arm == null) arm = HumanoidArm.RIGHT;
-
         float bodyY = Mth.sin(Mth.sqrt(attackTime) * Mth.PI * 2.0F) * 0.2F;
         if (arm == HumanoidArm.LEFT) bodyY *= -1.0F;
-
         model.body.yRot = bodyY;
         model.jacket.yRot = bodyY;
-
         model.rightArm.z = Mth.sin(bodyY) * 5.0F;
         model.rightArm.x = -Mth.cos(bodyY) * 5.0F;
         model.leftArm.z = -Mth.sin(bodyY) * 5.0F;
         model.leftArm.x = Mth.cos(bodyY) * 5.0F;
-
         model.rightArm.yRot += bodyY;
         model.leftArm.yRot += bodyY;
         model.leftArm.xRot += bodyY;
-
         float swingCurve = 1.0F - attackTime;
         swingCurve *= swingCurve;
         swingCurve *= swingCurve;
         swingCurve = 1.0F - swingCurve;
-
         float swing = Mth.sin(swingCurve * Mth.PI);
         float lift = Mth.sin(attackTime * Mth.PI) * -(model.head.xRot - 0.7F) * 0.75F;
-
         if (arm == HumanoidArm.LEFT) {
             model.leftArm.xRot -= swing * 1.2F + lift;
             model.leftArm.yRot += bodyY * 2.0F;
             model.leftArm.zRot += Mth.sin(attackTime * Mth.PI) * -0.4F;
             return;
         }
-
         model.rightArm.xRot -= swing * 1.2F + lift;
         model.rightArm.yRot += bodyY * 2.0F;
         model.rightArm.zRot += Mth.sin(attackTime * Mth.PI) * -0.4F;
     }
-
     static float getAgeInTicks(Object state) {
         if (state == null) return timeFallback();
         if (!(state instanceof AvatarRenderState avatarState)) return timeFallback();
@@ -246,17 +190,10 @@ final class ArmPoseSupport {
         return Float.isNaN(value) ? timeFallback() : value;
     }
 
-    private static boolean armPoseIsBlocking(PlayerModel model, boolean right) {
-        if (model == null) return false;
-        java.lang.reflect.Field field = resolveArmPoseField(right);
-        if (field == null) return false;
-        try {
-            return isBlockPose((HumanoidModel.ArmPose) field.get(model));
-        } catch (IllegalAccessException | RuntimeException ignored) {
-            return false;
-        }
+    private static boolean armPoseIsBlocking(AvatarRenderState state, boolean right) {
+        if (state == null) return false;
+        return isBlockPose(right ? state.rightArmPose : state.leftArmPose);
     }
-
     private static boolean isBlockPose(HumanoidModel.ArmPose pose) { return pose == HumanoidModel.ArmPose.BLOCK; }
 
     private static AgeAccessor resolveAgeAccessor(Class<?> type) {

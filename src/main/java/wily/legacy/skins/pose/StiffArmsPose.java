@@ -1,11 +1,9 @@
 package wily.legacy.Skins.pose;
-
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-
 public final class StiffArmsPose {
     private StiffArmsPose() { }
 
@@ -18,16 +16,13 @@ public final class StiffArmsPose {
         if (player != null && player.getPose() == Pose.SWIMMING) return false;
         return state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.FALL_FLYING;
     }
-
     public static void apply(PlayerModel model, AvatarRenderState state) {
         if (state != null && state.pose == Pose.SWIMMING) return;
         Player player = ArmPoseSupport.getPlayer(state);
         if (player != null && player.getPose() == Pose.SWIMMING) return;
-
         ArmPoseSupport.ArmState rightState = ArmPoseSupport.ArmState.capture(model.rightArm, model.rightSleeve);
         ArmPoseSupport.ArmState leftState = ArmPoseSupport.ArmState.capture(model.leftArm, model.leftSleeve);
-        ArmPoseSupport.ArmFlags blocking = ArmPoseSupport.includeModelBlocking(model, ArmPoseSupport.getShieldBlockingArms(player, true));
-
+        ArmPoseSupport.ArmFlags blocking = ArmPoseSupport.includeModelBlocking(state, ArmPoseSupport.getShieldBlockingArms(player, true));
         if (!blocking.right()) {
             model.rightArm.xRot = 0.0F;
             model.rightArm.yRot = 0.0F;
@@ -38,7 +33,6 @@ public final class StiffArmsPose {
             model.leftArm.yRot = 0.0F;
             model.leftArm.zRot = 0.0F;
         }
-
         float attackTime = state == null ? 0.0F : state.attackTime;
         ArmPoseSupport.applyIdleSway(
                 model,
@@ -54,13 +48,10 @@ public final class StiffArmsPose {
                 blocking.left()
         );
         ArmPoseSupport.applyAttackSwing(model, state, attackTime);
-
         if (blocking.right()) rightState.restore(model.rightArm, model.rightSleeve);
         else rightState.syncSleeve(model.rightArm, model.rightSleeve);
-
         if (blocking.left()) leftState.restore(model.leftArm, model.leftSleeve);
         else leftState.syncSleeve(model.leftArm, model.leftSleeve);
     }
-
     public static float getAgeInTicks(Object state) { return ArmPoseSupport.getAgeInTicks(state); }
 }

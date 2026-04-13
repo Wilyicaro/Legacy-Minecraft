@@ -1,5 +1,4 @@
 package wily.legacy.Skins.skin;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 public final class ClientSkinAssets {
     public record ResolvedSkin(SkinEntry entry, ResourceLocation texture, ResourceLocation boxTexture, ResourceLocation modelId, BuiltBoxModel boxModel) {}
     public record AssetData(byte[] texture, byte[] model) {}
@@ -87,12 +85,10 @@ public final class ClientSkinAssets {
         Boolean slim = getBoolean(obj, "slim");
         if (slim != null) return slim;
         String model = getString(obj, "model");
-        if (model == null) { model = getString(obj, "arms"); }
-        if (model == null) return null;
-        String key = model.trim().toLowerCase(java.util.Locale.ROOT);
-        if (key.equals("slim") || key.equals("alex")) return true;
-        if (key.equals("wide") || key.equals("default") || key.equals("steve")) return false;
-        return null;
+        if (model == null) model = getString(obj, "arms");
+        slim = getSlimFlagFromValue(model);
+        if (slim != null) return slim;
+        return getSlimFlagFromPoses(getPoseElementFrom(obj));
     }
     public static boolean hasCape(ResolvedSkin resolved) {
         return resolved != null && resolved.entry() != null && resolved.entry().cape() != null;
@@ -161,26 +157,8 @@ public final class ClientSkinAssets {
     }
     public static void putTexture(String skinId, byte[] texturePng) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
-        Minecraft client = Minecraft.getInstance();
-        if (client == null) return;
         invalidateSkinCache(skinId);
-        if (texturePng == null) return;
-        if (texturePng.length == 0) {
-            clearTexture(skinId, client.getTextureManager());
-            return;
-        }
-        TEXTURE_BYTES.put(skinId, texturePng);
-        try {
-            NativeImage image = NativeImage.read(new ByteArrayInputStream(texturePng));
-            DynamicTexture texture = new DynamicTexture(() -> "legacy_runtime_skin_" + skinId, image);
-            TextureManager manager = client.getTextureManager();
-            ResourceLocation id = runtimeTextureId(skinId);
-            ResourceLocation old = TEXTURES.put(skinId, id);
-            if (old != null && !old.equals(id)) { releaseTexture(manager, old); }
-            manager.register(id, texture);
-        } catch (IOException | RuntimeException ex) {
-            DebugLog.debug("Failed to load runtime skin texture {}", skinId);
-        }
+        putTextureInternal(skinId, texturePng);
     }
     public static void putModel(String skinId, byte[] modelJson) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
@@ -225,13 +203,14 @@ public final class ClientSkinAssets {
         SKIN_CACHE.remove(skinId);
         SKIN_CACHE_CAPE.remove(skinId);
     }
-    private static void clearTexture(String skinId, TextureManager manager) {
-        TEXTURE_BYTES.remove(skinId);
-        ResourceLocation old = TEXTURES.remove(skinId);
+    private static void clearTexture(String key, TextureManager manager) {
+        TEXTURE_BYTES.remove(key);
+        ResourceLocation old = TEXTURES.remove(key);
         releaseTexture(manager, old);
     }
     private static PlayerModelType resolveModelType(String skinId, SkinEntry entry) {
         Boolean slim = getSlimFlag(skinId);
+        if (slim == null && entry != null && entry.modelId() != null) slim = BoxModelManager.getSlimFlag(entry.modelId());
         if (slim != null) { return slim ? PlayerModelType.SLIM : PlayerModelType.WIDE; }
         return entry != null && entry.slimArms() ? PlayerModelType.SLIM : PlayerModelType.WIDE;
     }
@@ -273,6 +252,23 @@ public final class ClientSkinAssets {
     }
     private static JsonObject getObject(JsonObject obj, String key) { return obj != null && obj.has(key) && obj.get(key).isJsonObject() ? obj.getAsJsonObject(key) : null; }
     private static JsonPrimitive getPrimitive(JsonObject obj, String key) { return obj != null && obj.has(key) && obj.get(key).isJsonPrimitive() ? obj.getAsJsonPrimitive(key) : null; }
+    private static Boolean getSlimFlagFromPoses(JsonElement poses) {
+        if (poses == null || poses.isJsonNull()) return null;
+        if (poses.isJsonPrimitive()) return getSlimFlagFromValue(poses.getAsString());
+        if (!poses.isJsonArray()) return null;
+        for (JsonElement value : poses.getAsJsonArray()) {
+            Boolean slim = getSlimFlagFromPoses(value);
+            if (slim != null) return slim;
+        }
+        return null;
+    }
+    private static Boolean getSlimFlagFromValue(String value) {
+        if (value == null) return null;
+        String key = value.trim().toLowerCase(java.util.Locale.ROOT);
+        if (key.equals("slim") || key.equals("alex")) return true;
+        if (key.equals("wide") || key.equals("default") || key.equals("steve")) return false;
+        return null;
+    }
     private static Boolean getBoolean(JsonObject obj, String key) {
         JsonPrimitive primitive = getPrimitive(obj, key);
         if (primitive == null) return null;
@@ -314,7 +310,30 @@ public final class ClientSkinAssets {
     private static void warmTexture(Minecraft client, ResourceLocation id) {
         if (client != null && id != null) client.getTextureManager().getTexture(id);
     }
-    private static ResourceLocation runtimeTextureId(String skinId) { return ResourceLocation.fromNamespaceAndPath("legacy", "runtime_skins/" + skinId); }
+    private static ResourceLocation putTextureInternal(String key, byte[] texturePng) {
+        Minecraft client = Minecraft.getInstance();
+        if (client == null || key == null || key.isBlank()) return null;
+        if (texturePng == null) return null;
+        if (texturePng.length == 0) {
+            clearTexture(key, client.getTextureManager());
+            return null;
+        }
+        TEXTURE_BYTES.put(key, texturePng);
+        try {
+            NativeImage image = NativeImage.read(new ByteArrayInputStream(texturePng));
+            DynamicTexture texture = new DynamicTexture(() -> "legacy_runtime_texture_" + key, image);
+            TextureManager manager = client.getTextureManager();
+            ResourceLocation id = runtimeTextureId(key);
+            ResourceLocation old = TEXTURES.put(key, id);
+            if (old != null && !old.equals(id)) releaseTexture(manager, old);
+            manager.register(id, texture);
+            return id;
+        } catch (IOException | RuntimeException ex) {
+            DebugLog.debug("Failed to load runtime texture {}", key);
+            return null;
+        }
+    }
+    private static ResourceLocation runtimeTextureId(String key) { return ResourceLocation.fromNamespaceAndPath("legacy", "runtime_skins/" + key); }
     private static void releaseTexture(TextureManager manager, ResourceLocation id) {
         if (manager == null || id == null) return;
         manager.release(id);

@@ -1,5 +1,4 @@
 package wily.legacy.Skins.client.render.boxloader;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -20,31 +19,23 @@ import wily.legacy.compat.cpm.CpmRenderCompat;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 public class BoxAddonLayer extends RenderLayer {
     public BoxAddonLayer(RenderLayerParent parent) {
         super(parent);
     }
-
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, EntityRenderState state, float partialTick, float ageInTicks) {
         if (!(state instanceof AvatarRenderState ars)) return;
         if (!(ars instanceof RenderStateSkinIdAccess a)) return;
-
         if (CpmRenderCompat.isCpmModelActive(ars)) return;
-
         if (consoleskins$isInvisible(ars, a)) return;
-
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
-
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(a);
         ResourceLocation texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
-
         BuiltBoxModel built = resolved == null ? null : resolved.boxModel();
         if (built == null) return;
-
         ResourceLocation boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
         var parentModel = this.getParentModel();
         if (!(parentModel instanceof PlayerModel pm)) return;
@@ -64,7 +55,6 @@ public class BoxAddonLayer extends RenderLayer {
         final ModelPart rightPants = snapshotPart(pm.rightPants);
         final ModelPart leftPants = snapshotPart(pm.leftPants);
         final boolean hatChildLike = isHatChildLike(head, hat);
-
         collector.submitCustomGeometry(
                 poseStack,
                 RenderType.entityCutoutNoCull(texFinal),
@@ -88,7 +78,6 @@ public class BoxAddonLayer extends RenderLayer {
                 }
         );
     }
-
     private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
         if (ars.isInvisible) return true;
         UUID u = a.consoleskins$getEntityUuid();
@@ -99,7 +88,6 @@ public class BoxAddonLayer extends RenderLayer {
         Player p = mc.level.getPlayerByUUID(u);
         return p != null && p.isInvisible();
     }
-
     private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
         if (parts == null || parts.isEmpty()) return;
         ps.pushPose();
