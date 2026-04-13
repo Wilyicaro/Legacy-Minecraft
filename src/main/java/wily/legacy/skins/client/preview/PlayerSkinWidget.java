@@ -18,8 +18,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 public class PlayerSkinWidget extends AbstractWidget {
-    private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F;
-    private static final int CAROUSEL_KEYFRAMES = 15;
+    private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F, DEFAULT_CAROUSEL_FPS = 30.0F;
     private static final long MOVE_HINT_MS = 170L;
     private static volatile boolean CLIP_ENABLED, CENTER_NAME_PLATE, CENTER_SELECTED_BADGE;
     private static volatile int CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2, CENTER_NAME_PLATE_W, CENTER_NAME_PLATE_H, CENTER_NAME_PLATE_PAD_Y,
@@ -223,6 +222,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         }
         clearInterpolationTargets();
         this.lastStep = -1;
+        this.progress = 2;
         if (pendingPoseMode != -1) {
             setPoseModeInternal(pendingPoseMode, pendingPunchLoop);
             pendingPoseMode = -1;
@@ -244,30 +244,44 @@ public class PlayerSkinWidget extends AbstractWidget {
         this.rotationY = nRotY;
         setTransform(nPosX, nPosY, nScale);
     }
+    private int getDefaultCarouselStepCount(float interpMs) {
+        return Math.max(1, Mth.ceil(interpMs * DEFAULT_CAROUSEL_FPS / 1000.0F));
+    }
+    private int getDefaultCarouselStep(long elapsed, float interpMs) {
+        int stepCount = getDefaultCarouselStepCount(interpMs);
+        if (elapsed >= interpMs) return stepCount;
+        float frameMs = 1000.0F / DEFAULT_CAROUSEL_FPS;
+        return Math.min(stepCount - 1, Math.max(0, (int) (elapsed / frameMs)));
+    }
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!visible) return;
         boolean clipActive = false;
         try {
             long now = System.currentTimeMillis();
-            float interpMs = ConsoleSkinsClientSettings.isSmoothPreviewScroll() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
-            if (ConsoleSkinsClientSettings.isSmoothPreviewScroll()) {
-                if (start == 0L) start = now;
-                progress = (now - start) / interpMs;
-                interpolate(progress);
-            } else {
-                if (start == 0L) {
-                    start = now;
-                    lastStep = -1;
-                }
-                float stepMs = interpMs / CAROUSEL_KEYFRAMES;
-                int step = (int) ((now - start) / stepMs);
-                if (step != lastStep) {
-                    lastStep = step;
-                    progress = step / (float) CAROUSEL_KEYFRAMES;
+            if (isInterpolating()) {
+                long elapsed;
+                float interpMs = ConsoleSkinsClientSettings.isSmoothPreviewScroll() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
+                if (ConsoleSkinsClientSettings.isSmoothPreviewScroll()) {
+                    if (start == 0L) start = now;
+                    elapsed = Math.max(0L, now - start);
+                    progress = elapsed / interpMs;
                     interpolate(progress);
+                } else {
+                    if (start == 0L) {
+                        start = now;
+                        lastStep = -1;
+                    }
+                    elapsed = Math.max(0L, now - start);
+                    int stepCount = getDefaultCarouselStepCount(interpMs);
+                    int step = getDefaultCarouselStep(elapsed, interpMs);
+                    if (step != lastStep) {
+                        lastStep = step;
+                        progress = step / (float) stepCount;
+                        interpolate(progress);
+                    }
                 }
-            }
+            } else progress = 2;
             int absOffset = Math.abs(slotOffset);
             if (absOffset > 4) return;
             if (absOffset > renderRadius) {
