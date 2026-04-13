@@ -86,12 +86,13 @@ public final class SkinPackLoader {
         return packs.keySet().stream().findFirst().orElse(null);
     }
     static int nextCustomPackSortIndex() {
-        int maxSort = 5900;
+        int minSort = Integer.MAX_VALUE;
         for (SkinPack pack : PACKS.values()) {
             if (pack == null || !pack.hasSort()) continue;
-            maxSort = Math.max(maxSort, pack.sortIndex());
+            if (SkinIdUtil.PACK_DEFAULT.equals(pack.id()) || SkinIdUtil.PACK_FAVOURITES.equals(pack.id())) continue;
+            minSort = Math.min(minSort, pack.sortIndex());
         }
-        return ((maxSort / 10) + 1) * 10;
+        return minSort == Integer.MAX_VALUE ? 0 : minSort - 1;
     }
     private static String requestId(String id) {
         return id == null || id.isBlank() ? null : id;
