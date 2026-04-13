@@ -190,13 +190,13 @@ final class CustomSkinPackFlow {
     private int optionsHeight(String customPackId, String downloadedPackId) {
         boolean sd = LegacyOptions.getUIMode().isSD();
         int buttonStep = sd ? 19 : 22;
-        int height = sd ? 68 : 97;
         int count = 0;
         if (downloadedPackId != null && customPackId == null) count++;
         if (!isEditing() && !isReordering()) count++;
         if (customPackId != null) count += 2;
         if (customPackId != null || isEditing() || isReordering()) count++;
-        return height + Math.max(0, count - 2) * buttonStep;
+        int height = sd ? 50 : 75;
+        return height + Math.max(0, count - 1) * buttonStep;
     }
     private void openCreateScreen(Screen rootParent) { if (screen.minecraft != null) screen.minecraft.setScreen(CreateCustomSkinPackScreen.create(screen, rootParent)); }
     private void openEditScreen(Screen rootParent, String packId) {
