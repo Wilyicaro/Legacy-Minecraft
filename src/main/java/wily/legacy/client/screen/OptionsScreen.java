@@ -360,7 +360,7 @@ public class OptionsScreen extends PanelVListScreen {
                 s -> Panel.centered(s, 250, 88, 0, -12),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptions(
-                                LegacyOptions.of(mc.options.getSoundSourceOptionInstance(SoundSource.MUSIC)),
+                                LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(SoundSource.MUSIC), "soundCategory.music"),
                                 LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(SoundSource.MASTER), "legacy.menu.sound"),
                                 LegacyOptions.caveSounds, LegacyOptions.minecartSounds))),
                 () -> Section.ADVANCED_AUDIO));
@@ -377,7 +377,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.directionalAudio()),
                                 LegacyOptions.of(mc.options.musicFrequency()),
                                 LegacyOptions.of(mc.options.showNowPlayingToast())),
-                        o -> o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss -> ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
+                        o -> o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss -> ss.ordinal() > 1).map(ss -> (FactoryConfig<?>) LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(ss), "soundCategory." + ss.getName()))))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
                 s -> LegacyOptions.legacySettingsMenus.get()

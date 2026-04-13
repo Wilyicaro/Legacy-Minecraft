@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
@@ -74,6 +75,9 @@ public class LegacyOptions {
                 OptionInstanceAccessor.of(optionInstance).getKey(),
                 FactoryConfigDisplay.<Double>percentBuilder()
                         .tooltip(v -> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v)))
+                        .messageFunction((display, value) -> value <= 0.0
+                                ? CommonComponents.optionNameValue(display.name(), CommonComponents.OPTION_OFF)
+                                : Component.translatable("options.percent_value", display.name(), Mth.floor(value * 100.0)))
                         .build(Component.translatable(captionKey)),
                 OptionInstanceAccessor.of(optionInstance).defaultValue(),
                 Bearer.of(optionInstance::get, optionInstance::set),
