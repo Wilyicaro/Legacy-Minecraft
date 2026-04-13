@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HelpAndOptionsScreen extends RenderableVListScreen {
+    private static final Component LEGACY_SKIN_OPTIONS = Component.literal("Legacy4J Skin Options");
+    private static final Component VANILLA_SKIN_OPTIONS = Component.literal("Vanilla Skin Options");
 
     public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 240, Math.min(7, s.renderableVList.renderables.size()) * 25 + 24), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 20)), new ArrayList<>(List.of(o -> HowToPlayScreen.Section.getWithButton().forEach(s -> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section) {
         @Override
@@ -23,7 +25,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
             getRenderableVList().cyclic(false).layoutSpacing(l -> 5).init(panel.x + 8, panel.getY() + 8, panel.getWidth() - 16, panel.getHeight() - 16);
         }
     }));
-    public static final OptionsScreen.Section CHANGE_SKIN_OPTIONS = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets()))));
+    public static final OptionsScreen.Section CHANGE_SKIN_OPTIONS = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(HelpAndOptionsScreen::addPlayerSkinOptions)));
     public static ScreenSection<?> CHANGE_SKIN = CHANGE_SKIN_OPTIONS;
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
@@ -49,6 +51,23 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new RenderableVListScreen(this, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new WinScreen(false, () -> this.minecraft.setScreen(r.getScreen()))).build(), Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(), Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()))).build());
     }
 
+    private static void addPlayerSkinOptions(OptionsScreen screen) {
+        List<AbstractWidget> legacyWidgets = createLegacyPlayerSkinWidgets();
+        if (!legacyWidgets.isEmpty()) {
+            screen.renderableVList.addCategory(LEGACY_SKIN_OPTIONS);
+            screen.renderableVList.renderables.addAll(legacyWidgets);
+        }
+        List<AbstractWidget> vanillaWidgets = createPlayerSkinWidgets();
+        if (!vanillaWidgets.isEmpty()) {
+            screen.renderableVList.addCategory(VANILLA_SKIN_OPTIONS);
+            screen.renderableVList.renderables.addAll(vanillaWidgets);
+        }
+    }
+
+    public static List<AbstractWidget> createLegacyPlayerSkinWidgets() {
+        return new ArrayList<>();
+    }
+
     public static List<AbstractWidget> createPlayerSkinWidgets() {
         List<AbstractWidget> list = new ArrayList<>();
         for (PlayerModelPart p : PlayerModelPart.values()) {
@@ -68,7 +87,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
             return new OptionsScreen(parent, new OptionsScreen.Section(
                     Component.translatable("legacy.menu.change_skin"),
                     s -> Panel.centered(s, 250, 150),
-                    new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets())))
+                    new ArrayList<>(List.of(HelpAndOptionsScreen::addPlayerSkinOptions))
             ));
         }
     }

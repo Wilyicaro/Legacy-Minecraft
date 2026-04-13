@@ -15,11 +15,11 @@ import java.util.List;
 
 @Mixin(value = HelpAndOptionsScreen.class, remap = false)
 public class SkinsOptionMixin {
-    @Inject(method = "createPlayerSkinWidgets", at = @At("RETURN"), remap = false, require = 0)
-    private static void consoleskins$addSmoothPreviewScroll(CallbackInfoReturnable<List<AbstractWidget>> cir) {
+    @Inject(method = "createLegacyPlayerSkinWidgets", at = @At("RETURN"), remap = false, require = 0)
+    private static void consoleskins$addLegacySkinOptions(CallbackInfoReturnable<List<AbstractWidget>> cir) {
         List<AbstractWidget> list = cir.getReturnValue();
         if (list == null) return;
-        list.add(0, new TickBox(
+        list.add(new TickBox(
                 0,
                 0,
                 ConsoleSkinsClientSettings.isTu3ChangeSkinScreen(),
@@ -27,7 +27,7 @@ public class SkinsOptionMixin {
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setTu3ChangeSkinScreen(t.selected)
         ));
-        list.add(1, new TickBox(
+        list.add(new TickBox(
                 0,
                 0,
                 ConsoleSkinsClientSettings.isSmoothPreviewScroll(),
@@ -35,16 +35,7 @@ public class SkinsOptionMixin {
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setSmoothPreviewScroll(t.selected)
         ));
-        int idx = 2;
-        if (!LegacyOptions.legacySettingsMenus.get()) {
-            AbstractWidget widget = LegacyConfigWidgets.createWidget(LegacyOptions.customSkinAnimation);
-            if (widget != null) {
-                list.add(idx, widget);
-                idx++;
-            }
-        }
-        idx = Math.min(idx, list.size());
-        list.add(idx, new TickBox(
+        list.add(new TickBox(
                 0,
                 0,
                 ConsoleSkinsClientSettings.isHideArmorOnAllBoxSkins(),
@@ -52,5 +43,11 @@ public class SkinsOptionMixin {
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setHideArmorOnAllBoxSkins(t.selected)
         ));
+        if (!LegacyOptions.legacySettingsMenus.get()) {
+            AbstractWidget widget = LegacyConfigWidgets.createWidget(LegacyOptions.customSkinAnimation);
+            if (widget != null) {
+                list.add(widget);
+            }
+        }
     }
 }
