@@ -610,7 +610,9 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_left") : null);
             r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_right") : null);
         }
-        r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : null, () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
+        if (ConsoleSkinsClientSettings.isShowCustomPackOptionsTooltip()) {
+            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : null, () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
+        }
         r.add(navigateIcon, navigateLabel);
         if (LegacyOptions.hideAdvancedOptionsTooltip.get() || LegacyOptions.legacySettingsMenus.get()) return;
         r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> LegacyComponents.SHOW_ADVANCED_OPTIONS);

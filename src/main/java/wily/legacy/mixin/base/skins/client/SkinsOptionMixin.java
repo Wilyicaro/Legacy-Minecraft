@@ -49,5 +49,13 @@ public class SkinsOptionMixin {
                 list.add(widget);
             }
         }
+        list.add(new TickBox(
+                0,
+                0,
+                ConsoleSkinsClientSettings.isShowCustomPackOptionsTooltip(),
+                b -> Component.translatable("legacy.menu.change_skin.custom_pack_options"),
+                b -> null,
+                t -> ConsoleSkinsClientSettings.setShowCustomPackOptionsTooltip(t.selected)
+        ));
     }
 }

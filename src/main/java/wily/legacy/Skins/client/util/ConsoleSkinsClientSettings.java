@@ -12,12 +12,14 @@ public final class ConsoleSkinsClientSettings {
     private static final boolean DEFAULT_SMOOTH_PREVIEW_SCROLL = false;
     private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
     private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
+    private static final boolean DEFAULT_SHOW_CUSTOM_PACK_OPTIONS_TOOLTIP = true;
     private static final boolean DEFAULT_SKIN_SELECTION_INITIALIZED = false;
     private static final String DEFAULT_CLOUD_RELAY_URL = "https://legacy4j-skins-relay.creepereater201.workers.dev";
     private static volatile boolean loaded;
     private static volatile boolean smoothPreviewScroll;
     private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
     private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
+    private static volatile boolean showCustomPackOptionsTooltip = DEFAULT_SHOW_CUSTOM_PACK_OPTIONS_TOOLTIP;
     private static volatile boolean skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
     private static volatile String lastUsedCustomPackId;
     private static volatile String cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
@@ -55,6 +57,17 @@ public final class ConsoleSkinsClientSettings {
     public static void setTu3ChangeSkinScreen(boolean enabled) {
         ensureLoaded();
         tu3ChangeSkinScreen = enabled;
+        saveQuiet();
+    }
+
+    public static boolean isShowCustomPackOptionsTooltip() {
+        ensureLoaded();
+        return showCustomPackOptionsTooltip;
+    }
+
+    public static void setShowCustomPackOptionsTooltip(boolean enabled) {
+        ensureLoaded();
+        showCustomPackOptionsTooltip = enabled;
         saveQuiet();
     }
 
@@ -96,6 +109,7 @@ public final class ConsoleSkinsClientSettings {
         smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
         hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
         tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
+        showCustomPackOptionsTooltip = DEFAULT_SHOW_CUSTOM_PACK_OPTIONS_TOOLTIP;
         skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
         lastUsedCustomPackId = null;
         cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
@@ -113,6 +127,7 @@ public final class ConsoleSkinsClientSettings {
             smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
             hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
             tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
+            showCustomPackOptionsTooltip = DEFAULT_SHOW_CUSTOM_PACK_OPTIONS_TOOLTIP;
             skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
             lastUsedCustomPackId = null;
             cloudRelayUrl = DEFAULT_CLOUD_RELAY_URL;
@@ -152,6 +167,12 @@ public final class ConsoleSkinsClientSettings {
                     if (k.equalsIgnoreCase("tu3_change_skin_screen") || k.equalsIgnoreCase("tu3ChangeSkinScreen")
                             || k.equalsIgnoreCase("tu3_change_skin") || k.equalsIgnoreCase("tu3ChangeSkin")) {
                         tu3ChangeSkinScreen = parseBool(v, DEFAULT_TU3_CHANGE_SKIN_SCREEN);
+                        continue;
+                    }
+
+                    if (k.equalsIgnoreCase("show_custom_pack_options_tooltip") || k.equalsIgnoreCase("showCustomPackOptionsTooltip")
+                            || k.equalsIgnoreCase("custom_pack_options_tooltip") || k.equalsIgnoreCase("customPackOptionsTooltip")) {
+                        showCustomPackOptionsTooltip = parseBool(v, DEFAULT_SHOW_CUSTOM_PACK_OPTIONS_TOOLTIP);
                         continue;
                     }
 
@@ -199,6 +220,7 @@ public final class ConsoleSkinsClientSettings {
                     + "smooth_preview_scroll=" + smoothPreviewScroll + "\n"
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
+                    + "show_custom_pack_options_tooltip=" + showCustomPackOptionsTooltip + "\n"
                     + "skin_selection_initialized=" + skinSelectionInitialized + "\n"
                     + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n"
                     + "cloud_relay_url=" + (cloudRelayUrl == null ? "" : cloudRelayUrl) + "\n";
