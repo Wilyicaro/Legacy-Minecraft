@@ -277,7 +277,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
     @Override
     protected boolean handlePackListStepNavigation(int key) {
-        return handlePackListStepNavigation(key, true, true, false, false);
+        return handlePackListStepNavigation(key, true, true, true, false);
     }
     @Override
     protected void focusPackListItem(Object item) {
@@ -312,13 +312,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private void startHoldingPackStick(int dir) {
         packHold.start(dir);
         if (isReorderingCustomPack()) customPacks.moveReorderingPack(packHold.dir());
-        else focusRelativePack(packHold.dir(), true);
+        else if (focusRelativePack(packHold.dir(), true)) applyQueuedPackChange();
     }
     private void stopHoldingPackStick() { packHold.stop(); }
     private void pumpHoldingPackStick() {
         if (!packHold.ready()) return;
         if (isReorderingCustomPack()) customPacks.moveReorderingPack(packHold.dir());
-        else focusRelativePack(packHold.dir(), true);
+        else if (focusRelativePack(packHold.dir(), true)) applyQueuedPackChange();
         packHold.step();
     }
     @Override
@@ -337,7 +337,9 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int iconY  = panel.y + tooltipBox.getHeight() - sc(normalLayout.actionHolderBaseY());
         if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderTopOffset()), holder, holder)) { selectSkin(); return true; }
         if (inside(mx, my, iconX, iconY + sc(normalLayout.actionHolderGap()), holder, holder)) { favoriteSkin(); return true; }
-        return super.mouseClicked(e, bl);
+        boolean handled = super.mouseClicked(e, bl);
+        if (handled) applyQueuedPackChange();
+        return handled;
     }
     @Override
     public void bindingStateTick(BindingState state) {

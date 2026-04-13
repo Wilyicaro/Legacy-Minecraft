@@ -77,6 +77,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private final int originalWidth, originalHeight;
     public int slotOffset;
     public int renderRadius = 4;
+    private int sourceSlotOffset;
     private float rotationX, rotationY, prevPosX, prevPosY, prevRotationX, prevRotationY, prevScale;
     private float targetRotationX = Float.NEGATIVE_INFINITY, targetRotationY = Float.NEGATIVE_INFINITY, targetPosX = Float.NEGATIVE_INFINITY,
             targetPosY = Float.NEGATIVE_INFINITY;
@@ -107,6 +108,7 @@ public class PlayerSkinWidget extends AbstractWidget {
             cachedEntryVersion = -1;
         }
     }
+    public void setSourceSlotOffset(int offset) { this.sourceSlotOffset = offset; }
     private SkinEntry getCachedEntry(String id) {
         if (SkinIdUtil.isBlankOrAutoSelect(id)) return null;
         int version = SkinPackLoader.getReloadVersion();
@@ -267,7 +269,10 @@ public class PlayerSkinWidget extends AbstractWidget {
                 }
             }
             int absOffset = Math.abs(slotOffset);
-            if (absOffset > renderRadius && progress > 1f || absOffset > 4) return;
+            if (absOffset > 4) return;
+            if (absOffset > renderRadius) {
+                if (!isInterpolating() || Math.abs(sourceSlotOffset) > renderRadius) return;
+            }
             int moveHintX = slotOffset == 0 ? resolveMoveHintOffset(now) : 0;
             int left = getX() + moveHintX;
             int top = getY();

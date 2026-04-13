@@ -276,6 +276,7 @@ public class PlayerSkinWidgetList {
 
     private void setupSlot(PlayerSkinWidget w, int offset) {
         int prevOffset = w.slotOffset;
+        w.setSourceSlotOffset(prevOffset);
         w.slotOffset = offset;
         w.renderRadius = renderRadius;
 
