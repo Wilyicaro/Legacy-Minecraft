@@ -5,15 +5,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.GameRules;
 import wily.factoryapi.FactoryAPIPlatform;
-import wily.factoryapi.base.config.FactoryConfig;
-import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.network.PlayerInfoSync;
 
-import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public class LegacyGameRules {
+    private static Predicate<GameRules.Key<GameRules.BooleanValue>> clientRuleResolver = key -> false;
 
     // Only the TNT Limit is accurate (enabled) by default, since it won't make the gameplay worse, as no one is going to blow a lot of TNTs at the same time, mainly in Survival
     public static final GameRules.Key<GameRules.BooleanValue> GLOBAL_MAP_PLAYER_ICON = GameRules.register("globalMapPlayerIcon", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
@@ -30,12 +28,6 @@ public class LegacyGameRules {
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_MOBCAP_LIMITS = GameRules.register("legacyMobcapLimits", GameRules.Category.MOBS, GameRules.BooleanValue.create(false));
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_OFFHAND_LIMITS = GameRules.register("legacyOffhandLimits", GameRules.Category.PLAYER, GameRules.BooleanValue.create(false, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_OFFHAND_LIMITS, booleanValue, server)));
 
-    protected static final Map<GameRules.Key<GameRules.BooleanValue>, FactoryConfig<Boolean>> FORCED_GAMERULES_MAP = Map.of(
-            LEGACY_SWIMMING, LegacyOptions.forceLegacySwimming,
-            LEGACY_FLIGHT, LegacyOptions.forceLegacyFlight,
-            LEGACY_SHIELD_CONTROLS, LegacyOptions.forceLegacyShieldControls,
-            LEGACY_OFFHAND_LIMITS, LegacyOptions.forceLegacyOffhandLimits);
-
     public static GameRules.Key<GameRules.BooleanValue> getTntExplodes() {
         return GameRules.RULE_TNT_EXPLODES;
     }
@@ -47,13 +39,15 @@ public class LegacyGameRules {
     public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
         if (!entity.level().isClientSide())
             return FactoryAPIPlatform.getEntityServer(entity).getGameRules().getBoolean(key);
-        FactoryConfig<Boolean> option = FORCED_GAMERULES_MAP.get(key);
-        if (option != null && option.get()) return true;
-        return Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules.getBoolean(key);
+        return clientRuleResolver.test(key);
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){
         return GameRules.IntegerValue.create(defaultValue, min, max, FeatureFlagSet.of(), biConsumer);
+    }
+
+    public static void setClientRuleResolver(Predicate<GameRules.Key<GameRules.BooleanValue>> resolver) {
+        clientRuleResolver = resolver == null ? key -> false : resolver;
     }
 
     public static void init(){
