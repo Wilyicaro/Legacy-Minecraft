@@ -59,6 +59,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             handleSkinPackReload();
             return;
         }
+        applyPendingInitialPackFocus();
         boolean windowActive = minecraft == null || minecraft.isWindowActive();
         if (windowActive && !lastWindowActive) { onWindowRegainedFocus(); }
         lastWindowActive = windowActive;
@@ -85,6 +86,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected boolean lastWindowActive;
     protected int seenPackReloadVersion;
     protected final CustomSkinPackFlow customPacks;
+    protected String pendingInitialPackId;
     protected AbstractChangeSkinScreen(Screen parent) {
         super(parent, s -> {
             ChangeSkinScreenLayout layout = LegacyOptions.getUIMode().isSD()
@@ -508,8 +510,9 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected void focusInitialPack() {
         String requestedPackId = SkinPackLoader.consumeRequestedFocusPackId();
         if (requestedPackId != null) {
+            pendingInitialPackId = requestedPackId;
             packList.focusPackId(requestedPackId, false);
-            return;
+            if (requestedPackId.equals(packList.getFocusedPackId())) return;
         }
         String selectedId = currentAppliedSkinId();
         if (selectedId != null && !selectedId.isBlank()) {
@@ -519,9 +522,17 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                 return;
             }
         }
-        String preferredDefaultPackId = SkinPackLoader.getPreferredDefaultPackId();
-        String focusId = preferredDefaultPackId != null ? preferredDefaultPackId : SkinPackLoader.getLastUsedCustomPackId();
+        String focusId = SkinPackLoader.getLastUsedCustomPackId();
+        if (focusId == null) focusId = SkinPackLoader.getPreferredDefaultPackId();
         if (focusId != null) packList.focusPackId(focusId, false);
+    }
+    protected void applyPendingInitialPackFocus() {
+        if (pendingInitialPackId == null) return;
+        packList.focusPackId(pendingInitialPackId, false);
+        if (!pendingInitialPackId.equals(packList.getFocusedPackId())) return;
+        restorePackButtonFocus();
+        if (playerSkinWidgetList != null) skinPack(resolveFocusedPackSkinIndex(currentAppliedSkinId()));
+        pendingInitialPackId = null;
     }
     protected boolean focusPackIndex(int index, boolean requestFocus) {
         int count = packList.getPackCount();

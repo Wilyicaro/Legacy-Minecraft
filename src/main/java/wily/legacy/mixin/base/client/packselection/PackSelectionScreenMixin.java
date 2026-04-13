@@ -37,7 +37,9 @@ import wily.legacy.util.client.LegacySoundUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
@@ -65,6 +67,10 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     private final RenderableVList unselectedPacksList = new RenderableVList(this).layoutSpacing(l -> 0);
     @Unique
     private final List<RenderableVList> renderableVLists = List.of(unselectedPacksList, selectedPacksList);
+    @Unique
+    private final Map<AbstractButton, String> packIds = new IdentityHashMap<>();
+    @Unique
+    private String lastFocusedPackId;
 
     protected PackSelectionScreenMixin(Component component) {
         super(component);
@@ -80,11 +86,13 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
+        rememberFocusedPack();
         super.init();
         panel.init();
         unselectedPacksList.init(panel.x + 15, panel.y + 30, 180, 192);
         selectedPacksList.init(panel.x + 215, panel.y + 30, 180, 192);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
+        restoreFocusedPack();
     }
 
     @Inject(method = "repositionElements", at = @At("HEAD"), cancellable = true)
@@ -111,9 +119,12 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     @Inject(method = "populateLists", at = @At("HEAD"), cancellable = true)
     private void populateLists(CallbackInfo ci) {
         ci.cancel();
+        rememberFocusedPack();
+        packIds.clear();
         addPacks(unselectedPacksList, model.getUnselected());
         addPacks(selectedPacksList, model.getSelected());
         repositionElements();
+        restoreFocusedPack();
     }
 
     @Inject(method = "onClose", at = @At("RETURN"))
@@ -249,9 +260,31 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     defaultButtonNarrationText(narrationElementOutput);
                 }
             };
+            packIds.put(button, e.getId());
             if (!description.isEmpty()) button.setTooltip(new MultilineTooltip(description, 161));
             list.addRenderable(button);
         });
+    }
+
+    @Unique
+    private void rememberFocusedPack() {
+        if (getFocused() instanceof AbstractButton button) {
+            String packId = packIds.get(button);
+            if (packId != null) lastFocusedPackId = packId;
+        }
+    }
+
+    @Unique
+    private void restoreFocusedPack() {
+        if (lastFocusedPackId == null) return;
+        for (RenderableVList list : renderableVLists) {
+            for (var renderable : list.renderables) {
+                if (renderable instanceof AbstractButton button && lastFocusedPackId.equals(packIds.get(button))) {
+                    list.focusRenderable(button);
+                    return;
+                }
+            }
+        }
     }
 
 
