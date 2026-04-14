@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.*;
 import wily.legacy.client.screen.*;
@@ -122,16 +123,6 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private float mainTextScale() { return bigTextScale(); }
 
     private float packTypeTextScale() { return Math.min(1.0f, smallTextScale()); }
-
-    private void drawScaledCenteredShadow(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
-        int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
-        var pose = g.pose();
-        pose.pushMatrix();
-        pose.translate((float) centerX, (float) yAdj);
-        pose.scale(scale, scale);
-        g.drawCenteredString(minecraft.font, text, 0, 0, color);
-        pose.popMatrix();
-    }
     @Override
     protected int previewBoxX() {
         int size = previewBoxSize();
@@ -435,7 +426,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
             float mainTextScale = mainTextScale();
             int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
-            drawScaledCenteredShadow(g, Component.literal(PlayerSkinWidget.clipText(minecraft.font, name, maxNameWidth)), mid, skinNameY, 0xFFFFFFFF, mainTextScale);
+            drawScaledCentered(g, Component.literal(PlayerSkinWidget.clipText(minecraft.font, name, maxNameWidth)), mid, skinNameY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
 
             ResourceLocation modelId = entry == null ? null : entry.modelId();
             if (modelId == null && entry != null && entry.texture() != null) modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
@@ -445,7 +436,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 int maxThemeWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
                 String show = PlayerSkinWidget.clipText(minecraft.font, theme, maxThemeWidth);
                 int themeY = skinNameY + (int) (minecraft.font.lineHeight * mainTextScale) + sc(normalLayout.themeTextGap());
-                drawScaledCenteredShadow(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), 0xFFFFFFFF, mainTextScale);
+                drawScaledCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             }
         }
         SkinPack pack = packList.getFocusedPack();
@@ -456,7 +447,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (pack != null) {
             int maxPackWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())) / mainTextScale));
             String packName = PlayerSkinWidget.clipText(minecraft.font, SkinPackLoader.nameString(pack.name(), pack.id()), maxPackWidth);
-            drawScaledCenteredShadow(g, Component.literal(packName), packMid, packTitleY, 0xFFFFFFFF, mainTextScale);
+            drawScaledCentered(g, Component.literal(packName), packMid, packTitleY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             Component label = null;
             if (isReorderingCustomPack()) label = Component.translatable("legacy.menu.reorder_custom_skin_pack");
             else if (isEditingCustomPack()) label = Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
@@ -468,7 +459,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                     if (k.equals("mashup")) label = Component.translatable("legacy.skinpack.type.mashup");
                 }
             }
-            if (label != null) drawScaledCenteredShadow(g, label, packMid, packMetaY, 0xCCFFFFFF, packTypeTextScale());
+            if (label != null) drawScaledCentered(g, label, packMid, packMetaY, ColorUtil.withAlpha(LegacyRenderUtil.getDefaultTextColor(true), 0.8f), packTypeTextScale(), true);
         }
     }
     @Override

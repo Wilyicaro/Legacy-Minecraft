@@ -958,6 +958,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) { drawScaledCentered(g, text, centerX, y, color, smallTextScale()); }
 
     protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
+        drawScaledCentered(g, text, centerX, y, color, scale, false);
+    }
+
+    protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale, boolean shadow) {
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         int textWidth = minecraft.font.width(text);
         int textX = -textWidth / 2;
@@ -965,7 +969,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         pose.pushMatrix();
         pose.translate((float) centerX, (float) yAdj);
         pose.scale(scale, scale);
-        g.drawString(minecraft.font, text, textX, 0, color, false);
+        g.drawString(minecraft.font, text, textX, 0, color, shadow);
         pose.popMatrix();
     }
     protected static final class HoldRepeat {
