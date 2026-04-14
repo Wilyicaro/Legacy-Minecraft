@@ -130,6 +130,7 @@ public final class SkinPackFiles {
         Files.deleteIfExists(packDir.resolve("skins").resolve(skinId + ".png"));
         Files.deleteIfExists(packDir.resolve("box_models").resolve(skinId + ".json"));
         Files.deleteIfExists(packDir.resolve("box_textures").resolve(skinId + ".png"));
+        Files.deleteIfExists(packDir.resolve("advancement_faces").resolve(skinId + ".png"));
     }
     static void copySkinPng(Path source, Path target) throws IOException {
         if (source == null || !Files.isRegularFile(source)) throw new IOException("Skin file was not found");

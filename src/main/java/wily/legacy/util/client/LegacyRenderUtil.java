@@ -71,6 +71,7 @@ import wily.legacy.Skins.client.render.boxloader.AttachSlot;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinIdUtil;
+import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
@@ -399,13 +400,7 @@ public class LegacyRenderUtil {
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
         if (mc.player == null) return;
-        String skinId;
-        try {
-            skinId = ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName());
-        } catch (Throwable ignored) {
-            skinId = null;
-        }
-
+        String skinId = getLocalPlayerSkinId();
         if (shouldRenderBoxHeadPreview(skinId)) {
             int x0 = x;
             int y0 = y;
@@ -419,8 +414,28 @@ public class LegacyRenderUtil {
         PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
     }
 
+    public static void renderLocalPlayerAdvancementFace(GuiGraphics guiGraphics, int x, int y, int size) {
+        ResourceLocation face = SkinPackLoader.getAdvancementFace(getLocalPlayerSkinId());
+        if (face != null) {
+            FactoryScreenUtil.enableBlend();
+            FactoryGuiGraphics.of(guiGraphics).blit(face, x, y, 0.0f, 0.0f, size, size, size, size);
+            FactoryScreenUtil.disableBlend();
+            return;
+        }
+        renderLocalPlayerHead(guiGraphics, x, y, size);
+    }
+
     private static boolean shouldRenderBoxHeadPreview(String skinId) {
         return !SkinIdUtil.isBlankOrAutoSelect(skinId) && ClientSkinAssets.hasHeadBox(ClientSkinAssets.resolveSkin(skinId));
+    }
+
+    private static String getLocalPlayerSkinId() {
+        if (mc.player == null) return null;
+        try {
+            return ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName());
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     public static float getAutoGuiScale() {

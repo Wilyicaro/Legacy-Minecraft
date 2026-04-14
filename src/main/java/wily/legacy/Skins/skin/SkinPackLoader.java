@@ -20,6 +20,7 @@ public final class SkinPackLoader {
     private static volatile Map<String, SkinPack> PACKS = Map.of();
     private static volatile Map<String, SkinEntry> SKINS_BY_ID = Map.of();
     private static volatile Map<String, String> PACK_BY_SKIN = Map.of();
+    private static volatile Map<String, ResourceLocation> ADVANCEMENT_FACES_BY_SKIN = Map.of();
     private static volatile boolean loaded;
     private static volatile int reloadVersion;
     private static volatile String LAST_USED_CUSTOM_PACK_ID;
@@ -30,6 +31,7 @@ public final class SkinPackLoader {
     private static final ResourceLocation DEFAULT_PACK_ICON = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "skinpacks/default/pack.png");
     private static final String SKINPACKS_PREFIX = "skinpacks/";
     private static final String DEFAULT_SKINPACKS_PREFIX = "default_skinpacks/";
+    private static final String ADVANCEMENT_FACES_DIR = "advancement_faces/";
     private static final String PACK_JSON_SUFFIX = "/pack.json";
     private static final String[] RESOURCE_ROOTS = {"skinpacks", "default_skinpacks"};
     private SkinPackLoader() { }
@@ -39,6 +41,10 @@ public final class SkinPackLoader {
     }
     public static SkinEntry getSkin(String id) { if (!loaded) ensureLoaded(); return SKINS_BY_ID.get(id); }
     public static String getSourcePackId(String skinId) { ensureLoaded(); return PACK_BY_SKIN.get(skinId); }
+    public static ResourceLocation getAdvancementFace(String skinId) {
+        if (!loaded) ensureLoaded();
+        return skinId == null ? null : ADVANCEMENT_FACES_BY_SKIN.get(skinId);
+    }
     public static String getLastUsedCustomPackId() { return LAST_USED_CUSTOM_PACK_ID; }
     public static void requestFocusPack(String packId) { REQUESTED_FOCUS_PACK_ID = requestId(packId); }
     public static String consumeRequestedFocusPackId() {
@@ -181,6 +187,7 @@ public final class SkinPackLoader {
             PACKS = Collections.unmodifiableMap(orderedPacks);
             SKINS_BY_ID = Collections.unmodifiableMap(state.skinsById);
             PACK_BY_SKIN = Collections.unmodifiableMap(state.packBySkin);
+            ADVANCEMENT_FACES_BY_SKIN = Collections.unmodifiableMap(state.advancementFacesBySkin);
             loaded = true;
             reloadVersion++;
         }
@@ -344,8 +351,10 @@ public final class SkinPackLoader {
                     if (capePath.startsWith(SKINPACKS_PREFIX) || capePath.startsWith(DEFAULT_SKINPACKS_PREFIX)) cape = ResourceLocation.fromNamespaceAndPath(namespace, capePath);
                     else cape = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + capePath);
                 }
+                ResourceLocation advancementFace = resolveAdvancementFace(namespace, packPrefix, packFolder, sourceId, rm);
                 collectPoseTagsFromSkinJson(o, loadedSkinId);
                 skinIdsBySourceId.computeIfAbsent(sourceId, ignored -> new ArrayList<>()).add(loadedSkinId);
+                if (advancementFace != null) state.advancementFacesBySkin.put(loadedSkinId, advancementFace);
                 tmp.add(new SkinEntryWithIndex(new SkinEntry(loadedSkinId, sourceId, skinName, texture, modelId, cape, slimArms, order), i));
             }
         }
@@ -376,6 +385,14 @@ public final class SkinPackLoader {
         if (json.has("sort_sub_index")) sortSub = SkinPackJson.integer(json.get("sort_sub_index"), 0);
         else if (json.has("sort_sub")) sortSub = SkinPackJson.integer(json.get("sort_sub"), 0);
         state.packs.put(packId, new LoadedPack(new SkinPack(packId, name, author, type, icon, entries, editable, sort, has, sortSub == null ? 0 : sortSub), sort, has, sortSub, state.nextInsertIndex++));
+    }
+    private static ResourceLocation resolveAdvancementFace(String namespace, String packPrefix, String packFolder, String skinId, ResourceManager rm) {
+        if (rm == null || namespace == null || namespace.isBlank() || packFolder == null || packFolder.isBlank() || skinId == null || skinId.isBlank()) return null;
+        ResourceLocation face = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + ADVANCEMENT_FACES_DIR + skinId + ".png");
+        if (rm.getResource(face).isPresent()) return face;
+        if (DEFAULT_SKINPACKS_PREFIX.equals(packPrefix)) return null;
+        ResourceLocation fallback = ResourceLocation.fromNamespaceAndPath(namespace, DEFAULT_SKINPACKS_PREFIX + packFolder + "/" + ADVANCEMENT_FACES_DIR + skinId + ".png");
+        return rm.getResource(fallback).isPresent() ? fallback : null;
     }
     private static void applyBuiltinAutoSelection(Map<String, SkinPack> ordered) {
         if (LAST_USED_CUSTOM_PACK_ID != null) {
@@ -459,6 +476,7 @@ public final class SkinPackLoader {
         private final LinkedHashMap<String, LoadedPack> packs = new LinkedHashMap<>();
         private final LinkedHashMap<String, SkinEntry> skinsById = new LinkedHashMap<>();
         private final LinkedHashMap<String, String> packBySkin = new LinkedHashMap<>();
+        private final LinkedHashMap<String, ResourceLocation> advancementFacesBySkin = new LinkedHashMap<>();
         private int nextInsertIndex;
     }
     public static String nameString(String name, String fallbackId) { return SkinPackLang.translateMaybeKey(name, fallbackId); }
