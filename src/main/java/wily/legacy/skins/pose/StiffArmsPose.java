@@ -7,6 +7,10 @@ import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 public final class StiffArmsPose {
     private StiffArmsPose() { }
 
+    private static float getBaseXRot(AvatarRenderState state) {
+        return state != null && state.isCrouching ? 0.4F : 0.0F;
+    }
+
     public static boolean shouldApply(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return false;
         String skinId = access.consoleskins$getSkinId();
@@ -23,13 +27,14 @@ public final class StiffArmsPose {
         ArmPoseSupport.ArmState rightState = ArmPoseSupport.ArmState.capture(model.rightArm, model.rightSleeve);
         ArmPoseSupport.ArmState leftState = ArmPoseSupport.ArmState.capture(model.leftArm, model.leftSleeve);
         ArmPoseSupport.ArmFlags blocking = ArmPoseSupport.includeModelBlocking(state, ArmPoseSupport.getShieldBlockingArms(player, true));
+        float baseXRot = getBaseXRot(state);
         if (!blocking.right()) {
-            model.rightArm.xRot = 0.0F;
+            model.rightArm.xRot = baseXRot;
             model.rightArm.yRot = 0.0F;
             model.rightArm.zRot = 0.0F;
         }
         if (!blocking.left()) {
-            model.leftArm.xRot = 0.0F;
+            model.leftArm.xRot = baseXRot;
             model.leftArm.yRot = 0.0F;
             model.leftArm.zRot = 0.0F;
         }
