@@ -122,6 +122,7 @@ public class Legacy4J {
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerHostOptionsPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
+            r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);

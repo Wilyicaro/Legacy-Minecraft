@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.entity.LegacyLocalPlayer;
+import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.*;
@@ -286,9 +287,14 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         legacy$updateShieldControls();
     }
 
+    @WrapWithCondition(method = "onSyncedDataUpdated", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;startUsingItem(Lnet/minecraft/world/InteractionHand;)V"))
+    private boolean onSyncedDataUpdatedStartUsingItem(LocalPlayer instance, InteractionHand hand) {
+        return !((LegacyShieldPlayer) this).isShieldPaused() || !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) || !(getItemInHand(hand).getItem() instanceof ShieldItem);
+    }
+
     private void legacy$updateShieldControls() {
         InteractionHand hand = legacy$getShieldHand();
-        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
+        if (!((LegacyShieldPlayer) this).isShieldPaused() && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
             if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
                 if (isUsingItem()) stopUsingItem();
                 startUsingItem(hand);
