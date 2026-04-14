@@ -166,7 +166,7 @@ public final class SkinSyncClient {
     }
 
     private static void sendSelection(Minecraft client, String skinId) {
-        String id = SkinIdUtil.normalize(skinId);
+        String id = SkinFairness.effectiveSkinId(client, skinId);
         STATE.sessionAnnounced = true;
         if (SkinCloudSyncClient.isActive(client)) {
             SkinCloudSyncClient.submitSelection(client, id);
@@ -177,7 +177,7 @@ public final class SkinSyncClient {
     }
 
     private static void sendAssets(Minecraft client, String skinId) {
-        if (!SkinIdUtil.hasSkin(skinId) || STATE.sentAssets.putIfAbsent(skinId, Boolean.TRUE) != null) return;
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId) || STATE.sentAssets.putIfAbsent(skinId, Boolean.TRUE) != null) return;
         ClientSkinAssets.AssetData assets = ClientSkinAssets.resolveAssetData(client, skinId);
         sendAssetChunks(skinId, SkinSync.ASSET_TEXTURE, assets.texture());
         sendAssetChunks(skinId, SkinSync.ASSET_MODEL, assets.model());

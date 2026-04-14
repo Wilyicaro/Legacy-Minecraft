@@ -5,8 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.util.DebugLog;
@@ -39,12 +37,12 @@ final class SkinCloudSyncClient {
                 && !client.hasSingleplayerServer()
                 && !Legacy4JClient.hasModOnServer()
                 && !ConsoleSkinsClientSettings.getCloudRelayUrl().isBlank()
-                && resolveServerKey(client) != null;
+                && SkinFairness.resolveServerKey(client) != null;
     }
 
     static void submitSelection(Minecraft client, String skinId) {
         String relayUrl = ConsoleSkinsClientSettings.getCloudRelayUrl();
-        String serverKey = resolveServerKey(client);
+        String serverKey = SkinFairness.resolveServerKey(client);
         UUID playerId = client == null || client.player == null ? null : client.player.getUUID();
         if (relayUrl.isBlank() || serverKey == null || playerId == null) return;
 
@@ -57,7 +55,7 @@ final class SkinCloudSyncClient {
 
     static void requestSnapshot(Minecraft client, boolean force) {
         String relayUrl = ConsoleSkinsClientSettings.getCloudRelayUrl();
-        String serverKey = resolveServerKey(client);
+        String serverKey = SkinFairness.resolveServerKey(client);
         if (relayUrl.isBlank() || serverKey == null) return;
         long now = System.currentTimeMillis();
         if (!force && (SNAPSHOT_IN_FLIGHT.get() || now - lastSnapshotRequestAt < 5000L)) return;
@@ -66,37 +64,6 @@ final class SkinCloudSyncClient {
 
         String query = relayUrl + "/v1/session?serverKey=" + URLEncoder.encode(serverKey, StandardCharsets.UTF_8);
         sendAsync(HttpRequest.newBuilder(URI.create(query)).timeout(Duration.ofSeconds(8)).GET().build(), true);
-    }
-
-    private static String resolveServerKey(Minecraft client) {
-        if (client == null || client.hasSingleplayerServer()) return null;
-        ServerData server = client.getCurrentServer();
-        if (server == null || server.ip == null || server.ip.isBlank()) return null;
-        return normalizeServerKey(server.ip);
-    }
-
-    private static String normalizeServerKey(String value) {
-        if (value == null) return null;
-        String raw = value.trim();
-        if (raw.isEmpty()) return null;
-        try {
-            ServerAddress address = ServerAddress.parseString(raw);
-            if (address != null) {
-                String host = normalizeHost(address.getHost());
-                int port = address.getPort();
-                if (host != null && !host.isBlank() && port > 0) return host + ":" + port;
-            }
-        } catch (RuntimeException ignored) {
-        }
-        String host = normalizeHost(raw);
-        return host == null ? null : host + ":25565";
-    }
-
-    private static String normalizeHost(String value) {
-        if (value == null) return null;
-        String host = value.trim().toLowerCase();
-        while (host.endsWith(".")) host = host.substring(0, host.length() - 1);
-        return host.isEmpty() ? null : host;
     }
 
     private static HttpRequest buildPost(String url, String body) {

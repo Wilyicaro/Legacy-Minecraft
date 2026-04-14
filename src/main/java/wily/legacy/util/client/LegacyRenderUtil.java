@@ -70,6 +70,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.Skins.client.render.boxloader.AttachSlot;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.ClientSkinCache;
+import wily.legacy.Skins.skin.SkinFairness;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
@@ -432,7 +433,7 @@ public class LegacyRenderUtil {
     private static String getLocalPlayerSkinId() {
         if (mc.player == null) return null;
         try {
-            return ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName());
+            return SkinFairness.effectiveSkinId(mc, ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName()));
         } catch (Throwable ignored) {
             return null;
         }

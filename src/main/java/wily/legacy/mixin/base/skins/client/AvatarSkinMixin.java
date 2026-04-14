@@ -1,8 +1,10 @@
 package wily.legacy.mixin.base.skins.client;
 
+import net.minecraft.client.Minecraft;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.ClientSkinAssets;
+import wily.legacy.Skins.skin.SkinFairness;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -29,7 +31,7 @@ public abstract class AvatarSkinMixin {
     private static void consoleskins$applySkinToState(Avatar avatar, AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return;
         consoleskins$clearSkinState(access);
-        String skinId = consoleskins$resolveSkinId(avatar);
+        String skinId = SkinFairness.effectiveSkinId(Minecraft.getInstance(), consoleskins$resolveSkinId(avatar));
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         access.consoleskins$setSkinId(skinId);
         access.consoleskins$setEntityUuid(avatar.getUUID());

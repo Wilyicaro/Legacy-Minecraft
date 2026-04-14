@@ -318,6 +318,7 @@ public final class SkinPackLoader {
                 if (skinName == null || skinName.isBlank()) skinName = sourceId;
                 skinName = SkinPackLang.translateMaybeKey(skinName, sourceId);
                 int order = SkinPackJson.integer(o.get("order"), i + 1);
+                boolean fair = SkinPackJson.bool(o.get("fair"), true);
                 String capePath = SkinPackJson.string(o.get("cape"));
                 boolean slimArms = SkinPackJson.bool(o.get("slim"), false);
                 boolean modelExplicit = o.has("slim") && o.get("slim").isJsonPrimitive();
@@ -355,7 +356,7 @@ public final class SkinPackLoader {
                 collectPoseTagsFromSkinJson(o, loadedSkinId);
                 skinIdsBySourceId.computeIfAbsent(sourceId, ignored -> new ArrayList<>()).add(loadedSkinId);
                 if (advancementFace != null) state.advancementFacesBySkin.put(loadedSkinId, advancementFace);
-                tmp.add(new SkinEntryWithIndex(new SkinEntry(loadedSkinId, sourceId, skinName, texture, modelId, cape, slimArms, order), i));
+                tmp.add(new SkinEntryWithIndex(new SkinEntry(loadedSkinId, sourceId, skinName, texture, modelId, cape, slimArms, order, fair), i));
             }
         }
         tmp.sort(Comparator.comparingInt((SkinEntryWithIndex w) -> w.entry.order()).thenComparingInt(w -> w.index));
