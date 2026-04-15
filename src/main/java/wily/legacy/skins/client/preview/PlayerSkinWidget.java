@@ -26,18 +26,37 @@ public class PlayerSkinWidget extends AbstractWidget {
             CENTER_NAME_PLATE_HIGHLIGHT_COLOR = 0xFFEBEB0F, CENTER_SELECTED_BADGE_W, CENTER_SELECTED_BADGE_H, CENTER_SELECTED_BADGE_GAP;
     private static volatile ResourceLocation CENTER_NAME_PLATE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/skin_box");
     private static volatile ResourceLocation CENTER_SELECTED_BADGE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
+    private static volatile String CENTER_NAME_PLATE_DISPLAY_ID, CENTER_NAME_PLATE_PENDING_ID;
+    private static volatile boolean CENTER_NAME_PLATE_WAITING;
     public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY) {
         CENTER_NAME_PLATE = enabled;
         CENTER_NAME_PLATE_W = Math.max(1, width);
         CENTER_NAME_PLATE_H = Math.max(1, height);
         CENTER_NAME_PLATE_PAD_Y = Math.max(0, padY);
         CENTER_NAME_PLATE_Y = fixedY;
+        if (!enabled) {
+            CENTER_NAME_PLATE_DISPLAY_ID = null;
+            CENTER_NAME_PLATE_PENDING_ID = null;
+            CENTER_NAME_PLATE_WAITING = false;
+        }
     }
     public static void setCenterNamePlateCenterX(int centerX) { CENTER_NAME_PLATE_CENTER_X = centerX; }
 
     public static void setCenterNamePlateSprite(ResourceLocation sprite) { if (sprite != null) CENTER_NAME_PLATE_SPRITE = sprite; }
 
-    public static void setCenterNamePlateReady(boolean ready) { CENTER_NAME_PLATE_READY = ready; }
+    public static void setCenterNamePlateReady(boolean ready) {
+        CENTER_NAME_PLATE_READY = ready;
+        if (!ready) {
+            CENTER_NAME_PLATE_WAITING = true;
+            return;
+        }
+        if (CENTER_NAME_PLATE_WAITING) {
+            if (CENTER_NAME_PLATE_PENDING_ID != null && !CENTER_NAME_PLATE_PENDING_ID.isBlank()) {
+                CENTER_NAME_PLATE_DISPLAY_ID = CENTER_NAME_PLATE_PENDING_ID;
+            }
+            CENTER_NAME_PLATE_WAITING = false;
+        }
+    }
 
     public static void setCenterNamePlateHighlight(boolean enabled, int pad, int thickness, int color) {
         CENTER_NAME_PLATE_HIGHLIGHT = enabled;
@@ -320,7 +339,7 @@ public class PlayerSkinWidget extends AbstractWidget {
                 clipActive = true;
             }
             renderDoll(guiGraphics, partialTick, id, yawOffset, attackTime, left, top, right, bottom);
-            if (CENTER_NAME_PLATE && CENTER_NAME_PLATE_READY && slotOffset == 0) renderNamePlate(guiGraphics, id, left, right, bottom);
+            if (CENTER_NAME_PLATE && slotOffset == 0) renderNamePlate(guiGraphics, id, left, right, bottom);
         } catch (RuntimeException ignored) {
         } finally {
             if (clipActive) {
@@ -403,6 +422,13 @@ public class PlayerSkinWidget extends AbstractWidget {
         return !SkinIdUtil.isBlankOrAutoSelect(id)
                 && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.UPSIDE_DOWN, id);
     }
+    private String resolveNamePlateId(String id) {
+        if (id != null && !id.isBlank()) {
+            CENTER_NAME_PLATE_PENDING_ID = id;
+        }
+        if (CENTER_NAME_PLATE_DISPLAY_ID == null || CENTER_NAME_PLATE_DISPLAY_ID.isBlank()) CENTER_NAME_PLATE_DISPLAY_ID = CENTER_NAME_PLATE_PENDING_ID;
+        return CENTER_NAME_PLATE_DISPLAY_ID;
+    }
     private void renderDoll(GuiGraphics guiGraphics, float partialTick, String id, float yawOffset, float attackTime, int left, int top, int right, int bottom) {
         if (SkinIdUtil.isAutoSelect(id)) {
             var playerSkin = GuiSessionSkin.getSessionPlayerSkin();
@@ -413,7 +439,9 @@ public class PlayerSkinWidget extends AbstractWidget {
         if (entry != null && entry.texture() != null) GuiDollRender.renderDollInRect(guiGraphics, id, entry.texture(), yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom, 165);
     }
     private void renderNamePlate(GuiGraphics guiGraphics, String id, int left, int right, int bottom) {
-        String label = SkinIdUtil.isAutoSelect(id) ? "Current Skin" : nameLabel(id);
+        String displayId = resolveNamePlateId(id);
+        if (displayId == null || displayId.isBlank()) return;
+        String label = SkinIdUtil.isAutoSelect(displayId) ? "Current Skin" : nameLabel(displayId);
         if (label == null) label = "";
         int plateW = CENTER_NAME_PLATE_W;
         int plateH = CENTER_NAME_PLATE_H;
@@ -425,7 +453,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
         var font = Minecraft.getInstance().font;
         int maxPx = Math.max(1, plateW - 8);
-        String theme = themeLabel(id, label);
+        String theme = themeLabel(displayId, label);
         String showName = clipText(font, label, maxPx);
         if (theme == null) guiGraphics.drawCenteredString(font, Component.literal(showName), plateX + plateW / 2, plateY + (plateH - font.lineHeight) / 2, 0xFFFFFFFF);
         else {
@@ -433,7 +461,7 @@ public class PlayerSkinWidget extends AbstractWidget {
             guiGraphics.drawCenteredString(font, Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
             guiGraphics.drawCenteredString(font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
         }
-        if (!CENTER_SELECTED_BADGE || !isCurrentSkinSelected(id)) return;
+        if (!CENTER_SELECTED_BADGE || !isCurrentSkinSelected(displayId)) return;
         int badgeW = CENTER_SELECTED_BADGE_W;
         int badgeH = CENTER_SELECTED_BADGE_H;
         int badgeX = cx - badgeW / 2;
