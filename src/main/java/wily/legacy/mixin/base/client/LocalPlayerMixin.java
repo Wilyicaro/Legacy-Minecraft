@@ -294,7 +294,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     private void legacy$updateShieldControls() {
         InteractionHand hand = legacy$getShieldHand();
-        if (!((LegacyShieldPlayer) this).isShieldPaused() && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
+            if (LegacyShieldPlayer.hasConflictingUse((LocalPlayer) (Object) this, hand)) {
+                legacyAutoShielding = false;
+                return;
+            }
+            if (((LegacyShieldPlayer) this).isShieldPaused()) {
+                if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+                legacyAutoShielding = false;
+                return;
+            }
             if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
                 if (isUsingItem()) stopUsingItem();
                 startUsingItem(hand);

@@ -116,6 +116,15 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
         InteractionHand hand = legacy$getShieldHand();
         if (level().isClientSide()) return;
         if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || isShiftKeyDown())) {
+            if (!isShieldPaused() && LegacyShieldPlayer.hasConflictingUse((Player) (Object) this, hand)) {
+                legacy$autoShielding = false;
+                return;
+            }
+            if (isShieldPaused()) {
+                if (legacy$autoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+                legacy$autoShielding = false;
+                return;
+            }
             if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
                 if (isUsingItem()) stopUsingItem();
                 startUsingItem(hand);
