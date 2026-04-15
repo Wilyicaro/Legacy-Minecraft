@@ -438,7 +438,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         int badgeY = plateY - CENTER_SELECTED_BADGE_GAP - badgeH;
         if (CLIP_ENABLED) badgeY = Math.max(CLIP_Y1, Math.min(badgeY, CLIP_Y2 - badgeH - 1));
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
-        guiGraphics.drawCenteredString(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2, 0xFFFFFFFF);
+        guiGraphics.drawCenteredString(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2 + 2, 0xFFFFFFFF);
     }
     private void renderNamePlateHighlight(GuiGraphics guiGraphics, int plateX, int plateY, int plateW, int plateH) {
         int pad = CENTER_NAME_PLATE_HIGHLIGHT_PAD;
