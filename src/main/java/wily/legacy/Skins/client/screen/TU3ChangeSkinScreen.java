@@ -236,6 +236,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         renderTu3Tabs(g);
         int plateH = Math.max(1, Math.round(tu3Layout.namePlateBaseHeight() * uiScale) * 2);
         int plateY = Math.max(tu3StripY + tu3StripH + Math.max(1, sc(tu3Layout.namePlateTopMargin())), tu3BottomStripY - Math.max(1, sc(tu3Layout.namePlateBottomMargin())) - plateH);
+        PlayerSkinWidget.setCenterNamePlateReady(!carouselAnimating());
         PlayerSkinWidget.setCenterNamePlate(true, tu3TabMidW, plateH, 0, plateY);
         PlayerSkinWidget.setCenterNamePlateCenterX(width / 2);
         PlayerSkinWidget.setCenterNamePlateSprite(LegacySprites.SQUARE_RECESSED_PANEL);
@@ -255,6 +256,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public void removed() {
         PlayerSkinWidget.setCenterNamePlate(false, 1, 1, 0, -1);
+        PlayerSkinWidget.setCenterNamePlateReady(true);
         PlayerSkinWidget.setCenterNamePlateCenterX(-1);
         PlayerSkinWidget.setCenterNamePlateHighlight(false, 0, 1, TU3_NAME_PLATE_HIGHLIGHT);
         PlayerSkinWidget.setCenterSelectedBadge(false, 1, 1, 0, TU3_SELECTED_BADGE);

@@ -20,7 +20,7 @@ import net.minecraft.util.Mth;
 public class PlayerSkinWidget extends AbstractWidget {
     private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F, DEFAULT_CAROUSEL_FPS = 30.0F;
     private static final long MOVE_HINT_MS = 170L;
-    private static volatile boolean CLIP_ENABLED, CENTER_NAME_PLATE, CENTER_NAME_PLATE_HIGHLIGHT, CENTER_SELECTED_BADGE;
+    private static volatile boolean CLIP_ENABLED, CENTER_NAME_PLATE, CENTER_NAME_PLATE_HIGHLIGHT, CENTER_NAME_PLATE_READY = true, CENTER_SELECTED_BADGE;
     private static volatile int CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2, CENTER_NAME_PLATE_W, CENTER_NAME_PLATE_H, CENTER_NAME_PLATE_PAD_Y,
             CENTER_NAME_PLATE_Y = -1, CENTER_NAME_PLATE_CENTER_X = -1, CENTER_NAME_PLATE_HIGHLIGHT_PAD, CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS = 1,
             CENTER_NAME_PLATE_HIGHLIGHT_COLOR = 0xFFEBEB0F, CENTER_SELECTED_BADGE_W, CENTER_SELECTED_BADGE_H, CENTER_SELECTED_BADGE_GAP;
@@ -36,6 +36,8 @@ public class PlayerSkinWidget extends AbstractWidget {
     public static void setCenterNamePlateCenterX(int centerX) { CENTER_NAME_PLATE_CENTER_X = centerX; }
 
     public static void setCenterNamePlateSprite(ResourceLocation sprite) { if (sprite != null) CENTER_NAME_PLATE_SPRITE = sprite; }
+
+    public static void setCenterNamePlateReady(boolean ready) { CENTER_NAME_PLATE_READY = ready; }
 
     public static void setCenterNamePlateHighlight(boolean enabled, int pad, int thickness, int color) {
         CENTER_NAME_PLATE_HIGHLIGHT = enabled;
@@ -318,7 +320,7 @@ public class PlayerSkinWidget extends AbstractWidget {
                 clipActive = true;
             }
             renderDoll(guiGraphics, partialTick, id, yawOffset, attackTime, left, top, right, bottom);
-            if (CENTER_NAME_PLATE && slotOffset == 0) renderNamePlate(guiGraphics, id, left, right, bottom);
+            if (CENTER_NAME_PLATE && CENTER_NAME_PLATE_READY && slotOffset == 0) renderNamePlate(guiGraphics, id, left, right, bottom);
         } catch (RuntimeException ignored) {
         } finally {
             if (clipActive) {
