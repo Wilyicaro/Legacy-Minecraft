@@ -16,13 +16,12 @@ public final class SkinPoseRegistry {
     public enum PoseTag {
         ZOMBIE_ARMS("zombie_arms"),
         IDLE_SIT("idle_sit"),
-        SKIING("skiing"),
         STIFF_ARMS("stiff_arms"),
         STIFF_LEGS("stiff_legs"),
         SYNC_LEGS("sync_legs"),
         SYNC_ARMS("sync_arms"),
         UPSIDE_DOWN("upside_down"),
-        WEEPING_STATUE("weeping_statue"),
+        STATUE_OF_LIBERTY("statue_of_liberty"),
         DISABLE_VIEW_BOBBING("disable_view_bobbing"),
         HIDE_HAND("hide_hand");
 

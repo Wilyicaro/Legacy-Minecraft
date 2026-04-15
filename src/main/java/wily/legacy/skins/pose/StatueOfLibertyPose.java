@@ -7,13 +7,13 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 
-public final class WeepingStatuePose {
-    private WeepingStatuePose() { }
+public final class StatueOfLibertyPose {
+    private StatueOfLibertyPose() { }
 
     public static boolean shouldApply(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess a)) return false;
         String id = a.consoleskins$getSkinId();
-        if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.WEEPING_STATUE, id)) return false;
+        if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STATUE_OF_LIBERTY, id)) return false;
         if (state != null && state.attackTime > 0.0F) return false;
         Player player = ArmPoseSupport.getPlayer(state);
         if (player != null && ArmPoseSupport.getHoldingArms(player).right()) return false;

@@ -58,13 +58,9 @@ public abstract class MenuDollMixin {
         if (IdleSitPose.shouldApply(state)) {
             if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.SWIMMING || state.pose == Pose.FALL_FLYING) { IdleSitPose.apply(self); }
         }
-        if (SkiingPose.shouldApply(state)) {
-            float t = state.id == GuiDollRender.MENU_DOLL_ID ? (System.currentTimeMillis() % 1_000_000L) / 1000.0F : StiffArmsPose.getAgeInTicks(state);
-            SkiingPose.apply(self, state, t);
-        }
         if (stiffLegs) consoleskins$applyStiffLegs(self, state);
         if (!ZombieArmsPose.shouldApply(state) && StiffArmsPose.shouldApply(state)) { StiffArmsPose.apply(self, state); }
-        if (WeepingStatuePose.shouldApply(state)) { WeepingStatuePose.apply(self, state); }
+        if (StatueOfLibertyPose.shouldApply(state)) { StatueOfLibertyPose.apply(self, state); }
         if (!zombieArms) {
             if (consoleskins$shouldSyncArms(state, skinId)) consoleskins$applyMenuSyncArms(self);
             else consoleskins$applySyncArms(self, state, skinId);
