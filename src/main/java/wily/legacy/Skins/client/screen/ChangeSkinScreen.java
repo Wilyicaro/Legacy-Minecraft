@@ -123,6 +123,22 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private float mainTextScale() { return bigTextScale(); }
 
     private float packTypeTextScale() { return Math.min(1.0f, smallTextScale()); }
+
+    private Component packLabel(SkinPack pack) {
+        if (isReorderingCustomPack()) return Component.translatable("legacy.menu.reorder_custom_skin_pack");
+        if (isEditingCustomPack()) return Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
+        String type = pack.type();
+        if (type == null || type.isBlank()) return null;
+        String key = type.toLowerCase(Locale.ROOT);
+        if (key.equals("skin")) return Component.translatable("legacy.skinpack.type.skin");
+        if (key.equals("mashup")) return Component.translatable("legacy.skinpack.type.mashup");
+        if (key.equals("author") || key.equals("accredited")) {
+            String author = pack.author();
+            if (author != null && !author.isBlank()) return Component.translatable("legacy.skinpack.type.author", author);
+            return Component.translatable("legacy.skinpack.type.skin");
+        }
+        return null;
+    }
     @Override
     protected int previewBoxX() {
         int size = previewBoxSize();
@@ -448,17 +464,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             int maxPackWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())) / mainTextScale));
             String packName = PlayerSkinWidget.clipText(minecraft.font, SkinPackLoader.nameString(pack.name(), pack.id()), maxPackWidth);
             drawScaledCentered(g, Component.literal(packName), packMid, packTitleY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
-            Component label = null;
-            if (isReorderingCustomPack()) label = Component.translatable("legacy.menu.reorder_custom_skin_pack");
-            else if (isEditingCustomPack()) label = Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
-            else {
-                String t = pack.type();
-                if (t != null && !t.isBlank()) {
-                    String k = t.toLowerCase(Locale.ROOT);
-                    if (k.equals("skin")) label = Component.translatable("legacy.skinpack.type.skin");
-                    if (k.equals("mashup")) label = Component.translatable("legacy.skinpack.type.mashup");
-                }
-            }
+            Component label = packLabel(pack);
             if (label != null) drawScaledCentered(g, label, packMid, packMetaY, ColorUtil.withAlpha(LegacyRenderUtil.getDefaultTextColor(true), 0.8f), packTypeTextScale(), true);
         }
     }
