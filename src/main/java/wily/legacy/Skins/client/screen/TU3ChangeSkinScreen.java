@@ -33,6 +33,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private Tu3LayoutMetrics tu3Layout = Tu3LayoutMetrics.DEFAULT;
     public TU3ChangeSkinScreen(Screen parent) { super(parent); }
 
+    public TU3ChangeSkinScreen(Screen parent, ChangeSkinScreenSource source) { super(parent, source); }
+
     private void refreshTu3Layout() { tu3Layout = isCompact480() ? Tu3LayoutMetrics.SD_480 : Tu3LayoutMetrics.DEFAULT; }
 
     @Override

@@ -5,16 +5,16 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Skins.client.preview.PlayerSkinWidget;
+import wily.legacy.Skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
-import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import java.util.*;
 public final class ChangeSkinPackList {
     private static final String FESTIVE_MASHUP_PACK_ID = "festivemashup";
     private static final String FESTIVE_PACK_ID = "festive";
-    private static final Component NO_PACKS = Component.translatable("consoleskins.pack.none");
+    private final ChangeSkinScreenSource source;
     private final Runnable focusSound;
     private final Runnable pressSound;
     private final List<String> basePackIds = new ArrayList<>();
@@ -23,12 +23,12 @@ public final class ChangeSkinPackList {
     private int focusedPackIndex;
     private boolean queuedChangePack;
     private boolean reorderMode;
-    public ChangeSkinPackList(Runnable focusSound, Runnable pressSound) {
+    public ChangeSkinPackList(ChangeSkinScreenSource source, Runnable focusSound, Runnable pressSound) {
+        this.source = source;
         this.focusSound = focusSound;
         this.pressSound = pressSound;
     }
-    public void initFromLoader() {
-        SkinPackLoader.ensureLoaded();
+    public void init() {
         setBasePackIds(collectPackIds(), null);
         String preferred = resolvePreferredDefaultPackId(packIds);
         focusedPackIndex = preferred == null ? 0 : Math.max(0, packIds.indexOf(preferred));
@@ -41,7 +41,6 @@ public final class ChangeSkinPackList {
         if (reorderMode) queuedChangePack = false;
     }
     public void refreshPackIdsIfNeeded() {
-        SkinPackLoader.ensureLoaded();
         List<String> currentBase = collectPackIds();
         if (currentBase.equals(basePackIds)) return;
         setBasePackIds(currentBase, getFocusedPackId());
@@ -57,7 +56,7 @@ public final class ChangeSkinPackList {
     public int getPackCount() { return packIds.size(); }
     public Component getLabelForIndex(int index) { return getLabel(index, false); }
     public Component getWrappedLabelForIndex(int index) { return getLabel(index, true); }
-    public SkinPack getFocusedPack() { return pack(SkinPackLoader.getPacks(), getFocusedPackId()); }
+    public SkinPack getFocusedPack() { return pack(source.packs(), getFocusedPackId()); }
     public void setFocusedPackIndex(int index, boolean playSound) {
         if (packIds.isEmpty()) {
             focusedPackIndex = 0;
@@ -87,7 +86,7 @@ public final class ChangeSkinPackList {
         return packIds.isEmpty() ? 0 : Math.floorMod(index, packIds.size());
     }
     private Component getLabel(int index, boolean wrap) {
-        if (packIds.isEmpty()) return wrap ? NO_PACKS : Component.empty();
+        if (packIds.isEmpty()) return wrap ? source.noPacksLabel() : Component.empty();
         int resolved = wrap ? wrapIndex(index) : index;
         return resolved < 0 || resolved >= packIds.size() ? Component.empty() : labelForPackId(packIds.get(resolved));
     }
@@ -122,9 +121,9 @@ public final class ChangeSkinPackList {
         packIds.clear();
         packIds.addAll(basePackIds);
         normalizeSpecialPackOrder(packIds);
-        String lastUsedCustomPackId = SkinPackLoader.getLastUsedCustomPackId();
+        String lastUsedCustomPackId = source.lastUsedPackId();
         String preferredDefaultPackId = resolvePreferredDefaultPackId(packIds);
-        SkinPack lastUsedPack = pack(SkinPackLoader.getPacks(), lastUsedCustomPackId);
+        SkinPack lastUsedPack = pack(source.packs(), lastUsedCustomPackId);
         if (lastUsedCustomPackId != null && packIds.contains(lastUsedCustomPackId) && !lastUsedCustomPackId.equals(preferredDefaultPackId) && (lastUsedPack == null || !lastUsedPack.editable())) {
             packIds.remove(lastUsedCustomPackId);
             int insertAt = Math.max(1, packIds.indexOf(SkinIdUtil.PACK_FAVOURITES) + 1);
@@ -138,13 +137,13 @@ public final class ChangeSkinPackList {
         focusedPackIndex = preservedIndex >= 0 ? preservedIndex : 0;
     }
     private Component labelForPackId(String packId) {
-        SkinPack pack = pack(SkinPackLoader.getPacks(), packId);
-        return pack == null ? Component.literal(String.valueOf(packId)) : Component.literal(SkinPackLoader.nameString(pack.name(), packId));
+        SkinPack pack = pack(source.packs(), packId);
+        return pack == null ? Component.literal(String.valueOf(packId)) : Component.literal(source.packName(pack));
     }
     private List<String> collectPackIds() {
-        Map<String, SkinPack> source = SkinPackLoader.getPacks();
-        ArrayList<String> ids = new ArrayList<>(source.size());
-        for (String packId : source.keySet()) {
+        Map<String, SkinPack> packs = source.packs();
+        ArrayList<String> ids = new ArrayList<>(packs.size());
+        for (String packId : packs.keySet()) {
             if (packId == null || packId.isBlank()) continue;
             ids.add(packId);
         }
@@ -158,11 +157,11 @@ public final class ChangeSkinPackList {
         ids.removeIf(SkinIdUtil.PACK_DEFAULT::equals);
         if (preferredDefaultPackId != null && !SkinIdUtil.PACK_DEFAULT.equals(preferredDefaultPackId)) ids.removeIf(preferredDefaultPackId::equals);
         int insertAt = 0;
-        if (preferredDefaultPackId != null && SkinPackLoader.getPacks().containsKey(preferredDefaultPackId)) ids.add(insertAt++, preferredDefaultPackId);
-        if (SkinPackLoader.getPacks().containsKey(SkinIdUtil.PACK_FAVOURITES)) ids.add(insertAt, SkinIdUtil.PACK_FAVOURITES);
+        if (preferredDefaultPackId != null && source.packs().containsKey(preferredDefaultPackId)) ids.add(insertAt++, preferredDefaultPackId);
+        if (source.packs().containsKey(SkinIdUtil.PACK_FAVOURITES)) ids.add(insertAt, SkinIdUtil.PACK_FAVOURITES);
     }
     private String resolvePreferredDefaultPackId(List<String> ids) {
-        String preferred = SkinPackLoader.getPreferredDefaultPackId();
+        String preferred = source.preferredDefaultPackId();
         if (preferred != null && ids != null && ids.contains(preferred)) return preferred;
         if (ids == null) return null;
         for (String packId : ids) {
@@ -172,7 +171,7 @@ public final class ChangeSkinPackList {
         return null;
     }
     private void restoreCuratedFestivePack(List<String> ids) {
-        if (ids == null || ids.contains(FESTIVE_PACK_ID) || !SkinPackLoader.getPacks().containsKey(FESTIVE_PACK_ID)) return;
+        if (ids == null || ids.contains(FESTIVE_PACK_ID) || !source.packs().containsKey(FESTIVE_PACK_ID)) return;
         int mashupIndex = ids.indexOf(FESTIVE_MASHUP_PACK_ID);
         ids.add(mashupIndex < 0 ? ids.size() : mashupIndex + 1, FESTIVE_PACK_ID);
     }
