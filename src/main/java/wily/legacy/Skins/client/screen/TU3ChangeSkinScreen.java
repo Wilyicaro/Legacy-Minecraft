@@ -21,8 +21,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
             int namePlateBaseHeight, int namePlateTopMargin, int namePlateBottomMargin, float badgeWidthRatio, int badgeBaseHeight, int badgeYOffset,
             float badgeScale, int tabLabelWidthTrim, int centerOriginYOffset, int spawnerExtraMin, float spawnerExtraFactor
     ) {
-        static final Tu3LayoutMetrics DEFAULT = new Tu3LayoutMetrics(0.60f, 20, 0.67f, 105, 11, 2, 1.5f, 1.1f, 45, 23, 90, 6, 16, 4, 8, 0.52f, 12, 4, 0.75f, 16, 20, 10, 0.35f);
-        static final Tu3LayoutMetrics SD_480 = new Tu3LayoutMetrics(0.48f, 14, 0.60f, 84, 8, 1, 1.28f, 0.95f, 34, 18, 72, 4, 14, 3, 6, 0.48f, 10, 3, 0.70f, 12, 12, 8, 0.25f);
+        static final Tu3LayoutMetrics DEFAULT = new Tu3LayoutMetrics(0.60f, 20, 0.67f, 105, 11, 2, 1.4175f, 1.1f, 45, 23, 90, 6, 16, 4, 8, 0.52f, 12, 4, 0.75f, 16, 32, 10, 0.35f);
+        static final Tu3LayoutMetrics SD_480 = new Tu3LayoutMetrics(0.48f, 14, 0.60f, 84, 8, 1, 1.2096f, 0.95f, 34, 18, 72, 4, 14, 3, 6, 0.48f, 10, 3, 0.70f, 12, 24, 8, 0.25f);
     }
     private static final ResourceLocation TU3_TOP_STRIP = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip"),
             TU3_BOTTOM_STRIP = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_bottom_strip"),
@@ -243,7 +243,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         PlayerSkinWidget.setCenterNamePlateHighlight(true, Math.max(1, sc(2)), Math.max(2, sc(3)), TU3_NAME_PLATE_HIGHLIGHT);
         int badgeW = Math.max(1, Math.round(tu3TabMidW * tu3Layout.badgeWidthRatio()));
         int badgeH = Math.max(1, Math.round(tu3Layout.badgeBaseHeight() * uiScale));
-        PlayerSkinWidget.setCenterSelectedBadge(true, badgeW, badgeH, Math.max(0, sc(tu3Layout.badgeYOffset())), TU3_SELECTED_BADGE);
+        PlayerSkinWidget.setCenterSelectedBadge(true, badgeW, badgeH, Math.max(0, sc(tu3Layout.badgeYOffset())) + Math.max(1, sc(4)), TU3_SELECTED_BADGE);
     }
     @Override
     public void addControlTooltips(ControlTooltip.Renderer r) {

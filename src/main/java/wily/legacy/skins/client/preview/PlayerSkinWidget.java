@@ -17,9 +17,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import wily.legacy.util.LegacySprites;
 public class PlayerSkinWidget extends AbstractWidget {
     private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F, DEFAULT_CAROUSEL_FPS = 30.0F;
     private static final long MOVE_HINT_MS = 170L;
+    private static final int CENTER_SELECTED_BADGE_FILL = 0xB30FA2EB;
+    private static final int CENTER_SELECTED_BADGE_TINT = 0xA06A6A6A;
     private static volatile boolean CLIP_ENABLED, CENTER_NAME_PLATE, CENTER_NAME_PLATE_HIGHLIGHT, CENTER_NAME_PLATE_READY = true, CENTER_SELECTED_BADGE;
     private static volatile int CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2, CENTER_NAME_PLATE_W, CENTER_NAME_PLATE_H, CENTER_NAME_PLATE_PAD_Y,
             CENTER_NAME_PLATE_Y = -1, CENTER_NAME_PLATE_CENTER_X = -1, CENTER_NAME_PLATE_HIGHLIGHT_PAD, CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS = 1,
@@ -461,14 +464,35 @@ public class PlayerSkinWidget extends AbstractWidget {
             guiGraphics.drawCenteredString(font, Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
             guiGraphics.drawCenteredString(font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
         }
-        if (!CENTER_SELECTED_BADGE || !isCurrentSkinSelected(displayId)) return;
+        if (!CENTER_SELECTED_BADGE || !CENTER_NAME_PLATE_READY || !isCurrentSkinSelected(displayId)) return;
         int badgeW = CENTER_SELECTED_BADGE_W;
         int badgeH = CENTER_SELECTED_BADGE_H;
         int badgeX = cx - badgeW / 2;
         int badgeY = plateY - CENTER_SELECTED_BADGE_GAP - badgeH;
         if (CLIP_ENABLED) badgeY = Math.max(CLIP_Y1, Math.min(badgeY, CLIP_Y2 - badgeH - 1));
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
-        guiGraphics.drawCenteredString(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2 + 2, 0xFFFFFFFF);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.SQUARE_RECESSED_PANEL, badgeX, badgeY, badgeW, badgeH);
+        guiGraphics.fill(badgeX, badgeY, badgeX + badgeW, badgeY + badgeH, CENTER_SELECTED_BADGE_TINT);
+        int innerX = badgeX + 1;
+        int innerY = badgeY + 1;
+        int innerW = Math.max(1, badgeW - 2);
+        int innerH = Math.max(1, badgeH - 2);
+        guiGraphics.fill(innerX, innerY, innerX + innerW, innerY + innerH, CENTER_SELECTED_BADGE_FILL);
+        drawCenteredScaledString(guiGraphics, font, "Selected", innerX, innerY, innerW, innerH, 1, 0xFFFFFFFF);
+    }
+    private void drawCenteredScaledString(GuiGraphics guiGraphics, Font font, String text, int x, int y, int w, int h, int yOffset, int color) {
+        if (text == null || text.isBlank() || w < 1 || h < 1) return;
+        int textW = font.width(text);
+        if (textW < 1) return;
+        float scaleX = Math.max(0.01f, w / (float) textW);
+        float scaleY = Math.max(0.01f, h / (float) font.lineHeight);
+        float scale = Math.min(1.0f, Math.min(scaleX, scaleY));
+        float drawX = x + (w - textW * scale) / 2.0f;
+        float drawY = y + (h - font.lineHeight * scale) / 2.0f + yOffset;
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(drawX, drawY);
+        guiGraphics.pose().scale(scale, scale);
+        guiGraphics.drawString(font, text, 0, 0, color, false);
+        guiGraphics.pose().popMatrix();
     }
     private void renderNamePlateHighlight(GuiGraphics guiGraphics, int plateX, int plateY, int plateW, int plateH) {
         int pad = CENTER_NAME_PLATE_HIGHLIGHT_PAD;
