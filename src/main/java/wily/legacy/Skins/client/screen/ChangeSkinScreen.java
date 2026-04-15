@@ -127,11 +127,15 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private Component packLabel(SkinPack pack) {
         if (isReorderingCustomPack()) return Component.translatable("legacy.menu.reorder_custom_skin_pack");
         if (isEditingCustomPack()) return Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
+        if (minecraft != null && DownloadedSkinPackStore.isDownloadedPack(minecraft, pack.id())) {
+            return Component.translatable("legacy.skinpack.type.community");
+        }
         String type = pack.type();
         if (type == null || type.isBlank()) return null;
         String key = type.toLowerCase(Locale.ROOT);
         if (key.equals("skin")) return Component.translatable("legacy.skinpack.type.skin");
         if (key.equals("mashup")) return Component.translatable("legacy.skinpack.type.mashup");
+        if (key.equals("community")) return Component.translatable("legacy.skinpack.type.community");
         if (key.equals("author") || key.equals("accredited")) {
             String author = pack.author();
             if (author != null && !author.isBlank()) return Component.translatable("legacy.skinpack.type.author", author);

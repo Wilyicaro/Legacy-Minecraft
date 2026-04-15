@@ -2037,6 +2037,7 @@
   "legacy.favorites.pack": "Favorites",
   "legacy.skinpack.type.skin": "Skin Pack",
   "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.skinpack.type.community": "Community Skin Pack",
   "legacy.skinpack.type.author": "Skin Pack by %s",
   "legacy.menu.change_skin.hide_armor": "Hide Armor",
   "consoleskins.pack.none": "None"

@@ -30,6 +30,7 @@ public final class DownloadedSkinPackStore {
         JsonObject root = SkinPackFiles.readJson(packJson);
         root.remove("editable");
         root.remove("allow_empty");
+        root.addProperty("type", "community");
         if (root.has("skins") && root.get("skins").isJsonArray()) {
             JsonArray oldSkins = root.getAsJsonArray("skins");
             JsonArray skins = new JsonArray();
