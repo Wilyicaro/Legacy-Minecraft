@@ -12,6 +12,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private record Tu3LayoutMetrics(
@@ -26,8 +27,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final ResourceLocation TU3_TOP_STRIP = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip"),
             TU3_BOTTOM_STRIP = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_bottom_strip"),
             TU3_TAB_PLATE = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_tab_plate"),
-            TU3_NAME_PLATE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_nameplate"),
             TU3_SELECTED_BADGE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
+    private static final int TU3_NAME_PLATE_HIGHLIGHT = 0xFFEBEB0F;
     private int layoutX, layoutY, layoutW, layoutH, tu3StripY, tu3StripH, tu3BottomStripY, tu3BottomStripH, tu3TabY, tu3TabH,
             tu3TabLeftX, tu3TabMidX, tu3TabRightX, tu3TabLeftW, tu3TabMidW, tu3TabRightW;
     private Tu3LayoutMetrics tu3Layout = Tu3LayoutMetrics.DEFAULT;
@@ -237,7 +238,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         int plateY = Math.max(tu3StripY + tu3StripH + Math.max(1, sc(tu3Layout.namePlateTopMargin())), tu3BottomStripY - Math.max(1, sc(tu3Layout.namePlateBottomMargin())) - plateH);
         PlayerSkinWidget.setCenterNamePlate(true, tu3TabMidW, plateH, 0, plateY);
         PlayerSkinWidget.setCenterNamePlateCenterX(width / 2);
-        PlayerSkinWidget.setCenterNamePlateSprite(TU3_NAME_PLATE);
+        PlayerSkinWidget.setCenterNamePlateSprite(LegacySprites.SQUARE_RECESSED_PANEL);
+        PlayerSkinWidget.setCenterNamePlateHighlight(true, Math.max(1, sc(2)), Math.max(2, sc(3)), TU3_NAME_PLATE_HIGHLIGHT);
         int badgeW = Math.max(1, Math.round(tu3TabMidW * tu3Layout.badgeWidthRatio()));
         int badgeH = Math.max(1, Math.round(tu3Layout.badgeBaseHeight() * uiScale));
         PlayerSkinWidget.setCenterSelectedBadge(true, badgeW, badgeH, Math.max(0, sc(tu3Layout.badgeYOffset())), TU3_SELECTED_BADGE);
@@ -254,6 +256,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void removed() {
         PlayerSkinWidget.setCenterNamePlate(false, 1, 1, 0, -1);
         PlayerSkinWidget.setCenterNamePlateCenterX(-1);
+        PlayerSkinWidget.setCenterNamePlateHighlight(false, 0, 1, TU3_NAME_PLATE_HIGHLIGHT);
         PlayerSkinWidget.setCenterSelectedBadge(false, 1, 1, 0, TU3_SELECTED_BADGE);
         super.removed();
     }

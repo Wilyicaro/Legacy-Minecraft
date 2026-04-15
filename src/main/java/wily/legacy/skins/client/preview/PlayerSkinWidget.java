@@ -20,9 +20,10 @@ import net.minecraft.util.Mth;
 public class PlayerSkinWidget extends AbstractWidget {
     private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F, DEFAULT_CAROUSEL_FPS = 30.0F;
     private static final long MOVE_HINT_MS = 170L;
-    private static volatile boolean CLIP_ENABLED, CENTER_NAME_PLATE, CENTER_SELECTED_BADGE;
+    private static volatile boolean CLIP_ENABLED, CENTER_NAME_PLATE, CENTER_NAME_PLATE_HIGHLIGHT, CENTER_SELECTED_BADGE;
     private static volatile int CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2, CENTER_NAME_PLATE_W, CENTER_NAME_PLATE_H, CENTER_NAME_PLATE_PAD_Y,
-            CENTER_NAME_PLATE_Y = -1, CENTER_NAME_PLATE_CENTER_X = -1, CENTER_SELECTED_BADGE_W, CENTER_SELECTED_BADGE_H, CENTER_SELECTED_BADGE_GAP;
+            CENTER_NAME_PLATE_Y = -1, CENTER_NAME_PLATE_CENTER_X = -1, CENTER_NAME_PLATE_HIGHLIGHT_PAD, CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS = 1,
+            CENTER_NAME_PLATE_HIGHLIGHT_COLOR = 0xFFEBEB0F, CENTER_SELECTED_BADGE_W, CENTER_SELECTED_BADGE_H, CENTER_SELECTED_BADGE_GAP;
     private static volatile ResourceLocation CENTER_NAME_PLATE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/skin_box");
     private static volatile ResourceLocation CENTER_SELECTED_BADGE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY) {
@@ -35,6 +36,13 @@ public class PlayerSkinWidget extends AbstractWidget {
     public static void setCenterNamePlateCenterX(int centerX) { CENTER_NAME_PLATE_CENTER_X = centerX; }
 
     public static void setCenterNamePlateSprite(ResourceLocation sprite) { if (sprite != null) CENTER_NAME_PLATE_SPRITE = sprite; }
+
+    public static void setCenterNamePlateHighlight(boolean enabled, int pad, int thickness, int color) {
+        CENTER_NAME_PLATE_HIGHLIGHT = enabled;
+        CENTER_NAME_PLATE_HIGHLIGHT_PAD = Math.max(0, pad);
+        CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS = Math.max(1, thickness);
+        CENTER_NAME_PLATE_HIGHLIGHT_COLOR = color;
+    }
 
     public static void setCenterSelectedBadge(boolean enabled, int width, int height, int gap, ResourceLocation sprite) {
         CENTER_SELECTED_BADGE = enabled;
@@ -411,6 +419,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         int plateX = cx - plateW / 2;
         int plateY = CENTER_NAME_PLATE_Y >= 0 ? CENTER_NAME_PLATE_Y : bottom + CENTER_NAME_PLATE_PAD_Y;
         if (CLIP_ENABLED) plateY = Math.max(CLIP_Y1, Math.min(plateY, CLIP_Y2 - plateH - 1));
+        if (CENTER_NAME_PLATE_HIGHLIGHT) renderNamePlateHighlight(guiGraphics, plateX, plateY, plateW, plateH);
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
         var font = Minecraft.getInstance().font;
         int maxPx = Math.max(1, plateW - 8);
@@ -430,6 +439,18 @@ public class PlayerSkinWidget extends AbstractWidget {
         if (CLIP_ENABLED) badgeY = Math.max(CLIP_Y1, Math.min(badgeY, CLIP_Y2 - badgeH - 1));
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
         guiGraphics.drawCenteredString(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2, 0xFFFFFFFF);
+    }
+    private void renderNamePlateHighlight(GuiGraphics guiGraphics, int plateX, int plateY, int plateW, int plateH) {
+        int pad = CENTER_NAME_PLATE_HIGHLIGHT_PAD;
+        int x = plateX - pad;
+        int y = plateY - pad;
+        int w = plateW + pad * 2;
+        int h = plateH + pad * 2;
+        int thickness = Math.min(CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS, Math.max(1, Math.min(w, h) / 2));
+        guiGraphics.fill(x, y, x + w, y + thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        guiGraphics.fill(x, y + h - thickness, x + w, y + h, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        guiGraphics.fill(x, y + thickness, x + thickness, y + h - thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        guiGraphics.fill(x + w - thickness, y + thickness, x + w, y + h - thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
     }
     private String nameLabel(String id) {
         SkinEntry entry = getCachedEntry(id);
