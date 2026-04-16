@@ -1,20 +1,20 @@
 [
   {
-    "id": "community_skinpacks",
-    "title": {
-      "translate": "legacy.menu.community_skinpacks"
-    },
-    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/community_skinpacks/index.json",
-    "targetDirectoryName": "resourcepacks/Legacy Downloaded Skinpacks/assets/lce_skinpacks/skinpacks",
-    "requiresResourceReload": true
-  },
-  {
     "id": "texture_packs",
     "title": {
       "translate": "legacy.menu.albums.texture_packs"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/texture_packs/index.json",
     "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true
+  },
+  {
+    "id": "community_skinpacks",
+    "title": {
+      "translate": "legacy.menu.community_skinpacks"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/community_skinpacks/index.json",
+    "targetDirectoryName": "resourcepacks/Legacy Downloaded Skinpacks/assets/lce_skinpacks/skinpacks",
     "requiresResourceReload": true
   }
 ]

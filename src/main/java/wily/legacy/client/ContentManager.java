@@ -193,6 +193,8 @@ public class ContentManager {
                 extractZip(downloadedTempFile, targetFolder);
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
+                } else if (Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
+                    DownloadedPackMetadata.write(targetFolder, pack);
                 }
                 Files.deleteIfExists(downloadedTempFile);
 

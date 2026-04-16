@@ -118,7 +118,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public void updateTooltip() {
-            if (hasTooltip) setTooltip(Tooltip.create(selectedPack.getDescription(), selectedPack.getTitle()));
+            if (hasTooltip) setTooltip(Tooltip.create(DownloadedPackMetadata.getDescription(selectedPack), DownloadedPackMetadata.getTitle(selectedPack)));
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel) {
@@ -138,11 +138,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getTitle(selectedPack), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
+                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getDescription(selectedPack), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);

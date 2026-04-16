@@ -28,6 +28,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.DownloadedPackMetadata;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
@@ -135,13 +136,15 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     private void addPacks(RenderableVList list, Stream<PackSelectionModel.Entry> stream) {
         list.renderables.clear();
         stream.forEach(e -> {
+            Component title = DownloadedPackMetadata.getTitle(e.getId(), e.getTitle());
+            Component descriptionText = DownloadedPackMetadata.getDescription(e.getId(), e.getExtendedDescription());
             List<Component> description = new ArrayList<>();
             if (!e.getCompatibility().isCompatible()) {
                 description.add(INCOMPATIBLE_TITLE);
                 description.add(e.getCompatibility().getDescription());
             }
-            if (!e.getExtendedDescription().getString().isEmpty()) description.add(e.getExtendedDescription());
-            AbstractButton button = new AbstractButton(0, 0, 180, 30, e.getTitle()) {
+            if (!descriptionText.getString().isEmpty()) description.add(descriptionText);
+            AbstractButton button = new AbstractButton(0, 0, 180, 30, title) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
