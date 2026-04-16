@@ -26,7 +26,11 @@ public abstract class CloudRendererMixin {
     @Unique
     private static final float LEGACY_CLOUD_HEIGHT = 128.0f;
     @Unique
-    private static final float CLOUD_LAYER_HEIGHT = 4.0f;
+    private static final float CLOUD_BASE_HEIGHT = 4.0f;
+    @Unique
+    private static final float CLOUD_TOP_EXTENSION = 0.25f;
+    @Unique
+    private static final float CLOUD_BOTTOM_EXTENSION = 2.0f / 3.0f;
     @Unique
     private static final int INSIDE_FACE_RADIUS = 1;
     @Unique
@@ -193,7 +197,14 @@ public abstract class CloudRendererMixin {
     @Unique
     private void legacy$buildSquareExtrudedCell(ByteBuffer buffer, int offsetX, int offsetZ, boolean emitTopAndBottomFaces, long cellData) {
         int relativeCameraPos = legacy$getRelativeCameraPos();
+        boolean renderInsideFaces = relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS;
         if (emitTopAndBottomFaces) {
+            if (renderInsideFaces) {
+                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.UP, 16);
+                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 16);
+                return;
+            }
+
             if (relativeCameraPos != -1) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.UP, 0);
             }
@@ -201,12 +212,26 @@ public abstract class CloudRendererMixin {
             if (relativeCameraPos != 1) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 0);
             }
-
-            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS) {
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.UP, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 16);
-            }
         } else {
+            if (renderInsideFaces) {
+                if (legacy$isNorthEmpty(cellData)) {
+                    legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 16);
+                }
+
+                if (legacy$isSouthEmpty(cellData)) {
+                    legacy$encodeFace(buffer, offsetX, offsetZ, Direction.SOUTH, 16);
+                }
+
+                if (legacy$isWestEmpty(cellData)) {
+                    legacy$encodeFace(buffer, offsetX, offsetZ, Direction.WEST, 16);
+                }
+
+                if (legacy$isEastEmpty(cellData)) {
+                    legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 16);
+                }
+                return;
+            }
+
             if (legacy$isNorthEmpty(cellData) && offsetZ > 0) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 0);
             }
@@ -222,13 +247,6 @@ public abstract class CloudRendererMixin {
             if (legacy$isEastEmpty(cellData) && offsetX < 0) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 0);
             }
-
-            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS) {
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.SOUTH, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.WEST, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 16);
-            }
         }
 
     }
@@ -242,11 +260,11 @@ public abstract class CloudRendererMixin {
 
         double cameraY = minecraft.gameRenderer.getMainCamera().getPosition().y;
         float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : (float) minecraft.level.dimensionType().cloudHeight().orElse((int) LEGACY_CLOUD_HEIGHT);
-        if (cameraY > cloudHeight + CLOUD_LAYER_HEIGHT) {
+        if (cameraY > cloudHeight + CLOUD_BASE_HEIGHT + CLOUD_TOP_EXTENSION) {
             return 1;
         }
 
-        if (cameraY < cloudHeight) {
+        if (cameraY < cloudHeight - CLOUD_BOTTOM_EXTENSION) {
             return -1;
         }
 

@@ -9,6 +9,8 @@ const int FLAG_INSIDE_FACE = 1 << 4;
 const int FLAG_USE_TOP_COLOR = 1 << 5;
 const int FLAG_EXTRA_Z = 1 << 6;
 const int FLAG_EXTRA_X = 1 << 7;
+const float CLOUD_TOP_EXTENSION = 0.25;
+const float CLOUD_BOTTOM_EXTENSION = 0.6666667;
 
 layout(std140) uniform CloudInfo {
     vec4 CloudColor;
@@ -72,7 +74,8 @@ void main() {
     cellZ = (cellZ << 1) | ((dirAndFlags & FLAG_EXTRA_Z) >> 6);
 
     vec3 faceVertex = vertices[(direction * 4) + (isInsideFace ? 3 - quadVertex : quadVertex)];
-    vec3 pos = (faceVertex * CellSize) + (vec3(cellX, 0, cellZ) * CellSize) + CloudOffset;
+    float y = faceVertex.y > 0.5 ? CellSize.y + CLOUD_TOP_EXTENSION : -CLOUD_BOTTOM_EXTENSION;
+    vec3 pos = vec3(faceVertex.x * CellSize.x, y, faceVertex.z * CellSize.z) + (vec3(cellX, 0, cellZ) * CellSize) + CloudOffset;
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 
     vertexDistance = fog_spherical_distance(pos);
