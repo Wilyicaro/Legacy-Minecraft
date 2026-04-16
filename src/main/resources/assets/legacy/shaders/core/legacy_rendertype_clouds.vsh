@@ -11,6 +11,7 @@ const int FLAG_EXTRA_Z = 1 << 6;
 const int FLAG_EXTRA_X = 1 << 7;
 const float CLOUD_TOP_EXTENSION = 0.25;
 const float CLOUD_BOTTOM_EXTENSION = 0.6666667;
+const float CLOUD_INSIDE_FACE_OFFSET = 0.02;
 
 layout(std140) uniform CloudInfo {
     vec4 CloudColor;
@@ -60,6 +61,15 @@ const vec4[] faceColors = vec4[](
     vec4(0.9, 0.9, 0.9, 0.8)
 );
 
+const vec3[] faceNormals = vec3[](
+    vec3(0.0, -1.0, 0.0),
+    vec3(0.0, 1.0, 0.0),
+    vec3(0.0, 0.0, -1.0),
+    vec3(0.0, 0.0, 1.0),
+    vec3(-1.0, 0.0, 0.0),
+    vec3(1.0, 0.0, 0.0)
+);
+
 void main() {
     int quadVertex = gl_VertexID % 4;
     int index = (gl_VertexID / 4) * 3;
@@ -76,6 +86,9 @@ void main() {
     vec3 faceVertex = vertices[(direction * 4) + (isInsideFace ? 3 - quadVertex : quadVertex)];
     float y = faceVertex.y > 0.5 ? CellSize.y + CLOUD_TOP_EXTENSION : -CLOUD_BOTTOM_EXTENSION;
     vec3 pos = vec3(faceVertex.x * CellSize.x, y, faceVertex.z * CellSize.z) + (vec3(cellX, 0, cellZ) * CellSize) + CloudOffset;
+    if (isInsideFace) {
+        pos -= faceNormals[direction] * CLOUD_INSIDE_FACE_OFFSET;
+    }
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 
     vertexDistance = fog_spherical_distance(pos);
