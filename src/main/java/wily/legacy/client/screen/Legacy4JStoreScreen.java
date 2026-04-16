@@ -50,7 +50,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
             prefetchCategory(category);
             addMenuButton(category.title(), b -> {
                 if (this.isLoading) return;
-                CompletableFuture<List<ContentManager.Pack>> future = prefetchCategory(category);
+                CompletableFuture<List<ContentManager.Pack>> future = prefetchCategory(category).thenCompose(Legacy4JContentListScreen::prepareOpen);
                 if (!future.isDone()) this.isLoading = true;
                 future.thenAccept(packs -> {
                     minecraft.execute(() -> {
@@ -66,10 +66,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
     }
 
     private CompletableFuture<List<ContentManager.Pack>> prefetchCategory(ContentManager.Category category) {
-        return prefetchedIndexes.computeIfAbsent(category.id(), id -> ContentManager.fetchIndex(category.indexUrl()).thenApply(packs -> {
-            Legacy4JContentListScreen.warmImages(packs);
-            return packs;
-        }));
+        return prefetchedIndexes.computeIfAbsent(category.id(), id -> ContentManager.fetchIndex(category.indexUrl()));
     }
 
     @Override

@@ -38,8 +38,11 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.DownloadedResourceAlbums;
+import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.PackAlbum;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -318,6 +321,11 @@ public class SaveRenderableList extends RenderableVList {
 
         @Override
         public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+            PackAlbum album = LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum();
+            if (DownloadedResourceAlbums.isManagedAlbum(album.id()) && album.isValidPackDisplay(minecraft.getResourcePackRepository())) {
+                FactoryGuiGraphics.of(guiGraphics).blit(PackAlbum.Selector.getPackIcon(minecraft.getResourcePackRepository().getPack(album.getDisplayPackId())), getX() + x, getY() + y, 0, 0, width, height, width, height);
+                return;
+            }
             FactoryGuiGraphics.of(guiGraphics).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + x, getY() + y, 0, 0, width, height, width, height);
         }
 

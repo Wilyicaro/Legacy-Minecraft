@@ -17,13 +17,13 @@ import java.util.Map;
 
 public final class DownloadedPackMetadata {
     private static final String FILE_NAME = ".legacy4j_content.json";
-    private static final Entry EMPTY = new Entry(null, null);
+    private static final Entry EMPTY = new Entry(null, null, null);
     private static final Map<String, Entry> CACHE = new HashMap<>();
 
     private DownloadedPackMetadata() {
     }
 
-    public record Entry(String name, String description) {
+    public record Entry(String name, String description, String worldTemplateFolderName) {
         public Component title(Component fallback) {
             return name == null || name.isBlank() ? fallback : Component.literal(name);
         }
@@ -31,14 +31,19 @@ public final class DownloadedPackMetadata {
         public Component description(Component fallback) {
             return description == null || description.isBlank() ? fallback : Component.literal(description);
         }
+
+        public boolean hasWorldTemplate() {
+            return worldTemplateFolderName != null && !worldTemplateFolderName.isBlank();
+        }
     }
 
     public static void write(Path packDir, ContentManager.Pack pack) throws IOException {
         JsonObject root = new JsonObject();
         root.addProperty("name", pack.name());
         if (!pack.description().isBlank()) root.addProperty("description", pack.description());
+        pack.worldTemplateFolderName().filter(s -> !s.isBlank()).ifPresent(s -> root.addProperty("worldTemplateFolderName", s));
         Files.writeString(packDir.resolve(FILE_NAME), root.toString(), StandardCharsets.UTF_8);
-        CACHE.put(normalize(pack.id()), new Entry(pack.name(), pack.description()));
+        CACHE.put(normalize(pack.id()), new Entry(pack.name(), pack.description(), pack.worldTemplateFolderName().orElse(null)));
     }
 
     public static void clear(String packId) {
@@ -86,7 +91,8 @@ public final class DownloadedPackMetadata {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
             String name = root.has("name") ? root.get("name").getAsString() : null;
             String description = root.has("description") ? root.get("description").getAsString() : null;
-            return new Entry(name, description);
+            String worldTemplateFolderName = root.has("worldTemplateFolderName") ? root.get("worldTemplateFolderName").getAsString() : null;
+            return new Entry(name, description, worldTemplateFolderName);
         } catch (Exception e) {
             Legacy4J.LOGGER.warn("Failed to read downloaded pack metadata for {}", packId, e);
             return EMPTY;

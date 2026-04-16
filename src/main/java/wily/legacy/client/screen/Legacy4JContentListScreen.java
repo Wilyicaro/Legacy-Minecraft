@@ -20,12 +20,9 @@ import wily.legacy.Skins.skin.DownloadedSkinPackStore;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.DownloadedPackMetadata;
-import wily.legacy.client.DownloadedResourceAlbums;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -56,7 +53,13 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     
     private static final Map<String, RemoteImage> downloadedImages = new ConcurrentHashMap<>();
     private static final java.util.Set<String> downloadingImages = ConcurrentHashMap.newKeySet();
+    private static final Map<String, CompletableFuture<RemoteImage>> pendingImageLoads = new ConcurrentHashMap<>();
+    private final java.util.Set<String> downloadingPacks = ConcurrentHashMap.newKeySet();
+    private final Map<String, Boolean> installedPacks = new ConcurrentHashMap<>();
+    private final Map<String, MultiLineLabel> descriptionLabels = new ConcurrentHashMap<>();
     private boolean needsReload = false;
+    private ContentManager.Pack previewPack;
+    private ContentManager.Pack pendingPreviewPack;
     private ContentManager.Pack armedPack;
 
     private static class RemoteImage {
@@ -79,6 +82,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         this.parent = parent;
         this.category = category;
         this.packs = packs;
+        packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category.targetDirectoryName())));
+        if (!packs.isEmpty()) {
+            hoveredPack = packs.get(0);
+            queuePreview(hoveredPack);
+        }
         
         renderableVList.layoutSpacing(l -> 0);
         for (ContentManager.Pack pack : packs) {
@@ -86,20 +94,60 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
     }
 
+    private boolean isInstalled(ContentManager.Pack pack) {
+        return installedPacks.computeIfAbsent(pack.id(), id -> ContentManager.isPackInstalled(pack, category.targetDirectoryName()));
+    }
+
+    private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
+        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, Component.literal(pack.description()), width));
+    }
+
+    public static CompletableFuture<List<ContentManager.Pack>> prepareOpen(List<ContentManager.Pack> packs) {
+        if (packs.isEmpty()) return CompletableFuture.completedFuture(packs);
+        return requestImage(packs.get(0).imageUrl()).thenApply(image -> packs);
+    }
+
+    private void queuePreview(ContentManager.Pack pack) {
+        pendingPreviewPack = pack;
+        if (hasReadyImage(pack.imageUrl())) {
+            previewPack = pack;
+            pendingPreviewPack = null;
+            return;
+        }
+        requestImage(pack.imageUrl()).thenRun(() -> Minecraft.getInstance().execute(() -> {
+            if (pendingPreviewPack == pack) {
+                previewPack = pack;
+                pendingPreviewPack = null;
+            }
+        }));
+    }
+
+    private static boolean hasReadyImage(Optional<URI> url) {
+        return url.isEmpty() || downloadedImages.containsKey(url.get().toString());
+    }
+
     private void addMenuButton(ContentManager.Pack pack) {
-        renderableVList.addRenderable(new LeftAlignedButton(LIST_WIDTH, BUTTON_HEIGHT, pack, category, b -> {
+        renderableVList.addRenderable(new LeftAlignedButton(LIST_WIDTH, BUTTON_HEIGHT, pack, category, downloadingPacks, installedPacks, b -> {
+            if (downloadingPacks.contains(pack.id())) return;
             if (armedPack != pack) {
                 armedPack = pack;
                 if (hoveredPack != pack) scrollableRenderer.resetScrolled();
                 hoveredPack = pack;
+                queuePreview(pack);
                 return;
             }
-            if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
+            if (isInstalled(pack)) {
                 minecraft.setScreen(new PackActionScreen(this, pack, category));
             } else {
                 armedPack = null;
                 if (!prepareDownloadTarget()) return;
-                ContentManager.downloadPack(pack, category.targetDirectoryName(), () -> needsReload = true);
+                downloadingPacks.add(pack.id());
+                ContentManager.downloadPack(pack, category.targetDirectoryName(), () -> {
+                    downloadingPacks.remove(pack.id());
+                    boolean installed = ContentManager.isPackInstalled(pack, category.targetDirectoryName());
+                    installedPacks.put(pack.id(), installed);
+                    if (installed) needsReload = true;
+                });
             }
         }) {
             @Override
@@ -109,6 +157,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     if (hoveredPack != pack) armedPack = null;
                     if (hoveredPack != pack) scrollableRenderer.resetScrolled();
                     hoveredPack = pack;
+                    queuePreview(pack);
                 }
             }
         }); 
@@ -135,28 +184,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private void deletePack(ContentManager.Pack pack) {
-        File packDir = new File(minecraft.gameDirectory, category.targetDirectoryName() + "/" + pack.id());
-        if (packDir.exists()) {
-            deleteDirectoryRecursively(packDir);
-        }
+        ContentManager.deletePack(pack, category.targetDirectoryName());
+        installedPacks.put(pack.id(), false);
         armedPack = null;
-        DownloadedPackMetadata.clear(pack.id());
-        DownloadedResourceAlbums.remove(pack.id());
         needsReload = true;
-    }
-
-    private void deleteDirectoryRecursively(File directory) {
-        File[] allContents = directory.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectoryRecursively(file);
-            }
-        }
-        directory.delete();
-    }
-
-    public static void warmImages(List<ContentManager.Pack> packs) {
-        packs.forEach(pack -> getOrDownloadImage(pack.imageUrl()));
     }
 
     private static RemoteImage getOrDownloadImage(Optional<URI> url) {
@@ -164,7 +195,21 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         String key = url.get().toString();
         RemoteImage image = downloadedImages.get(key);
         if (image != null) return image;
-        if (downloadingImages.contains(key)) return null;
+        requestImage(url);
+        return null;
+    }
+
+    private static CompletableFuture<RemoteImage> requestImage(Optional<URI> url) {
+        if (url.isEmpty()) return CompletableFuture.completedFuture(null);
+        String key = url.get().toString();
+        RemoteImage image = downloadedImages.get(key);
+        if (image != null) return CompletableFuture.completedFuture(image);
+        CompletableFuture<RemoteImage> pending = pendingImageLoads.get(key);
+        if (pending != null) return pending;
+        CompletableFuture<RemoteImage> future = new CompletableFuture<>();
+        CompletableFuture<RemoteImage> existing = pendingImageLoads.putIfAbsent(key, future);
+        if (existing != null) return existing;
+        if (downloadingImages.contains(key)) return future;
         downloadingImages.add(key);
         CompletableFuture.runAsync(() -> {
             Minecraft client = Minecraft.getInstance();
@@ -179,16 +224,23 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     
                     client.getTextureManager().register(textureId, new DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
                     
-                    downloadedImages.put(key, new RemoteImage(textureId, nativeWidth, nativeHeight));
+                    RemoteImage remoteImage = new RemoteImage(textureId, nativeWidth, nativeHeight);
+                    downloadedImages.put(key, remoteImage);
+                    future.complete(remoteImage);
                 });
             } catch (Exception e) {
-                downloadedImages.put(key, new RemoteImage(null, 0, 0));
+                RemoteImage remoteImage = new RemoteImage(null, 0, 0);
+                downloadedImages.put(key, remoteImage);
                 Legacy4J.LOGGER.warn("Failed to load content image {}", key, e);
+                client.execute(() -> future.complete(remoteImage));
             } finally {
-                client.execute(() -> downloadingImages.remove(key));
+                client.execute(() -> {
+                    downloadingImages.remove(key);
+                    pendingImageLoads.remove(key);
+                });
             }
         });
-        return null;
+        return future;
     }
 
     @Override
@@ -197,7 +249,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
         // Contextual Install/Delete Select
         renderer.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> {
-            if (hoveredPack != null && ContentManager.isPackInstalled(hoveredPack, category.targetDirectoryName())) {
+            if (hoveredPack != null && downloadingPacks.contains(hoveredPack.id())) {
+                return Component.translatable("legacy.menu.install");
+            }
+            if (hoveredPack != null && isInstalled(hoveredPack)) {
                 return Component.translatable("legacy.menu.delete");
             }
             return Component.translatable("legacy.menu.install");
@@ -216,7 +271,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     @Override
     public void renderableVListInit() {
         tooltipBox.init();
-        warmImages(packs);
+        for (int i = 0; i < Math.min(4, packs.size()); i++) {
+            requestImage(packs.get(i).imageUrl());
+        }
         
         addRenderableOnly((guiGraphics, i, j, f) -> {
             guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.PANEL_RECESS, 
@@ -242,39 +299,42 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
         tooltipBox.render(guiGraphics, mouseX, mouseY, partialTick);
         
-        if (hoveredPack != null) {
+        if (previewPack != null || pendingPreviewPack != null) {
+            ContentManager.Pack displayPack = previewPack;
             int x = tooltipBox.getX() + 8;
             int y = tooltipBox.getY() + 8;
             int width = tooltipBox.getWidth() - 16;
             int height = tooltipBox.getHeight() - 16;
             
-            // 1. Render Icon/Image
-            RemoteImage remoteImage = getOrDownloadImage(hoveredPack.imageUrl());
-            int imageAreaHeight = 0;
-            
-            if (remoteImage != null && remoteImage.width > 0) {
-                int maxImgHeight = (tooltipBox.getHeight() * 4) / 10;
-                float scale = Math.min((float) width / remoteImage.width, (float) maxImgHeight / remoteImage.height);
-                int imgWidth = (int) (remoteImage.width * scale);
-                int imgHeight = (int) (remoteImage.height * scale);
+            if (displayPack == null) {
+                LegacyRenderUtil.drawGenericLoading(guiGraphics, x + (width - 30) / 2, y + Math.max(0, (height - 30) / 2), 6, 3);
+            } else {
+                RemoteImage remoteImage = getOrDownloadImage(displayPack.imageUrl());
+                int imageAreaHeight = 0;
                 
-                FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
-                imageAreaHeight = imgHeight + 10;
+                if (remoteImage != null && remoteImage.width > 0) {
+                    int maxImgHeight = (tooltipBox.getHeight() * 4) / 10;
+                    float scale = Math.min((float) width / remoteImage.width, (float) maxImgHeight / remoteImage.height);
+                    int imgWidth = (int) (remoteImage.width * scale);
+                    int imgHeight = (int) (remoteImage.height * scale);
+                    
+                    FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
+                    imageAreaHeight = imgHeight + 10;
+                }
+
+                int lineHeight = 12;
+                int descriptionY = y + imageAreaHeight;
+                int descriptionWidth = width;
+                MultiLineLabel label = getDescriptionLabel(displayPack, descriptionWidth);
+                
+                int visibleLines = (tooltipBox.getY() + tooltipBox.getHeight() - 24 - descriptionY) / lineHeight;
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
+                scrollableRenderer.lineHeight = lineHeight;
+
+                scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
+                    label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
+                );
             }
-
-            // 2. Render Description with ScrollableRenderer
-            int lineHeight = 12;
-            int descriptionY = y + imageAreaHeight;
-            int descriptionWidth = width;
-            MultiLineLabel label = MultiLineLabel.create(font, Component.literal(hoveredPack.description()), descriptionWidth);
-            
-            int visibleLines = (tooltipBox.getY() + tooltipBox.getHeight() - 24 - descriptionY) / lineHeight;
-            scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
-            scrollableRenderer.lineHeight = lineHeight;
-
-            scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
-            );
         }
 
         panel.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -317,17 +377,26 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private static class LeftAlignedButton extends Button {
         private final ContentManager.Pack pack;
         private final ContentManager.Category category;
+        private final java.util.Set<String> downloadingPacks;
+        private final Map<String, Boolean> installedPacks;
 
-        public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category, OnPress onPress) {
+        public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category, java.util.Set<String> downloadingPacks, Map<String, Boolean> installedPacks, OnPress onPress) {
             super(0, 0, width, height, Component.literal(pack.name()), onPress, DEFAULT_NARRATION);
             this.pack = pack;
             this.category = category;
+            this.downloadingPacks = downloadingPacks;
+            this.installedPacks = installedPacks;
         }
 
         @Override
         public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-            if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
+            if (downloadingPacks.contains(pack.id())) {
+                int size = 16;
+                int x = this.getX() + this.width - size - 11;
+                int y = this.getY() + (this.height - size) / 2;
+                LegacyRenderUtil.drawGenericLoading(guiGraphics, x, y, 4, 2);
+            } else if (installedPacks.getOrDefault(pack.id(), false)) {
                 int spriteSize = 18;
                 int sx = this.getX() + this.width - spriteSize - 10;
                 int sy = this.getY() + (this.height - spriteSize) / 2;
@@ -338,7 +407,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         @Override
         public void renderString(GuiGraphics guiGraphics, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
-            guiGraphics.drawString(font, this.getMessage(), this.getX() + 12, textY, color, true);
+            int textX = this.getX() + 12;
+            int maxWidth = this.width - 44;
+            String text = this.getMessage().getString();
+            String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";
+            guiGraphics.drawString(font, clipped, textX, textY, color, true);
         }
     }
 }

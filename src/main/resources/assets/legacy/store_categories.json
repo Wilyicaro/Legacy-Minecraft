@@ -1,5 +1,14 @@
 [
   {
+    "id": "mashup_packs",
+    "title": {
+      "text": "Mash-up Packs"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/mashup_packs/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true
+  },
+  {
     "id": "texture_packs",
     "title": {
       "translate": "legacy.menu.albums.texture_packs"

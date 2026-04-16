@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -60,23 +61,43 @@ public class ContentManager {
         String description,
         URI downloadURI,
         Optional<URI> imageUrl,
-        Optional<String> checkSum
+        Optional<String> checkSum,
+        Optional<URI> worldTemplateDownloadURI,
+        Optional<String> worldTemplateCheckSum,
+        Optional<String> worldTemplateFolderName
     ) {
         public static final Codec<Pack> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("id").forGetter(Pack::id),
             Codec.STRING.fieldOf("name").forGetter(Pack::name),
             Codec.STRING.optionalFieldOf("description", "").forGetter(Pack::description),
             Codec.STRING.xmap(URI::create, URI::toString).fieldOf("downloadURI").forGetter(Pack::downloadURI),
-            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl)
+            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl),
+            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(Pack::worldTemplateDownloadURI),
+            Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName)
         ).apply(i, Pack::create));
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, URI compoundDownloadURI, Optional<URI> imageUrl) {
-            String[] splitURI = compoundDownloadURI.toString().split("\\?checksum=");
-            URI downloadURI = URI.create(splitURI[0]);
-            Optional<String> checkSum = splitURI.length < 2 ? Optional.empty() : Optional.of(splitURI[1]);
-            return new Pack(id, name, description, downloadURI, imageUrl, checkSum);
+        public static Pack create(String id, String name, String description, URI compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName) {
+            ParsedURI download = ParsedURI.of(compoundDownloadURI);
+            ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
+            return new Pack(id, name, description, download.uri().orElseThrow(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName);
+        }
+
+        public boolean hasWorldTemplate() {
+            return worldTemplateDownloadURI.isPresent();
+        }
+    }
+
+    private record ParsedURI(Optional<URI> uri, Optional<String> checkSum) {
+        private static ParsedURI of(URI compoundURI) {
+            return of(Optional.of(compoundURI));
+        }
+
+        private static ParsedURI of(Optional<URI> compoundURI) {
+            if (compoundURI.isEmpty()) return new ParsedURI(Optional.empty(), Optional.empty());
+            String[] splitURI = compoundURI.get().toString().split("\\?checksum=");
+            return new ParsedURI(Optional.of(URI.create(splitURI[0])), splitURI.length < 2 ? Optional.empty() : Optional.of(splitURI[1]));
         }
     }
 
@@ -143,6 +164,7 @@ public class ContentManager {
         Path path = getContentDir(folderName).resolve(pack.id());
         if (!Files.exists(path) || !Files.isDirectory(path)) return false;
         if (DownloadedSkinPackStore.managesTargetDirectory(folderName) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
+        if (pack.hasWorldTemplate() && !LegacyWorldTemplate.isDownloadedPackInstalled(pack)) return false;
 
         if (pack.checkSum().isPresent()) {
             Path checksumFile = path.resolve(".md5");
@@ -160,9 +182,9 @@ public class ContentManager {
         return true;
     }
 
-    public static void downloadPack(Pack pack, String folderName, Runnable onFinished) {
+    public static void downloadPack(Pack pack, String folderName, Runnable onComplete) {
         if (isPackInstalled(pack, folderName)) {
-            Minecraft.getInstance().execute(onFinished);
+            Minecraft.getInstance().execute(onComplete);
             return;
         }
 
@@ -180,7 +202,8 @@ public class ContentManager {
                     if (!pack.checkSum().get().equals(fileHash)) {
                         Legacy4J.LOGGER.warn("Checksum mismatch for pack {}. Expected {}, got {}", pack.id(), pack.checkSum().get(), fileHash);
                         Files.deleteIfExists(downloadedTempFile);
-                        return; 
+                        Minecraft.getInstance().execute(onComplete);
+                        return;
                     }
                 }
 
@@ -197,17 +220,34 @@ public class ContentManager {
                     DownloadedPackMetadata.write(targetFolder, pack);
                     DownloadedResourceAlbums.sync(pack);
                 }
+                LegacyWorldTemplate.downloadDownloadedPack(pack);
                 Files.deleteIfExists(downloadedTempFile);
 
                 if (pack.checkSum().isPresent()) {
                     Files.writeString(targetFolder.resolve(".md5"), pack.checkSum().get());
                 }
 
-                Minecraft.getInstance().execute(onFinished);
+                Minecraft.getInstance().execute(() -> {
+                    LegacyWorldTemplate.refreshDownloadedPacks();
+                    onComplete.run();
+                });
             } catch (Exception e) {
+                deletePack(pack, folderName);
                 Legacy4J.LOGGER.warn("Error when downloading content pack to {}: {}", contentDir.resolve(pack.id()), e.getMessage());
+                Minecraft.getInstance().execute(onComplete);
             }
         });
+    }
+
+    public static void deletePack(Pack pack, String folderName) {
+        Path packDir = getContentDir(folderName).resolve(pack.id());
+        if (Files.exists(packDir)) {
+            deleteDirectoryRecursively(packDir.toFile());
+        }
+        DownloadedPackMetadata.clear(pack.id());
+        DownloadedResourceAlbums.remove(pack.id());
+        LegacyWorldTemplate.removeDownloadedPack(pack.id());
+        LegacyWorldTemplate.refreshDownloadedPacks();
     }
 
     private static void deleteDirectoryRecursively(File directory) {
