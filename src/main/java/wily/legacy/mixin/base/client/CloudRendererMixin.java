@@ -34,6 +34,8 @@ public abstract class CloudRendererMixin {
     @Unique
     private boolean legacy$lastLegacyCloudHeightAndTextureState;
     @Unique
+    private boolean legacy$lastPackCloudShaderState;
+    @Unique
     private boolean legacy$useWarmCloudPipelines;
 
     @Shadow
@@ -48,9 +50,11 @@ public abstract class CloudRendererMixin {
         legacy$useWarmCloudPipelines = minecraft.level != null && LegacyCloudAtmosphere.shouldUseWarmCloudTransparency(minecraft.level, ticks);
         boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
         boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
-        if (legacy$lastLceCloudState != lceCloudsEnabled || legacy$lastLegacyCloudHeightAndTextureState != legacyCloudHeightAndTextureEnabled) {
+        boolean packCloudShaderEnabled = LegacyCloudAtmosphere.shouldUsePackCloudShader();
+        if (legacy$lastLceCloudState != lceCloudsEnabled || legacy$lastLegacyCloudHeightAndTextureState != legacyCloudHeightAndTextureEnabled || legacy$lastPackCloudShaderState != packCloudShaderEnabled) {
             legacy$lastLceCloudState = lceCloudsEnabled;
             legacy$lastLegacyCloudHeightAndTextureState = legacyCloudHeightAndTextureEnabled;
+            legacy$lastPackCloudShaderState = packCloudShaderEnabled;
             needsRebuild = true;
         }
     }
@@ -76,6 +80,10 @@ public abstract class CloudRendererMixin {
             return RenderPipelines.CLOUDS;
         }
 
+        if (LegacyCloudAtmosphere.shouldUsePackCloudShader()) {
+            return LegacyRenderPipelines.LEGACY_PACK_CLOUDS;
+        }
+
         return legacy$useWarmCloudPipelines ? LegacyRenderPipelines.LEGACY_WARM_CLOUDS : LegacyRenderPipelines.LEGACY_CLOUDS;
     }
 
@@ -89,6 +97,10 @@ public abstract class CloudRendererMixin {
     private RenderPipeline legacy$useLegacyFlatCloudPipeline() {
         if (!LegacyCloudAtmosphere.areLceCloudsEnabled()) {
             return RenderPipelines.FLAT_CLOUDS;
+        }
+
+        if (LegacyCloudAtmosphere.shouldUsePackCloudShader()) {
+            return LegacyRenderPipelines.LEGACY_PACK_FLAT_CLOUDS;
         }
 
         return legacy$useWarmCloudPipelines ? LegacyRenderPipelines.LEGACY_WARM_FLAT_CLOUDS : LegacyRenderPipelines.LEGACY_FLAT_CLOUDS;
