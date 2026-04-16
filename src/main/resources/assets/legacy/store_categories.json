@@ -25,5 +25,15 @@
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/community_skinpacks/index.json",
     "targetDirectoryName": "resourcepacks/Legacy Downloaded Skinpacks/assets/lce_skinpacks/skinpacks",
     "requiresResourceReload": true
+  },
+  {
+    "id": "legacy4j",
+    "title": {
+      "text": "Legacy4j"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/Legacy4J/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true,
+    "useResourceAlbum": false
   }
 ]

@@ -42,14 +42,16 @@ public class ContentManager {
         Component title,
         String indexUrl,
         String targetDirectoryName,
-        boolean requiresResourceReload
+        boolean requiresResourceReload,
+        boolean useResourceAlbum
     ) {
         public static final Codec<Category> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("id").forGetter(Category::id),
             DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Category::title),
             Codec.STRING.fieldOf("indexUrl").forGetter(Category::indexUrl),
             Codec.STRING.fieldOf("targetDirectoryName").forGetter(Category::targetDirectoryName),
-            Codec.BOOL.optionalFieldOf("requiresResourceReload", false).forGetter(Category::requiresResourceReload)
+            Codec.BOOL.optionalFieldOf("requiresResourceReload", false).forGetter(Category::requiresResourceReload),
+            Codec.BOOL.optionalFieldOf("useResourceAlbum", true).forGetter(Category::useResourceAlbum)
         ).apply(i, Category::new));
 
         public static final Codec<List<Category>> LIST_CODEC = CODEC.listOf();
@@ -160,7 +162,8 @@ public class ContentManager {
         }
     }
 
-    public static boolean isPackInstalled(Pack pack, String folderName) {
+    public static boolean isPackInstalled(Pack pack, Category category) {
+        String folderName = category.targetDirectoryName();
         Path path = getContentDir(folderName).resolve(pack.id());
         if (!Files.exists(path) || !Files.isDirectory(path)) return false;
         if (DownloadedSkinPackStore.managesTargetDirectory(folderName) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
@@ -182,12 +185,13 @@ public class ContentManager {
         return true;
     }
 
-    public static void downloadPack(Pack pack, String folderName, Runnable onComplete) {
-        if (isPackInstalled(pack, folderName)) {
+    public static void downloadPack(Pack pack, Category category, Runnable onComplete) {
+        if (isPackInstalled(pack, category)) {
             Minecraft.getInstance().execute(onComplete);
             return;
         }
 
+        String folderName = category.targetDirectoryName();
         Path contentDir = getContentDir(folderName);
         CompletableFuture.runAsync(() -> {
             try {
@@ -216,7 +220,7 @@ public class ContentManager {
                 extractZip(downloadedTempFile, targetFolder);
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
-                } else if (Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
+                } else if (category.useResourceAlbum() && Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
                     DownloadedPackMetadata.write(targetFolder, pack);
                     DownloadedResourceAlbums.sync(pack);
                 }
@@ -232,15 +236,15 @@ public class ContentManager {
                     onComplete.run();
                 });
             } catch (Exception e) {
-                deletePack(pack, folderName);
+                deletePack(pack, category);
                 Legacy4J.LOGGER.warn("Error when downloading content pack to {}: {}", contentDir.resolve(pack.id()), e.getMessage());
                 Minecraft.getInstance().execute(onComplete);
             }
         });
     }
 
-    public static void deletePack(Pack pack, String folderName) {
-        Path packDir = getContentDir(folderName).resolve(pack.id());
+    public static void deletePack(Pack pack, Category category) {
+        Path packDir = getContentDir(category.targetDirectoryName()).resolve(pack.id());
         if (Files.exists(packDir)) {
             deleteDirectoryRecursively(packDir.toFile());
         }

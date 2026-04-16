@@ -82,7 +82,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         this.parent = parent;
         this.category = category;
         this.packs = packs;
-        packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category.targetDirectoryName())));
+        packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category)));
         if (!packs.isEmpty()) {
             hoveredPack = packs.get(0);
             queuePreview(hoveredPack);
@@ -95,7 +95,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private boolean isInstalled(ContentManager.Pack pack) {
-        return installedPacks.computeIfAbsent(pack.id(), id -> ContentManager.isPackInstalled(pack, category.targetDirectoryName()));
+        return installedPacks.computeIfAbsent(pack.id(), id -> ContentManager.isPackInstalled(pack, category));
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
@@ -142,9 +142,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 armedPack = null;
                 if (!prepareDownloadTarget()) return;
                 downloadingPacks.add(pack.id());
-                ContentManager.downloadPack(pack, category.targetDirectoryName(), () -> {
+                ContentManager.downloadPack(pack, category, () -> {
                     downloadingPacks.remove(pack.id());
-                    boolean installed = ContentManager.isPackInstalled(pack, category.targetDirectoryName());
+                    boolean installed = ContentManager.isPackInstalled(pack, category);
                     installedPacks.put(pack.id(), installed);
                     if (installed) needsReload = true;
                 });
@@ -184,7 +184,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private void deletePack(ContentManager.Pack pack) {
-        ContentManager.deletePack(pack, category.targetDirectoryName());
+        ContentManager.deletePack(pack, category);
         installedPacks.put(pack.id(), false);
         armedPack = null;
         needsReload = true;
