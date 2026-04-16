@@ -45,6 +45,15 @@ public final class DownloadedPackMetadata {
         CACHE.remove(normalize(packId));
     }
 
+    public static boolean exists(String packId) {
+        Path path = path(normalize(packId));
+        return path != null && Files.isRegularFile(path);
+    }
+
+    public static Entry entry(String packId) {
+        return get(packId);
+    }
+
     public static Component getTitle(Pack pack) {
         return getTitle(pack.getId(), pack.getTitle());
     }
@@ -87,7 +96,9 @@ public final class DownloadedPackMetadata {
     private static Path path(String packId) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft == null) return null;
-        return minecraft.getResourcePackDirectory().resolve(packId).resolve(FILE_NAME);
+        String normalized = normalize(packId);
+        if (normalized.indexOf(':') >= 0 || normalized.indexOf('/') >= 0 || normalized.indexOf('\\') >= 0) return null;
+        return minecraft.getResourcePackDirectory().resolve(normalized).resolve(FILE_NAME);
     }
 
     private static String normalize(String packId) {

@@ -114,7 +114,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<Pack> getDisplayPacks() {
-            return Stream.concat(model.selected.stream(), model.unselected.stream()).toList();
+            return Stream.concat(model.selected.stream(), model.unselected.stream()).filter(pack -> !DownloadedResourceAlbums.isManagedPack(pack.getId())).toList();
         }
 
         public void updateTooltip() {
@@ -201,7 +201,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<String> getSelectedIds() {
-            return model.selected.stream().filter(p -> !FactoryAPIPlatform.isPackHidden(p) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+            return model.selected.stream().filter(p -> !FactoryAPIPlatform.isPackHidden(p) && !DownloadedResourceAlbums.isManagedPack(p.getId()) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
                 Collections.reverse(l);
                 return l;
             }));

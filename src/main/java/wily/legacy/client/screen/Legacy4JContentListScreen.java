@@ -21,6 +21,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.DownloadedPackMetadata;
+import wily.legacy.client.DownloadedResourceAlbums;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -140,6 +141,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
         armedPack = null;
         DownloadedPackMetadata.clear(pack.id());
+        DownloadedResourceAlbums.remove(pack.id());
         needsReload = true;
     }
 

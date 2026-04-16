@@ -98,6 +98,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         if (!Files.exists(RESOURCE_ALBUMS_PATH))
             save(RESOURCE_ALBUMS_PATH, DEFAULT_RESOURCE_ALBUMS, defaultResourceAlbum);
         load();
+        DownloadedResourceAlbums.syncAll();
     }
 
     public static PackAlbum resourceById(String s) {
@@ -219,9 +220,9 @@ public record PackAlbum(String id, int version, Component displayName, Component
     }
 
     public static void applyDefaultResourceAlbum() {
-        List<String> oldSelection = getSelectableIds(Minecraft.getInstance().getResourcePackRepository());
+        List<String> oldSelection = getSelectedIds(Minecraft.getInstance().getResourcePackRepository());
         GlobalPacks.globalResources.get().applyPacks(Minecraft.getInstance().getResourcePackRepository(), getDefaultResourceAlbum().packs());
-        if (!oldSelection.equals(getSelectableIds(Minecraft.getInstance().getResourcePackRepository()))) {
+        if (!oldSelection.equals(getSelectedIds(Minecraft.getInstance().getResourcePackRepository()))) {
             Minecraft.getInstance().reloadResourcePacks();
             updateSavedResourcePacks();
         }
@@ -241,7 +242,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
     }
 
     public static List<String> getSelectableIds(PackRepository packRepository) {
-        return packRepository.getSelectedPacks().stream().filter(pack -> !FactoryAPIPlatform.isPackHidden(pack)).map(Pack::getId).toList();
+        return packRepository.getSelectedPacks().stream().filter(pack -> !FactoryAPIPlatform.isPackHidden(pack) && !DownloadedResourceAlbums.isManagedPack(pack.getId())).map(Pack::getId).toList();
     }
 
     public static ConfirmationScreen createAlbumEditScreen(Screen parent, Component title, Component defaultName, Component defaultDescription, BiConsumer<Component, Component> editAlbum) {
@@ -500,7 +501,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                     }, packPath, title));
                                 }));
                             }).build());
-                            renderableVList.addRenderable(Button.builder(EDIT_ALBUM, b -> {
+                            AbstractButton editButton;
+                            renderableVList.addRenderable(editButton = Button.builder(EDIT_ALBUM, b -> {
                                 PackAlbum editAlbum = getSelectedAlbum();
                                 minecraft.setScreen(createAlbumEditScreen(parent, b.getMessage(), editAlbum.displayName, editAlbum.description, (name, description) -> {
                                     PackAlbum.resourceAlbums.put(editAlbum.id(), new PackAlbum(editAlbum.id(), editAlbum.version(), name, description, editAlbum.iconSprite(), editAlbum.backgroundSprite(), editAlbum.packs(), editAlbum.displayPack()));
@@ -518,7 +520,10 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                 setSelectedIndex(0);
                                 minecraft.setScreen(screen);
                             }).build());
-                            if (DEFAULT_RESOURCE_ALBUMS.stream().anyMatch(a -> a.equals(getSelectedAlbum())))
+                            if (DownloadedResourceAlbums.isManagedAlbum(getSelectedAlbum().id())) {
+                                editButton.active = false;
+                                removeButton.active = false;
+                            } else if (DEFAULT_RESOURCE_ALBUMS.stream().anyMatch(a -> a.equals(getSelectedAlbum())))
                                 removeButton.active = false;
                         }
                     });
@@ -543,6 +548,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         public void openPackSelectionScreen() {
+            if (DownloadedResourceAlbums.isManagedAlbum(getSelectedAlbum().id())) return;
             if (minecraft.screen != null) {
                 Screen screen = minecraft.screen;
                 packRepository.setSelected(getSelectedAlbum().packs());

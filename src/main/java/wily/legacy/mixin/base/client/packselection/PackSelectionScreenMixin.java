@@ -29,6 +29,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.DownloadedPackMetadata;
+import wily.legacy.client.DownloadedResourceAlbums;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
@@ -136,6 +137,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     private void addPacks(RenderableVList list, Stream<PackSelectionModel.Entry> stream) {
         list.renderables.clear();
         stream.forEach(e -> {
+            if (DownloadedResourceAlbums.isManagedPack(e.getId())) return;
             Component title = DownloadedPackMetadata.getTitle(e.getId(), e.getTitle());
             Component descriptionText = DownloadedPackMetadata.getDescription(e.getId(), e.getExtendedDescription());
             List<Component> description = new ArrayList<>();

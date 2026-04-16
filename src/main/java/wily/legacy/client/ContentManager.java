@@ -195,6 +195,7 @@ public class ContentManager {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
                 } else if (Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
                     DownloadedPackMetadata.write(targetFolder, pack);
+                    DownloadedResourceAlbums.sync(pack);
                 }
                 Files.deleteIfExists(downloadedTempFile);
 
