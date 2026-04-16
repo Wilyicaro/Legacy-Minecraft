@@ -277,13 +277,20 @@ public record PackAlbum(String id, int version, Component displayName, Component
     }
 
     public boolean isValidPackDisplay(PackRepository packRepository) {
-        String id = getDisplayPackId();
-        if (id == null) return false;
-        return packRepository.getPack(id) != null;
+        return getDisplayPack(packRepository) != null;
     }
 
     public String getDisplayPackId() {
         return displayPack.orElse(packs.isEmpty() ? null : packs.get(packs.size() - 1));
+    }
+
+    public Pack getDisplayPack(PackRepository packRepository) {
+        String id = getDisplayPackId();
+        if (id == null) return null;
+        Pack pack = packRepository.getPack(id);
+        if (pack != null) return pack;
+        if (id.startsWith("file/")) return packRepository.getPack(id.substring(5));
+        return packRepository.getPack("file/" + id);
     }
 
     public static class Selector extends AbstractWidget implements ActionHolder {
@@ -430,18 +437,18 @@ public record PackAlbum(String id, int version, Component displayName, Component
             if (hasTooltip) return;
             LegacyRenderUtil.renderPointerPanel(graphics, x, y, width, height);
             if (getSelectedAlbum() != null) {
-                boolean p = getSelectedAlbum().isValidPackDisplay(packRepository);
+                Pack displayPack = getSelectedAlbum().getDisplayPack(packRepository);
                 if (getSelectedAlbum().iconSprite().isPresent())
                     FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(), x + 7, y + 5, 32, 32);
                 else
-                    FactoryGuiGraphics.of(graphics).blit(p ? getPackIcon(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : DEFAULT_ICON, x + 7, y + 5, 0.0f, 0.0f, 32, 32, 32, 32);
+                    FactoryGuiGraphics.of(graphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, x + 7, y + 5, 0.0f, 0.0f, 32, 32, 32, 32);
                 boolean sd = LegacyOptions.getUIMode().isSD();
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
                 (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().displayName(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
-                ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
+                ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(displayPack != null ? getPackBackground(displayPack) : null);
                 int descriptionWidth = width - 16;
                 MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().description(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
@@ -622,10 +629,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
             for (int index = 0; index < albums.size(); index++) {
                 if (visibleCount >= getMaxPacks() || scrolledList.get() + index >= albums.size()) break;
                 PackAlbum album = albums.getByIndex(Math.min(albums.size() - 1, scrolledList.get() + index));
+                Pack displayPack = album.getDisplayPack(packRepository);
                 if (album.iconSprite().isPresent())
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(album.iconSprite().get(), getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 28, 28);
                 else
-                    FactoryGuiGraphics.of(guiGraphics).blit(album.isValidPackDisplay(packRepository) ? getPackIcon(packRepository.getPack(album.getDisplayPackId())) : DEFAULT_ICON, getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 0.0f, 0.0f, 28, 28, 28, 28);
+                    FactoryGuiGraphics.of(guiGraphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 0.0f, 0.0f, 28, 28, 28, 28);
                 if (scrolledList.get() + index == selectedIndex)
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index, getY() + font.lineHeight + 3, 30, 30);
                 visibleCount++;

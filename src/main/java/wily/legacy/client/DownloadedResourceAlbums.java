@@ -32,7 +32,8 @@ public final class DownloadedResourceAlbums {
     }
 
     public static void sync(ContentManager.Pack pack) {
-        saveIfChanged(sync(normalize(pack.id()), pack.name(), pack.description()));
+        String packId = normalize(pack.id());
+        saveIfChanged(sync(packId, pack.name(), pack.description()));
     }
 
     public static void syncAll() {

@@ -29,7 +29,7 @@
   {
     "id": "legacy4j",
     "title": {
-      "text": "Legacy4j"
+      "text": "Legacy4J"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/Legacy4J/index.json",
     "targetDirectoryName": "resourcepacks",
