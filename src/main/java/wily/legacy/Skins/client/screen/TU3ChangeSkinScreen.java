@@ -44,6 +44,8 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private Tu3NavZone tu3NavZone = Tu3NavZone.CAROUSEL;
     public TU3ChangeSkinScreen(Screen parent) { super(parent); }
 
+    public TU3ChangeSkinScreen(Screen parent, ChangeSkinScreenSource source) { super(parent, source); }
+
     private void refreshTu3Layout() { tu3Layout = isCompact480() ? Tu3LayoutMetrics.SD_480 : Tu3LayoutMetrics.DEFAULT; }
     private boolean carouselNavActive() { return tu3NavZone == Tu3NavZone.CAROUSEL; }
     private void setTu3NavZone(Tu3NavZone zone) { tu3NavZone = zone == null ? Tu3NavZone.CAROUSEL : zone; }

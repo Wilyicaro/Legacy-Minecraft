@@ -31,6 +31,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private static volatile ResourceLocation CENTER_SELECTED_BADGE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     private static volatile String CENTER_NAME_PLATE_DISPLAY_ID, CENTER_NAME_PLATE_PENDING_ID;
     private static volatile boolean CENTER_NAME_PLATE_WAITING;
+    private final wily.legacy.Skins.client.screen.ChangeSkinScreenSource source;
     public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY) {
         CENTER_NAME_PLATE = enabled;
         CENTER_NAME_PLATE_W = Math.max(1, width);
@@ -75,17 +76,10 @@ public class PlayerSkinWidget extends AbstractWidget {
         CENTER_SELECTED_BADGE_GAP = Math.max(0, gap);
         if (sprite != null) CENTER_SELECTED_BADGE_SPRITE = sprite;
     }
-    private static boolean isCurrentSkinSelected(String previewId) {
+    private boolean isCurrentSkinSelected(String previewId) {
         if (previewId == null) return false;
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null) return false;
-        UUID self = mc.player != null ? mc.player.getUUID() : (mc.getUser() != null ? mc.getUser().getProfileId() : null);
-        if (self == null) return false;
-        String applied = ClientSkinCache.get(self);
-        if (applied == null) applied = SkinSync.getServerSkinId(self);
-        if (applied == null || applied.isBlank()) applied = SkinDataStore.getSelectedSkin(self);
-        if (applied == null) applied = "";
-        if (SkinIdUtil.isAutoSelect(previewId)) { return applied.isBlank(); }
+        String applied = source.currentAppliedSkinId();
+        if (SkinIdUtil.isAutoSelect(previewId)) return applied == null || applied.isBlank();
         return previewId.equals(applied);
     }
     public static void setCarouselClip(int x1, int y1, int x2, int y2) {
@@ -125,8 +119,9 @@ public class PlayerSkinWidget extends AbstractWidget {
     private boolean pendingPunchLoop;
     private int moveHintDir;
     private long moveHintStart;
-    public PlayerSkinWidget(int width, int height) {
+    public PlayerSkinWidget(wily.legacy.Skins.client.screen.ChangeSkinScreenSource source, int width, int height) {
         super(-9999, -9999, width, height, CommonComponents.EMPTY);
+        this.source = source;
         this.originalWidth = width;
         this.originalHeight = height;
         this.skinId = () -> skinIdValue;
@@ -142,21 +137,17 @@ public class PlayerSkinWidget extends AbstractWidget {
     public void setSourceSlotOffset(int offset) { this.sourceSlotOffset = offset; }
     private SkinEntry getCachedEntry(String id) {
         if (SkinIdUtil.isBlankOrAutoSelect(id)) return null;
-        int version = SkinPackLoader.getReloadVersion();
+        int version = source.version();
         if (id.equals(cachedEntryId) && cachedEntryVersion == version) return cachedEntry;
         cachedEntryId = id;
         cachedEntryVersion = version;
-        cachedEntry = SkinPackLoader.getSkin(id);
+        cachedEntry = source.skin(id);
         return cachedEntry;
     }
     public void prewarm() {
         String id = skinId.get();
         if (id == null || id.isBlank()) return;
-        if (SkinIdUtil.isAutoSelect(id)) {
-            GuiSessionSkin.prewarm();
-            return;
-        }
-        ClientSkinAssets.enqueuePreviewWarmup(id);
+        source.prewarmPreview(id);
     }
     public boolean isInterpolating() { return targetRotationX != Float.NEGATIVE_INFINITY; }
     private void updateScaledSize() {
@@ -433,13 +424,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         return CENTER_NAME_PLATE_DISPLAY_ID;
     }
     private void renderDoll(GuiGraphics guiGraphics, float partialTick, String id, float yawOffset, float attackTime, int left, int top, int right, int bottom) {
-        if (SkinIdUtil.isAutoSelect(id)) {
-            var playerSkin = GuiSessionSkin.getSessionPlayerSkin();
-            if (playerSkin != null) GuiDollRender.renderDollInRect(guiGraphics, id, playerSkin, yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom, 165);
-            return;
-        }
-        SkinEntry entry = getCachedEntry(id);
-        if (entry != null && entry.texture() != null) GuiDollRender.renderDollInRect(guiGraphics, id, entry.texture(), yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom, 165);
+        source.renderPreview(guiGraphics, id, yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom);
     }
     private void renderNamePlate(GuiGraphics guiGraphics, String id, int left, int right, int bottom) {
         String displayId = resolveNamePlateId(id);
@@ -508,7 +493,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     }
     private String nameLabel(String id) {
         SkinEntry entry = getCachedEntry(id);
-        return entry == null ? null : SkinPackLoader.nameString(entry.name(), id);
+        return entry == null ? null : source.skinName(entry);
     }
     private String themeLabel(String id, String label) {
         if (SkinIdUtil.isAutoSelect(id)) return null;

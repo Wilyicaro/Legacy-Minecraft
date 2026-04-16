@@ -1,5 +1,4 @@
 package wily.legacy.Skins.client.screen;
-import java.util.Locale;
 import com.mojang.blaze3d.platform.InputConstants;
 import wily.legacy.Skins.client.changeskin.*;
 import wily.legacy.Skins.client.preview.*;
@@ -70,6 +69,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private int lastLayoutWidth = -1;
     private int lastLayoutHeight = -1;
     public ChangeSkinScreen(Screen parent) { super(parent); }
+
+    public ChangeSkinScreen(Screen parent, ChangeSkinScreenSource source) { super(parent, source); }
     private static int hd(int value) { return Math.max(1, Math.round(value * HD_MENU_SCALE)); }
     @Override
     protected ChangeSkinScreenLayout resolveRuntimeLayout() { return isCompact480() ? ChangeSkinScreenLayout.DEFAULT : HD_LAYOUT; }
@@ -127,21 +128,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private Component packLabel(SkinPack pack) {
         if (isReorderingCustomPack()) return Component.translatable("legacy.menu.reorder_custom_skin_pack");
         if (isEditingCustomPack()) return Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
-        if (minecraft != null && DownloadedSkinPackStore.isDownloadedPack(minecraft, pack.id())) {
-            return Component.translatable("legacy.skinpack.type.community");
-        }
-        String type = pack.type();
-        if (type == null || type.isBlank()) return null;
-        String key = type.toLowerCase(Locale.ROOT);
-        if (key.equals("skin")) return Component.translatable("legacy.skinpack.type.skin");
-        if (key.equals("mashup")) return Component.translatable("legacy.skinpack.type.mashup");
-        if (key.equals("community")) return Component.translatable("legacy.skinpack.type.community");
-        if (key.equals("author") || key.equals("accredited")) {
-            String author = pack.author();
-            if (author != null && !author.isBlank()) return Component.translatable("legacy.skinpack.type.author", author);
-            return Component.translatable("legacy.skinpack.type.skin");
-        }
-        return null;
+        return packSubtitle(pack);
     }
     @Override
     protected int previewBoxX() {
@@ -415,7 +402,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             else if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
                 drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             }
-            if (!editing && !isImport && selected != null && SkinDataStore.isFavorite(selected)) {
+            if (!editing && !isImport && isSkinFavorite(selected)) {
                 int iconY = iconBaseY + sc(normalLayout.actionHolderGap());
                 float heartSize = Math.max(1f, holder - 8f);
                 float heartScaleX = heartSize / HEART_TEXTURE_SIZE;
@@ -440,8 +427,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         center = getCenterWidget();
         if (center != null) {
             String    skinId = center.skinId.get();
-            SkinEntry entry  = skinId == null ? null : SkinPackLoader.getSkin(skinId);
-            String    name   = SkinIdUtil.isAutoSelect(skinId) ? "Auto Selected" : entry == null ? String.valueOf(skinId) : entry.name();
+            SkinEntry entry  = skinId == null ? null : source.skin(skinId);
+            String    name   = SkinIdUtil.isAutoSelect(skinId) ? "Auto Selected" : entry == null ? String.valueOf(skinId) : source.skinName(entry);
             int mid       = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
             float mainTextScale = mainTextScale();
@@ -466,7 +453,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int packMetaY = packTitleY + (int) (minecraft.font.lineHeight * mainTextScale) + sc(normalLayout.packMetaGap());
         if (pack != null) {
             int maxPackWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim())) / mainTextScale));
-            String packName = PlayerSkinWidget.clipText(minecraft.font, SkinPackLoader.nameString(pack.name(), pack.id()), maxPackWidth);
+            String packName = PlayerSkinWidget.clipText(minecraft.font, source.packName(pack), maxPackWidth);
             drawScaledCentered(g, Component.literal(packName), packMid, packTitleY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             Component label = packLabel(pack);
             if (label != null) drawScaledCentered(g, label, packMid, packMetaY, ColorUtil.withAlpha(LegacyRenderUtil.getDefaultTextColor(true), 0.8f), packTypeTextScale(), true);
