@@ -93,9 +93,6 @@ public class LegacyGuiElements {
                 LegacyOptions.UIMode uiMode = LegacyOptions.UIMode.values()[i];
                 a.getElements().put("uiMode." + uiMode.getSerializedName(), () -> LegacyOptions.getUIMode() == uiMode);
             }
-
-            a.getElements().put("legacy.changelog", () -> LegacyResourceManager.WHATS_NEW_COMPONENT.withStyle(LegacyOptions.getUIMode().isSD() ? LegacyFontUtil.MOJANGLES_11_STYLE : LegacyFontUtil.DEFAULT_FONT_STYLE));
-
         }));
     }
 }

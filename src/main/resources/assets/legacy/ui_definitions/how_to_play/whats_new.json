@@ -21,7 +21,7 @@
           "name": "changelog",
           "type": "draw_multiline_string",
           "component": {
-            "reference": "legacy.changelog"
+            "baseDir": "minecraft:changelog"
           },
           "width": 433
         }
@@ -55,7 +55,9 @@
           "name": "changelog",
           "type": "draw_multiline_string",
           "component": {
-            "reference": "legacy.changelog"
+            "text": "",
+            "baseDir": "minecraft:changelog",
+            "font": "legacy:default_11"
           },
           "width": 268,
           "lineSpacing": 8

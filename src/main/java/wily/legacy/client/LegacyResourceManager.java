@@ -52,7 +52,6 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static LegacyIntro intro = LegacyIntro.EMPTY;
     public static ControllerBinding<?> shiftBinding;
-    public static MutableComponent WHATS_NEW_COMPONENT = Component.empty();
 
     public static void setKeyboardLayout(Resource resource) {
         try {
@@ -201,21 +200,6 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             }
 
             resourceManager.getResource(FactoryAPI.createLocation(name, "keyboard_layout/%s.json".formatted(langKey))).ifPresent(LegacyResourceManager::setKeyboardLayout);
-        });
-
-        ResourceLocation location = DEFAULT_CHANGELOG_PATH.withSuffix("/" + langKey + ".txt");
-        Optional<Resource> externalComponent = Minecraft.getInstance().getResourceManager().getResource(location);
-        WHATS_NEW_COMPONENT = Component.empty();
-        externalComponent.ifPresent((resource) -> {
-            try (BufferedReader reader = resource.openAsReader()) {
-                reader.lines().forEach((l) -> {
-                    WHATS_NEW_COMPONENT.append(l);
-                    WHATS_NEW_COMPONENT.append("\n");
-                });
-            } catch (IOException e) {
-                FactoryAPI.LOGGER.warn("Failed to parse {}, this external component won't be loaded.", location, e);
-            }
-
         });
     }
 
