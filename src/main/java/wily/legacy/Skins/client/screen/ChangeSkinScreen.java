@@ -45,7 +45,9 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     ) {
         static final NormalLayoutMetrics DEFAULT = new NormalLayoutMetrics(10, 7, 5, 16, 80, 14, 60, 1, 59, 55, 55, 5, 20, 18, 40, 5, 16, 14, 80, 24, 50, 60, 3, 30, 12, 137, 24, 147, 16, 32, 140, 20, 2, 8, 5, 18, 49, 26, 6, 12, 27, 8, 10);
     }
-    private static final int BEACON_CHECK_TEXTURE_SIZE = 28, BEACON_CHECK_VISIBLE_W = 24, BEACON_CHECK_VISIBLE_H = 20,
+    private static final int BEACON_CHECK_VISIBLE_X = 3, BEACON_CHECK_VISIBLE_Y = 4,
+            BEACON_CHECK_TEXTURE_SIZE = 28, BEACON_CHECK_VISIBLE_W = 24, BEACON_CHECK_VISIBLE_H = 20,
+            SKIN_TICK_W = 12, SKIN_TICK_H = 10,
             PADLOCK_TEXTURE_SIZE = 32, HEART_TEXTURE_SIZE = 9, SELECTION_ICON_SIZE = 16, PACK_BUTTON_BASE_HEIGHT = 20;
     private static final float BEACON_CHECK_CENTER_X = 14.0f;
     private static final float BEACON_CHECK_CENTER_Y = 12.5f;
@@ -477,11 +479,15 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         float scale = Math.min(targetSize / BEACON_CHECK_VISIBLE_W, targetSize / BEACON_CHECK_VISIBLE_H);
         float centerX = iconX + holder / 2.0f + holder * TICK_HOLDER_OFFSET_X;
         float centerY = iconY + holder / 2.0f + holder * TICK_HOLDER_OFFSET_Y;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(centerX - BEACON_CHECK_CENTER_X * scale, centerY - BEACON_CHECK_CENTER_Y * scale);
-        guiGraphics.pose().scale(scale, scale);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
-        guiGraphics.pose().popMatrix();
+        float visibleCenterX = centerX + (BEACON_CHECK_VISIBLE_X + BEACON_CHECK_VISIBLE_W / 2.0f - BEACON_CHECK_CENTER_X) * scale;
+        float visibleCenterY = centerY + (BEACON_CHECK_VISIBLE_Y + BEACON_CHECK_VISIBLE_H / 2.0f - BEACON_CHECK_CENTER_Y) * scale;
+        int left = Math.round(visibleCenterX - SKIN_TICK_W / 2.0f);
+        int top = Math.round(visibleCenterY - SKIN_TICK_H / 2.0f);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, left, top,
+                (float) BEACON_CHECK_VISIBLE_X, (float) BEACON_CHECK_VISIBLE_Y,
+                SKIN_TICK_W, SKIN_TICK_H,
+                BEACON_CHECK_VISIBLE_W, BEACON_CHECK_VISIBLE_H,
+                BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
     }
     private void drawPadlock(GuiGraphics guiGraphics, int iconX, int iconY, int holder) {
         float size = Math.max(1f, holder - 8f);

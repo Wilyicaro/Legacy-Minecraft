@@ -22,6 +22,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.controller.ControllerManager;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.*;
@@ -597,7 +598,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_right") : null);
         }
         if (source.supportsCustomPackOptions() && ConsoleSkinsClientSettings.isShowCustomPackOptionsTooltip()) {
-            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : null, () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
+            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : ControllerBinding.BACK.getIcon(), () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
         }
         r.add(navigateIcon, navigateLabel);
         if (!source.supportsAdvancedOptions() || LegacyOptions.hideAdvancedOptionsTooltip.get() || LegacyOptions.legacySettingsMenus.get()) return;
@@ -925,6 +926,29 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (center != null && !center.isInterpolating()) syncCenterPreviewState(center);
         return applyQueuedPackChange();
     }
+
+    @Override
+    public void simulateKeyAction(ControllerManager manager, BindingState state) {
+        if (manager.isCursorDisabled) {
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.DOWN_BUTTON), InputConstants.KEY_RETURN, state);
+        }
+        manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_BUTTON), InputConstants.KEY_ESCAPE, state, true);
+        manager.simulateKeyAction(s -> s.is(ControllerBinding.LEFT_BUTTON), InputConstants.KEY_X, state);
+        manager.simulateKeyAction(s -> s.is(ControllerBinding.UP_BUTTON), InputConstants.KEY_O, state);
+        if (manager.isCursorDisabled) {
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.LEFT_TRIGGER), InputConstants.KEY_PAGEUP, state);
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_TRIGGER), InputConstants.KEY_PAGEDOWN, state);
+        } else {
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_TRIGGER), InputConstants.KEY_W, state);
+        }
+        manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_BUMPER), InputConstants.KEY_RBRACKET, state);
+        manager.simulateKeyAction(s -> s.is(ControllerBinding.LEFT_BUMPER), InputConstants.KEY_LBRACKET, state);
+        if (source.supportsCustomPackOptions()) {
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.BACK), InputConstants.KEY_C, state, true);
+        }
+        manager.simulateKeyAction(s -> s.is(ControllerBinding.CAPTURE), InputConstants.KEY_F2, state);
+    }
+
     @Override
     public void removed() {
         stickUpHeld = stickDownHeld = leftStickUpHeld = leftStickDownHeld = false;
