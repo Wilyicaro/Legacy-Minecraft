@@ -193,7 +193,7 @@ public class OptionsScreen extends PanelVListScreen {
                 b -> FactoryConfigWidgets.getCachedTooltip(LegacyOptions.legacySettingsMenus.getDisplay().tooltip().apply(b)),
                 t -> {
                     if (!t.selected) {
-                        disableLegacySettingsMenus(screen);
+                        disableLegacySettingsMenus(screen.parent);
                         return;
                     }
                     t.selected = false;
@@ -220,19 +220,19 @@ public class OptionsScreen extends PanelVListScreen {
                 LegacyOptions.displayPackManagementTooltips::get);
     }
 
-    private static AbstractWidget createLegacyGraphicsPresetWidget(boolean active) {
+    static AbstractWidget createLegacyGraphicsPresetWidget(boolean active) {
         AbstractWidget widget = LegacyConfigWidgets.createWidget(LegacyOptions.showOptionsPresetInLegacyGraphics);
         widget.active = active;
         return widget;
     }
 
-    private static ConfirmationScreen createLegacySettingsMenusWarningScreen(OptionsScreen screen) {
-        return new ConfirmationScreen(screen,
+    static ConfirmationScreen createLegacySettingsMenusWarningScreen(Screen parent, Consumer<ConfirmationScreen> okAction) {
+        return new ConfirmationScreen(parent,
                 ConfirmationScreen::getPanelWidth,
                 () -> ConfirmationScreen.getBaseHeight() + (LegacyOptions.getUIMode().isSD() ? 19 : 22),
                 Component.translatable("legacy.menu.legacy_settings_menus_warning"),
                 Component.translatable("legacy.menu.legacy_settings_menus_warning.message"),
-                s -> enableLegacySettingsMenus(screen)) {
+                okAction) {
             @Override
             protected void addButtons() {
                 renderableVList.addRenderable(createLegacyGraphicsPresetWidget(true));
@@ -241,14 +241,18 @@ public class OptionsScreen extends PanelVListScreen {
         };
     }
 
-    private static void enableLegacySettingsMenus(OptionsScreen screen) {
+    private static ConfirmationScreen createLegacySettingsMenusWarningScreen(OptionsScreen screen) {
+        return createLegacySettingsMenusWarningScreen(screen, s -> enableLegacySettingsMenus(screen.parent));
+    }
+
+    static void enableLegacySettingsMenus(Screen screen) {
         FactoryConfig.saveOptionAndConsume(LegacyOptions.displayChatIndicators, false, v ->
                 FactoryConfig.saveOptionAndConsume(LegacyOptions.displayPackManagementTooltips, false, v1 ->
                         FactoryConfig.saveOptionAndConsume(LegacyOptions.advancedOptionsMode, LegacyOptions.AdvancedOptionsMode.MERGE, v2 ->
                                 FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, true, v3 -> reopenLegacySettingsMenusScreen(screen)))));
     }
 
-    private static void disableLegacySettingsMenus(OptionsScreen screen) {
+    static void disableLegacySettingsMenus(Screen screen) {
         FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, false, v -> {
             if (LegacyOptions.advancedOptionsMode.get() == LegacyOptions.AdvancedOptionsMode.MERGE) {
                 FactoryConfig.saveOptionAndConsume(LegacyOptions.advancedOptionsMode, LegacyOptions.AdvancedOptionsMode.DEFAULT, v1 -> reopenLegacySettingsMenusScreen(screen));
@@ -262,8 +266,8 @@ public class OptionsScreen extends PanelVListScreen {
         return useLegacySettingsMenusOptions() && LegacyOptions.showOptionsPresetInLegacyGraphics.get();
     }
 
-    private static void reopenLegacySettingsMenusScreen(OptionsScreen screen) {
-        screen.minecraft.setScreen(Section.ADVANCED_USER_INTERFACE.build(refreshLegacySettingsParent(screen.parent)));
+    private static void reopenLegacySettingsMenusScreen(Screen screen) {
+        Minecraft.getInstance().setScreen(Section.ADVANCED_USER_INTERFACE.build(refreshLegacySettingsParent(screen)));
     }
 
     private static Screen refreshLegacySettingsParent(Screen screen) {
