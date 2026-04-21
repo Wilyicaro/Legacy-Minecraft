@@ -18,10 +18,13 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 @Mixin(Options.class)
 public abstract class OptionsMixin {
+    private static final List<String> MANAGED_SKIN_PACKS = List.of("Legacy Custom Skinpacks", "Legacy Downloaded Skinpacks");
 
     @Shadow
     protected Minecraft minecraft;
@@ -29,6 +32,10 @@ public abstract class OptionsMixin {
     @Shadow public int overrideWidth;
 
     @Shadow public int overrideHeight;
+
+    @Shadow public List<String> resourcePacks;
+
+    @Shadow public List<String> incompatibleResourcePacks;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILnet/minecraft/client/KeyMapping$Category;)V", ordinal = 5), index = 0)
     protected String initKeyCraftingName(String string) {
@@ -86,8 +93,23 @@ public abstract class OptionsMixin {
         PackAlbum.init();
         GlobalPacks.STORAGE.load();
         GlobalPacks.globalResources.get().applyPacks(packRepository, PackAlbum.getDefaultResourceAlbum().packs());
+        restoreManagedSkinPacks(packRepository);
         PackAlbum.updateSavedResourcePacks();
         ci.cancel();
+    }
+
+    private void restoreManagedSkinPacks(PackRepository packRepository) {
+        List<String> selected = new ArrayList<>(packRepository.getSelectedIds());
+        boolean changed = false;
+        for (String packName : MANAGED_SKIN_PACKS) {
+            String fileId = "file/" + packName;
+            if (!resourcePacks.contains(packName) && !resourcePacks.contains(fileId) && !incompatibleResourcePacks.contains(packName) && !incompatibleResourcePacks.contains(fileId)) continue;
+            String resolved = packRepository.getPack(fileId) != null ? fileId : packRepository.getPack(packName) != null ? packName : null;
+            if (resolved == null || selected.contains(resolved)) continue;
+            selected.add(resolved);
+            changed = true;
+        }
+        if (changed) packRepository.setSelected(selected);
     }
 
 }
