@@ -30,6 +30,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -37,6 +39,8 @@ public class ContentManager {
 
     public static final List<Category> CATEGORIES = new ArrayList<>();
     private static final String CATEGORIES_FILE = "store_categories.json";
+    private static final java.util.Set<String> ACTIVE_DOWNLOADS = ConcurrentHashMap.newKeySet();
+    private static final String TRANSPARENCY_FIX_URL = "https://cdn.modrinth.com/data/MK3k9U5o/versions/BdYLypGY/Transparency%20Fix.zip";
 
     public record Category(
         String id,
@@ -62,33 +66,73 @@ public class ContentManager {
         String id,
         String name,
         String description,
-        URI downloadURI,
+        Optional<URI> downloadURI,
         Optional<URI> imageUrl,
         Optional<String> checkSum,
         Optional<URI> worldTemplateDownloadURI,
         Optional<String> worldTemplateCheckSum,
-        Optional<String> worldTemplateFolderName
+        Optional<String> worldTemplateFolderName,
+        List<BundlePack> bundlePacks
     ) {
+        public record BundlePack(
+            String categoryId,
+            String id,
+            String name,
+            String description,
+            Optional<URI> downloadURI,
+            Optional<URI> imageUrl,
+            Optional<String> checkSum,
+            Optional<URI> worldTemplateDownloadURI,
+            Optional<String> worldTemplateCheckSum,
+            Optional<String> worldTemplateFolderName
+        ) {
+            public static final Codec<BundlePack> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.STRING.fieldOf("categoryId").forGetter(BundlePack::categoryId),
+                Codec.STRING.fieldOf("id").forGetter(BundlePack::id),
+                Codec.STRING.fieldOf("name").forGetter(BundlePack::name),
+                Codec.STRING.optionalFieldOf("description", "").forGetter(BundlePack::description),
+                Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(BundlePack::downloadURI),
+                Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(BundlePack::imageUrl),
+                Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(BundlePack::worldTemplateDownloadURI),
+                Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(BundlePack::worldTemplateFolderName)
+            ).apply(i, BundlePack::create));
+
+            public static BundlePack create(String categoryId, String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName) {
+                ParsedURI download = ParsedURI.of(compoundDownloadURI);
+                ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
+                return new BundlePack(categoryId, id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName);
+            }
+
+            public Pack toPack() {
+                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, List.of());
+            }
+        }
+
         public static final Codec<Pack> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("id").forGetter(Pack::id),
             Codec.STRING.fieldOf("name").forGetter(Pack::name),
             Codec.STRING.optionalFieldOf("description", "").forGetter(Pack::description),
-            Codec.STRING.xmap(URI::create, URI::toString).fieldOf("downloadURI").forGetter(Pack::downloadURI),
+            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(Pack::downloadURI),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(Pack::worldTemplateDownloadURI),
-            Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName)
+            Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName),
+            BundlePack.CODEC.listOf().optionalFieldOf("bundlePacks", List.of()).forGetter(Pack::bundlePacks)
         ).apply(i, Pack::create));
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, URI compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName) {
+        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<BundlePack> bundlePacks) {
             ParsedURI download = ParsedURI.of(compoundDownloadURI);
             ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-            return new Pack(id, name, description, download.uri().orElseThrow(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName);
+            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks);
         }
 
         public boolean hasWorldTemplate() {
             return worldTemplateDownloadURI.isPresent();
+        }
+
+        public boolean hasBundlePacks() {
+            return !bundlePacks.isEmpty();
         }
     }
 
@@ -171,7 +215,52 @@ public class ContentManager {
         }
     }
 
+    private static Optional<Category> getCategory(String categoryId) {
+        return CATEGORIES.stream().filter(c -> c.id().equals(categoryId)).findFirst();
+    }
+
+    private static List<Pack.BundlePack> getLimitedBundlePacks(Pack pack) {
+        if (pack.bundlePacks().size() > 6) {
+            Legacy4J.LOGGER.warn("Bundle pack {} exceeds the supported child pack limit of 6. Extra entries will be ignored.", pack.id());
+        }
+        return pack.bundlePacks().stream().limit(6).toList();
+    }
+
+    private static boolean shouldApplyTransparencyFix(Category category) {
+        return "resourcepacks".equals(category.targetDirectoryName()) && ("texture_packs".equals(category.id()) || "mashup_packs".equals(category.id()));
+    }
+
+    private static void applyTransparencyFix(Path targetFolder) throws IOException {
+        Path fixTempFile = Files.createTempFile("legacy_pack_fix_", ".zip");
+        try {
+            try (InputStream stream = openRemoteStream(new URL(TRANSPARENCY_FIX_URL), 5000, 10000)) {
+                Files.copy(stream, fixTempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            extractZip(fixTempFile, targetFolder);
+        } finally {
+            Files.deleteIfExists(fixTempFile);
+        }
+    }
+
+    private static String downloadKey(Category category, Pack pack) {
+        return category.id() + ":" + pack.id();
+    }
+
+    public static boolean isPackDownloading(Pack pack, Category category) {
+        return ACTIVE_DOWNLOADS.contains(downloadKey(category, pack));
+    }
+
     public static boolean isPackInstalled(Pack pack, Category category) {
+        if (pack.hasBundlePacks()) {
+            List<Pack.BundlePack> bundlePacks = getLimitedBundlePacks(pack);
+            if (bundlePacks.isEmpty()) return false;
+            for (Pack.BundlePack bundlePack : bundlePacks) {
+                Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
+                if (bundleCategory.isEmpty() || !isPackInstalled(bundlePack.toPack(), bundleCategory.get())) return false;
+            }
+            return true;
+        }
+
         String folderName = category.targetDirectoryName();
         Path path = getContentDir(folderName).resolve(pack.id());
         if (!Files.exists(path) || !Files.isDirectory(path)) return false;
@@ -194,19 +283,57 @@ public class ContentManager {
         return true;
     }
 
-    public static void downloadPack(Pack pack, Category category, Runnable onComplete) {
+    public static void downloadPack(Pack pack, Category category, Consumer<Boolean> onComplete) {
+        downloadPackInternal(pack, category).whenComplete((installedAnything, throwable) ->
+            Minecraft.getInstance().execute(() -> onComplete.accept(installedAnything != null && installedAnything))
+        );
+    }
+
+    private static CompletableFuture<Boolean> downloadPackInternal(Pack pack, Category category) {
+        if (pack.hasBundlePacks()) {
+            return downloadBundlePack(pack, category);
+        }
+        return downloadSinglePack(pack, category);
+    }
+
+    private static CompletableFuture<Boolean> downloadBundlePack(Pack pack, Category category) {
+        List<Pack.BundlePack> bundlePacks = getLimitedBundlePacks(pack);
+        if (bundlePacks.isEmpty()) return CompletableFuture.completedFuture(false);
+        ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
+        CompletableFuture<Boolean>[] futures = bundlePacks.stream().map(bundlePack -> {
+            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
+            if (bundleCategory.isEmpty()) {
+                Legacy4J.LOGGER.warn("Unknown bundle pack category {} while installing {}", bundlePack.categoryId(), pack.id());
+                return CompletableFuture.completedFuture(false);
+            }
+            return downloadSinglePack(bundlePack.toPack(), bundleCategory.get());
+        }).toArray(CompletableFuture[]::new);
+        return CompletableFuture.allOf(futures).thenApply(v -> {
+            boolean installedAnything = false;
+            for (CompletableFuture<Boolean> future : futures) {
+                installedAnything |= future.getNow(false);
+            }
+            return installedAnything;
+        }).whenComplete((result, throwable) -> ACTIVE_DOWNLOADS.remove(downloadKey(category, pack)));
+    }
+
+    private static CompletableFuture<Boolean> downloadSinglePack(Pack pack, Category category) {
         if (isPackInstalled(pack, category)) {
-            Minecraft.getInstance().execute(onComplete);
-            return;
+            return CompletableFuture.completedFuture(false);
         }
 
         String folderName = category.targetDirectoryName();
         Path contentDir = getContentDir(folderName);
-        CompletableFuture.runAsync(() -> {
+        ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
+        return CompletableFuture.supplyAsync(() -> {
             try {
+                if (pack.downloadURI().isEmpty()) {
+                    Legacy4J.LOGGER.warn("Pack {} has no download URI.", pack.id());
+                    return false;
+                }
                 Path downloadedTempFile = Files.createTempFile("legacy_pack_", ".zip");
                 
-                try (InputStream stream = pack.downloadURI().toURL().openStream()) {
+                try (InputStream stream = pack.downloadURI().get().toURL().openStream()) {
                     Files.copy(stream, downloadedTempFile, StandardCopyOption.REPLACE_EXISTING);
                 }
 
@@ -215,8 +342,7 @@ public class ContentManager {
                     if (!pack.checkSum().get().equals(fileHash)) {
                         Legacy4J.LOGGER.warn("Checksum mismatch for pack {}. Expected {}, got {}", pack.id(), pack.checkSum().get(), fileHash);
                         Files.deleteIfExists(downloadedTempFile);
-                        Minecraft.getInstance().execute(onComplete);
-                        return;
+                        return false;
                     }
                 }
 
@@ -227,6 +353,9 @@ public class ContentManager {
                 Files.createDirectories(targetFolder);
 
                 extractZip(downloadedTempFile, targetFolder);
+                if (shouldApplyTransparencyFix(category)) {
+                    applyTransparencyFix(targetFolder);
+                }
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
                 } else if (category.useResourceAlbum() && Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
@@ -240,19 +369,23 @@ public class ContentManager {
                     Files.writeString(targetFolder.resolve(".md5"), pack.checkSum().get());
                 }
 
-                Minecraft.getInstance().execute(() -> {
-                    LegacyWorldTemplate.refreshDownloadedPacks();
-                    onComplete.run();
-                });
+                Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
+                return true;
             } catch (Exception e) {
                 deletePack(pack, category);
                 Legacy4J.LOGGER.warn("Error when downloading content pack to {}: {}", contentDir.resolve(pack.id()), e.getMessage());
-                Minecraft.getInstance().execute(onComplete);
+                return false;
             }
-        });
+        }).whenComplete((result, throwable) -> ACTIVE_DOWNLOADS.remove(downloadKey(category, pack)));
     }
 
     public static void deletePack(Pack pack, Category category) {
+        if (pack.hasBundlePacks()) {
+            for (Pack.BundlePack bundlePack : getLimitedBundlePacks(pack)) {
+                getCategory(bundlePack.categoryId()).ifPresent(bundleCategory -> deletePack(bundlePack.toPack(), bundleCategory));
+            }
+            return;
+        }
         Path packDir = getContentDir(category.targetDirectoryName()).resolve(pack.id());
         if (Files.exists(packDir)) {
             deleteDirectoryRecursively(packDir.toFile());
