@@ -1739,7 +1739,7 @@
   "legacy.menu.legacy_settings_menus_warning.message": "This will hide extra settings in several menus and hide the advanced options prompt. The advanced options button will still work, and you can turn this off again at any time.",
   "legacy.menu.sorting": "Sorting: %s",
   "legacy.menu.sorting.alphabetical": "Alphabetical",
-  "legacy.menu.community_skinpacks": "Community Skinpacks",
+  "legacy.menu.community_skinpacks": "Skin Packs",
   "legacy.menu.store": "Download Content",
   "legacy.menu.store_no_content": "There are no downloadable content offers available for this title at the moment.",
   "legacy.menu.store_no_content_message": "There are no downloadable content offers of this type available for this title at the moment.",
