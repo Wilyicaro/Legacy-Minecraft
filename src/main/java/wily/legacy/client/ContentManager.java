@@ -20,6 +20,7 @@ import wily.legacy.util.IOUtil;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -103,9 +104,17 @@ public class ContentManager {
         }
     }
 
+    public static InputStream openRemoteStream(URL url, int connectTimeout, int readTimeout) throws IOException {
+        URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(connectTimeout);
+        connection.setReadTimeout(readTimeout);
+        return connection.getInputStream();
+    }
+
     public static CompletableFuture<List<Pack>> fetchIndex(String indexUrl) {
         return CompletableFuture.supplyAsync(() -> {
-            try (InputStreamReader reader = new InputStreamReader(new URL(indexUrl).openStream())) {
+            try (InputStream stream = openRemoteStream(new URL(indexUrl), 5000, 10000);
+                 InputStreamReader reader = new InputStreamReader(stream)) {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                 return Pack.LIST_CODEC.parse(JsonOps.INSTANCE, json.get("packs"))
                         .resultOrPartial(Legacy4J.LOGGER::warn)

@@ -50,7 +50,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
             prefetchCategory(category);
             addMenuButton(category.title(), b -> {
                 if (this.isLoading) return;
-                CompletableFuture<List<ContentManager.Pack>> future = prefetchCategory(category).thenCompose(Legacy4JContentListScreen::prepareOpen);
+                CompletableFuture<List<ContentManager.Pack>> future = prefetchCategory(category);
                 if (!future.isDone()) this.isLoading = true;
                 future.thenAccept(packs -> {
                     minecraft.execute(() -> {
