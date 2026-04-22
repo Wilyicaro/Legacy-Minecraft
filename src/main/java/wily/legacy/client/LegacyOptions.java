@@ -59,6 +59,7 @@ public class LegacyOptions {
             } finally {
                 loadingClientOptions = false;
             }
+            ensureLegacySettingsMenusUseMergeMode();
             Legacy4JClient.isNewerVersion = Legacy4J.isNewerVersion(Legacy4J.VERSION.get(), lastLoadedVersion.get());
             Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().name(), lastLoadedMinecraftVersion.get());
         }
@@ -192,8 +193,10 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inGameTooltips = CLIENT_STORAGE.register(createBoolean("gameTooltips", true));
     public static final FactoryConfig<Boolean> tooltipBoxes = CLIENT_STORAGE.register(createBoolean("tooltipBoxes", true));
     public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", false));
+    public static final FactoryConfig<Boolean> displayPackManagementTooltips = CLIENT_STORAGE.register(createBoolean("displayPackManagementTooltips", true));
     public static final FactoryConfig<Boolean> legacySettingsMenus = CLIENT_STORAGE.register(createBoolean("legacySettingsMenus", false));
     public static final FactoryConfig<Boolean> displayGameMessages = CLIENT_STORAGE.register(createBoolean("displayGameMessages", true));
+    public static final FactoryConfig<Boolean> announceAdvancements = CLIENT_STORAGE.register(createBoolean("announceAdvancements", true));
     public static final FactoryConfig<Boolean> deathMessages = CLIENT_STORAGE.register(createBoolean("deathMessages", true));
     public static final FactoryConfig<Boolean> hints = CLIENT_STORAGE.register(createBoolean("hints", true));
     public static final FactoryConfig<Boolean> flyingViewRolling = CLIENT_STORAGE.register(createBoolean("flyingViewRolling", true));
@@ -257,6 +260,7 @@ public class LegacyOptions {
     public static final FactoryConfig<VehicleCameraRotation> vehicleCameraRotation = CLIENT_STORAGE.register(create("vehicleCameraRotation", builder -> builder.valueToComponent(v -> v.displayName), i -> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal, ()->VehicleCameraRotation.values().length, VehicleCameraRotation.CODEC, VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> defaultParticlePhysics = CLIENT_STORAGE.register(createBoolean("defaultParticlePhysics", true));
     public static final FactoryConfig<Boolean> linearCameraMovement = CLIENT_STORAGE.register(createBoolean("linearCameraMovement", false));
+    public static final FactoryConfig<Boolean> showOptionsPresetInLegacyGraphics = CLIENT_STORAGE.register(createBoolean("showOptionsPresetInLegacyGraphics", false));
     public static final FactoryConfig<Boolean> legacyOverstackedItems = CLIENT_STORAGE.register(createBoolean("legacyOverstackedItems", true));
     public static final FactoryConfig<Boolean> displayMultipleControlsFromAction = CLIENT_STORAGE.register(createBoolean("displayMultipleControlsFromAction", false));
     public static final FactoryConfig<Boolean> enhancedPistonMovingRenderer = CLIENT_STORAGE.register(createBoolean("enhancedPistonMovingRenderer", true));
@@ -311,6 +315,11 @@ public class LegacyOptions {
         FactoryConfig.saveOptionAndConsume(classicStonecutting, enabled, v -> {});
         FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
         FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
+    }
+
+    public static void ensureLegacySettingsMenusUseMergeMode() {
+        if (!legacySettingsMenus.get() || advancedOptionsMode.get() == AdvancedOptionsMode.MERGE) return;
+        FactoryConfig.saveOptionAndConsume(advancedOptionsMode, AdvancedOptionsMode.MERGE, v -> {});
     }
 
     public static boolean canSendPlayerInfoSync() {

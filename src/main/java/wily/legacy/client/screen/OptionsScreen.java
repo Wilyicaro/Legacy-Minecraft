@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -39,6 +40,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.ControlTooltip.getKeyIcon;
 
 public class OptionsScreen extends PanelVListScreen {
+    private static boolean buildingMergedLegacyAdvancedOptions = false;
     public Screen advancedOptionsScreen;
 
     public OptionsScreen(Screen parent, Panel.Constructor<OptionsScreen> panelConstructor, Component component) {
@@ -46,14 +48,37 @@ public class OptionsScreen extends PanelVListScreen {
     }
 
     public OptionsScreen(Screen parent, Section section) {
-        this(parent, LegacyOptions.advancedOptionsMode.get() == LegacyOptions.AdvancedOptionsMode.MERGE && section.advancedSection.isPresent() ? section.advancedSection.get().panelConstructor() : section.panelConstructor(), section.title());
+        this(parent, section.panelConstructor(), section.title());
         section.elements().forEach(c -> c.accept(this));
         section.advancedSection.ifPresent(s -> {
             switch (LegacyOptions.advancedOptionsMode.get()) {
                 case DEFAULT -> withAdvancedOptions(s.build(this));
-                case MERGE -> s.elements().forEach(c -> c.accept(this));
+                case MERGE -> {
+                    if (LegacyOptions.legacySettingsMenus.get()) withAdvancedOptions(buildMergedAdvancedOptionsScreen(this, section, s));
+                    else s.elements().forEach(c -> c.accept(this));
+                }
             }
         });
+    }
+
+    private static Screen buildMergedAdvancedOptionsScreen(Screen parent, Section baseSection, Section advancedSection) {
+        List<Consumer<OptionsScreen>> mergedElements = new ArrayList<>(baseSection.elements());
+        mergedElements.addAll(advancedSection.elements());
+        Section mergedSection = new Section(advancedSection.title(), advancedSection.panelConstructor(), mergedElements, ArbitrarySupplier.empty(), baseSection.sectionBuilder());
+        buildingMergedLegacyAdvancedOptions = true;
+        try {
+            return mergedSection.build(parent);
+        } finally {
+            buildingMergedLegacyAdvancedOptions = false;
+        }
+    }
+
+    private static boolean isMergedLegacyGraphicsSection(Section section) {
+        return LegacyOptions.legacySettingsMenus.get() && section.panelConstructor() == Section.ADVANCED_GRAPHICS.panelConstructor();
+    }
+
+    private static boolean useLegacySettingsMenusOptions() {
+        return LegacyOptions.legacySettingsMenus.get() && !buildingMergedLegacyAdvancedOptions;
     }
 
     public static void setupSelectorControlTooltips(ControlTooltip.Renderer renderer, Screen screen) {
@@ -84,8 +109,14 @@ public class OptionsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        setupSelectorControlTooltips(renderer, this);
-        renderer.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
+        if (shouldAddSelectorControlTooltips()) setupSelectorControlTooltips(renderer, this);
+        if (renderer.tooltips.size() > 6) {
+            renderer.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
+        }
+    }
+
+    protected boolean shouldAddSelectorControlTooltips() {
+        return true;
     }
 
     public void updateWidgets(boolean forceMessageUpdate) {
@@ -162,17 +193,11 @@ public class OptionsScreen extends PanelVListScreen {
                 b -> FactoryConfigWidgets.getCachedTooltip(LegacyOptions.legacySettingsMenus.getDisplay().tooltip().apply(b)),
                 t -> {
                     if (!t.selected) {
-                        FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, false, v -> reopenLegacySettingsMenusScreen(screen));
+                        disableLegacySettingsMenus(screen.parent);
                         return;
                     }
                     t.selected = false;
-                    screen.minecraft.setScreen(new ConfirmationScreen(screen,
-                            Component.translatable("legacy.menu.legacy_settings_menus_warning"),
-                            Component.translatable("legacy.menu.legacy_settings_menus_warning.message"),
-                            s -> {
-                                FactoryConfig.saveOptionAndConsume(LegacyOptions.displayChatIndicators, false, v ->
-                                        FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, true, v1 -> reopenLegacySettingsMenusScreen(screen)));
-                            }));
+                    screen.minecraft.setScreen(createLegacySettingsMenusWarningScreen(screen));
                 },
                 LegacyOptions.legacySettingsMenus::get);
     }
@@ -186,8 +211,63 @@ public class OptionsScreen extends PanelVListScreen {
                 () -> !LegacyOptions.hideAdvancedOptionsTooltip.get());
     }
 
-    private static void reopenLegacySettingsMenusScreen(OptionsScreen screen) {
-        screen.minecraft.setScreen(Section.ADVANCED_USER_INTERFACE.build(refreshLegacySettingsParent(screen.parent)));
+    private static TickBox createDisplayPackManagementTooltipsTickBox() {
+        return new TickBox(0, 0, 200,
+                LegacyOptions.displayPackManagementTooltips.get(),
+                b -> LegacyOptions.displayPackManagementTooltips.getDisplay().name(),
+                b -> FactoryConfigWidgets.getCachedTooltip(LegacyOptions.displayPackManagementTooltips.getDisplay().tooltip().apply(b)),
+                t -> FactoryConfig.saveOptionAndConsume(LegacyOptions.displayPackManagementTooltips, t.selected, v -> {}),
+                LegacyOptions.displayPackManagementTooltips::get);
+    }
+
+    static AbstractWidget createLegacyGraphicsPresetWidget(boolean active) {
+        AbstractWidget widget = LegacyConfigWidgets.createWidget(LegacyOptions.showOptionsPresetInLegacyGraphics);
+        widget.active = active;
+        return widget;
+    }
+
+    static ConfirmationScreen createLegacySettingsMenusWarningScreen(Screen parent, Consumer<ConfirmationScreen> okAction) {
+        return new ConfirmationScreen(parent,
+                ConfirmationScreen::getPanelWidth,
+                () -> ConfirmationScreen.getBaseHeight() + (LegacyOptions.getUIMode().isSD() ? 19 : 22),
+                Component.translatable("legacy.menu.legacy_settings_menus_warning"),
+                Component.translatable("legacy.menu.legacy_settings_menus_warning.message"),
+                okAction) {
+            @Override
+            protected void addButtons() {
+                renderableVList.addRenderable(createLegacyGraphicsPresetWidget(true));
+                super.addButtons();
+            }
+        };
+    }
+
+    private static ConfirmationScreen createLegacySettingsMenusWarningScreen(OptionsScreen screen) {
+        return createLegacySettingsMenusWarningScreen(screen, s -> enableLegacySettingsMenus(screen.parent));
+    }
+
+    static void enableLegacySettingsMenus(Screen screen) {
+        FactoryConfig.saveOptionAndConsume(LegacyOptions.displayChatIndicators, false, v ->
+                FactoryConfig.saveOptionAndConsume(LegacyOptions.displayPackManagementTooltips, false, v1 ->
+                        FactoryConfig.saveOptionAndConsume(LegacyOptions.advancedOptionsMode, LegacyOptions.AdvancedOptionsMode.MERGE, v2 ->
+                                FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, true, v3 -> reopenLegacySettingsMenusScreen(screen)))));
+    }
+
+    static void disableLegacySettingsMenus(Screen screen) {
+        FactoryConfig.saveOptionAndConsume(LegacyOptions.legacySettingsMenus, false, v -> {
+            if (LegacyOptions.advancedOptionsMode.get() == LegacyOptions.AdvancedOptionsMode.MERGE) {
+                FactoryConfig.saveOptionAndConsume(LegacyOptions.advancedOptionsMode, LegacyOptions.AdvancedOptionsMode.DEFAULT, v1 -> reopenLegacySettingsMenusScreen(screen));
+                return;
+            }
+            reopenLegacySettingsMenusScreen(screen);
+        });
+    }
+
+    private static boolean shouldShowLegacyGraphicsPresetInGraphics() {
+        return useLegacySettingsMenusOptions() && LegacyOptions.showOptionsPresetInLegacyGraphics.get();
+    }
+
+    private static void reopenLegacySettingsMenusScreen(Screen screen) {
+        Minecraft.getInstance().setScreen(Section.ADVANCED_USER_INTERFACE.build(refreshLegacySettingsParent(screen)));
     }
 
     private static Screen refreshLegacySettingsParent(Screen screen) {
@@ -262,7 +342,7 @@ public class OptionsScreen extends PanelVListScreen {
                         : Panel.centered(s, 250, 162),
                 new ArrayList<>(List.of(
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
+                            if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.of(mc.options.autoJump()),
                                     LegacyOptions.of(mc.options.bobView()),
                                     LegacyOptions.flyingViewRolling,
@@ -276,7 +356,7 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.autoSaveInterval);
                         },
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) {
+                            if (useLegacySettingsMenusOptions()) {
                                 o.renderableVList.addRenderable(
                                         RenderableVListScreen.openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(o, mc.getLanguageManager())).build());
                             } else if (mc.level == null && !mc.hasSingleplayerServer()) {
@@ -284,7 +364,7 @@ public class OptionsScreen extends PanelVListScreen {
                             }
                         },
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) {
+                            if (useLegacySettingsMenusOptions()) {
                                 o.renderableVList.addOptions(
                                         LegacyOptions.autoSaveInterval,
                                         LegacyOptions.combinedLookSensitivity());
@@ -295,7 +375,7 @@ public class OptionsScreen extends PanelVListScreen {
                             }
                         },
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) addDifficultyOption(o);
+                            if (useLegacySettingsMenusOptions()) addDifficultyOption(o);
                         })),
                 () -> Section.ADVANCED_GAME_OPTIONS));
         public static final Section ADVANCED_GAME_OPTIONS = new Section(
@@ -385,11 +465,11 @@ public class OptionsScreen extends PanelVListScreen {
                         : Panel.centered(s, 250, 222, 0, 24),
                 new ArrayList<>(List.of(
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addRenderable(createRenderCloudsTickBox());
+                            if (useLegacySettingsMenusOptions()) o.renderableVList.addRenderable(createRenderCloudsTickBox());
                             else o.renderableVList.addOptions(LegacyOptions.of(mc.options.cloudStatus()), LegacyOptions.optionsPreset);
                         },
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
+                            if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.customSkinAnimation,
                                     LegacyOptions.legacyGamma);
                             else o.renderableVList.addLinkedOptions(
@@ -397,12 +477,15 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.legacyGamma);
                         },
                         o -> {
-                            if (!LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
+                            if (shouldShowLegacyGraphicsPresetInGraphics()) o.renderableVList.addOptions(LegacyOptions.optionsPreset);
+                        },
+                        o -> {
+                            if (!useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.of(mc.options.gamma()),
                                     LegacyOptions.of(mc.options.ambientOcclusion()));
         })),
                 () -> Section.ADVANCED_GRAPHICS, (p, s) -> {
-            if (LegacyOptions.legacySettingsMenus.get()) return new OptionsScreen(p, s) {
+            if (LegacyOptions.legacySettingsMenus.get() && !isMergedLegacyGraphicsSection(s)) return new OptionsScreen(p, s) {
                 @Override
                 public void onClose() {
                     super.onClose();
@@ -425,23 +508,33 @@ public class OptionsScreen extends PanelVListScreen {
 
                 @Override
                 public boolean mouseScrolled(double d, double e, double f, double g) {
-                    return selectorTooltipVisibility > 0 && (globalPackSelector.scrollableRenderer.mouseScrolled(g) || selector.scrollableRenderer.mouseScrolled(g)) || super.mouseScrolled(d, e, f, g);
+                    return shouldDisplayPackManagementTooltips() && selectorTooltipVisibility > 0 && (globalPackSelector.scrollableRenderer.mouseScrolled(g) || selector.scrollableRenderer.mouseScrolled(g)) || super.mouseScrolled(d, e, f, g);
+                }
+
+                @Override
+                protected boolean shouldAddSelectorControlTooltips() {
+                    return shouldDisplayPackManagementTooltips();
                 }
 
                 @Override
                 protected void panelInit() {
                     super.panelInit();
-                    panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 20f * PackAlbum.Selector.getDefaultWidth());
+                    if (shouldDisplayPackManagementTooltips()) {
+                        panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 20f * PackAlbum.Selector.getDefaultWidth());
+                    }
                 }
 
                 private float getSelectorTooltipVisibility() {
+                    if (!shouldDisplayPackManagementTooltips()) {
+                        return 0;
+                    }
                     return selectorTooltipVisibility == 0 ? selectorTooltipVisibility : selectorTooltipVisibility + FactoryAPIClient.getPartialTick();
                 }
 
                 @Override
                 public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
                     super.renderDefaultBackground(guiGraphics, i, j, f);
-                    if (selectorTooltipVisibility > 0) {
+                    if (shouldDisplayPackManagementTooltips() && selectorTooltipVisibility > 0) {
                         if (getFocused() != globalPackSelector)
                             selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
                         else
@@ -453,15 +546,19 @@ public class OptionsScreen extends PanelVListScreen {
 
                 @Override
                 public void tick() {
-                    if (((getFocused() == selector || getFocused() == globalPackSelector) || selectorTooltipVisibility > 0) && selectorTooltipVisibility < 10) {
+                    if (shouldDisplayPackManagementTooltips() && ((getFocused() == selector || getFocused() == globalPackSelector) || selectorTooltipVisibility > 0) && selectorTooltipVisibility < 10) {
                         selectorTooltipVisibility++;
                     }
 
-                    if (!finishedAnimation && selectorTooltipVisibility > 0) {
+                    if (shouldDisplayPackManagementTooltips() && !finishedAnimation && selectorTooltipVisibility > 0) {
                         repositionElements();
                         if (selectorTooltipVisibility == 10) finishedAnimation = true;
                     }
                     super.tick();
+                }
+
+                private boolean shouldDisplayPackManagementTooltips() {
+                    return LegacyOptions.displayPackManagementTooltips.get();
                 }
             };
             screen.renderableVList.addRenderables(globalPackSelector, selector);
@@ -472,7 +569,7 @@ public class OptionsScreen extends PanelVListScreen {
                 s -> Panel.centered(s, 250, 215, 0, 20),
                 new ArrayList<>(List.of(
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(LegacyOptions.optionsPreset);
+                            if (useLegacySettingsMenusOptions() && !shouldShowLegacyGraphicsPresetInGraphics()) o.renderableVList.addOptions(LegacyOptions.optionsPreset);
                         },
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.videoTitle"),
@@ -551,7 +648,7 @@ public class OptionsScreen extends PanelVListScreen {
                         : Panel.centered(s, 250, 184, 0, 18),
                 new ArrayList<>(List.of(
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
+                            if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.displayHUD,
                                     LegacyOptions.displayHand,
                                     LegacyOptions.displayGameMessages,
@@ -571,13 +668,14 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.hudDistance,
                                     LegacyOptions.of(mc.options.guiScale()),
                                     LegacyOptions.uiMode);
-                            if (!LegacyOptions.legacySettingsMenus.get()) {
+                            if (!useLegacySettingsMenusOptions()) {
                                 o.getRenderableVList().addRenderable(createDisplayAdvancedOptionsTooltipTickBox());
+                                o.getRenderableVList().addRenderable(createDisplayPackManagementTooltipsTickBox());
                             }
                         },
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
                         o -> {
-                            if (LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
+                            if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.inGameOnlineIds,
                                     LegacyOptions.classicCrafting,
                                     LegacyOptions.hudSize);
@@ -589,7 +687,7 @@ public class OptionsScreen extends PanelVListScreen {
                             }
                         },
                         o -> {
-                            if (!LegacyOptions.legacySettingsMenus.get()) o.renderableVList.addOptions(
+                            if (!useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.inGameTooltips,
                                     LegacyOptions.animatedCharacter,
                                     LegacyOptions.smoothAnimatedCharacter,
@@ -633,6 +731,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> {
                             o.renderableVList.addCategory(Component.translatable("legacy.menu.menu_settings"));
                             o.renderableVList.addRenderable(createLegacySettingsMenusTickBox(o));
+                            o.renderableVList.addRenderable(createLegacyGraphicsPresetWidget(LegacyOptions.legacySettingsMenus.get()));
                             o.renderableVList.addOptions(
                                     LegacyOptions.titleScreenFade,
                                     LegacyOptions.titleScreenVersionText,
@@ -652,6 +751,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.chat.title"),
                                 LegacyOptions.of(mc.options.reducedDebugInfo()),
+                                LegacyOptions.announceAdvancements,
                                 LegacyOptions.displayChatIndicators,
                                 LegacyOptions.of(mc.options.chatVisibility()),
                                 LegacyOptions.of(mc.options.chatOpacity()),

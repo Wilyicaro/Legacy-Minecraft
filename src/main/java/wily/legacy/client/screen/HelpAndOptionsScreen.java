@@ -48,6 +48,16 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                 Button.builder(Component.translatable("legacy.options.selectedController"), button -> Minecraft.getInstance().setScreen(new ControllerMappingScreen(r.getScreen()))).build()));
     }
 
+    private static Screen createCreditsScreen(Screen parent) {
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            return new WinScreen(false, () -> Minecraft.getInstance().setScreen(parent));
+        }
+        return new RenderableVListScreen(parent, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(
+                openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new WinScreen(false, () -> Minecraft.getInstance().setScreen(r.getScreen()))).build(),
+                Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),
+                Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()));
+    }
+
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
         });
@@ -55,7 +65,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         renderableVList.addRenderable(HOW_TO_PLAY.createButtonBuilder(this).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> createControlsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"), () -> new SettingsScreen(this)).build());
-        renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new RenderableVListScreen(this, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new WinScreen(false, () -> this.minecraft.setScreen(r.getScreen()))).build(), Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(), Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()))).build());
+        renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCreditsScreen(this)).build());
     }
 
     public static List<AbstractWidget> createPlayerSkinWidgets() {
