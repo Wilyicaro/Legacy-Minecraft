@@ -12,12 +12,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Skins.skin.CustomSkinPackStore;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -92,18 +94,28 @@ public abstract class OptionsMixin {
     private void loadSelectedResourcePacks(PackRepository packRepository, CallbackInfo ci) {
         PackAlbum.init();
         GlobalPacks.STORAGE.load();
+        List<String> savedResourcePacks = List.copyOf(resourcePacks);
+        List<String> savedIncompatibleResourcePacks = List.copyOf(incompatibleResourcePacks);
         GlobalPacks.globalResources.get().applyPacks(packRepository, PackAlbum.getDefaultResourceAlbum().packs());
-        restoreManagedSkinPacks(packRepository);
+        enableCustomSkinPack();
+        restoreManagedSkinPacks(packRepository, savedResourcePacks, savedIncompatibleResourcePacks);
         PackAlbum.updateSavedResourcePacks();
         ci.cancel();
     }
 
-    private void restoreManagedSkinPacks(PackRepository packRepository) {
+    private void enableCustomSkinPack() {
+        try {
+            CustomSkinPackStore.enableResourcePack(minecraft);
+        } catch (IOException ignored) {
+        }
+    }
+
+    private void restoreManagedSkinPacks(PackRepository packRepository, List<String> savedResourcePacks, List<String> savedIncompatibleResourcePacks) {
         List<String> selected = new ArrayList<>(packRepository.getSelectedIds());
         boolean changed = false;
         for (String packName : MANAGED_SKIN_PACKS) {
             String fileId = "file/" + packName;
-            if (!resourcePacks.contains(packName) && !resourcePacks.contains(fileId) && !incompatibleResourcePacks.contains(packName) && !incompatibleResourcePacks.contains(fileId)) continue;
+            if (!savedResourcePacks.contains(packName) && !savedResourcePacks.contains(fileId) && !savedIncompatibleResourcePacks.contains(packName) && !savedIncompatibleResourcePacks.contains(fileId)) continue;
             String resolved = packRepository.getPack(fileId) != null ? fileId : packRepository.getPack(packName) != null ? packName : null;
             if (resolved == null || selected.contains(resolved)) continue;
             selected.add(resolved);

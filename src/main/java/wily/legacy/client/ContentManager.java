@@ -9,6 +9,7 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
@@ -72,8 +73,43 @@ public class ContentManager {
         Optional<URI> worldTemplateDownloadURI,
         Optional<String> worldTemplateCheckSum,
         Optional<String> worldTemplateFolderName,
-        List<BundlePack> bundlePacks
+        List<BundlePack> bundlePacks,
+        Optional<ResourceAlbum> resourceAlbum
     ) {
+        public record ResourceAlbum(
+            Optional<String> id,
+            int version,
+            Optional<String> name,
+            Optional<String> description,
+            Optional<ResourceLocation> icon,
+            Optional<ResourceLocation> background,
+            List<String> packs,
+            Optional<String> displayPack
+        ) {
+            public static final Codec<ResourceAlbum> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.STRING.optionalFieldOf("id").forGetter(ResourceAlbum::id),
+                Codec.INT.optionalFieldOf("version", 0).forGetter(ResourceAlbum::version),
+                Codec.STRING.optionalFieldOf("name").forGetter(ResourceAlbum::name),
+                Codec.STRING.optionalFieldOf("description").forGetter(ResourceAlbum::description),
+                ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(ResourceAlbum::icon),
+                ResourceLocation.CODEC.optionalFieldOf("background").forGetter(ResourceAlbum::background),
+                Codec.STRING.listOf().optionalFieldOf("packs", List.of()).forGetter(ResourceAlbum::packs),
+                Codec.STRING.optionalFieldOf("displayPack").forGetter(ResourceAlbum::displayPack)
+            ).apply(i, ResourceAlbum::new));
+
+            public String resolvedId(Pack pack) {
+                return id.filter(s -> !s.isBlank()).orElse(pack.id());
+            }
+
+            public String resolvedName(Pack pack) {
+                return name.filter(s -> !s.isBlank()).orElse(pack.name());
+            }
+
+            public String resolvedDescription(Pack pack) {
+                return description.filter(s -> !s.isBlank()).orElse(pack.description());
+            }
+        }
+
         public record BundlePack(
             String categoryId,
             String id,
@@ -104,7 +140,7 @@ public class ContentManager {
             }
 
             public Pack toPack() {
-                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, List.of());
+                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, List.of(), Optional.empty());
             }
         }
 
@@ -116,15 +152,16 @@ public class ContentManager {
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(Pack::worldTemplateDownloadURI),
             Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName),
-            BundlePack.CODEC.listOf().optionalFieldOf("bundlePacks", List.of()).forGetter(Pack::bundlePacks)
+            BundlePack.CODEC.listOf().optionalFieldOf("bundlePacks", List.of()).forGetter(Pack::bundlePacks),
+            ResourceAlbum.CODEC.optionalFieldOf("resourceAlbum").forGetter(Pack::resourceAlbum)
         ).apply(i, Pack::create));
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<BundlePack> bundlePacks) {
+        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum) {
             ParsedURI download = ParsedURI.of(compoundDownloadURI);
             ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks);
+            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks, resourceAlbum);
         }
 
         public boolean hasWorldTemplate() {
@@ -133,6 +170,10 @@ public class ContentManager {
 
         public boolean hasBundlePacks() {
             return !bundlePacks.isEmpty();
+        }
+
+        public boolean hasResourceAlbum() {
+            return resourceAlbum.isPresent();
         }
     }
 
@@ -219,13 +260,6 @@ public class ContentManager {
         return CATEGORIES.stream().filter(c -> c.id().equals(categoryId)).findFirst();
     }
 
-    private static List<Pack.BundlePack> getLimitedBundlePacks(Pack pack) {
-        if (pack.bundlePacks().size() > 6) {
-            Legacy4J.LOGGER.warn("Bundle pack {} exceeds the supported child pack limit of 6. Extra entries will be ignored.", pack.id());
-        }
-        return pack.bundlePacks().stream().limit(6).toList();
-    }
-
     private static boolean shouldApplyTransparencyFix(Category category) {
         return "resourcepacks".equals(category.targetDirectoryName()) && ("texture_packs".equals(category.id()) || "mashup_packs".equals(category.id()));
     }
@@ -242,6 +276,33 @@ public class ContentManager {
         }
     }
 
+    private static Optional<byte[]> readOptionalFileBytes(Path path) throws IOException {
+        return Files.isRegularFile(path) ? Optional.of(Files.readAllBytes(path)) : Optional.empty();
+    }
+
+    private static void restoreOptionalFileBytes(Path path, Optional<byte[]> bytes) throws IOException {
+        if (bytes.isPresent()) {
+            Files.write(path, bytes.get());
+        } else {
+            Files.deleteIfExists(path);
+        }
+    }
+
+    private static Optional<String> readOptionalFileText(Path path) throws IOException {
+        return Files.isRegularFile(path) ? Optional.of(Files.readString(path)) : Optional.empty();
+    }
+
+    private static void mergeTransparencyFixPackMeta(Path targetFolder, Optional<String> originalPackMeta) throws IOException {
+        if (originalPackMeta.isEmpty()) return;
+        Path packMetaPath = targetFolder.resolve("pack.mcmeta");
+        JsonObject original = JsonParser.parseString(originalPackMeta.get()).getAsJsonObject();
+        if (Files.isRegularFile(packMetaPath)) {
+            JsonObject fixed = JsonParser.parseString(Files.readString(packMetaPath)).getAsJsonObject();
+            if (fixed.has("overlays")) original.add("overlays", fixed.get("overlays").deepCopy());
+        }
+        Files.writeString(packMetaPath, original.toString());
+    }
+
     private static String downloadKey(Category category, Pack pack) {
         return category.id() + ":" + pack.id();
     }
@@ -252,13 +313,7 @@ public class ContentManager {
 
     public static boolean isPackInstalled(Pack pack, Category category) {
         if (pack.hasBundlePacks()) {
-            List<Pack.BundlePack> bundlePacks = getLimitedBundlePacks(pack);
-            if (bundlePacks.isEmpty()) return false;
-            for (Pack.BundlePack bundlePack : bundlePacks) {
-                Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
-                if (bundleCategory.isEmpty() || !isPackInstalled(bundlePack.toPack(), bundleCategory.get())) return false;
-            }
-            return true;
+            return areBundleChildrenInstalled(pack) && (!pack.hasResourceAlbum() || DownloadedResourceAlbums.hasManagedBundleAlbum(pack));
         }
 
         String folderName = category.targetDirectoryName();
@@ -297,7 +352,7 @@ public class ContentManager {
     }
 
     private static CompletableFuture<Boolean> downloadBundlePack(Pack pack, Category category) {
-        List<Pack.BundlePack> bundlePacks = getLimitedBundlePacks(pack);
+        List<Pack.BundlePack> bundlePacks = pack.bundlePacks();
         if (bundlePacks.isEmpty()) return CompletableFuture.completedFuture(false);
         ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
         CompletableFuture<Boolean>[] futures = bundlePacks.stream().map(bundlePack -> {
@@ -306,18 +361,29 @@ public class ContentManager {
                 Legacy4J.LOGGER.warn("Unknown bundle pack category {} while installing {}", bundlePack.categoryId(), pack.id());
                 return CompletableFuture.completedFuture(false);
             }
-            return downloadSinglePack(bundlePack.toPack(), bundleCategory.get());
+            return downloadSinglePack(bundlePack.toPack(), bundleCategory.get(), !pack.hasResourceAlbum());
         }).toArray(CompletableFuture[]::new);
         return CompletableFuture.allOf(futures).thenApply(v -> {
             boolean installedAnything = false;
             for (CompletableFuture<Boolean> future : futures) {
                 installedAnything |= future.getNow(false);
             }
+            if (pack.hasResourceAlbum()) {
+                if (areBundleChildrenInstalled(pack)) {
+                    installedAnything |= DownloadedResourceAlbums.syncBundle(pack);
+                } else {
+                    DownloadedResourceAlbums.removeBundle(pack);
+                }
+            }
             return installedAnything;
         }).whenComplete((result, throwable) -> ACTIVE_DOWNLOADS.remove(downloadKey(category, pack)));
     }
 
     private static CompletableFuture<Boolean> downloadSinglePack(Pack pack, Category category) {
+        return downloadSinglePack(pack, category, true);
+    }
+
+    private static CompletableFuture<Boolean> downloadSinglePack(Pack pack, Category category, boolean syncResourceAlbum) {
         if (isPackInstalled(pack, category)) {
             return CompletableFuture.completedFuture(false);
         }
@@ -354,12 +420,18 @@ public class ContentManager {
 
                 extractZip(downloadedTempFile, targetFolder);
                 if (shouldApplyTransparencyFix(category)) {
+                    Optional<byte[]> originalPackIcon = readOptionalFileBytes(targetFolder.resolve("pack.png"));
+                    Optional<String> originalPackMeta = readOptionalFileText(targetFolder.resolve("pack.mcmeta"));
                     applyTransparencyFix(targetFolder);
+                    restoreOptionalFileBytes(targetFolder.resolve("pack.png"), originalPackIcon);
+                    mergeTransparencyFixPackMeta(targetFolder, originalPackMeta);
+                }
+                if (Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
+                    DownloadedPackMetadata.write(targetFolder, pack);
                 }
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
-                } else if (category.useResourceAlbum() && Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
-                    DownloadedPackMetadata.write(targetFolder, pack);
+                } else if (syncResourceAlbum && category.useResourceAlbum() && Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
                     DownloadedResourceAlbums.sync(pack);
                 }
                 LegacyWorldTemplate.downloadDownloadedPack(pack);
@@ -369,6 +441,7 @@ public class ContentManager {
                     Files.writeString(targetFolder.resolve(".md5"), pack.checkSum().get());
                 }
 
+                PackAlbum.Selector.invalidatePackAssets(pack.id());
                 Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
                 return true;
             } catch (Exception e) {
@@ -381,7 +454,8 @@ public class ContentManager {
 
     public static void deletePack(Pack pack, Category category) {
         if (pack.hasBundlePacks()) {
-            for (Pack.BundlePack bundlePack : getLimitedBundlePacks(pack)) {
+            DownloadedResourceAlbums.removeBundle(pack);
+            for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
                 getCategory(bundlePack.categoryId()).ifPresent(bundleCategory -> deletePack(bundlePack.toPack(), bundleCategory));
             }
             return;
@@ -392,8 +466,18 @@ public class ContentManager {
         }
         DownloadedPackMetadata.clear(pack.id());
         DownloadedResourceAlbums.remove(pack.id());
+        PackAlbum.Selector.invalidatePackAssets(pack.id());
         LegacyWorldTemplate.removeDownloadedPack(pack.id());
         LegacyWorldTemplate.refreshDownloadedPacks();
+    }
+
+    private static boolean areBundleChildrenInstalled(Pack pack) {
+        if (!pack.hasBundlePacks()) return false;
+        for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
+            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
+            if (bundleCategory.isEmpty() || !isPackInstalled(bundlePack.toPack(), bundleCategory.get())) return false;
+        }
+        return true;
     }
 
     private static void deleteDirectoryRecursively(File directory) {
