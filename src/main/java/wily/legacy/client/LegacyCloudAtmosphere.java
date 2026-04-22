@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
@@ -13,6 +14,7 @@ import org.joml.Vector3f;
 
 public final class LegacyCloudAtmosphere {
     private static final float TWO_PI = 6.2831855f;
+    private static final ResourceLocation VANILLA_CLOUD_SHADER = ResourceLocation.withDefaultNamespace("shaders/core/rendertype_clouds.fsh");
 
     private static final class CloudGeometry {
         private static final float LEGACY_HEIGHT = 128.0f;
@@ -32,7 +34,6 @@ public final class LegacyCloudAtmosphere {
     }
 
     private static final class FogTuning {
-        private static final int DEFAULT_COLOR = 0xFFC0D8FF;
         private static final float SUNRISE_TINT_STRENGTH = 0.96f;
 
         private FogTuning() {
@@ -87,6 +88,11 @@ public final class LegacyCloudAtmosphere {
         return getSunriseCloudViewBlend(level, sampledPartialTick) > warmViewThreshold;
     }
 
+    public static boolean shouldUsePackCloudShader() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.getResourceManager().getResourceStack(VANILLA_CLOUD_SHADER).size() > 1;
+    }
+
     public static int getSkyColor(ClientLevel level, Vec3 position, float partialTick) {
         float brightness = getDayBrightness(level.getTimeOfDay(partialTick));
         BlockPos blockPos = BlockPos.containing(position.x, position.y, position.z);
@@ -113,7 +119,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static int getAtmosphericFogColor(ClientLevel level, Camera camera, int renderDistanceChunks, float partialTick) {
-        float[] rgb = getDimensionFogRgb(level, partialTick);
+        float[] rgb = getDimensionFogRgb(level, camera, partialTick);
 
         if (renderDistanceChunks >= 4) {
             int sunriseColor = getSunriseColor(level.getTimeOfDay(partialTick));
@@ -183,12 +189,15 @@ public final class LegacyCloudAtmosphere {
         return ARGB.colorFromFloat(alpha, red, green, blue);
     }
 
-    private static float[] getDimensionFogRgb(ClientLevel level, float partialTick) {
+    private static float[] getDimensionFogRgb(ClientLevel level, Camera camera, float partialTick) {
         float brightness = getDayBrightness(level.getTimeOfDay(partialTick));
+        BlockPos blockPos = BlockPos.containing(camera.getPosition());
+        Biome biome = level.getBiome(blockPos).value();
+        Vec3 fogColor = level.effects().getBrightnessDependentFogColor(Vec3.fromRGB24(biome.getFogColor()), brightness);
         return new float[]{
-            ARGB.redFloat(FogTuning.DEFAULT_COLOR) * (brightness * 0.94f + 0.06f),
-            ARGB.greenFloat(FogTuning.DEFAULT_COLOR) * (brightness * 0.94f + 0.06f),
-            ARGB.blueFloat(FogTuning.DEFAULT_COLOR) * (brightness * 0.91f + 0.09f)
+            (float) fogColor.x,
+            (float) fogColor.y,
+            (float) fogColor.z
         };
     }
 
