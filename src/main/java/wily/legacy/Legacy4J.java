@@ -57,7 +57,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 //? if forge || neoforge
-/*@Mod(Legacy4J.MOD_ID)*/
+//@Mod(Legacy4J.MOD_ID)
 public class Legacy4J {
 
     public static final String MOD_ID = "legacy";

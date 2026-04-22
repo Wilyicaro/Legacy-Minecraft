@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
@@ -108,7 +109,7 @@ public interface Controller {
     default void connect(ControllerManager manager) {
         manager.setControllerTheLastInput(true);
         if (!manager.isCursorDisabled && manager.minecraft.screen != null)
-            manager.minecraft.execute(() -> manager.minecraft.screen.repositionElements());
+            manager.minecraft.execute(() -> UIAccessor.of(manager.minecraft.screen).reloadUI());
         addOrSetControllerToast(CONTROLLER_DETECTED);
     }
 

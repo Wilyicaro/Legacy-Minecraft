@@ -235,7 +235,7 @@ public class ServerRenderableList extends RenderableVList {
         public final ServerData server;
         public final int serverIndex;
         public final FaviconTexture icon;
-        private byte @Nullable [] lastIconBytes;
+        private byte[] lastIconBytes;
         private boolean showOnlinePlayersTooltip;
         @Nullable
         private ResourceLocation statusIcon;

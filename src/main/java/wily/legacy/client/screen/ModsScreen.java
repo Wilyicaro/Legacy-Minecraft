@@ -100,10 +100,6 @@ public class ModsScreen extends PanelVListScreen {
     public static Style urlClickStyle(String url) {
         Style style = Style.EMPTY;
 
-        //For some reason, Screen::handleComponentClicked doesn't allow to handle click events when outside a world by default (Minecraft::player can't be null)
-        // So I'm going to use this workaround for now
-        if (Minecraft.getInstance().player == null) return style;
-
         try {
             style = style.withClickEvent(new ClickEvent.OpenUrl(URI.create(url)));
         } catch (Exception e) {

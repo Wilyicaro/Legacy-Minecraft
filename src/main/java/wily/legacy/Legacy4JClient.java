@@ -95,9 +95,9 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
 //? if fabric || >=1.21 && neoforge {
-import wily.legacy.client.screen.compat.IrisCompat;
+/*import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
-//?}
+*///?}
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
@@ -451,9 +451,9 @@ public class Legacy4JClient {
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
             //? if fabric || >=1.21 && neoforge {
-            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+            /*if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            //?}
+            *///?}
             LegacyGuiElements.setup(m);
         });
 
@@ -619,7 +619,7 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
         else if (minecraft.screen instanceof LeaderboardsScreen s) {
             s.rebuildRenderableVList(minecraft);
-            s.repositionElements();
+            UIAccessor.of(s).reloadUI();
         }
     }
 

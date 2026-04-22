@@ -22,6 +22,7 @@ import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -467,7 +468,7 @@ public class ControllerManager {
             case ALWAYS -> enableCursor();
             case NEVER -> {
                 tryDisableCursor();
-                if (minecraft.screen != null) minecraft.screen.repositionElements();
+                if (minecraft.screen != null) UIAccessor.of(minecraft.screen).reloadUI();
             }
         }
     }
