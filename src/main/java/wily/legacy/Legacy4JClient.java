@@ -100,6 +100,7 @@ import wily.legacy.client.screen.compat.SodiumCompat;
 *///?}
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyLocalPlayer;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
@@ -398,6 +399,13 @@ public class Legacy4JClient {
     }
 
     public static void init() {
+        LegacyGameRules.setClientRuleResolver(key -> {
+            if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SHIELD_CONTROLS && LegacyOptions.forceLegacyShieldControls.get()) return true;
+            if (key == LegacyGameRules.LEGACY_OFFHAND_LIMITS && LegacyOptions.forceLegacyOffhandLimits.get()) return true;
+            return hasModOnServer() && gameRules != null && gameRules.getBoolean(key);
+        });
         ControlType.UpdateEvent.EVENT.register((last, actual) -> {
             UIAccessor uiAccessor = Minecraft.getInstance().screen == null ? FactoryScreenUtil.getGuiAccessor() : FactoryScreenUtil.getScreenAccessor();
             uiAccessor.reloadUI();
