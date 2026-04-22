@@ -100,6 +100,8 @@ public class LegacySprites {
     public static final ResourceLocation SLIDER_HANDLE = FactoryAPI.createVanillaLocation("widget/slider_handle");
     public static final ResourceLocation BUTTON = FactoryAPI.createVanillaLocation("widget/button");
     public static final ResourceLocation BUTTON_HIGHLIGHTED = FactoryAPI.createVanillaLocation("widget/button_highlighted");
+    public static final ResourceLocation LIST_BUTTON = Legacy4J.createModLocation("widget/list_button");
+    public static final ResourceLocation LIST_BUTTON_HIGHLIGHTED = Legacy4J.createModLocation("widget/list_button_highlighted");
     public static final ResourceLocation TICKBOX = Legacy4J.createModLocation("widget/tickbox");
     public static final ResourceLocation TICKBOX_HOVERED = Legacy4J.createModLocation("widget/tickbox_hovered");
     public static final ResourceLocation TICK = Legacy4J.createModLocation("widget/tick");

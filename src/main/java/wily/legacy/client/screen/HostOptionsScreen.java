@@ -179,12 +179,11 @@ public class HostOptionsScreen extends PanelVListScreen {
         LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font, title, panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false));
     }
 
-    protected abstract class PlayerButton extends AbstractButton implements RenderableVListEntry {
+    protected abstract class PlayerButton extends ListButton implements RenderableVListEntry {
         public final PlayerInfo playerInfo;
-        protected RenderableVList list;
 
         public PlayerButton(int x, int y, int width, int height, PlayerInfo playerInfo) {
-            super(x, y, width, height, Component.literal(playerInfo.getProfile().name()));
+            super(null, x, y, width, height, Component.literal(playerInfo.getProfile().name()));
             this.playerInfo = playerInfo;
         }
 
@@ -202,11 +201,6 @@ public class HostOptionsScreen extends PanelVListScreen {
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             LegacyFontUtil.applySDFont(sd -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + list.accessor.getInteger(list.name + ".buttonMessage.x", 68), this.getY(), getX() + getWidth() - i, this.getY() + this.getHeight(), j, true));
-        }
-
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-            defaultButtonNarrationText(narrationElementOutput);
         }
 
         @Override

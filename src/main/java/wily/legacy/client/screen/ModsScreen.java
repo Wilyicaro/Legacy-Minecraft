@@ -114,7 +114,7 @@ public class ModsScreen extends PanelVListScreen {
         if (sorting.get() != 0) mods = mods.stream().sorted(Comparator.comparing(ModInfo::getName)).toList();
         mods.forEach(mod -> {
             if (mod.isHidden()) return;
-            renderableVList.addRenderable(new AbstractButton(0, 0, 260, 30, Component.literal(mod.getName())) {
+            renderableVList.addRenderable(new ListButton(renderableVList, 0, 0, 260, 30, Component.literal(mod.getName())) {
                 @Override
                 public void onPress(InputWithModifiers input) {
                     if (isFocused()) {
@@ -147,10 +147,6 @@ public class ModsScreen extends PanelVListScreen {
                     LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
                 }
 
-                @Override
-                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                    defaultButtonNarrationText(narrationElementOutput);
-                }
             });
         });
     }
