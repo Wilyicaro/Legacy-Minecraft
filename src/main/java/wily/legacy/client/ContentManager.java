@@ -15,6 +15,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.Skins.skin.CustomSkinPackStore;
 import wily.legacy.Skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.IOUtil;
 
@@ -313,13 +314,17 @@ public class ContentManager {
 
     public static boolean isPackInstalled(Pack pack, Category category) {
         if (pack.hasBundlePacks()) {
-            return areBundleChildrenInstalled(pack) && (!pack.hasResourceAlbum() || DownloadedResourceAlbums.hasManagedBundleAlbum(pack));
+            boolean standaloneInstalled = !hasStandaloneContent(pack) || isStandalonePackInstalled(pack, category);
+            return standaloneInstalled && areBundleChildrenInstalled(pack) && (!pack.hasResourceAlbum() || DownloadedResourceAlbums.hasManagedBundleAlbum(pack));
         }
+        return isStandalonePackInstalled(pack, category);
+    }
 
+    private static boolean isStandalonePackInstalled(Pack pack, Category category) {
         String folderName = category.targetDirectoryName();
         Path path = getContentDir(folderName).resolve(pack.id());
         if (!Files.exists(path) || !Files.isDirectory(path)) return false;
-        if (DownloadedSkinPackStore.managesTargetDirectory(folderName) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
+        if ((DownloadedSkinPackStore.managesTargetDirectory(folderName) || CustomSkinPackStore.managesTargetDirectory(folderName)) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
         if (pack.hasWorldTemplate() && !LegacyWorldTemplate.isDownloadedPackInstalled(pack)) return false;
 
         if (pack.checkSum().isPresent()) {
@@ -336,6 +341,10 @@ public class ContentManager {
         }
 
         return true;
+    }
+
+    private static boolean hasStandaloneContent(Pack pack) {
+        return pack.downloadURI().isPresent();
     }
 
     public static void downloadPack(Pack pack, Category category, Consumer<Boolean> onComplete) {
@@ -355,21 +364,24 @@ public class ContentManager {
         List<Pack.BundlePack> bundlePacks = pack.bundlePacks();
         if (bundlePacks.isEmpty()) return CompletableFuture.completedFuture(false);
         ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
-        CompletableFuture<Boolean>[] futures = bundlePacks.stream().map(bundlePack -> {
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+        if (hasStandaloneContent(pack)) futures.add(isStandalonePackInstalled(pack, category) ? CompletableFuture.completedFuture(false) : downloadPackFiles(pack, category, !pack.hasResourceAlbum(), false));
+        futures.addAll(bundlePacks.stream().map(bundlePack -> {
             Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
             if (bundleCategory.isEmpty()) {
                 Legacy4J.LOGGER.warn("Unknown bundle pack category {} while installing {}", bundlePack.categoryId(), pack.id());
                 return CompletableFuture.completedFuture(false);
             }
             return downloadSinglePack(bundlePack.toPack(), bundleCategory.get(), !pack.hasResourceAlbum());
-        }).toArray(CompletableFuture[]::new);
-        return CompletableFuture.allOf(futures).thenApply(v -> {
+        }).toList());
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).thenApply(v -> {
             boolean installedAnything = false;
             for (CompletableFuture<Boolean> future : futures) {
                 installedAnything |= future.getNow(false);
             }
             if (pack.hasResourceAlbum()) {
-                if (areBundleChildrenInstalled(pack)) {
+                boolean standaloneInstalled = !hasStandaloneContent(pack) || isStandalonePackInstalled(pack, category);
+                if (standaloneInstalled && areBundleChildrenInstalled(pack)) {
                     installedAnything |= DownloadedResourceAlbums.syncBundle(pack);
                 } else {
                     DownloadedResourceAlbums.removeBundle(pack);
@@ -387,10 +399,13 @@ public class ContentManager {
         if (isPackInstalled(pack, category)) {
             return CompletableFuture.completedFuture(false);
         }
+        return downloadPackFiles(pack, category, syncResourceAlbum, true);
+    }
 
+    private static CompletableFuture<Boolean> downloadPackFiles(Pack pack, Category category, boolean syncResourceAlbum, boolean trackActiveDownload) {
         String folderName = category.targetDirectoryName();
         Path contentDir = getContentDir(folderName);
-        ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
+        if (trackActiveDownload) ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
         return CompletableFuture.supplyAsync(() -> {
             try {
                 if (pack.downloadURI().isEmpty()) {
@@ -431,6 +446,8 @@ public class ContentManager {
                 }
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
+                } else if (CustomSkinPackStore.managesTargetDirectory(folderName)) {
+                    CustomSkinPackStore.normalizeDownloadedPack(targetFolder);
                 } else if (syncResourceAlbum && category.useResourceAlbum() && Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
                     DownloadedResourceAlbums.sync(pack);
                 }
@@ -445,21 +462,28 @@ public class ContentManager {
                 Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
                 return true;
             } catch (Exception e) {
-                deletePack(pack, category);
+                deleteStandalonePack(pack, category);
                 Legacy4J.LOGGER.warn("Error when downloading content pack to {}: {}", contentDir.resolve(pack.id()), e.getMessage());
                 return false;
             }
-        }).whenComplete((result, throwable) -> ACTIVE_DOWNLOADS.remove(downloadKey(category, pack)));
+        }).whenComplete((result, throwable) -> {
+            if (trackActiveDownload) ACTIVE_DOWNLOADS.remove(downloadKey(category, pack));
+        });
     }
 
     public static void deletePack(Pack pack, Category category) {
         if (pack.hasBundlePacks()) {
+            if (hasStandaloneContent(pack)) deleteStandalonePack(pack, category);
             DownloadedResourceAlbums.removeBundle(pack);
             for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
                 getCategory(bundlePack.categoryId()).ifPresent(bundleCategory -> deletePack(bundlePack.toPack(), bundleCategory));
             }
             return;
         }
+        deleteStandalonePack(pack, category);
+    }
+
+    private static void deleteStandalonePack(Pack pack, Category category) {
         Path packDir = getContentDir(category.targetDirectoryName()).resolve(pack.id());
         if (Files.exists(packDir)) {
             deleteDirectoryRecursively(packDir.toFile());

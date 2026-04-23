@@ -13,6 +13,7 @@ public final class CustomSkinPackStore {
     private static final String PACK_DESCRIPTION = "Legacy4J custom skin packs";
     private static final String ASSET_NAMESPACE = "lce_skinpacks";
     private static final String PACKS_DIR = "assets/" + ASSET_NAMESPACE + "/skinpacks";
+    private static final String TARGET_DIRECTORY_NAME = "resourcepacks/" + RESOURCE_PACK_DIR + "/" + PACKS_DIR;
     private static final String IMPORT_TEMPLATE_RESOURCE = "/assets/legacy/skin_templates/import_skin.png";
     private static final String RESOURCE_PACK_ICON = "/assets/legacy/skin_templates/custom_skinpacks_pack.png";
     private static final String IMPORT_NAME_KEY = "legacy.menu.import_skin";
@@ -59,6 +60,12 @@ public final class CustomSkinPackStore {
     }
     public static boolean isCustomPack(Minecraft minecraft, String packId) {
         return SkinPackFiles.isPackInResourcePack(minecraft, RESOURCE_PACK_DIR, PACKS_DIR, packId);
+    }
+    public static boolean managesTargetDirectory(String folderName) {
+        return SkinPackFiles.managesTargetDirectory(folderName, TARGET_DIRECTORY_NAME);
+    }
+    public static void normalizeDownloadedPack(Path packDir) throws IOException {
+        DownloadedSkinPackStore.normalizePack(packDir, "community");
     }
     public static boolean isImportSkin(String packId, String skinId) {
         return packId != null && skinId != null && importSkinId(packId).equals(skinId);

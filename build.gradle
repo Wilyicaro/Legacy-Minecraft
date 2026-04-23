@@ -12,7 +12,6 @@ base.archivesName = project.archives_base_name
 version = stonecutter.current.version + "-" + mod_version
 group = rootProject.maven_group
 def loader = property("loom.platform")
-def skinpackArchive = rootProject.file("src/main/resources/assets/lce_skinpacks/skinpacks/skinpacks.zip")
 
 repositories {
     mavenCentral()
@@ -194,15 +193,6 @@ ext {
 
 processResources {
     def version_range = mc_version_range
-
-    exclude "assets/lce_skinpacks/skinpacks/skinpacks.zip"
-
-    if (skinpackArchive.exists()) {
-        from(zipTree(skinpackArchive)) {
-            exclude "pack.mcmeta", "pack.png"
-        }
-        inputs.file(skinpackArchive)
-    }
 
     if (loader == "fabric") {
         version_range = version_range.split(",").join("\",\"")

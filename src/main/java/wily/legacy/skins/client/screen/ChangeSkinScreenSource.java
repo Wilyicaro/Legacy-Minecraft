@@ -175,10 +175,8 @@ public interface ChangeSkinScreenSource {
         public Component packSubtitle(SkinPack pack) {
             if (pack == null) return null;
             Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft != null && DownloadedSkinPackStore.isDownloadedPack(minecraft, pack.id())) {
-                return Component.translatable("legacy.skinpack.type.community");
-            }
-            if (pack.type() == null || pack.type().isBlank()) return null;
+            boolean downloaded = minecraft != null && DownloadedSkinPackStore.isDownloadedPack(minecraft, pack.id());
+            if (pack.type() == null || pack.type().isBlank()) return downloaded ? Component.translatable("legacy.skinpack.type.community") : null;
             String key = pack.type().toLowerCase(Locale.ROOT);
             if (key.equals("skin")) return Component.translatable("legacy.skinpack.type.skin");
             if (key.equals("mashup")) return Component.translatable("legacy.skinpack.type.mashup");

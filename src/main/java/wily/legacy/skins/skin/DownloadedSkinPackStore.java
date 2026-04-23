@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 public final class DownloadedSkinPackStore {
     private static final String RESOURCE_PACK_DIR = "Legacy Downloaded Skinpacks";
-    private static final String PACK_DESCRIPTION = "Legacy4J downloaded skin packs";
+    private static final String PACK_DESCRIPTION = "Legacy4J skin packs";
     private static final String ASSET_NAMESPACE = "lce_skinpacks";
     private static final String PACKS_DIR = "assets/" + ASSET_NAMESPACE + "/skinpacks";
     private static final String RESOURCE_PACK_ICON = "/assets/legacy/skin_templates/downloaded_skinpacks_pack.png";
@@ -25,12 +25,16 @@ public final class DownloadedSkinPackStore {
         return SkinPackFiles.isPackInResourcePack(minecraft, RESOURCE_PACK_DIR, PACKS_DIR, packId);
     }
     public static void normalizeInstalledPack(Path packDir) throws IOException {
+        normalizePack(packDir, "community");
+    }
+    static void normalizePack(Path packDir, String fallbackType) throws IOException {
         if (!isValidPackInstall(packDir)) return;
         Path packJson = packDir.resolve("pack.json");
         JsonObject root = SkinPackFiles.readJson(packJson);
         root.remove("editable");
         root.remove("allow_empty");
-        root.addProperty("type", "community");
+        String type = SkinPackJson.string(root.get("type"));
+        if (type == null || type.isBlank()) root.addProperty("type", fallbackType);
         if (root.has("skins") && root.get("skins").isJsonArray()) {
             JsonArray oldSkins = root.getAsJsonArray("skins");
             JsonArray skins = new JsonArray();
