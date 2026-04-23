@@ -128,7 +128,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             if (isInstalled(pack)) {
                 minecraft.setScreen(new PackActionScreen(this, pack, category));
             } else {
-                if (!prepareDownloadTarget()) return;
+                if (!prepareDownloadTarget(pack)) return;
                 downloadingPacks.add(pack.id());
                 ContentManager.downloadPack(pack, category, installedAnything -> {
                     downloadingPacks.remove(pack.id());
@@ -149,15 +149,25 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }); 
     }
 
-    private boolean prepareDownloadTarget() {
-        if (!DownloadedSkinPackStore.managesTargetDirectory(category.targetDirectoryName()) && !CustomSkinPackStore.managesTargetDirectory(category.targetDirectoryName())) return true;
+    private boolean prepareDownloadTarget(ContentManager.Pack pack) {
+        if (!prepareManagedTarget(category)) return false;
+        if (!pack.hasBundlePacks()) return true;
+        for (ContentManager.Pack.BundlePack bundlePack : pack.bundlePacks()) {
+            Optional<ContentManager.Category> bundleCategory = ContentManager.CATEGORIES.stream().filter(c -> c.id().equals(bundlePack.categoryId())).findFirst();
+            if (bundleCategory.isPresent() && !bundleCategory.get().id().equals(category.id()) && !prepareManagedTarget(bundleCategory.get())) return false;
+        }
+        return true;
+    }
+
+    private boolean prepareManagedTarget(ContentManager.Category targetCategory) {
+        if (!DownloadedSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName()) && !CustomSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName())) return true;
         try {
-            if (DownloadedSkinPackStore.managesTargetDirectory(category.targetDirectoryName())) DownloadedSkinPackStore.enableResourcePack(minecraft);
+            if (DownloadedSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName())) DownloadedSkinPackStore.enableResourcePack(minecraft);
             else CustomSkinPackStore.enableResourcePack(minecraft);
             return true;
         } catch (IOException e) {
             String message = e.getMessage();
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
+            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, targetCategory.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
             return false;
         }
     }

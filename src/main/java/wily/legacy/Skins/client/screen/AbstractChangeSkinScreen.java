@@ -32,9 +32,6 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacySoundUtil;
 public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         implements wily.legacy.client.controller.Controller.Event, ControlTooltip.Event, InputTypeSwitchLock {
-    private static final long MIN_PERSISTED_REMINDER_TIME = 946684800000L;
-    private static final long SKINPACK_REMINDER_DELAY_MS = 4000L;
-    private static final long SKINPACK_REMINDER_COOLDOWN_MS = 21600000L;
     private static final int[] WARMUP_OFFSETS = {0, -1, 1, -2, 2, -3, 3};
     protected record ChangeSkinLayoutMetrics(
             int tooltipTopOffset, int tooltipWidthTrim, int tooltipHeightTrim, int tooltipFooterHeight, int tooltipHeightRecover, int carouselClipInset,
@@ -56,11 +53,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     @Override
     public void tick() {
         super.tick();
-        if (skinpackReminderQueued && minecraft != null && minecraft.screen == this && System.currentTimeMillis() >= getReminderTime(LegacyOptions.skinpackReminderReadyAt.get())) {
-            skinpackReminderQueued = false;
-            minecraft.setScreen(new SkinpackReminderScreen(this));
-            return;
-        }
         int reloadVersion = source.version();
         if (reloadVersion != seenPackReloadVersion) {
             seenPackReloadVersion = reloadVersion;
@@ -96,7 +88,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected int seenPackReloadVersion;
     protected final CustomSkinPackFlow customPacks;
     protected String pendingInitialPackId;
-    protected boolean skinpackReminderQueued;
     protected AbstractChangeSkinScreen(Screen parent) {
         this(parent, ChangeSkinScreenSource.Default.INSTANCE);
     }
@@ -472,7 +463,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     private static int findSkinIndex(List<SkinEntry> skins, String skinId, int limit) {
         for (int i = 0; i < limit; i++) {
             SkinEntry entry = skins.get(i);
-            if (entry != null && skinId.equals(entry.id())) return i;
+            if (entry != null && (skinId.equals(entry.id()) || skinId.equals(entry.sourceId()))) return i;
         }
         return 0;
     }
@@ -518,6 +509,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         String focusId = source.initialPackId(currentAppliedSkinId());
         if (focusId == null) return;
         pendingInitialPackId = focusId;
+        if (!isReorderingCustomPack()) packList.promotePackId(focusId);
         packList.focusPackId(focusId, false);
     }
     protected void applyPendingInitialPackFocus() {
@@ -729,7 +721,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         for (PlayerSkinWidget widget : previewWidgets) addRenderableWidget(widget);
         restorePackButtonFocus();
         refreshSkinPackState();
-        queueSkinpackReminderIfNeeded();
     }
     @Override
     public void repositionElements() {
@@ -991,37 +982,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         pose.scale(scale, scale);
         g.drawString(minecraft.font, text, textX, 0, color, shadow);
         pose.popMatrix();
-    }
-    protected void queueSkinpackReminderIfNeeded() {
-        if (skinpackReminderQueued || minecraft == null) return;
-        long now = System.currentTimeMillis();
-        LegacyOptions.skinpackReminderReadyAt.set(now);
-        LegacyOptions.skinpackReminderReadyAt.save();
-        LegacyOptions.skinpackReminderNextPromptAt.set(0L);
-        LegacyOptions.skinpackReminderNextPromptAt.save();
-        skinpackReminderQueued = true;
-    }
-
-    protected boolean shouldQueueSkinpackReminder() {
-        Map<String, SkinPack> packs = source.packs();
-        if (packs == null || packs.isEmpty()) return true;
-        for (String packId : packs.keySet()) {
-            if (packId == null || packId.isBlank()) continue;
-            if (SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.PACK_FAVOURITES.equals(packId)) continue;
-            return false;
-        }
-        return true;
-    }
-
-    private long getReminderTime(long value) {
-        if (value >= MIN_PERSISTED_REMINDER_TIME) return value;
-        if (value != 0L) {
-            LegacyOptions.skinpackReminderReadyAt.set(0L);
-            LegacyOptions.skinpackReminderReadyAt.save();
-            LegacyOptions.skinpackReminderNextPromptAt.set(0L);
-            LegacyOptions.skinpackReminderNextPromptAt.save();
-        }
-        return 0L;
     }
     protected static final class HoldRepeat {
         private int dir;

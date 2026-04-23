@@ -113,7 +113,7 @@ public interface ChangeSkinScreenSource {
         @Override
         public String currentAppliedSkinId() {
             Minecraft minecraft = Minecraft.getInstance();
-            UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+            UUID self = selfId(minecraft);
             if (self == null) return null;
             String applied = ClientSkinCache.get(self);
             if (SkinIdUtil.hasSkin(applied)) return applied;
@@ -143,7 +143,7 @@ public interface ChangeSkinScreenSource {
             String sourcePackId = packId;
             if (sourcePackId != null && SkinIdUtil.isFavouritesPack(sourcePackId)) sourcePackId = SkinPackLoader.getSourcePackId(skinId);
             SkinPackLoader.setLastUsedCustomPackId(sourcePackId);
-            SkinSyncClient.requestSetSkin(Minecraft.getInstance(), requestedId);
+            SkinSyncClient.requestSetSkin(Minecraft.getInstance(), sourcePackId, requestedId);
         }
 
         @Override
@@ -197,6 +197,11 @@ public interface ChangeSkinScreenSource {
         public String initialPackId(String selectedSkinId) {
             String packId = SkinPackLoader.consumeRequestedFocusPackId();
             if (packId != null) return packId;
+            UUID self = selfId(Minecraft.getInstance());
+            if (self != null) {
+                packId = SkinDataStore.getSelectedPack(self);
+                if (packContainsSkin(packId, selectedSkinId)) return packId;
+            }
             if (selectedSkinId != null && !selectedSkinId.isBlank()) {
                 packId = SkinPackLoader.getSourcePackId(selectedSkinId);
                 if (packId != null) return packId;
@@ -237,6 +242,23 @@ public interface ChangeSkinScreenSource {
         @Override
         public boolean supportsAdvancedOptions() {
             return true;
+        }
+
+        private static UUID selfId(Minecraft minecraft) {
+            if (minecraft == null) return null;
+            if (minecraft.player != null) return minecraft.player.getUUID();
+            return minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+        }
+
+        private static boolean packContainsSkin(String packId, String skinId) {
+            if (packId == null || packId.isBlank() || skinId == null || skinId.isBlank()) return false;
+            SkinPack pack = SkinPackLoader.getPacks().get(packId);
+            if (pack == null || pack.skins() == null) return false;
+            for (SkinEntry entry : pack.skins()) {
+                if (entry == null) continue;
+                if (skinId.equals(entry.id()) || skinId.equals(entry.sourceId())) return true;
+            }
+            return false;
         }
     }
 }

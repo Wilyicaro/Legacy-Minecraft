@@ -15,7 +15,7 @@ public final class StorePreviewAtlas {
     public static final int SKINPACK_PADDING = 2;
     public static final int SKINPACK_CELL_SIZE = TILE_SIZE + SKINPACK_PADDING * 2;
     public static final int SKINPACK_COLUMNS = 8;
-    public static final int SKINPACK_ROWS = 8;
+    public static final int SKINPACK_ROWS = 9;
     public static final int SKINPACK_ATLAS_WIDTH = SKINPACK_CELL_SIZE * SKINPACK_COLUMNS;
     public static final int SKINPACK_ATLAS_HEIGHT = SKINPACK_CELL_SIZE * SKINPACK_ROWS;
     public static final ResourceLocation ATLAS = Legacy4J.createModLocation("textures/gui/store/content_preview_atlas.png");
@@ -41,7 +41,8 @@ public final class StorePreviewAtlas {
         entry("littlebigplanet_mashup", 17),
         entry("halloween_mashup", 18),
         entry("supermario", 19),
-        entry("builders_pack", 20)
+        entry("builders_pack", 20),
+        entry("skinpack_megabundle", 21)
     );
     private static final List<String> SKINPACK_IDS = List.of(
         "birthday5",
@@ -106,7 +107,9 @@ public final class StorePreviewAtlas {
         "supercuteskins",
         "theincredibles",
         "thesimpsons",
-        "villians"
+        "villians",
+        "toystory",
+        "halo"
     );
 
     private StorePreviewAtlas() {

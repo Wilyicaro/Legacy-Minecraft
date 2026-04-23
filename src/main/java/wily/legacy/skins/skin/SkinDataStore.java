@@ -38,12 +38,25 @@ public final class SkinDataStore {
         }
     }
 
+    public static String getSelectedPack(UUID userId) {
+        if (userId == null) return null;
+        synchronized (LOCK) {
+            State data = state();
+            return userId.equals(data.selectionUserId) ? data.selectionPackId : null;
+        }
+    }
+
     public static void setSelectedSkin(UUID userId, String skinId) {
+        setSelectedSkin(userId, skinId, null);
+    }
+
+    public static void setSelectedSkin(UUID userId, String skinId, String packId) {
         if (userId == null) return;
         synchronized (LOCK) {
             State data = state();
             data.selectionUserId = userId;
             data.selectionSkinId = SkinIdUtil.normalize(skinId);
+            data.selectionPackId = SkinIdUtil.trimToNull(packId);
             saveState(data);
         }
     }
@@ -104,6 +117,7 @@ public final class SkinDataStore {
         JsonObject selection = object(root, "selection");
         data.selectionUserId = uuid(selection, "userId");
         data.selectionSkinId = SkinIdUtil.normalize(string(selection, "skinId"));
+        data.selectionPackId = SkinIdUtil.trimToNull(string(selection, "packId"));
         readArray(root, "favorites", data.favorites, true);
         readArray(root, "excludedPacks", data.excludedPacks, false);
         return data;
@@ -195,6 +209,8 @@ public final class SkinDataStore {
         if (data.selectionUserId != null) selection.addProperty("userId", data.selectionUserId.toString());
         else selection.add("userId", null);
         selection.addProperty("skinId", data.selectionSkinId);
+        if (data.selectionPackId != null) selection.addProperty("packId", data.selectionPackId);
+        else selection.add("packId", null);
         root.add("selection", selection);
         root.add("favorites", toJsonArray(data.favorites));
         root.add("excludedPacks", toJsonArray(data.excludedPacks));
@@ -210,6 +226,7 @@ public final class SkinDataStore {
     private static final class State {
         private UUID selectionUserId;
         private String selectionSkinId = "";
+        private String selectionPackId;
         private final LinkedHashSet<String> favorites = new LinkedHashSet<>();
         private final LinkedHashSet<String> excludedPacks = new LinkedHashSet<>();
     }

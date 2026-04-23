@@ -82,6 +82,11 @@ public final class ChangeSkinPackList {
         int index = packIds.indexOf(packId);
         if (index >= 0) setFocusedPackIndex(index, playSound);
     }
+    public void promotePackId(String packId) {
+        String focusedPackId = getFocusedPackId();
+        if (!movePackAfterFavourites(packId)) return;
+        if (focusedPackId != null && packIds.contains(focusedPackId)) focusedPackIndex = packIds.indexOf(focusedPackId);
+    }
     private int wrapIndex(int index) {
         return packIds.isEmpty() ? 0 : Math.floorMod(index, packIds.size());
     }
@@ -122,13 +127,7 @@ public final class ChangeSkinPackList {
         packIds.addAll(basePackIds);
         normalizeSpecialPackOrder(packIds);
         String lastUsedCustomPackId = source.lastUsedPackId();
-        String preferredDefaultPackId = resolvePreferredDefaultPackId(packIds);
-        SkinPack lastUsedPack = pack(source.packs(), lastUsedCustomPackId);
-        if (lastUsedCustomPackId != null && packIds.contains(lastUsedCustomPackId) && !lastUsedCustomPackId.equals(preferredDefaultPackId) && (lastUsedPack == null || !lastUsedPack.editable())) {
-            packIds.remove(lastUsedCustomPackId);
-            int insertAt = Math.max(1, packIds.indexOf(SkinIdUtil.PACK_FAVOURITES) + 1);
-            packIds.add(Math.min(insertAt, packIds.size()), lastUsedCustomPackId);
-        }
+        movePackAfterFavourites(lastUsedCustomPackId);
         if (preserveFocusedId == null) {
             if (focusedPackIndex >= packIds.size()) focusedPackIndex = 0;
             return;
@@ -159,6 +158,15 @@ public final class ChangeSkinPackList {
         int insertAt = 0;
         if (preferredDefaultPackId != null && source.packs().containsKey(preferredDefaultPackId)) ids.add(insertAt++, preferredDefaultPackId);
         if (source.packs().containsKey(SkinIdUtil.PACK_FAVOURITES)) ids.add(insertAt, SkinIdUtil.PACK_FAVOURITES);
+    }
+    private boolean movePackAfterFavourites(String packId) {
+        if (packId == null || packId.isBlank() || packIds.isEmpty()) return false;
+        if (SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.PACK_FAVOURITES.equals(packId)) return false;
+        String preferredDefaultPackId = resolvePreferredDefaultPackId(packIds);
+        if (packId.equals(preferredDefaultPackId) || !packIds.remove(packId)) return false;
+        int insertAt = Math.max(1, packIds.indexOf(SkinIdUtil.PACK_FAVOURITES) + 1);
+        packIds.add(Math.min(insertAt, packIds.size()), packId);
+        return true;
     }
     private String resolvePreferredDefaultPackId(List<String> ids) {
         String preferred = source.preferredDefaultPackId();

@@ -125,6 +125,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
         String packId = requestedFocusPackId;
         requestedFocusPackId = null;
         if (packId != null) return packId;
+        if (matchesPackSkin(lastUsedPackId, selectedSkinId)) return lastUsedPackId;
         if (selectedSkinId != null && !selectedSkinId.isBlank()) {
             packId = findPackId(selectedSkinId);
             if (packId != null) return packId;
@@ -254,5 +255,16 @@ final class SkinUiSource implements ChangeSkinScreenSource {
             }
         }
         return null;
+    }
+
+    private boolean matchesPackSkin(@Nullable String packId, @Nullable String skinId) {
+        if (packId == null || skinId == null || skinId.isBlank()) return false;
+        SkinPack pack = packs.get(packId);
+        if (pack == null) return false;
+        for (SkinEntry skin : pack.skins()) {
+            if (skin == null) continue;
+            if (skinId.equals(skin.id()) || skinId.equals(skin.sourceId())) return true;
+        }
+        return false;
     }
 }

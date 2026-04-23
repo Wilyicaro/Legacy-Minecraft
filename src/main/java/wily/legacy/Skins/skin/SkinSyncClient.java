@@ -33,21 +33,21 @@ public final class SkinSyncClient {
         }
         if (connected && !STATE.sessionAnnounced) onRequestSkinUpload();
         if (!connected) return;
-        String skinId = takePendingSkinId();
-        if (skinId != null) requestSetSkin(client, skinId);
+        PendingSelection pendingSelection = takePendingSelection();
+        if (pendingSelection != null) requestSetSkin(client, pendingSelection.packId(), pendingSelection.skinId());
     }
 
     public static void onClientJoin() {
         Minecraft client = Minecraft.getInstance();
         if (client == null) return;
         STATE.snapshotDelay = 1;
-        String skinId = takePendingSkinId();
-        if (skinId != null) {
-            requestSetSkin(client, skinId);
+        PendingSelection pendingSelection = takePendingSelection();
+        if (pendingSelection != null) {
+            requestSetSkin(client, pendingSelection.packId(), pendingSelection.skinId());
             return;
         }
         if (client.player == null) return;
-        skinId = resolveSelectedSkinId(client);
+        String skinId = resolveSelectedSkinId(client);
         if (!SkinIdUtil.hasSkin(skinId)) return;
         if (isConnected(client)) onRequestSkinUpload();
         else STATE.pendingUpload = true;
@@ -65,13 +65,19 @@ public final class SkinSyncClient {
     }
 
     public static void requestSetSkin(Minecraft client, String skinId) {
+        requestSetSkin(client, null, skinId);
+    }
+
+    public static void requestSetSkin(Minecraft client, String packId, String skinId) {
         if (client == null) return;
         String id = SkinIdUtil.normalize(skinId);
+        String selectedPackId = SkinIdUtil.trimToNull(packId);
         UUID userId = getUserId(client);
-        if (userId != null) SkinDataStore.setSelectedSkin(userId, id);
+        if (userId != null) SkinDataStore.setSelectedSkin(userId, id, selectedPackId);
         cacheLocalSelection(client, id);
         if (!isConnected(client)) {
             STATE.pendingSkinId = id;
+            STATE.pendingPackId = selectedPackId;
             return;
         }
         sendSelection(client, id);
@@ -190,10 +196,12 @@ public final class SkinSyncClient {
         );
     }
 
-    private static String takePendingSkinId() {
+    private static PendingSelection takePendingSelection() {
         String skinId = STATE.pendingSkinId;
+        String packId = STATE.pendingPackId;
         STATE.pendingSkinId = null;
-        return skinId;
+        STATE.pendingPackId = null;
+        return skinId == null ? null : new PendingSelection(packId, skinId);
     }
 
     private static boolean tickSnapshotRequest() {
@@ -206,6 +214,7 @@ public final class SkinSyncClient {
     private static final class State {
         private static final int SCAN_INTERVAL = 20;
         private String pendingSkinId;
+        private String pendingPackId;
         private boolean pendingUpload;
         private boolean sessionAnnounced;
         private int snapshotDelay = -1;
@@ -216,6 +225,7 @@ public final class SkinSyncClient {
 
         private void reset() {
             pendingSkinId = null;
+            pendingPackId = null;
             pendingUpload = false;
             sessionAnnounced = false;
             snapshotDelay = -1;
@@ -224,5 +234,8 @@ public final class SkinSyncClient {
             assetChunks.clear();
             lastApplied.clear();
         }
+    }
+
+    private record PendingSelection(String packId, String skinId) {
     }
 }
