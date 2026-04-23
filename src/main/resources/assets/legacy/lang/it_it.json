@@ -108,7 +108,7 @@
   "block.minecraft.bush.tip": "Similar to grass, but does not drop wheat seeds when broken.",
   "block.minecraft.button.tip": "Premilo per generare una scarica elettrica. Rimane attivo per circa un secondo prima di spegnersi di nuovo.",
   "block.minecraft.cactus.tip": "Si può cuocere nella fornace per produrre tintura verde.",
-  "block.minecraft.cake.tip": "Fa recuperare 1 §f\uD83C\uDF56§r. Utilizzabile 7 volte.",
+  "block.minecraft.cake.tip": "Fa recuperare 1 §f🍖§r. Utilizzabile 7 volte.",
   "block.minecraft.calcite.tip": "Generated as part of Amethyst Geodes. Can be used as decoration.",
   "block.minecraft.calibrated_sculk_sensor.tip": "Emits a Redstone signal whenever it detects a sound with a specific intensity. The intensity is determined by giving the sensor a Redstone signal. Cannot detect sounds through wool.",
   "block.minecraft.campfire.tip": "The Campfire can be used to cook food or act as a light source or smoke signal.",
