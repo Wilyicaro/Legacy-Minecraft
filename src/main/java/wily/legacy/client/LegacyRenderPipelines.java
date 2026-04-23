@@ -44,6 +44,23 @@ public class LegacyRenderPipelines {
                     .withDepthWrite(true)
                     .build()
     );
+    public static final RenderPipeline LEGACY_PACK_FLAT_CLOUDS = RenderPipelinesAccessor.register(
+            RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
+                    .withLocation(Legacy4J.createModLocation("pipeline/pack_flat_clouds"))
+                    .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
+                    .withFragmentShader("core/rendertype_clouds")
+                    .withDepthWrite(true)
+                    .withCull(false)
+                    .build()
+    );
+    public static final RenderPipeline LEGACY_PACK_CLOUDS = RenderPipelinesAccessor.register(
+            RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
+                    .withLocation(Legacy4J.createModLocation("pipeline/pack_clouds"))
+                    .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
+                    .withFragmentShader("core/rendertype_clouds")
+                    .withDepthWrite(true)
+                    .build()
+    );
     public static final RenderPipeline GAMMA = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/gamma"))

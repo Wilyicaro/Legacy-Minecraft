@@ -23,7 +23,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     public static final CommonNetwork.Identifier<PlayerInfoSync> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_c2s"), PlayerInfoSync::new);
 
     public PlayerInfoSync(CommonNetwork.PlayBuf buf) {
-        this(buf.get().readEnum(Sync.class), buf.get().readUUID());
+        this(Sync.byId(buf.get().readVarInt()), buf.get().readUUID());
     }
 
     public PlayerInfoSync(Sync sync, Player player) {
@@ -82,7 +82,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeEnum(sync);
+        buf.get().writeVarInt(sync.id());
         buf.get().writeUUID(player);
     }
 
@@ -148,7 +148,52 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     }
 
     public enum Sync {
-        ASK_ALL, CLASSIC_CRAFTING, LEGACY_CRAFTING, DISABLE_EXHAUSTION, ENABLE_EXHAUSTION, ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL, ENABLE_INVISIBILITY, DISABLE_INVISIBILITY, CLASSIC_TRADING, LEGACY_TRADING, CLASSIC_STONECUTTING, LEGACY_STONECUTTING, CLASSIC_LOOM, LEGACY_LOOM
+        ASK_ALL(0),
+        CLASSIC_CRAFTING(1),
+        LEGACY_CRAFTING(2),
+        DISABLE_EXHAUSTION(3),
+        ENABLE_EXHAUSTION(4),
+        ENABLE_MAY_FLY_SURVIVAL(5),
+        DISABLE_MAY_FLY_SURVIVAL(6),
+        CLASSIC_TRADING(7),
+        LEGACY_TRADING(8),
+        CLASSIC_STONECUTTING(9),
+        LEGACY_STONECUTTING(10),
+        CLASSIC_LOOM(11),
+        LEGACY_LOOM(12),
+        ENABLE_INVISIBILITY(13),
+        DISABLE_INVISIBILITY(14);
+
+        private final int id;
+
+        Sync(int id) {
+            this.id = id;
+        }
+
+        public int id() {
+            return id;
+        }
+
+        public static Sync byId(int id) {
+            return switch (id) {
+                case 0 -> ASK_ALL;
+                case 1 -> CLASSIC_CRAFTING;
+                case 2 -> LEGACY_CRAFTING;
+                case 3 -> DISABLE_EXHAUSTION;
+                case 4 -> ENABLE_EXHAUSTION;
+                case 5 -> ENABLE_MAY_FLY_SURVIVAL;
+                case 6 -> DISABLE_MAY_FLY_SURVIVAL;
+                case 7 -> CLASSIC_TRADING;
+                case 8 -> LEGACY_TRADING;
+                case 9 -> CLASSIC_STONECUTTING;
+                case 10 -> LEGACY_STONECUTTING;
+                case 11 -> CLASSIC_LOOM;
+                case 12 -> LEGACY_LOOM;
+                case 13 -> ENABLE_INVISIBILITY;
+                case 14 -> DISABLE_INVISIBILITY;
+                default -> throw new IllegalArgumentException("Unknown player info sync id: " + id);
+            };
+        }
     }
 
     private static void syncPlayerInfo(ServerPlayer player) {

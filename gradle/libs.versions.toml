@@ -1,0 +1,40 @@
+[versions]
+stonecutter = "0.9"
+stonecutter-postprocess = "2.1-beta.8"
+mod-publish = "1.1.0"
+dotenv-gradle = "4.0.0"
+fabric-loom = "1.15-SNAPSHOT"
+neoforge-moddev = "2.0.141"
+forge-gradle = "[7.0.20,8)"
+foojay = "1.0.0"
+fabric-loader = "0.18.6"
+devtools-ksp = "2.2.10-2.0.2"
+kotlin-jvm = "2.2.10"
+fletching-table = "0.1.0-alpha.22"
+moulberry-mixinconstraints = "1.1.0"
+vanniktech-maven-publish = "0.36.0"
+mixin = "0.8.7"
+
+[libraries]
+kikugie-postprocess = { module = "dev.kikugie:postprocess", version.ref = "stonecutter-postprocess" }
+mod-publish-plugin = { module = "me.modmuss50:mod-publish-plugin", version.ref = "mod-publish" }
+kikugie-stonecutter = { module = "dev.kikugie:stonecutter", version.ref = "stonecutter" }
+vanniktech-maven-publish = { module = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin", version.ref = "vanniktech-maven-publish"}
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+foojay-resolver = { module = "org.gradle.toolchains:foojay-resolver", version.ref = "foojay" }
+fletching-table = { module = "dev.kikugie:fletching-table", version.ref = "fletching-table" }
+moulberry-mixinconstraints = { module = "com.moulberry:mixinconstraints", version.ref = "moulberry-mixinconstraints" }
+
+[plugins]
+stonecutter = { id = "dev.kikugie.stonecutter", version.ref = "stonecutter" }
+dotenv = { id = "co.uzzu.dotenv.gradle", version.ref = "dotenv-gradle" }
+fabric-loom = { id = "fabric-loom", version.ref = "fabric-loom" }
+fabricmc-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
+neoforged-moddev = { id = "net.neoforged.moddev", version.ref = "neoforge-moddev" }
+jsonlang-postprocess = { id = "dev.kikugie.postprocess.jsonlang", version.ref = "stonecutter-postprocess" }
+mod-publish-plugin = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish"}
+devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtools-ksp" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
+fletching-table = { id = "dev.kikugie.fletching-table", version.ref = "fletching-table" }
+legacyforge-moddev = { id = "net.minecraftforge.gradle", version.ref = "forge-gradle" }

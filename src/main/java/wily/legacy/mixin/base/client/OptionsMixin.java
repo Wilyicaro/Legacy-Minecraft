@@ -76,9 +76,8 @@ public abstract class OptionsMixin {
 
     @ModifyReturnValue(method = "getFinalSoundSourceVolume", at = @At("RETURN"))
     private float getFinalSoundSourceVolume(float original, SoundSource soundSource) {
-        if (soundSource == SoundSource.MUSIC || soundSource == SoundSource.RECORDS) {
-            return ((Options) (Object) this).getSoundSourceVolume(soundSource);
-        }
+        if (soundSource == SoundSource.MUSIC) return ((Options) (Object) this).getSoundSourceVolume(soundSource);
+        if (soundSource == SoundSource.RECORDS) return ((Options) (Object) this).getSoundSourceVolume(soundSource) * ((Options) (Object) this).getSoundSourceVolume(SoundSource.MUSIC);
         return original;
     }
 

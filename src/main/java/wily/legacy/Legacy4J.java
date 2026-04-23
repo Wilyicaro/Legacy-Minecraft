@@ -59,7 +59,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 //? if forge || neoforge
-/*@Mod(Legacy4J.MOD_ID)*/
+//@Mod(Legacy4J.MOD_ID)
 public class Legacy4J {
 
     public static final String MOD_ID = "legacy";
@@ -124,6 +124,7 @@ public class Legacy4J {
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerHostOptionsPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
+            r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);

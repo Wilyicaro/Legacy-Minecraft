@@ -202,13 +202,9 @@ public class CreationList extends RenderableVList {
     }
 
 
-    public static abstract class ContentButton extends AbstractButton {
-
-        protected final RenderableVList list;
-
+    public static abstract class ContentButton extends ListButton {
         public ContentButton(RenderableVList list, int x, int y, int width, int height, Component component) {
-            super(x, y, width, height, component);
-            this.list = list;
+            super(list, x, y, width, height, component);
         }
 
         @Override
@@ -233,16 +229,6 @@ public class CreationList extends RenderableVList {
 
         public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
             guiGraphics.fill(getX() + x, getY() + y, getX() + x + width, getY() + y + height, -1601138544);
-        }
-
-        @Override
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35), this.getY(), getX() + this.getWidth() - 2, this.getY() + this.getHeight(), j, true));
-        }
-
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-            defaultButtonNarrationText(narrationElementOutput);
         }
     }
 }

@@ -309,7 +309,12 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
 
         @Override
         public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, k -> k.key() == InputConstants.KEY_X && isFocused() || k.key() == InputConstants.MOUSE_BUTTON_LEFT && isHovered() ? screenComponent : ControlTooltip.getSelectAction(this, context));
+            return context.actionOfContext(KeyContext.class, k -> {
+                if (LegacyOptions.displayPackManagementTooltips.get() && (k.key() == InputConstants.KEY_X && isFocused() || k.key() == InputConstants.MOUSE_BUTTON_LEFT && isHovered())) {
+                    return screenComponent;
+                }
+                return ControlTooltip.getSelectAction(this, context);
+            });
         }
     }
 }

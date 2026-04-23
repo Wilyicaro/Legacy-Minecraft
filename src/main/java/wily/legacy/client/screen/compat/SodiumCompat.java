@@ -1,5 +1,5 @@
 //? if fabric || >=1.21 && neoforge {
-package wily.legacy.client.screen.compat;
+/*package wily.legacy.client.screen.compat;
 
 //? if >=1.21 {
 
@@ -15,7 +15,7 @@ import net.caffeinemc.mods.sodium.client.gui.options.control.TickBoxControl;
 import net.caffeinemc.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;
 import net.caffeinemc.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
 //?} else {
-/*import me.jellysquid.mods.sodium.client.SodiumClientMod;
+/^import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptionPages;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
 import me.jellysquid.mods.sodium.client.gui.options.Option;
@@ -26,7 +26,7 @@ import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
 import me.jellysquid.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;
 import me.jellysquid.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
-*///?}
+^///?}
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -102,4 +102,4 @@ public class SodiumCompat {
         });
     }
 }
-//?}
+*///?}

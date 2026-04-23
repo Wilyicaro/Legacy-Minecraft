@@ -1,7 +1,5 @@
 package wily.legacy.mixin.base.client;
 
-//? if >=1.21.2 {
-
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;

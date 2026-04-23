@@ -119,6 +119,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             ci.cancel();
             return;
         }
+        if (!LegacyOptions.announceAdvancements.get() && isAdvancementAnnouncement(clientboundSystemChatPacket.content())) {
+            ci.cancel();
+            return;
+        }
         if (!LegacyOptions.displayGameMessages.get()) {
             ci.cancel();
             return;
@@ -127,5 +131,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);
             ci.cancel();
         }
+    }
+
+    private static boolean isAdvancementAnnouncement(Component component) {
+        if (!(component.getContents() instanceof TranslatableContents contents)) return false;
+        return contents.getKey().startsWith("chat.type.advancement.");
     }
 }

@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: prevent-protected-files-change
+        name: Prevent commits that modify protected files
+        entry: ./scripts/prevent-protected-files-change.sh
+        language: script
+        types: [file]

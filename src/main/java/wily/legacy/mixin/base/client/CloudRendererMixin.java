@@ -26,13 +26,23 @@ public abstract class CloudRendererMixin {
     @Unique
     private static final float LEGACY_CLOUD_HEIGHT = 128.0f;
     @Unique
-    private static final float CLOUD_LAYER_HEIGHT = 4.0f;
+    private static final float CLOUD_BASE_HEIGHT = 4.0f;
     @Unique
-    private static final int INSIDE_FACE_RADIUS = 1;
+    private static final float CLOUD_TOP_EXTENSION = 0.25f;
+    @Unique
+    private static final float CLOUD_BOTTOM_EXTENSION = 2.0f / 3.0f;
+    @Unique
+    private static final float CLOUD_STATE_HYSTERESIS = 0.05f;
     @Unique
     private boolean legacy$lastLceCloudState;
     @Unique
     private boolean legacy$lastLegacyCloudHeightAndTextureState;
+    @Unique
+    private boolean legacy$lastPackCloudShaderState;
+    @Unique
+    private int legacy$currentRelativeCameraPos;
+    @Unique
+    private int legacy$lastRelativeCameraPos = Integer.MIN_VALUE;
     @Unique
     private boolean legacy$useWarmCloudPipelines;
 
@@ -48,9 +58,14 @@ public abstract class CloudRendererMixin {
         legacy$useWarmCloudPipelines = minecraft.level != null && LegacyCloudAtmosphere.shouldUseWarmCloudTransparency(minecraft.level, ticks);
         boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
         boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
-        if (legacy$lastLceCloudState != lceCloudsEnabled || legacy$lastLegacyCloudHeightAndTextureState != legacyCloudHeightAndTextureEnabled) {
+        boolean packCloudShaderEnabled = LegacyCloudAtmosphere.shouldUsePackCloudShader();
+        int relativeCameraPos = legacy$getRelativeCameraPos();
+        legacy$currentRelativeCameraPos = relativeCameraPos;
+        if (legacy$lastLceCloudState != lceCloudsEnabled || legacy$lastLegacyCloudHeightAndTextureState != legacyCloudHeightAndTextureEnabled || legacy$lastPackCloudShaderState != packCloudShaderEnabled || legacy$lastRelativeCameraPos != relativeCameraPos) {
             legacy$lastLceCloudState = lceCloudsEnabled;
             legacy$lastLegacyCloudHeightAndTextureState = legacyCloudHeightAndTextureEnabled;
+            legacy$lastPackCloudShaderState = packCloudShaderEnabled;
+            legacy$lastRelativeCameraPos = relativeCameraPos;
             needsRebuild = true;
         }
     }
@@ -76,6 +91,10 @@ public abstract class CloudRendererMixin {
             return RenderPipelines.CLOUDS;
         }
 
+        if (LegacyCloudAtmosphere.shouldUsePackCloudShader()) {
+            return LegacyRenderPipelines.LEGACY_PACK_CLOUDS;
+        }
+
         return legacy$useWarmCloudPipelines ? LegacyRenderPipelines.LEGACY_WARM_CLOUDS : LegacyRenderPipelines.LEGACY_CLOUDS;
     }
 
@@ -89,6 +108,10 @@ public abstract class CloudRendererMixin {
     private RenderPipeline legacy$useLegacyFlatCloudPipeline() {
         if (!LegacyCloudAtmosphere.areLceCloudsEnabled()) {
             return RenderPipelines.FLAT_CLOUDS;
+        }
+
+        if (LegacyCloudAtmosphere.shouldUsePackCloudShader()) {
+            return LegacyRenderPipelines.LEGACY_PACK_FLAT_CLOUDS;
         }
 
         return legacy$useWarmCloudPipelines ? LegacyRenderPipelines.LEGACY_WARM_FLAT_CLOUDS : LegacyRenderPipelines.LEGACY_FLAT_CLOUDS;
@@ -180,7 +203,8 @@ public abstract class CloudRendererMixin {
 
     @Unique
     private void legacy$buildSquareExtrudedCell(ByteBuffer buffer, int offsetX, int offsetZ, boolean emitTopAndBottomFaces, long cellData) {
-        int relativeCameraPos = legacy$getRelativeCameraPos();
+        int relativeCameraPos = legacy$currentRelativeCameraPos;
+        boolean renderInsideFaces = relativeCameraPos == 0 && offsetX == 0 && offsetZ == 0;
         if (emitTopAndBottomFaces) {
             if (relativeCameraPos != -1) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.UP, 0);
@@ -190,11 +214,18 @@ public abstract class CloudRendererMixin {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 0);
             }
 
-            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS) {
+            if (renderInsideFaces) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.UP, 16);
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 16);
             }
         } else {
+            if (renderInsideFaces) {
+                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 16);
+                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.SOUTH, 16);
+                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.WEST, 16);
+                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 16);
+            }
+
             if (legacy$isNorthEmpty(cellData) && offsetZ > 0) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 0);
             }
@@ -210,13 +241,6 @@ public abstract class CloudRendererMixin {
             if (legacy$isEastEmpty(cellData) && offsetX < 0) {
                 legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 0);
             }
-
-            if (relativeCameraPos == 0 && Math.abs(offsetX) <= INSIDE_FACE_RADIUS && Math.abs(offsetZ) <= INSIDE_FACE_RADIUS) {
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.NORTH, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.SOUTH, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.WEST, 16);
-                legacy$encodeFace(buffer, offsetX, offsetZ, Direction.EAST, 16);
-            }
         }
 
     }
@@ -230,11 +254,34 @@ public abstract class CloudRendererMixin {
 
         double cameraY = minecraft.gameRenderer.getMainCamera().getPosition().y;
         float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : (float) minecraft.level.dimensionType().cloudHeight().orElse((int) LEGACY_CLOUD_HEIGHT);
-        if (cameraY > cloudHeight + CLOUD_LAYER_HEIGHT) {
+        double top = cloudHeight + CLOUD_BASE_HEIGHT + CLOUD_TOP_EXTENSION;
+        double bottom = cloudHeight - CLOUD_BOTTOM_EXTENSION;
+
+        if (legacy$lastRelativeCameraPos == 0) {
+            if (cameraY > top + CLOUD_STATE_HYSTERESIS) {
+                return 1;
+            }
+
+            if (cameraY < bottom - CLOUD_STATE_HYSTERESIS) {
+                return -1;
+            }
+
+            return 0;
+        }
+
+        if (legacy$lastRelativeCameraPos > 0) {
+            return cameraY > top - CLOUD_STATE_HYSTERESIS ? 1 : 0;
+        }
+
+        if (legacy$lastRelativeCameraPos < 0) {
+            return cameraY < bottom + CLOUD_STATE_HYSTERESIS ? -1 : 0;
+        }
+
+        if (cameraY > top) {
             return 1;
         }
 
-        if (cameraY < cloudHeight) {
+        if (cameraY < bottom) {
             return -1;
         }
 
