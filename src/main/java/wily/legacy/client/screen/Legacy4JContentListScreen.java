@@ -59,6 +59,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private final java.util.Set<String> downloadingPacks = ConcurrentHashMap.newKeySet();
     private final Map<String, Boolean> installedPacks = new ConcurrentHashMap<>();
     private final Map<String, MultiLineLabel> descriptionLabels = new ConcurrentHashMap<>();
+    private ContentManager.Pack armedPack;
     private boolean needsReload = false;
 
     private static class RemoteImage {
@@ -119,6 +120,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         renderableVList.addRenderable(new LeftAlignedButton(LIST_WIDTH, BUTTON_HEIGHT, pack, category, downloadingPacks, installedPacks, b -> {
             if (isDownloading(pack)) return;
             selectPack(pack);
+            if (armedPack != pack) {
+                armedPack = pack;
+                return;
+            }
+            armedPack = null;
             if (isInstalled(pack)) {
                 minecraft.setScreen(new PackActionScreen(this, pack, category));
             } else {
