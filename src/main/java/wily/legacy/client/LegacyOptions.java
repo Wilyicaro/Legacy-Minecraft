@@ -168,6 +168,8 @@ public class LegacyOptions {
 
     public static final FactoryConfig<String> lastLoadedVersion = FactoryConfig.<String>builder().key("lastLoadedVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = FactoryConfig.<String>builder().key("lastLoadedMinecraftVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<Long> skinpackReminderReadyAt = FactoryConfig.<Long>builder().key("skinpackReminderReadyAt").control(FactoryConfigControl.of(Codec.LONG)).defaultValue(0L).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<Long> skinpackReminderNextPromptAt = FactoryConfig.<Long>builder().key("skinpackReminderNextPromptAt").control(FactoryConfigControl.of(Codec.LONG)).defaultValue(0L).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b -> {
         syncLegacyClassicWorkstations(b);

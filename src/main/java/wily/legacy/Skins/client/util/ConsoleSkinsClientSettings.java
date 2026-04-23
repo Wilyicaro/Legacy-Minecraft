@@ -216,7 +216,7 @@ public final class ConsoleSkinsClientSettings {
             if (cfg == null) return;
 
             Files.createDirectories(cfg.getParent());
-            String out = "# ConsoleSkins client options (dont mind the typos)\n"
+            String out = "# Skin client options\n"
                     + "smooth_preview_scroll=" + smoothPreviewScroll + "\n"
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"

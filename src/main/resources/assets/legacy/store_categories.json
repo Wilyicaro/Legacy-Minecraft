@@ -2,7 +2,7 @@
   {
     "id": "skinpacks",
     "title": {
-      "text": "Skin Packs"
+      "translate": "legacy.menu.store.skinpacks"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/skinpacks/index.json",
     "targetDirectoryName": "resourcepacks/Legacy Downloaded Skinpacks/assets/lce_skinpacks/skinpacks",
@@ -11,7 +11,7 @@
   {
     "id": "community_skinpacks",
     "title": {
-      "text": "Community Skin Packs"
+      "translate": "legacy.menu.store.community_skinpacks"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/community_skinpacks/index.json",
     "targetDirectoryName": "resourcepacks/Legacy Custom Skinpacks/assets/lce_skinpacks/skinpacks",
@@ -29,7 +29,7 @@
   {
     "id": "mashup_packs",
     "title": {
-      "text": "Mash-up Packs"
+      "translate": "legacy.menu.store.mashup_packs"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/mashup_packs/index.json",
     "targetDirectoryName": "resourcepacks",
@@ -38,7 +38,7 @@
   {
     "id": "legacy4j",
     "title": {
-      "text": "Bundle Packs"
+      "translate": "legacy.menu.store.bundle_packs"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/Bundle%20Packs/index.json",
     "targetDirectoryName": "resourcepacks",
