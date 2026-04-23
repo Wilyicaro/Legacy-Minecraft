@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyGlyphInfo;
+import wily.legacy.client.MutableBitmapGlyph;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,14 +67,11 @@ public abstract class BitmapProviderMixin {
                     int p = n++;
                     if (o != 0) {
                         int q = this.getActualGlyphWidth(nativeImage, k, l, p, m);
-                        BitmapProvider.Glyph glyph = codepointMap.put(o, new BitmapProvider.Glyph(f, nativeImage, p * k, m * l, k, l, (int) (0.5 + (double) ((float) q * f)) + 1, this.ascent) {
-
-                            @Override
-                            public GlyphInfo info() {
-                                return new LegacyGlyphInfo((q + 1) * f, f);
-                            }
-                        });
-                        if (glyph != null) {
+                        BitmapProvider.Glyph glyph = new BitmapProvider.Glyph(f, nativeImage, p * k, m * l, k, l, (int) (0.5 + (double) ((float) q * f)) + 1, this.ascent);
+                        GlyphInfo info = new LegacyGlyphInfo((q + 1) * f, f);
+                        ((MutableBitmapGlyph)(Object)glyph).setGlyphInfo(info);
+                        BitmapProvider.Glyph oldGlyph = codepointMap.put(o, glyph);
+                        if (oldGlyph != null) {
                             Legacy4J.LOGGER.warn("Codepoint '{}' declared multiple times in {}", Integer.toHexString(o), resourceLocation);
                         }
                     }

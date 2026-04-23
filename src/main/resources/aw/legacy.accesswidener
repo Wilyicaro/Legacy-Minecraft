@@ -18,7 +18,6 @@ accessible field net/minecraft/client/gui/screens/LevelLoadingScreen lastNarrati
 accessible field net/minecraft/client/gui/screens/ProgressScreen progress I
 accessible field net/minecraft/client/gui/screens/ProgressScreen header Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/ProgressScreen stage Lnet/minecraft/network/chat/Component;
-accessible method net/minecraft/client/gui/screens/Screen repositionElements ()V
 accessible field net/minecraft/client/gui/Gui autosaveIndicatorValue F
 accessible field net/minecraft/client/gui/Gui lastAutosaveIndicatorValue F
 accessible field net/minecraft/client/gui/screens/ProgressScreen clearScreenAfterStop Z
@@ -73,9 +72,6 @@ accessible field net/minecraft/client/MouseHandler mouseGrabbed Z
 accessible field net/minecraft/client/gui/screens/packs/PackSelectionModel selected Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/packs/PackSelectionModel unselected Ljava/util/List;
 accessible field net/minecraft/world/item/HoeItem TILLABLES Ljava/util/Map;
-accessible method net/minecraft/world/item/BlockItem getPlacementState (Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;
-accessible method net/minecraft/world/entity/Entity canAddPassenger (Lnet/minecraft/world/entity/Entity;)Z
-accessible method net/minecraft/world/entity/Entity canRide (Lnet/minecraft/world/entity/Entity;)Z
 accessible method net/minecraft/world/item/Item getPlayerPOVHitResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/ClipContext$Fluid;)Lnet/minecraft/world/phys/BlockHitResult;
 accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
 accessible field net/minecraft/world/item/ShovelItem FLATTENABLES Ljava/util/Map;
@@ -104,7 +100,7 @@ accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 accessible field net/minecraft/world/item/CreativeModeTabs OP_BLOCKS Lnet/minecraft/resources/ResourceKey;
 accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
-transitive-accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
+accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible field net/minecraft/client/gui/Gui displayHealth I
 accessible method net/minecraft/client/gui/components/events/ContainerEventHandler nextFocusPathInDirection (Lnet/minecraft/client/gui/navigation/ScreenRectangle;Lnet/minecraft/client/gui/navigation/ScreenDirection;Lnet/minecraft/client/gui/components/events/GuiEventListener;Lnet/minecraft/client/gui/navigation/FocusNavigationEvent;)Lnet/minecraft/client/gui/ComponentPath;
@@ -119,6 +115,7 @@ accessible class net/minecraft/world/level/GameRules$VisitorCaller
 accessible method net/minecraft/world/inventory/AbstractFurnaceMenu canSmelt (Lnet/minecraft/world/item/ItemStack;)Z
 accessible method net/minecraft/client/multiplayer/ClientPacketListener setKeyPair (Lnet/minecraft/world/entity/player/ProfileKeyPair;)V
 accessible class net/minecraft/client/gui/screens/recipebook/GhostSlots$GhostSlot
+accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots$GhostSlot <init> (Ljava/util/List;Z)V
 accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V
 extendable class net/minecraft/world/item/crafting/Ingredient
 accessible method net/minecraft/world/item/crafting/Ingredient <init> (Lnet/minecraft/core/HolderSet;)V
@@ -127,6 +124,7 @@ accessible field net/minecraft/client/renderer/GameRenderer resourcePool Lcom/mo
 accessible method net/minecraft/world/level/GameRules$BooleanValue create (ZLjava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$Subtitle
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt
+accessible method net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt <init> (Lnet/minecraft/world/phys/Vec3;J)V
 accessible class net/minecraft/client/gui/Gui$HeartType
 accessible field net/minecraft/client/gui/GuiGraphics deferredTooltip Ljava/lang/Runnable;
 accessible field net/minecraft/client/renderer/PostPass customUniforms Ljava/util/Map;
@@ -135,3 +133,4 @@ accessible field net/minecraft/client/gui/GuiGraphics scissorStack Lnet/minecraf
 accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
 accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
 accessible class net/minecraft/client/Minecraft$GameLoadCookie
+accessible method net/minecraft/client/Minecraft$GameLoadCookie <init> (Lcom/mojang/realmsclient/client/RealmsClient;Lnet/minecraft/client/main/GameConfig$QuickPlayData;)V

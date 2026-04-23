@@ -24,12 +24,7 @@ public class OptionsPresetScreen extends ConfirmationScreen {
 
     public OptionsPresetScreen(Screen parent, OptionsPreset preset) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 130 : 175, Component.translatable("legacy.menu.options_preset", preset.nameOrEmpty()), LegacyComponents.OPTIONS_PRESET_MESSAGE, screen -> {
-            ((OptionsPresetScreen)screen).preset.applyAndSave();
-            if (screen.parent instanceof OptionsScreen optionsScreen) {
-                optionsScreen.updateWidgets(true);
-                optionsScreen.updateWidgetMessages();
-            }
-            screen.onClose();
+            ((OptionsPresetScreen) screen).applyPreset();
         });
         renderableVLists.add(renderableVList);
         renderableVLists.add(showOptionsList);
@@ -48,9 +43,37 @@ public class OptionsPresetScreen extends ConfirmationScreen {
         }));
     }
 
-    @Override
-    public void onClose() {
-        super.onClose();
+    private void applyPreset() {
+        if (enablesLegacySettingsMenus()) {
+            minecraft.setScreen(OptionsScreen.createLegacySettingsMenusWarningScreen(this, s -> {
+                preset.applyAndSave();
+                updateSelectedPresetState();
+                OptionsScreen.enableLegacySettingsMenus(parent);
+            }));
+            return;
+        }
+        preset.applyAndSave();
+        if (disablesLegacySettingsMenus()) {
+            updateSelectedPresetState();
+            OptionsScreen.disableLegacySettingsMenus(parent);
+            return;
+        }
+        if (parent instanceof OptionsScreen optionsScreen) {
+            optionsScreen.updateWidgets(true);
+            optionsScreen.updateWidgetMessages();
+        }
+        onClose();
+    }
+
+    private boolean enablesLegacySettingsMenus() {
+        return Boolean.TRUE.equals(preset.legacyOptions().get(LegacyOptions.legacySettingsMenus.getKey())) && !LegacyOptions.legacySettingsMenus.get();
+    }
+
+    private boolean disablesLegacySettingsMenus() {
+        return Boolean.FALSE.equals(preset.legacyOptions().get(LegacyOptions.legacySettingsMenus.getKey())) && LegacyOptions.legacySettingsMenus.get();
+    }
+
+    private void updateSelectedPresetState() {
         for (OptionsPreset preset : Legacy4JClient.optionPresetsManager.map().values()) {
             if (preset.isApplied()) {
                 if (!preset.equals(originalPreset)) {
@@ -62,6 +85,12 @@ public class OptionsPresetScreen extends ConfirmationScreen {
         }
         LegacyOptions.optionsPreset.set(OptionHolder.none());
         LegacyOptions.optionsPreset.save();
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        updateSelectedPresetState();
     }
 
     @Override

@@ -100,10 +100,6 @@ public class ModsScreen extends PanelVListScreen {
     public static Style urlClickStyle(String url) {
         Style style = Style.EMPTY;
 
-        //For some reason, Screen::handleComponentClicked doesn't allow to handle click events when outside a world by default (Minecraft::player can't be null)
-        // So I'm going to use this workaround for now
-        if (Minecraft.getInstance().player == null) return style;
-
         try {
             style = style.withClickEvent(new ClickEvent.OpenUrl(URI.create(url)));
         } catch (Exception e) {
@@ -118,7 +114,7 @@ public class ModsScreen extends PanelVListScreen {
         if (sorting.get() != 0) mods = mods.stream().sorted(Comparator.comparing(ModInfo::getName)).toList();
         mods.forEach(mod -> {
             if (mod.isHidden()) return;
-            renderableVList.addRenderable(new AbstractButton(0, 0, 260, 30, Component.literal(mod.getName())) {
+            renderableVList.addRenderable(new ListButton(renderableVList, 0, 0, 260, 30, Component.literal(mod.getName())) {
                 @Override
                 public void onPress(InputWithModifiers input) {
                     if (isFocused()) {
@@ -151,10 +147,6 @@ public class ModsScreen extends PanelVListScreen {
                     LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
                 }
 
-                @Override
-                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                    defaultButtonNarrationText(narrationElementOutput);
-                }
             });
         });
     }

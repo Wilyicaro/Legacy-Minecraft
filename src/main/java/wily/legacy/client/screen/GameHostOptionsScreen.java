@@ -81,10 +81,11 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         if (!legacyMenus) {
             LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
             Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
-            if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
-            getRenderableVList().addRenderable(createTeleportButton(true, Component.translatable("legacy.menu.host_options.teleport_player")));
-            getRenderableVList().addRenderable(createTeleportButton(false, Component.translatable("legacy.menu.host_options.teleport_me")));
         }
+        if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
+        if (legacyMenus && HostOptionsScreen.getActualPlayerInfos().size() <= 1) return;
+        getRenderableVList().addRenderable(createTeleportButton(true, Component.translatable("legacy.menu.host_options.teleport_player")));
+        getRenderableVList().addRenderable(createTeleportButton(false, Component.translatable("legacy.menu.host_options.teleport_me")));
     }
 
     protected Button createTeleportButton(boolean toPlayer, Component component) {

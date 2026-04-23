@@ -10,8 +10,15 @@ import wily.legacy.inventory.RenameItemMenu;
 
 @Mixin(AnvilMenu.class)
 public class AnvilMenuMixin {
+    //? if neoforge {
+    /*@Redirect(method = "createResultInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getHoverName()Lnet/minecraft/network/chat/Component;"))
+    private Component createResultInternal(ItemStack itemStack) {
+        return Component.literal(RenameItemMenu.getItemName(itemStack));
+    }
+    *///?} else {
     @Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getHoverName()Lnet/minecraft/network/chat/Component;"))
     private Component createResult(ItemStack itemStack) {
         return Component.literal(RenameItemMenu.getItemName(itemStack));
     }
+    //?}
 }

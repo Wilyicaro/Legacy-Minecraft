@@ -91,10 +91,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.init.LegacyGameRules;
-import wily.legacy.mixin.base.FlowerPotBlockAccessor;
-import wily.legacy.mixin.base.HangingEntityItemAccessor;
-import wily.legacy.mixin.base.ItemBasedSteeringAccessor;
-import wily.legacy.mixin.base.PigAccessor;
+import wily.legacy.mixin.base.*;
 import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
@@ -399,7 +396,7 @@ public interface ControlTooltip {
             if (entity instanceof Llama llama && llama.isTamed() && mainHand.is(ItemTags.WOOL_CARPETS) && llama.getItemBySlot(EquipmentSlot.BODY).isEmpty())
                 return LegacyComponents.EQUIP;
         }
-        if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
+        if (entity != null && ((EntityAccessor)entity).canVehicleAddPassenger(minecraft.player) && ((EntityAccessor)entity).canRideVehicle(entity)) {
             boolean holdingLead = minecraft.player.getMainHandItem().getItem() instanceof LeadItem;
             if (!holdingLead) {
                 if (entity instanceof Boat || entity instanceof ChestBoat) return LegacyComponents.SAIL;
@@ -702,7 +699,7 @@ public interface ControlTooltip {
 
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;
-        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && b.getPlacementState(c) != null));
+        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && ((BlockItemAccessor) b).getPlacementBlockState(c) != null));
     }
 
     static boolean canHang(Minecraft minecraft, BlockHitResult hitResult, BlockState blockState, ItemStack usedItem) {

@@ -7,8 +7,8 @@ import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 //? if fabric || >=1.21 && neoforge {
-import wily.legacy.client.screen.compat.SodiumCompat;
-//?}
+/*import wily.legacy.client.screen.compat.SodiumCompat;
+*///?}
 
 
 import java.util.List;
@@ -34,9 +34,9 @@ public class SettingsScreen extends RenderableVListScreen {
     private static boolean shouldHideSection(OptionsScreen.Section section) {
         if (!LegacyOptions.legacySettingsMenus.get() && !LegacyOptions.hideSodiumSettings.get()) return false;
         //? if fabric || >=1.21 && neoforge {
-        return FactoryAPI.isModLoaded("sodium") && section == SodiumCompat.SODIUM;
-        //?} else {
-        /*return false;*/
+        /*return FactoryAPI.isModLoaded("sodium") && section == SodiumCompat.SODIUM;
+        *///?} else {
+        return false;
         //?}
     }
 

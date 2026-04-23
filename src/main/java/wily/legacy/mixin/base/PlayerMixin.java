@@ -22,14 +22,17 @@ import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity {
+public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPlayer {
     @Unique
     private boolean legacy$autoShielding;
+    @Unique
+    private int legacy$shieldPauseUntilTick;
 
     protected PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -113,6 +116,15 @@ public abstract class PlayerMixin extends LivingEntity {
         InteractionHand hand = legacy$getShieldHand();
         if (level().isClientSide()) return;
         if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || isShiftKeyDown())) {
+            if (!isShieldPaused() && LegacyShieldPlayer.hasConflictingUse((Player) (Object) this, hand)) {
+                legacy$autoShielding = false;
+                return;
+            }
+            if (isShieldPaused()) {
+                if (legacy$autoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+                legacy$autoShielding = false;
+                return;
+            }
             if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
                 if (isUsingItem()) stopUsingItem();
                 startUsingItem(hand);
@@ -128,5 +140,16 @@ public abstract class PlayerMixin extends LivingEntity {
     private InteractionHand legacy$getShieldHand() {
         if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
         return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
+    }
+
+    @Override
+    public void pauseShield(int ticks) {
+        legacy$shieldPauseUntilTick = Math.max(legacy$shieldPauseUntilTick, tickCount + ticks);
+        if (isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+    }
+
+    @Override
+    public boolean isShieldPaused() {
+        return tickCount < legacy$shieldPauseUntilTick;
     }
 }

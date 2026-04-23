@@ -288,21 +288,15 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             guiGraphics.deferredTooltip = null;
     }
 
-    public abstract static class ItemIconButton extends AbstractButton implements RenderableVListEntry {
-        protected RenderableVList list;
+    public abstract static class ItemIconButton extends ListButton implements RenderableVListEntry {
         public ItemIconButton(int i, int j, int k, int l, Component component) {
-            super(i, j, k, l, component);
+            super(null, i, j, k, l, component);
         }
 
         @Override
         public void initRenderable(RenderableVList list) {
             this.list = list;
             setHeight(list.accessor.getInteger("buttonsHeight", 30));
-        }
-
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-            defaultButtonNarrationText(narrationElementOutput);
         }
 
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, String messageName, int messageX, int xd, int color) {
