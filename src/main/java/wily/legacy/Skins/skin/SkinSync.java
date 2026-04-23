@@ -39,23 +39,24 @@ public final class SkinSync {
         buf.get().readBytes(out);
         return out;
     }
-    private static String assetKey(String skinId, int assetType) { return normalizeSkinId(skinId) + "|" + assetType; }
+    private static String assetKey(UUID owner, String skinId, int assetType) {
+        return owner + "|" + normalizeSkinId(skinId) + "|" + assetType;
+    }
     private static void cacheChunk(UUID owner, String skinId, int assetType, int index, int total, byte[] data) {
         if (owner == null) return;
         if (skinId == null || skinId.isBlank()) return;
         if (total <= 0) return;
-        String baseKey = assetKey(skinId, assetType);
-        String k = owner + "|" + baseKey;
+        String k = assetKey(owner, skinId, assetType);
         SkinChunkAccumulator acc = SERVER_ACC.computeIfAbsent(k, kk -> new SkinChunkAccumulator(total));
         acc.put(index, data);
         if (!acc.isComplete()) return;
         SERVER_ACC.remove(k);
-        SERVER_ASSETS.put(baseKey, acc.assemble());
+        SERVER_ASSETS.put(k, acc.assemble());
     }
-    public static boolean hasServerAssets(String skinId) {
-        if (skinId == null || skinId.isBlank()) return false;
-        return SERVER_ASSETS.containsKey(assetKey(skinId, ASSET_TEXTURE))
-                && SERVER_ASSETS.containsKey(assetKey(skinId, ASSET_MODEL));
+    public static boolean hasServerAssets(UUID owner, String skinId) {
+        if (owner == null || skinId == null || skinId.isBlank()) return false;
+        return SERVER_ASSETS.containsKey(assetKey(owner, skinId, ASSET_TEXTURE))
+                && SERVER_ASSETS.containsKey(assetKey(owner, skinId, ASSET_MODEL));
     }
     public static void requestSkin(ServerPlayer player) {
         if (player != null) CommonNetwork.sendToPlayer(player, new RequestSkinS2C());
@@ -80,7 +81,7 @@ public final class SkinSync {
         if (to == null || owner == null) return;
         if (skinId == null || skinId.isBlank()) return;
         for (int assetType = ASSET_TEXTURE; assetType <= ASSET_MODEL; assetType++) {
-            byte[] bytes = SERVER_ASSETS.get(assetKey(skinId, assetType));
+            byte[] bytes = SERVER_ASSETS.get(assetKey(owner, skinId, assetType));
             if (bytes == null || bytes.length == 0) continue;
             int type = assetType;
             forEachChunk(bytes, UploadAssetChunkC2S.MAX_CHUNK, (index, total, chunk) ->
@@ -88,11 +89,23 @@ public final class SkinSync {
             );
         }
     }
+    public static void clearPlayer(UUID uuid) {
+        if (uuid == null) return;
+        SERVER_SKINS.remove(uuid);
+        String prefix = uuid + "|";
+        SERVER_ASSETS.keySet().removeIf(key -> key.startsWith(prefix));
+        SERVER_ACC.keySet().removeIf(key -> key.startsWith(prefix));
+    }
+    public static void clearAll() {
+        SERVER_SKINS.clear();
+        SERVER_ASSETS.clear();
+        SERVER_ACC.clear();
+    }
     private static void sendSnapshotEntry(ServerPlayer requester, MinecraftServer server, UUID who, String skinId) {
         if (requester == null || server == null || who == null) return;
         CommonNetwork.sendToPlayer(requester, new SyncSkinS2C(who, skinId));
         sendCachedAssetsTo(requester, who, skinId);
-        if (skinId != null && !skinId.isBlank() && !hasServerAssets(skinId)) { requestSkin(server.getPlayerList().getPlayer(who)); }
+        if (skinId != null && !skinId.isBlank() && !hasServerAssets(who, skinId)) { requestSkin(server.getPlayerList().getPlayer(who)); }
     }
     public record SetSkinC2S(String skinId) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<SetSkinC2S> ID =

@@ -95,6 +95,16 @@ public final class SkinSyncClient {
         }
         sendSelection(client, resolveSelectedSkinId(client));
     }
+    public static void onSkinAssetsReloaded(Minecraft client) {
+        if (client == null) return;
+        STATE.sentAssets.clear();
+        if (!isConnected(client)) return;
+        String skinId = resolveSelectedSkinId(client);
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        sendSelection(client, skinId);
+        if (SkinCloudSyncClient.isActive(client)) SkinCloudSyncClient.requestSnapshot(client, true);
+        else CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
+    }
 
     public static void onSyncAssetChunk(UUID uuid, String skinId, int assetType, int index, int total, byte[] data) {
         if (!SkinIdUtil.hasSkin(skinId) || total <= 0) return;
@@ -103,8 +113,9 @@ public final class SkinSyncClient {
         accumulator.put(index, data);
         if (!accumulator.isComplete()) return;
         STATE.assetChunks.remove(key);
-        if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(skinId, accumulator.assemble());
-        else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(skinId, accumulator.assemble());
+        String assetKey = ClientSkinAssets.runtimeAssetKey(uuid, skinId);
+        if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(assetKey, accumulator.assemble());
+        else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, accumulator.assemble());
         ClientSkinCache.set(uuid, skinId);
     }
 

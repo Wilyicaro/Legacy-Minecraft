@@ -21,7 +21,10 @@ public final class SkinsBootstrap {
     public static void initCommon() {
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(SkinsBootstrap::onServerPlayerJoin);
         FactoryEvent.afterServerTick(SkinsBootstrap::processPendingJoinSync);
-        FactoryEvent.serverStopping(server -> PENDING_JOIN_SYNC.clear());
+        FactoryEvent.serverStopping(server -> {
+            PENDING_JOIN_SYNC.clear();
+            SkinSync.clearAll();
+        });
     }
 
     private static void onServerPlayerJoin(ServerPlayer joining) {

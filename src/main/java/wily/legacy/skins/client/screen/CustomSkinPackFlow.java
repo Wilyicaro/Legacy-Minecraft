@@ -246,6 +246,7 @@ final class CustomSkinPackFlow {
         ClientSkinAssets.clearPreviewWarmup();
         BoxModelManager.reload(screen.minecraft.getResourceManager());
         SkinPackLoader.loadPacks(screen.minecraft.getResourceManager());
+        SkinSyncClient.onSkinAssetsReloaded(screen.minecraft);
         screen.seenPackReloadVersion = SkinPackLoader.getReloadVersion();
         if (packId != null && !packId.isBlank()) {
             screen.packList.refreshPackIdsIfNeeded();

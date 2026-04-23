@@ -24,7 +24,7 @@ public abstract class PlayerSkinMixin {
         String skinId = SkinFairness.effectiveSkinId(Minecraft.getInstance(), ClientSkinCache.get(player.getUUID()));
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         if (cir.getReturnValue() == null) return;
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId, player.getUUID());
         boolean wantCape = ClientSkinAssets.shouldShowCape(resolved, player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA));
         PlayerSkin skin = ClientSkinAssets.resolvePlayerSkin(skinId, resolved, wantCape);
         if (skin == null) return;

@@ -32,6 +32,7 @@ public final class SkinsClientBootstrap {
                     ClientSkinAssets.clearPreviewWarmup();
                     BoxModelManager.reload(manager);
                     SkinPackLoader.loadPacks(manager);
+                    SkinSyncClient.onSkinAssetsReloaded(mc);
                 });
                 return;
             }
@@ -39,6 +40,7 @@ public final class SkinsClientBootstrap {
             ClientSkinAssets.clearPreviewWarmup();
             BoxModelManager.reload(manager);
             SkinPackLoader.loadPacks(manager);
+            SkinSyncClient.onSkinAssetsReloaded(mc);
         }
         @Override
         public String getName() {

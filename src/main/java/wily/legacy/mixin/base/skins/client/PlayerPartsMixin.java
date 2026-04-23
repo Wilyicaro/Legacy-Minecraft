@@ -60,7 +60,7 @@ public abstract class PlayerPartsMixin {
         boolean spectator = consoleskins$isSpectator(uuid);
         if (!spectator) consoleskins$uninstallSpectatorBoxHead(self);
         if (spectator) {
-            consoleskins$applySpectatorBoxHeadIfNeeded(self, skinId);
+            consoleskins$applySpectatorBoxHeadIfNeeded(self, uuid, skinId);
             return;
         }
         consoleskins$resetAllParts(self);
@@ -92,12 +92,12 @@ public abstract class PlayerPartsMixin {
         if (model.hides(overlay)) { consoleskins$hidePart(overlayPart); }
     }
     @Unique
-    private void consoleskins$applySpectatorBoxHeadIfNeeded(PlayerModel self, String skinId) {
+    private void consoleskins$applySpectatorBoxHeadIfNeeded(PlayerModel self, UUID uuid, String skinId) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) {
             consoleskins$uninstallSpectatorBoxHead(self);
             return;
         }
-        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId, uuid);
         if (!ClientSkinAssets.hasHeadBox(resolved)) {
             consoleskins$uninstallSpectatorBoxHead(self);
             return;
