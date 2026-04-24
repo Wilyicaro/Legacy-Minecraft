@@ -1,8 +1,8 @@
 package wily.legacy.mixin.base.skins.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
@@ -18,46 +18,35 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.skins.client.render.boxloader.*;
-import wily.legacy.skins.skin.*;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.boxloader.ArmorSlot;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.SkinIdUtil;
+
 import java.util.EnumMap;
 import java.util.EnumSet;
 
 @Mixin(HumanoidArmorLayer.class)
 public abstract class ArmorOffsetsMixin {
-    @Unique private static final ThreadLocal<Boolean> consoleskins$posePushed = new ThreadLocal<>();
-    @Unique private static final ThreadLocal<Boolean> consoleskins$layerActive = new ThreadLocal<>();
     @Unique
-    private HumanoidModel<?> consoleskins$getParentHumanoidModel() {
-        Object model = ((HumanoidArmorLayer<?, ?, ?>) (Object) this).getParentModel();
-        return model instanceof HumanoidModel<?> humanoidModel ? humanoidModel : null;
-    }
+    private static final ThreadLocal<Boolean> consoleskins$posePushed = new ThreadLocal<>();
     @Unique
-    private HumanoidModel<?> consoleskins$getArmorModel(EquipmentSlot slot, HumanoidRenderState renderState) {
-        if (slot == null || renderState == null) return null;
-        HumanoidArmorLayerAccessor<?, ?, ?> accessor = (HumanoidArmorLayerAccessor<?, ?, ?>) this;
-        ArmorModelSet<?> modelSet = renderState.isBaby ? accessor.consoleskins$getBabyModelSet() : accessor.consoleskins$getModelSet();
-        if (modelSet == null) return null;
-        return switch (slot) {
-            case HEAD -> (HumanoidModel<?>) modelSet.head();
-            case CHEST -> (HumanoidModel<?>) modelSet.chest();
-            case LEGS -> (HumanoidModel<?>) modelSet.legs();
-            case FEET -> (HumanoidModel<?>) modelSet.feet();
-            default -> null;
-        };
-    }
+    private static final ThreadLocal<Boolean> consoleskins$layerActive = new ThreadLocal<>();
+
     private static void consoleskins$clearContext() {
         consoleskins$posePushed.remove();
         consoleskins$layerActive.remove();
     }
+
     @Unique
     private static boolean consoleskins$tryEnterLayer() {
         if (Boolean.TRUE.equals(consoleskins$layerActive.get())) return false;
         consoleskins$layerActive.set(Boolean.TRUE);
         return true;
     }
+
     @Unique
     private static void consoleskins$setForceRender(HumanoidModel<?> model, boolean value) {
         if (model == null) return;
@@ -76,10 +65,33 @@ public abstract class ArmorOffsetsMixin {
             consoleskins$setForceRender(playerModel.rightPants, value);
         }
     }
+
     @Unique
     private static void consoleskins$setForceRender(ModelPart part, boolean value) {
         if (part != null) ((ModelPartSkipRenderOverrideAccess) (Object) part).consoleskins$setForceRender(value);
     }
+
+    @Unique
+    private HumanoidModel<?> consoleskins$getParentHumanoidModel() {
+        Object model = ((HumanoidArmorLayer<?, ?, ?>) (Object) this).getParentModel();
+        return model instanceof HumanoidModel<?> humanoidModel ? humanoidModel : null;
+    }
+
+    @Unique
+    private HumanoidModel<?> consoleskins$getArmorModel(EquipmentSlot slot, HumanoidRenderState renderState) {
+        if (slot == null || renderState == null) return null;
+        HumanoidArmorLayerAccessor<?, ?, ?> accessor = (HumanoidArmorLayerAccessor<?, ?, ?>) this;
+        ArmorModelSet<?> modelSet = renderState.isBaby ? accessor.consoleskins$getBabyModelSet() : accessor.consoleskins$getModelSet();
+        if (modelSet == null) return null;
+        return switch (slot) {
+            case HEAD -> (HumanoidModel<?>) modelSet.head();
+            case CHEST -> (HumanoidModel<?>) modelSet.chest();
+            case LEGS -> (HumanoidModel<?>) modelSet.legs();
+            case FEET -> (HumanoidModel<?>) modelSet.feet();
+            default -> null;
+        };
+    }
+
     @Inject(method = "renderArmorPiece", at = @At("HEAD"), require = 0, cancellable = true)
     private void consoleskins$pushArmorOffsets(PoseStack poseStack, SubmitNodeCollector nodeCollector,
                                                ItemStack item, EquipmentSlot slot, int packedLight,
@@ -153,6 +165,7 @@ public abstract class ArmorOffsetsMixin {
         poseStack.translate(offset[0] / 16f, offset[1] / 16f, offset[2] / 16f);
         consoleskins$posePushed.set(Boolean.TRUE);
     }
+
     @Inject(method = "renderArmorPiece", at = @At("RETURN"), require = 0)
     private void consoleskins$popArmorOffsets(PoseStack poseStack, SubmitNodeCollector nodeCollector,
                                               ItemStack item, EquipmentSlot slot, int packedLight,

@@ -58,17 +58,6 @@ public final class SkinsClientBootstrap {
 
     public static void init() {
         SkinSyncClient.init();
-        HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
-            @Override
-            public net.minecraft.network.chat.Component title() {
-                return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
-            }
-
-            @Override
-            public Screen build(Screen parent) {
-                return createChangeSkinScreen(parent);
-            }
-        };
 
         Legacy4JClient.whenResetOptions.add(() -> {
             Minecraft mc = Minecraft.getInstance();
@@ -78,11 +67,10 @@ public final class SkinsClientBootstrap {
         });
 
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, SKIN_PACK_RELOAD_LISTENER);
-        FactoryAPIClient.postTick(SkinsClientBootstrap::postTick);
         FactoryAPIClient.PlayerEvent.JOIN_EVENT.register(p -> SkinSyncClient.onClientJoin());
     }
 
-    private static void postTick(Minecraft minecraft) {
+    public static void postTick(Minecraft minecraft) {
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
         GuiSessionSkin.prewarm();

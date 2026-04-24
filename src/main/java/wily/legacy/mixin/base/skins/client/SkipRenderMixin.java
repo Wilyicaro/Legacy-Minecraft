@@ -13,25 +13,43 @@ import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
 
 @Mixin(ModelPart.class)
 public abstract class SkipRenderMixin implements ModelPartSkipRenderOverrideAccess {
-    @Shadow private boolean skipDraw;
-    @Shadow public boolean visible;
-    @Unique private boolean consoleskins$forceRender;
-    @Override public boolean consoleskins$getForceRender() { return consoleskins$forceRender; }
-    @Override public void consoleskins$setForceRender(boolean v) { consoleskins$forceRender = v; }
+    @Shadow
+    public boolean visible;
+    @Shadow
+    private boolean skipDraw;
+    @Unique
+    private boolean consoleskins$forceRender;
+
+    @Override
+    public boolean consoleskins$getForceRender() {
+        return consoleskins$forceRender;
+    }
+
+    @Override
+    public void consoleskins$setForceRender(boolean v) {
+        consoleskins$forceRender = v;
+    }
+
     @Unique
     private void consoleskins$applyForceRender() {
         if (!consoleskins$forceRender) return;
         skipDraw = false;
         visible = true;
     }
+
     @Inject(
-        method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V",
-        at = @At("HEAD"), cancellable = false, require = 0
+            method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V",
+            at = @At("HEAD"), cancellable = false, require = 0
     )
-    private void consoleskins$applyForceRender4(PoseStack ps, VertexConsumer vc, int light, int overlay, CallbackInfo ci) { consoleskins$applyForceRender(); }
+    private void consoleskins$applyForceRender4(PoseStack ps, VertexConsumer vc, int light, int overlay, CallbackInfo ci) {
+        consoleskins$applyForceRender();
+    }
+
     @Inject(
-        method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V",
-        at = @At("HEAD"), cancellable = false, require = 0
+            method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V",
+            at = @At("HEAD"), cancellable = false, require = 0
     )
-    private void consoleskins$applyForceRender5(PoseStack ps, VertexConsumer vc, int light, int overlay, int color, CallbackInfo ci) { consoleskins$applyForceRender(); }
+    private void consoleskins$applyForceRender5(PoseStack ps, VertexConsumer vc, int light, int overlay, int color, CallbackInfo ci) {
+        consoleskins$applyForceRender();
+    }
 }

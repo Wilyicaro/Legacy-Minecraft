@@ -1,11 +1,6 @@
 package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.Minecraft;
-import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.skins.skin.ClientSkinCache;
-import wily.legacy.skins.skin.ClientSkinAssets;
-import wily.legacy.skins.skin.SkinFairness;
-import wily.legacy.skins.skin.SkinIdUtil;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Avatar;
@@ -18,14 +13,14 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinFairness;
+import wily.legacy.skins.skin.SkinIdUtil;
 
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarSkinMixin {
-    @Inject(method = "extractRenderState", at = @At("RETURN"), require = 0)
-    private void consoleskins$patchStateSkin(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
-        if (avatar == null || state == null) return;
-        consoleskins$applySkinToState(avatar, state);
-    }
     @Unique
     private static void consoleskins$applySkinToState(Avatar avatar, AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return;
@@ -49,8 +44,11 @@ public abstract class AvatarSkinMixin {
         boolean showCape = ClientSkinAssets.shouldShowCape(resolved, avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA));
         state.showCape = showCape;
         PlayerSkin cachedSkin = ClientSkinAssets.resolvePlayerSkin(skinId, resolved, showCape);
-        if (cachedSkin != null) { state.skin = cachedSkin; }
+        if (cachedSkin != null) {
+            state.skin = cachedSkin;
+        }
     }
+
     @Unique
     private static void consoleskins$clearSkinState(RenderStateSkinIdAccess access) {
         if (access == null) return;
@@ -66,6 +64,7 @@ public abstract class AvatarSkinMixin {
         access.consoleskins$setCachedModelId(null);
         access.consoleskins$setCachedBoxModel(null);
     }
+
     @Unique
     private static String consoleskins$resolveSkinId(Avatar avatar) {
         String name = avatar.getScoreboardName();
@@ -74,5 +73,11 @@ public abstract class AvatarSkinMixin {
             if (skinId != null && !skinId.isBlank()) return skinId;
         }
         return ClientSkinCache.get(avatar.getUUID());
+    }
+
+    @Inject(method = "extractRenderState", at = @At("RETURN"), require = 0)
+    private void consoleskins$patchStateSkin(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
+        if (avatar == null || state == null) return;
+        consoleskins$applySkinToState(avatar, state);
     }
 }

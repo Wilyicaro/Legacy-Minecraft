@@ -12,5 +12,7 @@ import wily.legacy.skins.client.render.boxloader.BoxAddonLayer;
 @Mixin(AvatarRenderer.class)
 public abstract class BoxLayerSetupMixin {
     @Inject(method = "<init>", at = @At("TAIL"), require = 0)
-    private void consoleskins$addBoxAddonLayer(EntityRendererProvider.Context context, boolean slim, CallbackInfo ci) { ((LivingEntityRendererAccessor) this).consoleskins$getLayers().add(0, new BoxAddonLayer((RenderLayerParent<?, ?>) (Object) this)); }
+    private void consoleskins$addBoxAddonLayer(EntityRendererProvider.Context context, boolean slim, CallbackInfo ci) {
+        ((LivingEntityRendererAccessor) this).consoleskins$getLayers().add(0, new BoxAddonLayer((RenderLayerParent<?, ?>) this));
+    }
 }

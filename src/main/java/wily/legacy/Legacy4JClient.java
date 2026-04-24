@@ -367,6 +367,7 @@ public class Legacy4JClient {
                     knownEntities.add(r.getEntity().getType());
             }
         }
+        SkinsClientBootstrap.postTick(minecraft);
     }
 
     public static void postScreenInit(Screen screen) {
@@ -465,6 +466,18 @@ public class Legacy4JClient {
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
             *///?}
             LegacyGuiElements.setup(m);
+
+            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+                @Override
+                public net.minecraft.network.chat.Component title() {
+                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+                }
+
+                @Override
+                public Screen build(Screen parent) {
+                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
+                }
+            };
         });
 
         FactoryAPIClient.registerBlockColor(registry -> {
