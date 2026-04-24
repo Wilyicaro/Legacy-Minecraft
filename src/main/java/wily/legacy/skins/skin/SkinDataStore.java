@@ -1,12 +1,12 @@
-package wily.legacy.Skins.skin;
+package wily.legacy.skins.skin;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import wily.legacy.Skins.util.DebugLog;
-import wily.legacy.Skins.util.SkinPaths;
+import wily.legacy.skins.util.DebugLog;
+import wily.legacy.skins.util.SkinPaths;
 
 import java.io.IOException;
 import java.io.Reader;

@@ -1,10 +1,9 @@
-package wily.legacy.Skins.client.preview;
-import wily.legacy.Skins.client.gui.*;
-import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
-import wily.legacy.Skins.pose.SkinPoseRegistry;
-import wily.legacy.Skins.client.util.*;
-import wily.legacy.Skins.skin.*;
-import java.util.UUID;
+package wily.legacy.skins.client.preview;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.skins.pose.SkinPoseRegistry;
+import wily.legacy.skins.client.util.*;
+import wily.legacy.skins.skin.*;
+
 import java.util.function.Supplier;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.*;
@@ -28,7 +27,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private static volatile ResourceLocation CENTER_SELECTED_BADGE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     private static volatile String CENTER_NAME_PLATE_DISPLAY_ID, CENTER_NAME_PLATE_PENDING_ID;
     private static volatile boolean CENTER_NAME_PLATE_WAITING;
-    private final wily.legacy.Skins.client.screen.ChangeSkinScreenSource source;
+    private final wily.legacy.skins.client.screen.ChangeSkinScreenSource source;
     public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY) {
         CENTER_NAME_PLATE = enabled;
         CENTER_NAME_PLATE_W = Math.max(1, width);
@@ -116,7 +115,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private boolean pendingPunchLoop;
     private int moveHintDir;
     private long moveHintStart;
-    public PlayerSkinWidget(wily.legacy.Skins.client.screen.ChangeSkinScreenSource source, int width, int height) {
+    public PlayerSkinWidget(wily.legacy.skins.client.screen.ChangeSkinScreenSource source, int width, int height) {
         super(-9999, -9999, width, height, CommonComponents.EMPTY);
         this.source = source;
         this.originalWidth = width;

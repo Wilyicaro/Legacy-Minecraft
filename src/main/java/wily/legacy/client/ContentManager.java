@@ -15,8 +15,8 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Skins.skin.CustomSkinPackStore;
-import wily.legacy.Skins.skin.DownloadedSkinPackStore;
+import wily.legacy.skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.IOUtil;
 
 import java.io.*;
@@ -26,7 +26,6 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;

@@ -1,9 +1,8 @@
-package wily.legacy.Skins.skin;
+package wily.legacy.skins.skin;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import wily.legacy.Skins.pose.SkinPoseRegistry;
+import wily.legacy.skins.pose.SkinPoseRegistry;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;

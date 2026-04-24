@@ -1,10 +1,9 @@
-package wily.legacy.Skins.skin;
+package wily.legacy.skins.skin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 public final class DownloadedSkinPackStore {
     private static final String RESOURCE_PACK_DIR = "Legacy Downloaded Skinpacks";

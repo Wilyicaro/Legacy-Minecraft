@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Skins.client.gui.GuiDollRender;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.pose.*;
-import wily.legacy.Skins.skin.SkinIdUtil;
+import wily.legacy.skins.client.gui.GuiDollRender;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.pose.*;
+import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(PlayerModel.class)

@@ -1,10 +1,10 @@
-package wily.legacy.Skins.api.ui;
+package wily.legacy.skins.api.ui;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.Skins.client.screen.ChangeSkinScreenSource;
+import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 
 import java.util.List;
 import java.util.Objects;

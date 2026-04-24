@@ -1,4 +1,4 @@
-package wily.legacy.Skins.skin;
+package wily.legacy.skins.skin;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

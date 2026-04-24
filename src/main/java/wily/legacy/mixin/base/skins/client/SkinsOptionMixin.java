@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.HelpAndOptionsScreen;
 import wily.legacy.client.screen.LegacyConfigWidgets;

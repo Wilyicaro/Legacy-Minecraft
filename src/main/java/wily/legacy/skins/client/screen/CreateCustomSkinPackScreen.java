@@ -1,11 +1,11 @@
-package wily.legacy.Skins.client.screen;
+package wily.legacy.skins.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import wily.legacy.Skins.SkinsClientBootstrap;
-import wily.legacy.Skins.skin.*;
+import wily.legacy.skins.SkinsClientBootstrap;
+import wily.legacy.skins.skin.*;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;

@@ -1,14 +1,13 @@
 package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.Minecraft;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.ClientSkinAssets;
-import wily.legacy.Skins.skin.SkinFairness;
-import wily.legacy.Skins.skin.SkinIdUtil;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.SkinFairness;
+import wily.legacy.skins.skin.SkinIdUtil;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;

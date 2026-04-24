@@ -1,23 +1,23 @@
-package wily.legacy.Skins.client.screen;
+package wily.legacy.skins.client.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.Skins.client.gui.GuiDollRender;
-import wily.legacy.Skins.client.gui.GuiSessionSkin;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
-import wily.legacy.Skins.skin.ClientSkinAssets;
-import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinDataStore;
-import wily.legacy.Skins.skin.DownloadedSkinPackStore;
-import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinIdUtil;
-import wily.legacy.Skins.skin.SkinPack;
-import wily.legacy.Skins.skin.SkinPackLoader;
-import wily.legacy.Skins.skin.SkinSyncClient;
-import wily.legacy.Skins.api.ui.LegacySkinUi;
+import wily.legacy.skins.client.gui.GuiDollRender;
+import wily.legacy.skins.client.gui.GuiSessionSkin;
+import wily.legacy.skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinDataStore;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
+import wily.legacy.skins.skin.SkinEntry;
+import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.skins.skin.SkinPack;
+import wily.legacy.skins.skin.SkinPackLoader;
+import wily.legacy.skins.skin.SkinSyncClient;
+import wily.legacy.skins.api.ui.LegacySkinUi;
 
 import java.util.Locale;
 import java.util.Map;

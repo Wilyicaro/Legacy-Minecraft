@@ -1,4 +1,4 @@
-package wily.legacy.Skins.client.preview;
+package wily.legacy.skins.client.preview;
 
 import java.util.ArrayList;
 import java.util.Arrays;

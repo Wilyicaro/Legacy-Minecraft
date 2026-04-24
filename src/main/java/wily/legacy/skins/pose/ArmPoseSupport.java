@@ -1,4 +1,4 @@
-package wily.legacy.Skins.pose;
+package wily.legacy.skins.pose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -10,8 +10,8 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
-import wily.legacy.Skins.client.gui.GuiDollRender;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.gui.GuiDollRender;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 import java.util.Map;
 import java.util.UUID;

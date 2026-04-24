@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Skins.pose.SkinPoseRegistry;
-import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinIdUtil;
+import wily.legacy.skins.pose.SkinPoseRegistry;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(LivingEntityRenderer.class)

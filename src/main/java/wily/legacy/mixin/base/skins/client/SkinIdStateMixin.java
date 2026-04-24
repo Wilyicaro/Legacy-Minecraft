@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import java.util.UUID;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
 
 @Mixin(AvatarRenderState.class)
 public abstract class SkinIdStateMixin implements RenderStateSkinIdAccess {

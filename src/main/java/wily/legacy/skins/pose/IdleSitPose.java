@@ -1,4 +1,4 @@
-package wily.legacy.Skins.pose;
+package wily.legacy.skins.pose;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 import net.minecraft.world.entity.Pose;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class IdleSitPose {
     public static final float BODY_DOWN = 9.25F;

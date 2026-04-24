@@ -67,12 +67,11 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.Skins.client.render.boxloader.AttachSlot;
-import wily.legacy.Skins.skin.ClientSkinAssets;
-import wily.legacy.Skins.skin.ClientSkinCache;
-import wily.legacy.Skins.skin.SkinFairness;
-import wily.legacy.Skins.skin.SkinIdUtil;
-import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinFairness;
+import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
@@ -83,7 +82,6 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -525,7 +523,13 @@ public class LegacyRenderUtil {
     }
 
     public static List<Component> getTooltip(ItemStack stack) {
-        return LegacyItemUtil.sanitizeTooltip(stack, stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL));
+        return getTooltip(stack, false);
+    }
+
+    public static List<Component> getTooltip(ItemStack stack, boolean removeBlankLines) {
+        List<Component> lines = stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        if (removeBlankLines) lines.removeIf(component -> component.getString().isBlank());
+        return LegacyItemUtil.sanitizeTooltip(stack, lines);
     }
 
     public static List<FormattedCharSequence> getTooltip(ItemStack stack, int width) {
@@ -541,8 +545,7 @@ public class LegacyRenderUtil {
         LegacyFontUtil.applySDFont(sd -> {
         if (GuiAccessor.getInstance().getToolHighlightTimer() > 0 && !GuiAccessor.getInstance().getLastToolHighlight().isEmpty()) {
             Font font = /*? if forge || neoforge {*//*Objects.requireNonNullElse(IClientItemExtensions.of(GuiAccessor.getInstance().getLastToolHighlight()).getFont(GuiAccessor.getInstance().getLastToolHighlight(), IClientItemExtensions.FontContext.SELECTED_ITEM_NAME), mc.font)*//*?} else {*/  mc.font/*?}*/;
-            List<Component> tooltip = LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight());
-            tooltip.removeIf(c -> c.getString().isBlank());
+            List<Component> tooltip = LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight(), true);
             Object2IntMap<Component> tooltipLines = tooltip.stream().limit(LegacyRenderUtil.getSelectedItemTooltipLines()).map(c -> tooltip.indexOf(c) == LegacyRenderUtil.getSelectedItemTooltipLines() - 1 && LegacyOptions.itemTooltipEllipsis.get() ? MORE : c).collect(Collectors.toMap(Function.identity(), font::width, (a, b) -> b, Object2IntLinkedOpenHashMap::new));
             int l = Math.min((int) ((float) GuiAccessor.getInstance().getToolHighlightTimer() * 256.0f / 10.0f), 255);
             if (l > 0) {

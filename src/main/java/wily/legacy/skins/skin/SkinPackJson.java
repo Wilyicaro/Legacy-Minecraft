@@ -1,10 +1,10 @@
-package wily.legacy.Skins.skin;
+package wily.legacy.skins.skin;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.server.packs.resources.Resource;
-import wily.legacy.Skins.util.DebugLog;
+import wily.legacy.skins.util.DebugLog;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;

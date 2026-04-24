@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Skins.skin.SkinSyncClient;
+import wily.legacy.skins.skin.SkinSyncClient;
 
 @Mixin(Minecraft.class)
 public abstract class SkinTickMixin {

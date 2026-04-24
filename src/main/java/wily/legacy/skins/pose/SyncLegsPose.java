@@ -1,10 +1,10 @@
-package wily.legacy.Skins.pose;
+package wily.legacy.skins.pose;
 
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Pose;
-import wily.legacy.Skins.client.gui.GuiDollRender;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.gui.GuiDollRender;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class SyncLegsPose {
     private SyncLegsPose() { }
