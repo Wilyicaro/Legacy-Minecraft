@@ -42,6 +42,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
             tu3TabLeftX, tu3TabMidX, tu3TabRightX, tu3TabLeftW, tu3TabMidW, tu3TabRightW;
     private Tu3LayoutMetrics tu3Layout = Tu3LayoutMetrics.DEFAULT;
     private Tu3NavZone tu3NavZone = Tu3NavZone.CAROUSEL;
+    private final HoldRepeat tu3HorizontalHold = new HoldRepeat();
     public TU3ChangeSkinScreen(Screen parent) { super(parent); }
 
     public TU3ChangeSkinScreen(Screen parent, ChangeSkinScreenSource source) { super(parent, source); }
@@ -50,10 +51,15 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private boolean carouselNavActive() { return tu3NavZone == Tu3NavZone.CAROUSEL; }
     private void setTu3NavZone(Tu3NavZone zone) { tu3NavZone = zone == null ? Tu3NavZone.CAROUSEL : zone; }
     private boolean once(BindingState state, ControllerBinding<?> binding) { return state != null && state.is(binding) && state.onceClick(true); }
-    private boolean repeat(BindingState state, ControllerBinding<?> binding) {
-        if (state == null || !state.is(binding) || !state.pressed || !state.canClick()) return false;
-        state.block();
-        return true;
+    private void startHoldingTu3Horizontal(int dir) {
+        tu3HorizontalHold.start(dir);
+        handleTu3NavMove(dir < 0, dir > 0);
+    }
+    private void stopHoldingTu3Horizontal() { tu3HorizontalHold.stop(); }
+    private void pumpHoldingTu3Horizontal() {
+        if (!tu3HorizontalHold.ready()) return;
+        handleTu3NavMove(tu3HorizontalHold.dir() < 0, tu3HorizontalHold.dir() > 0);
+        tu3HorizontalHold.step();
     }
     private void tintBlitSprite(GuiGraphics g, ResourceLocation sprite, int x, int y, int w, int h, float tint) {
         FactoryGuiGraphics.of(g).setBlitColor(tint, tint, tint, 1.0f);
@@ -265,13 +271,20 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (once(state, ControllerBinding.DPAD_DOWN) || once(state, ControllerBinding.LEFT_STICK_DOWN)) {
             if (handleTu3NavVertical(false, true)) return;
         }
-        if (repeat(state, ControllerBinding.DPAD_LEFT) || repeat(state, ControllerBinding.LEFT_STICK_LEFT)) {
-            handleTu3NavMove(true, false);
-            return;
-        }
-        if (repeat(state, ControllerBinding.DPAD_RIGHT) || repeat(state, ControllerBinding.LEFT_STICK_RIGHT)) {
-            handleTu3NavMove(false, true);
-            return;
+        if (state != null && (
+                state.is(ControllerBinding.DPAD_LEFT)
+                        || state.is(ControllerBinding.LEFT_STICK_LEFT)
+                        || state.is(ControllerBinding.DPAD_RIGHT)
+                        || state.is(ControllerBinding.LEFT_STICK_RIGHT))) {
+            int dir = (state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.LEFT_STICK_RIGHT)) ? 1 : -1;
+            if (state.released) {
+                if (tu3HorizontalHold.active() && tu3HorizontalHold.dir() == dir) stopHoldingTu3Horizontal();
+            } else if (state.pressed) {
+                if (!tu3HorizontalHold.active() || tu3HorizontalHold.dir() != dir) startHoldingTu3Horizontal(dir);
+                pumpHoldingTu3Horizontal();
+                state.block();
+                return;
+            }
         }
         if (handleSharedBindingState(state)) return;
         if (!ControlType.getActiveType().isKbm()
@@ -303,6 +316,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public void tick() {
         super.tick();
+        pumpHoldingTu3Horizontal();
         tickScreenTail();
     }
     @Override
@@ -336,6 +350,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
     @Override
     public void removed() {
+        stopHoldingTu3Horizontal();
         PlayerSkinWidget.setCenterNamePlate(false, 1, 1, 0, -1);
         PlayerSkinWidget.setCenterNamePlateReady(true);
         PlayerSkinWidget.setCenterNamePlateCenterX(-1);
