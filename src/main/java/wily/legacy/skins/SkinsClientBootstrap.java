@@ -50,6 +50,9 @@ public final class SkinsClientBootstrap {
     private static volatile boolean packPreloadStarted = false;
     private static volatile boolean defaultSelectionChecked = false;
     private static volatile boolean customPackSelectionChecked = false;
+    public static void markCustomPackSelectionChecked() {
+        customPackSelectionChecked = true;
+    }
     public static void initClient() {
         SkinSyncClient.initClient();
         HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
