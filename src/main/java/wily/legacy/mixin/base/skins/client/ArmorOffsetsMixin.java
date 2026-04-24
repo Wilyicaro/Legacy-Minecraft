@@ -17,10 +17,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.client.render.boxloader.*;
-import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
-import wily.legacy.Skins.skin.*;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.boxloader.*;
+import wily.legacy.skins.skin.*;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -101,7 +101,7 @@ public abstract class ArmorOffsetsMixin {
         EnumMap<ArmorSlot, float[]> armorOffsets = BoxModelManager.getArmorOffsets(modelId);
         boolean hasBoxModel = resolved.boxModel() != null;
         boolean hideArmor = false;
-        if (ConsoleSkinsClientSettings.isHideArmorOnAllBoxSkins() && hasBoxModel) hideArmor = true;
+        if (LegacyOptions.hideArmorOnAllBoxSkins.get() && hasBoxModel) hideArmor = true;
         else if (armorHide != null && armorHide.contains(armorSlot)) hideArmor = true;
         if (hideArmor) {
             consoleskins$setForceRender(armorModel, false);

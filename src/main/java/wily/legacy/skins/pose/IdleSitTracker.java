@@ -1,4 +1,4 @@
-package wily.legacy.Skins.pose;
+package wily.legacy.skins.pose;
 
 import net.minecraft.util.Mth;
 

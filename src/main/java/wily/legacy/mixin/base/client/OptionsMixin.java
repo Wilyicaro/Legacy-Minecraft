@@ -12,11 +12,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
+import wily.legacy.skins.SkinsClientBootstrap;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,6 +106,7 @@ public abstract class OptionsMixin {
     private void enableCustomSkinPack() {
         try {
             CustomSkinPackStore.enableResourcePack(minecraft);
+            SkinsClientBootstrap.markCustomPackSelectionChecked();
         } catch (IOException ignored) {
         }
     }

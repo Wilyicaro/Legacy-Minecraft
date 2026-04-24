@@ -1,11 +1,10 @@
-package wily.legacy.Skins.pose;
+package wily.legacy.skins.pose;
 
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class StatueOfLibertyPose {
     private StatueOfLibertyPose() { }

@@ -18,7 +18,7 @@
     "renderableVList.x": "${panel.x}+10",
     "renderableVList.y": "${panel.y}+16",
     "renderableVList.width": 180,
-    "renderableVList.height": 177,
+    "renderableVList.height": 90,
     "renderableVList.buttonMessage.x": 36,
     "renderableVList.playerIcon.x": 3,
     "renderableVList.playerIcon.y": 2,

@@ -109,7 +109,7 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.MCAccount;
-import wily.legacy.Skins.SkinsClientBootstrap;
+import wily.legacy.skins.SkinsClientBootstrap;
 
 
 import java.io.File;

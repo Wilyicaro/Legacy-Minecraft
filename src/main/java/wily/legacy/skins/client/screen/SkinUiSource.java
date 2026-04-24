@@ -1,12 +1,12 @@
-package wily.legacy.Skins.client.screen;
+package wily.legacy.skins.client.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinIdUtil;
-import wily.legacy.Skins.skin.SkinPack;
-import wily.legacy.Skins.api.ui.LegacySkinUi;
+import wily.legacy.skins.skin.SkinEntry;
+import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.skins.skin.SkinPack;
+import wily.legacy.skins.api.ui.LegacySkinUi;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

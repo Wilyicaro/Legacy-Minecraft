@@ -1,6 +1,6 @@
-package wily.legacy.Skins.pose;
+package wily.legacy.skins.pose;
 
-import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,8 +1,8 @@
-package wily.legacy.Skins.client.render;
+package wily.legacy.skins.client.render;
 
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import wily.legacy.Skins.client.render.boxloader.AttachSlot;
+import wily.legacy.skins.client.render.boxloader.AttachSlot;
 
 public final class PlayerModelParts {
     public static final AttachSlot[] ALL = {

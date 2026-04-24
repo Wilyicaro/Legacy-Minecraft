@@ -1,10 +1,9 @@
-package wily.legacy.Skins.client.preview;
-import wily.legacy.Skins.client.gui.*;
-import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
-import wily.legacy.Skins.pose.SkinPoseRegistry;
-import wily.legacy.Skins.client.util.*;
-import wily.legacy.Skins.skin.*;
-import java.util.UUID;
+package wily.legacy.skins.client.preview;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.skins.pose.SkinPoseRegistry;
+import wily.legacy.skins.client.util.*;
+import wily.legacy.skins.skin.*;
+
 import java.util.function.Supplier;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.*;
@@ -17,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import wily.legacy.client.LegacyOptions;
 public class PlayerSkinWidget extends AbstractWidget {
     private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F, DEFAULT_CAROUSEL_FPS = 30.0F;
     private static final long MOVE_HINT_MS = 170L;
@@ -28,7 +28,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private static volatile ResourceLocation CENTER_SELECTED_BADGE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     private static volatile String CENTER_NAME_PLATE_DISPLAY_ID, CENTER_NAME_PLATE_PENDING_ID;
     private static volatile boolean CENTER_NAME_PLATE_WAITING;
-    private final wily.legacy.Skins.client.screen.ChangeSkinScreenSource source;
+    private final wily.legacy.skins.client.screen.ChangeSkinScreenSource source;
     public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY) {
         CENTER_NAME_PLATE = enabled;
         CENTER_NAME_PLATE_W = Math.max(1, width);
@@ -116,7 +116,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private boolean pendingPunchLoop;
     private int moveHintDir;
     private long moveHintStart;
-    public PlayerSkinWidget(wily.legacy.Skins.client.screen.ChangeSkinScreenSource source, int width, int height) {
+    public PlayerSkinWidget(wily.legacy.skins.client.screen.ChangeSkinScreenSource source, int width, int height) {
         super(-9999, -9999, width, height, CommonComponents.EMPTY);
         this.source = source;
         this.originalWidth = width;
@@ -281,8 +281,8 @@ public class PlayerSkinWidget extends AbstractWidget {
             long now = System.currentTimeMillis();
             if (isInterpolating()) {
                 long elapsed;
-                float interpMs = ConsoleSkinsClientSettings.isSmoothPreviewScroll() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
-                if (ConsoleSkinsClientSettings.isSmoothPreviewScroll()) {
+                float interpMs = LegacyOptions.smoothPreviewScroll.get() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
+                if (LegacyOptions.smoothPreviewScroll.get()) {
                     if (start == 0L) start = now;
                     elapsed = Math.max(0L, now - start);
                     progress = elapsed / interpMs;

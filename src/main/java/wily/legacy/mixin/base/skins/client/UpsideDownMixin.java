@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Skins.client.gui.GuiDollRender;
-import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.pose.SkinPoseRegistry;
+import wily.legacy.skins.client.gui.GuiDollRender;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(AvatarRenderer.class)

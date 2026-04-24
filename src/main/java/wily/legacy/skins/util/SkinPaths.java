@@ -1,4 +1,4 @@
-package wily.legacy.Skins.util;
+package wily.legacy.skins.util;
 
 import net.minecraft.client.Minecraft;
 
