@@ -20,9 +20,12 @@ import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate,
                                   String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean preDownload,
@@ -98,6 +101,90 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
         }
     }
 
+    public static boolean isDownloadedPackInstalled(ContentManager.Pack pack) {
+        if (!pack.hasWorldTemplate()) return true;
+        Path path = downloadedPackPath(pack.id());
+        if (!Files.isRegularFile(path)) return false;
+        return pack.worldTemplateCheckSum().map(s -> s.equals(ContentManager.readFileCheckSum(path))).orElse(true);
+    }
+
+    public static void downloadDownloadedPack(ContentManager.Pack pack) throws IOException {
+        if (!pack.hasWorldTemplate()) return;
+        Path path = downloadedPackPath(pack.id());
+        Path temp = Files.createTempFile("legacy_world_", ".mcsave");
+        try {
+            try (InputStream stream = pack.worldTemplateDownloadURI().orElseThrow().toURL().openStream()) {
+                Files.copy(stream, temp, StandardCopyOption.REPLACE_EXISTING);
+            }
+            if (pack.worldTemplateCheckSum().isPresent()) {
+                String fileHash = ContentManager.readFileCheckSum(temp);
+                if (!pack.worldTemplateCheckSum().get().equals(fileHash)) {
+                    throw new IOException("Checksum mismatch for world template " + pack.id());
+                }
+            }
+            Files.createDirectories(path.getParent());
+            Files.copy(temp, path, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(temp);
+        }
+    }
+
+    public static void removeDownloadedPack(String packId) {
+        try {
+            Files.deleteIfExists(downloadedPackPath(packId));
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Failed to remove downloaded world template {}", packId, e);
+        }
+    }
+
+    public static void refreshDownloadedPacks() {
+        list.removeIf(LegacyWorldTemplate::isManagedDownloadedPack);
+        loadDownloadedPacks(list);
+    }
+
+    private static void loadDownloadedPacks(List<LegacyWorldTemplate> list) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft == null) return;
+        Path dir = minecraft.getResourcePackDirectory();
+        if (dir == null || !Files.isDirectory(dir)) return;
+        try (Stream<Path> paths = Files.list(dir)) {
+            paths.filter(Files::isDirectory)
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .map(LegacyWorldTemplate::downloadedPackTemplate)
+                .flatMap(Optional::stream)
+                .sorted(Comparator.comparing(template -> template.buttonMessage().getString(), String.CASE_INSENSITIVE_ORDER))
+                .forEach(list::add);
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Failed to load downloaded world templates", e);
+        }
+    }
+
+    private static Optional<LegacyWorldTemplate> downloadedPackTemplate(String packId) {
+        DownloadedPackMetadata.Entry entry = DownloadedPackMetadata.entry(packId);
+        if (!entry.hasWorldTemplate() || !Files.isRegularFile(downloadedPackPath(packId))) return Optional.empty();
+        String name = entry.name() == null || entry.name().isBlank() ? packId : entry.name();
+        String folderName = entry.worldTemplateFolderName();
+        if (folderName == null || folderName.isBlank()) folderName = name;
+        return Optional.of(new LegacyWorldTemplate(Component.literal(name), Legacy4J.createModLocation("creation_list/create_world"), downloadedPackLocation(packId), folderName, false, true, true, false, Optional.of(DownloadedResourceAlbums.albumId(packId)), Optional.empty(), Optional.empty(), Optional.empty()));
+    }
+
+    private static Path downloadedPackPath(String packId) {
+        return Minecraft.getInstance().gameDirectory.toPath().resolve(downloadedPackLocation(packId));
+    }
+
+    private static String downloadedPackLocation(String packId) {
+        return "legacy_world_templates/files/" + normalizeDownloadedPackId(packId) + ".mcsave";
+    }
+
+    private static String normalizeDownloadedPackId(String packId) {
+        return packId.startsWith("file/") ? packId.substring(5) : packId;
+    }
+
+    private static boolean isManagedDownloadedPack(LegacyWorldTemplate template) {
+        return template.albumId().filter(DownloadedResourceAlbums::isManagedAlbum).isPresent();
+    }
+
     public static class Manager implements ResourceManagerReloadListener {
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
@@ -114,6 +201,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
                     Legacy4J.LOGGER.warn(var8.getMessage());
                 }
             }));
+            loadDownloadedPacks(list);
         }
 
         @Override

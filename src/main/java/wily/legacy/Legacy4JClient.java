@@ -109,6 +109,7 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.MCAccount;
+import wily.legacy.skins.SkinsClientBootstrap;
 
 
 import java.io.File;
@@ -366,6 +367,7 @@ public class Legacy4JClient {
                     knownEntities.add(r.getEntity().getType());
             }
         }
+        SkinsClientBootstrap.postTick(minecraft);
     }
 
     public static void postScreenInit(Screen screen) {
@@ -399,6 +401,7 @@ public class Legacy4JClient {
     }
 
     public static void init() {
+        SkinsClientBootstrap.init();
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
             if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;
@@ -463,6 +466,18 @@ public class Legacy4JClient {
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
             *///?}
             LegacyGuiElements.setup(m);
+
+            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+                @Override
+                public net.minecraft.network.chat.Component title() {
+                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+                }
+
+                @Override
+                public Screen build(Screen parent) {
+                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
+                }
+            };
         });
 
         FactoryAPIClient.registerBlockColor(registry -> {

@@ -14,13 +14,17 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTooltip.Event {
 
     private static final Component TITLE_LABEL = Component.translatable("legacy.menu.store_title");
     private static final Component STORE_NO_CONTENT = Component.translatable("legacy.menu.store_no_content");
     private final Panel panelRecess;
+    private final Map<String, CompletableFuture<List<ContentManager.Pack>>> prefetchedIndexes = new HashMap<>();
     private boolean warnNoContent = false;
     public boolean isLoading = false;
 
@@ -43,12 +47,12 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
 
         // Loop through the categories provided and create buttons
         for (ContentManager.Category category : categories) {
+            prefetchCategory(category);
             addMenuButton(category.title(), b -> {
-                // Prevent spam-clicking buttons while an index is downloading
-                if (this.isLoading) return; 
-                
-                this.isLoading = true;
-                ContentManager.fetchIndex(category.indexUrl()).thenAccept(packs -> {
+                if (this.isLoading) return;
+                CompletableFuture<List<ContentManager.Pack>> future = prefetchCategory(category);
+                if (!future.isDone()) this.isLoading = true;
+                future.thenAccept(packs -> {
                     minecraft.execute(() -> {
                         this.isLoading = false;
                         minecraft.setScreen(new Legacy4JContentListScreen(this, category, packs));
@@ -59,6 +63,10 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
                 });
             });
         }
+    }
+
+    private CompletableFuture<List<ContentManager.Pack>> prefetchCategory(ContentManager.Category category) {
+        return prefetchedIndexes.computeIfAbsent(category.id(), id -> ContentManager.fetchIndex(category.indexUrl()));
     }
 
     @Override

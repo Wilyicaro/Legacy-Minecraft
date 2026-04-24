@@ -114,11 +114,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<Pack> getDisplayPacks() {
-            return Stream.concat(model.selected.stream(), model.unselected.stream()).toList();
+            return Stream.concat(model.selected.stream(), model.unselected.stream()).filter(pack -> !DownloadedResourceAlbums.isManagedPack(pack.getId())).toList();
         }
 
         public void updateTooltip() {
-            if (hasTooltip) setTooltip(Tooltip.create(selectedPack.getDescription(), selectedPack.getTitle()));
+            if (hasTooltip) setTooltip(Tooltip.create(DownloadedPackMetadata.getDescription(selectedPack), DownloadedPackMetadata.getTitle(selectedPack)));
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel) {
@@ -138,11 +138,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getTitle(selectedPack), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
+                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getDescription(selectedPack), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
@@ -201,7 +201,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<String> getSelectedIds() {
-            return model.selected.stream().filter(p -> !FactoryAPIPlatform.isPackHidden(p) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+            return model.selected.stream().filter(p -> !FactoryAPIPlatform.isPackHidden(p) && !DownloadedResourceAlbums.isManagedPack(p.getId()) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
                 Collections.reverse(l);
                 return l;
             }));
