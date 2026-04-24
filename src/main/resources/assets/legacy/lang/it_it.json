@@ -1892,7 +1892,7 @@
   "legacy.options.may_be_a_cheat": "This option can be considered a cheat if enabled in some servers without Legacy4J, use it with caution.",
   "legacy.options.menusWithBackground": "Menus With Background",
   "legacy.options.merchantTradingIndicator": "Display Trading Icon",
-  "legacy.options.minecartSounds": "Minecart Sounds",
+  "legacy.options.minecartSounds": "Suoni del carrello da miniera",
   "legacy.options.mins_value": "%s: %s Mins",
   "legacy.options.modCraftingTabs": "Mod Crafting Tabs",
   "legacy.options.needs_restart": "This option will require a §4restart§r to be applied correctly.",
