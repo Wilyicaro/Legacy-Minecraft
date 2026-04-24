@@ -1,10 +1,12 @@
 package wily.legacy.skins.skin;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.server.packs.resources.Resource;
-import wily.legacy.skins.util.DebugLog;
+import wily.legacy.skins.util.SkinsLogger;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -14,9 +16,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+
 final class SkinPackJson {
-    private SkinPackJson() { }
-    static JsonObject readObject(Resource resource) { return readObject(resource, null); }
+    private SkinPackJson() {
+    }
+
+    static JsonObject readObject(Resource resource) {
+        return readObject(resource, null);
+    }
+
     static JsonObject readObject(Resource resource, String failureContext) {
         if (resource == null) return null;
         try (Reader reader = new InputStreamReader(resource.open(), StandardCharsets.UTF_8)) {
@@ -26,29 +34,39 @@ final class SkinPackJson {
             return parsed != null && parsed.isJsonObject() ? parsed.getAsJsonObject() : null;
         } catch (IOException | RuntimeException ex) {
             if (failureContext != null && !failureContext.isBlank()) {
-                DebugLog.warn("Failed to read {}: {}", failureContext, ex.toString());
+                SkinsLogger.warn("Failed to read {}: {}", failureContext, ex.toString());
             }
             return null;
         }
     }
+
     static String string(JsonElement element) {
         if (element == null || element.isJsonNull()) return null;
         try {
             return element.getAsString();
-        } catch (RuntimeException ignored) { return null; }
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
+
     static int integer(JsonElement element, int defaultValue) {
         if (element == null || element.isJsonNull()) return defaultValue;
         try {
             return element.getAsInt();
-        } catch (RuntimeException ignored) { return defaultValue; }
+        } catch (RuntimeException ignored) {
+            return defaultValue;
+        }
     }
+
     static boolean bool(JsonElement element, boolean defaultValue) {
         if (element == null || element.isJsonNull()) return defaultValue;
         try {
             return element.getAsBoolean();
-        } catch (RuntimeException ignored) { return defaultValue; }
+        } catch (RuntimeException ignored) {
+            return defaultValue;
+        }
     }
+
     static ArrayList<JsonObject> readOrderedSkins(Path path) throws IOException {
         ArrayList<SkinJsonEntry> ordered = new ArrayList<>();
         JsonObject root = SkinPackFiles.readJson(path);
@@ -64,6 +82,7 @@ final class SkinPackJson {
         for (SkinJsonEntry skin : ordered) out.add(skin.json());
         return out;
     }
+
     static void writeOrderedSkins(Path path, List<JsonObject> skins) throws IOException {
         JsonObject root = SkinPackFiles.readJson(path);
         var array = new com.google.gson.JsonArray();
@@ -75,12 +94,14 @@ final class SkinPackJson {
         root.add("skins", array);
         SkinPackFiles.writeJson(path, root);
     }
+
     static int indexOfSkin(List<JsonObject> skins, String skinId) {
         for (int i = 0; i < skins.size(); i++) {
             if (skinId.equals(string(skins.get(i).get("id")))) return i;
         }
         return -1;
     }
+
     static LinkedHashSet<String> readSkinIds(Path path) throws IOException {
         LinkedHashSet<String> ids = new LinkedHashSet<>();
         JsonObject root = SkinPackFiles.readJson(path);
@@ -92,6 +113,7 @@ final class SkinPackJson {
         }
         return ids;
     }
+
     static int nextSkinOrder(Path path) throws IOException {
         int maxOrder = 0;
         JsonObject root = SkinPackFiles.readJson(path);
@@ -102,5 +124,7 @@ final class SkinPackJson {
         }
         return maxOrder + 1;
     }
-    private record SkinJsonEntry(JsonObject json, int order, int index) { }
+
+    private record SkinJsonEntry(JsonObject json, int order, int index) {
+    }
 }

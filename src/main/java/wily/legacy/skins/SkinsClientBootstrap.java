@@ -1,4 +1,5 @@
 package wily.legacy.skins;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.server.packs.PackType;
@@ -8,20 +9,16 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.HelpAndOptionsScreen;
 import wily.legacy.client.screen.ScreenSection;
+import wily.legacy.skins.client.gui.GuiSessionSkin;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.client.screen.AbstractChangeSkinScreen;
 import wily.legacy.skins.client.util.ViewBobbingSkinOverride;
-import wily.legacy.skins.client.gui.GuiSessionSkin;
-import wily.legacy.skins.skin.ClientSkinAssets;
-import wily.legacy.skins.skin.CustomSkinPackStore;
-import wily.legacy.skins.skin.SkinDataStore;
-import wily.legacy.skins.skin.SkinPackLoader;
-import wily.legacy.skins.client.render.boxloader.BoxModelManager;
-import wily.legacy.skins.skin.SkinSyncClient;
-import wily.legacy.skins.util.DebugLog;
+import wily.legacy.skins.skin.*;
+import wily.legacy.skins.util.SkinsLogger;
+
 import java.io.IOException;
+
 public final class SkinsClientBootstrap {
-    private SkinsClientBootstrap() {
-    }
     private static final net.minecraft.server.packs.resources.ResourceManagerReloadListener SKIN_PACK_RELOAD_LISTENER = new net.minecraft.server.packs.resources.ResourceManagerReloadListener() {
         @Override
         public void onResourceManagerReload(net.minecraft.server.packs.resources.ResourceManager manager) {
@@ -42,6 +39,7 @@ public final class SkinsClientBootstrap {
             SkinPackLoader.loadPacks(manager);
             SkinSyncClient.onSkinAssetsReloaded(mc);
         }
+
         @Override
         public String getName() {
             return "legacy:skins";
@@ -50,23 +48,28 @@ public final class SkinsClientBootstrap {
     private static volatile boolean packPreloadStarted = false;
     private static volatile boolean defaultSelectionChecked = false;
     private static volatile boolean customPackSelectionChecked = false;
+
+    private SkinsClientBootstrap() {
+    }
+
     public static void markCustomPackSelectionChecked() {
         customPackSelectionChecked = true;
     }
-    public static void initClient() {
-        SkinSyncClient.initClient();
+
+    public static void init() {
+        SkinSyncClient.init();
         HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
             @Override
             public net.minecraft.network.chat.Component title() {
                 return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
             }
+
             @Override
             public Screen build(Screen parent) {
                 return createChangeSkinScreen(parent);
             }
         };
 
-        Legacy4JClient.whenResetOptions.add(LegacyOptions::resetSkinClientOptions);
         Legacy4JClient.whenResetOptions.add(() -> {
             Minecraft mc = Minecraft.getInstance();
             SkinPackLoader.setLastUsedCustomPackId(null);
@@ -78,6 +81,7 @@ public final class SkinsClientBootstrap {
         FactoryAPIClient.postTick(SkinsClientBootstrap::postTick);
         FactoryAPIClient.PlayerEvent.JOIN_EVENT.register(p -> SkinSyncClient.onClientJoin());
     }
+
     private static void postTick(Minecraft minecraft) {
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
@@ -92,6 +96,7 @@ public final class SkinsClientBootstrap {
             preloadPacks(minecraft);
         }
     }
+
     public static Screen createChangeSkinScreen(Screen parent) {
         SkinPackLoader.ensureLoaded();
         try {
@@ -100,15 +105,17 @@ public final class SkinsClientBootstrap {
             }
             return new wily.legacy.skins.client.screen.ChangeSkinScreen(parent);
         } catch (RuntimeException ex) {
-            DebugLog.debug("Failed to create change skin screen {}", ex.toString());
+            SkinsLogger.debug("Failed to create change skin screen {}", ex.toString());
             return parent;
         }
     }
+
     public static void requestOpenChangeSkinScreen(Minecraft minecraft, Screen parent) {
         if (minecraft == null) return;
         GuiSessionSkin.prewarm();
         minecraft.setScreen(createChangeSkinScreen(parent));
     }
+
     public static void reloadChangeSkinScreen(Minecraft minecraft, Screen parent) {
         if (minecraft == null) return;
         if (parent instanceof AbstractChangeSkinScreen screen) {
@@ -120,9 +127,11 @@ public final class SkinsClientBootstrap {
         minecraft.setScreen(new wily.legacy.client.screen.LegacyLoadingScreen());
         minecraft.reloadResourcePacks().thenRun(() -> minecraft.execute(() -> requestOpenChangeSkinScreen(minecraft, parent)));
     }
+
     public static void reloadChangeSkinScreen(Minecraft minecraft, Screen parent, String packId, String skinId) {
         reloadChangeSkinScreen(minecraft, parent, packId, skinId, false);
     }
+
     public static void reloadChangeSkinScreen(Minecraft minecraft, Screen parent, String packId, String skinId, boolean reorder) {
         if (packId != null && !packId.isBlank()) {
             SkinPackLoader.requestFocusPack(packId);
@@ -134,6 +143,7 @@ public final class SkinsClientBootstrap {
         minecraft.setScreen(new wily.legacy.client.screen.LegacyLoadingScreen());
         minecraft.reloadResourcePacks().thenRun(() -> minecraft.execute(() -> requestOpenChangeSkinScreen(minecraft, parent)));
     }
+
     private static void checkDefaultSelection(Minecraft minecraft) {
         if (minecraft == null || minecraft.getUser() == null) return;
         if (!LegacyOptions.skinSelectionInitialized.get()) {
@@ -148,6 +158,7 @@ public final class SkinsClientBootstrap {
         }
         defaultSelectionChecked = true;
     }
+
     private static void preloadPacks(Minecraft minecraft) {
         if (minecraft == null || minecraft.getResourceManager() == null || SkinPackLoader.isLoaded()) return;
         packPreloadStarted = true;
@@ -157,8 +168,10 @@ public final class SkinsClientBootstrap {
             packPreloadStarted = false;
         }
     }
+
     private static boolean checkCustomPackSelection(Minecraft minecraft) {
-        if (minecraft == null || minecraft.gameDirectory == null || minecraft.getResourcePackRepository() == null) return false;
+        if (minecraft == null || minecraft.gameDirectory == null || minecraft.getResourcePackRepository() == null)
+            return false;
         try {
             boolean changed = CustomSkinPackStore.enableResourcePack(minecraft);
             customPackSelectionChecked = true;
@@ -168,7 +181,7 @@ public final class SkinsClientBootstrap {
             }
             return false;
         } catch (IOException ex) {
-            DebugLog.debug("Failed to enable custom skin pack resource pack {}", ex.toString());
+            SkinsLogger.debug("Failed to enable custom skin pack resource pack {}", ex.toString());
             customPackSelectionChecked = true;
             return false;
         }

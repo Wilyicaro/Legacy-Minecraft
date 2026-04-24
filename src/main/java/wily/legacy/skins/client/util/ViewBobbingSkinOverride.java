@@ -3,9 +3,9 @@ package wily.legacy.skins.client.util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.world.entity.player.Player;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.ClientSkinCache;
-import wily.legacy.client.LegacyOptions;
 
 public final class ViewBobbingSkinOverride {
     private static Boolean savedUserBobView;

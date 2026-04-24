@@ -400,7 +400,7 @@ public class Legacy4JClient {
     }
 
     public static void init() {
-        SkinsClientBootstrap.initClient();
+        SkinsClientBootstrap.init();
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
             if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;

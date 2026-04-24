@@ -11,20 +11,10 @@ final class IdleSitTracker {
     private static final long FORGET_MS = 60_000L;
 
     private static final float LOOK_EPS = 0.25F;
-
-    private static final class Entry {
-        volatile long lastMoveMs;
-        volatile long lastSeenMs;
-        volatile boolean sitting;
-
-        volatile boolean hasRot;
-        volatile float lastYaw;
-        volatile float lastPitch;
-    }
-
     private static final Map<UUID, Entry> MAP = new ConcurrentHashMap<>();
 
-    private IdleSitTracker() { }
+    private IdleSitTracker() {
+    }
 
     public static void reset(UUID uuid) {
         if (uuid == null) return;
@@ -36,7 +26,9 @@ final class IdleSitTracker {
         return e != null && e.sitting;
     }
 
-    public static boolean updateAndShouldSit(UUID uuid, boolean movingNow) { return updateAndShouldSit(uuid, movingNow, Float.NaN, Float.NaN); }
+    public static boolean updateAndShouldSit(UUID uuid, boolean movingNow) {
+        return updateAndShouldSit(uuid, movingNow, Float.NaN, Float.NaN);
+    }
 
     public static boolean updateAndShouldSit(UUID uuid, boolean movingNow, float yawDeg, float pitchDeg) {
         if (uuid == null) return false;
@@ -58,7 +50,9 @@ final class IdleSitTracker {
                 float dyaw = Math.abs(Mth.wrapDegrees(yawDeg - e.lastYaw));
                 float dpitch = Math.abs(pitchDeg - e.lastPitch);
                 lookMoved = dyaw > LOOK_EPS || dpitch > LOOK_EPS;
-            } else { e.hasRot = true; }
+            } else {
+                e.hasRot = true;
+            }
             e.lastYaw = yawDeg;
             e.lastPitch = pitchDeg;
         }
@@ -69,7 +63,9 @@ final class IdleSitTracker {
             return false;
         }
 
-        if (!e.sitting && (now - e.lastMoveMs) >= IDLE_MS) { e.sitting = true; }
+        if (!e.sitting && (now - e.lastMoveMs) >= IDLE_MS) {
+            e.sitting = true;
+        }
 
         if ((now & 255L) == 0L) prune(now);
         return e.sitting;
@@ -85,5 +81,15 @@ final class IdleSitTracker {
             }
             if ((now - e.lastSeenMs) > FORGET_MS) it.remove();
         }
+    }
+
+    private static final class Entry {
+        volatile long lastMoveMs;
+        volatile long lastSeenMs;
+        volatile boolean sitting;
+
+        volatile boolean hasRot;
+        volatile float lastYaw;
+        volatile float lastPitch;
     }
 }

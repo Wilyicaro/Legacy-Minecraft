@@ -3,8 +3,8 @@ package wily.legacy.skins;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import wily.factoryapi.FactoryAPI;
-import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.FactoryAPIPlatform;
+import wily.factoryapi.FactoryEvent;
 import wily.legacy.skins.skin.SkinSync;
 
 import java.util.Iterator;

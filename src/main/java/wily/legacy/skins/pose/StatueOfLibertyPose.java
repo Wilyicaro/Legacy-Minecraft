@@ -7,7 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class StatueOfLibertyPose {
-    private StatueOfLibertyPose() { }
+    private StatueOfLibertyPose() {
+    }
 
     public static boolean shouldApply(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess a)) return false;
@@ -15,8 +16,7 @@ public final class StatueOfLibertyPose {
         if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STATUE_OF_LIBERTY, id)) return false;
         if (state != null && state.attackTime > 0.0F) return false;
         Player player = ArmPoseSupport.getPlayer(state);
-        if (player != null && ArmPoseSupport.getHoldingArms(player).right()) return false;
-        return true;
+        return player == null || !ArmPoseSupport.getHoldingArms(player).right();
     }
 
     public static void apply(PlayerModel model, AvatarRenderState state) {
@@ -42,5 +42,7 @@ public final class StatueOfLibertyPose {
         model.rightSleeve.zRot = model.rightArm.zRot;
     }
 
-    public static void apply(PlayerModel model) { apply(model, null); }
+    public static void apply(PlayerModel model) {
+        apply(model, null);
+    }
 }

@@ -3,11 +3,11 @@ package wily.legacy.skins.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class DebugLog {
+public final class SkinsLogger {
     private static final Logger LOGGER = LoggerFactory.getLogger("ConsoleSkins");
     private static final boolean ENABLED = Boolean.getBoolean("consoleskins.debug");
 
-    private DebugLog() {
+    private SkinsLogger() {
     }
 
     public static void debug(String msg, Object... args) {

@@ -1,22 +1,26 @@
 package wily.legacy.skins.client.render.boxloader;
-import com.google.gson.*;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.CubeDeformation;
-import net.minecraft.client.model.geom.builders.CubeListBuilder;
-import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import wily.legacy.skins.client.lang.SkinPackLang;
 import wily.legacy.skins.pose.SkinPoseRegistry;
-import java.io.*;
+
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 public final class BoxModelManager {
     private static final Gson GSON = new Gson();
     private static final Map<ResourceLocation, BoxData> CACHE = new ConcurrentHashMap<>();
@@ -28,36 +32,56 @@ public final class BoxModelManager {
     private static final Map<String, ResourceLocation> KEY_INDEX = new ConcurrentHashMap<>();
     private static final Set<ResourceLocation> LOADED = ConcurrentHashMap.newKeySet();
     private static final Map<ResourceLocation, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
-    private static volatile boolean initialized;
-    private record BoxData(BuiltBoxModel model, ResourceLocation texture, String themeName, String themeKey,
-                           EnumMap<AttachSlot, float[]> offsets, EnumMap<AttachSlot, float[]> scales,
-                           EnumMap<ArmorSlot, float[]> armorOffsets, EnumSet<ArmorSlot> armorHide, Boolean slim) {
-        boolean isEmpty() { return model == null && texture == null && themeName == null && themeKey == null && offsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null; }
-    }
     private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null);
-    private BoxModelManager() {}
+    private static volatile boolean initialized;
+
+    private BoxModelManager() {
+    }
 
     public static void ensureReloaded(ResourceManager manager) {
         if (manager != null && !initialized) reload(manager);
     }
+
     public static void reload(ResourceManager manager) {
         initialized = true;
         clearState();
         index(manager, "box_models", false);
         index(manager, "skinpacks", true);
     }
+
     public static boolean isAvailable(ResourceLocation id) {
         if (id == null) return false;
         ensureInitialized();
         return RUNTIME.containsKey(id) || CACHE.containsKey(id) || JSON_INDEX.containsKey(id);
     }
-    public static BuiltBoxModel get(ResourceLocation id) { return getValue(id, BoxData::model); }
-    public static ResourceLocation getTexture(ResourceLocation id) { return getValue(id, BoxData::texture); }
-    public static EnumMap<AttachSlot, float[]> getOffsets(ResourceLocation id) { return getValue(id, BoxData::offsets); }
-    public static EnumMap<AttachSlot, float[]> getScales(ResourceLocation id) { return getValue(id, BoxData::scales); }
-    public static EnumMap<ArmorSlot, float[]> getArmorOffsets(ResourceLocation id) { return getValue(id, BoxData::armorOffsets); }
-    public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) { return getValue(id, BoxData::armorHide); }
-    public static Boolean getSlimFlag(ResourceLocation id) { return getValue(id, BoxData::slim); }
+
+    public static BuiltBoxModel get(ResourceLocation id) {
+        return getValue(id, BoxData::model);
+    }
+
+    public static ResourceLocation getTexture(ResourceLocation id) {
+        return getValue(id, BoxData::texture);
+    }
+
+    public static EnumMap<AttachSlot, float[]> getOffsets(ResourceLocation id) {
+        return getValue(id, BoxData::offsets);
+    }
+
+    public static EnumMap<AttachSlot, float[]> getScales(ResourceLocation id) {
+        return getValue(id, BoxData::scales);
+    }
+
+    public static EnumMap<ArmorSlot, float[]> getArmorOffsets(ResourceLocation id) {
+        return getValue(id, BoxData::armorOffsets);
+    }
+
+    public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) {
+        return getValue(id, BoxData::armorHide);
+    }
+
+    public static Boolean getSlimFlag(ResourceLocation id) {
+        return getValue(id, BoxData::slim);
+    }
 
     public static boolean hasPoseTag(String id, SkinPoseRegistry.PoseTag tag) {
         if (tag == null || id == null || id.isBlank()) return false;
@@ -70,6 +94,7 @@ public final class BoxModelManager {
                 || hasPoseTag(CACHE_POSE_TAGS, modelId.getPath(), tag)
                 || hasPoseTag(CACHE_POSE_TAGS, modelId.toString(), tag);
     }
+
     public static List<String> getPoseKeys(String id) {
         if (id == null || id.isBlank()) return List.of();
         ArrayList<String> keys = new ArrayList<>();
@@ -78,16 +103,19 @@ public final class BoxModelManager {
         }
         return List.copyOf(keys);
     }
+
     public static void clearRuntime() {
         RUNTIME.clear();
         RUNTIME_POSE_TAGS.clear();
     }
+
     public static void removeRuntime(ResourceLocation id) {
         if (id == null) return;
         RUNTIME.remove(id);
         RUNTIME_POSE_TAGS.remove(id.getPath());
         RUNTIME_POSE_TAGS.remove(id.toString());
     }
+
     public static String getThemeText(ResourceLocation id) {
         BoxData data = getData(id);
         if (data == null) return null;
@@ -95,6 +123,7 @@ public final class BoxModelManager {
         if (theme == null) theme = data.themeName();
         return trimToNull(theme);
     }
+
     public static void registerRuntime(ResourceLocation id, JsonObject root) {
         if (id == null || root == null) return;
         try {
@@ -104,6 +133,7 @@ public final class BoxModelManager {
         } catch (RuntimeException ignored) {
         }
     }
+
     public static void registerAlias(ResourceLocation id, ResourceLocation jsonId) {
         if (id == null || jsonId == null) return;
         ensureInitialized();
@@ -114,11 +144,13 @@ public final class BoxModelManager {
         LOADED.remove(id);
         LOAD_LOCKS.remove(id);
     }
+
     public static ResourceLocation getJsonLocation(ResourceLocation id) {
         if (id == null) return null;
         ensureInitialized();
         return JSON_INDEX.get(id);
     }
+
     private static void clearState() {
         CACHE.clear();
         RUNTIME.clear();
@@ -130,6 +162,7 @@ public final class BoxModelManager {
         LOADED.clear();
         LOAD_LOCKS.clear();
     }
+
     private static void index(ResourceManager manager, String base, boolean skinpacksMode) {
         if (manager == null) return;
         try {
@@ -146,9 +179,11 @@ public final class BoxModelManager {
         } catch (RuntimeException ignored) {
         }
     }
+
     private static boolean isIndexedJson(String path, boolean skinpacksMode) {
         return path.endsWith(".json") && (!skinpacksMode || path.contains("/box_models/"));
     }
+
     private static ResourceLocation readModelId(String base, ResourceLocation jsonId, boolean skinpacksMode) {
         String path = jsonId.getPath();
         if (skinpacksMode) {
@@ -160,16 +195,21 @@ public final class BoxModelManager {
         if (!path.startsWith(prefix)) return null;
         return ResourceLocation.fromNamespaceAndPath(jsonId.getNamespace(), path.substring(prefix.length(), path.length() - 5));
     }
+
     private static void indexKeys(String namespace, ResourceLocation modelId, boolean includeLeafAlias) {
         if (namespace == null || modelId == null) return;
         forEachAlias(namespace, modelId.getPath(), includeLeafAlias, key -> KEY_INDEX.put(key, modelId));
     }
+
     private static void ensureInitialized() {
         if (initialized) return;
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
         if (manager != null) ensureReloaded(manager);
     }
-    private static Object loadLock(ResourceLocation id) { return LOAD_LOCKS.computeIfAbsent(id, ignored -> new Object()); }
+
+    private static Object loadLock(ResourceLocation id) {
+        return LOAD_LOCKS.computeIfAbsent(id, ignored -> new Object());
+    }
 
     private static void ensureLoaded(ResourceLocation id) {
         if (id == null || LOADED.contains(id)) return;
@@ -192,6 +232,7 @@ public final class BoxModelManager {
             LOADED.add(id);
         }
     }
+
     private static JsonObject readRoot(Resource resource) {
         if (resource == null) return null;
         try (Reader reader = resource.openAsReader()) {
@@ -201,6 +242,7 @@ public final class BoxModelManager {
             return null;
         }
     }
+
     private static void storeCachedData(ResourceLocation id, String namespace, boolean includeLeafAlias, JsonObject root) {
         try {
             BoxData data = readBoxData(root);
@@ -209,6 +251,7 @@ public final class BoxModelManager {
         } catch (RuntimeException ignored) {
         }
     }
+
     private static BoxData getData(ResourceLocation id) {
         if (id == null) return null;
         ensureInitialized();
@@ -219,10 +262,12 @@ public final class BoxModelManager {
         ensureLoaded(id);
         return CACHE.get(id);
     }
+
     private static <T> T getValue(ResourceLocation id, Function<BoxData, T> getter) {
         BoxData data = getData(id);
         return data == null ? null : getter.apply(data);
     }
+
     private static ResourceLocation resolveModelId(String id) {
         ResourceLocation modelId = KEY_INDEX.get(id);
         if (modelId != null) return modelId;
@@ -232,15 +277,18 @@ public final class BoxModelManager {
             return null;
         }
     }
+
     private static boolean hasPoseTag(Map<String, EnumSet<SkinPoseRegistry.PoseTag>> tags, String key, SkinPoseRegistry.PoseTag tag) {
         EnumSet<SkinPoseRegistry.PoseTag> values = tags.get(key);
         return values != null && values.contains(tag);
     }
+
     private static String translateThemeKey(String key) {
         if (key == null) return null;
         if (key.startsWith("key:")) key = key.substring(4);
         return trimToNull(SkinPackLang.translate(key, null));
     }
+
     private static BoxData readBoxData(JsonObject root) {
         if (root == null) return null;
         JsonObject texture = getObject(root, "texture");
@@ -264,6 +312,7 @@ public final class BoxModelManager {
         );
         return data.isEmpty() ? null : data;
     }
+
     private static ResourceLocation readTexture(JsonObject texture) {
         String path = readString(texture, "path", "texturePath");
         if (path == null) return null;
@@ -273,11 +322,16 @@ public final class BoxModelManager {
             return null;
         }
     }
-    private static JsonObject getObject(JsonObject root, String key) { return root != null && key != null && root.has(key) && root.get(key).isJsonObject() ? root.getAsJsonObject(key) : null; }
+
+    private static JsonObject getObject(JsonObject root, String key) {
+        return root != null && key != null && root.has(key) && root.get(key).isJsonObject() ? root.getAsJsonObject(key) : null;
+    }
+
     private static Boolean readSlimFlag(JsonObject root, JsonObject meta) {
         Boolean slim = readSlimFlag(root);
         return slim != null ? slim : readSlimFlag(meta);
     }
+
     private static Boolean readSlimFlag(JsonObject root) {
         if (root == null) return null;
         try {
@@ -288,6 +342,7 @@ public final class BoxModelManager {
         if (slim != null) return slim;
         return readSlimFlag(getAny(root, "poses", "pose_tags", "animations"));
     }
+
     private static Boolean readSlimFlag(JsonElement element) {
         if (element == null || element.isJsonNull()) return null;
         if (element.isJsonPrimitive()) return readSlimFlag(element.getAsString());
@@ -298,6 +353,7 @@ public final class BoxModelManager {
         }
         return null;
     }
+
     private static Boolean readSlimFlag(String value) {
         if (value == null) return null;
         String key = value.trim().toLowerCase(Locale.ROOT);
@@ -314,9 +370,18 @@ public final class BoxModelManager {
         }
         return null;
     }
-    private static int readInt(JsonObject root, String key, int defaultValue) { return root != null && key != null && root.has(key) ? root.get(key).getAsInt() : defaultValue; }
-    private static float readFloat(JsonObject root, String key, float defaultValue) { return root != null && key != null && root.has(key) ? root.get(key).getAsFloat() : defaultValue; }
-    private static String trimToNull(String value) { return value == null || (value = value.trim()).isEmpty() ? null : value; }
+
+    private static int readInt(JsonObject root, String key, int defaultValue) {
+        return root != null && key != null && root.has(key) ? root.get(key).getAsInt() : defaultValue;
+    }
+
+    private static float readFloat(JsonObject root, String key, float defaultValue) {
+        return root != null && key != null && root.has(key) ? root.get(key).getAsFloat() : defaultValue;
+    }
+
+    private static String trimToNull(String value) {
+        return value == null || (value = value.trim()).isEmpty() ? null : value;
+    }
 
     private static JsonElement getAny(JsonObject root, String... keys) {
         if (root == null || keys == null) return null;
@@ -325,6 +390,7 @@ public final class BoxModelManager {
         }
         return null;
     }
+
     private static void storePoseTags(Map<String, EnumSet<SkinPoseRegistry.PoseTag>> target,
                                       String namespace,
                                       String key,
@@ -333,6 +399,7 @@ public final class BoxModelManager {
         if (target == null || namespace == null || key == null || poseTags == null || poseTags.isEmpty()) return;
         forEachAlias(namespace, key, includeLeafAlias, alias -> BoxModelJsonSupport.putPoseTags(target, alias, poseTags));
     }
+
     private static void forEachAlias(String namespace, String key, boolean includeLeafAlias, Consumer<String> consumer) {
         if (namespace == null || key == null || consumer == null) return;
         consumer.accept(key);
@@ -344,8 +411,14 @@ public final class BoxModelManager {
         consumer.accept(leaf);
         consumer.accept(namespace + ":" + leaf);
     }
-    private static <K extends Enum<K>, V> EnumMap<K, V> nonEmpty(EnumMap<K, V> map) { return map == null || map.isEmpty() ? null : map; }
-    private static <E extends Enum<E>> EnumSet<E> nonEmpty(EnumSet<E> set) { return set == null || set.isEmpty() ? null : set; }
+
+    private static <K extends Enum<K>, V> EnumMap<K, V> nonEmpty(EnumMap<K, V> map) {
+        return map == null || map.isEmpty() ? null : map;
+    }
+
+    private static <E extends Enum<E>> EnumSet<E> nonEmpty(EnumSet<E> set) {
+        return set == null || set.isEmpty() ? null : set;
+    }
 
     private static BuiltBoxModel bake(int texW, int texH, float texelScale, List<BoneDef> bones, EnumSet<AttachSlot> hide) {
         MeshDefinition mesh = new MeshDefinition();
@@ -415,11 +488,20 @@ public final class BoxModelManager {
         }
         return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bboxH, bboxW, parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide);
     }
+
     private static ModelPart getChild(ModelPart root, String name) {
         try {
             return root.getChild(name);
         } catch (RuntimeException ignored) {
             return null;
+        }
+    }
+
+    private record BoxData(BuiltBoxModel model, ResourceLocation texture, String themeName, String themeKey,
+                           EnumMap<AttachSlot, float[]> offsets, EnumMap<AttachSlot, float[]> scales,
+                           EnumMap<ArmorSlot, float[]> armorOffsets, EnumSet<ArmorSlot> armorHide, Boolean slim) {
+        boolean isEmpty() {
+            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null;
         }
     }
 }

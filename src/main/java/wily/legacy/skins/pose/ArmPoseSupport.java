@@ -1,4 +1,5 @@
 package wily.legacy.skins.pose;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -16,72 +17,18 @@ import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
 final class ArmPoseSupport {
-    private static volatile java.lang.reflect.Field cachedRightArmPoseField;
-    private static volatile java.lang.reflect.Field cachedLeftArmPoseField;
-    private static volatile boolean triedResolveArmPoseFields;
     private static final String[] AGE_FIELD_NAMES = {"ageInTicks", "age", "tick", "ticks", "time"};
     private static final String[] AGE_METHOD_NAMES = {"ageInTicks", "getAgeInTicks"};
     private static final Map<Class<?>, AgeAccessor> cachedAgeAccessors = new ConcurrentHashMap<>();
+    private static volatile java.lang.reflect.Field cachedRightArmPoseField;
+    private static volatile java.lang.reflect.Field cachedLeftArmPoseField;
+    private static volatile boolean triedResolveArmPoseFields;
 
-    private ArmPoseSupport() { }
-
-    record ArmState(float armX, float armY, float armZ, float armXRot, float armYRot, float armZRot, float armXScale, float armYScale, float armZScale,
-                    float sleeveX, float sleeveY, float sleeveZ, float sleeveXRot, float sleeveYRot, float sleeveZRot, float sleeveXScale,
-                    float sleeveYScale, float sleeveZScale) {
-        static ArmState capture(ModelPart arm, ModelPart sleeve) {
-            return new ArmState(arm.x, arm.y, arm.z, arm.xRot, arm.yRot, arm.zRot, arm.xScale, arm.yScale, arm.zScale, sleeve.x, sleeve.y, sleeve.z,
-                    sleeve.xRot, sleeve.yRot, sleeve.zRot, sleeve.xScale, sleeve.yScale, sleeve.zScale);
-        }
-        void restore(ModelPart arm, ModelPart sleeve) {
-            arm.x = armX;
-            arm.y = armY;
-            arm.z = armZ;
-            arm.xRot = armXRot;
-            arm.yRot = armYRot;
-            arm.zRot = armZRot;
-            arm.xScale = armXScale;
-            arm.yScale = armYScale;
-            arm.zScale = armZScale;
-            sleeve.x = sleeveX;
-            sleeve.y = sleeveY;
-            sleeve.z = sleeveZ;
-            sleeve.xRot = sleeveXRot;
-            sleeve.yRot = sleeveYRot;
-            sleeve.zRot = sleeveZRot;
-            sleeve.xScale = sleeveXScale;
-            sleeve.yScale = sleeveYScale;
-            sleeve.zScale = sleeveZScale;
-        }
-        void syncSleeve(ModelPart arm, ModelPart sleeve) {
-            sleeve.x = arm.x;
-            sleeve.y = arm.y;
-            sleeve.z = arm.z;
-            sleeve.xRot = arm.xRot;
-            sleeve.yRot = arm.yRot;
-            sleeve.zRot = arm.zRot;
-            sleeve.xScale = arm.xScale;
-            sleeve.yScale = arm.yScale;
-            sleeve.zScale = arm.zScale;
-        }
-    }
-    record ArmFlags(boolean right, boolean left) {
-        static final ArmFlags NONE = new ArmFlags(false, false);
-        ArmFlags merge(boolean right, boolean left) { return new ArmFlags(this.right || right, this.left || left); }
+    private ArmPoseSupport() {
     }
 
-    record AgeAccessor(java.lang.reflect.Field field, java.lang.reflect.Method method) {
-        static final AgeAccessor NONE = new AgeAccessor(null, null);
-
-        float read(Object target) {
-            try {
-                Object value = field != null ? field.get(target) : method != null ? method.invoke(target) : null;
-                if (value instanceof Float number) return number;
-                if (value instanceof Number number) return number.floatValue();
-            } catch (ReflectiveOperationException | RuntimeException ignored) { }
-            return Float.NaN;
-        }
-    }
     static Player getPlayer(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return null;
         UUID uuid = access.consoleskins$getEntityUuid();
@@ -90,6 +37,7 @@ final class ArmPoseSupport {
         if (minecraft == null || minecraft.level == null) return null;
         return minecraft.level.getPlayerByUUID(uuid);
     }
+
     static ArmFlags getShieldBlockingArms(Player player, boolean lenient) {
         if (player == null || !player.isUsingItem()) return ArmFlags.NONE;
         var useItem = player.getUseItem();
@@ -102,6 +50,7 @@ final class ArmPoseSupport {
         HumanoidArm usedArm = getUsedArm(player);
         return new ArmFlags(usedArm == HumanoidArm.RIGHT, usedArm == HumanoidArm.LEFT);
     }
+
     static ArmFlags getHoldingArms(Player player) {
         if (player == null) return ArmFlags.NONE;
         HumanoidArm mainArm = player.getMainArm();
@@ -117,13 +66,16 @@ final class ArmPoseSupport {
         return new ArmFlags(right, left);
     }
 
-    static ArmFlags includeModelBlocking(AvatarRenderState state, ArmFlags flags) { return flags.merge(armPoseIsBlocking(state, true), armPoseIsBlocking(state, false)); }
+    static ArmFlags includeModelBlocking(AvatarRenderState state, ArmFlags flags) {
+        return flags.merge(armPoseIsBlocking(state, true), armPoseIsBlocking(state, false));
+    }
 
     private static HumanoidArm getUsedArm(Player player) {
         HumanoidArm mainArm = player.getMainArm();
         if (player.getUsedItemHand() == InteractionHand.MAIN_HAND) return mainArm;
         return mainArm == HumanoidArm.RIGHT ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
     }
+
     static void applyIdleSway(PlayerModel model,
                               float ageInTicks,
                               float attackTime,
@@ -151,6 +103,7 @@ final class ArmPoseSupport {
             model.leftArm.yRot -= yaw;
         }
     }
+
     static void applyAttackSwing(PlayerModel model, AvatarRenderState state, float attackTime) {
         if (attackTime <= 0.0F) return;
         HumanoidArm arm = state.attackArm;
@@ -182,6 +135,7 @@ final class ArmPoseSupport {
         model.rightArm.yRot += bodyY * 2.0F;
         model.rightArm.zRot += Mth.sin(attackTime * Mth.PI) * -0.4F;
     }
+
     static float getAgeInTicks(Object state) {
         if (state == null) return timeFallback();
         if (!(state instanceof AvatarRenderState avatarState)) return timeFallback();
@@ -194,7 +148,10 @@ final class ArmPoseSupport {
         if (state == null) return false;
         return isBlockPose(right ? state.rightArmPose : state.leftArmPose);
     }
-    private static boolean isBlockPose(HumanoidModel.ArmPose pose) { return pose == HumanoidModel.ArmPose.BLOCK; }
+
+    private static boolean isBlockPose(HumanoidModel.ArmPose pose) {
+        return pose == HumanoidModel.ArmPose.BLOCK;
+    }
 
     private static AgeAccessor resolveAgeAccessor(Class<?> type) {
         for (String name : AGE_FIELD_NAMES) {
@@ -202,14 +159,16 @@ final class ArmPoseSupport {
                 java.lang.reflect.Field field = type.getDeclaredField(name);
                 field.setAccessible(true);
                 return new AgeAccessor(field, null);
-            } catch (ReflectiveOperationException | RuntimeException ignored) { }
+            } catch (ReflectiveOperationException | RuntimeException ignored) {
+            }
         }
         for (String name : AGE_METHOD_NAMES) {
             try {
                 java.lang.reflect.Method method = type.getMethod(name);
                 method.setAccessible(true);
                 return new AgeAccessor(null, method);
-            } catch (ReflectiveOperationException | RuntimeException ignored) { }
+            } catch (ReflectiveOperationException | RuntimeException ignored) {
+            }
         }
         return AgeAccessor.NONE;
     }
@@ -222,16 +181,86 @@ final class ArmPoseSupport {
                     try {
                         cachedRightArmPoseField = PlayerModel.class.getDeclaredField("rightArmPose");
                         cachedRightArmPoseField.setAccessible(true);
-                    } catch (ReflectiveOperationException ignored) { }
+                    } catch (ReflectiveOperationException ignored) {
+                    }
                     try {
                         cachedLeftArmPoseField = PlayerModel.class.getDeclaredField("leftArmPose");
                         cachedLeftArmPoseField.setAccessible(true);
-                    } catch (ReflectiveOperationException ignored) { }
+                    } catch (ReflectiveOperationException ignored) {
+                    }
                 }
             }
         }
         return right ? cachedRightArmPoseField : cachedLeftArmPoseField;
     }
 
-    private static float timeFallback() { return (System.currentTimeMillis() % 1_000_000L) / 1000.0F; }
+    private static float timeFallback() {
+        return (System.currentTimeMillis() % 1_000_000L) / 1000.0F;
+    }
+
+    record ArmState(float armX, float armY, float armZ, float armXRot, float armYRot, float armZRot, float armXScale,
+                    float armYScale, float armZScale,
+                    float sleeveX, float sleeveY, float sleeveZ, float sleeveXRot, float sleeveYRot, float sleeveZRot,
+                    float sleeveXScale,
+                    float sleeveYScale, float sleeveZScale) {
+        static ArmState capture(ModelPart arm, ModelPart sleeve) {
+            return new ArmState(arm.x, arm.y, arm.z, arm.xRot, arm.yRot, arm.zRot, arm.xScale, arm.yScale, arm.zScale, sleeve.x, sleeve.y, sleeve.z,
+                    sleeve.xRot, sleeve.yRot, sleeve.zRot, sleeve.xScale, sleeve.yScale, sleeve.zScale);
+        }
+
+        void restore(ModelPart arm, ModelPart sleeve) {
+            arm.x = armX;
+            arm.y = armY;
+            arm.z = armZ;
+            arm.xRot = armXRot;
+            arm.yRot = armYRot;
+            arm.zRot = armZRot;
+            arm.xScale = armXScale;
+            arm.yScale = armYScale;
+            arm.zScale = armZScale;
+            sleeve.x = sleeveX;
+            sleeve.y = sleeveY;
+            sleeve.z = sleeveZ;
+            sleeve.xRot = sleeveXRot;
+            sleeve.yRot = sleeveYRot;
+            sleeve.zRot = sleeveZRot;
+            sleeve.xScale = sleeveXScale;
+            sleeve.yScale = sleeveYScale;
+            sleeve.zScale = sleeveZScale;
+        }
+
+        void syncSleeve(ModelPart arm, ModelPart sleeve) {
+            sleeve.x = arm.x;
+            sleeve.y = arm.y;
+            sleeve.z = arm.z;
+            sleeve.xRot = arm.xRot;
+            sleeve.yRot = arm.yRot;
+            sleeve.zRot = arm.zRot;
+            sleeve.xScale = arm.xScale;
+            sleeve.yScale = arm.yScale;
+            sleeve.zScale = arm.zScale;
+        }
+    }
+
+    record ArmFlags(boolean right, boolean left) {
+        static final ArmFlags NONE = new ArmFlags(false, false);
+
+        ArmFlags merge(boolean right, boolean left) {
+            return new ArmFlags(this.right || right, this.left || left);
+        }
+    }
+
+    record AgeAccessor(java.lang.reflect.Field field, java.lang.reflect.Method method) {
+        static final AgeAccessor NONE = new AgeAccessor(null, null);
+
+        float read(Object target) {
+            try {
+                Object value = field != null ? field.get(target) : method != null ? method.invoke(target) : null;
+                if (value instanceof Float number) return number;
+                if (value instanceof Number number) return number.floatValue();
+            } catch (ReflectiveOperationException | RuntimeException ignored) {
+            }
+            return Float.NaN;
+        }
+    }
 }

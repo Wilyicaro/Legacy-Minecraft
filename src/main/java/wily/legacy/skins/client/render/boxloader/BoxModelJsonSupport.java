@@ -7,10 +7,13 @@ import com.google.gson.JsonPrimitive;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 final class BoxModelJsonSupport {
-    private BoxModelJsonSupport() { }
+    private BoxModelJsonSupport() {
+    }
+
     static EnumSet<SkinPoseRegistry.PoseTag> parsePoseTags(JsonObject root) {
         EnumSet<SkinPoseRegistry.PoseTag> out = EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
         if (root == null) return out;
@@ -19,6 +22,7 @@ final class BoxModelJsonSupport {
         collectPoseTags(out, root.get("hide"));
         return out;
     }
+
     static void collectPoseTags(EnumSet<SkinPoseRegistry.PoseTag> out, JsonElement el) {
         if (out == null || el == null || el.isJsonNull()) return;
         if (el.isJsonPrimitive()) {
@@ -30,7 +34,9 @@ final class BoxModelJsonSupport {
         }
         if (el.isJsonArray()) {
             JsonArray array = el.getAsJsonArray();
-            for (int i = 0; i < array.size(); i++) { collectPoseTags(out, array.get(i)); }
+            for (int i = 0; i < array.size(); i++) {
+                collectPoseTags(out, array.get(i));
+            }
             return;
         }
         if (!el.isJsonObject()) return;
@@ -48,6 +54,7 @@ final class BoxModelJsonSupport {
             collectPoseTags(out, entry.getValue());
         }
     }
+
     static void putPoseTags(Map<String, EnumSet<SkinPoseRegistry.PoseTag>> map, String key, EnumSet<SkinPoseRegistry.PoseTag> tags) {
         if (map == null || key == null || key.isBlank() || tags == null || tags.isEmpty()) return;
         String normalized = key.trim();
@@ -61,11 +68,27 @@ final class BoxModelJsonSupport {
         merged.addAll(tags);
         map.put(normalized, merged);
     }
-    static EnumSet<AttachSlot> parseHideSlots(JsonElement el) { return parseEnumFlags(el, AttachSlot.class, BoxModelJsonSupport::addHideToken); }
-    static EnumMap<AttachSlot, float[]> parseOffsets(JsonElement el) { return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseVec3); }
-    static EnumMap<AttachSlot, float[]> parseScales(JsonElement el) { return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseScale3); }
-    static EnumMap<ArmorSlot, float[]> parseArmorOffsets(JsonElement el) { return parseMap(el, ArmorSlot.class, ArmorSlot::fromString, BoxModelJsonSupport::parseVec3); }
-    static EnumSet<ArmorSlot> parseArmorHideSlots(JsonElement el) { return parseEnumFlags(el, ArmorSlot.class, BoxModelJsonSupport::addArmorHideToken); }
+
+    static EnumSet<AttachSlot> parseHideSlots(JsonElement el) {
+        return parseEnumFlags(el, AttachSlot.class, BoxModelJsonSupport::addHideToken);
+    }
+
+    static EnumMap<AttachSlot, float[]> parseOffsets(JsonElement el) {
+        return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseVec3);
+    }
+
+    static EnumMap<AttachSlot, float[]> parseScales(JsonElement el) {
+        return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseScale3);
+    }
+
+    static EnumMap<ArmorSlot, float[]> parseArmorOffsets(JsonElement el) {
+        return parseMap(el, ArmorSlot.class, ArmorSlot::fromString, BoxModelJsonSupport::parseVec3);
+    }
+
+    static EnumSet<ArmorSlot> parseArmorHideSlots(JsonElement el) {
+        return parseEnumFlags(el, ArmorSlot.class, BoxModelJsonSupport::addArmorHideToken);
+    }
+
     static float[] parseVec3(JsonElement el) {
         if (el == null || el.isJsonNull()) return null;
         try {
@@ -87,9 +110,11 @@ final class BoxModelJsonSupport {
                 JsonPrimitive primitive = el.getAsJsonPrimitive();
                 if (primitive.isNumber()) return new float[]{0f, primitive.getAsFloat(), 0f};
             }
-        } catch (RuntimeException ignored) { }
+        } catch (RuntimeException ignored) {
+        }
         return null;
     }
+
     static void addHideToken(EnumSet<AttachSlot> out, String token) {
         if (token == null) return;
         String value = token.trim();
@@ -127,8 +152,10 @@ final class BoxModelJsonSupport {
         }
         try {
             out.add(AttachSlot.valueOf(upper));
-        } catch (IllegalArgumentException ignored) { }
+        } catch (IllegalArgumentException ignored) {
+        }
     }
+
     static void addArmorHideToken(EnumSet<ArmorSlot> out, String token) {
         if (token == null) return;
         String value = token.trim();
@@ -145,21 +172,32 @@ final class BoxModelJsonSupport {
         ArmorSlot slot = ArmorSlot.fromString(upper);
         if (slot != null) out.add(slot);
     }
+
     static List<BoneDef> expandMirrors(JsonObject root, BoneDef[] sourceBones) {
         List<BoneDef> bones = new ArrayList<>();
-        for (BoneDef bone : sourceBones) bones.add(bone);
+        Collections.addAll(bones, sourceBones);
         if (root == null) return bones;
         JsonObject mirror = root.has("mirror") && root.get("mirror").isJsonObject() ? root.getAsJsonObject("mirror") : null;
         boolean mirrorArm = readMirrorFlag(root, mirror, "mirror_limbs", "mirrorLimbs", "mirror_right_arm", "mirrorRightArm", "right_arm_from_left", "rightArmFromLeft");
         boolean mirrorLeg = readMirrorFlag(root, mirror, "mirror_limbs", "mirrorLimbs", "mirror_right_leg", "mirrorRightLeg", "right_leg_from_left", "rightLegFromLeft");
         if (!mirrorArm && !mirrorLeg) return bones;
         java.util.HashSet<String> names = new java.util.HashSet<>();
-        for (BoneDef bone : bones) { if (bone != null && bone.name() != null) names.add(bone.name()); }
-        if (mirrorArm) { mirrorSide(bones, sourceBones, names, AttachSlot.LEFT_ARM, AttachSlot.RIGHT_ARM, AttachSlot.LEFT_SLEEVE, AttachSlot.RIGHT_SLEEVE); }
-        if (mirrorLeg) { mirrorSide(bones, sourceBones, names, AttachSlot.LEFT_LEG, AttachSlot.RIGHT_LEG, AttachSlot.LEFT_PANTS, AttachSlot.RIGHT_PANTS); }
+        for (BoneDef bone : bones) {
+            if (bone != null && bone.name() != null) names.add(bone.name());
+        }
+        if (mirrorArm) {
+            mirrorSide(bones, sourceBones, names, AttachSlot.LEFT_ARM, AttachSlot.RIGHT_ARM, AttachSlot.LEFT_SLEEVE, AttachSlot.RIGHT_SLEEVE);
+        }
+        if (mirrorLeg) {
+            mirrorSide(bones, sourceBones, names, AttachSlot.LEFT_LEG, AttachSlot.RIGHT_LEG, AttachSlot.LEFT_PANTS, AttachSlot.RIGHT_PANTS);
+        }
         return bones;
     }
-    static BoneDef mirrorBone(BoneDef src, AttachSlot dstAttach, Set<String> usedNames) { return mirrorBoneFiltered(src, dstAttach, usedNames, false); }
+
+    static BoneDef mirrorBone(BoneDef src, AttachSlot dstAttach, Set<String> usedNames) {
+        return mirrorBoneFiltered(src, dstAttach, usedNames, false);
+    }
+
     static BoneDef mirrorBoneFiltered(BoneDef src, AttachSlot dstAttach, Set<String> usedNames, boolean onlyInflated) {
         String base = src.name() == null ? "bone" : src.name();
         String name = base;
@@ -187,6 +225,7 @@ final class BoxModelJsonSupport {
         if (outCubes.isEmpty()) return null;
         return new BoneDef(name, dstAttach, outCubes, src.visible());
     }
+
     private static <E extends Enum<E>> EnumSet<E> parseEnumFlags(JsonElement el, Class<E> type, BiConsumer<EnumSet<E>, String> tokenReader) {
         EnumSet<E> out = EnumSet.noneOf(type);
         if (el == null || el.isJsonNull()) return out;
@@ -200,7 +239,9 @@ final class BoxModelJsonSupport {
             JsonArray array = el.getAsJsonArray();
             for (int i = 0; i < array.size(); i++) {
                 JsonElement value = array.get(i);
-                if (value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) { tokenReader.accept(out, value.getAsString()); }
+                if (value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
+                    tokenReader.accept(out, value.getAsString());
+                }
             }
             return out;
         }
@@ -211,6 +252,7 @@ final class BoxModelJsonSupport {
         addBooleanFlags(out, obj, type.getEnumConstants());
         return out;
     }
+
     private static <E extends Enum<E>> void addBooleanFlags(EnumSet<E> out, JsonObject obj, E[] values) {
         for (E value : values) {
             String upper = value.name();
@@ -218,6 +260,7 @@ final class BoxModelJsonSupport {
             if (isTrue(obj, upper) || isTrue(obj, lower)) out.add(value);
         }
     }
+
     private static <E extends Enum<E>> EnumMap<E, float[]> parseMap(JsonElement el, Class<E> type, Function<String, E> parser, Function<JsonElement, float[]> valueParser) {
         if (el == null || el.isJsonNull() || !el.isJsonObject()) return null;
         EnumMap<E, float[]> out = new EnumMap<>(type);
@@ -228,9 +271,11 @@ final class BoxModelJsonSupport {
                 float[] value = valueParser.apply(entry.getValue());
                 if (value != null) out.put(slot, value);
             }
-        } catch (RuntimeException ignored) { }
+        } catch (RuntimeException ignored) {
+        }
         return out;
     }
+
     private static float[] parseScale3(JsonElement el) {
         if (el == null || el.isJsonNull()) return null;
         try {
@@ -258,9 +303,11 @@ final class BoxModelJsonSupport {
                 float z = obj.has("z") || obj.has("Z") ? readAxis(obj, "z", "Z") : base;
                 return new float[]{x, y, z};
             }
-        } catch (RuntimeException ignored) { }
+        } catch (RuntimeException ignored) {
+        }
         return null;
     }
+
     private static void mirrorSide(List<BoneDef> bones,
                                    BoneDef[] sourceBones,
                                    Set<String> names,
@@ -274,11 +321,14 @@ final class BoxModelJsonSupport {
             if (!hasAttach(sourceBones, dstBase)) addMirroredBones(bones, sourceBones, names, srcBase, dstBase, false);
         }
         if (hasOuter) {
-            if (!hasAttach(sourceBones, dstOuter)) addMirroredBones(bones, sourceBones, names, srcOuter, dstOuter, false);
+            if (!hasAttach(sourceBones, dstOuter))
+                addMirroredBones(bones, sourceBones, names, srcOuter, dstOuter, false);
             return;
         }
-        if (hasBase && !hasAttach(sourceBones, dstOuter)) addMirroredBones(bones, sourceBones, names, srcBase, dstOuter, true);
+        if (hasBase && !hasAttach(sourceBones, dstOuter))
+            addMirroredBones(bones, sourceBones, names, srcBase, dstOuter, true);
     }
+
     private static void addMirroredBones(List<BoneDef> bones,
                                          BoneDef[] sourceBones,
                                          Set<String> names,
@@ -293,10 +343,14 @@ final class BoxModelJsonSupport {
             if (mirrored != null) bones.add(mirrored);
         }
     }
+
     private static boolean hasAttach(BoneDef[] bones, AttachSlot slot) {
-        for (BoneDef bone : bones) { if (bone != null && bone.attach() == slot) return true; }
+        for (BoneDef bone : bones) {
+            if (bone != null && bone.attach() == slot) return true;
+        }
         return false;
     }
+
     private static boolean readMirrorFlag(JsonObject root,
                                           JsonObject mirror,
                                           String limbsSnake,
@@ -309,16 +363,19 @@ final class BoxModelJsonSupport {
         if (isTrue(root, directSnake) || isTrue(root, directCamel)) return true;
         return mirror != null && (isTrue(mirror, nestedSnake) || isTrue(mirror, nestedCamel));
     }
+
     private static float readAxis(JsonObject obj, String lower, String upper) {
         if (obj.has(lower)) return obj.get(lower).getAsFloat();
         if (obj.has(upper)) return obj.get(upper).getAsFloat();
         return 0f;
     }
+
     private static boolean isFalse(JsonElement el) {
         if (el == null || !el.isJsonPrimitive()) return false;
         JsonPrimitive primitive = el.getAsJsonPrimitive();
         return primitive.isBoolean() && !primitive.getAsBoolean();
     }
+
     private static boolean isTrue(JsonObject obj, String key) {
         return obj.has(key)
                 && obj.get(key).isJsonPrimitive()

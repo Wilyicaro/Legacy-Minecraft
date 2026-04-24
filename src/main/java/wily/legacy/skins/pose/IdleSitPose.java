@@ -1,23 +1,22 @@
 package wily.legacy.skins.pose;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import net.minecraft.client.model.PlayerModel;
-
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
-import java.util.UUID;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 
 public final class IdleSitPose {
     public static final float BODY_DOWN = 9.25F;
-
-    private IdleSitPose() { }
-
     private static final Map<PlayerModel, BasePose> BASE = new WeakHashMap<>();
+
+    private IdleSitPose() {
+    }
 
     private static BasePose base(PlayerModel model) {
         BasePose b = BASE.get(model);
@@ -25,27 +24,6 @@ public final class IdleSitPose {
         b = new BasePose(model);
         BASE.put(model, b);
         return b;
-    }
-
-    private static final class BasePose {
-        final float bodyY, jacketY, headY, hatY;
-        final float rArmY, lArmY, rSleeveY, lSleeveY;
-        final float rLegY, lLegY, rLegZ, lLegZ;
-
-        BasePose(PlayerModel m) {
-            this.bodyY = m.body.y;
-            this.jacketY = m.jacket.y;
-            this.headY = m.head.y;
-            this.hatY = m.hat.y;
-            this.rArmY = m.rightArm.y;
-            this.lArmY = m.leftArm.y;
-            this.rSleeveY = m.rightSleeve.y;
-            this.lSleeveY = m.leftSleeve.y;
-            this.rLegY = m.rightLeg.y;
-            this.lLegY = m.leftLeg.y;
-            this.rLegZ = m.rightLeg.z;
-            this.lLegZ = m.leftLeg.z;
-        }
     }
 
     public static boolean shouldApply(AvatarRenderState state) {
@@ -134,5 +112,26 @@ public final class IdleSitPose {
         model.leftPants.zRot = model.leftLeg.zRot;
         model.leftPants.y = model.leftLeg.y;
         model.leftPants.z = model.leftLeg.z;
+    }
+
+    private static final class BasePose {
+        final float bodyY, jacketY, headY, hatY;
+        final float rArmY, lArmY, rSleeveY, lSleeveY;
+        final float rLegY, lLegY, rLegZ, lLegZ;
+
+        BasePose(PlayerModel m) {
+            this.bodyY = m.body.y;
+            this.jacketY = m.jacket.y;
+            this.headY = m.head.y;
+            this.hatY = m.hat.y;
+            this.rArmY = m.rightArm.y;
+            this.lArmY = m.leftArm.y;
+            this.rSleeveY = m.rightSleeve.y;
+            this.lSleeveY = m.leftSleeve.y;
+            this.rLegY = m.rightLeg.y;
+            this.lLegY = m.leftLeg.y;
+            this.rLegZ = m.rightLeg.z;
+            this.lLegZ = m.leftLeg.z;
+        }
     }
 }

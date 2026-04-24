@@ -334,20 +334,6 @@ public class LegacyOptions {
         FactoryConfig.saveOptionAndConsume(advancedOptionsMode, AdvancedOptionsMode.MERGE, v -> {});
     }
 
-    public static void resetSkinClientOptions() {
-        smoothPreviewScroll.set(false);
-        hideArmorOnAllBoxSkins.set(false);
-        tu3ChangeSkinScreen.set(false);
-        showCustomPackOptionsTooltip.set(true);
-        skinSelectionInitialized.set(false);
-        lastUsedCustomPackId.set("");
-        selectedSkinUserId.set("");
-        selectedSkinId.set("");
-        selectedSkinPackId.set("");
-        favoriteSkinIds.set(List.of());
-        skinCloudRelayUrl.set(DEFAULT_SKIN_CLOUD_RELAY_URL);
-    }
-
     public static String getLastUsedCustomPackIdOrNull() {
         String packId = lastUsedCustomPackId.get();
         return packId == null || packId.isBlank() ? null : packId;

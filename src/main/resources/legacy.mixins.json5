@@ -207,7 +207,6 @@
     "skins.client.UpsideDownRendererMixin",
     "skins.client.UpsideDownMixin",
     "skins.client.SkinTickMixin",
-    "skins.client.SkinsOptionMixin",
     "skins.client.LivingEntityRendererAccessor",
     "skins.client.HumanoidArmorLayerAccessor",
     "skins.client.ModelPartAccessor",

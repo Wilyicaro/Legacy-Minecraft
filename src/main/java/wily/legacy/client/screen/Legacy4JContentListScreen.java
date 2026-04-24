@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.StorePreviewAtlas;
@@ -35,19 +36,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Legacy4JContentListScreen extends PanelVListScreen implements ControlTooltip.Event {
-    private static final int PANEL_WIDTH = 240;
-    private static final int PANEL_HEIGHT = 222;
-    private static final int TOOLTIP_WIDTH = 222;
-    private static final int LIST_X = 18;
-    private static final int LIST_Y = 34;
-    private static final int LIST_WIDTH = 204;
-    private static final int LIST_HEIGHT = 184;
-    private static final int BUTTON_HEIGHT = 26;
+    private static final int PANEL_WIDTH = 257;
+    private static final int PANEL_HEIGHT = 226;
+    private static final int TOOLTIP_WIDTH = 240;
+    private static final int LIST_X = 20;
+    private static final int LIST_Y = 48;
+    private static final int LIST_WIDTH = 218;
+    private static final int LIST_HEIGHT = 162;
+    private static final int BUTTON_HEIGHT = 30;
     
     protected final ContentManager.Category category;
     protected final List<ContentManager.Pack> packs;
     protected ContentManager.Pack hoveredPack;
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, TOOLTIP_WIDTH);
+    private final Panel panelRecess;
     
     // Legacy Scrolling System
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
@@ -59,26 +61,20 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private final java.util.Set<String> downloadingPacks = ConcurrentHashMap.newKeySet();
     private final Map<String, Boolean> installedPacks = new ConcurrentHashMap<>();
     private final Map<String, MultiLineLabel> descriptionLabels = new ConcurrentHashMap<>();
-    private ContentManager.Pack armedPack;
     private boolean needsReload = false;
 
-    private static class RemoteImage {
-        public final int width;
-        public final int height;
-        public final ResourceLocation id;
-        public RemoteImage(ResourceLocation id, int width, int height) {
-            this.id = id;
-            this.width = width;
-            this.height = height;
-        }
+    private record RemoteImage(ResourceLocation id, int width, int height) {
     }
 
     public Legacy4JContentListScreen(Screen parent, ContentManager.Category category, List<ContentManager.Pack> packs) {
         super(s -> Panel.createPanel(s,
                 p -> p.appearance(PANEL_WIDTH, PANEL_HEIGHT), 
-                p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 17)), 
-                Component.empty()
+                p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 17)),
+                Component.translatable("legacy.menu.store_title")
         );
+        panelRecess = Panel.createPanel(this,
+                p -> p.appearance(LegacySprites.PANEL_RECESS, panel.getWidth() - 20, panel.getHeight() - 40),
+                p -> p.pos(panel.getX() + 10, panel.getY() + 30));
         this.parent = parent;
         this.category = category;
         this.packs = packs;
@@ -117,30 +113,31 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private void addMenuButton(ContentManager.Pack pack) {
-        renderableVList.addRenderable(new LeftAlignedButton(LIST_WIDTH, BUTTON_HEIGHT, pack, category, downloadingPacks, installedPacks, b -> {
-            if (isDownloading(pack)) return;
-            selectPack(pack);
-            if (armedPack != pack) {
-                armedPack = pack;
-                return;
+        renderableVList.addRenderable(new LeftAlignedButton(renderableVList, LIST_WIDTH, BUTTON_HEIGHT, pack, category, downloadingPacks, installedPacks) {
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                if (isDownloading(pack)) return;
+                selectPack(pack);
+                if (!isFocused()) {
+                    return;
+                }
+                if (isInstalled(pack)) {
+                    minecraft.setScreen(new PackActionScreen(Legacy4JContentListScreen.this, pack, category));
+                } else {
+                    if (!prepareDownloadTarget(pack)) return;
+                    downloadingPacks.add(pack.id());
+                    ContentManager.downloadPack(pack, category, installedAnything -> {
+                        downloadingPacks.remove(pack.id());
+                        boolean installed = ContentManager.isPackInstalled(pack, category);
+                        installedPacks.put(pack.id(), installed);
+                        if (installedAnything && category.requiresResourceReload()) {
+                            if (minecraft.screen == Legacy4JContentListScreen.this) needsReload = true;
+                            else minecraft.reloadResourcePacks();
+                        }
+                    });
+                }
             }
-            armedPack = null;
-            if (isInstalled(pack)) {
-                minecraft.setScreen(new PackActionScreen(this, pack, category));
-            } else {
-                if (!prepareDownloadTarget(pack)) return;
-                downloadingPacks.add(pack.id());
-                ContentManager.downloadPack(pack, category, installedAnything -> {
-                    downloadingPacks.remove(pack.id());
-                    boolean installed = ContentManager.isPackInstalled(pack, category);
-                    installedPacks.put(pack.id(), installed);
-                    if (installedAnything && category.requiresResourceReload()) {
-                        if (minecraft.screen == this) needsReload = true;
-                        else minecraft.reloadResourcePacks();
-                    }
-                });
-            }
-        }) {
+
             @Override
             public void setFocused(boolean focused) {
                 super.setFocused(focused);
@@ -273,27 +270,21 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     @Override
-    public void renderableVListInit() {
+    protected void panelInit() {
+        super.panelInit();
         tooltipBox.init();
+        panelRecess.init("panelRecess");
+        addRenderableOnly(panelRecess);
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false)));
+    }
+
+    @Override
+    public void renderableVListInit() {
         for (int i = 0; i < Math.min(4, packs.size()); i++) {
             if (getLocalPreview(category, packs.get(i)) == null) requestImage(packs.get(i).imageUrl());
         }
-        
-        addRenderableOnly((guiGraphics, i, j, f) -> {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.PANEL_RECESS, 
-                panel.getX() + 9, panel.getY() + 9, panel.getWidth() - 18, panel.getHeight() - 17);
-            
-            Component title = Component.translatable("legacy.menu.store_title");
-            float textScale = 0.75f;
-            int scaledTextWidth = (int)(font.width(title) * textScale);
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - scaledTextWidth) / 2, panel.getY() + 17);
-            guiGraphics.pose().scale(textScale, textScale);
-            guiGraphics.drawString(font, title, 0, 0, CommonColor.GRAY_TEXT.get(), false);
-            guiGraphics.pose().popMatrix();
-        });
 
-        getRenderableVList().scrollArrowYOffset(-19).init("renderableVList", panel.getX() + LIST_X, panel.getY() + LIST_Y, LIST_WIDTH, LIST_HEIGHT);
+        getRenderableVList().init("renderableVList", panel.getX() + LIST_X, panel.getY() + LIST_Y, LIST_WIDTH, LIST_HEIGHT);
     }
 
     @Override
@@ -346,18 +337,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
             );
         }
-
-        panel.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
-        boolean isMouseOverTooltip = d >= tooltipBox.getX() && d < tooltipBox.getX() + tooltipBox.getWidth() && 
-                                     e >= tooltipBox.getY() && e < tooltipBox.getY() + tooltipBox.getHeight();
-        if (isMouseOverTooltip) {
-            scrollableRenderer.scrolled.add((int) -Math.signum(g));
+        if ((tooltipBox.isHovered(d, e) || !ControlType.getActiveType().isKbm()) && scrollableRenderer.mouseScrolled(g))
             return true;
-        }
         return super.mouseScrolled(d, e, f, g);
     }
 
@@ -384,14 +369,14 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
     }
 
-    private static class LeftAlignedButton extends Button {
+    private static abstract class LeftAlignedButton extends ListButton {
         private final ContentManager.Pack pack;
         private final ContentManager.Category category;
         private final java.util.Set<String> downloadingPacks;
         private final Map<String, Boolean> installedPacks;
 
-        public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category, java.util.Set<String> downloadingPacks, Map<String, Boolean> installedPacks, OnPress onPress) {
-            super(0, 0, width, height, Component.literal(pack.name()), onPress, DEFAULT_NARRATION);
+        public LeftAlignedButton(RenderableVList list, int width, int height, ContentManager.Pack pack, ContentManager.Category category, java.util.Set<String> downloadingPacks, Map<String, Boolean> installedPacks) {
+            super(list, 0, 0, width, height, Component.literal(pack.name()));
             this.pack = pack;
             this.category = category;
             this.downloadingPacks = downloadingPacks;
@@ -408,7 +393,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 LegacyRenderUtil.drawGenericLoading(guiGraphics, x, y, 4, 2);
             } else if (installedPacks.getOrDefault(pack.id(), false)) {
                 int spriteSize = 18;
-                int sx = this.getX() + this.width - spriteSize - 10;
+                int sx = this.getX() + this.width - spriteSize - 7;
                 int sy = this.getY() + (this.height - spriteSize) / 2;
                 guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
             }
@@ -417,7 +402,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         @Override
         public void renderString(GuiGraphics guiGraphics, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
-            int textX = this.getX() + 12;
+            int textX = this.getX() + 8;
             int maxWidth = this.width - 44;
             String text = this.getMessage().getString();
             String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";

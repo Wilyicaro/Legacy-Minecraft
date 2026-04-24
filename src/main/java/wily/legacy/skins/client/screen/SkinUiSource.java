@@ -3,17 +3,12 @@ package wily.legacy.skins.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
+import wily.legacy.skins.api.ui.LegacySkinUi;
 import wily.legacy.skins.skin.SkinEntry;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
-import wily.legacy.skins.api.ui.LegacySkinUi;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 final class SkinUiSource implements ChangeSkinScreenSource {
     private final LegacySkinUi.Adapter adapter;
@@ -30,6 +25,10 @@ final class SkinUiSource implements ChangeSkinScreenSource {
 
     SkinUiSource(LegacySkinUi.Adapter adapter) {
         this.adapter = adapter;
+    }
+
+    private static SkinEntry orderedSkin(SkinEntry skin, int order) {
+        return new SkinEntry(skin.id(), skin.sourceId(), skin.name(), skin.texture(), skin.modelId(), skin.cape(), skin.slimArms(), order, skin.fair());
     }
 
     @Override
@@ -148,7 +147,8 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     public void requestFocus(@Nullable String packId, @Nullable String skinId) {
         requestedFocusSkinId = SkinIdUtil.trimToNull(skinId);
         requestedFocusPackId = SkinIdUtil.trimToNull(packId);
-        if (requestedFocusPackId == null && requestedFocusSkinId != null) requestedFocusPackId = findPackId(requestedFocusSkinId);
+        if (requestedFocusPackId == null && requestedFocusSkinId != null)
+            requestedFocusPackId = findPackId(requestedFocusSkinId);
         if (requestedFocusPackId != null) lastUsedPackId = requestedFocusPackId;
     }
 
@@ -234,10 +234,6 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     0
             ));
         }
-    }
-
-    private static SkinEntry orderedSkin(SkinEntry skin, int order) {
-        return new SkinEntry(skin.id(), skin.sourceId(), skin.name(), skin.texture(), skin.modelId(), skin.cape(), skin.slimArms(), order, skin.fair());
     }
 
     private @Nullable String findPackId(String skinId) {

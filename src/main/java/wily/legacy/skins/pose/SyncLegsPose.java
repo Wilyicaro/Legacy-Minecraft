@@ -7,7 +7,8 @@ import wily.legacy.skins.client.gui.GuiDollRender;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class SyncLegsPose {
-    private SyncLegsPose() { }
+    private SyncLegsPose() {
+    }
 
     public static boolean shouldApply(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return false;

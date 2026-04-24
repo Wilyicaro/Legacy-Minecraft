@@ -1,22 +1,12 @@
 package wily.legacy.skins.client.preview;
 
+import net.minecraft.util.Mth;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.util.Mth;
-
 public class PlayerSkinWidgetList {
-    public int x;
-    public int y;
-    public final List<PlayerSkinWidget> widgets;
-    private final PlayerSkinWidget[] visible = new PlayerSkinWidget[7];
-    private float centerRotationX;
-    private float centerRotationY;
-    private int centerPoseMode;
-    private boolean centerPunchLoop;
-    private List<String> skinIds = List.of();
-    public int index;
     private static final int OFFSET = 80;
     private static final float FACING_FROM_LEFT = -45f;
     private static final float FACING_FROM_RIGHT = 45f;
@@ -29,22 +19,28 @@ public class PlayerSkinWidgetList {
     private static final float[] SLOT_SCALE_MUL = new float[]{1f, 0.8f, 0.6375f, 0.508333f, 0.404167f};
     private static final float[] SLOT_DX_MUL = new float[]{0f, 1f, 1.808f, 2.460f, 2.989f};
     private static final float[] SLOT_DY_MUL = new float[]{0f, 30f / 294f, 53f / 294f, 72f / 294f, 87f / 294f};
+    public final List<PlayerSkinWidget> widgets;
+    private final PlayerSkinWidget[] visible = new PlayerSkinWidget[7];
+    private final ArrayList<PlayerSkinWidget> ring = new ArrayList<>();
+    private final int[] customCarouselCenterX = new int[9];
+    public int x;
+    public int y;
+    public int index;
+    private float centerRotationX;
+    private float centerRotationY;
+    private int centerPoseMode;
+    private boolean centerPunchLoop;
+    private List<String> skinIds = List.of();
     private float uiScale = 1f;
     private float carouselScaleMultiplier = 1f;
     private float carouselSpacingMultiplier = 1f;
     private int visibleRadius = VISIBLE_RADIUS;
     private int renderRadius = VISIBLE_RADIUS;
-    private final ArrayList<PlayerSkinWidget> ring = new ArrayList<>();
     private boolean forceInstantNextLayout;
     private boolean avoidRepeatsWhenFew;
     private int avoidRepeatsThreshold;
-
     private int lastShiftDir;
-
-    private record SlotLayout(boolean active, float rotX, float rotY, int x, int y, float scale, int step) { }
-
     private boolean customCarouselCenters;
-    private int[] customCarouselCenterX = new int[9];
 
     public PlayerSkinWidgetList(int x, int y, List<PlayerSkinWidget> widgetPool) {
         this.x = x;
@@ -55,6 +51,18 @@ public class PlayerSkinWidgetList {
         this.centerRotationY = 0;
         this.centerPoseMode = 0;
         this.centerPunchLoop = false;
+    }
+
+    private static boolean isSparseCarousel(int size) {
+        return size > 0 && size < 7;
+    }
+
+    private static int sparseStartOffset(int size) {
+        return -Math.max(1, size) / 2;
+    }
+
+    private static int sparseEndOffset(int size) {
+        return sparseStartOffset(size) + Math.max(1, size) - 1;
     }
 
     public void setCenterRotation(float rotX, float rotY) {
@@ -74,7 +82,9 @@ public class PlayerSkinWidgetList {
         this.y = y;
     }
 
-    public void setUiScale(float uiScale) { this.uiScale = uiScale <= 0f ? 1f : uiScale; }
+    public void setUiScale(float uiScale) {
+        this.uiScale = uiScale <= 0f ? 1f : uiScale;
+    }
 
     public void setCarouselTuning(float scaleMultiplier, float spacingMultiplier) {
         this.carouselScaleMultiplier = scaleMultiplier <= 0f ? 1f : scaleMultiplier;
@@ -99,7 +109,7 @@ public class PlayerSkinWidgetList {
             this.customCarouselCenters = false;
             return;
         }
-        for (int i = 0; i < 9; i++) this.customCarouselCenterX[i] = centers[i];
+        System.arraycopy(centers, 0, this.customCarouselCenterX, 0, 9);
         this.customCarouselCenters = true;
     }
 
@@ -108,7 +118,9 @@ public class PlayerSkinWidgetList {
         return index < 0 || index >= visible.length ? null : visible[index];
     }
 
-    public PlayerSkinWidget getCenter() { return getVisible(0); }
+    public PlayerSkinWidget getCenter() {
+        return getVisible(0);
+    }
 
     public int getCenterAnchorX() {
         float centerScale = getCenterScale();
@@ -120,7 +132,9 @@ public class PlayerSkinWidgetList {
         this.forceInstantNextLayout |= instant;
     }
 
-    public void sortForIndex(int index) { sortForIndex(index, false); }
+    public void sortForIndex(int index) {
+        sortForIndex(index, false);
+    }
 
     public void sortForIndex(int requestedIndex, boolean instant) {
         if (skinIds.isEmpty()) {
@@ -163,7 +177,9 @@ public class PlayerSkinWidgetList {
 
     private void sortVirtualized(int requestedIndex, int wrappedIndex, int n, boolean instant) {
         if (ring.isEmpty()) ring.addAll(widgets);
-        if (instant) { for (PlayerSkinWidget w : ring) w.invisible(); }
+        if (instant) {
+            for (PlayerSkinWidget w : ring) w.invisible();
+        }
         int delta = requestedIndex - this.index;
         this.index = wrappedIndex;
         if (!instant) {
@@ -252,18 +268,14 @@ public class PlayerSkinWidgetList {
         }
     }
 
-    private void clearVisibleElements() { Arrays.fill(visible, null); }
+    private void clearVisibleElements() {
+        Arrays.fill(visible, null);
+    }
 
     private void assignVisibleElement(int offset, PlayerSkinWidget widget) {
         int index = offset + 3;
         if (index >= 0 && index < visible.length) visible[index] = widget;
     }
-
-    private static boolean isSparseCarousel(int size) { return size > 0 && size < 7; }
-
-    private static int sparseStartOffset(int size) { return -Math.max(1, size) / 2; }
-
-    private static int sparseEndOffset(int size) { return sparseStartOffset(size) + Math.max(1, size) - 1; }
 
     private void hideAll() {
         clearVisibleElements();
@@ -321,26 +333,41 @@ public class PlayerSkinWidgetList {
         if (offset == 0) w.setPoseMode(centerPoseMode, centerPunchLoop, true);
     }
 
-    private float getCenterScale() { return CENTER_SCALE * uiScale * carouselScaleMultiplier; }
+    private float getCenterScale() {
+        return CENTER_SCALE * uiScale * carouselScaleMultiplier;
+    }
 
-    private int getBaseTopX() { return x + Math.round(BASE_PADDING_X * uiScale); }
+    private int getBaseTopX() {
+        return x + Math.round(BASE_PADDING_X * uiScale);
+    }
 
-    private int getBaseTopY() { return y + Math.round(BASE_PADDING_Y * uiScale); }
+    private int getBaseTopY() {
+        return y + Math.round(BASE_PADDING_Y * uiScale);
+    }
 
-    private int getDefaultCenterX(float centerScale) { return getBaseTopX() + Math.round(BASE_WIDGET_W * centerScale / 2f); }
+    private int getDefaultCenterX(float centerScale) {
+        return getBaseTopX() + Math.round(BASE_WIDGET_W * centerScale / 2f);
+    }
 
-    private int getSlotSpacing() { return Math.round(OFFSET * uiScale * carouselSpacingMultiplier); }
+    private int getSlotSpacing() {
+        return Math.round(OFFSET * uiScale * carouselSpacingMultiplier);
+    }
 
     private int resolveSlotCenterX(int offset, int defaultCenterX, int slotSpacing) {
         if (customCarouselCenters) {
             int idx = offset + VISIBLE_RADIUS;
             if (idx >= 0 && idx < customCarouselCenterX.length) {
                 int customCenter = customCarouselCenterX[idx];
-                if (customCenter != Integer.MIN_VALUE) { return customCenter; }
+                if (customCenter != Integer.MIN_VALUE) {
+                    return customCenter;
+                }
             }
         }
 
         int abs = Math.abs(offset);
         return defaultCenterX + (offset == 0 ? 0 : Integer.signum(offset) * Math.round(slotSpacing * SLOT_DX_MUL[abs]));
+    }
+
+    private record SlotLayout(boolean active, float rotX, float rotY, int x, int y, float scale, int step) {
     }
 }

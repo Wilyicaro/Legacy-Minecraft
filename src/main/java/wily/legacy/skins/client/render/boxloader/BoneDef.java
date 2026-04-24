@@ -7,4 +7,5 @@ public record BoneDef(
         AttachSlot attach,
         List<CubeDef> cubes,
         Boolean visible
-) { }
+) {
+}

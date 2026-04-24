@@ -19,7 +19,10 @@ public final class PlayerModelParts {
             AttachSlot.RIGHT_PANTS,
             AttachSlot.LEFT_PANTS
     };
-    private PlayerModelParts() { }
+
+    private PlayerModelParts() {
+    }
+
     public static ModelPart get(PlayerModel model, AttachSlot slot) {
         if (model == null || slot == null) return null;
         return switch (slot) {

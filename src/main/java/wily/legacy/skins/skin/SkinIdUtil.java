@@ -1,27 +1,50 @@
 package wily.legacy.skins.skin;
+
 import net.minecraft.resources.ResourceLocation;
+
 import java.text.Normalizer;
 import java.util.Locale;
 import java.util.Set;
+
 public final class SkinIdUtil {
     public static final String PACK_DEFAULT = "default";
     public static final String PACK_FAVOURITES = "favourites";
     public static final String AUTO_SELECT = "auto_select";
-    private SkinIdUtil() { }
-    public static boolean hasSkin(String skinId) { return skinId != null && !skinId.isBlank(); }
-    public static boolean isAutoSelect(String skinId) { return AUTO_SELECT.equals(skinId); }
-    public static boolean isBlankOrAutoSelect(String skinId) { return !hasSkin(skinId) || isAutoSelect(skinId); }
-    public static String normalize(String skinId) { return skinId == null ? "" : skinId; }
-    public static boolean isFavouritesPack(String packId) { return PACK_FAVOURITES.equals(packId); }
+
+    private SkinIdUtil() {
+    }
+
+    public static boolean hasSkin(String skinId) {
+        return skinId != null && !skinId.isBlank();
+    }
+
+    public static boolean isAutoSelect(String skinId) {
+        return AUTO_SELECT.equals(skinId);
+    }
+
+    public static boolean isBlankOrAutoSelect(String skinId) {
+        return !hasSkin(skinId) || isAutoSelect(skinId);
+    }
+
+    public static String normalize(String skinId) {
+        return skinId == null ? "" : skinId;
+    }
+
+    public static boolean isFavouritesPack(String packId) {
+        return PACK_FAVOURITES.equals(packId);
+    }
+
     public static String cleanName(String name, String fallback) {
         String value = name == null ? "" : name.trim();
         return value.isBlank() ? fallback : value;
     }
+
     public static String trimToNull(String value) {
         if (value == null) return null;
         String trimmed = value.trim();
         return trimmed.isBlank() ? null : trimmed;
     }
+
     public static String slug(String text, String fallback) {
         String normalized = Normalizer.normalize(cleanName(text, fallback), Normalizer.Form.NFD)
                 .replaceAll("\\p{M}+", "")
@@ -30,6 +53,7 @@ public final class SkinIdUtil {
                 .replaceAll("^_+|_+$", "");
         return normalized.isBlank() ? fallback : normalized;
     }
+
     public static String uniqueLoadedSkinId(String packId, String sourceId, Set<String> usedIds) {
         String base = normalize(sourceId);
         if (!hasSkin(base)) base = hasSkin(packId) ? packId : "skin";
@@ -41,10 +65,12 @@ public final class SkinIdUtil {
             if (!usedIds.contains(candidate)) return candidate;
         }
     }
+
     public static ResourceLocation modelId(String namespace, String skinId) {
         if (!hasSkin(namespace) || !hasSkin(skinId)) return null;
         return ResourceLocation.fromNamespaceAndPath(namespace, skinId);
     }
+
     public static ResourceLocation modelLocation(ResourceLocation texture) {
         if (texture == null) return null;
         String path = texture.getPath();

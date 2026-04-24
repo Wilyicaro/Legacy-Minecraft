@@ -1,19 +1,19 @@
 package wily.legacy.skins.client.gui;
 
+import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.PlayerSkin;
-import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.skins.skin.ClientSkinAssets;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.skin.ClientSkinAssets;
 
 public final class GuiDollRender {
     public static final int MENU_DOLL_ID = -0x5D011;
@@ -25,7 +25,8 @@ public final class GuiDollRender {
     private static final float CROUCH_Y_OFFSET = -0.125F;
     private static final int MIN_RENDER_SIZE = 20;
 
-    private GuiDollRender() { }
+    private GuiDollRender() {
+    }
 
     private static float normalizeYaw(float yaw) {
         while (yaw < 0.0F) yaw += 360.0F;
@@ -127,5 +128,6 @@ public final class GuiDollRender {
             Quaternionf cameraRotation,
             int expandedTop,
             int expandedBottom
-    ) { }
+    ) {
+    }
 }

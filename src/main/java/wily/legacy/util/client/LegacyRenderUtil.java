@@ -179,6 +179,10 @@ public class LegacyRenderUtil {
         FactoryScreenUtil.disableBlend();
     }
 
+    public static ResourceLocation getSpriteOrFallback(ResourceLocation main, ResourceLocation fallback) {
+        return FactoryGuiGraphics.getSprites().texturesByName.containsKey(main) ? main : fallback;
+    }
+
     public static void renderUsername(GuiGraphics graphics) {
         if (mc.level != null || !LegacyOptions.getUIMode().isFHD() || LegacyOptions.legacySettingsMenus.get()) return;
         String username = MCAccount.isOfflineUser() ? I18n.get("legacy.menu.offline_user", mc.getUser().getName()) : mc.getUser().getName();

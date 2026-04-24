@@ -15,6 +15,7 @@ public enum AttachSlot {
     LEFT_LEG,
     RIGHT_PANTS,
     LEFT_PANTS;
+
     public static AttachSlot fromString(String key) {
         if (key == null) return null;
         String k = key.trim();
@@ -36,6 +37,8 @@ public enum AttachSlot {
         if (k.equals("jacket")) return JACKET;
         try {
             return AttachSlot.valueOf(k.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException ignored) { return null; }
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 }

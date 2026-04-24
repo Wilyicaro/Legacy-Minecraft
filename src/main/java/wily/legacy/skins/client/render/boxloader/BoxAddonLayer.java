@@ -1,4 +1,5 @@
 package wily.legacy.skins.client.render.boxloader;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -13,16 +14,76 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import wily.legacy.compat.cpm.CpmRenderCompat;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.skin.ClientSkinAssets;
-import wily.legacy.compat.cpm.CpmRenderCompat;
+import wily.legacy.skins.skin.SkinIdUtil;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 public class BoxAddonLayer extends RenderLayer {
     public BoxAddonLayer(RenderLayerParent parent) {
         super(parent);
     }
+
+    private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
+        if (ars.isInvisible) return true;
+        UUID u = a.consoleskins$getEntityUuid();
+        if (u == null) return false;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null) return false;
+        if (mc.level == null) return false;
+        Player p = mc.level.getPlayerByUUID(u);
+        return p != null && p.isInvisible();
+    }
+
+    private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
+        if (parts == null || parts.isEmpty()) return;
+        ps.pushPose();
+        limb.translateAndRotate(ps);
+        if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
+        for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
+        ps.popPose();
+    }
+
+    private static void renderHat(ModelPart head, ModelPart hat, boolean hatChildLike, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
+        if (parts == null || parts.isEmpty()) return;
+        ps.pushPose();
+        if (hatChildLike) head.translateAndRotate(ps);
+        hat.translateAndRotate(ps);
+        if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
+        for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
+        ps.popPose();
+    }
+
+    private static boolean isHatChildLike(ModelPart h, ModelPart hat) {
+        float e = 1.0E-4F;
+        if (Math.abs(hat.x - h.x) > e) return true;
+        if (Math.abs(hat.y - h.y) > e) return true;
+        if (Math.abs(hat.z - h.z) > e) return true;
+        if (Math.abs(hat.xRot - h.xRot) > e) return true;
+        if (Math.abs(hat.yRot - h.yRot) > e) return true;
+        return Math.abs(hat.zRot - h.zRot) > e;
+    }
+
+    private static ModelPart snapshotPart(ModelPart part) {
+        ModelPart snapshot = new ModelPart(List.of(), Map.of());
+        if (part == null) return snapshot;
+        snapshot.visible = part.visible;
+        snapshot.x = part.x;
+        snapshot.y = part.y;
+        snapshot.z = part.z;
+        snapshot.xRot = part.xRot;
+        snapshot.yRot = part.yRot;
+        snapshot.zRot = part.zRot;
+        snapshot.xScale = part.xScale;
+        snapshot.yScale = part.yScale;
+        snapshot.zScale = part.zScale;
+        return snapshot;
+    }
+
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, EntityRenderState state, float partialTick, float ageInTicks) {
         if (!(state instanceof AvatarRenderState ars)) return;
@@ -30,7 +91,7 @@ public class BoxAddonLayer extends RenderLayer {
         if (CpmRenderCompat.isCpmModelActive(ars)) return;
         if (consoleskins$isInvisible(ars, a)) return;
         String skinId = a.consoleskins$getSkinId();
-        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
+        if (skinId == null || skinId.isBlank() || SkinIdUtil.AUTO_SELECT.equals(skinId)) return;
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(a);
         ResourceLocation texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
@@ -77,59 +138,5 @@ public class BoxAddonLayer extends RenderLayer {
                     renderSlot(leftPants, baked.get(AttachSlot.LEFT_PANTS), ps, vc, packedLight, partScale);
                 }
         );
-    }
-    private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
-        if (ars.isInvisible) return true;
-        UUID u = a.consoleskins$getEntityUuid();
-        if (u == null) return false;
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null) return false;
-        if (mc.level == null) return false;
-        Player p = mc.level.getPlayerByUUID(u);
-        return p != null && p.isInvisible();
-    }
-    private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
-        if (parts == null || parts.isEmpty()) return;
-        ps.pushPose();
-        limb.translateAndRotate(ps);
-        if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
-        for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
-        ps.popPose();
-    }
-
-    private static void renderHat(ModelPart head, ModelPart hat, boolean hatChildLike, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
-        if (parts == null || parts.isEmpty()) return;
-        ps.pushPose();
-        if (hatChildLike) head.translateAndRotate(ps);
-        hat.translateAndRotate(ps);
-        if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
-        for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
-        ps.popPose();
-    }
-
-    private static boolean isHatChildLike(ModelPart h, ModelPart hat) {
-        float e = 1.0E-4F;
-        if (Math.abs(hat.x - h.x) > e) return true;
-        if (Math.abs(hat.y - h.y) > e) return true;
-        if (Math.abs(hat.z - h.z) > e) return true;
-        if (Math.abs(hat.xRot - h.xRot) > e) return true;
-        if (Math.abs(hat.yRot - h.yRot) > e) return true;
-        return Math.abs(hat.zRot - h.zRot) > e;
-    }
-
-    private static ModelPart snapshotPart(ModelPart part) {
-        ModelPart snapshot = new ModelPart(List.of(), Map.of());
-        if (part == null) return snapshot;
-        snapshot.visible = part.visible;
-        snapshot.x = part.x;
-        snapshot.y = part.y;
-        snapshot.z = part.z;
-        snapshot.xRot = part.xRot;
-        snapshot.yRot = part.yRot;
-        snapshot.zRot = part.zRot;
-        snapshot.xScale = part.xScale;
-        snapshot.yScale = part.yScale;
-        snapshot.zScale = part.zScale;
-        return snapshot;
     }
 }

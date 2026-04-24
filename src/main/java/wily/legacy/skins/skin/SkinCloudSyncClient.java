@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.skins.util.DebugLog;
+import wily.legacy.skins.util.SkinsLogger;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -78,11 +78,11 @@ final class SkinCloudSyncClient {
         HTTP.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8)).whenComplete((response, error) -> {
             if (snapshotRequest) SNAPSHOT_IN_FLIGHT.set(false);
             if (error != null) {
-                DebugLog.debug("Cloud skin sync request failed {}", error.toString());
+                SkinsLogger.debug("Cloud skin sync request failed {}", error.toString());
                 return;
             }
             if (response == null || response.statusCode() < 200 || response.statusCode() >= 300) {
-                DebugLog.debug("Cloud skin sync returned status {}", response == null ? "null" : response.statusCode());
+                SkinsLogger.debug("Cloud skin sync returned status {}", response == null ? "null" : response.statusCode());
                 return;
             }
             if (!snapshotRequest) return;
@@ -111,7 +111,7 @@ final class SkinCloudSyncClient {
                 }
             }
         } catch (RuntimeException ex) {
-            DebugLog.debug("Cloud skin snapshot parse failed {}", ex.toString());
+            SkinsLogger.debug("Cloud skin snapshot parse failed {}", ex.toString());
         }
         return skins;
     }

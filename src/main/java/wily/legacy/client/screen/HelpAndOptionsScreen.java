@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 
@@ -83,8 +84,21 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         }
     }
 
+    private static void addWidget(List<AbstractWidget> list, FactoryConfig<?> config) {
+        AbstractWidget widget = LegacyConfigWidgets.createWidget(config);
+        if (widget != null) list.add(widget);
+    }
+
     public static List<AbstractWidget> createLegacyPlayerSkinWidgets() {
-        return new ArrayList<>();
+        List<AbstractWidget> list = new ArrayList<>();
+        addWidget(list, LegacyOptions.tu3ChangeSkinScreen);
+        addWidget(list, LegacyOptions.smoothPreviewScroll);
+        addWidget(list, LegacyOptions.hideArmorOnAllBoxSkins);
+        if (!LegacyOptions.legacySettingsMenus.get()) {
+            addWidget(list, LegacyOptions.customSkinAnimation);
+        }
+        addWidget(list, LegacyOptions.showCustomPackOptionsTooltip);
+        return list;
     }
 
     public static List<AbstractWidget> createPlayerSkinWidgets() {

@@ -1,11 +1,14 @@
 package wily.legacy.skins.pose;
+
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+
 public final class StiffArmsPose {
-    private StiffArmsPose() { }
+    private StiffArmsPose() {
+    }
 
     private static float getBaseXRot(AvatarRenderState state) {
         return state != null && state.isCrouching ? 0.4F : 0.0F;
@@ -20,6 +23,7 @@ public final class StiffArmsPose {
         if (player != null && player.getPose() == Pose.SWIMMING) return false;
         return state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.FALL_FLYING;
     }
+
     public static void apply(PlayerModel model, AvatarRenderState state) {
         if (state != null && state.pose == Pose.SWIMMING) return;
         Player player = ArmPoseSupport.getPlayer(state);
@@ -58,5 +62,8 @@ public final class StiffArmsPose {
         if (blocking.left()) leftState.restore(model.leftArm, model.leftSleeve);
         else leftState.syncSleeve(model.leftArm, model.leftSleeve);
     }
-    public static float getAgeInTicks(Object state) { return ArmPoseSupport.getAgeInTicks(state); }
+
+    public static float getAgeInTicks(Object state) {
+        return ArmPoseSupport.getAgeInTicks(state);
+    }
 }

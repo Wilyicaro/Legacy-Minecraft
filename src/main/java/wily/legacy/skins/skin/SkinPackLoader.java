@@ -1,4 +1,5 @@
 package wily.legacy.skins.skin;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,13 +11,22 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.client.lang.SkinPackLang;
 import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.pose.SkinPoseRegistry;
-import wily.legacy.skins.util.DebugLog;
+import wily.legacy.skins.util.SkinsLogger;
+
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
+
 public final class SkinPackLoader {
     private static final Object LOCK = new Object();
+    private static final ResourceLocation DEFAULT_PACK_ICON = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "skinpacks/default/pack.png");
+    private static final String SKINPACKS_PREFIX = "skinpacks/";
+    private static final String DEFAULT_SKINPACKS_PREFIX = "default_skinpacks/";
+    private static final String ADVANCEMENT_FACES_DIR = "advancement_faces/";
+    private static final String PACK_JSON_SUFFIX = "/pack.json";
+    private static final String[] RESOURCE_ROOTS = {"skinpacks", "default_skinpacks"};
     private static volatile Map<String, SkinPack> PACKS = Map.of();
     private static volatile Map<String, SkinEntry> SKINS_BY_ID = Map.of();
     private static volatile Map<String, String> PACK_BY_SKIN = Map.of();
@@ -27,52 +37,80 @@ public final class SkinPackLoader {
     private static volatile String REQUESTED_FOCUS_SKIN_ID;
     private static volatile String REQUESTED_EDIT_PACK_ID;
     private static volatile String REQUESTED_REORDER_PACK_ID;
-    private static final ResourceLocation DEFAULT_PACK_ICON = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "skinpacks/default/pack.png");
-    private static final String SKINPACKS_PREFIX = "skinpacks/";
-    private static final String DEFAULT_SKINPACKS_PREFIX = "default_skinpacks/";
-    private static final String ADVANCEMENT_FACES_DIR = "advancement_faces/";
-    private static final String PACK_JSON_SUFFIX = "/pack.json";
-    private static final String[] RESOURCE_ROOTS = {"skinpacks", "default_skinpacks"};
-    private SkinPackLoader() { }
+
+    private SkinPackLoader() {
+    }
+
     public static Map<String, SkinPack> getPacks() {
         ensureLoaded();
         return PACKS;
     }
-    public static SkinEntry getSkin(String id) { if (!loaded) ensureLoaded(); return SKINS_BY_ID.get(id); }
-    public static String getSourcePackId(String skinId) { ensureLoaded(); return PACK_BY_SKIN.get(skinId); }
+
+    public static SkinEntry getSkin(String id) {
+        if (!loaded) ensureLoaded();
+        return SKINS_BY_ID.get(id);
+    }
+
+    public static String getSourcePackId(String skinId) {
+        ensureLoaded();
+        return PACK_BY_SKIN.get(skinId);
+    }
+
     public static ResourceLocation getAdvancementFace(String skinId) {
         if (!loaded) ensureLoaded();
         return skinId == null ? null : ADVANCEMENT_FACES_BY_SKIN.get(skinId);
     }
-    public static String getLastUsedCustomPackId() { return LegacyOptions.getLastUsedCustomPackIdOrNull(); }
-    public static void requestFocusPack(String packId) { REQUESTED_FOCUS_PACK_ID = requestId(packId); }
+
+    public static String getLastUsedCustomPackId() {
+        return LegacyOptions.getLastUsedCustomPackIdOrNull();
+    }
+
+    public static void setLastUsedCustomPackId(String packId) {
+        if (packId == null || packId.isBlank() || SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.isFavouritesPack(packId))
+            packId = null;
+        storeLastUsedCustomPackId(packId);
+    }
+
+    public static void requestFocusPack(String packId) {
+        REQUESTED_FOCUS_PACK_ID = requestId(packId);
+    }
+
     public static String consumeRequestedFocusPackId() {
         String packId = REQUESTED_FOCUS_PACK_ID;
         REQUESTED_FOCUS_PACK_ID = null;
         return packId;
     }
-    public static void requestFocusSkin(String skinId) { REQUESTED_FOCUS_SKIN_ID = requestId(skinId); }
+
+    public static void requestFocusSkin(String skinId) {
+        REQUESTED_FOCUS_SKIN_ID = requestId(skinId);
+    }
+
     public static String consumeRequestedFocusSkinId() {
         String skinId = REQUESTED_FOCUS_SKIN_ID;
         REQUESTED_FOCUS_SKIN_ID = null;
         return skinId;
     }
-    public static void requestEditPack(String packId) { REQUESTED_EDIT_PACK_ID = requestId(packId); }
+
+    public static void requestEditPack(String packId) {
+        REQUESTED_EDIT_PACK_ID = requestId(packId);
+    }
+
     public static String consumeRequestedEditPackId() {
         String packId = REQUESTED_EDIT_PACK_ID;
         REQUESTED_EDIT_PACK_ID = null;
         return packId;
     }
-    public static void requestReorderPack(String packId) { REQUESTED_REORDER_PACK_ID = requestId(packId); }
+
+    public static void requestReorderPack(String packId) {
+        REQUESTED_REORDER_PACK_ID = requestId(packId);
+    }
+
     public static String consumeRequestedReorderPackId() {
         String packId = REQUESTED_REORDER_PACK_ID;
         REQUESTED_REORDER_PACK_ID = null;
         return packId;
     }
-    public static void setLastUsedCustomPackId(String packId) {
-        if (packId == null || packId.isBlank() || SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.isFavouritesPack(packId)) packId = null;
-        storeLastUsedCustomPackId(packId);
-    }
+
     public static void ensureLoaded() {
         if (loaded) return;
         synchronized (LOCK) {
@@ -81,14 +119,22 @@ public final class SkinPackLoader {
             }
         }
     }
-    public static boolean isLoaded() { return loaded; }
-    public static int getReloadVersion() { return reloadVersion; }
+
+    public static boolean isLoaded() {
+        return loaded;
+    }
+
+    public static int getReloadVersion() {
+        return reloadVersion;
+    }
+
     public static String getPreferredDefaultPackId() {
         ensureLoaded();
         Map<String, SkinPack> packs = PACKS;
         if (packs.containsKey(SkinIdUtil.PACK_DEFAULT)) return SkinIdUtil.PACK_DEFAULT;
         return packs.keySet().stream().findFirst().orElse(null);
     }
+
     static int nextCustomPackSortIndex() {
         int minSort = Integer.MAX_VALUE;
         for (SkinPack pack : PACKS.values()) {
@@ -98,20 +144,24 @@ public final class SkinPackLoader {
         }
         return minSort == Integer.MAX_VALUE ? 0 : minSort - 1;
     }
+
     private static String requestId(String id) {
         return id == null || id.isBlank() ? null : id;
     }
+
     private static void storeLastUsedCustomPackId(String packId) {
         LegacyOptions.lastUsedCustomPackId.set(packId == null ? "" : packId);
         LegacyOptions.CLIENT_STORAGE.save();
     }
+
     public static void saveCustomPackOrder(Minecraft minecraft, List<String> orderedPackIds) throws IOException {
         if (minecraft == null) throw new IOException("Minecraft is not available");
         if (orderedPackIds == null || orderedPackIds.isEmpty()) return;
         ArrayList<SkinPack> orderedPacks = new ArrayList<>();
         for (String packId : orderedPackIds) {
             SkinPack pack = PACKS.get(packId);
-            if (pack == null || SkinIdUtil.PACK_DEFAULT.equals(pack.id()) || SkinIdUtil.PACK_FAVOURITES.equals(pack.id())) continue;
+            if (pack == null || SkinIdUtil.PACK_DEFAULT.equals(pack.id()) || SkinIdUtil.PACK_FAVOURITES.equals(pack.id()))
+                continue;
             orderedPacks.add(pack);
         }
         ArrayList<SkinPack> pending = new ArrayList<>();
@@ -130,13 +180,17 @@ public final class SkinPackLoader {
         wroteAny |= writeCustomPackSorts(minecraft, pending, leftRank, null);
         if (!wroteAny) throw new IOException("There were no editable skin packs to reorder");
     }
+
     public static void rebuildFavouritesPack() {
         ensureLoaded();
         LinkedHashMap<String, SkinPack> basePacks = new LinkedHashMap<>(PACKS);
         basePacks.remove(SkinIdUtil.PACK_FAVOURITES);
         LinkedHashMap<String, SkinPack> orderedPacks = withFavourites(basePacks, SKINS_BY_ID);
-        synchronized (LOCK) { PACKS = Collections.unmodifiableMap(orderedPacks); }
+        synchronized (LOCK) {
+            PACKS = Collections.unmodifiableMap(orderedPacks);
+        }
     }
+
     public static void loadPacks() {
         Minecraft client = Minecraft.getInstance();
         ResourceManager rm = client == null ? null : client.getResourceManager();
@@ -155,9 +209,10 @@ public final class SkinPackLoader {
             loadPacks(rm);
         } catch (RuntimeException ex) {
             loaded = false;
-            DebugLog.warn("SkinPackLoader.loadPacks called before resources are ready: {}", ex.toString());
+            SkinsLogger.warn("SkinPackLoader.loadPacks called before resources are ready: {}", ex.toString());
         }
     }
+
     public static void loadPacks(ResourceManager rm) {
         SkinPackLang.reload(rm);
         SkinPoseRegistry.beginReload();
@@ -175,7 +230,9 @@ public final class SkinPackLoader {
                 String prefix = path.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
                 loadSinglePack(ns, packId, packId, prefix, json, rm, state);
             }
-        } finally { SkinPoseRegistry.endReload(); }
+        } finally {
+            SkinPoseRegistry.endReload();
+        }
         LinkedHashMap<String, SkinPack> orderedBasePacks = sortPacks(state);
         LinkedHashMap<String, SkinPack> orderedPacks = withFavourites(orderedBasePacks, state.skinsById);
         applyBuiltinAutoSelection(orderedPacks);
@@ -188,7 +245,10 @@ public final class SkinPackLoader {
             reloadVersion++;
         }
     }
-    private static boolean isClientThread(Minecraft client) { return client == null || client.isSameThread(); }
+
+    private static boolean isClientThread(Minecraft client) {
+        return client == null || client.isSameThread();
+    }
 
     private static boolean writeCustomPackSorts(Minecraft minecraft, List<SkinPack> packs, Integer leftRank, Integer rightRank) throws IOException {
         List<Integer> ranks = assignSortRanks(leftRank, rightRank, packs.size());
@@ -206,6 +266,7 @@ public final class SkinPackLoader {
         }
         return wroteAny;
     }
+
     private static List<Integer> assignSortRanks(Integer leftRank, Integer rightRank, int count) throws IOException {
         ArrayList<Integer> values = new ArrayList<>(count);
         if (count <= 0) return values;
@@ -230,28 +291,36 @@ public final class SkinPackLoader {
         for (int i = 1; i <= count; i++) values.add(leftRank + step * i);
         return values;
     }
-    private static int sortRank(SkinPack pack) { return pack.sortIndex() * 1000 + pack.sortSubIndex(); }
+
+    private static int sortRank(SkinPack pack) {
+        return pack.sortIndex() * 1000 + pack.sortSubIndex();
+    }
+
     private static Map<ResourceLocation, Resource> listPackJsonResources(ResourceManager rm) {
         HashMap<ResourceLocation, Resource> jsons = new HashMap<>();
         for (String root : RESOURCE_ROOTS) addPackJsonResources(jsons, rm, root);
         return jsons;
     }
+
     private static void addPackJsonResources(Map<ResourceLocation, Resource> jsons, ResourceManager rm, String root) {
         try {
             jsons.putAll(rm.listResources(root, rl -> rl.getPath().endsWith(".json")));
         } catch (RuntimeException ex) {
-            DebugLog.warn("Failed to list {} resources: {}", root, ex.toString());
+            SkinsLogger.warn("Failed to list {} resources: {}", root, ex.toString());
         }
     }
+
     private static List<ResourceLocation> sortedResourceLocations(Map<ResourceLocation, Resource> resources) {
         ArrayList<ResourceLocation> ids = new ArrayList<>(resources.keySet());
         ids.sort(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
         return ids;
     }
+
     private static String parsePackId(String path) {
         String id = parsePackIdForPrefix(path, SKINPACKS_PREFIX);
         return id != null ? id : parsePackIdForPrefix(path, DEFAULT_SKINPACKS_PREFIX);
     }
+
     private static String parsePackIdForPrefix(String path, String prefix) {
         if (path == null || prefix == null) return null;
         if (!path.startsWith(prefix) || !path.endsWith(PACK_JSON_SUFFIX)) return null;
@@ -259,6 +328,7 @@ public final class SkinPackLoader {
         if (packPath.indexOf('/') >= 0 || packPath.startsWith("_")) return null;
         return packPath;
     }
+
     private static LinkedHashMap<String, SkinPack> withFavourites(Map<String, SkinPack> base, Map<String, SkinEntry> skinsById) {
         ArrayList<SkinEntry> fav = new ArrayList<>();
         for (String id : SkinDataStore.getFavorites()) {
@@ -267,7 +337,9 @@ public final class SkinPackLoader {
         }
         ResourceLocation favIcon = DEFAULT_PACK_ICON;
         SkinPack def = base.get(SkinIdUtil.PACK_DEFAULT);
-        if (def != null && def.icon() != null) { favIcon = def.icon(); }
+        if (def != null && def.icon() != null) {
+            favIcon = def.icon();
+        }
         SkinPack favPack = new SkinPack(SkinIdUtil.PACK_FAVOURITES, "key:legacy.favorites.pack", "", "", favIcon, fav, false, Integer.MIN_VALUE, true, 0);
         LinkedHashMap<String, SkinPack> out = new LinkedHashMap<>();
         if (def != null) out.put(SkinIdUtil.PACK_DEFAULT, def);
@@ -280,6 +352,7 @@ public final class SkinPackLoader {
         }
         return out;
     }
+
     private static void loadSinglePack(String namespace,
                                        String packId,
                                        String packFolder,
@@ -345,8 +418,10 @@ public final class SkinPackLoader {
                 if (modelId != null && modelLocation != null) BoxModelManager.registerAlias(modelId, modelLocation);
                 ResourceLocation cape = null;
                 if (capePath != null && !capePath.isBlank()) {
-                    if (capePath.startsWith(SKINPACKS_PREFIX) || capePath.startsWith(DEFAULT_SKINPACKS_PREFIX)) cape = ResourceLocation.fromNamespaceAndPath(namespace, capePath);
-                    else cape = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + capePath);
+                    if (capePath.startsWith(SKINPACKS_PREFIX) || capePath.startsWith(DEFAULT_SKINPACKS_PREFIX))
+                        cape = ResourceLocation.fromNamespaceAndPath(namespace, capePath);
+                    else
+                        cape = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + capePath);
                 }
                 ResourceLocation advancementFace = resolveAdvancementFace(namespace, packPrefix, packFolder, sourceId, rm);
                 collectPoseTagsFromSkinJson(o, loadedSkinId);
@@ -375,22 +450,25 @@ public final class SkinPackLoader {
         boolean has = json.has("sort_index") || json.has("sort");
         int sort = has
                 ? json.has("sort_index")
-                    ? SkinPackJson.integer(json.get("sort_index"), 0)
-                    : SkinPackJson.integer(json.get("sort"), 0)
+                  ? SkinPackJson.integer(json.get("sort_index"), 0)
+                  : SkinPackJson.integer(json.get("sort"), 0)
                 : 0;
         Integer sortSub = null;
         if (json.has("sort_sub_index")) sortSub = SkinPackJson.integer(json.get("sort_sub_index"), 0);
         else if (json.has("sort_sub")) sortSub = SkinPackJson.integer(json.get("sort_sub"), 0);
         state.packs.put(packId, new LoadedPack(new SkinPack(packId, name, author, type, icon, entries, editable, sort, has, sortSub == null ? 0 : sortSub), sort, has, sortSub, state.nextInsertIndex++));
     }
+
     private static ResourceLocation resolveAdvancementFace(String namespace, String packPrefix, String packFolder, String skinId, ResourceManager rm) {
-        if (rm == null || namespace == null || namespace.isBlank() || packFolder == null || packFolder.isBlank() || skinId == null || skinId.isBlank()) return null;
+        if (rm == null || namespace == null || namespace.isBlank() || packFolder == null || packFolder.isBlank() || skinId == null || skinId.isBlank())
+            return null;
         ResourceLocation face = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + ADVANCEMENT_FACES_DIR + skinId + ".png");
         if (rm.getResource(face).isPresent()) return face;
         if (DEFAULT_SKINPACKS_PREFIX.equals(packPrefix)) return null;
         ResourceLocation fallback = ResourceLocation.fromNamespaceAndPath(namespace, DEFAULT_SKINPACKS_PREFIX + packFolder + "/" + ADVANCEMENT_FACES_DIR + skinId + ".png");
         return rm.getResource(fallback).isPresent() ? fallback : null;
     }
+
     private static void applyBuiltinAutoSelection(Map<String, SkinPack> ordered) {
         String selectedPackId = getLastUsedCustomPackId();
         if (selectedPackId != null) {
@@ -405,6 +483,7 @@ public final class SkinPackLoader {
             return;
         }
     }
+
     private static void collectPoseTagsFromPackJson(String namespace, JsonObject packObj, Map<String, List<String>> skinIdsBySourceId) {
         if (packObj == null) return;
         JsonObject poses = poseObject(packObj);
@@ -415,6 +494,7 @@ public final class SkinPackLoader {
             collectPoseSelectors(e.getValue(), selector -> addPackPoseSelector(tag, selector, namespace, skinIdsBySourceId));
         }
     }
+
     private static void collectPoseTagsFromSkinJson(JsonObject skinObj, String skinId) {
         if (skinObj == null || skinId == null || skinId.isBlank()) return;
         JsonElement poses = poseValue(skinObj);
@@ -424,15 +504,18 @@ public final class SkinPackLoader {
             if (tag != null) SkinPoseRegistry.addSelector(tag, skinId, null);
         });
     }
+
     private static JsonObject poseObject(JsonObject obj) {
         JsonElement poses = poseValue(obj);
         return poses != null && poses.isJsonObject() ? poses.getAsJsonObject() : null;
     }
+
     private static JsonElement poseValue(JsonObject obj) {
         if (obj == null) return null;
         if (obj.has("poses")) return obj.get("poses");
         return obj.has("animations") ? obj.get("animations") : null;
     }
+
     private static void collectPoseSelectors(JsonElement value, Consumer<String> consumer) {
         if (value == null || consumer == null) return;
         if (value.isJsonArray()) {
@@ -446,6 +529,7 @@ public final class SkinPackLoader {
         String selector = SkinPackJson.string(value);
         if (selector != null) consumer.accept(selector);
     }
+
     private static void addPackPoseSelector(SkinPoseRegistry.PoseTag tag,
                                             String selector,
                                             String namespace,
@@ -460,6 +544,7 @@ public final class SkinPackLoader {
         }
         SkinPoseRegistry.addSelector(tag, selector, namespace);
     }
+
     private static String exactSourceId(String selector, String namespace) {
         if (selector == null) return null;
         String value = selector.trim();
@@ -468,16 +553,11 @@ public final class SkinPackLoader {
         if (split < 0) return value;
         return namespace == null || namespace.isBlank() || split != namespace.length() || !value.startsWith(namespace + ":") ? null : value.substring(split + 1);
     }
-    private record SkinEntryWithIndex(SkinEntry entry, int index) { }
-    private record LoadedPack(SkinPack pack, int sortIndex, boolean hasSort, Integer sortSubIndex, int insertIndex) { }
-    private static final class PackLoadState {
-        private final LinkedHashMap<String, LoadedPack> packs = new LinkedHashMap<>();
-        private final LinkedHashMap<String, SkinEntry> skinsById = new LinkedHashMap<>();
-        private final LinkedHashMap<String, String> packBySkin = new LinkedHashMap<>();
-        private final LinkedHashMap<String, ResourceLocation> advancementFacesBySkin = new LinkedHashMap<>();
-        private int nextInsertIndex;
+
+    public static String nameString(String name, String fallbackId) {
+        return SkinPackLang.translateMaybeKey(name, fallbackId);
     }
-    public static String nameString(String name, String fallbackId) { return SkinPackLang.translateMaybeKey(name, fallbackId); }
+
     private static LinkedHashMap<String, SkinPack> sortPacks(PackLoadState state) {
         ArrayList<Map.Entry<String, LoadedPack>> entries = new ArrayList<>(state.packs.entrySet());
         entries.sort((left, right) -> {
@@ -485,7 +565,8 @@ public final class SkinPackLoader {
             LoadedPack rightPack = right.getValue();
             if (leftPack.hasSort() != rightPack.hasSort()) return leftPack.hasSort() ? -1 : 1;
             if (!leftPack.hasSort()) return Integer.compare(leftPack.insertIndex(), rightPack.insertIndex());
-            if (leftPack.sortIndex() != rightPack.sortIndex()) return Integer.compare(leftPack.sortIndex(), rightPack.sortIndex());
+            if (leftPack.sortIndex() != rightPack.sortIndex())
+                return Integer.compare(leftPack.sortIndex(), rightPack.sortIndex());
             return Integer.compare(leftPack.insertIndex(), rightPack.insertIndex());
         });
 
@@ -506,6 +587,7 @@ public final class SkinPackLoader {
         flushSortedBucket(ordered, bucket);
         return ordered;
     }
+
     private static void flushSortedBucket(LinkedHashMap<String, SkinPack> ordered, ArrayList<Map.Entry<String, LoadedPack>> bucket) {
         if (bucket.isEmpty()) return;
         ArrayList<ResolvedPack> resolved = new ArrayList<>(bucket.size());
@@ -521,5 +603,21 @@ public final class SkinPackLoader {
         for (ResolvedPack pack : resolved) ordered.put(pack.id(), pack.pack());
         bucket.clear();
     }
-    private record ResolvedPack(String id, SkinPack pack, int insertIndex) { }
+
+    private record SkinEntryWithIndex(SkinEntry entry, int index) {
+    }
+
+    private record LoadedPack(SkinPack pack, int sortIndex, boolean hasSort, Integer sortSubIndex, int insertIndex) {
+    }
+
+    private static final class PackLoadState {
+        private final LinkedHashMap<String, LoadedPack> packs = new LinkedHashMap<>();
+        private final LinkedHashMap<String, SkinEntry> skinsById = new LinkedHashMap<>();
+        private final LinkedHashMap<String, String> packBySkin = new LinkedHashMap<>();
+        private final LinkedHashMap<String, ResourceLocation> advancementFacesBySkin = new LinkedHashMap<>();
+        private int nextInsertIndex;
+    }
+
+    private record ResolvedPack(String id, SkinPack pack, int insertIndex) {
+    }
 }

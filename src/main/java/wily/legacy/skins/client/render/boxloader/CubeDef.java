@@ -7,4 +7,5 @@ public record CubeDef(
         float inflate,
         boolean mirror,
         Boolean visible
-) { }
+) {
+}

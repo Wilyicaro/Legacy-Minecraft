@@ -1,25 +1,32 @@
 package wily.legacy.skins.client.screen;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.skins.SkinsClientBootstrap;
 import wily.legacy.skins.client.changeskin.ChangeSkinPackList;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.skin.*;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.util.LegacyComponents;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 final class CustomSkinPackFlow {
     private final AbstractChangeSkinScreen screen;
     private String editingPackId, reorderingPackId;
     private boolean pendingRefresh;
     private String pendingPackId, pendingSkinId;
-    CustomSkinPackFlow(AbstractChangeSkinScreen screen) { this.screen = screen; }
+
+    CustomSkinPackFlow(AbstractChangeSkinScreen screen) {
+        this.screen = screen;
+    }
+
     void openOptionsScreen() {
         if (screen.minecraft == null) return;
         Screen rootParent = screen.rootParentScreen();
@@ -55,24 +62,40 @@ final class CustomSkinPackFlow {
         });
         screen.playPressSound();
     }
-    boolean isEditing(String packId) { return packId != null && packId.equals(editingPackId); }
-    boolean isEditing() { return editingPackId != null; }
+
+    boolean isEditing(String packId) {
+        return packId != null && packId.equals(editingPackId);
+    }
+
+    boolean isEditing() {
+        return editingPackId != null;
+    }
+
     void setEditing(String packId) {
         editingPackId = packId == null || packId.isBlank() ? null : packId;
         if (editingPackId != null) reorderingPackId = null;
     }
-    boolean isReordering() { return reorderingPackId != null; }
+
+    boolean isReordering() {
+        return reorderingPackId != null;
+    }
+
     void setReordering(String packId) {
         reorderingPackId = packId == null || packId.isBlank() ? null : packId;
         if (reorderingPackId != null) editingPackId = null;
     }
-    String reorderingPackId() { return reorderingPackId; }
+
+    String reorderingPackId() {
+        return reorderingPackId;
+    }
+
     void queueRefresh(String packId, String skinId) {
         pendingRefresh = true;
         pendingPackId = packId;
         pendingSkinId = skinId;
         if (packId != null && !packId.isBlank()) editingPackId = packId;
     }
+
     void applyPendingRefresh() {
         if (!pendingRefresh || screen.minecraft == null || screen.minecraft.getResourceManager() == null) return;
         pendingRefresh = false;
@@ -82,11 +105,18 @@ final class CustomSkinPackFlow {
         pendingSkinId = null;
         reloadCustomPackResources(packId, skinId);
     }
+
     void handlePackReload() {
-        if (editingPackId != null && !CustomSkinPackStore.isCustomPack(screen.minecraft, editingPackId)) editingPackId = null;
-        if (reorderingPackId != null && !CustomSkinPackStore.isCustomPack(screen.minecraft, reorderingPackId)) reorderingPackId = null;
+        if (editingPackId != null && !CustomSkinPackStore.isCustomPack(screen.minecraft, editingPackId))
+            editingPackId = null;
+        if (reorderingPackId != null && !CustomSkinPackStore.isCustomPack(screen.minecraft, reorderingPackId))
+            reorderingPackId = null;
     }
-    boolean moveReorderingPack(int delta) { return moveReorderingPack(delta, true); }
+
+    boolean moveReorderingPack(int delta) {
+        return moveReorderingPack(delta, true);
+    }
+
     boolean moveReorderingPack(int delta, boolean playSound) {
         if (screen.minecraft == null || delta == 0 || !isReordering()) return false;
         if (reorderingPackId != null) screen.packList.focusPackId(reorderingPackId, false);
@@ -97,6 +127,7 @@ final class CustomSkinPackFlow {
         if (playSound) screen.playPressSound();
         return true;
     }
+
     boolean moveReorderingPackTo(int targetIndex) {
         if (screen.minecraft == null || !isReordering()) return false;
         if (reorderingPackId != null) screen.packList.focusPackId(reorderingPackId, false);
@@ -107,6 +138,7 @@ final class CustomSkinPackFlow {
         screen.playPressSound();
         return true;
     }
+
     void finishReorderingPack() {
         if (screen.minecraft == null || !isReordering()) return;
         String packId = reorderingPackId;
@@ -118,32 +150,42 @@ final class CustomSkinPackFlow {
             screen.showError(Component.translatable("legacy.menu.reorder_custom_skin_pack"), ex);
         }
     }
-    private SkinPack focusedPack() { return screen.packList.getFocusedPack(); }
+
+    private SkinPack focusedPack() {
+        return screen.packList.getFocusedPack();
+    }
+
     String focusedCustomPackId() {
         SkinPack focusedPack = focusedPack();
         return focusedPack != null && focusedPack.editable() ? focusedPack.id() : null;
     }
+
     String focusedDownloadedPackId() {
         if (screen.minecraft == null) return null;
         SkinPack focusedPack = focusedPack();
         if (focusedPack == null || focusedPack.editable()) return null;
         return DownloadedSkinPackStore.isDownloadedPack(screen.minecraft, focusedPack.id()) ? focusedPack.id() : null;
     }
+
     boolean isImportSkinSelection(String skinId) {
         String packId = focusedCustomPackId();
-        return packId != null && CustomSkinPackStore.isImportSkin(packId, skinId);
+        return CustomSkinPackStore.isImportSkin(packId, skinId);
     }
+
     boolean isEditableSkinSelection(String skinId) {
         String packId = focusedCustomPackId();
         return packId != null && skinId != null && !skinId.isBlank() && !CustomSkinPackStore.isImportSkin(packId, skinId);
     }
+
     boolean isLockedSkinSelection(String skinId) {
         return isEditing() && skinId != null && !skinId.isBlank() && !isImportSkinSelection(skinId) && !isEditableSkinSelection(skinId);
     }
+
     private String selectedSkinId() {
         PlayerSkinWidget center = screen.getCenterWidget();
         return center == null ? null : center.skinId.get();
     }
+
     void editSelectedSkin() {
         if (screen.minecraft == null) return;
         String packId = focusedCustomPackId();
@@ -163,6 +205,7 @@ final class CustomSkinPackFlow {
         screen.minecraft.setScreen(ImportCustomSkinScreen.edit(screen, screen.rootParentScreen(), packId, skin.id(), skin.name(), theme, poses, savedSkinId -> queueRefresh(packId, savedSkinId)));
         screen.playPressSound();
     }
+
     void moveSelectedSkin(int delta) {
         if (screen.minecraft == null || delta == 0) return;
         String packId = focusedCustomPackId();
@@ -180,6 +223,7 @@ final class CustomSkinPackFlow {
             screen.showError(Component.translatable("legacy.menu.edit_custom_skin_pack_skins"), ex);
         }
     }
+
     void openDeleteSelectedSkin() {
         String packId = focusedCustomPackId();
         String skinId = selectedSkinId();
@@ -187,6 +231,7 @@ final class CustomSkinPackFlow {
         openRemoveScreen(Component.translatable("legacy.menu.delete_custom_skin_title"), Component.translatable("legacy.menu.delete_custom_skin_message"), () -> deleteSelectedSkin(packId, skinId));
         screen.playPressSound();
     }
+
     private int optionsHeight(String customPackId, String downloadedPackId) {
         boolean sd = LegacyOptions.getUIMode().isSD();
         int buttonStep = sd ? 19 : 22;
@@ -198,23 +243,30 @@ final class CustomSkinPackFlow {
         int height = sd ? 50 : 75;
         return height + Math.max(0, count - 1) * buttonStep;
     }
-    private void openCreateScreen(Screen rootParent) { if (screen.minecraft != null) screen.minecraft.setScreen(CreateCustomSkinPackScreen.create(screen, rootParent)); }
+
+    private void openCreateScreen(Screen rootParent) {
+        if (screen.minecraft != null) screen.minecraft.setScreen(CreateCustomSkinPackScreen.create(screen, rootParent));
+    }
+
     private void openEditScreen(Screen rootParent, String packId) {
         if (screen.minecraft == null || packId == null) return;
         SkinPack pack = focusedPack();
         if (pack == null || !packId.equals(pack.id())) pack = SkinPackLoader.getPacks().get(packId);
         screen.minecraft.setScreen(CreateCustomSkinPackScreen.edit(screen, rootParent, packId, pack == null ? packId : pack.name()));
     }
+
     private void toggleEditMode(String packId) {
         if (screen.minecraft == null) return;
         setEditing(isEditing() ? null : packId);
         screen.minecraft.setScreen(screen);
     }
+
     private void openPackRemoveScreen(Screen rootParent, String customPackId, String downloadedPackId) {
         String packId = customPackId != null ? customPackId : downloadedPackId;
         if (packId == null) return;
         openRemoveScreen(Component.translatable("legacy.menu.delete_custom_skin_pack_title").withStyle(ChatFormatting.BOLD), Component.translatable("legacy.menu.delete_custom_skin_pack_message"), () -> removePack(rootParent, customPackId, downloadedPackId));
     }
+
     private void removePack(Screen rootParent, String customPackId, String downloadedPackId) {
         if (screen.minecraft == null) return;
         String packId = customPackId != null ? customPackId : downloadedPackId;
@@ -222,7 +274,8 @@ final class CustomSkinPackFlow {
         try {
             if (customPackId != null) {
                 CustomSkinPackStore.deletePack(screen.minecraft, customPackId);
-                if (customPackId.equals(SkinPackLoader.getLastUsedCustomPackId())) SkinPackLoader.setLastUsedCustomPackId(null);
+                if (customPackId.equals(SkinPackLoader.getLastUsedCustomPackId()))
+                    SkinPackLoader.setLastUsedCustomPackId(null);
             } else {
                 DownloadedSkinPackStore.deletePack(screen.minecraft, packId);
             }
@@ -232,6 +285,7 @@ final class CustomSkinPackFlow {
             screen.showError(Component.translatable(customPackId != null ? "legacy.menu.remove_custom_skin_pack" : "legacy.menu.remove_pack"), ex);
         }
     }
+
     void syncReorderingPackList() {
         if (!isReordering() || reorderingPackId == null) return;
         screen.packList.focusPackId(reorderingPackId, false);
@@ -239,6 +293,7 @@ final class CustomSkinPackFlow {
         if (button == null) return;
         screen.getRenderableVList().focusRenderable(button);
     }
+
     private void reloadCustomPackResources(String packId, String skinId) {
         if (screen.minecraft == null || screen.minecraft.getResourceManager() == null) return;
         releasePackResources(focusedPack());
@@ -255,6 +310,7 @@ final class CustomSkinPackFlow {
         }
         SkinPackLoader.requestFocusSkin(skinId);
     }
+
     private void releasePackResources(SkinPack pack) {
         if (screen.minecraft == null || pack == null) return;
         if (pack.icon() != null) screen.minecraft.getTextureManager().release(pack.icon());
@@ -265,6 +321,7 @@ final class CustomSkinPackFlow {
             if (entry.cape() != null) screen.minecraft.getTextureManager().release(entry.cape());
         }
     }
+
     private void deleteSelectedSkin(String packId, String skinId) {
         if (screen.minecraft == null) return;
         try {
@@ -286,6 +343,7 @@ final class CustomSkinPackFlow {
             screen.showError(Component.translatable("legacy.menu.remove_custom_skin"), ex);
         }
     }
+
     private void openRemoveScreen(Component title, Component message, Runnable action) {
         if (screen.minecraft == null) return;
         screen.minecraft.setScreen(new ConfirmationScreen(screen, ConfirmationScreen::getPanelWidth, ConfirmationScreen::getBaseHeight, title, message, s -> action.run()) {

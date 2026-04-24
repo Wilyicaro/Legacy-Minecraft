@@ -1,4 +1,5 @@
 package wily.legacy.skins.skin;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -6,12 +7,13 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.GsonHelper;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import wily.legacy.client.PackAlbum;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -20,18 +22,22 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
+
 public final class SkinPackFiles {
     private SkinPackFiles() {
     }
+
     static Path resourcePackDir(Minecraft minecraft, String dirName) {
         if (minecraft == null || minecraft.gameDirectory == null) return null;
         return minecraft.gameDirectory.toPath().resolve("resourcepacks").resolve(dirName);
     }
+
     static boolean isPackInResourcePack(Minecraft minecraft, String dirName, String packsDir, String packId) {
         if (packId == null || packId.isBlank()) return false;
         Path dir = resourcePackDir(minecraft, dirName);
         return dir != null && Files.isDirectory(dir.resolve(packsDir).resolve(packId));
     }
+
     static boolean enableResourcePack(Minecraft minecraft, String dirName, String description, String iconResource, String iconError) throws IOException {
         if (minecraft == null) throw new IOException("Minecraft is not available");
         PackRepository repository = minecraft.getResourcePackRepository();
@@ -54,6 +60,7 @@ public final class SkinPackFiles {
         }
         return changed;
     }
+
     public static Path choosePng(Minecraft minecraft, String title) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             PointerBuffer filters = stack.mallocPointer(1);
@@ -64,6 +71,7 @@ public final class SkinPackFiles {
             return path == null || path.isBlank() ? null : Path.of(path);
         }
     }
+
     static boolean managesTargetDirectory(String folderName, String targetDir) {
         if (folderName == null || targetDir == null) return false;
         String normalized = folderName.replace('\\', '/').trim();
@@ -71,9 +79,11 @@ public final class SkinPackFiles {
         while (normalized.endsWith("/")) normalized = normalized.substring(0, normalized.length() - 1);
         return targetDir.equals(normalized);
     }
+
     static boolean isPackInstall(Path packDir) {
         return packDir != null && Files.isRegularFile(packDir.resolve("pack.json"));
     }
+
     static JsonObject readJson(Path path) throws IOException {
         if (!Files.isRegularFile(path)) return new JsonObject();
         try {
@@ -83,6 +93,7 @@ public final class SkinPackFiles {
             throw new IOException("Invalid JSON in " + path.getFileName(), ex);
         }
     }
+
     static void writeJson(Path path, JsonObject root) throws IOException {
         Files.createDirectories(path.getParent());
         try (JsonWriter writer = new JsonWriter(Files.newBufferedWriter(path, StandardCharsets.UTF_8))) {
@@ -91,6 +102,7 @@ public final class SkinPackFiles {
             GsonHelper.writeValue(writer, root, null);
         }
     }
+
     static void copyBundledResource(Class<?> owner, String resource, Path target, String error) throws IOException {
         Files.createDirectories(target.getParent());
         try (InputStream in = owner.getResourceAsStream(resource)) {
@@ -98,6 +110,7 @@ public final class SkinPackFiles {
             Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
         }
     }
+
     static void ensureResourcePackShell(Path resourcePackDir, String description, String iconResource, String iconError) throws IOException {
         Files.createDirectories(resourcePackDir.resolve("assets/lce_skinpacks/skinpacks"));
         if (!Files.exists(resourcePackDir.resolve("pack.mcmeta"))) {
@@ -120,18 +133,21 @@ public final class SkinPackFiles {
             copyBundledResource(CustomSkinPackStore.class, iconResource, resourcePackDir.resolve("pack.png"), iconError);
         }
     }
+
     static void deleteTree(Path root) throws IOException {
         if (!Files.exists(root)) return;
         try (var paths = Files.walk(root).sorted(Comparator.reverseOrder())) {
             for (Path path : (Iterable<Path>) paths::iterator) Files.deleteIfExists(path);
         }
     }
+
     static void deleteSkinFiles(Path packDir, String skinId) throws IOException {
         Files.deleteIfExists(packDir.resolve("skins").resolve(skinId + ".png"));
         Files.deleteIfExists(packDir.resolve("box_models").resolve(skinId + ".json"));
         Files.deleteIfExists(packDir.resolve("box_textures").resolve(skinId + ".png"));
         Files.deleteIfExists(packDir.resolve("advancement_faces").resolve(skinId + ".png"));
     }
+
     static void copySkinPng(Path source, Path target) throws IOException {
         if (source == null || !Files.isRegularFile(source)) throw new IOException("Skin file was not found");
         try (InputStream in = Files.newInputStream(source); NativeImage image = NativeImage.read(in)) {
@@ -156,6 +172,7 @@ public final class SkinPackFiles {
             throw new IOException("Skin must be a valid PNG", ex);
         }
     }
+
     static void validateSquarePng(Path path, String label, int minSize, int maxSize) throws IOException {
         if (path == null || !Files.isRegularFile(path)) throw new IOException(label + " file was not found");
         try (InputStream in = Files.newInputStream(path); NativeImage image = NativeImage.read(in)) {
@@ -168,12 +185,14 @@ public final class SkinPackFiles {
             throw new IOException(label + " must be a valid PNG", ex);
         }
     }
+
     private static String resolveResourcePackId(PackRepository repository, String... ids) {
         for (String id : ids) {
             if (repository.getPack(id) != null) return id;
         }
         return null;
     }
+
     private static NativeImage convertLegacySkin(NativeImage image) {
         NativeImage converted = new NativeImage(64, 64, true);
         converted.copyFrom(image);
@@ -196,6 +215,7 @@ public final class SkinPackFiles {
         setNoAlpha(converted, 16, 48, 48, 64);
         return converted;
     }
+
     private static void doNotchTransparencyHack(NativeImage image, int startX, int startY, int endX, int endY) {
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
@@ -208,6 +228,7 @@ public final class SkinPackFiles {
             }
         }
     }
+
     private static void setNoAlpha(NativeImage image, int startX, int startY, int endX, int endY) {
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
@@ -215,6 +236,7 @@ public final class SkinPackFiles {
             }
         }
     }
+
     private static boolean isManagedResourcePackId(String id, String dirName) {
         return ("file/" + dirName).equals(id) || dirName.equals(id);
     }

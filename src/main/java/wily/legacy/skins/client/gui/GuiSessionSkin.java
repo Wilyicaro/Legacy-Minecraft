@@ -1,10 +1,10 @@
 package wily.legacy.skins.client.gui;
 
 import com.mojang.authlib.GameProfile;
-import wily.legacy.skins.skin.ClientSkinCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.PlayerSkin;
+import wily.legacy.skins.skin.ClientSkinCache;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +18,8 @@ public final class GuiSessionSkin {
     private static volatile String cachedLookupKey;
     private static volatile CompletableFuture<Optional<PlayerSkin>> cachedLookup;
 
-    private GuiSessionSkin() { }
+    private GuiSessionSkin() {
+    }
 
     public static void prewarm() {
         Minecraft mc = Minecraft.getInstance();
@@ -47,7 +48,9 @@ public final class GuiSessionSkin {
                     cacheSessionSkin(profile, liveSkin);
                     return liveSkin;
                 }
-            } finally { ClientSkinCache.popBypassSkinOverride(); }
+            } finally {
+                ClientSkinCache.popBypassSkinOverride();
+            }
         }
 
         return null;
@@ -137,7 +140,8 @@ public final class GuiSessionSkin {
                 if (!key.equals(cachedLookupKey) || result == null || result.isEmpty()) return;
                 cacheSessionSkin(profile, result.get());
             });
-        } catch (RuntimeException ignored) { }
+        } catch (RuntimeException ignored) {
+        }
     }
 
     private static boolean isDefaultSkin(PlayerSkin skin) {

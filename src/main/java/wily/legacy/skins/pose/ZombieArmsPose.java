@@ -7,7 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class ZombieArmsPose {
-    private ZombieArmsPose() { }
+    private ZombieArmsPose() {
+    }
 
     public static boolean shouldApply(AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return false;

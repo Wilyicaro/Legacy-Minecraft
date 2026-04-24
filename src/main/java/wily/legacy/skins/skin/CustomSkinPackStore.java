@@ -1,11 +1,17 @@
 package wily.legacy.skins.skin;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import wily.legacy.skins.pose.SkinPoseRegistry;
+
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+
 public final class CustomSkinPackStore {
     private static final String RESOURCE_PACK_DIR = "Legacy Custom Skinpacks";
     private static final String RESOURCE_PACK_ID = "file/" + RESOURCE_PACK_DIR;
@@ -17,8 +23,10 @@ public final class CustomSkinPackStore {
     private static final String RESOURCE_PACK_ICON = "/assets/legacy/skin_templates/custom_skinpacks_pack.png";
     private static final String IMPORT_NAME_KEY = "legacy.menu.import_skin";
     private static final String SLIM = "slim";
+
     private CustomSkinPackStore() {
     }
+
     public static String createPack(Minecraft minecraft, String name, Path iconPath) throws IOException {
         if (minecraft == null) throw new IOException("Minecraft is not available");
         Path resourcePackDir = resourcePackDir(minecraft);
@@ -42,6 +50,7 @@ public final class CustomSkinPackStore {
         }
         return packId;
     }
+
     public static String importSkin(Minecraft minecraft, String packId, String name, String theme, List<String> poses, Path skinPath) throws IOException {
         Path packDir = requirePackDir(minecraft, packId);
         String displayName = SkinIdUtil.cleanName(name, "Custom Skin");
@@ -57,23 +66,31 @@ public final class CustomSkinPackStore {
         writeSkinModel(packDir.resolve("box_models").resolve(skinId + ".json"), themeText == null ? null : themeKey, poseKeys);
         return skinId;
     }
+
     public static boolean isCustomPack(Minecraft minecraft, String packId) {
         return SkinPackFiles.isPackInResourcePack(minecraft, RESOURCE_PACK_DIR, PACKS_DIR, packId);
     }
+
     public static boolean managesTargetDirectory(String folderName) {
         return SkinPackFiles.managesTargetDirectory(folderName, TARGET_DIRECTORY_NAME);
     }
+
     public static void normalizeDownloadedPack(Path packDir) throws IOException {
         DownloadedSkinPackStore.normalizePack(packDir, "community");
     }
+
     public static boolean isImportSkin(String packId, String skinId) {
-        return packId != null && skinId != null && importSkinId(packId).equals(skinId);
+        return packId != null && importSkinId(packId).equals(skinId);
     }
-    public static boolean isEditableSkin(Minecraft minecraft, String packId, String skinId) throws IOException { return isCustomPack(minecraft, packId) && skinId != null && !skinId.isBlank() && !isImportSkin(packId, skinId); }
+
+    public static boolean isEditableSkin(Minecraft minecraft, String packId, String skinId) throws IOException {
+        return isCustomPack(minecraft, packId) && skinId != null && !skinId.isBlank() && !isImportSkin(packId, skinId);
+    }
 
     public static String importSkinId(String packId) {
         return packId + "_import_skin";
     }
+
     public static void updatePack(Minecraft minecraft, String packId, String name, Path iconPath) throws IOException {
         Path packDir = requirePackDir(minecraft, packId);
         writePackName(packDir.resolve("lang/en_us.json"), packId, SkinIdUtil.cleanName(name, "Custom Skin Pack"));
@@ -85,6 +102,7 @@ public final class CustomSkinPackStore {
             }
         }
     }
+
     public static void updateSkin(Minecraft minecraft, String packId, String skinId, String name, String theme, List<String> poses, Path skinPath) throws IOException {
         Path dir = requirePackDir(minecraft, packId);
         requireEditableSkin(minecraft, packId, skinId, "edited");
@@ -97,6 +115,7 @@ public final class CustomSkinPackStore {
         writeSkinLang(dir.resolve("lang/en_us.json"), packId, skinId, displayName, themeText);
         writeSkinModel(dir.resolve("box_models").resolve(skinId + ".json"), themeText == null ? null : "custom." + packId + "." + skinId + ".theme", poseKeys);
     }
+
     public static void moveSkin(Minecraft minecraft, String packId, String skinId, int delta) throws IOException {
         Path packJson = requirePackDir(minecraft, packId).resolve("pack.json");
         if (delta == 0 || !isEditableSkin(minecraft, packId, skinId)) return;
@@ -110,6 +129,7 @@ public final class CustomSkinPackStore {
         skins.add(target, skin);
         SkinPackJson.writeOrderedSkins(packJson, skins);
     }
+
     public static void deleteSkin(Minecraft minecraft, String packId, String skinId) throws IOException {
         Path dir = requirePackDir(minecraft, packId);
         requireEditableSkin(minecraft, packId, skinId, "removed");
@@ -122,31 +142,39 @@ public final class CustomSkinPackStore {
         removeSkinLang(dir.resolve("lang/en_us.json"), packId, skinId);
         SkinPackFiles.deleteSkinFiles(dir, skinId);
     }
+
     public static void deletePack(Minecraft minecraft, String packId) throws IOException {
         SkinPackFiles.deleteTree(requirePackDir(minecraft, packId));
     }
+
     public static boolean enableResourcePack(Minecraft minecraft) throws IOException {
         return SkinPackFiles.enableResourcePack(minecraft, RESOURCE_PACK_DIR, PACK_DESCRIPTION, RESOURCE_PACK_ICON, "Missing bundled custom skin pack resource icon");
     }
+
     private static Path resourcePackDir(Minecraft minecraft) {
         return SkinPackFiles.resourcePackDir(minecraft, RESOURCE_PACK_DIR);
     }
+
     private static Path packDir(Minecraft minecraft, String packId) {
         Path dir = resourcePackDir(minecraft);
         if (dir == null) throw new IllegalStateException("Game directory is not available");
         return dir.resolve(PACKS_DIR).resolve(packId);
     }
+
     static Path packJsonPath(Minecraft minecraft, String packId) {
         return packDir(minecraft, packId).resolve("pack.json");
     }
+
     private static Path requirePackDir(Minecraft minecraft, String packId) throws IOException {
         if (!isCustomPack(minecraft, packId)) throw new IOException("Custom skin pack was not found");
         return packDir(minecraft, packId);
     }
+
     private static void requireEditableSkin(Minecraft minecraft, String packId, String skinId, String action) throws IOException {
         if (skinId == null || skinId.isBlank()) throw new IOException("Custom skin was not found");
         if (!isEditableSkin(minecraft, packId, skinId)) throw new IOException("This skin cannot be " + action);
     }
+
     private static void writePackJson(Path path, String packId, int sortIndex, String importSkinId) throws IOException {
         JsonObject root = new JsonObject();
         root.addProperty("name", "key:custom." + packId + ".pack.name");
@@ -161,6 +189,7 @@ public final class CustomSkinPackStore {
         root.add("skins", skins);
         SkinPackFiles.writeJson(path, root);
     }
+
     private static JsonObject createSkinEntry(String skinId, String name, String texture, int order) {
         JsonObject skin = new JsonObject();
         skin.addProperty("id", skinId);
@@ -169,6 +198,7 @@ public final class CustomSkinPackStore {
         skin.addProperty("order", order);
         return skin;
     }
+
     private static void appendSkin(Path path, JsonObject skin) throws IOException {
         JsonObject root = SkinPackFiles.readJson(path);
         JsonArray skins = root.has("skins") && root.get("skins").isJsonArray() ? root.getAsJsonArray("skins") : new JsonArray();
@@ -176,9 +206,11 @@ public final class CustomSkinPackStore {
         root.add("skins", skins);
         SkinPackFiles.writeJson(path, root);
     }
+
     private static void writePackName(Path path, String packId, String displayName) throws IOException {
         updateLang(path, root -> root.addProperty("custom." + packId + ".pack.name", displayName));
     }
+
     private static void writeSkinLang(Path path, String packId, String skinId, String displayName, String themeText) throws IOException {
         updateLang(path, root -> {
             root.addProperty("custom." + packId + "." + skinId + ".name", displayName);
@@ -186,17 +218,20 @@ public final class CustomSkinPackStore {
             else root.remove("custom." + packId + "." + skinId + ".theme");
         });
     }
+
     private static void removeSkinLang(Path path, String packId, String skinId) throws IOException {
         updateLang(path, root -> {
             root.remove("custom." + packId + "." + skinId + ".name");
             root.remove("custom." + packId + "." + skinId + ".theme");
         });
     }
+
     private static void updateLang(Path path, LangUpdate update) throws IOException {
         JsonObject root = SkinPackFiles.readJson(path);
         update.apply(root);
         SkinPackFiles.writeJson(path, root);
     }
+
     private static void writeSkinModel(Path path, String themeKey, List<String> poseKeys) throws IOException {
         JsonObject root = SkinPackFiles.readJson(path);
         if (themeKey != null && !themeKey.isBlank()) {
@@ -221,6 +256,7 @@ public final class CustomSkinPackStore {
         }
         SkinPackFiles.writeJson(path, root);
     }
+
     private static String nextPackId(Minecraft minecraft, String displayName) throws IOException {
         String base = SkinIdUtil.slug(displayName, "custom_skin");
         LinkedHashSet<String> used = new LinkedHashSet<>(SkinPackLoader.getPacks().keySet());
@@ -234,9 +270,11 @@ public final class CustomSkinPackStore {
         }
         return uniqueId(used, base);
     }
+
     private static String nextSkinId(Path packDir, String packId, String displayName) throws IOException {
         return uniqueId(SkinPackJson.readSkinIds(packDir.resolve("pack.json")), packId + "_" + SkinIdUtil.slug(displayName, "custom_skin"));
     }
+
     private static String normalizePose(String pose) {
         if (pose == null || pose.isBlank()) return null;
         String key = pose.trim().toLowerCase(Locale.ROOT);
@@ -244,6 +282,7 @@ public final class CustomSkinPackStore {
         SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(key);
         return tag == null ? null : tag.name().toLowerCase(Locale.ROOT);
     }
+
     private static List<String> normalizePoses(List<String> poses) {
         if (poses == null || poses.isEmpty()) return List.of();
         LinkedHashSet<String> out = new LinkedHashSet<>();
@@ -253,6 +292,7 @@ public final class CustomSkinPackStore {
         }
         return List.copyOf(out);
     }
+
     private static String uniqueId(Set<String> used, String base) {
         if (!used.contains(base)) return base;
         for (int i = 2; ; i++) {
@@ -260,6 +300,9 @@ public final class CustomSkinPackStore {
             if (!used.contains(candidate)) return candidate;
         }
     }
+
     @FunctionalInterface
-    private interface LangUpdate { void apply(JsonObject root); }
+    private interface LangUpdate {
+        void apply(JsonObject root);
+    }
 }

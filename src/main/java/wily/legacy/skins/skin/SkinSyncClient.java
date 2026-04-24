@@ -14,7 +14,7 @@ public final class SkinSyncClient {
     private SkinSyncClient() {
     }
 
-    public static void initClient() {
+    public static void init() {
         UUID userId = getUserId(Minecraft.getInstance());
         if (userId != null) loadStoredSelection(userId);
     }
@@ -95,6 +95,7 @@ public final class SkinSyncClient {
         }
         sendSelection(client, resolveSelectedSkinId(client));
     }
+
     public static void onSkinAssetsReloaded(Minecraft client) {
         if (client == null) return;
         STATE.sentAssets.clear();
@@ -119,16 +120,22 @@ public final class SkinSyncClient {
         ClientSkinCache.set(uuid, skinId);
     }
 
-    public static void onSyncSkin(UUID uuid, String skinId) { ClientSkinCache.set(uuid, skinId); }
+    public static void onSyncSkin(UUID uuid, String skinId) {
+        ClientSkinCache.set(uuid, skinId);
+    }
 
     static void onCloudSnapshot(Map<UUID, String> skins) {
         if (skins == null || skins.isEmpty()) return;
         skins.forEach(ClientSkinCache::set);
     }
 
-    private static UUID getUserId(Minecraft client) { return client == null || client.getUser() == null ? null : client.getUser().getProfileId(); }
+    private static UUID getUserId(Minecraft client) {
+        return client == null || client.getUser() == null ? null : client.getUser().getProfileId();
+    }
 
-    private static boolean isConnected(Minecraft client) { return client != null && client.player != null && client.getConnection() != null; }
+    private static boolean isConnected(Minecraft client) {
+        return client != null && client.player != null && client.getConnection() != null;
+    }
 
     private static String loadStoredSelection(UUID userId) {
         String skinId = SkinDataStore.getSelectedSkin(userId);
@@ -194,7 +201,8 @@ public final class SkinSyncClient {
     }
 
     private static void sendAssets(Minecraft client, String skinId) {
-        if (SkinIdUtil.isBlankOrAutoSelect(skinId) || STATE.sentAssets.putIfAbsent(skinId, Boolean.TRUE) != null) return;
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId) || STATE.sentAssets.putIfAbsent(skinId, Boolean.TRUE) != null)
+            return;
         ClientSkinAssets.AssetData assets = ClientSkinAssets.resolveAssetData(client, skinId);
         sendAssetChunks(skinId, SkinSync.ASSET_TEXTURE, assets.texture());
         sendAssetChunks(skinId, SkinSync.ASSET_MODEL, assets.model());
@@ -224,15 +232,15 @@ public final class SkinSyncClient {
 
     private static final class State {
         private static final int SCAN_INTERVAL = 20;
+        private final ConcurrentHashMap<String, Boolean> sentAssets = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, SkinSync.SkinChunkAccumulator> assetChunks = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<UUID, String> lastApplied = new ConcurrentHashMap<>();
         private String pendingSkinId;
         private String pendingPackId;
         private boolean pendingUpload;
         private boolean sessionAnnounced;
         private int snapshotDelay = -1;
         private int scanTick;
-        private final ConcurrentHashMap<String, Boolean> sentAssets = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<String, SkinSync.SkinChunkAccumulator> assetChunks = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<UUID, String> lastApplied = new ConcurrentHashMap<>();
 
         private void reset() {
             pendingSkinId = null;

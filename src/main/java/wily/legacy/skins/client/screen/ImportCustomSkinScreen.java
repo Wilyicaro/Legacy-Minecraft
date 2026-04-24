@@ -1,4 +1,5 @@
 package wily.legacy.skins.client.screen;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -6,22 +7,27 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import wily.legacy.skins.SkinsClientBootstrap;
-import wily.legacy.skins.pose.SkinPoseRegistry;
-import wily.legacy.skins.client.preview.PlayerSkinWidget;
-import wily.legacy.skins.skin.CustomSkinPackStore;
-import wily.legacy.skins.skin.SkinPackFiles;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.TickBox;
+import wily.legacy.skins.SkinsClientBootstrap;
+import wily.legacy.skins.client.preview.PlayerSkinWidget;
+import wily.legacy.skins.pose.SkinPoseRegistry;
+import wily.legacy.skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.SkinPackFiles;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
+
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
+
 public class ImportCustomSkinScreen extends ConfirmationScreen {
     private static final Component IMPORT_TITLE = Component.translatable("legacy.menu.import_custom_skin");
     private static final Component IMPORT_MESSAGE = Component.translatable("legacy.menu.import_custom_skin_message");
@@ -47,10 +53,11 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
     private Path skinPath;
     private boolean openedPicker;
     private boolean closeOnFirstCancel;
-    public ImportCustomSkinScreen(Screen parent, Screen rootParent, String packId, Consumer<String> importedAction) { this(parent, rootParent, packId, null, importedAction, "", "", List.of()); }
-    public static ImportCustomSkinScreen edit(Screen parent, Screen rootParent, String packId, String skinId, String name, String theme, List<String> poses, Consumer<String> savedAction) {
-        return new ImportCustomSkinScreen(parent, rootParent, packId, skinId, savedAction, name, theme, poses);
+
+    public ImportCustomSkinScreen(Screen parent, Screen rootParent, String packId, Consumer<String> importedAction) {
+        this(parent, rootParent, packId, null, importedAction, "", "", List.of());
     }
+
     private ImportCustomSkinScreen(Screen parent, Screen rootParent, String packId, String skinId, Consumer<String> importedAction, String initialName, String initialTheme, List<String> initialPoses) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> getBaseHeight(skinId), skinId == null ? IMPORT_TITLE : Component.empty(), skinId == null ? IMPORT_MESSAGE : Component.empty(), screen -> {
         });
@@ -63,30 +70,116 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         if (initialPoses != null) poseKeys.addAll(initialPoses);
         okAction = screen -> importSkin();
     }
+
+    public static ImportCustomSkinScreen edit(Screen parent, Screen rootParent, String packId, String skinId, String name, String theme, List<String> poses, Consumer<String> savedAction) {
+        return new ImportCustomSkinScreen(parent, rootParent, packId, skinId, savedAction, name, theme, poses);
+    }
+
     private static int getBaseHeight(String skinId) {
         boolean sd = LegacyOptions.getUIMode().isSD();
         if (skinId == null) return sd ? 214 : 264;
         return sd ? 232 : 280;
     }
-    private boolean editing() { return skinId != null; }
-    private boolean showPoseButton() { return editing(); }
-    private boolean sd() { return LegacyOptions.getUIMode().isSD(); }
-    private int fieldHeight() { return sd() ? 16 : 20; }
-    private int fieldX() { return panel.x + (panel.width - renderableVList.listWidth) / 2; }
-    private int titleY() { return panel.y + (sd() ? 4 : 10); }
+
+    private static int posePanelHeight() {
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        return (sd ? 30 : 44) + poseListHeight(sd, sd ? 18 : 20) + (sd ? 6 : 8);
+    }
+
+    private static int poseListHeight(boolean sd, int buttonHeight) {
+        int spacing = sd ? 1 : 2;
+        int toggleCount = SkinPoseRegistry.PoseTag.values().length + 1;
+        int totalHeight = toggleCount * TickBox.getDefaultHeight() + Math.max(0, toggleCount - 1) * spacing;
+        if (toggleCount > 0) totalHeight += spacing;
+        return totalHeight + 2 * buttonHeight + spacing;
+    }
+
+    private static void togglePose(LinkedHashSet<String> selected, String poseKey) {
+        if (!selected.remove(poseKey)) selected.add(poseKey);
+    }
+
+    private static String formatPose(String poseKey) {
+        String[] words = poseKey.split("_");
+        StringBuilder builder = new StringBuilder();
+        for (String word : words) {
+            if (word.isBlank()) continue;
+            if (builder.length() > 0) builder.append(' ');
+            builder.append(Character.toUpperCase(word.charAt(0)));
+            if (word.length() > 1) builder.append(word.substring(1).toLowerCase(Locale.ROOT));
+        }
+        return builder.toString();
+    }
+
+    private static String errorText(Exception ex) {
+        String message = ex.getMessage();
+        return message == null || message.isBlank() ? ex.toString() : message;
+    }
+
+    private boolean editing() {
+        return skinId != null;
+    }
+
+    private boolean showPoseButton() {
+        return editing();
+    }
+
+    private boolean sd() {
+        return LegacyOptions.getUIMode().isSD();
+    }
+
+    private int fieldHeight() {
+        return sd() ? 16 : 20;
+    }
+
+    private int fieldX() {
+        return panel.x + (panel.width - renderableVList.listWidth) / 2;
+    }
+
+    private int titleY() {
+        return panel.y + (sd() ? 4 : 10);
+    }
+
     private int formTop() {
         if (editing()) return titleY() + font.lineHeight + (sd() ? 10 : 14);
         return panel.y + messageYOffset.get() + messageLabel.height + (sd() ? 10 : 14);
     }
-    private int nameLabelY() { return formTop(); }
-    private int nameY() { return nameLabelY() + font.lineHeight + (sd() ? 4 : 6); }
-    private int themeLabelY() { return nameY() + fieldHeight() + (sd() ? 8 : 10); }
-    private int themeY() { return themeLabelY() + font.lineHeight + (sd() ? 4 : 6); }
-    private int poseY() { return themeY() + fieldHeight() + (sd() ? 10 : 12); }
-    private int skinY() { return (showPoseButton() ? poseY() + fieldHeight() : themeY() + fieldHeight()) + (sd() ? 6 : 8); }
-    private int fileY() { return skinY() + fieldHeight() + (sd() ? 6 : 8); }
-    private int formBottomY() { return fileY() + font.lineHeight; }
-    private int buttonsY() { return formBottomY() + (sd() ? 8 : 10); }
+
+    private int nameLabelY() {
+        return formTop();
+    }
+
+    private int nameY() {
+        return nameLabelY() + font.lineHeight + (sd() ? 4 : 6);
+    }
+
+    private int themeLabelY() {
+        return nameY() + fieldHeight() + (sd() ? 8 : 10);
+    }
+
+    private int themeY() {
+        return themeLabelY() + font.lineHeight + (sd() ? 4 : 6);
+    }
+
+    private int poseY() {
+        return themeY() + fieldHeight() + (sd() ? 10 : 12);
+    }
+
+    private int skinY() {
+        return (showPoseButton() ? poseY() + fieldHeight() : themeY() + fieldHeight()) + (sd() ? 6 : 8);
+    }
+
+    private int fileY() {
+        return skinY() + fieldHeight() + (sd() ? 6 : 8);
+    }
+
+    private int formBottomY() {
+        return fileY() + font.lineHeight;
+    }
+
+    private int buttonsY() {
+        return formBottomY() + (sd() ? 8 : 10);
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -116,6 +209,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
             minecraft.execute(this::browseForSkin);
         }
     }
+
     @Override
     public void repositionElements() {
         String name = nameBox == null ? "" : nameBox.getValue();
@@ -125,8 +219,12 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         if (themeBox != null) themeBox.setValue(theme);
         if (poseButton != null) poseButton.setMessage(CHARACTER_ANIMATIONS);
     }
+
     @Override
-    public boolean keyPressed(KeyEvent keyEvent) { return super.keyPressed(keyEvent); }
+    public boolean keyPressed(KeyEvent keyEvent) {
+        return super.keyPressed(keyEvent);
+    }
+
     @Override
     public void renderableVListInit() {
         messageYOffset.set(title.getString().isEmpty() ? (sd() ? 6 : 15) : (sd() ? 18 : 35));
@@ -134,11 +232,13 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         int y = buttonsY();
         renderableVList.init(panel.x + (panel.width - listWidth) / 2, y, listWidth, 0);
     }
+
     @Override
     protected void addButtons() {
         renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), button -> onClose()).build());
         renderableVList.addRenderable(okButton = Button.builder(skinId == null ? Component.translatable("legacy.menu.import_skin") : CONFIRM, button -> okAction.accept(this)).build());
     }
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -147,12 +247,15 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         int fileValueY = fileY();
         String fileText = skinPath == null ? null : PlayerSkinWidget.clipText(font, skinPath.getFileName().toString(), renderableVList.listWidth);
         LegacyFontUtil.applySDFont(ignored -> {
-            if (editing()) guiGraphics.drawString(font, EDIT_TITLE, textX, titleY(), CommonColor.GRAY_TEXT.get(), false);
+            if (editing())
+                guiGraphics.drawString(font, EDIT_TITLE, textX, titleY(), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.drawString(font, NAME, textX, nameLabelY(), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.drawString(font, THEME, textX, themeLabelY(), CommonColor.GRAY_TEXT.get(), false);
-            if (fileText != null) guiGraphics.drawString(font, fileText, textX, fileValueY, CommonColor.GRAY_TEXT.get(), false);
+            if (fileText != null)
+                guiGraphics.drawString(font, fileText, textX, fileValueY, CommonColor.GRAY_TEXT.get(), false);
         });
     }
+
     private void renderFormRecess(GuiGraphics guiGraphics) {
         if (nameBox == null || themeBox == null || skinButton == null) return;
         int insetX = sd() ? 4 : 6;
@@ -164,6 +267,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         int height = formBottomY() + insetBottom - y;
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, x, y, width, height);
     }
+
     private void browseForSkin() {
         try {
             Path selected = SkinPackFiles.choosePng(minecraft, CHOOSE.getString());
@@ -180,8 +284,11 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
                 nameBox.setValue(dot > 0 ? fileName.substring(0, dot) : fileName);
             }
             updateImportButtonStatus();
-        } catch (Exception ex) { showError(ex); }
+        } catch (Exception ex) {
+            showError(ex);
+        }
     }
+
     private void importSkin() {
         if (minecraft == null || nameBox == null) return;
         try {
@@ -198,8 +305,11 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
             }
             CustomSkinPackStore.enableResourcePack(minecraft);
             SkinsClientBootstrap.reloadChangeSkinScreen(minecraft, rootParent == null ? parent : rootParent, packId, savedSkinId);
-        } catch (IOException ex) { showError(ex); }
+        } catch (IOException ex) {
+            showError(ex);
+        }
     }
+
     private void openPoseScreen() {
         if (minecraft == null) return;
         LinkedHashSet<String> selected = new LinkedHashSet<>(poseKeys);
@@ -224,6 +334,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
                     if (minecraft != null) minecraft.setScreen(parent);
                 }).build());
             }
+
             @Override
             public void renderableVListInit() {
                 boolean sd = LegacyOptions.getUIMode().isSD();
@@ -234,31 +345,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
             }
         });
     }
-    private static int posePanelHeight() {
-        boolean sd = LegacyOptions.getUIMode().isSD();
-        return (sd ? 30 : 44) + poseListHeight(sd, sd ? 18 : 20) + (sd ? 6 : 8);
-    }
-    private static int poseListHeight(boolean sd, int buttonHeight) {
-        int spacing = sd ? 1 : 2;
-        int toggleCount = SkinPoseRegistry.PoseTag.values().length + 1;
-        int totalHeight = toggleCount * TickBox.getDefaultHeight() + Math.max(0, toggleCount - 1) * spacing;
-        if (toggleCount > 0) totalHeight += spacing;
-        return totalHeight + 2 * buttonHeight + spacing;
-    }
-    private static void togglePose(LinkedHashSet<String> selected, String poseKey) {
-        if (!selected.remove(poseKey)) selected.add(poseKey);
-    }
-    private static String formatPose(String poseKey) {
-        String[] words = poseKey.split("_");
-        StringBuilder builder = new StringBuilder();
-        for (String word : words) {
-            if (word.isBlank()) continue;
-            if (builder.length() > 0) builder.append(' ');
-            builder.append(Character.toUpperCase(word.charAt(0)));
-            if (word.length() > 1) builder.append(word.substring(1).toLowerCase(Locale.ROOT));
-        }
-        return builder.toString();
-    }
+
     private void updateImportButtonStatus() {
         if (okButton == null || nameBox == null) return;
         if (skinId == null) {
@@ -267,12 +354,9 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         }
         okButton.active = !nameBox.getValue().trim().isEmpty();
     }
+
     private void showError(Exception ex) {
         if (minecraft == null) return;
         minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, editing() ? EDIT_TITLE : title, Component.literal(errorText(ex))));
-    }
-    private static String errorText(Exception ex) {
-        String message = ex.getMessage();
-        return message == null || message.isBlank() ? ex.toString() : message;
     }
 }

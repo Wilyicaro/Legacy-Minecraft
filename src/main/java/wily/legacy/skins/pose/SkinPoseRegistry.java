@@ -2,56 +2,17 @@ package wily.legacy.skins.pose;
 
 import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public final class SkinPoseRegistry {
-    private SkinPoseRegistry() {}
-
-    public enum PoseTag {
-        ZOMBIE_ARMS("zombie_arms"),
-        IDLE_SIT("idle_sit"),
-        STIFF_ARMS("stiff_arms"),
-        STIFF_LEGS("stiff_legs"),
-        SYNC_LEGS("sync_legs"),
-        SYNC_ARMS("sync_arms"),
-        UPSIDE_DOWN("upside_down"),
-        STATUE_OF_LIBERTY("statue_of_liberty"),
-        DISABLE_VIEW_BOBBING("disable_view_bobbing"),
-        HIDE_HAND("hide_hand");
-
-        private final String key;
-        PoseTag(String key) { this.key = key; }
-
-        public static PoseTag fromKey(String key) {
-            if (key == null) return null;
-            String k = key.trim().toLowerCase(Locale.ROOT);
-            String nk = k.replace("_", "");
-            for (PoseTag t : values()) {
-                if (t.key.equals(k)) return t;
-                if (t.key.replace("_", "").equals(nk)) return t;
-            }
-            return null;
-        }
-    }
-
-    private record Selector(String raw, Pattern pattern, boolean exact) {
-        boolean matches(String skinId) {
-            if (skinId == null) return false;
-            return exact ? raw.equals(skinId) : pattern.matcher(skinId).matches();
-        }
-    }
-
     private static final Object LOCK = new Object();
-
     private static volatile Map<PoseTag, List<Selector>> ACTIVE = empty();
     private static volatile Map<PoseTag, List<Selector>> RUNTIME = empty();
     private static Map<PoseTag, List<Selector>> STAGING = empty();
+
+    private SkinPoseRegistry() {
+    }
 
     private static Map<PoseTag, List<Selector>> empty() {
         Map<PoseTag, List<Selector>> m = new EnumMap<>(PoseTag.class);
@@ -117,7 +78,9 @@ public final class SkinPoseRegistry {
         }
     }
 
-    public static void clearRuntimeSelectors() { RUNTIME = empty(); }
+    public static void clearRuntimeSelectors() {
+        RUNTIME = empty();
+    }
 
     public static boolean hasPose(PoseTag tag, String skinId) {
         if (tag == null || skinId == null || skinId.isEmpty()) return false;
@@ -129,11 +92,15 @@ public final class SkinPoseRegistry {
         if (id.isEmpty()) return false;
 
         if (sels != null && !sels.isEmpty()) {
-            for (Selector s : sels) { if (s.matches(id)) return true; }
+            for (Selector s : sels) {
+                if (s.matches(id)) return true;
+            }
         }
 
         if (rt != null && !rt.isEmpty()) {
-            for (Selector s : rt) { if (s.matches(id)) return true; }
+            for (Selector s : rt) {
+                if (s.matches(id)) return true;
+            }
         }
 
         return BoxModelManager.hasPoseTag(id, tag);
@@ -143,7 +110,9 @@ public final class SkinPoseRegistry {
         String s = in.trim();
         if (s.isEmpty()) return null;
 
-        if (!s.contains(":") && defaultNamespace != null && !defaultNamespace.isBlank()) { s = defaultNamespace + ":" + s; }
+        if (!s.contains(":") && defaultNamespace != null && !defaultNamespace.isBlank()) {
+            s = defaultNamespace + ":" + s;
+        }
         return s;
     }
 
@@ -160,12 +129,49 @@ public final class SkinPoseRegistry {
                 case '?' -> regex.append(".");
                 case '.' -> regex.append("\\.");
                 case '\\' -> regex.append("\\\\");
-                case '(' , ')' , '[' , ']' , '{' , '}' , '+' , '^' , '$' , '|' -> regex.append('\\').append(c);
+                case '(', ')', '[', ']', '{', '}', '+', '^', '$', '|' -> regex.append('\\').append(c);
                 default -> regex.append(c);
             }
         }
         regex.append("$");
         Pattern p = Pattern.compile(regex.toString());
         return new Selector(selector, p, false);
+    }
+
+    public enum PoseTag {
+        ZOMBIE_ARMS("zombie_arms"),
+        IDLE_SIT("idle_sit"),
+        STIFF_ARMS("stiff_arms"),
+        STIFF_LEGS("stiff_legs"),
+        SYNC_LEGS("sync_legs"),
+        SYNC_ARMS("sync_arms"),
+        UPSIDE_DOWN("upside_down"),
+        STATUE_OF_LIBERTY("statue_of_liberty"),
+        DISABLE_VIEW_BOBBING("disable_view_bobbing"),
+        HIDE_HAND("hide_hand");
+
+        private final String key;
+
+        PoseTag(String key) {
+            this.key = key;
+        }
+
+        public static PoseTag fromKey(String key) {
+            if (key == null) return null;
+            String k = key.trim().toLowerCase(Locale.ROOT);
+            String nk = k.replace("_", "");
+            for (PoseTag t : values()) {
+                if (t.key.equals(k)) return t;
+                if (t.key.replace("_", "").equals(nk)) return t;
+            }
+            return null;
+        }
+    }
+
+    private record Selector(String raw, Pattern pattern, boolean exact) {
+        boolean matches(String skinId) {
+            if (skinId == null) return false;
+            return exact ? raw.equals(skinId) : pattern.matcher(skinId).matches();
+        }
     }
 }

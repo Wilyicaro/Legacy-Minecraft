@@ -6,18 +6,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.skins.api.ui.LegacySkinUi;
 import wily.legacy.skins.client.gui.GuiDollRender;
 import wily.legacy.skins.client.gui.GuiSessionSkin;
-import wily.legacy.skins.skin.ClientSkinAssets;
-import wily.legacy.skins.skin.ClientSkinCache;
-import wily.legacy.skins.skin.SkinDataStore;
-import wily.legacy.skins.skin.DownloadedSkinPackStore;
-import wily.legacy.skins.skin.SkinEntry;
-import wily.legacy.skins.skin.SkinIdUtil;
-import wily.legacy.skins.skin.SkinPack;
-import wily.legacy.skins.skin.SkinPackLoader;
-import wily.legacy.skins.skin.SkinSyncClient;
-import wily.legacy.skins.api.ui.LegacySkinUi;
+import wily.legacy.skins.skin.*;
 
 import java.util.Locale;
 import java.util.Map;
@@ -90,6 +82,23 @@ public interface ChangeSkinScreenSource {
         private Default() {
         }
 
+        private static UUID selfId(Minecraft minecraft) {
+            if (minecraft == null) return null;
+            if (minecraft.player != null) return minecraft.player.getUUID();
+            return minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+        }
+
+        private static boolean packContainsSkin(String packId, String skinId) {
+            if (packId == null || packId.isBlank() || skinId == null || skinId.isBlank()) return false;
+            SkinPack pack = SkinPackLoader.getPacks().get(packId);
+            if (pack == null || pack.skins() == null) return false;
+            for (SkinEntry entry : pack.skins()) {
+                if (entry == null) continue;
+                if (skinId.equals(entry.id()) || skinId.equals(entry.sourceId())) return true;
+            }
+            return false;
+        }
+
         @Override
         public Map<String, SkinPack> packs() {
             return SkinPackLoader.getPacks();
@@ -141,7 +150,8 @@ public interface ChangeSkinScreenSource {
         public void selectSkin(String packId, String skinId) {
             String requestedId = SkinIdUtil.isAutoSelect(skinId) ? "" : skinId;
             String sourcePackId = packId;
-            if (sourcePackId != null && SkinIdUtil.isFavouritesPack(sourcePackId)) sourcePackId = SkinPackLoader.getSourcePackId(skinId);
+            if (SkinIdUtil.isFavouritesPack(sourcePackId))
+                sourcePackId = SkinPackLoader.getSourcePackId(skinId);
             SkinPackLoader.setLastUsedCustomPackId(sourcePackId);
             SkinSyncClient.requestSetSkin(Minecraft.getInstance(), sourcePackId, requestedId);
         }
@@ -176,13 +186,15 @@ public interface ChangeSkinScreenSource {
             if (pack == null) return null;
             Minecraft minecraft = Minecraft.getInstance();
             boolean downloaded = minecraft != null && DownloadedSkinPackStore.isDownloadedPack(minecraft, pack.id());
-            if (pack.type() == null || pack.type().isBlank()) return downloaded ? Component.translatable("legacy.skinpack.type.community") : null;
+            if (pack.type() == null || pack.type().isBlank())
+                return downloaded ? Component.translatable("legacy.skinpack.type.community") : null;
             String key = pack.type().toLowerCase(Locale.ROOT);
             if (key.equals("skin")) return Component.translatable("legacy.skinpack.type.skin");
             if (key.equals("mashup")) return Component.translatable("legacy.skinpack.type.mashup");
             if (key.equals("community")) return Component.translatable("legacy.skinpack.type.community");
             if (key.equals("author") || key.equals("accredited")) {
-                if (pack.author() != null && !pack.author().isBlank()) return Component.translatable("legacy.skinpack.type.author", pack.author());
+                if (pack.author() != null && !pack.author().isBlank())
+                    return Component.translatable("legacy.skinpack.type.author", pack.author());
                 return Component.translatable("legacy.skinpack.type.skin");
             }
             return null;
@@ -242,23 +254,6 @@ public interface ChangeSkinScreenSource {
         @Override
         public boolean supportsAdvancedOptions() {
             return true;
-        }
-
-        private static UUID selfId(Minecraft minecraft) {
-            if (minecraft == null) return null;
-            if (minecraft.player != null) return minecraft.player.getUUID();
-            return minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
-        }
-
-        private static boolean packContainsSkin(String packId, String skinId) {
-            if (packId == null || packId.isBlank() || skinId == null || skinId.isBlank()) return false;
-            SkinPack pack = SkinPackLoader.getPacks().get(packId);
-            if (pack == null || pack.skins() == null) return false;
-            for (SkinEntry entry : pack.skins()) {
-                if (entry == null) continue;
-                if (skinId.equals(entry.id()) || skinId.equals(entry.sourceId())) return true;
-            }
-            return false;
         }
     }
 }
