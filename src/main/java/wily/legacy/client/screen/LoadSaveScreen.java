@@ -84,7 +84,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         }, () -> publishScreen.publish);
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
-        (resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220, 45, !LegacyRenderUtil.hasTooltipBoxes(accessor), LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
+        (resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220, 45, !LegacyRenderUtil.hasTooltipBoxes(accessor), getSelectedResourceAlbum(summary))).active = !this.isLocked;
     }
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource source) {
@@ -151,9 +151,13 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         }
     }
 
+    private static PackAlbum getSelectedResourceAlbum(LevelSummary summary) {
+        return PackAlbum.resolveWorldResourceAlbum(LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum());
+    }
+
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
-        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()), LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum().packs(), () -> new WorldOpenFlows(minecraft, source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, () -> minecraft.setScreen(screen)/*?}*/));
+        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()), getSelectedResourceAlbum(summary).packs(), false, () -> new WorldOpenFlows(minecraft, source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, () -> minecraft.setScreen(screen)/*?}*/));
     }
 
     @Override

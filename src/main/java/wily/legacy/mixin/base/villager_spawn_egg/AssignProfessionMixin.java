@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AssignProfessionFromJobSite.class)
 public class AssignProfessionMixin {
+    //? if fabric {
     @ModifyExpressionValue(method = "method_46890", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;is(Lnet/minecraft/resources/ResourceKey;)Z"))
     private static boolean allowSpawnEggProfessionSwap(boolean original, BehaviorBuilder.Instance<?> instance, MemoryAccessor<?, ?> potentialJobSite, MemoryAccessor<?, ?> jobSite, ServerLevel level, Villager villager, long time) {
         return original || villager.getVillagerXp() == 0 && villager.getTags().contains("legacy_spawn_egg_profession");
@@ -23,4 +24,15 @@ public class AssignProfessionMixin {
     private static void clearSpawnEggProfessionTag(Villager villager, ServerLevel level, Holder.Reference<?> profession, CallbackInfo ci) {
         villager.removeTag("legacy_spawn_egg_profession");
     }
+    //?} else {
+    /*@ModifyExpressionValue(method = "lambda$create$4", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;is(Lnet/minecraft/resources/ResourceKey;)Z"))
+    private static boolean allowSpawnEggProfessionSwap(boolean original, BehaviorBuilder.Instance<?> instance, MemoryAccessor<?, ?> potentialJobSite, MemoryAccessor<?, ?> jobSite, ServerLevel level, Villager villager, long time) {
+        return original || villager.getVillagerXp() == 0 && villager.getTags().contains("legacy_spawn_egg_profession");
+    }
+
+    @Inject(method = "lambda$create$3", at = @At("RETURN"))
+    private static void clearSpawnEggProfessionTag(Villager villager, ServerLevel level, Holder.Reference<?> profession, CallbackInfo ci) {
+        villager.removeTag("legacy_spawn_egg_profession");
+    }
+    *///?}
 }

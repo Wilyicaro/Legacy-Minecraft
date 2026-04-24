@@ -67,6 +67,11 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinFairness;
+import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
@@ -172,6 +177,10 @@ public class LegacyRenderUtil {
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(graphics).blit(LegacyRenderUtil.MENU_BACKGROUND, 0, 0, 0, 0, graphics.guiWidth(), graphics.guiHeight(), graphics.guiWidth(), graphics.guiHeight());
         FactoryScreenUtil.disableBlend();
+    }
+
+    public static ResourceLocation getSpriteOrFallback(ResourceLocation main, ResourceLocation fallback) {
+        return FactoryGuiGraphics.getSprites().texturesByName.containsKey(main) ? main : fallback;
     }
 
     public static void renderUsername(GuiGraphics graphics) {
@@ -395,7 +404,42 @@ public class LegacyRenderUtil {
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
         if (mc.player == null) return;
+        String skinId = getLocalPlayerSkinId();
+        if (shouldRenderBoxHeadPreview(skinId)) {
+            int x0 = x;
+            int y0 = y;
+            int x1 = x + size;
+            int y1 = y + size;
+            float centerX = (x0 + x1) / 2.0F;
+            float centerY = (y0 + y1) / 2.0F;
+            renderEntityInInventoryFollowsMouse(guiGraphics, x0, y0, x1, y1, size, 0.75F, centerX, centerY, mc.player);
+            return;
+        }
         PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
+    }
+
+    public static void renderLocalPlayerAdvancementFace(GuiGraphics guiGraphics, int x, int y, int size) {
+        ResourceLocation face = SkinPackLoader.getAdvancementFace(getLocalPlayerSkinId());
+        if (face != null) {
+            FactoryScreenUtil.enableBlend();
+            FactoryGuiGraphics.of(guiGraphics).blit(face, x, y, 0.0f, 0.0f, size, size, size, size);
+            FactoryScreenUtil.disableBlend();
+            return;
+        }
+        renderLocalPlayerHead(guiGraphics, x, y, size);
+    }
+
+    private static boolean shouldRenderBoxHeadPreview(String skinId) {
+        return !SkinIdUtil.isBlankOrAutoSelect(skinId) && ClientSkinAssets.hasHeadBox(ClientSkinAssets.resolveSkin(skinId));
+    }
+
+    private static String getLocalPlayerSkinId() {
+        if (mc.player == null) return null;
+        try {
+            return SkinFairness.effectiveSkinId(mc, ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName()));
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     public static float getAutoGuiScale() {
@@ -484,7 +528,13 @@ public class LegacyRenderUtil {
     }
 
     public static List<Component> getTooltip(ItemStack stack) {
-        return LegacyItemUtil.sanitizeTooltip(stack, stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL));
+        return getTooltip(stack, false);
+    }
+
+    public static List<Component> getTooltip(ItemStack stack, boolean removeBlankLines) {
+        List<Component> lines = stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        if (removeBlankLines) lines.removeIf(component -> component.getString().isBlank());
+        return LegacyItemUtil.sanitizeTooltip(stack, lines);
     }
 
     public static List<FormattedCharSequence> getTooltip(ItemStack stack, int width) {
@@ -500,8 +550,7 @@ public class LegacyRenderUtil {
         LegacyFontUtil.applySDFont(sd -> {
         if (GuiAccessor.getInstance().getToolHighlightTimer() > 0 && !GuiAccessor.getInstance().getLastToolHighlight().isEmpty()) {
             Font font = /*? if forge || neoforge {*//*Objects.requireNonNullElse(IClientItemExtensions.of(GuiAccessor.getInstance().getLastToolHighlight()).getFont(GuiAccessor.getInstance().getLastToolHighlight(), IClientItemExtensions.FontContext.SELECTED_ITEM_NAME), mc.font)*//*?} else {*/  mc.font/*?}*/;
-            List<Component> tooltip = LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight());
-            tooltip.removeIf(c -> c.getString().isBlank());
+            List<Component> tooltip = LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight(), true);
             Object2IntMap<Component> tooltipLines = tooltip.stream().limit(LegacyRenderUtil.getSelectedItemTooltipLines()).map(c -> tooltip.indexOf(c) == LegacyRenderUtil.getSelectedItemTooltipLines() - 1 && LegacyOptions.itemTooltipEllipsis.get() ? MORE : c).collect(Collectors.toMap(Function.identity(), font::width, (a, b) -> b, Object2IntLinkedOpenHashMap::new));
             int l = Math.min((int) ((float) GuiAccessor.getInstance().getToolHighlightTimer() * 256.0f / 10.0f), 255);
             if (l > 0) {

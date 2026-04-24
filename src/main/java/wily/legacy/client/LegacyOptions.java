@@ -35,6 +35,7 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 public class LegacyOptions {
     public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
+    private static final String DEFAULT_SKIN_CLOUD_RELAY_URL = "https://legacy4j-skins-relay.creepereater201.workers.dev";
     private static boolean suppressPlayerInfoSync = false;
 
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
@@ -173,6 +174,17 @@ public class LegacyOptions {
 
     public static final FactoryConfig<String> lastLoadedVersion = FactoryConfig.<String>builder().key("lastLoadedVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = FactoryConfig.<String>builder().key("lastLoadedMinecraftVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<Boolean> tu3ChangeSkinScreen = CLIENT_STORAGE.register(FactoryConfig.createBoolean("tu3ChangeSkinScreen", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.tu3_change_skin_screen")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> smoothPreviewScroll = CLIENT_STORAGE.register(FactoryConfig.createBoolean("smoothPreviewScroll", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.smooth_preview_scroll")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> hideArmorOnAllBoxSkins = CLIENT_STORAGE.register(FactoryConfig.createBoolean("hideArmorOnAllBoxSkins", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.hide_armor")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> showCustomPackOptionsTooltip = CLIENT_STORAGE.register(FactoryConfig.createBoolean("showCustomPackOptionsTooltip", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.custom_pack_options")), true, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> skinSelectionInitialized = FactoryConfig.<Boolean>builder().key("skinSelectionInitialized").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> lastUsedCustomPackId = FactoryConfig.<String>builder().key("lastUsedCustomPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinUserId = FactoryConfig.<String>builder().key("selectedSkinUserId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinId = FactoryConfig.<String>builder().key("selectedSkinId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinPackId = FactoryConfig.<String>builder().key("selectedSkinPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<List<String>> favoriteSkinIds = FactoryConfig.<List<String>>builder().key("favoriteSkinIds").control(FactoryConfigControl.of(Codec.STRING.listOf())).defaultValue(List.of()).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> skinCloudRelayUrl = FactoryConfig.<String>builder().key("skinCloudRelayUrl").control(FactoryConfigControl.of(Codec.STRING)).defaultValue(DEFAULT_SKIN_CLOUD_RELAY_URL).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b -> {
         syncLegacyClassicWorkstations(b);
@@ -320,6 +332,19 @@ public class LegacyOptions {
     public static void ensureLegacySettingsMenusUseMergeMode() {
         if (!legacySettingsMenus.get() || advancedOptionsMode.get() == AdvancedOptionsMode.MERGE) return;
         FactoryConfig.saveOptionAndConsume(advancedOptionsMode, AdvancedOptionsMode.MERGE, v -> {});
+    }
+
+    public static String getLastUsedCustomPackIdOrNull() {
+        String packId = lastUsedCustomPackId.get();
+        return packId == null || packId.isBlank() ? null : packId;
+    }
+
+    public static String getSkinCloudRelayUrl() {
+        String value = skinCloudRelayUrl.get();
+        if (value == null) return DEFAULT_SKIN_CLOUD_RELAY_URL;
+        value = value.trim();
+        while (value.endsWith("/")) value = value.substring(0, value.length() - 1);
+        return value.isEmpty() ? DEFAULT_SKIN_CLOUD_RELAY_URL : value;
     }
 
     public static boolean canSendPlayerInfoSync() {

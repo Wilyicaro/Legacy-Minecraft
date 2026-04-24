@@ -493,7 +493,7 @@ public class OptionsScreen extends PanelVListScreen {
                 }
             };
             GlobalPacks.Selector globalPackSelector = GlobalPacks.Selector.resources(0, 0, 230, 45, false);
-            PackAlbum.Selector selector = PackAlbum.Selector.resources(0, 0, 230, 45, false);
+            PackAlbum.Selector selector = PackAlbum.Selector.globalResources(0, 0, 230, 45, false);
             OptionsScreen screen = new OptionsScreen(p, s) {
                 int selectorTooltipVisibility = 0;
                 boolean finishedAnimation = false;
