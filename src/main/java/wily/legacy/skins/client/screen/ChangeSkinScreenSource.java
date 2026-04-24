@@ -5,9 +5,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.client.gui.GuiDollRender;
 import wily.legacy.skins.client.gui.GuiSessionSkin;
-import wily.legacy.skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinDataStore;
@@ -29,7 +29,7 @@ public interface ChangeSkinScreenSource {
     }
 
     default Screen create(Screen parent) {
-        return ConsoleSkinsClientSettings.isTu3ChangeSkinScreen()
+        return LegacyOptions.tu3ChangeSkinScreen.get()
                 ? new TU3ChangeSkinScreen(parent, this)
                 : new ChangeSkinScreen(parent, this);
     }

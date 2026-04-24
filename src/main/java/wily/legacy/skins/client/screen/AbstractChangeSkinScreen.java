@@ -132,11 +132,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         Screen rootParent = rootParentScreen();
         String packId = focusedPackId();
         String skinId = focusedSkinId();
-        boolean wasTu3 = ConsoleSkinsClientSettings.isTu3ChangeSkinScreen();
+        boolean wasTu3 = LegacyOptions.tu3ChangeSkinScreen.get();
         Screen built = HelpAndOptionsScreen.buildChangeSkinOptionsScreen(this);
         if (built instanceof OptionsScreen optionsScreen) {
             optionsScreen.onClose = screen -> {
-                if (ConsoleSkinsClientSettings.isTu3ChangeSkinScreen() != wasTu3) {
+                if (LegacyOptions.tu3ChangeSkinScreen.get() != wasTu3) {
                     source.requestFocus(packId, skinId);
                     minecraft.setScreen(source.create(rootParent));
                 }
@@ -595,7 +595,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_left") : null);
             r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_right") : null);
         }
-        if (source.supportsCustomPackOptions() && ConsoleSkinsClientSettings.isShowCustomPackOptionsTooltip()) {
+        if (source.supportsCustomPackOptions() && LegacyOptions.showCustomPackOptionsTooltip.get()) {
             r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : ControllerBinding.BACK.getIcon(), () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
         }
         r.add(navigateIcon, navigateLabel);

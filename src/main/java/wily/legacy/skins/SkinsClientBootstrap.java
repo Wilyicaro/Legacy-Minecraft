@@ -5,9 +5,9 @@ import net.minecraft.server.packs.PackType;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryEvent;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.HelpAndOptionsScreen;
 import wily.legacy.client.screen.ScreenSection;
-import wily.legacy.skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.skins.client.screen.AbstractChangeSkinScreen;
 import wily.legacy.skins.client.util.ViewBobbingSkinOverride;
 import wily.legacy.skins.client.gui.GuiSessionSkin;
@@ -63,12 +63,12 @@ public final class SkinsClientBootstrap {
             }
         };
 
-        Legacy4JClient.whenResetOptions.add(ConsoleSkinsClientSettings::resetToDefaults);
+        Legacy4JClient.whenResetOptions.add(LegacyOptions::resetSkinClientOptions);
         Legacy4JClient.whenResetOptions.add(() -> {
             Minecraft mc = Minecraft.getInstance();
             SkinPackLoader.setLastUsedCustomPackId(null);
             SkinSyncClient.requestSetSkin(mc, "");
-            ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
+            LegacyOptions.skinSelectionInitialized.set(true);
         });
 
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, SKIN_PACK_RELOAD_LISTENER);
@@ -92,7 +92,7 @@ public final class SkinsClientBootstrap {
     public static Screen createChangeSkinScreen(Screen parent) {
         SkinPackLoader.ensureLoaded();
         try {
-            if (ConsoleSkinsClientSettings.isTu3ChangeSkinScreen()) {
+            if (LegacyOptions.tu3ChangeSkinScreen.get()) {
                 return new wily.legacy.skins.client.screen.TU3ChangeSkinScreen(parent);
             }
             return new wily.legacy.skins.client.screen.ChangeSkinScreen(parent);
@@ -133,7 +133,7 @@ public final class SkinsClientBootstrap {
     }
     private static void checkDefaultSelection(Minecraft minecraft) {
         if (minecraft == null || minecraft.getUser() == null) return;
-        if (!ConsoleSkinsClientSettings.isSkinSelectionInitialized()) {
+        if (!LegacyOptions.skinSelectionInitialized.get()) {
             java.util.UUID userId = minecraft.getUser().getProfileId();
             String existing = wily.legacy.skins.skin.ClientSkinCache.get(userId);
             if (existing == null || existing.isBlank()) existing = SkinDataStore.getSelectedSkin(userId);
@@ -141,7 +141,7 @@ public final class SkinsClientBootstrap {
                 SkinPackLoader.setLastUsedCustomPackId(null);
                 SkinSyncClient.requestSetSkin(minecraft, "");
             }
-            ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
+            LegacyOptions.skinSelectionInitialized.set(true);
         }
         defaultSelectionChecked = true;
     }

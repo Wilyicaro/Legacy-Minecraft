@@ -6,10 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.client.lang.SkinPackLang;
 import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.pose.SkinPoseRegistry;
-import wily.legacy.skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.skins.util.DebugLog;
 import java.io.IOException;
 import java.nio.file.*;
@@ -23,7 +23,6 @@ public final class SkinPackLoader {
     private static volatile Map<String, ResourceLocation> ADVANCEMENT_FACES_BY_SKIN = Map.of();
     private static volatile boolean loaded;
     private static volatile int reloadVersion;
-    private static volatile String LAST_USED_CUSTOM_PACK_ID;
     private static volatile String REQUESTED_FOCUS_PACK_ID;
     private static volatile String REQUESTED_FOCUS_SKIN_ID;
     private static volatile String REQUESTED_EDIT_PACK_ID;
@@ -45,7 +44,7 @@ public final class SkinPackLoader {
         if (!loaded) ensureLoaded();
         return skinId == null ? null : ADVANCEMENT_FACES_BY_SKIN.get(skinId);
     }
-    public static String getLastUsedCustomPackId() { return LAST_USED_CUSTOM_PACK_ID; }
+    public static String getLastUsedCustomPackId() { return LegacyOptions.getLastUsedCustomPackIdOrNull(); }
     public static void requestFocusPack(String packId) { REQUESTED_FOCUS_PACK_ID = requestId(packId); }
     public static String consumeRequestedFocusPackId() {
         String packId = REQUESTED_FOCUS_PACK_ID;
@@ -78,7 +77,6 @@ public final class SkinPackLoader {
         if (loaded) return;
         synchronized (LOCK) {
             if (!loaded) {
-                LAST_USED_CUSTOM_PACK_ID = ConsoleSkinsClientSettings.getLastUsedCustomPackId();
                 loadPacks();
             }
         }
@@ -104,8 +102,8 @@ public final class SkinPackLoader {
         return id == null || id.isBlank() ? null : id;
     }
     private static void storeLastUsedCustomPackId(String packId) {
-        LAST_USED_CUSTOM_PACK_ID = packId;
-        ConsoleSkinsClientSettings.setLastUsedCustomPackId(packId);
+        LegacyOptions.lastUsedCustomPackId.set(packId == null ? "" : packId);
+        LegacyOptions.CLIENT_STORAGE.save();
     }
     public static void saveCustomPackOrder(Minecraft minecraft, List<String> orderedPackIds) throws IOException {
         if (minecraft == null) throw new IOException("Minecraft is not available");
@@ -163,7 +161,6 @@ public final class SkinPackLoader {
     public static void loadPacks(ResourceManager rm) {
         SkinPackLang.reload(rm);
         SkinPoseRegistry.beginReload();
-        if (LAST_USED_CUSTOM_PACK_ID == null) { LAST_USED_CUSTOM_PACK_ID = ConsoleSkinsClientSettings.getLastUsedCustomPackId(); }
         PackLoadState state = new PackLoadState();
         try {
             Map<ResourceLocation, Resource> jsons = listPackJsonResources(rm);
@@ -173,7 +170,6 @@ public final class SkinPackLoader {
                 String packId = parsePackId(path);
                 if (packId == null || packId.isEmpty()) continue;
                 if (state.packs.containsKey(packId)) continue;
-                if (SkinDataStore.isExcludedPack(packId)) continue;
                 JsonObject json = SkinPackJson.readObject(jsons.get(rl));
                 if (json == null) continue;
                 String prefix = path.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
@@ -396,8 +392,9 @@ public final class SkinPackLoader {
         return rm.getResource(fallback).isPresent() ? fallback : null;
     }
     private static void applyBuiltinAutoSelection(Map<String, SkinPack> ordered) {
-        if (LAST_USED_CUSTOM_PACK_ID != null) {
-            if (ordered.containsKey(LAST_USED_CUSTOM_PACK_ID)) return;
+        String selectedPackId = getLastUsedCustomPackId();
+        if (selectedPackId != null) {
+            if (ordered.containsKey(selectedPackId)) return;
             storeLastUsedCustomPackId(null);
         }
         if (ordered == null || ordered.isEmpty()) return;

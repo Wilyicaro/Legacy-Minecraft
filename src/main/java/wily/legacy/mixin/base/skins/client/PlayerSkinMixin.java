@@ -13,10 +13,6 @@ import wily.legacy.skins.skin.*;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class PlayerSkinMixin {
-    @Inject(method = "isCapeLoaded", at = @At("HEAD"), cancellable = true, require = 0)
-    private void consoleskins$disableCapeWhenElytra(CallbackInfoReturnable<Boolean> cir) {
-        if (((AbstractClientPlayer) (Object) this).getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) cir.setReturnValue(false);
-    }
     @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true, require = 0)
     private void consoleskins$overrideSkin(CallbackInfoReturnable<PlayerSkin> cir) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;

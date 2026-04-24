@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import wily.legacy.client.LegacyOptions;
 public class PlayerSkinWidget extends AbstractWidget {
     private static final float ROTATION_SENSITIVITY = 2.5F, ROTATION_X_LIMIT = 50.0F, CAROUSEL_INTERP_MS = 250.0F, CAROUSEL_INTERP_SMOOTH_MS = 190.0F, DEFAULT_CAROUSEL_FPS = 30.0F;
     private static final long MOVE_HINT_MS = 170L;
@@ -280,8 +281,8 @@ public class PlayerSkinWidget extends AbstractWidget {
             long now = System.currentTimeMillis();
             if (isInterpolating()) {
                 long elapsed;
-                float interpMs = ConsoleSkinsClientSettings.isSmoothPreviewScroll() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
-                if (ConsoleSkinsClientSettings.isSmoothPreviewScroll()) {
+                float interpMs = LegacyOptions.smoothPreviewScroll.get() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
+                if (LegacyOptions.smoothPreviewScroll.get()) {
                     if (start == 0L) start = now;
                     elapsed = Math.max(0L, now - start);
                     progress = elapsed / interpMs;

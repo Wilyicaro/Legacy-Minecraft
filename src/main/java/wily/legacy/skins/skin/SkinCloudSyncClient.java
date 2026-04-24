@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.util.DebugLog;
 
 import java.net.URI;
@@ -36,12 +36,12 @@ final class SkinCloudSyncClient {
                 && client.getConnection() != null
                 && !client.hasSingleplayerServer()
                 && !Legacy4JClient.hasModOnServer()
-                && !ConsoleSkinsClientSettings.getCloudRelayUrl().isBlank()
+                && !LegacyOptions.getSkinCloudRelayUrl().isBlank()
                 && SkinFairness.resolveServerKey(client) != null;
     }
 
     static void submitSelection(Minecraft client, String skinId) {
-        String relayUrl = ConsoleSkinsClientSettings.getCloudRelayUrl();
+        String relayUrl = LegacyOptions.getSkinCloudRelayUrl();
         String serverKey = SkinFairness.resolveServerKey(client);
         UUID playerId = client == null || client.player == null ? null : client.player.getUUID();
         if (relayUrl.isBlank() || serverKey == null || playerId == null) return;
@@ -54,7 +54,7 @@ final class SkinCloudSyncClient {
     }
 
     static void requestSnapshot(Minecraft client, boolean force) {
-        String relayUrl = ConsoleSkinsClientSettings.getCloudRelayUrl();
+        String relayUrl = LegacyOptions.getSkinCloudRelayUrl();
         String serverKey = SkinFairness.resolveServerKey(client);
         if (relayUrl.isBlank() || serverKey == null) return;
         long now = System.currentTimeMillis();
