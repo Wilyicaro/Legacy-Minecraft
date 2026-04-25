@@ -4,8 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.repository.PackRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.nio.file.Path;
 
 public final class DownloadedSkinPackStore {
@@ -29,6 +32,10 @@ public final class DownloadedSkinPackStore {
 
     public static boolean isDownloadedPack(Minecraft minecraft, String packId) {
         return SkinPackFiles.isPackInResourcePack(minecraft, RESOURCE_PACK_DIR, PACKS_DIR, packId);
+    }
+
+    public static boolean isManagedResourcePackId(String packId) {
+        return ("file/" + RESOURCE_PACK_DIR).equals(packId) || RESOURCE_PACK_DIR.equals(packId);
     }
 
     public static void normalizeInstalledPack(Path packDir) throws IOException {
@@ -67,6 +74,14 @@ public final class DownloadedSkinPackStore {
 
     public static void enableResourcePack(Minecraft minecraft) throws IOException {
         SkinPackFiles.enableResourcePack(minecraft, RESOURCE_PACK_DIR, PACK_DESCRIPTION, RESOURCE_PACK_ICON, "Missing bundled downloaded skin pack resource icon");
+    }
+
+    public static List<String> preserveSelection(PackRepository repository, List<String> selectedIds) {
+        ArrayList<String> selected = new ArrayList<>(selectedIds);
+        if (repository == null) return selected;
+        String resolvedId = repository.getPack("file/" + RESOURCE_PACK_DIR) != null ? "file/" + RESOURCE_PACK_DIR : repository.getPack(RESOURCE_PACK_DIR) != null ? RESOURCE_PACK_DIR : null;
+        if (resolvedId != null && !selected.contains(resolvedId)) selected.add(resolvedId);
+        return selected;
     }
 
     public static void deletePack(Minecraft minecraft, String packId) throws IOException {
