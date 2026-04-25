@@ -12,6 +12,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -25,6 +26,7 @@ public class CarpetBlockMixin {
         }
     }
 
+    @Unique
     private static boolean isOnRails(AbstractMinecart minecart) {
         BlockPos blockPos = minecart.blockPosition();
         return minecart.level().getBlockState(blockPos).is(BlockTags.RAILS) || minecart.level().getBlockState(blockPos.below()).is(BlockTags.RAILS);

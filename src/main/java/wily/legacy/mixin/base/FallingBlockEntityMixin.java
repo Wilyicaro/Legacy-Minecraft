@@ -1,11 +1,16 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ConcretePowderBlock;
@@ -24,6 +29,9 @@ import wily.legacy.init.LegacyGameRules;
 public abstract class FallingBlockEntityMixin {
     private static final AABB fallingBlockDetectBounding = new AABB(-50, -50, -50, 50, 50, 50);
     @Shadow public int time;
+
+    @Shadow
+    private boolean cancelDrop;
 
     @Inject(method = "fall", at = @At("HEAD"), cancellable = true)
     private static void fall(Level level, BlockPos blockPos, BlockState blockState, CallbackInfoReturnable<FallingBlockEntity> cir) {
@@ -46,5 +54,10 @@ public abstract class FallingBlockEntityMixin {
         time = 0;
         entity.setDeltaMovement(Vec3.ZERO);
         ci.cancel();
+    }
+
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/FallingBlockEntity;spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/entity/item/ItemEntity;"))
+    private ItemEntity wrapSpawnAtLocation(FallingBlockEntity instance, ServerLevel serverLevel, ItemLike itemLike, Operation<ItemEntity> original) {
+        return cancelDrop ? null : original.call(instance, serverLevel, itemLike);
     }
 }
