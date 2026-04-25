@@ -167,7 +167,6 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
         return panel.y + 22;
     }
 
-
     @Override
     public boolean isPauseScreen() {
         return false;

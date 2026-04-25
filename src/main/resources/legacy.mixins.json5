@@ -215,7 +215,8 @@
     "skins.client.ArmorOffsetsMixin",
     "client.ScreenshotMixin",
     "client.AbstractClientPlayerMixin",
-    "client.BitmapGlyphMixin"
+    "client.BitmapGlyphMixin",
+    "client.MultilineTextFieldMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
