@@ -293,7 +293,7 @@ public class Legacy4JClient {
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                 continue;
             }
-            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock && controllerManager.isControllerTheLastInput()) {
+            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock) {
                 minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
             } else if (LegacyOptions.hasClassicCrafting()) {
                 minecraft.getTutorial().onOpenInventory();
