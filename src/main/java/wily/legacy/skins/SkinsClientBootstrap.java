@@ -16,8 +16,6 @@ import wily.legacy.skins.client.util.ViewBobbingSkinOverride;
 import wily.legacy.skins.skin.*;
 import wily.legacy.skins.util.SkinsLogger;
 
-import java.io.IOException;
-
 public final class SkinsClientBootstrap {
     private static final net.minecraft.server.packs.resources.ResourceManagerReloadListener SKIN_PACK_RELOAD_LISTENER = new net.minecraft.server.packs.resources.ResourceManagerReloadListener() {
         @Override
@@ -47,13 +45,8 @@ public final class SkinsClientBootstrap {
     };
     private static volatile boolean packPreloadStarted = false;
     private static volatile boolean defaultSelectionChecked = false;
-    private static volatile boolean customPackSelectionChecked = false;
 
     private SkinsClientBootstrap() {
-    }
-
-    public static void markCustomPackSelectionChecked() {
-        customPackSelectionChecked = true;
     }
 
     public static void init() {
@@ -74,9 +67,6 @@ public final class SkinsClientBootstrap {
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
         GuiSessionSkin.prewarm();
-        if (!customPackSelectionChecked && checkCustomPackSelection(minecraft)) {
-            return;
-        }
         if (!defaultSelectionChecked) {
             checkDefaultSelection(minecraft);
         }
@@ -154,24 +144,6 @@ public final class SkinsClientBootstrap {
         BoxModelManager.reload(minecraft.getResourceManager());
         if (!SkinPackLoader.isLoaded()) {
             packPreloadStarted = false;
-        }
-    }
-
-    private static boolean checkCustomPackSelection(Minecraft minecraft) {
-        if (minecraft == null || minecraft.gameDirectory == null || minecraft.getResourcePackRepository() == null)
-            return false;
-        try {
-            boolean changed = CustomSkinPackStore.enableResourcePack(minecraft);
-            customPackSelectionChecked = true;
-            if (changed) {
-                minecraft.reloadResourcePacks();
-                return true;
-            }
-            return false;
-        } catch (IOException ex) {
-            SkinsLogger.debug("Failed to enable custom skin pack resource pack {}", ex.toString());
-            customPackSelectionChecked = true;
-            return false;
         }
     }
 }

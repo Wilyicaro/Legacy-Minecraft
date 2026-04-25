@@ -12,12 +12,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
-import wily.legacy.skins.SkinsClientBootstrap;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,16 +96,15 @@ public abstract class OptionsMixin {
         List<String> savedResourcePacks = List.copyOf(resourcePacks);
         List<String> savedIncompatibleResourcePacks = List.copyOf(incompatibleResourcePacks);
         GlobalPacks.globalResources.get().applyPacks(packRepository, PackAlbum.getDefaultResourceAlbum().packs());
-        enableCustomSkinPack();
+        enableDownloadedSkinPack();
         restoreManagedSkinPacks(packRepository, savedResourcePacks, savedIncompatibleResourcePacks);
         PackAlbum.updateSavedResourcePacks();
         ci.cancel();
     }
 
-    private void enableCustomSkinPack() {
+    private void enableDownloadedSkinPack() {
         try {
-            CustomSkinPackStore.enableResourcePack(minecraft);
-            SkinsClientBootstrap.markCustomPackSelectionChecked();
+            DownloadedSkinPackStore.enableResourcePack(minecraft);
         } catch (IOException ignored) {
         }
     }
