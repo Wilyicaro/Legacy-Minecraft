@@ -95,7 +95,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
-        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, Component.literal(pack.description()), width));
+        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, pack.descriptionComponent(), width));
     }
 
     private boolean isDownloading(ContentManager.Pack pack) {
@@ -125,16 +125,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     minecraft.setScreen(new PackActionScreen(Legacy4JContentListScreen.this, pack, category));
                 } else {
                     if (!prepareDownloadTarget(pack)) return;
-                    downloadingPacks.add(pack.id());
-                    ContentManager.downloadPack(pack, category, installedAnything -> {
-                        downloadingPacks.remove(pack.id());
-                        boolean installed = ContentManager.isPackInstalled(pack, category);
-                        installedPacks.put(pack.id(), installed);
-                        if (installedAnything && category.requiresResourceReload()) {
-                            if (minecraft.screen == Legacy4JContentListScreen.this) needsReload = true;
-                            else minecraft.reloadResourcePacks();
-                        }
-                    });
+                    startDownload(pack, category.requiresResourceReload());
                 }
             }
 
@@ -167,6 +158,24 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, targetCategory.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
             return false;
         }
+    }
+
+    private void startDownload(ContentManager.Pack pack, boolean reloadResources) {
+        downloadingPacks.add(pack.id());
+        ContentManager.downloadPack(pack, category, installedAnything -> finishDownload(pack, installedAnything, reloadResources));
+    }
+
+    private void finishDownload(ContentManager.Pack pack, boolean installedAnything, boolean reloadResources) {
+        downloadingPacks.remove(pack.id());
+        refreshInstalledPacks();
+        if (installedAnything && reloadResources) {
+            if (minecraft.screen == this) needsReload = true;
+            else minecraft.reloadResourcePacks();
+        }
+    }
+
+    private void refreshInstalledPacks() {
+        packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category)));
     }
 
     @Override
@@ -350,7 +359,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         private final ContentManager.Pack pack;
 
         public PackActionScreen(Screen parent, ContentManager.Pack pack, ContentManager.Category category) {
-            super(parent, ConfirmationScreen::getPanelWidth, () -> 95, Component.literal(pack.name()), 
+            super(parent, ConfirmationScreen::getPanelWidth, () -> 95, pack.nameComponent(),
                   Component.translatable("legacy.menu.delete_message"), 
                   (b) -> {} 
             );
@@ -376,7 +385,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         private final Map<String, Boolean> installedPacks;
 
         public LeftAlignedButton(RenderableVList list, int width, int height, ContentManager.Pack pack, ContentManager.Category category, java.util.Set<String> downloadingPacks, Map<String, Boolean> installedPacks) {
-            super(list, 0, 0, width, height, Component.literal(pack.name()));
+            super(list, 0, 0, width, height, pack.nameComponent());
             this.pack = pack;
             this.category = category;
             this.downloadingPacks = downloadingPacks;

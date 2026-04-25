@@ -23,6 +23,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
 
     private static final Component TITLE_LABEL = Component.translatable("legacy.menu.store_title");
     private static final Component STORE_NO_CONTENT = Component.translatable("legacy.menu.store_no_content");
+    private static final int LIST_HEIGHT = 162;
     private final Panel panelRecess;
     private final Map<String, CompletableFuture<List<ContentManager.Pack>>> prefetchedIndexes = new HashMap<>();
     private boolean warnNoContent = false;
@@ -66,7 +67,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
     }
 
     private CompletableFuture<List<ContentManager.Pack>> prefetchCategory(ContentManager.Category category) {
-        return prefetchedIndexes.computeIfAbsent(category.id(), id -> ContentManager.fetchIndex(category.indexUrl()));
+        return prefetchedIndexes.computeIfAbsent(category.id(), id -> ContentManager.fetchIndex(category));
     }
 
     @Override
@@ -110,7 +111,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
                 y += 12;
             }
         });
-        getRenderableVList().init("renderableVList", panelRecess.getX() + 10, panelRecess.getY() + 21, panelRecess.getWidth() - 20, 160);
+        getRenderableVList().init("renderableVList", panelRecess.getX() + 10, panelRecess.getY() + 21, panelRecess.getWidth() - 20, LIST_HEIGHT);
     }
 
     @Override

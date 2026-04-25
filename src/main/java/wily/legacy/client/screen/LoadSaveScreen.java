@@ -157,7 +157,12 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
-        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()), getSelectedResourceAlbum(summary).packs(), false, () -> new WorldOpenFlows(minecraft, source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, () -> minecraft.setScreen(screen)/*?}*/));
+        PackAlbum album = getSelectedResourceAlbum(summary);
+        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()), album.packs(), false, () -> new WorldOpenFlows(minecraft, source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, () -> minecraft.setScreen(screen)/*?}*/));
+        Legacy4JClient.serverPlayerJoinConsumer = serverPlayer -> {
+            MinecraftServer server = FactoryAPIPlatform.getEntityServer(serverPlayer);
+            LegacyClientWorldSettings.of(server.getWorldData()).setSelectedResourceAlbum(album);
+        };
     }
 
     @Override
