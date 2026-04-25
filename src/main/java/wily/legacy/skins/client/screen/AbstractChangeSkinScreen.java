@@ -664,6 +664,30 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return delta != 0 && focusPackIndex(packList.getFocusedPackIndex() + delta, requestFocus);
     }
 
+    protected boolean handlePackListPageNavigation(int key) {
+        if (key != InputConstants.KEY_PAGEUP && key != InputConstants.KEY_PAGEDOWN) return false;
+        int pageSize = visiblePackButtonCount();
+        if (pageSize <= 0 || packList.getPackCount() <= 1) return false;
+        int delta = key == InputConstants.KEY_PAGEUP ? -pageSize : pageSize;
+        if (isReorderingCustomPack()) {
+            customPacks.moveReorderingPack(delta);
+            return true;
+        }
+        focusRelativePack(delta, true);
+        applyQueuedPackChange();
+        return true;
+    }
+
+    private int visiblePackButtonCount() {
+        int visible = 0;
+        for (var renderable : getRenderableVList().renderables) {
+            if (renderable instanceof ChangeSkinPackList.PackButton button
+                    && button.getPackIndex() >= 0
+                    && children().contains(button)) visible++;
+        }
+        return visible;
+    }
+
     protected boolean applyQueuedPackChange() {
         if (!packList.consumeQueuedChangePack() || isReorderingCustomPack()) return false;
         stopHoldingOuterCarousel();
@@ -945,6 +969,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             return true;
         }
 
+        if (handlePackListPageNavigation(key)) return true;
         if (handlePackListStepNavigation(key)) return true;
         if (control(
                 key == InputConstants.KEY_LEFT || key == InputConstants.KEY_LBRACKET || key == InputConstants.KEY_A,
