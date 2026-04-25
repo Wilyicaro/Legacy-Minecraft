@@ -40,6 +40,8 @@ public class ContentManager {
 
     public static final List<Category> CATEGORIES = new ArrayList<>();
     private static final String CATEGORIES_FILE = "store_categories.json";
+    private static final String STARTERPACKS_CATEGORY_ID = "starterpacks";
+    private static final String STARTERPACKS_PACK_ID = "starterpacks_bundle";
     private static final java.util.Set<String> ACTIVE_DOWNLOADS = ConcurrentHashMap.newKeySet();
     private static final String TRANSPARENCY_FIX_URL = "https://cdn.modrinth.com/data/MK3k9U5o/versions/BdYLypGY/Transparency%20Fix.zip";
 
@@ -164,6 +166,14 @@ public class ContentManager {
             return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks, resourceAlbum);
         }
 
+        public Component nameComponent() {
+            return STARTERPACKS_PACK_ID.equals(id) ? Component.translatable("legacy.menu.store.starterpacks.download_all") : Component.literal(name);
+        }
+
+        public Component descriptionComponent() {
+            return STARTERPACKS_PACK_ID.equals(id) ? Component.translatable("legacy.menu.store.starterpacks.download_all.description") : Component.literal(description);
+        }
+
         public boolean hasWorldTemplate() {
             return worldTemplateDownloadURI.isPresent();
         }
@@ -196,7 +206,14 @@ public class ContentManager {
         return connection.getInputStream();
     }
 
-    public static CompletableFuture<List<Pack>> fetchIndex(String indexUrl) {
+    public static CompletableFuture<List<Pack>> fetchIndex(Category category) {
+        if (STARTERPACKS_CATEGORY_ID.equals(category.id())) {
+            return fetchStarterpacksIndex(category);
+        }
+        return fetchRemoteIndex(category.indexUrl());
+    }
+
+    private static CompletableFuture<List<Pack>> fetchRemoteIndex(String indexUrl) {
         return CompletableFuture.supplyAsync(() -> {
             try (InputStream stream = openRemoteStream(new URL(indexUrl), 5000, 10000);
                  InputStreamReader reader = new InputStreamReader(stream)) {
@@ -208,6 +225,56 @@ public class ContentManager {
                 Legacy4J.LOGGER.warn("Failed to fetch content index from {}: {}", indexUrl, e.getMessage());
                 return new ArrayList<>();
             }
+        });
+    }
+
+    private static CompletableFuture<List<Pack>> fetchStarterpacksIndex(Category category) {
+        return fetchStarterpacksBundlePacks().thenApply(bundlePacks -> {
+            return List.of(new Pack(
+                STARTERPACKS_PACK_ID,
+                "Download All!",
+                "Download every mash-up pack, skin pack, texture pack, and more!",
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                bundlePacks,
+                Optional.empty()
+            ));
+        });
+    }
+
+    private static List<Category> getStarterpacksCategories() {
+        return CATEGORIES.stream()
+            .filter(c -> !STARTERPACKS_CATEGORY_ID.equals(c.id()) && !"bundle_packs".equals(c.id()) && !"legacy4j".equals(c.id()))
+            .toList();
+    }
+
+    private static CompletableFuture<List<Pack.BundlePack>> fetchStarterpacksBundlePacks() {
+        List<Category> categories = getStarterpacksCategories();
+        List<CompletableFuture<List<Pack>>> futures = categories.stream().map(ContentManager::fetchIndex).toList();
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).thenApply(v -> {
+            List<Pack.BundlePack> bundlePacks = new ArrayList<>();
+            for (int i = 0; i < categories.size(); i++) {
+                Category category = categories.get(i);
+                for (Pack pack : futures.get(i).getNow(List.of())) {
+                    bundlePacks.add(new Pack.BundlePack(
+                        category.id(),
+                        pack.id(),
+                        pack.name(),
+                        pack.description(),
+                        pack.downloadURI(),
+                        pack.imageUrl(),
+                        pack.checkSum(),
+                        pack.worldTemplateDownloadURI(),
+                        pack.worldTemplateCheckSum(),
+                        pack.worldTemplateFolderName()
+                    ));
+                }
+            }
+            return bundlePacks;
         });
     }
 
