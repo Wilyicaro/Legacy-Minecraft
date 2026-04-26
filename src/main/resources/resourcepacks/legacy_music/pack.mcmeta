@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "description": "Compressed music from Legacy Console Edition",
+    "pack_format": 16,
+    "min_format": 16,
+    "max_format": 999,
+    "supported_formats": [ 16, 999 ]
+  }
+}
