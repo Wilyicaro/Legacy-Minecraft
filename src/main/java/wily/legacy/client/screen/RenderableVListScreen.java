@@ -1,11 +1,12 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.LegacyOptions;
 
 import java.util.Collections;
@@ -53,8 +54,13 @@ public class RenderableVListScreen extends LegacyScreen implements RenderableVLi
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(accessor.getInteger("buttonsHeight", 20));
+    }
+
+    @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(20);
         renderableVList.init(width / 2 - 112, this.height / 3 + 5, 225, 0);
     }
 }

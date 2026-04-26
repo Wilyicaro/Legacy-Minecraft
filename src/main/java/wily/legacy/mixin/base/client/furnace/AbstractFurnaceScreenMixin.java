@@ -1,32 +1,24 @@
 package wily.legacy.mixin.base.client.furnace;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
 //? if <1.21.2 {
 /*import net.minecraft.client.gui.screens.recipebook.AbstractFurnaceRecipeBookComponent;
  *///?}
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ControlTooltip;
@@ -107,9 +99,9 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         LegacyFontUtil.applySDFont(b -> {
             super.renderLabels(guiGraphics, i, j);
             Component ingredient = Component.translatable("legacy.container.ingredient");
-            guiGraphics.drawString(this.font, ingredient, (b ? 57 : 70) - font.width(ingredient), b ? 19 : 32, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, ingredient, (b ? 57 : 70) - font.width(ingredient), b ? 19 : 32, CommonColor.GRAY_TEXT.get(), false);
             Component fuel = Component.translatable("legacy.container.fuel");
-            guiGraphics.drawString(this.font, fuel, (b ? 57 : 70) - font.width(fuel), (b ? 53 : 79), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, fuel, (b ? 57 : 70) - font.width(fuel), (b ? 53 : 79), CommonColor.GRAY_TEXT.get(), false);
         });
     }
 

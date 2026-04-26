@@ -7,8 +7,6 @@ import net.minecraft.network.chat.Component;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.ControlTooltip;
 
-import java.util.function.Function;
-
 public interface LegacyKeyMapping {
     static LegacyKeyMapping of(KeyMapping key) {
         return (LegacyKeyMapping) key;

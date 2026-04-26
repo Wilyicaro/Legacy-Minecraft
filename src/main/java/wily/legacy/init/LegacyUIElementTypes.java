@@ -38,25 +38,29 @@ public class LegacyUIElementTypes {
         }));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "backgroundSprite", ResourceLocation.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", UIDefinitionManager.ElementType::parseBoolean);
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "contentX", "contentY", "width", "height", "lineHeight");
         UIDefinitionManager.parseAllElements(uiDefinition, a -> a.getElementValue(elementName + ".renderables", a, UIAccessor.class), element, s -> s);
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> a.addRenderable(elementName, ((guiGraphics, i, j, f) -> {
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
+            int xd = a.getInteger(elementName + ".contentX", 11);
+            int yd = a.getInteger(elementName + ".contentY", 11);
             int width = a.getInteger(elementName + ".width", 0);
             int height = a.getInteger(elementName + ".height", 0);
+            int lineHeight = a.getInteger(elementName + ".lineHeight", 12);
             if (a.getBoolean(elementName + ".hasBackground", true))
                 LegacyRenderUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName + ".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height);
-            a.getElement(elementName, ScrollableRenderer.class).ifPresent(s -> s.render(guiGraphics, x + 11, y + 11, width - 22, height - 28, () -> {
+            a.getElement(elementName, ScrollableRenderer.class).ifPresent(s -> s.render(guiGraphics, x + xd, y + yd, width - 2 * xd, height - 2 * yd - 6, () -> {
                 int yOffset = 0;
                 for (Renderable r : a.getElementValue(elementName + ".renderables", a, UIAccessor.class).getChildrenRenderables()) {
                     if (r instanceof LayoutElement e) {
-                        e.setPosition(x + 11, y + 15 + yOffset);
+                        e.setPosition(x + xd, y + yd + 4 + yOffset);
                         r.render(guiGraphics, i, j + Math.round(s.getYOffset()), f);
                         yOffset += e.getHeight();
                     }
                 }
-                s.scrolled.max = Math.max(0, Mth.ceil((yOffset - (height - 28)) / 12f));
+                s.lineHeight = lineHeight;
+                s.scrolled.max = Math.max(0, Mth.ceil((yOffset - (height - 2 * yd - 6.0f)) / lineHeight));
             }));
         }))));
     }));
@@ -118,7 +122,7 @@ public class LegacyUIElementTypes {
         RandomSource random = RandomSource.create();
         Bearer<Boolean> canOpenBook = Bearer.of(false);
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
-            if (!a.initialized()) {
+            if (!a.initialized() || bookModel.isEmpty()) {
                 bookModel.set(new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK)));
                 flip.set(0f);
                 oFlip.set(0f);
@@ -154,7 +158,8 @@ public class LegacyUIElementTypes {
             float f1 = Mth.lerp(f, oFlip.get(), flip.get());
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
-            guiGraphics.submitBookModelRenderState(bookModel.get(), ENCHANTING_TABLE_BOOK, a.getFloat(elementName + ".scale", 40.0f), g, f1, x, y, x + a.getInteger(elementName + ".width", 38), y + a.getInteger(elementName + ".height", 31));
+            if (bookModel.isPresent())
+                guiGraphics.submitBookModelRenderState(bookModel.get(), ENCHANTING_TABLE_BOOK, a.getFloat(elementName + ".scale", 40.0f), g, f1, x, y, x + a.getInteger(elementName + ".width", 38), y + a.getInteger(elementName + ".height", 31));
         }))));
     }));
     public static final UIDefinitionManager.ElementType PUT_TOGGLEABLE_TAB_SPRITES = UIDefinitionManager.ElementType.registerCodec("put_toggleable_tab_sprites", LegacyTabButton.ToggleableTabSprites.CODEC);

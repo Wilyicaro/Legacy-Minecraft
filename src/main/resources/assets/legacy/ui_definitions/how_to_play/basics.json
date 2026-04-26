@@ -1,6 +1,8 @@
 {
-  "elements": {
-    "scrollable_renderer": {
+  "elements": [
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
       "type": "put_scrollable_renderer",
       "x": "(${width}-${scrollable_renderer.width})/2",
       "y": "(${height}-${scrollable_renderer.height})/2 + 31",
@@ -9,15 +11,81 @@
       "elements": {
         "text": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.basics_message", "allowVariables": true, "args": ["controlIcon.camera_movement","controlIcon.player_movement","controlIcon.key.jump"]},
+          "component": {
+            "translate": "legacy.menu.how_to_play.basics_message",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.camera_movement",
+              "controlIcon.player_movement",
+              "controlIcon.key.jump"
+            ]
+          },
           "width": 433
         },
         "text1": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.basics_message_1", "allowVariables": true, "args": ["controlIcon.key.forward","controlIcon.key.forward","controlIcon.key.attack","controlIcon.key.use","controlIcon.key.drop"]},
+          "component": {
+            "translate": "legacy.menu.how_to_play.basics_message_1",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.key.forward",
+              "controlIcon.key.forward",
+              "controlIcon.key.attack",
+              "controlIcon.key.use",
+              "controlIcon.key.drop"
+            ]
+          },
           "width": 433
         }
       }
+    },
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+      "contentX": 10,
+      "contentY": 8,
+      "width": 288,
+      "height": 137,
+      "lineHeight": 8,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.basics_message",
+            "font": "legacy:default_11",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.camera_movement",
+              "controlIcon.player_movement",
+              "controlIcon.key.jump"
+            ]
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.basics_message_1",
+            "font": "legacy:default_11",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.key.forward",
+              "controlIcon.key.forward",
+              "controlIcon.key.attack",
+              "controlIcon.key.use",
+              "controlIcon.key.drop"
+            ]
+          },
+          "width": 268,
+          "lineSpacing": 8
+        }
+      }
     }
-  }
+  ]
 }

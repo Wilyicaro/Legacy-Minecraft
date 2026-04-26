@@ -154,7 +154,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, (s & 0xFEFEFE) >> 1, false);
+                guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, CommonColor.INVALID_ENCHANTMENT_TEXT.get(), false);
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + (sd ? 52.5 : 80.5));

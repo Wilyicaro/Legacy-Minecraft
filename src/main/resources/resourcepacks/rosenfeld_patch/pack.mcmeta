@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "description": "Replaces most of the Minecraft soundtrack with C418",
+    "pack_format": 16,
+    "min_format": 16,
+    "max_format": 999,
+    "supported_formats": [ 16, 999 ]
+  }
+}

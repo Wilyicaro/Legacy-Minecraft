@@ -79,7 +79,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
     @Override
     protected void panelInit() {
         super.panelInit();
-        addRenderableOnly((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        addRenderableOnly((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.x + 11, panel.y + panel.height - 182, CommonColor.GRAY_TEXT.get(), false));
     }
 
     @Override

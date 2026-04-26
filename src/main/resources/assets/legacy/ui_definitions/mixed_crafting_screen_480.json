@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.MixedCraftingScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "imageSprite": {
       "type": "put_resource_location",
@@ -42,10 +44,10 @@
     "craftingArrow.x": 56,
     "craftingArrow.y": 37,
     "descriptionPanel.x": 128,
-    "descriptionPanel.y":  4,
+    "descriptionPanel.y": 4,
     "descriptionPanel.width": 117,
     "descriptionPanel.height": 39,
-    "descriptionText.x":  3,
+    "descriptionText.x": 3,
     "descriptionText.y": 3,
     "inventoryPanel.x": 127,
     "title.y": 6,

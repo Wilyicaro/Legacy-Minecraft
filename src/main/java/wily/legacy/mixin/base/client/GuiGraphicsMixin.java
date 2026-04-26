@@ -12,7 +12,6 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
@@ -31,7 +30,6 @@ import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.MutablePIPRenderState;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -55,12 +53,12 @@ public abstract class GuiGraphicsMixin {
 
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
-        LegacyFontUtil.legacyFont = false;
+        LegacyFontUtil.disableLegacyFont();
     }
 
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
-        LegacyFontUtil.legacyFont = true;
+        LegacyFontUtil.enableLegacyFont();
     }
 
     @Inject(method = /*? if forge || neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"renderTooltip"/*?}*/, at = @At("HEAD"), cancellable = true)

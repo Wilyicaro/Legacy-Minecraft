@@ -1,0 +1,114 @@
+{
+  "elements": [
+    {
+      "name": "newer_version_notes_fhd_hd",
+      "type": "children",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "applyPrefix": false,
+      "elements": {
+        "changelogBackground": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "x": "${panel.x}+7",
+          "y": "${panel.y}+10",
+          "width": 353,
+          "height": 190
+        },
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${panel.x}-2",
+          "y": "${panel.y}",
+          "width": 370,
+          "height": 200,
+          "hasBackground": false,
+          "lineHeight": 8,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.newerVersion"
+              },
+              "shadow": false,
+              "color": "${commonColor.inventory_gray_text}",
+              "width": 348
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "baseDir": "minecraft:changelog"
+              },
+              "shadow": false,
+              "color": "${commonColor.inventory_gray_text}",
+              "width": 348
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "newer_version_notes_sd",
+      "type": "children",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "applyPrefix": false,
+      "elements": {
+        "panel.width": 266,
+        "panel.height": 133,
+        "acceptButton.width": 180,
+        "acceptButton.height": 18,
+        "acceptButton.x": "${panel.x}+(${panel.width}-${acceptButton.width})/2",
+        "acceptButton.y": "${panel.y}+${panel.height}-22",
+        "panel.sprite": {
+          "type": "put_resource_location",
+          "value": "legacy:tiles/panel"
+        },
+        "panel.y": "(${height}-${panel.height})/2+6",
+        "changelogBackground": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "x": "${panel.x}+5",
+          "y": "${panel.y}+5",
+          "width": 256,
+          "height": 104
+        },
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${changelogBackground.x}+1",
+          "y": "${changelogBackground.y}+1",
+          "contentX": 1,
+          "contentY": 0,
+          "width": 253,
+          "height": 90,
+          "hasBackground": false,
+          "lineHeight": 8,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.newerVersion",
+                "font": "legacy:default_11"
+              },
+              "shadow": false,
+              "color": "${commonColor.inventory_gray_text}",
+              "lineHeight": 8,
+              "width": 253
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "text": "",
+                "baseDir": "minecraft:changelog",
+                "font": "legacy:default_11"
+              },
+              "shadow": false,
+              "color": "${commonColor.inventory_gray_text}",
+              "lineHeight": 8,
+              "width": 253
+            }
+          }
+        }
+      }
+    }
+  ]
+}

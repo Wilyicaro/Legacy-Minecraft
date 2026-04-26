@@ -2,6 +2,7 @@ package wily.legacy.network;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +23,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     public static final CommonNetwork.Identifier<PlayerInfoSync> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_c2s"), PlayerInfoSync::new);
 
     public PlayerInfoSync(CommonNetwork.PlayBuf buf) {
-        this(buf.get().readEnum(Sync.class), buf.get().readUUID());
+        this(Sync.byId(buf.get().readVarInt()), buf.get().readUUID());
     }
 
     public PlayerInfoSync(Sync sync, Player player) {
@@ -61,6 +62,10 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         return new PlayerInfoSync(mayFlySurvival ? Sync.ENABLE_MAY_FLY_SURVIVAL : Sync.DISABLE_MAY_FLY_SURVIVAL, profile);
     }
 
+    public static PlayerInfoSync invisibility(boolean invisible, GameProfile profile) {
+        return new PlayerInfoSync(invisible ? Sync.ENABLE_INVISIBILITY : Sync.DISABLE_INVISIBILITY, profile);
+    }
+
     public static Map<String, Object> getWritableGameRules(GameRules gameRules) {
         Map<String, Object> rules = new HashMap<>();
         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
@@ -77,7 +82,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeEnum(sync);
+        buf.get().writeVarInt(sync.id());
         buf.get().writeUUID(player);
     }
 
@@ -85,6 +90,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     public void apply(Context context) {
         if (context.player() instanceof ServerPlayer sp) {
             ServerPlayer affectPlayer;
+            boolean shouldSyncPlayerInfo = false;
             if (sp.getUUID().equals(player)) {
                 switch (sync) {
                     case ASK_ALL ->
@@ -102,12 +108,37 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             if (affectPlayer == null) return;
             if (sp.hasPermissions(2)) {
                 switch (sync) {
-                    case DISABLE_EXHAUSTION, ENABLE_EXHAUSTION ->
-                            ((LegacyPlayerInfo) affectPlayer).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
-                    case ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL ->
-                            LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
+                    case DISABLE_EXHAUSTION, ENABLE_EXHAUSTION -> {
+                        boolean disableExhaustion = sync == Sync.DISABLE_EXHAUSTION;
+                        LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
+                        if (info.isExhaustionDisabled() != disableExhaustion) {
+                            info.setDisableExhaustion(disableExhaustion);
+                            affectPlayer.displayClientMessage(Component.translatable(disableExhaustion ? "legacy.menu.host_options.player.disableExhaustion.enabled" : "legacy.menu.host_options.player.disableExhaustion.disabled"), false);
+                            shouldSyncPlayerInfo = true;
+                        }
+                    }
+                    case ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL -> {
+                        boolean mayFlySurvival = sync == Sync.ENABLE_MAY_FLY_SURVIVAL;
+                        LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
+                        if (info.mayFlySurvival() != mayFlySurvival) {
+                            LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, mayFlySurvival, true);
+                            affectPlayer.displayClientMessage(Component.translatable(mayFlySurvival ? "legacy.menu.host_options.player.mayFly.enabled" : "legacy.menu.host_options.player.mayFly.disabled"), false);
+                            shouldSyncPlayerInfo = true;
+                        }
+                    }
+                    case ENABLE_INVISIBILITY, DISABLE_INVISIBILITY -> {
+                        boolean visible = sync == Sync.DISABLE_INVISIBILITY;
+                        LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
+                        if (info.isVisible() != visible) {
+                            info.setVisibility(visible);
+                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
+                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);
+                            shouldSyncPlayerInfo = true;
+                        }
+                    }
                 }
             }
+            if (shouldSyncPlayerInfo) syncPlayerInfo(affectPlayer);
         }
     }
 
@@ -117,7 +148,58 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     }
 
     public enum Sync {
-        ASK_ALL, CLASSIC_CRAFTING, LEGACY_CRAFTING, DISABLE_EXHAUSTION, ENABLE_EXHAUSTION, ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL, CLASSIC_TRADING, LEGACY_TRADING, CLASSIC_STONECUTTING, LEGACY_STONECUTTING, CLASSIC_LOOM, LEGACY_LOOM
+        ASK_ALL(0),
+        CLASSIC_CRAFTING(1),
+        LEGACY_CRAFTING(2),
+        DISABLE_EXHAUSTION(3),
+        ENABLE_EXHAUSTION(4),
+        ENABLE_MAY_FLY_SURVIVAL(5),
+        DISABLE_MAY_FLY_SURVIVAL(6),
+        CLASSIC_TRADING(7),
+        LEGACY_TRADING(8),
+        CLASSIC_STONECUTTING(9),
+        LEGACY_STONECUTTING(10),
+        CLASSIC_LOOM(11),
+        LEGACY_LOOM(12),
+        ENABLE_INVISIBILITY(13),
+        DISABLE_INVISIBILITY(14);
+
+        private final int id;
+
+        Sync(int id) {
+            this.id = id;
+        }
+
+        public int id() {
+            return id;
+        }
+
+        public static Sync byId(int id) {
+            return switch (id) {
+                case 0 -> ASK_ALL;
+                case 1 -> CLASSIC_CRAFTING;
+                case 2 -> LEGACY_CRAFTING;
+                case 3 -> DISABLE_EXHAUSTION;
+                case 4 -> ENABLE_EXHAUSTION;
+                case 5 -> ENABLE_MAY_FLY_SURVIVAL;
+                case 6 -> DISABLE_MAY_FLY_SURVIVAL;
+                case 7 -> CLASSIC_TRADING;
+                case 8 -> LEGACY_TRADING;
+                case 9 -> CLASSIC_STONECUTTING;
+                case 10 -> LEGACY_STONECUTTING;
+                case 11 -> CLASSIC_LOOM;
+                case 12 -> LEGACY_LOOM;
+                case 13 -> ENABLE_INVISIBILITY;
+                case 14 -> DISABLE_INVISIBILITY;
+                default -> throw new IllegalArgumentException("Unknown player info sync id: " + id);
+            };
+        }
+    }
+
+    private static void syncPlayerInfo(ServerPlayer player) {
+        MinecraftServer server = FactoryAPIPlatform.getEntityServer(player);
+        if (server == null) return;
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), new All(Map.of(player.getUUID(), (LegacyPlayerInfo) player), Collections.emptyMap(), server.getDefaultGameType(), All.ID_S2C));
     }
 
     public record All(Map<UUID, LegacyPlayerInfo> players, Map<String, Object> gameRules, GameType defaultGameType,
@@ -188,3 +270,5 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
     }
 }
+
+

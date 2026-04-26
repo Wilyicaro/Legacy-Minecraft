@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.OptionsScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "panel.sprite": {
       "type": "put_resource_location",

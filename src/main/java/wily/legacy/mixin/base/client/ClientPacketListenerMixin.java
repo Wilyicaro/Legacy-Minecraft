@@ -8,6 +8,7 @@ import net.minecraft.client.multiplayer.*;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -20,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyDragonEggTeleportParticles;
+import wily.legacy.client.ConduitRotationCache;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
@@ -31,6 +34,8 @@ import wily.legacy.inventory.LegacyMerchantMenu;
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
     @Shadow
     private LevelLoadTracker levelLoadTracker;
+    @Shadow
+    private ClientLevel level;
 
     protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
@@ -51,6 +56,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
     @Inject(method = "handleLogin", at = @At("TAIL"))
     public void handleLoginMusic(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
+        ConduitRotationCache.clear();
         if (minecraft.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
     }
 
@@ -62,6 +68,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     @Inject(method = "handlePlayerInfoRemove", at = @At("RETURN"))
     public void handlePlayerInfoUpdate(ClientboundPlayerInfoRemovePacket clientboundPlayerInfoRemovePacket, CallbackInfo ci) {
         Legacy4JClient.onClientPlayerInfoChange();
+    }
+
+    @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;setServerVerifiedBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V"))
+    public void handleDragonEggTeleportBlockUpdate(ClientboundBlockUpdatePacket clientboundBlockUpdatePacket, CallbackInfo ci) {
+        LegacyDragonEggTeleportParticles.handleBlockUpdate(level, clientboundBlockUpdatePacket.getPos(), level.getBlockState(clientboundBlockUpdatePacket.getPos()), clientboundBlockUpdatePacket.getBlockState());
     }
 
     @WrapWithCondition(method = /*? if <1.21.2 {*//*"handleContainerSetSlot"*//*?} else {*/"handleSetCursorItem"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
@@ -104,9 +115,26 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
     @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/network/PacketProcessor;)V", shift = At.Shift.AFTER), cancellable = true)
     public void handleSystemChat(ClientboundSystemChatPacket clientboundSystemChatPacket, CallbackInfo ci) {
+        if (!LegacyOptions.deathMessages.get() && clientboundSystemChatPacket.content().getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.")) {
+            ci.cancel();
+            return;
+        }
+        if (!LegacyOptions.announceAdvancements.get() && isAdvancementAnnouncement(clientboundSystemChatPacket.content())) {
+            ci.cancel();
+            return;
+        }
+        if (!LegacyOptions.displayGameMessages.get()) {
+            ci.cancel();
+            return;
+        }
         if (!LegacyOptions.systemMessagesAsOverlay.get()) {
             minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);
             ci.cancel();
         }
+    }
+
+    private static boolean isAdvancementAnnouncement(Component component) {
+        if (!(component.getContents() instanceof TranslatableContents contents)) return false;
+        return contents.getKey().startsWith("chat.type.advancement.");
     }
 }

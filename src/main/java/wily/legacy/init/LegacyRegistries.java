@@ -53,10 +53,12 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<SoundEvent> BACK = SOUND_EVENT_REGISTER.add("random.back",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.back")));
     public static final RegisterListing.Holder<SoundEvent> FOCUS = SOUND_EVENT_REGISTER.add("random.focus",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.focus")));
     public static final RegisterListing.Holder<SoundEvent> ACTION = SOUND_EVENT_REGISTER.add("random.action",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.action")));
+    public static final RegisterListing.Holder<SoundEvent> PACK_SELECTION = SOUND_EVENT_REGISTER.add("random.pack_selection",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.pack_selection")));
     public static final RegisterListing.Holder<SoundEvent> SHIFT_LOCK = SOUND_EVENT_REGISTER.add("random.shift_lock",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.shift_lock")));
     public static final RegisterListing.Holder<SoundEvent> SHIFT_UNLOCK = SOUND_EVENT_REGISTER.add("random.shift_unlock",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.shift_unlock")));
     public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.space")));
     public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.backspace")));
+    public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.screenshot")));
 
 
     public static boolean isInvalidCauldron(BlockState blockState, Level level, BlockPos blockPos){

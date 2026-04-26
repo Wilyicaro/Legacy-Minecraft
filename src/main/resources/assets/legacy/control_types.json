@@ -101,6 +101,7 @@
     "name": {"translate": "legacy.options.controlType.steam"},
     "font": {
       "default": "legacy:steam",
+      "hd": "legacy:steam_hd",
       "sd": {
         "id": "legacy:steam_sd",
         "iconHeight": 9
@@ -113,7 +114,11 @@
     "name": {"translate": "legacy.options.controlType.stadia"},
     "font": {
       "default": "legacy:stadia",
-      "hd": "legacy:stadia_hd"
+      "hd": "legacy:stadia_hd",
+      "sd": {
+        "id": "legacy:stadia_sd",
+        "iconHeight": 9
+      }
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/stadia.png"
   }

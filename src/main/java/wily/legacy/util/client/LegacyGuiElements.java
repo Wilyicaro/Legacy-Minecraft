@@ -39,10 +39,10 @@ public class LegacyGuiElements {
             LegacyRenderUtil.renderTopText(guiGraphics, TopMessage.medium, 37, 1.5f, TopMessage.mediumTicks);
         });
         FactoryGuiElement.SPECTATOR_HOTBAR.pre().register(guiGraphics -> {
-            LegacyFontUtil.legacyFont = false;
+            LegacyFontUtil.disableLegacyFont();
             AnimatedCharacterRenderer.render(guiGraphics);
         });
-        FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> LegacyFontUtil.legacyFont = true);
+        FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> LegacyFontUtil.enableLegacyFont());
         accessor.addStatic(UIDefinition.createBeforeInit(a -> {
             if (!LegacyMixinOptions.legacyGui.get()) return;
             a.getElements().put(FactoryGuiElement.VIGNETTE.name() + ".isVisible", () -> false);
@@ -93,7 +93,6 @@ public class LegacyGuiElements {
                 LegacyOptions.UIMode uiMode = LegacyOptions.UIMode.values()[i];
                 a.getElements().put("uiMode." + uiMode.getSerializedName(), () -> LegacyOptions.getUIMode() == uiMode);
             }
-
         }));
     }
 }

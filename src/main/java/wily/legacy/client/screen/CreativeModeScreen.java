@@ -199,7 +199,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 296), accessor.getInteger("scroller.y", panel.y + 27));
         scroller.height = accessor.getInteger("scroller.height", 135);
         scroller.width = accessor.getInteger("scroller.width", 13);
-        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0));
+        scroller.offset(new Vec2(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f));
         boolean sd = LegacyOptions.getUIMode().isSD();
         if (arrangement.get() == 2) {
             searchBox.setWidth(sd ? 70 : 200);
@@ -253,7 +253,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         if (arrangement.get() == 2) return;
         Component tabTitle = tabList.tabButtons.get(tabList.getIndex()).getMessage();
-        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.GRAY_TEXT.get(), false));
     }
 
     @Override

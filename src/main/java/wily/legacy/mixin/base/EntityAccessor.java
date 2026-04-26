@@ -1,9 +1,8 @@
 package wily.legacy.mixin.base;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(Entity.class)
 public interface EntityAccessor {
@@ -14,4 +13,10 @@ public interface EntityAccessor {
     @Accessor
     void setPortalEntrancePos(BlockPos pos);
     *///?}
+
+    @Invoker("canAddPassenger")
+    boolean canVehicleAddPassenger(Entity entity);
+
+    @Invoker("canRide")
+    boolean canRideVehicle(Entity entity);
 }

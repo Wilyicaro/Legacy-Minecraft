@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/turtle_egg",
+  "display": {
+    "firstperson_righthand": {
+      "translation": [5, 4, 0]
+    },
+    "firstperson_lefthand": {
+      "translation": [5, 4, 0]
+    }
+  }
+}

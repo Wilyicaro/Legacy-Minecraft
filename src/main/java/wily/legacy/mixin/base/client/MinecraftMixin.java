@@ -28,6 +28,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -47,7 +51,11 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.screen.*;
+import wily.legacy.entity.LegacyShieldPlayer;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerPlayerMissHitPayload;
+import wily.legacy.network.ServerPlayerShieldPausePayload;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -90,6 +98,7 @@ public abstract class MinecraftMixin {
     Screen oldScreen;
     private boolean inventoryKeyLastPressed = false;
     private int inventoryKeyHold = 0;
+    private int legacy$shieldPauseSyncCooldown = 0;
     @Shadow
     private int rightClickDelay;
     @Shadow
@@ -108,6 +117,19 @@ public abstract class MinecraftMixin {
 
     @Shadow
     public abstract boolean isPaused();
+
+    @Unique
+    private void legacy$pauseShield() {
+        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS)) {
+            boolean usingShield = player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem;
+            if (usingShield && Legacy4JClient.hasModOnServer() && legacy$shieldPauseSyncCooldown == 0) {
+                CommonNetwork.sendToServer(new ServerPlayerShieldPausePayload());
+                legacy$shieldPauseSyncCooldown = 1;
+            }
+            ((LegacyShieldPlayer) player).pauseShield(LegacyShieldPlayer.SHIELD_PAUSE_TICKS);
+            if (usingShield && gameMode != null) gameMode.releaseUsingItem(player);
+        }
+    }
 
     private Minecraft self() {
         return (Minecraft) (Object) this;
@@ -132,16 +154,35 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
+        if (legacy$shieldPauseSyncCooldown > 0) legacy$shieldPauseSyncCooldown--;
+        if (player != null && screen == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
+            legacy$pauseShield();
+        }
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
+        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !LegacyItemUtil.canGoInLceOffhand(player.getMainHandItem())) {
+            while (options.keySwapOffhand.consumeClick()) {
+            }
+        }
+    }
+
+    @Inject(method = "continueAttack", at = @At("HEAD"))
+    private void continueAttack(boolean bl, CallbackInfo ci) {
+        if (bl) legacy$pauseShield();
+    }
+
+    @Inject(method = "startAttack", at = @At("HEAD"))
+    private void startAttackHead(CallbackInfoReturnable<Boolean> cir) {
+        legacy$pauseShield();
     }
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void startAttack(CallbackInfoReturnable<Boolean> cir) {
-        CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
+        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
     }
 
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
     private void startUseItem(CallbackInfo ci) {
+        legacy$pauseShield();
         if (player != null && player.isSleeping()) {
             ClientPacketListener clientPacketListener = player.connection;
             clientPacketListener.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.STOP_SLEEPING));
@@ -167,6 +208,13 @@ public abstract class MinecraftMixin {
         }
         if (level.getBlockState(hit.getBlockPos()).getBlock() instanceof BedBlock || player.getAbilities().flying && player.isSprinting())
             rightClickDelay = -1;
+    }
+
+    @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;", shift = At.Shift.AFTER))
+    private void rememberConduitRotation(CallbackInfo ci, @Local InteractionHand hand, @Local BlockHitResult hit) {
+        if (!(player.getItemInHand(hand).getItem() instanceof BlockItem blockItem) || blockItem.getBlock() != Blocks.CONDUIT) return;
+        BlockPlaceContext context = new BlockPlaceContext(player, hand, player.getItemInHand(hand), hit);
+        if (level.getBlockState(context.getClickedPos()).is(Blocks.CONDUIT)) ConduitRotationCache.remember(level, context.getClickedPos(), player.getYRot());
     }
 
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSleeping()Z"))
@@ -199,6 +247,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void disconnectFadeMusic(CallbackInfo ci) {
+        ConduitRotationCache.clear();
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
 

@@ -46,7 +46,14 @@ public abstract class RecipeToastMixin implements Toast {
 
     @Inject(method = "addOrUpdate", at = @At("HEAD"), cancellable = true)
     private static void addOrUpdate(CallbackInfo ci) {
-        if (!LegacyOptions.hasClassicCrafting()) ci.cancel();
+        if (shouldHideRecipeUnlockToast()) ci.cancel();
+    }
+
+    private static boolean shouldHideRecipeUnlockToast() {
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            return !LegacyOptions.showVanillaRecipeBook.get();
+        }
+        return !LegacyOptions.hasClassicCrafting();
     }
 
     @Inject(method = "addItem", at = @At("RETURN"))

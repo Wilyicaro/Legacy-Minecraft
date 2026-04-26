@@ -27,7 +27,7 @@ public class CommonColor extends CommonValue<Integer> {
     public static final ListMap<ResourceLocation, CommonColor> COMMON_COLORS = new ListMap<>();
 
     public static final CommonColor CHAT_BACKGROUND = registerCommonColor("chat_background", 0xFF323232);
-    public static final CommonColor INVENTORY_GRAY_TEXT = registerCommonColor("inventory_gray_text", 0xFF323232);
+    public static final CommonColor GRAY_TEXT = registerCommonColor("inventory_gray_text", 0xFF323232);
     public static final CommonColor WIDGET_TEXT = registerCommonColor("widget_text", 0xFFFFFFFF);
     public static final CommonColor HIGHLIGHTED_WIDGET_TEXT = registerCommonColor("highlighted_widget_text", 0xFFFFFF00);
     public static final CommonColor TITLE_TEXT = registerCommonColor("title_text", 0xFFFFFFFF);
@@ -42,6 +42,7 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor INSUFFICIENT_EXPERIENCE_TEXT = registerCommonColor("insufficient_experience_text", 0xFFCF1F1D);
     public static final CommonColor ANVIL_ERROR_TEXT = registerCommonColor("anvil_error_text", 0xFFFF6060);
     public static final CommonColor ENCHANTMENT_TEXT = registerCommonColor("enchantment_text", 0xFF685E4A);
+    public static final CommonColor INVALID_ENCHANTMENT_TEXT = registerCommonColor("invalid_enchantment_text", 0xFF383222);
     public static final CommonColor HIGHLIGHTED_ENCHANTMENT_TEXT = registerCommonColor("highlighted_enchantment_text", 0xFFFFFF80);
     public static final CommonColor BLACK = registerCommonColor("black", 0xFF000000);
     public static final CommonColor DARK_BLUE = registerCommonColor("dark_blue", 0xFF0000AA);

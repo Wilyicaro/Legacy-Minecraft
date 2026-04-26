@@ -90,10 +90,8 @@ import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.mixin.base.FlowerPotBlockAccessor;
-import wily.legacy.mixin.base.HangingEntityItemAccessor;
-import wily.legacy.mixin.base.ItemBasedSteeringAccessor;
-import wily.legacy.mixin.base.PigAccessor;
+import wily.legacy.init.LegacyGameRules;
+import wily.legacy.mixin.base.*;
 import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
@@ -398,7 +396,7 @@ public interface ControlTooltip {
             if (entity instanceof Llama llama && llama.isTamed() && mainHand.is(ItemTags.WOOL_CARPETS) && llama.getItemBySlot(EquipmentSlot.BODY).isEmpty())
                 return LegacyComponents.EQUIP;
         }
-        if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
+        if (entity != null && ((EntityAccessor)entity).canVehicleAddPassenger(minecraft.player) && ((EntityAccessor)entity).canRideVehicle(entity)) {
             boolean holdingLead = minecraft.player.getMainHandItem().getItem() instanceof LeadItem;
             if (!holdingLead) {
                 if (entity instanceof Boat || entity instanceof ChestBoat) return LegacyComponents.SAIL;
@@ -619,7 +617,7 @@ public interface ControlTooltip {
                 return LegacyComponents.REPAIR;
             // 6-Tool use (shears, brush, bone meal)
             if (actualItem.getItem() instanceof ShearsItem) {
-                if (entity instanceof Sheep s && !s.isBaby() && !s.isSheared() || entity instanceof SnowGolem snowGolem && snowGolem.hasPumpkin() || entity instanceof MushroomCow)
+                if (entity instanceof Sheep s && !s.isBaby() && !s.isSheared() || entity instanceof SnowGolem snowGolem && snowGolem.hasPumpkin())
                     return LegacyComponents.SHEAR;
                 else if (blockState != null && blockState.getBlock() instanceof PumpkinBlock)
                     return LegacyComponents.CARVE;
@@ -630,7 +628,7 @@ public interface ControlTooltip {
                 return LegacyComponents.GROW;
             // 7-Equipable items (armor, saddle, lead)
             if (actualItem.getUseAnimation().equals(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK))
-                return LegacyComponents.BLOCK;
+                return actualItem.getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(minecraft.player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) ? null : LegacyComponents.BLOCK;
             boolean lookingAtEntity = minecraft.hitResult instanceof EntityHitResult;
             if (!lookingAtEntity && /* ? if <1.21.2 { *//* actualItem.getItem() instanceof Equipable e *//* ?} else { */ actualItem.has(DataComponents.EQUIPPABLE)/* ?} */ && !actualItem.is(Items.SADDLE) && !actualItem.is(Items.LEATHER_HORSE_ARMOR) && !actualItem.is(Items.IRON_HORSE_ARMOR) && !actualItem.is(Items.GOLDEN_HORSE_ARMOR) && !actualItem.is(Items.COPPER_HORSE_ARMOR) && !actualItem.is(Items.DIAMOND_HORSE_ARMOR)) {
                 EquipmentSlot slot = /* ? if <1.21.2 { *//* e.getEquipmentSlot() *//* ?} else { */ actualItem.get(DataComponents.EQUIPPABLE).slot();/* ?} */
@@ -701,7 +699,7 @@ public interface ControlTooltip {
 
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;
-        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && b.getPlacementState(c) != null));
+        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && ((BlockItemAccessor) b).getPlacementBlockState(c) != null));
     }
 
     static boolean canHang(Minecraft minecraft, BlockHitResult hitResult, BlockState blockState, ItemStack usedItem) {
@@ -728,7 +726,7 @@ public interface ControlTooltip {
     }
 
     static boolean isEdible(ItemStack stack) {
-        return /*? if <1.20.5 {*//*stack.isEdible()*//*?} else {*/stack.has(DataComponents.FOOD)/*?}*/;
+        return stack.getUseAnimation() == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.EAT;
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem) {
@@ -1044,8 +1042,10 @@ public interface ControlTooltip {
 
         @Override
         public void click(MouseButtonEvent event) {
-            super.click(event);
-            state().nextUpdatePress();
+            if (Legacy4JClient.controllerManager.connectedController != null) {
+                super.click(event);
+                state().nextUpdatePress();
+            }
         }
 
         @Override

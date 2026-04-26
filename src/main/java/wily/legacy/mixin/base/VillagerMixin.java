@@ -2,9 +2,14 @@ package wily.legacy.mixin.base;
 
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.*;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
@@ -15,9 +20,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.inventory.LegacyMerchantOffer;
+import wily.legacy.util.LegacyItemUtil;
+import wily.legacy.mobcaps.ConsoleMobCaps;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Mixin(Villager.class)
 public abstract class VillagerMixin extends AbstractVillager {
@@ -61,6 +70,7 @@ public abstract class VillagerMixin extends AbstractVillager {
         updateTrades(getLevel());
     }
 
+    @Unique
     protected void updateTrades(int level) {
         Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap;
         VillagerData villagerData = this.getVillagerData();
@@ -71,6 +81,9 @@ public abstract class VillagerMixin extends AbstractVillager {
             return;
 
         ArrayList<VillagerTrades.ItemListing> arrayList = Lists.newArrayList(itemListings);
+        if (profession == VillagerProfession.FLETCHER && level == 5) {
+            arrayList.add(this::getDecayArrowTrade);
+        }
         int j = 0;
         while (j < 2 && !arrayList.isEmpty()) {
             MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer(self(), self().getRandom());
@@ -80,5 +93,17 @@ public abstract class VillagerMixin extends AbstractVillager {
             ++j;
         }
 
+    }
+
+    @Unique
+    protected MerchantOffer getDecayArrowTrade(Entity trader, net.minecraft.util.RandomSource randomSource) {
+        return new MerchantOffer(new ItemCost(Items.ARROW, 5), Optional.of(new ItemCost(Items.EMERALD, 2)), LegacyItemUtil.createDecayTippedArrow().copyWithCount(5), 12, 30, 0.2f);
+    }
+  
+    @Inject(method = "getBreedOffspring*", at = @At("HEAD"), cancellable = true)
+    public void getBreedOffspring(ServerLevel level, AgeableMob partner, CallbackInfoReturnable<Villager> cir) {
+        if (!ConsoleMobCaps.canVillagerBreed(level)) {
+            cir.setReturnValue(null);
+        }
     }
 }

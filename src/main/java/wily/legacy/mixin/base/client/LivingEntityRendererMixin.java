@@ -3,11 +3,13 @@ package wily.legacy.mixin.base.client;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.*;
 //? if >=1.21.2 {
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -59,8 +61,13 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
         return true;
     }
 
-    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"))
+    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
     public void render(LivingEntityRenderState livingEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft != null && minecraft.player != null && minecraft.getCameraEntity() == minecraft.player && minecraft.options.getCameraType() == CameraType.FIRST_PERSON && minecraft.player.isSleeping() && livingEntityRenderState instanceof AvatarRenderState avatarRenderState && avatarRenderState.id == minecraft.player.getId()) {
+            ci.cancel();
+            return;
+        }
         if (FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class) != null && FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class).isTrading && LegacyOptions.merchantTradingIndicator.get()) {
             poseStack.pushPose();
             poseStack.translate(0, livingEntityRenderState.boundingBoxHeight + 0.5f, 0);

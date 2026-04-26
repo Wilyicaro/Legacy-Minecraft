@@ -3,15 +3,19 @@ package wily.legacy.util;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import wily.factoryapi.FactoryAPI;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.init.LegacyGameRules;
 
 public class LegacyComponents {
     public static final Component RESOURCE_ALBUMS = Component.translatable("legacy.menu.albums.resource");
     public static final Component ALBUM_OPTIONS = Component.translatable("legacy.menu.album_options");
+    public static final Component CUSTOM_SKIN_PACK_OPTIONS = Component.translatable("legacy.menu.custom_skin_pack_options");
     public static final Component GLOBAL_RESOURCE_PACKS = Component.translatable("legacy.menu.global_packs.resource");
     public static final Component SELECT = Component.translatable("mco.template.button.select");
     public static final Component USE = Component.translatable("key.use");
@@ -190,6 +194,7 @@ public class LegacyComponents {
     public static final Component INITIALIZING = Component.translatable("legacy.connect.initializing");
     public static final Component LOADING_SPAWN_AREA = Component.translatable("legacy.loading_spawn_area");
     public static final Component PREPARING_AUTOSAVE = Component.translatable("legacy.menu.savingLevel.preparing");
+    public static final Component PREPARING_MANUAL_SAVE = Component.translatable("legacy.menu.savingLevel.preparing_manual");
     public static final Component PREPARING_CHUNKS = Component.translatable("legacy.menu.savingLevel.preparing_chunks");
     public static final Component FINALIZING = Component.translatable("legacy.menu.savingLevel.finalizing");
     public static final Component SPAWN_EGG_TIP = Component.translatable("item.minecraft.spawn_egg.tip");
@@ -231,6 +236,26 @@ public class LegacyComponents {
     public static final Component DETACH = Component.translatable("legacy.action.detach");
     public static final Component CLOSE = Component.translatable("legacy.action.close");
 
+    public static Component getResourceAlbums() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture_packs" : "legacy.menu.albums.resource");
+    }
+
+    public static Component getGlobalResourcePacks() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.global_packs.texture_packs" : "legacy.menu.global_packs.resource");
+    }
+
+    public static Component getShowResourcePacks() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.action.show_texture_packs" : "legacy.action.show_resource_packs");
+    }
+
+    public static Component getResourceAlbumTemplate(int repeat) {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture.template" : "legacy.menu.albums.resource.template", repeat);
+    }
+
+    public static Component getResourceAlbumTemplateDescription() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture.template.description" : "legacy.menu.albums.resource.template.description");
+    }
+
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);
         return presetDescription == null ? WORLD_TYPE_DESCRIPTION : WORLD_TYPE_DESCRIPTION.copy().append("\n\n").append(presetDescription);
@@ -264,6 +289,23 @@ public class LegacyComponents {
 
     public static Component optionName(String key) {
         return Component.translatable("legacy.options." + key);
+    }
+
+    public static Component getMenuGameRuleName(GameRules.Key<?> key) {
+        if (!LegacyOptions.legacySettingsMenus.get()) return Component.translatable(key.getDescriptionId());
+        if (key == GameRules.RULE_DOFIRETICK) return Component.translatable("legacy.gamerule.fire_spreads");
+        if (key == LegacyGameRules.getTntExplodes()) return Component.translatable("legacy.gamerule.tnt_explodes");
+        if (key == LegacyGameRules.getPvp()) return Component.translatable("legacy.gamerule.player_vs_player");
+        if (key == GameRules.RULE_DAYLIGHT) return Component.translatable("legacy.gamerule.daylight_cycle");
+        if (key == GameRules.RULE_WEATHER_CYCLE) return Component.translatable("legacy.gamerule.weather_cycle");
+        if (key == GameRules.RULE_KEEPINVENTORY) return Component.translatable("legacy.gamerule.keep_inventory");
+        if (key == GameRules.RULE_DOMOBSPAWNING) return Component.translatable("legacy.gamerule.mob_spawning");
+        if (key == GameRules.RULE_MOBGRIEFING) return Component.translatable("legacy.gamerule.mob_griefing");
+        if (key == GameRules.RULE_DOMOBLOOT) return Component.translatable("legacy.gamerule.mob_loot");
+        if (key == GameRules.RULE_DOBLOCKDROPS) return Component.translatable("legacy.gamerule.tile_drops");
+        if (key == GameRules.RULE_NATURAL_REGENERATION) return Component.translatable("legacy.gamerule.natural_regeneration");
+        if (key == GameRules.RULE_DO_IMMEDIATE_RESPAWN) return Component.translatable("legacy.gamerule.immediate_respawn");
+        return Component.translatable(key.getDescriptionId());
     }
 
     public static Component getDimensionName(ResourceKey<Level> dimension) {

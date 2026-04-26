@@ -41,6 +41,8 @@ import static net.minecraft.world.level.block.Blocks.CAULDRON;
 
 public class LegacyBlockBehaviors {
     public static void setup() {
+        DispenserBlock.registerProjectileBehavior(Items.TRIDENT);
+
         DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior() {
             public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
                 Direction direction = blockSource.state().getValue(DispenserBlock.FACING);

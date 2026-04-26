@@ -6,9 +6,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.LogoRenderer;
-import net.minecraft.client.gui.components.SplashRenderer;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.input.KeyEvent;
@@ -25,6 +23,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
@@ -33,6 +32,8 @@ import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
+import wily.legacy.client.ContentManager;
+import wily.legacy.util.LegacyComponents;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
@@ -48,13 +49,18 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
      *///?}
     @Unique
     private final RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
+    @Unique
+    private int legacy$lastFocusedButtonIndex = -1;
+    @Unique
+    private String legacy$lastFocusedButtonMessage;
 
     protected TitleScreenMixin(Component component) {
         super(component);
     }
 
-    @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
-    public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
+    @Unique
+    private void rebuildMenuButtons() {
+        renderableVList.renderables.clear();
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
             if (minecraft.isDemo()) {
                 try {
@@ -65,21 +71,59 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
             } else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         Button modButton;
-        renderableVList.addRenderable(modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
+        modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build();
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
+        }
+        if (!LegacyOptions.legacySettingsMenus.get()) {
+            renderableVList.addRenderable(modButton);
+            renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
+        }
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, ContentManager.CATEGORIES))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
         //? if forge || neoforge && <=1.20.4 {
         /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
          *///?}
     }
 
+    @Unique
+    private void legacy$rememberFocusedButton() {
+        if (getFocused() instanceof AbstractWidget widget) {
+            legacy$lastFocusedButtonIndex = renderableVList.renderables.indexOf(widget);
+            legacy$lastFocusedButtonMessage = widget.getMessage().getString();
+        }
+    }
+
+    @Unique
+    private void legacy$restoreFocusedButton() {
+        if (legacy$lastFocusedButtonMessage != null) {
+            for (Renderable renderable : renderableVList.renderables) {
+                if (renderable instanceof AbstractWidget widget && legacy$lastFocusedButtonMessage.equals(widget.getMessage().getString())) {
+                    renderableVList.focusRenderable(renderable);
+                    return;
+                }
+            }
+        }
+        if (legacy$lastFocusedButtonIndex >= 0 && legacy$lastFocusedButtonIndex < renderableVList.renderables.size()) {
+            renderableVList.focusRenderable(renderableVList.renderables.get(legacy$lastFocusedButtonIndex));
+        }
+    }
+
+    @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
+    public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
+        rebuildMenuButtons();
+    }
+
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
         ci.cancel();
+        legacy$rememberFocusedButton();
+        rebuildMenuButtons();
         super.init();
         renderableVListInit();
+        legacy$restoreFocusedButton();
     }
 
     @Override
@@ -88,14 +132,22 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+    }
+
+    @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(20);
         getRenderableVList().init(width / 2 - 112, this.height / 3 + 5, 225, 0);
     }
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
+        if (LegacyOptions.legacySettingsMenus.get())
+            ControlTooltip.Renderer.of(this).add(ControlTooltip.PRESS::get, () -> LegacyComponents.SELECT);
+        else
+            ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
         if (PublishScreen.hasWorldHost())
             ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
@@ -103,6 +155,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "removed", at = @At("RETURN"))
     public void removed(CallbackInfo ci) {
+        legacy$rememberFocusedButton();
         splash = null;
     }
 

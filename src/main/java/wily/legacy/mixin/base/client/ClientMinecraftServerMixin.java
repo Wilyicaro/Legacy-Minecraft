@@ -70,7 +70,7 @@ public abstract class ClientMinecraftServerMixin {
 
         if (ticksUntilAutosave >= 20 && ticksUntilAutosave <= 120) {
             if (ticksUntilAutosave % 20 == 0)
-                TopMessage.setMedium(new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", ticksUntilAutosave / 20 - 1), CommonColor.INVENTORY_GRAY_TEXT.get(), 21, false, false, false));
+                TopMessage.setMedium(new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", ticksUntilAutosave / 20 - 1), CommonColor.GRAY_TEXT.get(), 21, false, false, false));
         }
 
         if (ticksUntilAutosave <= 0) {

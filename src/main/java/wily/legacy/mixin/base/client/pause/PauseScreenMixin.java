@@ -2,7 +2,9 @@ package wily.legacy.mixin.base.client.pause;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -47,6 +49,20 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
         button.setMessage(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME);
     }
 
+    @Unique
+    private void startManualSaveFlow(Button button) {
+        LegacySaveCache.manualSave = true;
+        LegacySaveCache.retakeWorldIcon = true;
+        if (LegacyOptions.fakeManualSaveScreen.get()) {
+            LegacyLoadingScreen.openFakeManualSaveScreen(PauseScreenMixin.this);
+            return;
+        }
+        minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this, LegacyComponents.ENABLE_AUTO_SAVE, LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE, b1 -> {
+            setAutoSave(1, button);
+            minecraft.setScreen(PauseScreenMixin.this);
+        }));
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initScreen(CallbackInfo ci) {
         renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
@@ -67,11 +83,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
                     setAutoSave(0, button);
                     minecraft.setScreen(PauseScreenMixin.this);
                 } else {
-                    LegacySaveCache.manualSave = LegacySaveCache.retakeWorldIcon = true;
-                    minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this, LegacyComponents.ENABLE_AUTO_SAVE, LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE, b1 -> {
-                        setAutoSave(1, button);
-                        minecraft.setScreen(PauseScreenMixin.this);
-                    }));
+                    startManualSaveFlow(button);
                 }
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
@@ -108,8 +120,13 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+    }
+
+    @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(20);
         renderableVList.init(width / 2 - 112, this.height / 3 + 5, 225, 0);
     }
 

@@ -30,12 +30,14 @@ import wily.legacy.client.LegacyGuiItemRenderState;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 @Mixin(GuiRenderer.class)
 public class GuiRendererMixin {
+    @Unique
+    private static final int GUI_ENTITY_RENDERER_POOL_SIZE = 20;
     @Shadow
     @Final
     GuiRenderState renderState;
@@ -57,28 +59,7 @@ public class GuiRendererMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
-        guiEntityRenderers = List.of(
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher())
-        );
+        guiEntityRenderers = createGuiEntityRenderers(bufferSource);
     }
 
     @Inject(method = "prepareItemElements", at = @At("HEAD"))
@@ -138,5 +119,15 @@ public class GuiRendererMixin {
             ci.cancel();
             //?}
         }
+    }
+
+    @Unique
+    private static List<GuiEntityRenderer> createGuiEntityRenderers(MultiBufferSource.BufferSource bufferSource) {
+        var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        var renderers = new ArrayList<GuiEntityRenderer>(GUI_ENTITY_RENDERER_POOL_SIZE);
+        for (int i = 0; i < GUI_ENTITY_RENDERER_POOL_SIZE; i++) {
+            renderers.add(new GuiEntityRenderer(bufferSource, dispatcher));
+        }
+        return List.copyOf(renderers);
     }
 }

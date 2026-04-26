@@ -63,7 +63,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                 addRenderable(onlineButton = new CreationList.ContentButton(this, 0, 0, 270, 30, Component.literal(profile.name())) {
                     final ServerData serverData = new ServerData("", "", /*? if >1.20.2 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/);
                     final FaviconTexture icon = FaviconTexture.forServer(minecraft.getTextureManager(), serverData.ip);
-                    private byte @Nullable [] lastIconBytes;
+                    private byte[] lastIconBytes;
 
                     private boolean uploadServerIcon(@Nullable byte[] bs) {
                         if (bs == null) {

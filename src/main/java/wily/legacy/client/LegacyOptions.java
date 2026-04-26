@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
@@ -34,12 +35,16 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 public class LegacyOptions {
     public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
+    private static final String DEFAULT_SKIN_CLOUD_RELAY_URL = "https://legacy4j-skins-relay.creepereater201.workers.dev";
+    private static boolean suppressPlayerInfoSync = false;
 
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
             Component.translatable("key.sprint"), Component.translatable("options.key.toggleSprint"),
             Component.translatable("key.sneak"), Component.translatable("options.key.toggleSneak"),
             Component.translatable("key.use"), Component.translatable("options.key.toggleUse"),
             Component.translatable("key.attack"), Component.translatable("options.key.toggleAttack")));
+
+    private static boolean loadingClientOptions;
 
     
     public static final FactoryConfig.StorageHandler CLIENT_STORAGE = new FactoryConfig.StorageHandler() {
@@ -49,7 +54,13 @@ public class LegacyOptions {
                 LegacyKeyMapping mapping = LegacyKeyMapping.of(keyMapping);
                 register(FactoryConfig.create("component_" + keyMapping.getName(), null, Optional.ofNullable(((LegacyKeyMapping) keyMapping).getDefaultBinding()), Bearer.of(()->Optional.ofNullable(mapping.getBinding()),o->mapping.setBinding(o.filter(b -> b.isBindable).orElse(null))), ()->ControllerBinding.OPTIONAL_CODEC, m->{}, this));
             }
-            super.load();
+            loadingClientOptions = true;
+            try {
+                super.load();
+            } finally {
+                loadingClientOptions = false;
+            }
+            ensureLegacySettingsMenusUseMergeMode();
             Legacy4JClient.isNewerVersion = Legacy4J.isNewerVersion(Legacy4J.VERSION.get(), lastLoadedVersion.get());
             Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().name(), lastLoadedMinecraftVersion.get());
         }
@@ -59,6 +70,22 @@ public class LegacyOptions {
 
     public static <T> FactoryConfig<T> of(OptionInstance<T> optionInstance) {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
+    }
+
+    public static FactoryConfig<Double> ofSound(OptionInstance<Double> optionInstance, String captionKey) {
+        return FactoryConfig.create(
+                OptionInstanceAccessor.of(optionInstance).getKey(),
+                FactoryConfigDisplay.<Double>percentBuilder()
+                        .tooltip(v -> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v)))
+                        .messageFunction((display, value) -> value <= 0.0
+                                ? CommonComponents.optionNameValue(display.name(), CommonComponents.OPTION_OFF)
+                                : Component.translatable("options.percent_value", display.name(), Mth.floor(value * 100.0)))
+                        .build(Component.translatable(captionKey)),
+                OptionInstanceAccessor.of(optionInstance).defaultValue(),
+                Bearer.of(optionInstance::get, optionInstance::set),
+                FactoryConfigControl.createDouble(),
+                v -> {},
+                VANILLA_STORAGE_ACCESS);
     }
 
     public static <T> FactoryConfig<T> create(OptionInstance<T> optionInstance) {
@@ -81,8 +108,28 @@ public class LegacyOptions {
         return tooltip == null ? null : tooltip.message;
     }
 
+    private static void reloadCloudRendering() {
+        if (loadingClientOptions) {
+            return;
+        }
+
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            Legacy4JClient.updateChunks();
+            Legacy4JClient.updateSkyShape();
+            if (minecraft.levelRenderer != null) {
+                minecraft.levelRenderer.getCloudRenderer().markForRebuild();
+            }
+        });
+    }
+
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue) {
         return createBoolean(key, defaultValue, b -> {});
+    }
+
+    public static FactoryConfig<Boolean> createBooleanWithTooltip(String key, boolean defaultValue) {
+        Component tooltip = Component.translatable("legacy.options." + key + ".tooltip");
+        return createBoolean(key, b -> tooltip, defaultValue);
     }
 
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue, Consumer<Boolean> consumer) {
@@ -127,9 +174,21 @@ public class LegacyOptions {
 
     public static final FactoryConfig<String> lastLoadedVersion = FactoryConfig.<String>builder().key("lastLoadedVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = FactoryConfig.<String>builder().key("lastLoadedMinecraftVersion").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<Boolean> tu3ChangeSkinScreen = CLIENT_STORAGE.register(FactoryConfig.createBoolean("tu3ChangeSkinScreen", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.tu3_change_skin_screen")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> smoothPreviewScroll = CLIENT_STORAGE.register(FactoryConfig.createBoolean("smoothPreviewScroll", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.smooth_preview_scroll")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> hideArmorOnAllBoxSkins = CLIENT_STORAGE.register(FactoryConfig.createBoolean("hideArmorOnAllBoxSkins", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.hide_armor")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> showCustomPackOptionsTooltip = CLIENT_STORAGE.register(FactoryConfig.createBoolean("showCustomPackOptionsTooltip", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.custom_pack_options")), true, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> skinSelectionInitialized = FactoryConfig.<Boolean>builder().key("skinSelectionInitialized").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> lastUsedCustomPackId = FactoryConfig.<String>builder().key("lastUsedCustomPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinUserId = FactoryConfig.<String>builder().key("selectedSkinUserId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinId = FactoryConfig.<String>builder().key("selectedSkinId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinPackId = FactoryConfig.<String>builder().key("selectedSkinPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<List<String>> favoriteSkinIds = FactoryConfig.<List<String>>builder().key("favoriteSkinIds").control(FactoryConfigControl.of(Codec.STRING.listOf())).defaultValue(List.of()).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> skinCloudRelayUrl = FactoryConfig.<String>builder().key("skinCloudRelayUrl").control(FactoryConfigControl.of(Codec.STRING)).defaultValue(DEFAULT_SKIN_CLOUD_RELAY_URL).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
+        syncLegacyClassicWorkstations(b);
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
     public static final FactoryConfig<Boolean> modCraftingTabs = CLIENT_STORAGE.register(createBoolean("modCraftingTabs",false));
@@ -145,6 +204,12 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> autoSaveWhenPaused = CLIENT_STORAGE.register(createBoolean("autoSaveWhenPaused",false));
     public static final FactoryConfig<Boolean> inGameTooltips = CLIENT_STORAGE.register(createBoolean("gameTooltips", true));
     public static final FactoryConfig<Boolean> tooltipBoxes = CLIENT_STORAGE.register(createBoolean("tooltipBoxes", true));
+    public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", false));
+    public static final FactoryConfig<Boolean> displayPackManagementTooltips = CLIENT_STORAGE.register(createBoolean("displayPackManagementTooltips", true));
+    public static final FactoryConfig<Boolean> legacySettingsMenus = CLIENT_STORAGE.register(createBoolean("legacySettingsMenus", false));
+    public static final FactoryConfig<Boolean> displayGameMessages = CLIENT_STORAGE.register(createBoolean("displayGameMessages", true));
+    public static final FactoryConfig<Boolean> announceAdvancements = CLIENT_STORAGE.register(createBoolean("announceAdvancements", true));
+    public static final FactoryConfig<Boolean> deathMessages = CLIENT_STORAGE.register(createBoolean("deathMessages", true));
     public static final FactoryConfig<Boolean> hints = CLIENT_STORAGE.register(createBoolean("hints", true));
     public static final FactoryConfig<Boolean> flyingViewRolling = CLIENT_STORAGE.register(createBoolean("flyingViewRolling", true));
     public static final FactoryConfig<Boolean> directSaveLoad = CLIENT_STORAGE.register(createBoolean("directSaveLoad", false));
@@ -155,6 +220,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> caveSounds = CLIENT_STORAGE.register(createBoolean("caveSounds", true));
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
+    public static final FactoryConfig<Boolean> displayChatIndicators = CLIENT_STORAGE.register(createBoolean("displayChatIndicators", true));
     public static final FactoryConfig<Boolean> legacyItemTooltips = CLIENT_STORAGE.register(createBoolean("legacyItemTooltips", true));
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
@@ -166,7 +232,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", builder -> builder.valueToComponent(Controller.Handler::getName), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), Legacy4JClient.controllerManager::updateHandler));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b -> {}));
     public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", builder -> builder.valueToComponent(v -> v.displayName), i -> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.CODEC, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
-    public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBoolean("unfocusedInputs", b -> Component.translatable("legacy.options.unfocusedInputs.tooltip"), false));
+    public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBooleanWithTooltip("unfocusedInputs",  false));
     public static final FactoryConfig<Double> leftStickDeadZone = CLIENT_STORAGE.register(createDouble("leftStickDeadZone", Function.identity(), 0.25));
     public static final FactoryConfig<Double> rightStickDeadZone = CLIENT_STORAGE.register(createDouble("rightStickDeadZone", Function.identity(), 0.34));
     public static final FactoryConfig<Double> leftTriggerDeadZone = CLIENT_STORAGE.register(createDouble("leftTriggerDeadZone", Function.identity(), 0.2));
@@ -180,14 +246,18 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> terrainFogStart = CLIENT_STORAGE.register(createInteger("terrainFogStart", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", Math.min(i, Minecraft.getInstance().options.renderDistance().get()))), 2, ()-> Minecraft.getInstance().options.renderDistance().get(), 4, d -> {}));
     public static final FactoryConfig<Boolean> overrideTerrainFogEnd = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogEnd", true));
     public static final FactoryConfig<Integer> terrainFogEnd = CLIENT_STORAGE.register(createInteger("terrainFogEnd", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", i)), 2, () -> 32, 16, d -> {}));
+    public static final FactoryConfig<Boolean> lceClouds = CLIENT_STORAGE.register(createBoolean("lceClouds", true, b -> reloadCloudRendering()));
+    public static final FactoryConfig<Boolean> legacyCloudHeightAndTexture = CLIENT_STORAGE.register(createBoolean("legacyCloudHeightAndTexture", b -> Component.translatable("legacy.options.legacyCloudHeightAndTexture.tooltip"), false, b -> reloadCloudRendering()));
     public static final FactoryConfig<OptionHolder<ControlType>> selectedControlType = CLIENT_STORAGE.register(FactoryConfig.create("controlType", FactoryConfigDisplay.<OptionHolder<ControlType>>builder().valueToComponent(i -> i.isAuto() ? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().nameOrEmpty()) : i.get().nameOrEmpty()).build(optionName("controlType")), new FactoryConfigControl.FromInt<>(ControlType.OPTION_CODEC, i -> i == 0 || Legacy4JClient.controlTypesManager.map().size() < i ? OptionHolder.auto() : OptionHolder.of(Legacy4JClient.controlTypesManager.map().getByIndex(i - 1)), s1-> 1 + Legacy4JClient.controlTypesManager.map().indexOf(s1.get()), ()-> Legacy4JClient.controlTypesManager.map().size() + 1), OptionHolder.auto(), v-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Difficulty> createWorldDifficulty = CLIENT_STORAGE.register(FactoryConfig.create("createWorldDifficulty", FactoryConfigDisplay.<Difficulty>builder().tooltip(Difficulty::getInfo).valueToComponent(Difficulty::getDisplayName).build(Component.translatable("options.difficulty")), new FactoryConfigControl.FromInt<>(Difficulty::byId, Difficulty::getId, ()->Difficulty.values().length), Difficulty.NORMAL, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> smoothMovement = CLIENT_STORAGE.register(createBoolean("smoothMovement",true));
     public static final FactoryConfig<Boolean> forceSmoothMovement = CLIENT_STORAGE.register(createBoolean("forceSmoothMovement", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
     public static final FactoryConfig<Boolean> legacyCreativeBlockPlacing = CLIENT_STORAGE.register(createBoolean("legacyCreativeBlockPlacing",true));
     public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
+    public static final FactoryConfig<Boolean> customSkinAnimation = CLIENT_STORAGE.register(createBoolean("customSkinAnimation", true));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
+    public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyZombieAggressionAnimation", false));
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));
     public static final FactoryConfig<Boolean> itemLightingInHand = CLIENT_STORAGE.register(createBoolean("itemLightingInHand",true));
     public static final FactoryConfig<Boolean> loyaltyLines = CLIENT_STORAGE.register(createBoolean("loyaltyLines",true));
@@ -202,6 +272,7 @@ public class LegacyOptions {
     public static final FactoryConfig<VehicleCameraRotation> vehicleCameraRotation = CLIENT_STORAGE.register(create("vehicleCameraRotation", builder -> builder.valueToComponent(v -> v.displayName), i -> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal, ()->VehicleCameraRotation.values().length, VehicleCameraRotation.CODEC, VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> defaultParticlePhysics = CLIENT_STORAGE.register(createBoolean("defaultParticlePhysics", true));
     public static final FactoryConfig<Boolean> linearCameraMovement = CLIENT_STORAGE.register(createBoolean("linearCameraMovement", false));
+    public static final FactoryConfig<Boolean> showOptionsPresetInLegacyGraphics = CLIENT_STORAGE.register(createBoolean("showOptionsPresetInLegacyGraphics", false));
     public static final FactoryConfig<Boolean> legacyOverstackedItems = CLIENT_STORAGE.register(createBoolean("legacyOverstackedItems", true));
     public static final FactoryConfig<Boolean> displayMultipleControlsFromAction = CLIENT_STORAGE.register(createBoolean("displayMultipleControlsFromAction", false));
     public static final FactoryConfig<Boolean> enhancedPistonMovingRenderer = CLIENT_STORAGE.register(createBoolean("enhancedPistonMovingRenderer", true));
@@ -211,18 +282,19 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> saveCache = CLIENT_STORAGE.register(createBoolean("saveCache", true));
     public static final FactoryConfig<Boolean> autoSaveCountdown = CLIENT_STORAGE.register(createBoolean("autoSaveCountdown", false));
     public static final FactoryConfig<Boolean> displayControlTooltips = CLIENT_STORAGE.register(createBoolean("displayControlTooltips", true));
+    public static final FactoryConfig<Boolean> inGameOnlineIds = CLIENT_STORAGE.register(createBoolean("inGameOnlineIds", true));
     public static final FactoryConfig<Boolean> systemMessagesAsOverlay = CLIENT_STORAGE.register(createBoolean("systemMessagesAsOverlay", true));
     public static final FactoryConfig<Boolean> forceMixedCrafting = CLIENT_STORAGE.register(createBoolean("forceMixedCrafting", false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicTrading = CLIENT_STORAGE.register(createBoolean("classicTrading",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicStonecutting = CLIENT_STORAGE.register(createBoolean("classicStonecutting",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicLoom = CLIENT_STORAGE.register(createBoolean("classicLoom",false, b -> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> headFollowsTheCamera = CLIENT_STORAGE.register(createBoolean("headFollowsTheCamera", true));
     public static final FactoryConfig<Boolean> fastLeavesWhenBlocked = CLIENT_STORAGE.register(createBoolean("fastLeavesWhenBlocked", true, b -> Legacy4JClient.updateChunks()));
@@ -243,9 +315,52 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> mapsWithCoords = CLIENT_STORAGE.register(createBoolean("mapsWithCoords", true));
     public static final FactoryConfig<Boolean> menusWithBackground = CLIENT_STORAGE.register(createBoolean("menusWithBackground", false));
     public static final FactoryConfig<Boolean> legacyPanorama = CLIENT_STORAGE.register(createBoolean("legacyPanorama", true));
+    public static final FactoryConfig<Boolean> displayRealmsButton = CLIENT_STORAGE.register(createBoolean("displayRealmsButton", true));
+    public static final FactoryConfig<Boolean> hideSodiumSettings = CLIENT_STORAGE.register(createBoolean("hideSodiumSettings", false));
+    public static final FactoryConfig<Boolean> hideExperimentalWorldWarning = CLIENT_STORAGE.register(createBoolean("hideExperimentalWorldWarning", false));
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
     public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerCursorAtFirstInventorySlot", FactoryConfigDisplay.createToggle(Component.translatable("legacy.options.cursorAtFirstInventorySlot")),true, b -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> systemCursor = CLIENT_STORAGE.register(createBoolean("systemCursor", false, b -> Legacy4JClient.controllerManager.updateCursorInputMode()));
+
+    private static void syncLegacyClassicWorkstations(boolean enabled) {
+        if (!legacySettingsMenus.get()) return;
+        FactoryConfig.saveOptionAndConsume(classicStonecutting, enabled, v -> {});
+        FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
+        FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
+    }
+
+    public static void ensureLegacySettingsMenusUseMergeMode() {
+        if (!legacySettingsMenus.get() || advancedOptionsMode.get() == AdvancedOptionsMode.MERGE) return;
+        FactoryConfig.saveOptionAndConsume(advancedOptionsMode, AdvancedOptionsMode.MERGE, v -> {});
+    }
+
+    public static String getLastUsedCustomPackIdOrNull() {
+        String packId = lastUsedCustomPackId.get();
+        return packId == null || packId.isBlank() ? null : packId;
+    }
+
+    public static String getSkinCloudRelayUrl() {
+        String value = skinCloudRelayUrl.get();
+        if (value == null) return DEFAULT_SKIN_CLOUD_RELAY_URL;
+        value = value.trim();
+        while (value.endsWith("/")) value = value.substring(0, value.length() - 1);
+        return value.isEmpty() ? DEFAULT_SKIN_CLOUD_RELAY_URL : value;
+    }
+
+    public static boolean canSendPlayerInfoSync() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return !suppressPlayerInfoSync && minecraft.player != null && Legacy4JClient.hasModOnServer();
+    }
+
+    public static void runWithoutPlayerInfoSync(Runnable runnable) {
+        boolean previous = suppressPlayerInfoSync;
+        suppressPlayerInfoSync = true;
+        try {
+            runnable.run();
+        } finally {
+            suppressPlayerInfoSync = previous;
+        }
+    }
     public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", builder -> builder.valueToComponent(v -> v.displayName), i -> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, () -> ControlTooltipDisplay.values().length, ControlTooltipDisplay.CODEC, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> legacyLoadingAndConnecting = CLIENT_STORAGE.register(createBoolean("legacyLoadingAndConnecting", true));
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
@@ -265,8 +380,15 @@ public class LegacyOptions {
     public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", builder -> builder.valueToComponent(v -> v.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay), CLIENT_STORAGE));
     public static final FactoryConfig<OptionHolder<OptionsPreset>> optionsPreset = CLIENT_STORAGE.register(FactoryConfig.create("optionsPreset", FactoryConfigDisplay.<OptionHolder<OptionsPreset>>builder().valueToComponent(i -> i.isNone() ? LegacyComponents.NONE : i.get().isApplied() ? i.get().nameOrEmpty() : Component.translatable("legacy.options.not_applied_value", i.get().nameOrEmpty())).tooltip(holder -> holder.isNone() ? null : holder.get().tooltip().orElse(null)).build(optionName("optionsPreset")), new FactoryConfigControl.FromInt<>(OptionsPreset.OPTION_CODEC, i -> i == 0 || Legacy4JClient.optionPresetsManager.map().size() < i ? OptionHolder.none() : OptionHolder.of(Legacy4JClient.optionPresetsManager.map().getByIndex(i - 1)), s1 -> 1 + Legacy4JClient.optionPresetsManager.map().indexOf(s1.get()), () -> Legacy4JClient.optionPresetsManager.map().size() + 1), OptionHolder.none(), v -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> fakeAutosaveScreen = CLIENT_STORAGE.register(createBoolean("fakeAutosaveScreen", false));
+    public static final FactoryConfig<Boolean> fakeManualSaveScreen = CLIENT_STORAGE.register(createBoolean("fakeManualSaveScreen", false));
     public static final FactoryConfig<Boolean> legacyPotionsBar = CLIENT_STORAGE.register(createBoolean("legacyPotionsBar", false));
     public static final FactoryConfig<Boolean> defaultShowCraftableRecipes = CLIENT_STORAGE.register(createBoolean("defaultShowCraftableRecipes", false));
+    public static final FactoryConfig<Boolean> screenshotToasts = CLIENT_STORAGE.register(createBoolean("screenshotToasts", true));
+    public static final FactoryConfig<Boolean> forceLegacyFlight = CLIENT_STORAGE.register(createBoolean("forceLegacyFlight", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacySwimming = CLIENT_STORAGE.register(createBoolean("forceLegacySwimming", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacyShieldControls = CLIENT_STORAGE.register(createBoolean("forceLegacyShieldControls", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacyOffhandLimits = CLIENT_STORAGE.register(createBoolean("forceLegacyOffhandLimits", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> legacyFont = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyFont", true));
 
     public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());
@@ -287,6 +409,24 @@ public class LegacyOptions {
 
     public static boolean hasMixedCrafting() {
         return (forceMixedCrafting.get() || !Legacy4JClient.hasModOnServer()) && !classicCrafting.get();
+    }
+
+    public static FactoryConfig<Double> combinedLookSensitivity() {
+        FactoryConfig<Double> mouseSensitivity = of(Minecraft.getInstance().options.sensitivity());
+        return FactoryConfig.create(
+                "combinedLookSensitivity",
+                mouseSensitivity.getDisplay(),
+                mouseSensitivity.get(),
+                Bearer.of(mouseSensitivity::get, d -> {
+                    mouseSensitivity.set(d);
+                    controllerSensitivity.set(d);
+                }),
+                FactoryConfigControl.createDouble(),
+                d -> {},
+                () -> {
+                    mouseSensitivity.save();
+                    controllerSensitivity.save();
+                });
     }
 
     public static UIMode getUIMode() {

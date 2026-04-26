@@ -22,6 +22,7 @@ import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -266,7 +267,8 @@ public class ControllerManager {
                         LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
-                    if (mouseClick != -1 && (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
+                    if (mouseClick != -1 &&
+                            (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
                         isControllerSimulatingInput = true;
                         if (state.pressed && state.onceClick(true))
                             ((MouseHandlerAccessor) minecraft.mouseHandler).pressMouse(minecraft.getWindow().handle(), new MouseButtonInfo(mouseClick, 0), 1);
@@ -465,7 +467,7 @@ public class ControllerManager {
             case ALWAYS -> enableCursor();
             case NEVER -> {
                 tryDisableCursor();
-                if (minecraft.screen != null) minecraft.screen.repositionElements();
+                if (minecraft.screen != null) UIAccessor.of(minecraft.screen).reloadUI();
             }
         }
     }

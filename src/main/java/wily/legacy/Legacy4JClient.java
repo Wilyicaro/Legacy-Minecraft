@@ -43,6 +43,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,6 +51,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 //? if >=1.20.5 {
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -93,11 +95,12 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
 //? if fabric || >=1.21 && neoforge {
-import wily.legacy.client.screen.compat.IrisCompat;
+/*import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
-//?}
+*///?}
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyLocalPlayer;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
@@ -106,6 +109,7 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.MCAccount;
+import wily.legacy.skins.SkinsClientBootstrap;
 
 
 import java.io.File;
@@ -125,6 +129,7 @@ public class Legacy4JClient {
     public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.createModLocation("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
     public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.createModLocation("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
     public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
+    public static final ContentManager.CategoryManager categoryManager = new ContentManager.CategoryManager();
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
@@ -201,6 +206,15 @@ public class Legacy4JClient {
         }
     }
 
+    public static boolean isHostInvisible(Player player) {
+        return player != null && isHostInvisible(player.getUUID());
+    }
+
+    public static boolean isHostInvisible(UUID playerId) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(playerId) instanceof LegacyPlayerInfo info && !info.isVisible();
+    }
+
     public static boolean playerHasInfiniteMaterials() {
         return Minecraft.getInstance().player.hasInfiniteMaterials();
     }
@@ -222,6 +236,11 @@ public class Legacy4JClient {
                 }
             };
         } else if (screen instanceof BackupConfirmScreen s) {
+            if (LegacyOptions.hideExperimentalWorldWarning.get() && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+                Minecraft minecraft = Minecraft.getInstance();
+                minecraft.execute(() -> BackupConfirmScreenAccessor.of(s).proceed(false, false));
+                return minecraft.screen;
+            }
             return new ConfirmationScreen(Minecraft.getInstance().screen, ConfirmationScreen::getPanelWidth, () -> (LegacyOptions.getUIMode().isSD() ? 94 : 141) + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? LegacyOptions.getUIMode().isSD() ? 11 : 14 : 0), s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription(), LegacyScreen::onClose) {
                 boolean eraseCache = false;
 
@@ -240,6 +259,19 @@ public class Legacy4JClient {
             };
         }
         return screen;
+    }
+
+    private static boolean isExperimentalWorldWarning(Component... components) {
+        for (Component component : components) {
+            if (component == null) continue;
+            if (component.getContents() instanceof TranslatableContents contents) {
+                String key = contents.getKey().toLowerCase(Locale.ROOT);
+                if (key.contains("experimental") || key.contains("datapack") || key.contains("data_pack") || key.contains("dataPack")) return true;
+            }
+            String text = component.getString().toLowerCase(Locale.ROOT);
+            if (text.contains("experimental") || text.contains("data pack")) return true;
+        }
+        return false;
     }
 
     public static void preTick(Minecraft minecraft) {
@@ -261,14 +293,19 @@ public class Legacy4JClient {
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                 continue;
             }
-            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock && controllerManager.isControllerTheLastInput()) {
+            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock) {
                 minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
             } else if (LegacyOptions.hasClassicCrafting()) {
                 minecraft.getTutorial().onOpenInventory();
                 minecraft.setScreen(new InventoryScreen(minecraft.player));
             } else if (LegacyOptions.hasMixedCrafting()) {
                 minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
-            } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
+            } else if (hasModOnServer()) {
+                CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
+            } else {
+                minecraft.getTutorial().onOpenInventory();
+                minecraft.setScreen(new InventoryScreen(minecraft.player));
+            }
         }
         while (keyHostOptions.consumeClick()) {
             minecraft.setScreen(new HostOptionsScreen());
@@ -330,6 +367,7 @@ public class Legacy4JClient {
                     knownEntities.add(r.getEntity().getType());
             }
         }
+        SkinsClientBootstrap.postTick(minecraft);
     }
 
     public static void postScreenInit(Screen screen) {
@@ -363,6 +401,14 @@ public class Legacy4JClient {
     }
 
     public static void init() {
+        SkinsClientBootstrap.init();
+        LegacyGameRules.setClientRuleResolver(key -> {
+            if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SHIELD_CONTROLS && LegacyOptions.forceLegacyShieldControls.get()) return true;
+            if (key == LegacyGameRules.LEGACY_OFFHAND_LIMITS && LegacyOptions.forceLegacyOffhandLimits.get()) return true;
+            return hasModOnServer() && gameRules != null && gameRules.getBoolean(key);
+        });
         ControlType.UpdateEvent.EVENT.register((last, actual) -> {
             UIAccessor uiAccessor = Minecraft.getInstance().screen == null ? FactoryScreenUtil.getGuiAccessor() : FactoryScreenUtil.getScreenAccessor();
             uiAccessor.reloadUI();
@@ -388,6 +434,7 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCraftingListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyWorldTemplateManager);
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, categoryManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyTipOverridesManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, optionPresetsManager);
@@ -415,10 +462,22 @@ public class Legacy4JClient {
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
             //? if fabric || >=1.21 && neoforge {
-            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+            /*if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            //?}
+            *///?}
             LegacyGuiElements.setup(m);
+
+            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+                @Override
+                public net.minecraft.network.chat.Component title() {
+                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+                }
+
+                @Override
+                public Screen build(Screen parent) {
+                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
+                }
+            };
         });
 
         FactoryAPIClient.registerBlockColor(registry -> {
@@ -478,12 +537,13 @@ public class Legacy4JClient {
             knownEntities.save();
         });
         FactoryEvent.registerBuiltInPacks(registry -> {
-            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_resources"), true);
-            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_waters"), true);
-            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
             if (FactoryAPI.getLoader().isForgeLike()) {
-                registry.register("programmer_art", FactoryAPI.createLocation(MOD_ID, "programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
-                registry.register("high_contrast", FactoryAPI.createLocation(MOD_ID, "high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
             }
         });
         LegacyUIElementTypes.init();
@@ -582,7 +642,7 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
         else if (minecraft.screen instanceof LeaderboardsScreen s) {
             s.rebuildRenderableVList(minecraft);
-            s.repositionElements();
+            UIAccessor.of(s).reloadUI();
         }
     }
 
@@ -617,3 +677,4 @@ public class Legacy4JClient {
     }
 
 }
+

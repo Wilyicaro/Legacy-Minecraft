@@ -11,12 +11,10 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
@@ -43,7 +41,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
         if (section == Section.GAME_OPTIONS)
             getRenderableVList().addRenderables(Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(this))).build(), Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(this))).build());
         section.advancedSection().ifPresent(s1 -> {
-            getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(), 0, 1, 200, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+            getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(), 0, 1, 200, 9, CommonColor.GRAY_TEXT.get(), false));
             if (s1 == Section.ADVANCED_USER_INTERFACE)
                 getRenderableVList().addOptions(LegacyOptions.advancedOptionsMode);
             s1.elements().forEach(c -> c.accept(this));

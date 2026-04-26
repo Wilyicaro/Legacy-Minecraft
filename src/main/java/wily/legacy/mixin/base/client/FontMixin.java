@@ -10,6 +10,6 @@ import wily.legacy.util.client.LegacyFontUtil;
 public class FontMixin {
     @ModifyArg(method = "getShadowColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;scaleRGB(IF)I", ordinal = 0))
     private float getShadowDim(float dim) {
-        return !LegacyFontUtil.legacyFont || LegacyFontUtil.forceVanillaFontShadowColor ? 0.25f : CommonValue.LEGACY_FONT_DIM_FACTOR.get();
+        return !LegacyFontUtil.hasLegacyFont() || LegacyFontUtil.forceVanillaFontShadowColor ? 0.25f : CommonValue.LEGACY_FONT_DIM_FACTOR.get();
     }
 }

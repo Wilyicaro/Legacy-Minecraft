@@ -54,19 +54,26 @@ public class LegacyLoadingRenderer implements Renderable {
         int width = guiGraphics.guiWidth();
         int height = guiGraphics.guiHeight();
         ArbitrarySupplier<ResourceLocation> fontOverride = accessor.getElement("fontOverride", ResourceLocation.class);
+        int steppedProgress = progress < 0 ? -1 : Math.clamp(Math.round(progress * 100.0f), 0, 100);
 
         if (!genericLoading) {
-            if (progress != -1) {
+            if (steppedProgress >= 0) {
                 int loadingBarX = accessor.getInteger("loadingBar.x", width / 2 - 160);
                 int loadingBarY = accessor.getInteger("loadingBar.y", height / 2 + 15);
-                if (loadingStage != null)
-                    LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> guiGraphics.drawString(minecraft.font, loadingStage, accessor.getInteger("loadingStage.x", loadingBarX + 1), accessor.getInteger("loadingStage.y", height / 2 + 5), CommonColor.STAGE_TEXT.get()));
+                if (loadingStage != null) {
+                    LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
+                        int stageX = accessor.getInteger("loadingStage.x", loadingBarX + 1);
+                        int stageY = accessor.getInteger("loadingStage.y", loadingBarY - 10);
+                        guiGraphics.drawString(minecraft.font, loadingStage, stageX, stageY, CommonColor.STAGE_TEXT.get());
+                    });
+                }
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, loadingBarX, loadingBarY, 320, 320 * contents.height() / contents.width());
                 }
-                if (progress >= 0) {
+                if (steppedProgress > 0) {
                     try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BAR).contents()) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1, 0, (int) (318 * Math.max(0, Math.min(progress, 1))), 318 * contents.height() / contents.width());
+                        int fillWidth = Math.min(318, Math.round(318.0f * steppedProgress / 100.0f));
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1, 0, fillWidth, 318 * contents.height() / contents.width());
                     }
                 }
                 LegacyTip tip = Legacy4JClient.legacyTipManager.getLoadingTip();

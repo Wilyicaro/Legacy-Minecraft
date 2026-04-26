@@ -26,7 +26,7 @@
       "wily.legacy.Legacy4JClient::init"
     ]
   },
-  "accessWidener": "${aw}",
+  "accessWidener": "${aw}.accesswidener",
   "mixins": [
     "${mod_id}.mixins.json"
   ],

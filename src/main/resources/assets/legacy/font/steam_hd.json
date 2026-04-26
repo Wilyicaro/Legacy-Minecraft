@@ -1,0 +1,354 @@
+{
+    "providers":[
+    {
+            "type": "bitmap",
+            "file": "legacy:component/steam/down_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE735"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/down_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE736"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE737"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE003"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/up_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE738"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/up_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE004"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/back_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE73E"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/back_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE005"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/guide_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE745"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/start_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE73D"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/start_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE006"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_stick.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE746"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_stick_pressed_left.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE747"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_stick_pressed_right.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE748"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_stick.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE749"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_stick_pressed_left.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE74E"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_stick_pressed_right.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE74F"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_stick_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE743"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_stick_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE00F"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_stick_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE744"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_stick_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE010"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_bumper.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE739"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_bumper_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE74A"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_bumper.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE73A"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_bumper_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE74B"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_trigger.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE73B"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/left_trigger_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE74C"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_trigger.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE73C"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/right_trigger_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE74D"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_down.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE73F"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_down_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE00C"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_right.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE740"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_right_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE00D"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_left.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE741"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_left_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE00E"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_up.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE742"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/dpad_up_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE00F"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE750"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE752"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE753"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE754"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE755"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE756"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE757"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE758"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE759"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE75A"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/steam/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE75B"]
+        }
+    ]    
+}

@@ -56,10 +56,14 @@ public class PatchNotesScreen extends PanelBackgroundScreen {
         renderer.tooltips.remove(2);
     }
 
+    protected void addFooterButtons() {
+        accessor.putWidget("acceptButton", addRenderableWidget(Button.builder(LegacyComponents.ACCEPT, b -> onClose()).bounds(panel.getX() + (panel.getWidth() - 200) / 2, panel.getY() + panel.getHeight() - 30, 200, 20).build()));
+    }
+
     @Override
     protected void init() {
         accessor.putStaticElement("scrollable_renderer", scrollableRenderer);
         super.init();
-        addRenderableWidget(Button.builder(LegacyComponents.ACCEPT, b -> onClose()).bounds(panel.getX() + (panel.getWidth() - 200) / 2, panel.getY() + panel.getHeight() - 30, 200, 20).build());
+        addFooterButtons();
     }
 }
