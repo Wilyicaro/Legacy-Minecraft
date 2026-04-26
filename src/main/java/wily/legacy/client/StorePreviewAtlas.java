@@ -43,7 +43,9 @@ public final class StorePreviewAtlas {
         entry("supermario", 19),
         entry("builders_pack", 20),
         entry("skinpack_megabundle", 21),
-        entry("starterpacks_bundle", 22)
+        entry("starterpacks_bundle", 22),
+        entry("merrybundle", 23),
+        entry("spookybundle", 24)
     );
     private static final List<String> SKINPACK_IDS = List.of(
         "birthday5",
