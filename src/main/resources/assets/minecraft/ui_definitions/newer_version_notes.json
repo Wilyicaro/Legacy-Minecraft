@@ -26,7 +26,7 @@
             "text": {
               "type": "draw_multiline_string",
               "component": {
-                "translate": "legacy.menu.newerVersion"
+                "translate": "legacy.menu.newerMinecraftVersion"
               },
               "shadow": false,
               "color": "${commonColor.inventory_gray_text}",
@@ -86,7 +86,7 @@
             "text": {
               "type": "draw_multiline_string",
               "component": {
-                "translate": "legacy.menu.newerVersion",
+                "translate": "legacy.menu.newerMinecraftVersion",
                 "font": "legacy:default_11"
               },
               "shadow": false,

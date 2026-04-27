@@ -302,19 +302,6 @@ public class LegacyComponents {
     }
 
     public static Component getMenuGameRuleName(GameRule<?> key) {
-        if (!LegacyOptions.legacySettingsMenus.get()) return Component.translatable(key.getDescriptionId());
-        if (key == GameRules.FIRE_DAMAGE) return Component.translatable("legacy.gamerule.fire_spreads");
-        if (key == LegacyGameRules.getTntExplodes()) return Component.translatable("legacy.gamerule.tnt_explodes");
-        if (key == LegacyGameRules.getPvp()) return Component.translatable("legacy.gamerule.player_vs_player");
-        if (key == GameRules.ADVANCE_TIME) return Component.translatable("legacy.gamerule.daylight_cycle");
-        if (key == GameRules.ADVANCE_WEATHER) return Component.translatable("legacy.gamerule.weather_cycle");
-        if (key == GameRules.KEEP_INVENTORY) return Component.translatable("legacy.gamerule.keep_inventory");
-        if (key == GameRules.SPAWN_MOBS) return Component.translatable("legacy.gamerule.mob_spawning");
-        if (key == GameRules.MOB_GRIEFING) return Component.translatable("legacy.gamerule.mob_griefing");
-        if (key == GameRules.MOB_DROPS) return Component.translatable("legacy.gamerule.mob_loot");
-        if (key == GameRules.BLOCK_DROPS) return Component.translatable("legacy.gamerule.tile_drops");
-        if (key == GameRules.NATURAL_HEALTH_REGENERATION) return Component.translatable("legacy.gamerule.natural_regeneration");
-        if (key == GameRules.IMMEDIATE_RESPAWN) return Component.translatable("legacy.gamerule.immediate_respawn");
         return Component.translatable(key.getDescriptionId());
     }
 

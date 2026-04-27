@@ -211,7 +211,11 @@
     "client.AbstractClientPlayerMixin",
     "client.BitmapGlyphMixin",
     "client.MultilineTextFieldMixin",
-    "client.RidingEntitySoundInstanceMixin"
+    "client.RidingEntitySoundInstanceMixin",
+    "client.RenderTypeAccessor",
+    "client.RenderSetupAccessor",
+    "client.ClientBiomeMixin",
+    "client.EnvironmentAttributeMapMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
