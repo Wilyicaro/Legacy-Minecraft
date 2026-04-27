@@ -1,14 +1,11 @@
 package wily.legacy.client;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.mixin.base.client.BufferSourceAccessor;
-import wily.legacy.mixin.base.client.CompositeRenderTypeAccessor;
 
 import java.util.function.Function;
 
@@ -27,8 +24,8 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {
                 if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentItemSheet());
-                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
-                    return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
+//                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
+//                    return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
                 return super.getBuffer(renderType);
             }
         }.setVertexConsumerFunction(consumer -> new VertexConsumerWrapper(consumer).setColorMultiplier(ColorUtil.withAlpha(0xFFFFFF, opacity)));

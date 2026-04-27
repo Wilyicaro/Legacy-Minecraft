@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.DataResult;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
@@ -24,6 +23,8 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 //?}
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.raid.Raid;
@@ -33,6 +34,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.entity.state.*;
+import net.minecraft.world.level.gamerules.GameRules;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.*;
 //?}
@@ -45,7 +47,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
@@ -139,13 +141,13 @@ public class Legacy4JClient {
     public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
-    public static final MapIdValueManager<OptionsPreset, ListMap<ResourceLocation, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
-    public static final MapIdValueManager<ControlType, ListMap<ResourceLocation, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("control_types"), ControlType.CODEC);
+    public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
+    public static final MapIdValueManager<ControlType, ListMap<Identifier, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("control_types"), ControlType.CODEC);
     public static final ControllerManager controllerManager = new ControllerManager();
-    public static final Map<Block, ResourceLocation> fastLeavesModels = new HashMap<>();
+    public static final Map<Block, Identifier> fastLeavesModels = new HashMap<>();
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
-    public static final RenderType GHAST_SHOOTING_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
-    public static final RenderType DROWNED_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
+    public static final RenderType GHAST_SHOOTING_GLOW = RenderTypes.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
+    public static final RenderType DROWNED_GLOW = RenderTypes.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
     public static final Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> VANILLA_PRESET_EDITORS = new HashMap<>(Map.of(Optional.of(WorldPresets.FLAT), (createWorldScreen, settings) -> {
         ChunkGenerator chunkGenerator = settings.selectedDimensions().overworld();
         RegistryAccess.Frozen registryAccess = settings.worldgenLoadContext();
@@ -403,11 +405,11 @@ public class Legacy4JClient {
     public static void init() {
         SkinsClientBootstrap.init();
         LegacyGameRules.setClientRuleResolver(key -> {
-            if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
-            if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;
-            if (key == LegacyGameRules.LEGACY_SHIELD_CONTROLS && LegacyOptions.forceLegacyShieldControls.get()) return true;
-            if (key == LegacyGameRules.LEGACY_OFFHAND_LIMITS && LegacyOptions.forceLegacyOffhandLimits.get()) return true;
-            return hasModOnServer() && gameRules != null && gameRules.getBoolean(key);
+            if (key == LegacyGameRules.LEGACY_FLIGHT.get() && LegacyOptions.forceLegacyFlight.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SWIMMING.get() && LegacyOptions.forceLegacySwimming.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SHIELD_CONTROLS.get() && LegacyOptions.forceLegacyShieldControls.get()) return true;
+            if (key == LegacyGameRules.LEGACY_OFFHAND_LIMITS.get() && LegacyOptions.forceLegacyOffhandLimits.get()) return true;
+            return hasModOnServer() && gameRules != null && gameRules.get(key);
         });
         ControlType.UpdateEvent.EVENT.register((last, actual) -> {
             UIAccessor uiAccessor = Minecraft.getInstance().screen == null ? FactoryScreenUtil.getGuiAccessor() : FactoryScreenUtil.getScreenAccessor();
@@ -457,7 +459,6 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
-            FactoryAPIClient.registerRenderType(ChunkSectionLayer.CUTOUT_MIPPED, SHRUB.get());
             FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
@@ -613,7 +614,7 @@ public class Legacy4JClient {
     }
 
     public static BlockStateModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
-        boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
+        boolean fastGraphics = !Minecraft.getInstance().options.cutoutLeaves().get();
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())) {
             if (!fastGraphics && blockGetter != null) {
                 for (Direction value : Direction.values()) {

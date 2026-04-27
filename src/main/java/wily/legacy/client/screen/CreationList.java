@@ -19,7 +19,7 @@ import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -48,14 +48,14 @@ import java.util.function.Consumer;
 
 public class CreationList extends RenderableVList {
     protected final Minecraft minecraft;
-    private static final LoadingCache<String, ResourceLocation> packIcons = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+    private static final LoadingCache<String, Identifier> packIcons = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
-        public ResourceLocation load(String key) throws Exception {
+        public Identifier load(String key) throws Exception {
             Path path = Minecraft.getInstance().getResourcePackDirectory().resolve(key).resolve("pack.png");
             if (!Files.isRegularFile(path)) return PackAlbum.Selector.DEFAULT_ICON;
             try (InputStream inputStream = Files.newInputStream(path)) {
                 NativeImage image = NativeImage.read(inputStream);
-                ResourceLocation location = ResourceLocation.fromNamespaceAndPath("legacy", "template_pack_icon/" + Integer.toHexString(key.hashCode()));
+                Identifier location = Identifier.fromNamespaceAndPath("legacy", "template_pack_icon/" + Integer.toHexString(key.hashCode()));
                 Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(location::toString, image));
                 return location;
             }
@@ -147,11 +147,11 @@ public class CreationList extends RenderableVList {
         }
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress) {
+    public static void addIconButton(RenderableVList list, Identifier iconSprite, Component message, Consumer<AbstractButton> onPress) {
         addIconButton(list, iconSprite, message, onPress, null);
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
+    public static void addIconButton(RenderableVList list, Identifier iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
         AbstractButton button;
         list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, message) {
             @Override
@@ -172,7 +172,7 @@ public class CreationList extends RenderableVList {
         list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, template.buttonMessage()) {
             @Override
             public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-                ResourceLocation icon = getTemplatePackIcon(template);
+                Identifier icon = getTemplatePackIcon(template);
                 if (icon != null) {
                     FactoryGuiGraphics.of(guiGraphics).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
                     return;
@@ -187,7 +187,7 @@ public class CreationList extends RenderableVList {
         });
     }
 
-    private static ResourceLocation getTemplatePackIcon(LegacyWorldTemplate template) {
+    private static Identifier getTemplatePackIcon(LegacyWorldTemplate template) {
         String packId = template.albumId()
             .map(PackAlbum::resourceById)
             .map(PackAlbum::getDisplayPackId)
@@ -208,8 +208,8 @@ public class CreationList extends RenderableVList {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderContents(guiGraphics, i, j, f);
             if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true))
                 renderIcon(guiGraphics, i, j, f);
         }

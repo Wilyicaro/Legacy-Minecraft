@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.ClientAsset;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
@@ -30,13 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class ClientSkinAssets {
-    private static final Map<String, ResourceLocation> TEXTURES = new ConcurrentHashMap<>();
+    private static final Map<String, Identifier> TEXTURES = new ConcurrentHashMap<>();
     private static final Map<String, JsonObject> MODELS = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> TEXTURE_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> MODEL_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, PlayerSkin> SKIN_CACHE_CAPE = new ConcurrentHashMap<>();
-    private static final Map<ResourceLocation, ResourceLocation> MODEL_ID_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Identifier, Identifier> MODEL_ID_CACHE = new ConcurrentHashMap<>();
     private static final ConcurrentLinkedQueue<String> PREVIEW_QUEUE = new ConcurrentLinkedQueue<>();
     private static final Set<String> QUEUED_PREVIEWS = ConcurrentHashMap.newKeySet();
 
@@ -62,7 +62,7 @@ public final class ClientSkinAssets {
         );
     }
 
-    public static ResolvedSkin resolveSkin(String skinId, ResourceLocation texture, ResourceLocation modelId, BuiltBoxModel boxModel) {
+    public static ResolvedSkin resolveSkin(String skinId, Identifier texture, Identifier modelId, BuiltBoxModel boxModel) {
         return resolveSkin(skinId, null, texture, modelId, boxModel);
     }
 
@@ -71,11 +71,11 @@ public final class ClientSkinAssets {
         return ownerId + "|" + skinId;
     }
 
-    public static ResourceLocation resolveTexture(String skinId, SkinEntry entry) {
+    public static Identifier resolveTexture(String skinId, SkinEntry entry) {
         return resolveTexture(null, skinId, entry);
     }
 
-    public static BuiltBoxModel resolveBoxModel(String skinId, ResourceLocation modelId) {
+    public static BuiltBoxModel resolveBoxModel(String skinId, Identifier modelId) {
         return resolveBoxModel(null, skinId, modelId);
     }
 
@@ -83,7 +83,7 @@ public final class ClientSkinAssets {
         return getSlimFlag(null, skinId);
     }
 
-    private static ResolvedSkin resolveSkin(String skinId, String assetKey, ResourceLocation texture, ResourceLocation modelId, BuiltBoxModel boxModel) {
+    private static ResolvedSkin resolveSkin(String skinId, String assetKey, Identifier texture, Identifier modelId, BuiltBoxModel boxModel) {
         skinId = SkinIdUtil.isBlankOrAutoSelect(skinId) ? null : skinId;
         SkinEntry entry = skinId == null ? null : SkinPackLoader.getSkin(skinId);
         if (texture == null) texture = resolveTexture(assetKey, skinId, entry);
@@ -93,19 +93,19 @@ public final class ClientSkinAssets {
         }
         if (boxModel == null) boxModel = resolveBoxModel(assetKey, skinId, modelId);
         if (entry == null && texture == null && modelId == null && boxModel == null) return null;
-        ResourceLocation boxTexture = modelId == null ? texture : BoxModelManager.getTexture(modelId);
+        Identifier boxTexture = modelId == null ? texture : BoxModelManager.getTexture(modelId);
         return new ResolvedSkin(entry, texture, boxTexture == null ? texture : boxTexture, modelId, boxModel);
     }
 
-    private static ResourceLocation resolveTexture(String assetKey, String skinId, SkinEntry entry) {
+    private static Identifier resolveTexture(String assetKey, String skinId, SkinEntry entry) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
-        ResourceLocation texture = assetKey == null ? null : TEXTURES.get(assetKey);
+        Identifier texture = assetKey == null ? null : TEXTURES.get(assetKey);
         if (texture != null) return texture;
         texture = TEXTURES.get(skinId);
         return texture != null ? texture : entry != null ? entry.texture() : null;
     }
 
-    private static BuiltBoxModel resolveBoxModel(String assetKey, String skinId, ResourceLocation modelId) {
+    private static BuiltBoxModel resolveBoxModel(String assetKey, String skinId, Identifier modelId) {
         if (modelId == null) return null;
         BuiltBoxModel model = BoxModelManager.get(modelId);
         if (model != null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return model == null ? null : model.copy();
@@ -148,10 +148,10 @@ public final class ClientSkinAssets {
     public static PlayerSkin resolvePlayerSkin(String skinId, ResolvedSkin resolved, boolean wantCape) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
         SkinEntry entry = resolved == null ? null : resolved.entry();
-        ResourceLocation texture = resolved != null && resolved.texture() != null ? resolved.texture() : resolveTexture(skinId, entry);
+        Identifier texture = resolved != null && resolved.texture() != null ? resolved.texture() : resolveTexture(skinId, entry);
         if (texture == null) return null;
         PlayerModelType modelType = resolveModelType(skinId, resolved);
-        ResourceLocation capeId = wantCape && entry != null ? entry.cape() : null;
+        Identifier capeId = wantCape && entry != null ? entry.cape() : null;
         String cacheKey = texture + "|" + capeId + "|" + modelType;
         Map<String, PlayerSkin> cache = wantCape ? SKIN_CACHE_CAPE : SKIN_CACHE;
         PlayerSkin cached = cache.get(cacheKey);
@@ -205,7 +205,7 @@ public final class ClientSkinAssets {
         return new AssetData(texture, model);
     }
 
-    public static ResourceLocation getModelIdFromTexture(ResourceLocation texture) {
+    public static Identifier getModelIdFromTexture(Identifier texture) {
         if (texture == null) return null;
         return MODEL_ID_CACHE.computeIfAbsent(texture, value -> {
             String path = value.getPath();
@@ -216,7 +216,7 @@ public final class ClientSkinAssets {
             if (path.endsWith(".png")) {
                 path = path.substring(0, path.length() - 4);
             }
-            return ResourceLocation.fromNamespaceAndPath(value.getNamespace(), path);
+            return Identifier.fromNamespaceAndPath(value.getNamespace(), path);
         });
     }
 
@@ -248,7 +248,7 @@ public final class ClientSkinAssets {
     public static void clear() {
         Minecraft client = Minecraft.getInstance();
         TextureManager manager = client != null ? client.getTextureManager() : null;
-        for (ResourceLocation texture : TEXTURES.values()) {
+        for (Identifier texture : TEXTURES.values()) {
             releaseTexture(manager, texture);
         }
         clearPreviewWarmup();
@@ -276,11 +276,11 @@ public final class ClientSkinAssets {
 
     private static void clearTexture(String key, TextureManager manager) {
         TEXTURE_BYTES.remove(key);
-        ResourceLocation old = TEXTURES.remove(key);
+        Identifier old = TEXTURES.remove(key);
         releaseTexture(manager, old);
     }
 
-    private static PlayerModelType resolveModelType(String skinId, String assetKey, SkinEntry entry, ResourceLocation modelId) {
+    private static PlayerModelType resolveModelType(String skinId, String assetKey, SkinEntry entry, Identifier modelId) {
         Boolean slim = modelId == null ? null : BoxModelManager.getSlimFlag(modelId);
         if (slim == null) slim = getSlimFlag(assetKey, skinId);
         if (slim == null && entry != null && entry.modelId() != null)
@@ -402,21 +402,21 @@ public final class ClientSkinAssets {
         }
     }
 
-    private static ResourceLocation resolveModelLocation(Minecraft client, String skinId, SkinEntry entry) {
+    private static Identifier resolveModelLocation(Minecraft client, String skinId, SkinEntry entry) {
         if (client == null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
         if (entry != null) {
-            ResourceLocation modelId = entry.modelId();
+            Identifier modelId = entry.modelId();
             if (modelId != null) {
-                ResourceLocation jsonId = BoxModelManager.getJsonLocation(modelId);
+                Identifier jsonId = BoxModelManager.getJsonLocation(modelId);
                 if (jsonId != null && client.getResourceManager().getResource(jsonId).isPresent()) return jsonId;
             }
-            ResourceLocation packModel = SkinIdUtil.modelLocation(entry.texture());
+            Identifier packModel = SkinIdUtil.modelLocation(entry.texture());
             if (packModel != null && client.getResourceManager().getResource(packModel).isPresent()) return packModel;
         }
-        return ResourceLocation.fromNamespaceAndPath("legacy", "box_models/" + skinId + ".json");
+        return Identifier.fromNamespaceAndPath("legacy", "box_models/" + skinId + ".json");
     }
 
-    private static byte[] loadBytes(Minecraft client, ResourceLocation id) {
+    private static byte[] loadBytes(Minecraft client, Identifier id) {
         if (client == null || id == null) return new byte[0];
         Resource resource = client.getResourceManager().getResource(id).orElse(null);
         if (resource == null) return new byte[0];
@@ -428,11 +428,11 @@ public final class ClientSkinAssets {
         }
     }
 
-    private static void warmTexture(Minecraft client, ResourceLocation id) {
+    private static void warmTexture(Minecraft client, Identifier id) {
         if (client != null && id != null) client.getTextureManager().getTexture(id);
     }
 
-    private static ResourceLocation putTextureInternal(String key, byte[] texturePng) {
+    private static Identifier putTextureInternal(String key, byte[] texturePng) {
         Minecraft client = Minecraft.getInstance();
         if (client == null || key == null || key.isBlank()) return null;
         if (texturePng == null) return null;
@@ -445,8 +445,8 @@ public final class ClientSkinAssets {
             NativeImage image = NativeImage.read(new ByteArrayInputStream(texturePng));
             DynamicTexture texture = new DynamicTexture(() -> "legacy_runtime_texture_" + key, image);
             TextureManager manager = client.getTextureManager();
-            ResourceLocation id = runtimeTextureId(key);
-            ResourceLocation old = TEXTURES.put(key, id);
+            Identifier id = runtimeTextureId(key);
+            Identifier old = TEXTURES.put(key, id);
             if (old != null && !old.equals(id)) releaseTexture(manager, old);
             manager.register(id, texture);
             return id;
@@ -456,18 +456,18 @@ public final class ClientSkinAssets {
         }
     }
 
-    private static ResourceLocation runtimeTextureId(String key) {
+    private static Identifier runtimeTextureId(String key) {
         String safeKey = UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8)).toString();
-        return ResourceLocation.fromNamespaceAndPath("legacy", "runtime_skins/" + safeKey);
+        return Identifier.fromNamespaceAndPath("legacy", "runtime_skins/" + safeKey);
     }
 
-    private static void releaseTexture(TextureManager manager, ResourceLocation id) {
+    private static void releaseTexture(TextureManager manager, Identifier id) {
         if (manager == null || id == null) return;
         manager.release(id);
     }
 
-    public record ResolvedSkin(SkinEntry entry, ResourceLocation texture, ResourceLocation boxTexture,
-                               ResourceLocation modelId, BuiltBoxModel boxModel) {
+    public record ResolvedSkin(SkinEntry entry, Identifier texture, Identifier boxTexture,
+                               Identifier modelId, BuiltBoxModel boxModel) {
     }
 
     public record AssetData(byte[] texture, byte[] model) {

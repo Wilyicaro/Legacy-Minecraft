@@ -42,7 +42,7 @@
       {"group": "misc", "recipes": ["shears","tnt","flint_and_steel","bundle","brush","wind_charge","mace"]},
       {"group": "rod", "recipes": ["fishing_rod","carrot_on_a_stick","warped_fungus_on_a_stick"]},
       {"group": "archery", "recipes": ["bow","crossbow","arrow","spectral_arrow","tipped_arrow"]},
-      {"group": "sword", "recipes": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword","copper_sword"]},
+      {"group": "sword", "recipes": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword","copper_sword","wooden_spear","stone_spear","iron_spear","diamond_spear","golden_spear","copper_spear"]},
       "shield",
       {"group": "container", "recipes": ["bucket","bowl","glass_bottle","cauldron","composter"]},
       {"group": "lighting", "recipes": ["torch","soul_torch","copper_torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod","lantern","soul_lantern","copper_lantern"]},

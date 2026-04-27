@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -13,7 +13,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
@@ -400,7 +400,7 @@ public class LegacyOptions {
 
     public static float getLeftStickDeadZone() {
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.screen == null && minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
+        return minecraft.screen == null && minecraft.player != null && minecraft.player.getControlledVehicle() instanceof AbstractBoat ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
     }
 
     public static boolean hasClassicCrafting() {
@@ -552,7 +552,7 @@ public class LegacyOptions {
     }
 
     public enum ControlTooltipDisplay implements StringRepresentable {
-        AUTO("auto"),LEFT("left", HumanoidArm.LEFT.getCaption()),RIGHT("right", HumanoidArm.RIGHT.getCaption());
+        AUTO("auto"),LEFT("left", HumanoidArm.LEFT.caption()),RIGHT("right", HumanoidArm.RIGHT.caption());
         public static final EnumCodec<ControlTooltipDisplay> CODEC = StringRepresentable.fromEnum(ControlTooltipDisplay::values);
         private final String name;
         public final Component displayName;

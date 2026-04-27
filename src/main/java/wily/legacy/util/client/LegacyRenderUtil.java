@@ -3,7 +3,7 @@ package wily.legacy.util.client;
 import com.google.common.collect.Ordering;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
@@ -28,7 +28,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
@@ -93,11 +93,11 @@ public class LegacyRenderUtil {
     public static final boolean isNvidia;
     public static boolean suppressInventoryElytraPose;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
-    public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
-    public static final ResourceLocation PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
-    public static final ResourceLocation MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
-    public static final ResourceLocation LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
+    public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
+    public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
+    public static final Identifier PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
+    public static final Identifier MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
+    public static final Identifier LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -110,11 +110,11 @@ public class LegacyRenderUtil {
         blitTranslucentOverlaySprite(graphics, LegacySprites.POINTER_PANEL, x, y, width, height);
     }
 
-    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, Identifier sprite, int x, int y, int width, int height) {
         blitTranslucentSprite(graphics, sprite, x, y, width, height);
     }
 
-    public static void blitTranslucentSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+    public static void blitTranslucentSprite(GuiGraphics graphics, Identifier sprite, int x, int y, int width, int height) {
         FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width, height);
     }
 
@@ -179,7 +179,7 @@ public class LegacyRenderUtil {
         FactoryScreenUtil.disableBlend();
     }
 
-    public static ResourceLocation getSpriteOrFallback(ResourceLocation main, ResourceLocation fallback) {
+    public static Identifier getSpriteOrFallback(Identifier main, Identifier fallback) {
         return FactoryGuiGraphics.getSprites().texturesByName.containsKey(main) ? main : fallback;
     }
 
@@ -393,7 +393,6 @@ public class LegacyRenderUtil {
             suppressInventoryElytraPose = false;
         }
         entityRenderState.lightCoords = 15728880;
-        entityRenderState.hitboxesRenderState = null;
         entityRenderState.shadowPieces.clear();
         entityRenderState.outlineColor = 0;
         ScreenRectangle scissorStack = guiGraphics.scissorStack.peek();
@@ -419,7 +418,7 @@ public class LegacyRenderUtil {
     }
 
     public static void renderLocalPlayerAdvancementFace(GuiGraphics guiGraphics, int x, int y, int size) {
-        ResourceLocation face = SkinPackLoader.getAdvancementFace(getLocalPlayerSkinId());
+        Identifier face = SkinPackLoader.getAdvancementFace(getLocalPlayerSkinId());
         if (face != null) {
             FactoryScreenUtil.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).blit(face, x, y, 0.0f, 0.0f, size, size, size, size);

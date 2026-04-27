@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 
 public final class LegacyCloudAtmosphere {
     private static final float TWO_PI = 6.2831855f;
-    private static final ResourceLocation VANILLA_CLOUD_SHADER = ResourceLocation.withDefaultNamespace("shaders/core/rendertype_clouds.fsh");
+    private static final Identifier VANILLA_CLOUD_SHADER = Identifier.withDefaultNamespace("shaders/core/rendertype_clouds.fsh");
 
     private static final class CloudGeometry {
         private static final float LEGACY_HEIGHT = 128.0f;

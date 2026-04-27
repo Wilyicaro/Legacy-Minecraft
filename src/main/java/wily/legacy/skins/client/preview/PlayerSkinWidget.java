@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.client.render.boxloader.BoxModelManager;
@@ -29,8 +29,8 @@ public class PlayerSkinWidget extends AbstractWidget {
     private static volatile int CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2, CENTER_NAME_PLATE_W, CENTER_NAME_PLATE_H, CENTER_NAME_PLATE_PAD_Y,
             CENTER_NAME_PLATE_Y = -1, CENTER_NAME_PLATE_CENTER_X = -1, CENTER_NAME_PLATE_HIGHLIGHT_PAD, CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS = 1,
             CENTER_NAME_PLATE_HIGHLIGHT_COLOR = 0xFFEBEB0F, CENTER_SELECTED_BADGE_W, CENTER_SELECTED_BADGE_H, CENTER_SELECTED_BADGE_GAP;
-    private static volatile ResourceLocation CENTER_NAME_PLATE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/skin_box");
-    private static volatile ResourceLocation CENTER_SELECTED_BADGE_SPRITE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
+    private static volatile Identifier CENTER_NAME_PLATE_SPRITE = Identifier.fromNamespaceAndPath("legacy", "tiles/skin_box");
+    private static volatile Identifier CENTER_SELECTED_BADGE_SPRITE = Identifier.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     private static volatile String CENTER_NAME_PLATE_DISPLAY_ID, CENTER_NAME_PLATE_PENDING_ID;
     private static volatile boolean CENTER_NAME_PLATE_WAITING;
     public final Supplier<String> skinId;
@@ -84,7 +84,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         CENTER_NAME_PLATE_CENTER_X = centerX;
     }
 
-    public static void setCenterNamePlateSprite(ResourceLocation sprite) {
+    public static void setCenterNamePlateSprite(Identifier sprite) {
         if (sprite != null) CENTER_NAME_PLATE_SPRITE = sprite;
     }
 
@@ -109,7 +109,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         CENTER_NAME_PLATE_HIGHLIGHT_COLOR = color;
     }
 
-    public static void setCenterSelectedBadge(boolean enabled, int width, int height, int gap, ResourceLocation sprite) {
+    public static void setCenterSelectedBadge(boolean enabled, int width, int height, int gap, Identifier sprite) {
         CENTER_SELECTED_BADGE = enabled;
         CENTER_SELECTED_BADGE_W = Math.max(1, width);
         CENTER_SELECTED_BADGE_H = Math.max(1, height);
@@ -557,10 +557,10 @@ public class PlayerSkinWidget extends AbstractWidget {
     private String themeLabel(String id, String label) {
         if (SkinIdUtil.isAutoSelect(id)) return null;
         SkinEntry entry = getCachedEntry(id);
-        ResourceLocation modelId = entry == null ? null : entry.modelId();
+        Identifier modelId = entry == null ? null : entry.modelId();
         if (modelId == null) {
             String ns = entry != null && entry.texture() != null ? entry.texture().getNamespace() : SkinSync.ASSET_NS;
-            ResourceLocation texture = entry != null && entry.texture() != null ? entry.texture() : ResourceLocation.fromNamespaceAndPath(ns, id);
+            Identifier texture = entry != null && entry.texture() != null ? entry.texture() : Identifier.fromNamespaceAndPath(ns, id);
             modelId = ClientSkinAssets.getModelIdFromTexture(texture);
         }
         String theme = BoxModelManager.getThemeText(modelId);

@@ -1,10 +1,10 @@
 package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -221,7 +221,7 @@ public abstract class PlayerPartsMixin {
     }
 
     @Unique
-    private void consoleskins$applyVisualOffsets(PlayerModel self, ResourceLocation modelId) {
+    private void consoleskins$applyVisualOffsets(PlayerModel self, Identifier modelId) {
         if (modelId == null) return;
         EnumMap<AttachSlot, float[]> offsets = BoxModelManager.getOffsets(modelId);
         EnumMap<AttachSlot, float[]> scales = BoxModelManager.getScales(modelId);

@@ -1,7 +1,7 @@
 package wily.legacy.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Optional<Ingredient>> customIngredients,
+public record ServerMenuCraftPayload(Optional<Identifier> craftId, List<Optional<Ingredient>> customIngredients,
                                      int button, boolean max) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ServerMenuCraftPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_menu_craft"), ServerMenuCraftPayload::new);
 

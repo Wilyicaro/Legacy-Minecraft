@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.FormattedCharSequence;
@@ -138,7 +139,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         if (LegacyOptions.modCraftingTabs.get()) {
             allRecipes.stream().collect(Collectors.groupingBy(h -> h.getId().getNamespace(), () -> new TreeMap<>(Comparator.<String>naturalOrder()), recipesByGroupsCollector)).forEach((namespace, m) -> {
                 ModInfo modInfo = FactoryAPIPlatform.getModInfo(namespace);
-                if (modInfo == null || namespace.equals("minecraft") || namespace.equals(Legacy4J.MOD_ID) || m.isEmpty()) return;
+                if (modInfo == null || namespace.equals(Identifier.DEFAULT_NAMESPACE) || namespace.equals(Legacy4J.MOD_ID) || m.isEmpty()) return;
                 List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
                 m.values().forEach(l -> {
                     l.removeIf(i -> i.isInvalid() || i.getOptionalIngredients().size() > ingredientsGrid.size());

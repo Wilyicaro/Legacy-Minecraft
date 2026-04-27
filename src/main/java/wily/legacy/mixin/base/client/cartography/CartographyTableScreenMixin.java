@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CartographyTableMenu;
@@ -192,7 +192,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         int arrowHeight = sd ? 14 : 15;
         int arrowY = topPos + (sd ? 55 : 87);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW, leftPos + (sd ? 24 : 36), arrowY, arrowWidth, arrowHeight);
-        ResourceLocation cartographySprite;
+        Identifier cartographySprite;
         if (input.is(Items.FILLED_MAP)) {
             MapItemSavedData mapItemSavedData = MapItem.getSavedData(/*? if <1.20.5 {*//*MapItem.getMapId(input)*//*?} else {*/input.get(DataComponents.MAP_ID)/*?}*/, this.minecraft.level);
             if (mapItemSavedData != null && (mapItemSavedData.locked && (zoom || lock) || zoom && mapItemSavedData.scale >= 4))

@@ -1,6 +1,6 @@
 package wily.legacy.skins.skin;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.text.Normalizer;
 import java.util.Locale;
@@ -66,12 +66,12 @@ public final class SkinIdUtil {
         }
     }
 
-    public static ResourceLocation modelId(String namespace, String skinId) {
+    public static Identifier modelId(String namespace, String skinId) {
         if (!hasSkin(namespace) || !hasSkin(skinId)) return null;
-        return ResourceLocation.fromNamespaceAndPath(namespace, skinId);
+        return Identifier.fromNamespaceAndPath(namespace, skinId);
     }
 
-    public static ResourceLocation modelLocation(ResourceLocation texture) {
+    public static Identifier modelLocation(Identifier texture) {
         if (texture == null) return null;
         String path = texture.getPath();
         int slash = path.lastIndexOf('/');
@@ -82,6 +82,6 @@ public final class SkinIdUtil {
         if (!name.endsWith(".png")) return null;
         String boxFolder = folder.substring(0, folder.length() - "/skins".length()) + "/box_models/";
         String boxName = name.substring(0, name.length() - 4) + ".json";
-        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), boxFolder + boxName);
+        return Identifier.fromNamespaceAndPath(texture.getNamespace(), boxFolder + boxName);
     }
 }

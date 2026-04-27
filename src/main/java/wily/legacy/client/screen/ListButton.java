@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,16 +21,12 @@ public abstract class ListButton extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, isHoveredOrFocused() ? LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON_HIGHLIGHTED, LegacySprites.BUTTON_HIGHLIGHTED) : LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON, LegacySprites.BUTTON), this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
-        this.renderString(guiGraphics, minecraft.font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-        if (this.isHovered()) {
-            guiGraphics.requestCursor(this.isActive() ? CursorTypes.POINTING_HAND : CursorTypes.NOT_ALLOWED);
-        }
+        this.renderScrollingString(guiGraphics, minecraft.font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
     }
 
-    @Override
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
         LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35), this.getY(), getX() + this.getWidth() - 2, this.getY() + this.getHeight(), j, true));
     }

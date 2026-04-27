@@ -2,23 +2,28 @@ package wily.legacy.mixin.base.client.chat;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3x2f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.OverlayPanelScreen;
@@ -32,11 +37,6 @@ public abstract class ChatComponentMixin {
     @Final
     private Minecraft minecraft;
 
-    @Inject(method = "getWidth(D)I", at = @At(value = "HEAD"), cancellable = true)
-    private static void getWidth(double d, CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(Mth.floor(d * (Minecraft.getInstance().getWindow().getGuiScaledWidth() - (4 + LegacyRenderUtil.getChatSafeZone()) * 2)));
-    }
-
     @Shadow
     public abstract double getScale();
 
@@ -46,7 +46,40 @@ public abstract class ChatComponentMixin {
     @Shadow
     public abstract boolean isChatFocused();
 
-    @Shadow
+    //? if >=1.21.11 {
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "HEAD"), cancellable = true)
+    private void renderWithFont(CallbackInfo ci) {
+        if (minecraft.screen != null && !isChatFocused()) {
+            ci.cancel();
+            return;
+        }
+
+        if (LegacyOptions.getUIMode().isSD()) LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "RETURN"))
+    private void renderWithFontReturn(CallbackInfo ci) {
+        LegacyFontUtil.defaultFontOverride = null;
+    }
+
+    @ModifyArgs(method = "method_75802", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V"))
+    private static void renderChatBg(Args args) {
+        int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
+        args.set(0, (int) args.get(0) - safeZone);
+        args.set(2, (int) args.get(2) - safeZone);
+        args.set(4, ARGB.color(ARGB.alpha(args.get(4)), CommonColor.CHAT_BACKGROUND.get()));
+    }
+    @ModifyArgs(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V", ordinal = 0))
+    private void renderChatBgSecond(Args args) {
+        renderChatBg(args);
+    }
+
+    @Inject(method = "method_75801", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;translate(FF)Lorg/joml/Matrix3x2f;"), remap = false)
+    private static void offsetChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<Matrix3x2f> matrix3x2f) {
+        matrix3x2f.set(matrix3x2f.get().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42));
+    }
+    //?} else {
+    /*@Shadow
     protected abstract void drawTagIcon(GuiGraphics guiGraphics, int i, int j, GuiMessageTag.Icon icon);
 
     @Shadow
@@ -58,7 +91,7 @@ public abstract class ChatComponentMixin {
             int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
             guiGraphics.fill(lx - 4 - safeZone, mx, lx + n + 4 + 4 + safeZone, nx, ARGB.color(hx * h, CommonColor.CHAT_BACKGROUND.get().intValue()));
             GuiMessageTag guiMessageTag = line.tag();
-            if (LegacyOptions.displayChatIndicators.get() && guiMessageTag != null) {
+            if (guiMessageTag != null) {
                 int p = ARGB.color(hx * g, guiMessageTag.indicatorColor());
                 guiGraphics.fill(lx - 4 - safeZone, mx, lx - 2 - safeZone, nx, p);
                 if (ox == q && guiMessageTag.icon() != null) {
@@ -79,6 +112,16 @@ public abstract class ChatComponentMixin {
         LegacyFontUtil.defaultFontOverride = null;
     }
 
+    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
+    private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        if (minecraft.screen != null && !isChatFocused()) ci.cancel();
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
+    private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
+    }
+
     @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"))
     private void changeClickedChatFont(double d, double e, CallbackInfoReturnable<Style> cir) {
         if (LegacyOptions.getUIMode().isSD())
@@ -90,35 +133,9 @@ public abstract class ChatComponentMixin {
         LegacyFontUtil.defaultFontOverride = null;
     }
 
-    @Inject(method = "addMessageToDisplayQueue", at = @At("HEAD"))
-    private void changeClickedChatFontWidth(GuiMessage guiMessage, CallbackInfo ci) {
-        if (LegacyOptions.getUIMode().isSD())
-            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
-    }
-
-    @Inject(method = "addMessageToDisplayQueue", at = @At("RETURN"))
-    private void changeClickedChatFontWidthAfter(GuiMessage guiMessage, CallbackInfo ci) {
-        LegacyFontUtil.defaultFontOverride = null;
-    }
-
     @ModifyExpressionValue(method = "getMessageTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
     private double changeMessageTagXPos(double original) {
         return original + Math.round(LegacyRenderUtil.getChatSafeZone());
-    }
-
-    @Inject(method = "getMessageTagAt", at = @At("HEAD"), cancellable = true)
-    private void getMessageTagAt(double d, double e, CallbackInfoReturnable<GuiMessageTag> cir) {
-        if (!LegacyOptions.displayChatIndicators.get()) cir.setReturnValue(null);
-    }
-
-    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-    private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
-        if (minecraft.screen != null && !isChatFocused()) ci.cancel();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
-    private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
-        guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
     }
 
     @Inject(method = "screenToChatX", at = @At("RETURN"), cancellable = true)
@@ -130,6 +147,23 @@ public abstract class ChatComponentMixin {
     private void screenToChatY(double d, CallbackInfoReturnable<Double> cir) {
         double e = (double) this.minecraft.getWindow().getGuiScaledHeight() - d - 40 + LegacyRenderUtil.getHUDDistance() - 42;
         cir.setReturnValue(e / (this.getScale() * (double) this.getLineHeight()));
+    }
+    *///?}
+
+    @Inject(method = "getWidth(D)I", at = @At(value = "HEAD"), cancellable = true)
+    private static void getWidth(double d, CallbackInfoReturnable<Integer> cir) {
+        cir.setReturnValue(Mth.floor(d * (Minecraft.getInstance().getWindow().getGuiScaledWidth() - (4 + LegacyRenderUtil.getChatSafeZone()) * 2)));
+    }
+
+    @Inject(method = "addMessageToDisplayQueue", at = @At("HEAD"))
+    private void changeClickedChatFontWidth(GuiMessage guiMessage, CallbackInfo ci) {
+        if (LegacyOptions.getUIMode().isSD())
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "addMessageToDisplayQueue", at = @At("RETURN"))
+    private void changeClickedChatFontWidthAfter(GuiMessage guiMessage, CallbackInfo ci) {
+        LegacyFontUtil.defaultFontOverride = null;
     }
 
     @Inject(method = "isChatFocused", at = @At(value = "HEAD"), cancellable = true)

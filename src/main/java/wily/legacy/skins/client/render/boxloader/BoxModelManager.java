@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import wily.legacy.skins.client.lang.SkinPackLang;
@@ -23,15 +23,15 @@ import java.util.function.Function;
 
 public final class BoxModelManager {
     private static final Gson GSON = new Gson();
-    private static final Map<ResourceLocation, BoxData> CACHE = new ConcurrentHashMap<>();
-    private static final Map<ResourceLocation, BoxData> RUNTIME = new ConcurrentHashMap<>();
+    private static final Map<Identifier, BoxData> CACHE = new ConcurrentHashMap<>();
+    private static final Map<Identifier, BoxData> RUNTIME = new ConcurrentHashMap<>();
     private static final Map<String, EnumSet<SkinPoseRegistry.PoseTag>> CACHE_POSE_TAGS = new ConcurrentHashMap<>();
     private static final Map<String, EnumSet<SkinPoseRegistry.PoseTag>> RUNTIME_POSE_TAGS = new ConcurrentHashMap<>();
-    private static final Map<ResourceLocation, ResourceLocation> JSON_INDEX = new ConcurrentHashMap<>();
-    private static final Set<ResourceLocation> SKINPACK_MODELS = ConcurrentHashMap.newKeySet();
-    private static final Map<String, ResourceLocation> KEY_INDEX = new ConcurrentHashMap<>();
-    private static final Set<ResourceLocation> LOADED = ConcurrentHashMap.newKeySet();
-    private static final Map<ResourceLocation, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
+    private static final Map<Identifier, Identifier> JSON_INDEX = new ConcurrentHashMap<>();
+    private static final Set<Identifier> SKINPACK_MODELS = ConcurrentHashMap.newKeySet();
+    private static final Map<String, Identifier> KEY_INDEX = new ConcurrentHashMap<>();
+    private static final Set<Identifier> LOADED = ConcurrentHashMap.newKeySet();
+    private static final Map<Identifier, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
     private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null);
     private static volatile boolean initialized;
 
@@ -49,37 +49,37 @@ public final class BoxModelManager {
         index(manager, "skinpacks", true);
     }
 
-    public static boolean isAvailable(ResourceLocation id) {
+    public static boolean isAvailable(Identifier id) {
         if (id == null) return false;
         ensureInitialized();
         return RUNTIME.containsKey(id) || CACHE.containsKey(id) || JSON_INDEX.containsKey(id);
     }
 
-    public static BuiltBoxModel get(ResourceLocation id) {
+    public static BuiltBoxModel get(Identifier id) {
         return getValue(id, BoxData::model);
     }
 
-    public static ResourceLocation getTexture(ResourceLocation id) {
+    public static Identifier getTexture(Identifier id) {
         return getValue(id, BoxData::texture);
     }
 
-    public static EnumMap<AttachSlot, float[]> getOffsets(ResourceLocation id) {
+    public static EnumMap<AttachSlot, float[]> getOffsets(Identifier id) {
         return getValue(id, BoxData::offsets);
     }
 
-    public static EnumMap<AttachSlot, float[]> getScales(ResourceLocation id) {
+    public static EnumMap<AttachSlot, float[]> getScales(Identifier id) {
         return getValue(id, BoxData::scales);
     }
 
-    public static EnumMap<ArmorSlot, float[]> getArmorOffsets(ResourceLocation id) {
+    public static EnumMap<ArmorSlot, float[]> getArmorOffsets(Identifier id) {
         return getValue(id, BoxData::armorOffsets);
     }
 
-    public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) {
+    public static EnumSet<ArmorSlot> getArmorHide(Identifier id) {
         return getValue(id, BoxData::armorHide);
     }
 
-    public static Boolean getSlimFlag(ResourceLocation id) {
+    public static Boolean getSlimFlag(Identifier id) {
         return getValue(id, BoxData::slim);
     }
 
@@ -87,7 +87,7 @@ public final class BoxModelManager {
         if (tag == null || id == null || id.isBlank()) return false;
         ensureInitialized();
         if (hasPoseTag(RUNTIME_POSE_TAGS, id, tag) || hasPoseTag(CACHE_POSE_TAGS, id, tag)) return true;
-        ResourceLocation modelId = resolveModelId(id);
+        Identifier modelId = resolveModelId(id);
         if (modelId == null) return false;
         ensureLoaded(modelId);
         return hasPoseTag(CACHE_POSE_TAGS, id, tag)
@@ -109,14 +109,14 @@ public final class BoxModelManager {
         RUNTIME_POSE_TAGS.clear();
     }
 
-    public static void removeRuntime(ResourceLocation id) {
+    public static void removeRuntime(Identifier id) {
         if (id == null) return;
         RUNTIME.remove(id);
         RUNTIME_POSE_TAGS.remove(id.getPath());
         RUNTIME_POSE_TAGS.remove(id.toString());
     }
 
-    public static String getThemeText(ResourceLocation id) {
+    public static String getThemeText(Identifier id) {
         BoxData data = getData(id);
         if (data == null) return null;
         String theme = translateThemeKey(data.themeKey());
@@ -124,7 +124,7 @@ public final class BoxModelManager {
         return trimToNull(theme);
     }
 
-    public static void registerRuntime(ResourceLocation id, JsonObject root) {
+    public static void registerRuntime(Identifier id, JsonObject root) {
         if (id == null || root == null) return;
         try {
             BoxData data = readBoxData(root);
@@ -134,7 +134,7 @@ public final class BoxModelManager {
         }
     }
 
-    public static void registerAlias(ResourceLocation id, ResourceLocation jsonId) {
+    public static void registerAlias(Identifier id, Identifier jsonId) {
         if (id == null || jsonId == null) return;
         ensureInitialized();
         JSON_INDEX.put(id, jsonId);
@@ -145,7 +145,7 @@ public final class BoxModelManager {
         LOAD_LOCKS.remove(id);
     }
 
-    public static ResourceLocation getJsonLocation(ResourceLocation id) {
+    public static Identifier getJsonLocation(Identifier id) {
         if (id == null) return null;
         ensureInitialized();
         return JSON_INDEX.get(id);
@@ -166,9 +166,9 @@ public final class BoxModelManager {
     private static void index(ResourceManager manager, String base, boolean skinpacksMode) {
         if (manager == null) return;
         try {
-            for (ResourceLocation jsonId : manager.listResources(base, path -> isIndexedJson(path.getPath(), skinpacksMode)).keySet()) {
+            for (Identifier jsonId : manager.listResources(base, path -> isIndexedJson(path.getPath(), skinpacksMode)).keySet()) {
                 try {
-                    ResourceLocation modelId = readModelId(base, jsonId, skinpacksMode);
+                    Identifier modelId = readModelId(base, jsonId, skinpacksMode);
                     if (modelId == null) continue;
                     JSON_INDEX.put(modelId, jsonId);
                     if (skinpacksMode) SKINPACK_MODELS.add(modelId);
@@ -184,19 +184,19 @@ public final class BoxModelManager {
         return path.endsWith(".json") && (!skinpacksMode || path.contains("/box_models/"));
     }
 
-    private static ResourceLocation readModelId(String base, ResourceLocation jsonId, boolean skinpacksMode) {
+    private static Identifier readModelId(String base, Identifier jsonId, boolean skinpacksMode) {
         String path = jsonId.getPath();
         if (skinpacksMode) {
             int slash = path.lastIndexOf('/');
             String name = slash >= 0 ? path.substring(slash + 1) : path;
-            return ResourceLocation.fromNamespaceAndPath(jsonId.getNamespace(), name.substring(0, name.length() - 5));
+            return Identifier.fromNamespaceAndPath(jsonId.getNamespace(), name.substring(0, name.length() - 5));
         }
         String prefix = base + "/";
         if (!path.startsWith(prefix)) return null;
-        return ResourceLocation.fromNamespaceAndPath(jsonId.getNamespace(), path.substring(prefix.length(), path.length() - 5));
+        return Identifier.fromNamespaceAndPath(jsonId.getNamespace(), path.substring(prefix.length(), path.length() - 5));
     }
 
-    private static void indexKeys(String namespace, ResourceLocation modelId, boolean includeLeafAlias) {
+    private static void indexKeys(String namespace, Identifier modelId, boolean includeLeafAlias) {
         if (namespace == null || modelId == null) return;
         forEachAlias(namespace, modelId.getPath(), includeLeafAlias, key -> KEY_INDEX.put(key, modelId));
     }
@@ -207,17 +207,17 @@ public final class BoxModelManager {
         if (manager != null) ensureReloaded(manager);
     }
 
-    private static Object loadLock(ResourceLocation id) {
+    private static Object loadLock(Identifier id) {
         return LOAD_LOCKS.computeIfAbsent(id, ignored -> new Object());
     }
 
-    private static void ensureLoaded(ResourceLocation id) {
+    private static void ensureLoaded(Identifier id) {
         if (id == null || LOADED.contains(id)) return;
         if (RUNTIME.containsKey(id) || CACHE.containsKey(id)) {
             LOADED.add(id);
             return;
         }
-        ResourceLocation jsonId = JSON_INDEX.get(id);
+        Identifier jsonId = JSON_INDEX.get(id);
         if (jsonId == null) {
             LOADED.add(id);
             return;
@@ -243,7 +243,7 @@ public final class BoxModelManager {
         }
     }
 
-    private static void storeCachedData(ResourceLocation id, String namespace, boolean includeLeafAlias, JsonObject root) {
+    private static void storeCachedData(Identifier id, String namespace, boolean includeLeafAlias, JsonObject root) {
         try {
             BoxData data = readBoxData(root);
             if (data != null) CACHE.put(id, data);
@@ -252,7 +252,7 @@ public final class BoxModelManager {
         }
     }
 
-    private static BoxData getData(ResourceLocation id) {
+    private static BoxData getData(Identifier id) {
         if (id == null) return null;
         ensureInitialized();
         BoxData data = RUNTIME.get(id);
@@ -263,16 +263,16 @@ public final class BoxModelManager {
         return CACHE.get(id);
     }
 
-    private static <T> T getValue(ResourceLocation id, Function<BoxData, T> getter) {
+    private static <T> T getValue(Identifier id, Function<BoxData, T> getter) {
         BoxData data = getData(id);
         return data == null ? null : getter.apply(data);
     }
 
-    private static ResourceLocation resolveModelId(String id) {
-        ResourceLocation modelId = KEY_INDEX.get(id);
+    private static Identifier resolveModelId(String id) {
+        Identifier modelId = KEY_INDEX.get(id);
         if (modelId != null) return modelId;
         try {
-            return ResourceLocation.parse(id);
+            return Identifier.parse(id);
         } catch (RuntimeException ignored) {
             return null;
         }
@@ -313,11 +313,11 @@ public final class BoxModelManager {
         return data.isEmpty() ? null : data;
     }
 
-    private static ResourceLocation readTexture(JsonObject texture) {
+    private static Identifier readTexture(JsonObject texture) {
         String path = readString(texture, "path", "texturePath");
         if (path == null) return null;
         try {
-            return ResourceLocation.parse(path);
+            return Identifier.parse(path);
         } catch (RuntimeException ignored) {
             return null;
         }
@@ -497,7 +497,7 @@ public final class BoxModelManager {
         }
     }
 
-    private record BoxData(BuiltBoxModel model, ResourceLocation texture, String themeName, String themeKey,
+    private record BoxData(BuiltBoxModel model, Identifier texture, String themeName, String themeKey,
                            EnumMap<AttachSlot, float[]> offsets, EnumMap<AttachSlot, float[]> scales,
                            EnumMap<ArmorSlot, float[]> armorOffsets, EnumSet<ArmorSlot> armorHide, Boolean slim) {
         boolean isEmpty() {

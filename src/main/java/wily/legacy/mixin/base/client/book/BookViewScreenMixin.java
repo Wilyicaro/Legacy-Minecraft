@@ -1,21 +1,19 @@
 package wily.legacy.mixin.base.client.book;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.ControlType;
@@ -36,15 +34,8 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     @Shadow
     private PageButton backButton;
     @Shadow
-    private Component pageMsg;
-    @Shadow
     private int currentPage;
-    @Shadow
-    private int cachedPage;
-    @Shadow
-    private List<FormattedCharSequence> cachedPageComponents;
-    @Shadow
-    private BookViewScreen.BookAccess bookAccess;
+
     @Unique
     private final BookPanel panel = new BookPanel(this);
     protected BookViewScreenMixin(Component component) {
@@ -62,9 +53,6 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
 
     @Shadow
     protected abstract int getNumPages();
-
-    @Shadow
-    public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
 
     @Override
     public void added() {
@@ -92,30 +80,6 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
     //?}
 
-
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        ci.cancel();
-        super.render(guiGraphics, i, j, f);
-
-        if (this.cachedPage != this.currentPage) {
-            FormattedText formattedText = this.bookAccess.getPage(this.currentPage);
-            this.cachedPageComponents = this.font.split(formattedText, 159);
-            this.pageMsg = Component.translatable("book.pageIndicator", this.currentPage + 1, Math.max(this.getNumPages(), 1));
-        }
-        this.cachedPage = this.currentPage;
-        guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0xFF000000, false);
-        int n = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
-        for (int o = 0; o < n; ++o) {
-            FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(o);
-            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0xFF000000, false);
-        }
-        Style style = this.getClickedComponentStyleAt(i, j);
-        if (style != null) {
-            guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
-        }
-    }
-
     @Override
     public void bindingStateTick(BindingState state) {
         if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()) {
@@ -133,28 +97,34 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
-    @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
-    public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
-        if (this.cachedPageComponents.isEmpty()) {
-            cir.setReturnValue(null);
-            return;
-        }
-        int i = (int) Math.floor(d - panel.x - 20);
-        int j = (int) Math.floor(e - panel.y - 37);
-        if (i < 0 || j < 0) {
-            cir.setReturnValue(null);
-            return;
-        }
-        int k = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
-        if (i <= 159 && j < this.minecraft.font.lineHeight * k + k) {
-            int l = j / this.minecraft.font.lineHeight;
-            if (l < this.cachedPageComponents.size()) {
-                FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(l);
-                cir.setReturnValue(this.minecraft.font.getSplitter().componentStyleAtWidth(formattedCharSequence, i));
-                return;
-            }
-        }
-        cir.setReturnValue(null);
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 1)
+    public int changeSplitWidth(int i) {
+        return 159;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
+    public int changePageX(int i) {
+        return panel.x + panel.width - 24;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
+    public int changePageY(int i) {
+        return panel.y + 22;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 0)
+    public int changeTextX(int i) {
+        return panel.x + 20;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 1)
+    public int changeTextY(int i, @Local(ordinal = 3) int o) {
+        return panel.y + 37 + o * this.font.lineHeight;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"), index = 0)
+    public int changeMaxLines(int i) {
+        return 176 / this.font.lineHeight;
     }
 
     @Override

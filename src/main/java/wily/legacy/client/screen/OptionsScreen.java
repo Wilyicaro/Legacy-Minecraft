@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
 import wily.factoryapi.FactoryAPIClient;
@@ -172,7 +173,7 @@ public class OptionsScreen extends PanelVListScreen {
 
     private static void addDifficultyOption(OptionsScreen screen) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level != null && minecraft.player != null && minecraft.player.hasPermissions(2)) {
+        if (minecraft.level != null && minecraft.player != null && minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) {
             screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230, 16,
                     b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()),
                     b -> Tooltip.create(b.getObjectValue().getInfo()),
@@ -454,7 +455,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.showSubtitles()),
                                 LegacyOptions.of(mc.options.directionalAudio()),
                                 LegacyOptions.of(mc.options.musicFrequency()),
-                                LegacyOptions.of(mc.options.showNowPlayingToast())),
+                                LegacyOptions.of(mc.options.musicToast())),
                         o -> o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss -> ss.ordinal() > 1).map(ss -> (FactoryConfig<?>) LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(ss), "soundCategory." + ss.getName()))))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
@@ -575,7 +576,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("options.videoTitle"),
                                 LegacyOptions.of(createResolutionOptionInstance(o)),
                                 LegacyOptions.of(mc.options.fullscreen()),
-                                LegacyOptions.of(mc.options.graphicsMode()),
+                                LegacyOptions.of(mc.options.graphicsPreset()),
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),

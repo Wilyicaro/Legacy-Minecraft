@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.*;
+import net.minecraft.world.entity.npc.villager.*;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
@@ -38,8 +39,8 @@ public abstract class VillagerMixin extends AbstractVillager {
     @Shadow
     public abstract VillagerData getVillagerData();
 
-    @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;updateTrades()V"))
-    private void increaseMerchantCareer(Villager instance) {
+    @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/villager/Villager;updateTrades(Lnet/minecraft/server/level/ServerLevel;)V"))
+    private void increaseMerchantCareer(Villager instance, ServerLevel serverLevel) {
         if (getLevel() < 5) {
             updateTrades(getLevel() + 1);
         }
@@ -56,12 +57,17 @@ public abstract class VillagerMixin extends AbstractVillager {
 
     @Override
     public MerchantOffers getOffers() {
-        if (this.offers == null) {
-            this.offers = new MerchantOffers();
-            this.updateTrades();
-            updateTrades(getLevel() + 1);
+        if (this.level() instanceof ServerLevel serverLevel) {
+            if (this.offers == null) {
+                this.offers = new MerchantOffers();
+                this.updateTrades(serverLevel);
+                updateTrades(getLevel() + 1);
+            }
+
+            return this.offers;
+        } else {
+            throw new IllegalStateException("Cannot load Villager offers on the client");
         }
-        return this.offers;
     }
 
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
@@ -86,7 +92,7 @@ public abstract class VillagerMixin extends AbstractVillager {
         }
         int j = 0;
         while (j < 2 && !arrayList.isEmpty()) {
-            MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer(self(), self().getRandom());
+            MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer((ServerLevel) level(), self(), self().getRandom());
             if (merchantOffer == null) continue;
             ((LegacyMerchantOffer) merchantOffer).setRequiredLevel(level);
             self().getOffers().add(merchantOffer);
@@ -96,7 +102,7 @@ public abstract class VillagerMixin extends AbstractVillager {
     }
 
     @Unique
-    protected MerchantOffer getDecayArrowTrade(Entity trader, net.minecraft.util.RandomSource randomSource) {
+    protected MerchantOffer getDecayArrowTrade(ServerLevel level, Entity trader, net.minecraft.util.RandomSource randomSource) {
         return new MerchantOffer(new ItemCost(Items.ARROW, 5), Optional.of(new ItemCost(Items.EMERALD, 2)), LegacyItemUtil.createDecayTippedArrow().copyWithCount(5), 12, 30, 0.2f);
     }
   

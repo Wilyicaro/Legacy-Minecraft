@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Optional;
 
@@ -13,13 +13,13 @@ public interface IdValueInfo<T extends IdValueInfo<T>> {
         return name().orElse(CommonComponents.EMPTY);
     }
 
-    ResourceLocation id();
+    Identifier id();
 
     T copyFrom(T other);
 
     boolean isValid();
 
-    default boolean is(ResourceLocation id) {
+    default boolean is(Identifier id) {
         return id().equals(id);
     }
 }

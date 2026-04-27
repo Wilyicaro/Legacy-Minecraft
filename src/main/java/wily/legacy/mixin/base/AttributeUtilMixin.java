@@ -32,7 +32,7 @@ public class AttributeUtilMixin {
         return !FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat);
     }
 
-    @ModifyExpressionValue(method = "applyTextFor", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/ResourceLocation;equals(Ljava/lang/Object;)Z"))
+    @ModifyExpressionValue(method = "applyTextFor", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/Identifier;equals(Ljava/lang/Object;)Z"))
     private static boolean applyTextFor(boolean original) {
         return original && !FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat);
     }

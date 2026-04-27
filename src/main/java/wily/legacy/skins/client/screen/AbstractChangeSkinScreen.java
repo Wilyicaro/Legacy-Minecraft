@@ -9,7 +9,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -42,7 +42,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected final ChangeSkinScreenSource source;
     protected final Panel tooltipBox;
     protected final ChangeSkinPackList packList;
-    protected final Map<ResourceLocation, int[]> packIconDims = new HashMap<>();
+    protected final Map<Identifier, int[]> packIconDims = new HashMap<>();
     protected final HoldRepeat outerCarouselHold = new HoldRepeat();
     protected final List<PlayerSkinWidget> previewWidgets = new ArrayList<>(9);
     protected final CustomSkinPackFlow customPacks;
@@ -133,7 +133,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
 
-    protected static void blitSprite(GuiGraphics g, ResourceLocation id, int x, int y, int w, int h) {
+    protected static void blitSprite(GuiGraphics g, Identifier id, int x, int y, int w, int h) {
         FactoryGuiGraphics.of(g).blitSprite(id, x, y, w, h);
     }
 
@@ -490,12 +490,12 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return Math.max(layoutProfile.smallTextMinScale(), layoutProfile.smallTextScale() * uiScale);
     }
 
-    protected int[] packIconDims(ResourceLocation icon) {
+    protected int[] packIconDims(Identifier icon) {
         if (icon == null) return new int[]{128, 128};
         return packIconDims.computeIfAbsent(icon, this::readPackIconDims);
     }
 
-    private int[] readPackIconDims(ResourceLocation icon) {
+    private int[] readPackIconDims(Identifier icon) {
         int w = 128, h = 128;
         try {
             Resource r = minecraft.getResourceManager().getResource(icon).orElse(null);
@@ -539,7 +539,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         ensurePreviewWidgets();
         syncCenterPreviewState();
         SkinPack pack = packList.getFocusedPack();
-        ResourceLocation icon = pack == null ? null : pack.icon();
+        Identifier icon = pack == null ? null : pack.icon();
         if (icon != null && minecraft != null) minecraft.getTextureManager().getTexture(icon);
         List<String> ids = collectPackSkinIds(pack);
         if (ids.isEmpty()) {
@@ -1248,7 +1248,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
         void start(int dir) {
             this.dir = dir < 0 ? -1 : 1;
-            long now = net.minecraft.Util.getMillis();
+            long now = net.minecraft.util.Util.getMillis();
             startAt = now;
             nextAt = now + 220L;
         }
@@ -1260,11 +1260,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         }
 
         boolean ready() {
-            return dir != 0 && net.minecraft.Util.getMillis() >= nextAt;
+            return dir != 0 && net.minecraft.util.Util.getMillis() >= nextAt;
         }
 
         void step() {
-            long now = net.minecraft.Util.getMillis();
+            long now = net.minecraft.util.Util.getMillis();
             nextAt = now + (now - startAt < 700L ? 120L : 80L);
         }
     }

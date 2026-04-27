@@ -2,13 +2,14 @@ package wily.legacy.mixin.base.client.inventory;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.Llama;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.HorseInventoryMenu;
 import net.minecraft.world.inventory.Slot;
@@ -29,16 +30,13 @@ import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(HorseInventoryScreen.class)
-public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
-    @Shadow
-    @Final
-    private AbstractHorse horse;
+public abstract class HorseInventoryScreenMixin extends AbstractMountInventoryScreen<HorseInventoryMenu> {
 
     @Unique
     private static Vec2 SD_SLOTS_OFFSET = new Vec2(0.5f, 0.5f);
 
-    public HorseInventoryScreenMixin(HorseInventoryMenu abstractContainerMenu, Inventory inventory, Component component) {
-        super(abstractContainerMenu, inventory, component);
+    public HorseInventoryScreenMixin(HorseInventoryMenu abstractMountInventoryMenu, Inventory inventory, Component component, int i, LivingEntity livingEntity) {
+        super(abstractMountInventoryMenu, inventory, component, i, livingEntity);
     }
 
     @Override
@@ -63,7 +61,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
             if (i == 0) {
                 LegacySlotDisplay.override(s, inventoryLabelX, sd ? 16 : 21, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? LegacySprites.SADDLE_SLOT : null;
                     }
 
@@ -80,8 +78,8 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
             } else if (i == 1) {
                 LegacySlotDisplay.override(s, inventoryLabelX, sd ? 29 : 42, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
-                        return s.getItem().isEmpty() ? horse instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT : LegacySprites.ARMOR_SLOT : null;
+                    public Identifier getIconSprite() {
+                        return s.getItem().isEmpty() ? mount instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT : LegacySprites.ARMOR_SLOT : null;
                     }
 
                     @Override
@@ -96,7 +94,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
                 });
             } else if (i < menu.slots.size() - 36) {
                 int slotOffset = s.getContainerSlot();
-                LegacySlotDisplay.override(s, (sd ? 60 : 98) + slotOffset % horse.getInventoryColumns() * slotsSize, (sd ? 18 : 21) + slotOffset / horse.getInventoryColumns() * slotsSize, defaultDisplay);
+                LegacySlotDisplay.override(s, (sd ? 60 : 98) + slotOffset % ((AbstractHorse)mount).getInventoryColumns() * slotsSize, (sd ? 18 : 21) + slotOffset / ((AbstractHorse)mount).getInventoryColumns() * slotsSize, defaultDisplay);
             } else if (i < menu.slots.size() - 9) {
                 LegacySlotDisplay.override(s, inventoryLabelX + (s.getContainerSlot() - 9) % 9 * slotsSize, (sd ? 76 : 104) + (s.getContainerSlot() - 9) / 9 * slotsSize, defaultDisplay);
             } else {
@@ -110,9 +108,8 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
         LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
-        ci.cancel();
+    @Override
+    public void renderBackground(GuiGraphics graphics, int i, int j, float f) {
         boolean sd = LegacyOptions.getUIMode().isSD();
         FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
 
@@ -122,12 +119,6 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
 
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL, entityPanelX, entityPanelY, entityPanelSize, entityPanelSize);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 59 : 97), topPos + (sd ? 16 : 20), sd ? 65 : 105, sd ? 39 : 63);
-        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics, entityPanelX + 2, entityPanelY + 2, entityPanelX + entityPanelSize - 2, entityPanelY + entityPanelSize - 2, sd ? 15 : 25, 0.0625f, i, j, horse);
-
-    }
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics, entityPanelX + 2, entityPanelY + 2, entityPanelX + entityPanelSize - 2, entityPanelY + entityPanelSize - 2, sd ? 15 : 25, 0.0625f, i, j, mount);
     }
 }

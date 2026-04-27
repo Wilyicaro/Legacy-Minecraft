@@ -4,7 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BrewingStandScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.BrewingStandMenu;
@@ -52,7 +52,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
                 return LegacyOptions.getUIMode().isSD() ? 18 : 27;
             }
 
-            public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
+            public ArbitrarySupplier<Identifier> getIconHolderOverride() {
                 return EMPTY_OVERRIDE;
             }
         };
@@ -98,7 +98,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
                         return sd ? 18 : 27;
                     }
 
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? BREWING_FUEL_SLOT : null;
                     }
                 });

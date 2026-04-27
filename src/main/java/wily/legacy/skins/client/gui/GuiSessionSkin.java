@@ -2,7 +2,7 @@ package wily.legacy.skins.client.gui;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.PlayerSkin;
 import wily.legacy.skins.skin.ClientSkinCache;
 
@@ -146,7 +146,7 @@ public final class GuiSessionSkin {
 
     private static boolean isDefaultSkin(PlayerSkin skin) {
         if (skin == null || skin.body() == null) return true;
-        ResourceLocation texture = skin.body().texturePath();
+        Identifier texture = skin.body().texturePath();
         if (texture == null) return true;
         return "minecraft".equals(texture.getNamespace()) && texture.getPath().startsWith("textures/entity/player/");
     }

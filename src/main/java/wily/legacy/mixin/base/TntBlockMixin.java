@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,15 +35,15 @@ public class TntBlockMixin {
         if (level instanceof ServerLevel serverLevel && !serverLevel.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES)) ci.cancel();
     }
     *///?} else {
-    @ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
-    private static boolean explode(boolean original, Level level, BlockPos pos) {
-        return original && level instanceof ServerLevel serverLevel && (serverLevel.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get() == 0 || level.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(pos)).size() < serverLevel.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get());
+    @ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;"))
+    private static Object explode(Object original, @Local BlockPos pos, @Local ServerLevel serverLevel) {
+        return (Boolean) original && (serverLevel.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()) == 0 || serverLevel.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(pos)).size() < serverLevel.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()));
     }
 
     //?}
     @Inject(method = "wasExploded", at = @At("HEAD"), cancellable = true)
     private void wasExploded(/*? if <1.21.2 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, BlockPos blockPos, Explosion explosion, CallbackInfo ci) {
-        if (/*? if <1.21.5 {*//*!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) ||*//*?}*/level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get() > 0 && level.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(blockPos)).size() >= level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get())
+        if (/*? if <1.21.5 {*//*!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) ||*//*?}*/level.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()) > 0 && level.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(blockPos)).size() >= level.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()))
             ci.cancel();
     }
 }

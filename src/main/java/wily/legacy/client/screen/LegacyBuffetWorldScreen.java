@@ -33,15 +33,15 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
     }
 
     public void addBiome(Holder.Reference<Biome> biome) {
-        renderableVList.addRenderable(new ListButton(renderableVList, 0, 0, 260, 30, Component.translatable("biome." + biome.key().location().toLanguageKey())) {
+        renderableVList.addRenderable(new ListButton(renderableVList, 0, 0, 260, 30, Component.translatable("biome." + biome.key().identifier().toLanguageKey())) {
             @Override
             public void onPress(InputWithModifiers input) {
                 selectedBiome = biome;
             }
 
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.renderContents(guiGraphics, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()) {
                     guiGraphics.pose().pushMatrix();

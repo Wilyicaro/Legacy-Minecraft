@@ -10,7 +10,7 @@ import net.minecraft.client.gui.components.toasts.Toast;
 /*import net.minecraft.client.gui.components.toasts.ToastComponent;
  *///?}
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -83,7 +83,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
     }
 
     @Override
-    public ResourceLocation getAdvancementId() {
+    public Identifier getAdvancementId() {
         return advancement./*? if >1.20.1 {*/id/*?} else {*//*getId*//*?}*/();
     }
 

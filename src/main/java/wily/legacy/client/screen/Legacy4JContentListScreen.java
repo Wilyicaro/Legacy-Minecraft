@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -63,7 +63,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private final Map<String, MultiLineLabel> descriptionLabels = new ConcurrentHashMap<>();
     private boolean needsReload = false;
 
-    private record RemoteImage(ResourceLocation id, int width, int height) {
+    private record RemoteImage(Identifier id, int width, int height) {
     }
 
     public Legacy4JContentListScreen(Screen parent, ContentManager.Category category, List<ContentManager.Pack> packs) {
@@ -230,7 +230,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 
                 client.execute(() -> {
                     String cleanId = Integer.toHexString(key.hashCode());
-                    ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
+                    Identifier textureId = Identifier.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
                     
                     client.getTextureManager().register(textureId, new DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
                     

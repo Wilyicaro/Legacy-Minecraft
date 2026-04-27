@@ -154,7 +154,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addHostOptionsButton() {
-        if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
+        if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) && !minecraft.hasSingleplayerServer()) return;
         addRenderableWidget(accessor.putWidget("hostOptionsButton", Button.builder(HOST_OPTIONS, this::pressHostOptionsButton).bounds(panel.x, panel.y - 36, 250, 20).build()));
     }
 

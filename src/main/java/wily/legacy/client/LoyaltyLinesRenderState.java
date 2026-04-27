@@ -1,9 +1,9 @@
 package wily.legacy.client;
 
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
 import net.minecraft.client.renderer.entity.state.ThrownTridentRenderState;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.projectile.ThrownTrident;
 
 public class LoyaltyLinesRenderState implements FactoryRenderStateExtension<ThrownTrident> {
     public boolean canRender;

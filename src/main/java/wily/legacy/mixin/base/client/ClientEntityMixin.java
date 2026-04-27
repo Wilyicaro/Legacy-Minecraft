@@ -8,7 +8,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -125,7 +125,7 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)
     public void moveRelative(float f, Vec3 vec3, CallbackInfo ci) {
-        if (((Object) this) instanceof LocalPlayer p && LegacyGameRules.getSidedBooleanGamerule((Entity) (Object) this, LegacyGameRules.LEGACY_FLIGHT) && p.getAbilities().flying && p.isCreative() && !p.isSprinting()) {
+        if (((Object) this) instanceof LocalPlayer p && LegacyGameRules.getSidedBooleanGamerule((Entity) (Object) this, LegacyGameRules.LEGACY_FLIGHT.get()) && p.getAbilities().flying && p.isCreative() && !p.isSprinting()) {
             p.setDeltaMovement(p.getDeltaMovement().add(Legacy4J.getRelativeMovement(p, f, vec3, (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && p.input./*? if <1.21.5 {*//*leftImpulse*//*?} else {*/getMoveVector().x/*?}*/ == 0 ? 90 : 45)));
             ci.cancel();
         }

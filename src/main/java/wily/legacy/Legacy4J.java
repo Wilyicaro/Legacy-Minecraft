@@ -1,7 +1,7 @@
 package wily.legacy;
 
 import net.minecraft.core.cauldron.CauldronInteraction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -105,7 +105,7 @@ public class Legacy4J {
         FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
         FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
-        LegacyGameRules.init();
+        LegacyGameRules.register();
         FactoryEvent.registerPayload(r -> {
             r.register(false, ClientAdvancementsPayload.ID);
             r.register(false, ClientAnimalInLoveSyncPayload.ID);
@@ -142,7 +142,7 @@ public class Legacy4J {
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static ResourceLocation createModLocation(String path) {
+    public static Identifier createModLocation(String path) {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 

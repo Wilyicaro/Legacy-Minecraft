@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
@@ -26,7 +26,7 @@ import wily.factoryapi.FactoryAPI;
 
 public class KnownListing<T> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public final List<ResourceLocation> list = new ArrayList<>();
+    public final List<Identifier> list = new ArrayList<>();
     private final Path path;
     private final Registry<T> registry;
     private final String listingFile;

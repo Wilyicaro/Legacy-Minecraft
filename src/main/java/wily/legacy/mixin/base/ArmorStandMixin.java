@@ -11,8 +11,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -68,6 +68,6 @@ public abstract class ArmorStandMixin extends LivingEntity {
     @Redirect(method = "defineSynchedData", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SynchedEntityData$Builder;define(Lnet/minecraft/network/syncher/EntityDataAccessor;Ljava/lang/Object;)Lnet/minecraft/network/syncher/SynchedEntityData$Builder;", ordinal = 0))
     public SynchedEntityData.Builder defineSynchedData(SynchedEntityData.Builder instance, EntityDataAccessor<Object> i, Object arg) {
         GameRules gameRules = level() instanceof ServerLevel l ? l.getGameRules() : Legacy4JClient.gameRules;
-        return instance.define(i, this.setBit((byte) arg, 4, gameRules.getBoolean(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS)));
+        return instance.define(i, this.setBit((byte) arg, 4, gameRules.get(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS.get())));
     }
 }

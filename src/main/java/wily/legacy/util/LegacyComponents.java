@@ -3,8 +3,9 @@ package wily.legacy.util;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import wily.factoryapi.FactoryAPI;
@@ -300,25 +301,25 @@ public class LegacyComponents {
         return Component.translatable("legacy.options." + key);
     }
 
-    public static Component getMenuGameRuleName(GameRules.Key<?> key) {
+    public static Component getMenuGameRuleName(GameRule<?> key) {
         if (!LegacyOptions.legacySettingsMenus.get()) return Component.translatable(key.getDescriptionId());
-        if (key == GameRules.RULE_DOFIRETICK) return Component.translatable("legacy.gamerule.fire_spreads");
+        if (key == GameRules.FIRE_DAMAGE) return Component.translatable("legacy.gamerule.fire_spreads");
         if (key == LegacyGameRules.getTntExplodes()) return Component.translatable("legacy.gamerule.tnt_explodes");
         if (key == LegacyGameRules.getPvp()) return Component.translatable("legacy.gamerule.player_vs_player");
-        if (key == GameRules.RULE_DAYLIGHT) return Component.translatable("legacy.gamerule.daylight_cycle");
-        if (key == GameRules.RULE_WEATHER_CYCLE) return Component.translatable("legacy.gamerule.weather_cycle");
-        if (key == GameRules.RULE_KEEPINVENTORY) return Component.translatable("legacy.gamerule.keep_inventory");
-        if (key == GameRules.RULE_DOMOBSPAWNING) return Component.translatable("legacy.gamerule.mob_spawning");
-        if (key == GameRules.RULE_MOBGRIEFING) return Component.translatable("legacy.gamerule.mob_griefing");
-        if (key == GameRules.RULE_DOMOBLOOT) return Component.translatable("legacy.gamerule.mob_loot");
-        if (key == GameRules.RULE_DOBLOCKDROPS) return Component.translatable("legacy.gamerule.tile_drops");
-        if (key == GameRules.RULE_NATURAL_REGENERATION) return Component.translatable("legacy.gamerule.natural_regeneration");
-        if (key == GameRules.RULE_DO_IMMEDIATE_RESPAWN) return Component.translatable("legacy.gamerule.immediate_respawn");
+        if (key == GameRules.ADVANCE_TIME) return Component.translatable("legacy.gamerule.daylight_cycle");
+        if (key == GameRules.ADVANCE_WEATHER) return Component.translatable("legacy.gamerule.weather_cycle");
+        if (key == GameRules.KEEP_INVENTORY) return Component.translatable("legacy.gamerule.keep_inventory");
+        if (key == GameRules.SPAWN_MOBS) return Component.translatable("legacy.gamerule.mob_spawning");
+        if (key == GameRules.MOB_GRIEFING) return Component.translatable("legacy.gamerule.mob_griefing");
+        if (key == GameRules.MOB_DROPS) return Component.translatable("legacy.gamerule.mob_loot");
+        if (key == GameRules.BLOCK_DROPS) return Component.translatable("legacy.gamerule.tile_drops");
+        if (key == GameRules.NATURAL_HEALTH_REGENERATION) return Component.translatable("legacy.gamerule.natural_regeneration");
+        if (key == GameRules.IMMEDIATE_RESPAWN) return Component.translatable("legacy.gamerule.immediate_respawn");
         return Component.translatable(key.getDescriptionId());
     }
 
     public static Component getDimensionName(ResourceKey<Level> dimension) {
-        String s = dimension.location().toLanguageKey("dimension");
+        String s = dimension.identifier().toLanguageKey("dimension");
         return Component.translatable(!FactoryAPI.isClient() || LegacyTipManager.hasTip(s) ? s : "dimension.minecraft");
     }
 

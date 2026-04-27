@@ -6,7 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -81,7 +81,7 @@ public final class SkinPackLang {
     }
 
     private static void loadLocale(ResourceManager rm, String locale, Map<String, String> out) {
-        Map<ResourceLocation, Resource> packLang = new HashMap<>();
+        Map<Identifier, Resource> packLang = new HashMap<>();
         packLang.putAll(listResources(rm, "skinpacks", rl -> {
             String path = rl.getPath();
             return path.contains("/lang/") && path.endsWith(".json");
@@ -91,18 +91,18 @@ public final class SkinPackLang {
             return path.contains("/lang/") && path.endsWith(".json");
         }));
 
-        Map<ResourceLocation, Resource> vanilla = listResources(rm, "lang", rl -> {
+        Map<Identifier, Resource> vanilla = listResources(rm, "lang", rl -> {
             String path = rl.getPath();
             return path.equals("lang/" + locale + ".json") || (path.startsWith("lang/" + locale + ".") && path.endsWith(".json"));
         });
         if (packLang.isEmpty() && vanilla.isEmpty()) return;
 
-        ArrayList<ResourceLocation> keys = new ArrayList<>();
+        ArrayList<Identifier> keys = new ArrayList<>();
         keys.addAll(packLang.keySet());
         keys.addAll(vanilla.keySet());
-        keys.sort(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
+        keys.sort(Comparator.comparing(Identifier::getNamespace).thenComparing(Identifier::getPath));
 
-        for (ResourceLocation rl : keys) {
+        for (Identifier rl : keys) {
             Resource resource = packLang.get(rl);
             if (resource == null) resource = vanilla.get(rl);
             if (resource == null) continue;
@@ -130,7 +130,7 @@ public final class SkinPackLang {
         }
     }
 
-    private static Map<ResourceLocation, Resource> listResources(ResourceManager rm, String root, java.util.function.Predicate<ResourceLocation> filter) {
+    private static Map<Identifier, Resource> listResources(ResourceManager rm, String root, java.util.function.Predicate<Identifier> filter) {
         try {
             return rm.listResources(root, filter);
         } catch (RuntimeException ignored) {

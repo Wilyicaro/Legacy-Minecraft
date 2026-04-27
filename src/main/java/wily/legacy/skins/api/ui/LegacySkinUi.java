@@ -2,7 +2,7 @@ package wily.legacy.skins.api.ui;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 
@@ -50,7 +50,7 @@ public final class LegacySkinUi {
     public record Pack(String id,
                        String title,
                        @Nullable String subtitle,
-                       @Nullable ResourceLocation icon,
+                       @Nullable Identifier icon,
                        List<Skin> skins) {
         public Pack(String id, String title, List<Skin> skins) {
             this(id, title, null, null, skins);

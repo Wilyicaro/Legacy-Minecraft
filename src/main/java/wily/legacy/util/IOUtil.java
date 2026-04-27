@@ -9,7 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
 //?}
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -49,7 +49,7 @@ public class IOUtil {
                     if (s.startsWith("#"))
                         tipTags.add(TagKey.create(registry.key(), FactoryAPI.createLocation(s.replaceFirst("#", ""))));
                     else if (s.startsWith("!")) {
-                        ResourceLocation l = FactoryAPI.createLocation(s.replaceFirst("!", ""));
+                        Identifier l = FactoryAPI.createLocation(s.replaceFirst("!", ""));
                         registry.getOptional(l).ifPresent(tipExclusions::add);
                     } else tip.add(FactoryAPIPlatform.getRegistryValue(FactoryAPI.createLocation(s), registry));
                 }

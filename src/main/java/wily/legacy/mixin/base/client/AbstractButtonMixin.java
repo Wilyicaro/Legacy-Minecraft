@@ -1,6 +1,8 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.Util;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -12,10 +14,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.CommonValue;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractButton.class)
@@ -37,9 +39,11 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         lastTimePressed = Util.getMillis();
     }
 
-    @ModifyVariable(method = "renderWidget", at = @At(value = "STORE"), ordinal = 2)
-    protected int renderWidget(int k) {
-        return LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
+    @ModifyExpressionValue(method = "renderDefaultLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;getMessage()Lnet/minecraft/network/chat/Component;"))
+    protected Component getMessage(Component original) {
+        MutableComponent copy = original.copy().withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150));
+        if (!CommonValue.WIDGET_TEXT_SHADOW.get()) copy.withoutShadow();
+        return copy;
     }
 
     @Inject(method = "renderWidget", at = @At("HEAD"))
@@ -47,8 +51,8 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         alpha = active ? 1 : 0.8f;
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
-    protected boolean renderWidget(AbstractButton instance) {
+    @Redirect(method = "renderDefaultSprite", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
+    protected boolean renderDefaultSprite(AbstractButton instance) {
         return true;
     }
 

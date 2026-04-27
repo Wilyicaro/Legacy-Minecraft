@@ -166,7 +166,6 @@
     "client.LogoRendererMixin",
     "client.LightTextureMixin",
     "client.LightingMixin",
-    "client.CompositeRenderTypeAccessor",
     "client.ClientLivingEntityMixin",
     "client.VillagerModelMixin",
     "client.BubbleParticleMixin",
@@ -216,7 +215,8 @@
     "client.ScreenshotMixin",
     "client.AbstractClientPlayerMixin",
     "client.BitmapGlyphMixin",
-    "client.MultilineTextFieldMixin"
+    "client.MultilineTextFieldMixin",
+    "client.RidingEntitySoundInstanceMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
@@ -305,7 +305,9 @@
     "villager_spawn_egg.ResetProfessionMixin",
     "BlockItemAccessor",
     "FallingBlockAccessor",
-    "FallingBlockMixin"
+    "FallingBlockMixin",
+    "MinecraftServerMixin",
+    "GameRuleCategoryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

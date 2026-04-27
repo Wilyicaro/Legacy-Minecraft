@@ -1,7 +1,7 @@
 //? if >=1.21.2 {
 package wily.legacy.client;
 
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
 
 public class LegacyVillagerRenderState implements FactoryRenderStateExtension<AbstractVillager> {

@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.gui;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.spectator.SpectatorGui;
 import net.minecraft.client.gui.spectator.SpectatorMenu;
@@ -30,7 +30,7 @@ public abstract class SpectatorGuiMixin {
         this.renderPage(k, arg * LegacyRenderUtil.getHUDOpacity(), f, k.guiHeight() - 22, j);
     }
 
-    @Inject(method = "renderPage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIIII)V", ordinal = 1))
+    @Inject(method = "renderPage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIIII)V", ordinal = 1))
     private void renderHotbarSelection(GuiGraphics guiGraphics, float f, int i, int j, SpectatorPage spectatorPage, CallbackInfo ci) {
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION, 24, 24, 0, 23, guiGraphics.guiWidth() / 2 - 91 - 1 + spectatorPage.getSelectedSlot() * 20, j + 22, 24, 1);

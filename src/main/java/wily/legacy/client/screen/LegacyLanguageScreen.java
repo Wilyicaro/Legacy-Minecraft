@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
@@ -17,45 +18,14 @@ import java.util.Locale;
 public class LegacyLanguageScreen extends PanelVListScreen {
     public static final Component WARNING_LABEL = Component.translatable("options.languageAccuracyWarning");
     protected final Panel panelRecess;
+    private final LanguageManager manager;
     protected String selectedLang;
 
     public LegacyLanguageScreen(Screen parent, LanguageManager manager) {
         super(parent, s -> Panel.centered(s, 255, 240, 0, 24), Component.translatable("controls.keybinds.title"));
-        String autoCode = getSystemLanguageCode();
-        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, Component.translatable("legacy.menu.system_language")) {
-            @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
-                if (manager.getSelected().equals(autoCode)) setFocused(true);
-            }
-
-            @Override
-            public void onPress(InputWithModifiers input) {
-                selectedLang = autoCode;
-            }
-
-            @Override
-            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                defaultButtonNarrationText(narrationElementOutput);
-            }
-        });
-        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, languageInfo.toComponent()) {
-            @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
-                if (manager.getSelected().equals(s)) setFocused(true);
-            }
-
-            @Override
-            public void onPress(InputWithModifiers input) {
-                selectedLang = s;
-            }
-
-            @Override
-            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                defaultButtonNarrationText(narrationElementOutput);
-            }
-        })));
+        this.manager = manager;
+        renderableVList.addRenderable(new LanguageButton(0, 0, 260, 20, Component.translatable("legacy.menu.system_language"), getSystemLanguageCode()));
+        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new LanguageButton(0, 0, 260, 20, languageInfo.toComponent(), s))));
         panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 12, panel.height - 34), p -> p.pos(panel.x + 6, panel.y + 24));
     }
 
@@ -87,5 +57,20 @@ public class LegacyLanguageScreen extends PanelVListScreen {
     @Override
     public void renderableVListInit() {
         getRenderableVList().init(panel.x + 10, panel.y + 30, panel.width - 20, panel.height - 46);
+    }
+
+    public class LanguageButton extends Button.Plain {
+        public final String lang;
+
+        protected LanguageButton(int i, int j, int k, int l, Component component, String lang) {
+            super(i, j, k, l, component, b -> selectedLang = lang, DEFAULT_NARRATION);
+            this.lang = lang;
+        }
+
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderContents(guiGraphics, i, j, f);
+            if (manager.getSelected().equals(lang)) setFocused(true);
+        }
     }
 }

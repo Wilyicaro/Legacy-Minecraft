@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
@@ -20,7 +20,7 @@ public abstract class SkinIdStateMixin implements RenderStateSkinIdAccess {
     @Unique
     private float consoleskins$moveSpeedSq;
     @Unique
-    private ResourceLocation consoleskins$cachedTexture, consoleskins$cachedBoxTexture, consoleskins$cachedModelId;
+    private Identifier consoleskins$cachedTexture, consoleskins$cachedBoxTexture, consoleskins$cachedModelId;
     @Unique
     private BuiltBoxModel consoleskins$cachedBoxModel;
 
@@ -95,32 +95,32 @@ public abstract class SkinIdStateMixin implements RenderStateSkinIdAccess {
     }
 
     @Override
-    public ResourceLocation consoleskins$getCachedTexture() {
+    public Identifier consoleskins$getCachedTexture() {
         return consoleskins$cachedTexture;
     }
 
     @Override
-    public void consoleskins$setCachedTexture(ResourceLocation tex) {
+    public void consoleskins$setCachedTexture(Identifier tex) {
         consoleskins$cachedTexture = tex;
     }
 
     @Override
-    public ResourceLocation consoleskins$getCachedBoxTexture() {
+    public Identifier consoleskins$getCachedBoxTexture() {
         return consoleskins$cachedBoxTexture;
     }
 
     @Override
-    public void consoleskins$setCachedBoxTexture(ResourceLocation tex) {
+    public void consoleskins$setCachedBoxTexture(Identifier tex) {
         consoleskins$cachedBoxTexture = tex;
     }
 
     @Override
-    public ResourceLocation consoleskins$getCachedModelId() {
+    public Identifier consoleskins$getCachedModelId() {
         return consoleskins$cachedModelId;
     }
 
     @Override
-    public void consoleskins$setCachedModelId(ResourceLocation id) {
+    public void consoleskins$setCachedModelId(Identifier id) {
         consoleskins$cachedModelId = id;
     }
 

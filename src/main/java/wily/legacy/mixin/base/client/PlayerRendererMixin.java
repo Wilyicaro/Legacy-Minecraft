@@ -4,10 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.legacy.skins.client.render.boxloader.AttachSlot;
 import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.skins.pose.SkinPoseRegistry;
@@ -39,8 +39,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     @Shadow
     public abstract AvatarRenderState createRenderState();
 
-    @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModelPart(Lnet/minecraft/client/model/geom/ModelPart;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/RenderType;IILnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"), cancellable = true, require = 0)
-    private void renderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
+    @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModelPart(Lnet/minecraft/client/model/geom/ModelPart;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IILnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"), cancellable = true, require = 0)
+    private void renderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, Identifier resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null || mc.player == null) return;
         AvatarRenderState state = createRenderState();
@@ -56,7 +56,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         }
 
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId);
-        ResourceLocation texture = resolved == null ? null : resolved.texture();
+        Identifier texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
 
         BuiltBoxModel built = resolved == null ? null : resolved.boxModel();
@@ -75,14 +75,14 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         var parts = built.get(slot);
         if (parts == null || parts.isEmpty()) return;
 
-        ResourceLocation boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
-        final ResourceLocation texFinal = boxTexture;
+        Identifier boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
+        final Identifier texFinal = boxTexture;
         final var partsFinal = parts;
         final float partScale = built.partScale();
         final ModelPart modelPartSnapshot = snapshotPart(modelPart);
         submitNodeCollector.submitCustomGeometry(
                 poseStack,
-                RenderType.entityCutoutNoCull(texFinal),
+                RenderTypes.entityCutoutNoCull(texFinal),
                 (pose, vc) -> {
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);

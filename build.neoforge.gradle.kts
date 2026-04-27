@@ -67,6 +67,7 @@ dependencies {
 	compileOnly("maven.modrinth:sodium:${prop("sodium_version")}")
 	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
+	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") as Any)
 }
 
 tasks.withType<Javadoc> {

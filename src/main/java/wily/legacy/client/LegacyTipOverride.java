@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import com.google.gson.*;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 //? if >=1.20.5 {
 import net.minecraft.core.component.DataComponentPatch;
         //?}

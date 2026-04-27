@@ -8,9 +8,9 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.npc.VillagerData;
+import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
@@ -172,7 +172,7 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
 
 
             @Override
-            public ResourceLocation getIconHolderSprite() {
+            public Identifier getIconHolderSprite() {
                 return isValidIndex() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() > menu.merchantLevel ? LegacySprites.GRAY_ICON_HOLDER : super.getIconHolderSprite();
             }
 

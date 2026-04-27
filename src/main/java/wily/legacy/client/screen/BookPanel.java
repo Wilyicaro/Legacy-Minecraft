@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
@@ -62,13 +62,13 @@ public class BookPanel extends WidgetPanel {
             private long lastPressTime;
 
             @Override
-            public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            public void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || isMouseOver(i, j);
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(getX(), getY());
                 guiGraphics.pose().scale(1.5f, 1.5f);
                 guiGraphics.pose().translate(-getX(), -getY());
-                super.renderWidget(guiGraphics, i, j, f);
+                super.renderContents(guiGraphics, i, j, f);
                 guiGraphics.pose().popMatrix();
             }
 

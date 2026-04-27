@@ -3,16 +3,16 @@ package wily.legacy.skins.client.render.boxloader;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.compat.cpm.CpmRenderCompat;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
@@ -93,16 +93,16 @@ public class BoxAddonLayer extends RenderLayer {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || SkinIdUtil.AUTO_SELECT.equals(skinId)) return;
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(a);
-        ResourceLocation texture = resolved == null ? null : resolved.texture();
+        Identifier texture = resolved == null ? null : resolved.texture();
         if (texture == null) return;
         BuiltBoxModel built = resolved == null ? null : resolved.boxModel();
         if (built == null) return;
-        ResourceLocation boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
+        Identifier boxTexture = resolved == null || resolved.boxTexture() == null ? texture : resolved.boxTexture();
         var parentModel = this.getParentModel();
         if (!(parentModel instanceof PlayerModel pm)) return;
 
         final BuiltBoxModel baked = built;
-        final ResourceLocation texFinal = boxTexture;
+        final Identifier texFinal = boxTexture;
         final ModelPart head = snapshotPart(pm.head);
         final ModelPart hat = snapshotPart(pm.hat);
         final ModelPart body = snapshotPart(pm.body);
@@ -118,7 +118,7 @@ public class BoxAddonLayer extends RenderLayer {
         final boolean hatChildLike = isHatChildLike(head, hat);
         collector.submitCustomGeometry(
                 poseStack,
-                RenderType.entityCutoutNoCull(texFinal),
+                RenderTypes.entityCutoutNoCull(texFinal),
                 (pose, vc) -> {
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);

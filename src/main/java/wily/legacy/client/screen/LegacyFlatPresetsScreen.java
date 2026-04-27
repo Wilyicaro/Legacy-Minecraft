@@ -29,13 +29,13 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen {
         presetGetter.listElements().forEach(holder -> {
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
-                Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
+                Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.identifier().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
-                renderableVList.addRenderable(new LegacyFlatWorldScreen.ItemIconButton(0, 0, 263, 30, Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {
+                renderableVList.addRenderable(new LegacyFlatWorldScreen.ItemIconButton(0, 0, 263, 30, Component.translatable(holder.key().identifier().toLanguageKey("flat_world_preset"))) {
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderWidget(guiGraphics, i, j, f);
+                    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                        super.renderContents(guiGraphics, i, j, f);
                         renderItem(guiGraphics, preset.displayItem().value().getDefaultInstance(), "presetIcon", 5);
                     }
 

@@ -111,6 +111,7 @@ dependencies {
 	api("wily.factory_api:factory_api-forge:${stonecutter.current.version}-${prop("factory_api_version")}")
 	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
 	compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
+	api("jarJar"("org.apache.httpcomponents:httpclient:4.5.14") as Any)
 }
 
 if (stonecutter.eval(stonecutter.current.version, "<1.20.5")) {

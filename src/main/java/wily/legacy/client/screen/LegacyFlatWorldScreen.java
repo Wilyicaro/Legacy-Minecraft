@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -93,7 +94,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public void addStructure(Holder.Reference<StructureSet> structure) {
         MutableComponent component = Component.empty();
-        String nameKey = "structure." + structure.key().location().toLanguageKey();
+        String nameKey = "structure." + structure.key().identifier().toLanguageKey();
         String descriptionKey = nameKey + ".description";
         Component name = Component.translatable(nameKey);
         if (LegacyTipManager.hasTip(nameKey)) component.append(name);
@@ -109,15 +110,15 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public void addBiome(Holder.Reference<Biome> biome) {
         AbstractButton b;
-        displayBiomes.addRenderable(b = new ItemIconButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().location().toLanguageKey())) {
+        displayBiomes.addRenderable(b = new ItemIconButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().identifier().toLanguageKey())) {
             @Override
             public void onPress(InputWithModifiers input) {
                 generator.biome = biome;
             }
 
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.renderContents(guiGraphics, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()) {
                     renderItem(guiGraphics, s, "biomeIcon", 26);
@@ -138,7 +139,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             }
         });
         MutableComponent descr = b.getMessage().copy();
-        String descriptionKey = "biome." + biome.key().location().toLanguageKey() + ".description";
+        String descriptionKey = "biome." + biome.key().identifier().toLanguageKey() + ".description";
         if (LegacyTipManager.hasTip(descriptionKey)) {
             descr.append("\n\n").append(Component.translatable(descriptionKey));
         }
@@ -216,7 +217,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
                 tooltipBox.render(guiGraphics, i, j, f);
                 if (label != null) {
-                    scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF));
+                    scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.visitLines(TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, guiGraphics.textRenderer()));
                 }
             }
         }));
@@ -328,8 +329,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderContents(guiGraphics, i, j, f);
             LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, Component.translatable("legacy.menu.create_flat_world.layer_count", flatLayerInfo.getHeight()), getX() + list.accessor.getInteger(list.name + ".layerCount.xOffset", 12), getY() + 1 + (height - font.lineHeight) / 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused())));
             renderItem(guiGraphics, flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance(), "layerIcon",39);
         }

@@ -3,10 +3,10 @@ package wily.legacy.init;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LegacyUIElementTypes {
-    public static final ResourceLocation ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchanting_table_book.png");
+    public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchanting_table_book.png");
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
             a.putStaticElement(elementName + ".renderables", UIAccessor.createRenderablesWrapper(a, new ArrayList<>()));
             a.putStaticElement(elementName, new ScrollableRenderer());
         }));
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "backgroundSprite", ResourceLocation.CODEC);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "backgroundSprite", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", UIDefinitionManager.ElementType::parseBoolean);
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "contentX", "contentY", "width", "height", "lineHeight");
         UIDefinitionManager.parseAllElements(uiDefinition, a -> a.getElementValue(elementName + ".renderables", a, UIAccessor.class), element, s -> s);
@@ -168,8 +168,8 @@ public class LegacyUIElementTypes {
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", (s, d) -> d.asListOpt(d1 -> DynamicUtil.getItemFromDynamic(d1, true)).result().map(l -> UIDefinition.createBeforeInit(a -> a.putStaticElement(s, new SimpleContainer(l.stream().map(ArbitrarySupplier::get).toArray(ItemStack[]::new))))).orElse(null));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", (s, d) -> UIDefinitionManager.ElementType.parseItemStackElement(s, d));
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", ResourceLocation.CODEC);
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", ResourceLocation.CODEC);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", Identifier.CODEC);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "offset", DynamicUtil.VEC3_OBJECT_CODEC);
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseBoolean, "iconCondition", "iconHolderCondition", "isVisible", "isFake", "isWarning");
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height");
@@ -213,13 +213,13 @@ public class LegacyUIElementTypes {
                     }
 
                     @Override
-                    public ResourceLocation getIconSprite() {
-                        return a.getBoolean(elementName + ".iconCondition", true) ? a.getElementValue(elementName + ".iconSprite", LegacySlotDisplay.super.getIconSprite(), ResourceLocation.class) : null;
+                    public Identifier getIconSprite() {
+                        return a.getBoolean(elementName + ".iconCondition", true) ? a.getElementValue(elementName + ".iconSprite", LegacySlotDisplay.super.getIconSprite(), Identifier.class) : null;
                     }
 
                     @Override
-                    public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
-                        return a.getBoolean(elementName + ".iconHolderCondition", true) ? a.getElement(elementName + ".spriteOverride", ResourceLocation.class).or(LegacySlotDisplay.super.getIconHolderOverride()) : ArbitrarySupplier.empty();
+                    public ArbitrarySupplier<Identifier> getIconHolderOverride() {
+                        return a.getBoolean(elementName + ".iconHolderCondition", true) ? a.getElement(elementName + ".spriteOverride", Identifier.class).or(LegacySlotDisplay.super.getIconHolderOverride()) : ArbitrarySupplier.empty();
                     }
 
                     @Override

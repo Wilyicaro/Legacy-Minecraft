@@ -86,6 +86,7 @@ dependencies {
 
 	implementation(libs.moulberry.mixinconstraints)
 	include(libs.moulberry.mixinconstraints)
+	api(include("org.apache.httpcomponents:httpclient:4.5.14") as Any)
 }
 
 tasks.withType<Javadoc> {

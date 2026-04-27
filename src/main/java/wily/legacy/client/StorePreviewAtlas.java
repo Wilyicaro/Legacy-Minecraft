@@ -1,6 +1,6 @@
 package wily.legacy.client;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.legacy.Legacy4J;
 
 import java.util.List;
@@ -18,8 +18,8 @@ public final class StorePreviewAtlas {
     public static final int SKINPACK_ROWS = 9;
     public static final int SKINPACK_ATLAS_WIDTH = SKINPACK_CELL_SIZE * SKINPACK_COLUMNS;
     public static final int SKINPACK_ATLAS_HEIGHT = SKINPACK_CELL_SIZE * SKINPACK_ROWS;
-    public static final ResourceLocation ATLAS = Legacy4J.createModLocation("textures/gui/store/content_preview_atlas.png");
-    public static final ResourceLocation SKINPACK_ATLAS = Legacy4J.createModLocation("textures/gui/store/skinpack_preview_atlas.png");
+    public static final Identifier ATLAS = Legacy4J.createModLocation("textures/gui/store/content_preview_atlas.png");
+    public static final Identifier SKINPACK_ATLAS = Legacy4J.createModLocation("textures/gui/store/skinpack_preview_atlas.png");
     private static final Map<String, Entry> ENTRIES = Map.ofEntries(
         entry("supercute_texture_pack", 0),
         entry("city_texture_pack", 1),
@@ -132,7 +132,7 @@ public final class StorePreviewAtlas {
         return Map.entry(packId, entry(ATLAS, COLUMNS, ATLAS_WIDTH, ATLAS_HEIGHT, index));
     }
 
-    private static Entry entry(ResourceLocation atlas, int columns, int atlasWidth, int atlasHeight, int index) {
+    private static Entry entry(Identifier atlas, int columns, int atlasWidth, int atlasHeight, int index) {
         int column = index % columns;
         int row = index / columns;
         return new Entry(atlas, column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, atlasWidth, atlasHeight);
@@ -146,6 +146,6 @@ public final class StorePreviewAtlas {
         return new Entry(SKINPACK_ATLAS, x, y, TILE_SIZE, TILE_SIZE, SKINPACK_ATLAS_WIDTH, SKINPACK_ATLAS_HEIGHT);
     }
 
-    public record Entry(ResourceLocation resource, int u, int v, int width, int height, int atlasWidth, int atlasHeight) {
+    public record Entry(Identifier resource, int u, int v, int width, int height, int atlasWidth, int atlasHeight) {
     }
 }

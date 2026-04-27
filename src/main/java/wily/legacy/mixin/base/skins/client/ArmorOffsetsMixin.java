@@ -2,13 +2,13 @@ package wily.legacy.mixin.base.skins.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -105,7 +105,7 @@ public abstract class ArmorOffsetsMixin {
         String skinId = access.consoleskins$getSkinId();
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(access);
-        ResourceLocation modelId = resolved == null ? null : resolved.modelId();
+        Identifier modelId = resolved == null ? null : resolved.modelId();
         if (modelId == null) return;
         ArmorSlot armorSlot = ArmorSlot.fromEquipmentSlot(slot);
         if (armorSlot == null) return;

@@ -9,7 +9,7 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
@@ -83,8 +83,8 @@ public class ContentManager {
             int version,
             Optional<String> name,
             Optional<String> description,
-            Optional<ResourceLocation> icon,
-            Optional<ResourceLocation> background,
+            Optional<Identifier> icon,
+            Optional<Identifier> background,
             List<String> packs,
             Optional<String> displayPack
         ) {
@@ -93,8 +93,8 @@ public class ContentManager {
                 Codec.INT.optionalFieldOf("version", 0).forGetter(ResourceAlbum::version),
                 Codec.STRING.optionalFieldOf("name").forGetter(ResourceAlbum::name),
                 Codec.STRING.optionalFieldOf("description").forGetter(ResourceAlbum::description),
-                ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(ResourceAlbum::icon),
-                ResourceLocation.CODEC.optionalFieldOf("background").forGetter(ResourceAlbum::background),
+                Identifier.CODEC.optionalFieldOf("icon").forGetter(ResourceAlbum::icon),
+                Identifier.CODEC.optionalFieldOf("background").forGetter(ResourceAlbum::background),
                 Codec.STRING.listOf().optionalFieldOf("packs", List.of()).forGetter(ResourceAlbum::packs),
                 Codec.STRING.optionalFieldOf("displayPack").forGetter(ResourceAlbum::displayPack)
             ).apply(i, ResourceAlbum::new));

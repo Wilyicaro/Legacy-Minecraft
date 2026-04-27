@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
@@ -29,10 +29,10 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int TU3_MID_TAB_TOP_DROP = 6;
     private static final float TU3_GREY_TINT = 0.84f;
     private static final float TU3_SIDE_TAB_TINT = 0.94f;
-    private static final ResourceLocation TU3_TOP_STRIP = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip"),
-            TU3_BOTTOM_STRIP = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_bottom_strip"),
-            TU3_TAB_PLATE = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_tab_plate"),
-            TU3_SELECTED_BADGE = ResourceLocation.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
+    private static final Identifier TU3_TOP_STRIP = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip"),
+            TU3_BOTTOM_STRIP = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_bottom_strip"),
+            TU3_TAB_PLATE = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_tab_plate"),
+            TU3_SELECTED_BADGE = Identifier.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     private static final int TU3_NAME_PLATE_HIGHLIGHT = 0xFFEBEB0F;
     private final HoldRepeat tu3HorizontalHold = new HoldRepeat();
     private int layoutX, layoutY, layoutW, layoutH, tu3StripY, tu3StripH, tu3BottomStripY, tu3BottomStripH, tu3TabY, tu3TabH,
@@ -79,7 +79,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         tu3HorizontalHold.step();
     }
 
-    private void tintBlitSprite(GuiGraphics g, ResourceLocation sprite, int x, int y, int w, int h, float tint) {
+    private void tintBlitSprite(GuiGraphics g, Identifier sprite, int x, int y, int w, int h, float tint) {
         FactoryGuiGraphics.of(g).setBlitColor(tint, tint, tint, 1.0f);
         blitSprite(g, sprite, x, y, Math.max(1, w), Math.max(1, h));
         FactoryGuiGraphics.of(g).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);

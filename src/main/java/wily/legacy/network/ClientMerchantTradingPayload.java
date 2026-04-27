@@ -2,15 +2,13 @@ package wily.legacy.network;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public record ClientMerchantTradingPayload(int entityID, Optional<UUID> player,
                                            CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier) implements CommonNetwork.Payload {

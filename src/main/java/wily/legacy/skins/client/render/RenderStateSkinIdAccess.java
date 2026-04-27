@@ -1,6 +1,6 @@
 package wily.legacy.skins.client.render;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
 
 import java.util.UUID;
@@ -34,25 +34,25 @@ public interface RenderStateSkinIdAccess {
 
     void consoleskins$setBlocking(boolean blocking);
 
-    default ResourceLocation consoleskins$getCachedTexture() {
+    default Identifier consoleskins$getCachedTexture() {
         return null;
     }
 
-    default void consoleskins$setCachedTexture(ResourceLocation tex) {
+    default void consoleskins$setCachedTexture(Identifier tex) {
     }
 
-    default ResourceLocation consoleskins$getCachedBoxTexture() {
+    default Identifier consoleskins$getCachedBoxTexture() {
         return null;
     }
 
-    default void consoleskins$setCachedBoxTexture(ResourceLocation tex) {
+    default void consoleskins$setCachedBoxTexture(Identifier tex) {
     }
 
-    default ResourceLocation consoleskins$getCachedModelId() {
+    default Identifier consoleskins$getCachedModelId() {
         return null;
     }
 
-    default void consoleskins$setCachedModelId(ResourceLocation id) {
+    default void consoleskins$setCachedModelId(Identifier id) {
     }
 
     default BuiltBoxModel consoleskins$getCachedBoxModel() {

@@ -9,7 +9,7 @@ import net.minecraft.advancements.AdvancementTree;
 //?}
 import net.minecraft.advancements.Advancement;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public record ClientAdvancementsPayload(/*? if >1.20.1 {*/List<AdvancementHolder> collection
-/*?} else {*//*Map<ResourceLocation,Advancement.Builder> map*//*?}*/) implements CommonNetwork.Payload {
+/*?} else {*//*Map<Identifier,Advancement.Builder> map*//*?}*/) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ClientAdvancementsPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_advancements"), ClientAdvancementsPayload::new);
     public static /*? if >1.20.1 {*/ AdvancementTree/*?} else {*/ /*AdvancementList*//*?}*/ advancements = new /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/();
 

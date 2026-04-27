@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.ControlType;
@@ -51,16 +51,16 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float TICK_HOLDER_OFFSET_Y = -3.0f / 117.0f;
     private static final float HEART_HOLDER_OFFSET_X = -0.5f / 118.0f;
     private static final float HEART_HOLDER_OFFSET_Y = -2.0f / 117.0f;
-    private static final ResourceLocation
-            SKIN_PANEL = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_panel"),
-            PANEL_FILLER = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/panel_filler"),
-            PACK_NAME_BOX = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/pack_name_box"),
-            SKIN_BOX = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_box"),
-            SIZEABLE_ICON_HOLDER = ResourceLocation.fromNamespaceAndPath("legacy", "container/sizeable_icon_holder"),
-            BEACON_CHECK = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/beacon_check.png"),
-            PADLOCK = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/padlock.png"),
-            HEART_CONTAINER = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/container"),
-            HEART_FULL = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/full");
+    private static final Identifier
+            SKIN_PANEL = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_panel"),
+            PANEL_FILLER = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/panel_filler"),
+            PACK_NAME_BOX = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/pack_name_box"),
+            SKIN_BOX = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_box"),
+            SIZEABLE_ICON_HOLDER = Identifier.fromNamespaceAndPath("legacy", "container/sizeable_icon_holder"),
+            BEACON_CHECK = Identifier.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/beacon_check.png"),
+            PADLOCK = Identifier.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/padlock.png"),
+            HEART_CONTAINER = Identifier.fromNamespaceAndPath("minecraft", "hud/heart/container"),
+            HEART_FULL = Identifier.fromNamespaceAndPath("minecraft", "hud/heart/full");
     private final HoldRepeat packHold = new HoldRepeat();
     private final NormalLayoutMetrics normalLayout = NormalLayoutMetrics.DEFAULT;
     private int resolvedPackRowHeight = PACK_BUTTON_BASE_HEIGHT;
@@ -267,7 +267,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, packIconX, packIconY, packIconSize, packIconSize));
         addRenderableOnly((g, i, j, f) -> {
             SkinPack pack = packList.getFocusedPack();
-            ResourceLocation icon = pack == null ? null : pack.icon();
+            Identifier icon = pack == null ? null : pack.icon();
             if (icon == null) return;
             int innerInset = 2;
             int innerX = packIconX + innerInset;
@@ -511,7 +511,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
             drawScaledCentered(g, Component.literal(PlayerSkinWidget.clipText(minecraft.font, name, maxNameWidth)), mid, skinNameY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
 
-            ResourceLocation modelId = entry == null ? null : entry.modelId();
+            Identifier modelId = entry == null ? null : entry.modelId();
             if (modelId == null && entry != null && entry.texture() != null)
                 modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
 
@@ -581,7 +581,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         guiGraphics.pose().popMatrix();
     }
 
-    private void drawActionSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int iconX, int iconY, int holder) {
+    private void drawActionSprite(GuiGraphics guiGraphics, Identifier sprite, int iconX, int iconY, int holder) {
         int size = Math.max(1, holder - 8);
         int left = iconX + (holder - size) / 2;
         int top = iconY + (holder - size) / 2;

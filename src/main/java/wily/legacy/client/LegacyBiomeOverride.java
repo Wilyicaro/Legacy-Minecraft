@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import wily.factoryapi.FactoryAPI;
@@ -15,16 +15,16 @@ import wily.legacy.util.IOUtil;
 import java.util.List;
 import java.util.Optional;
 
-public record LegacyBiomeOverride(ResourceLocation id, Optional<Component> name, Optional<ItemStack> item,
+public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optional<ItemStack> item,
                                   Optional<Integer> waterColor, Optional<Integer> waterFogColor,
                                   Optional<Integer> fogColor, Optional<Integer> skyColor,
                                   Optional<Float> waterTransparency,
                                   Optional<Float> waterFogDistance) implements IdValueInfo<LegacyBiomeOverride> {
-    public static final ResourceLocation DEFAULT_LOCATION = FactoryAPI.createVanillaLocation("default");
-    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), DynamicUtil.ITEM_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
+    public static final Identifier DEFAULT_LOCATION = FactoryAPI.createVanillaLocation("default");
+    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), DynamicUtil.ITEM_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
     public static final Codec<List<LegacyBiomeOverride>> LIST_MAP_CODEC = IOUtil.createListIdMapCodec(CODEC, "id").fieldOf("overrides").codec();
 
-    public LegacyBiomeOverride(ResourceLocation id) {
+    public LegacyBiomeOverride(Identifier id) {
         this(id, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
@@ -36,7 +36,7 @@ public record LegacyBiomeOverride(ResourceLocation id, Optional<Component> name,
         return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().location());
     }
 
-    public static LegacyBiomeOverride getOrDefault(ResourceLocation location) {
+    public static LegacyBiomeOverride getOrDefault(Identifier location) {
         return Legacy4JClient.legacyBiomeOverrides.map().getOrDefault(location, getDefault());
     }
 

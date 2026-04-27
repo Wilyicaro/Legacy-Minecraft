@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.core.ClientAsset;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
@@ -38,7 +38,7 @@ public final class GuiDollRender {
         submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, null, null, null, null, BASE_BBOX_HEIGHT, BASE_BBOX_WIDTH, yawOffset, crouching, attackTime, false));
     }
 
-    public static void renderDollInRect(GuiGraphics gui, String selectionId, ResourceLocation skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
+    public static void renderDollInRect(GuiGraphics gui, String selectionId, Identifier skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
         if (gui == null || skinTexture == null) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc != null) mc.getTextureManager().getTexture(skinTexture);
@@ -55,8 +55,8 @@ public final class GuiDollRender {
         var built = resolved == null ? null : resolved.boxModel();
         float bboxHeight = built == null ? BASE_BBOX_HEIGHT : Math.max(BASE_BBOX_HEIGHT, built.bboxHeight());
         float bboxWidth = built == null ? BASE_BBOX_WIDTH : Math.max(BASE_BBOX_WIDTH, built.bboxWidth());
-        ResourceLocation resolvedTexture = resolved != null && resolved.texture() != null ? resolved.texture() : skinTexture;
-        ResourceLocation resolvedBoxTexture = resolved != null && resolved.boxTexture() != null ? resolved.boxTexture() : resolvedTexture;
+        Identifier resolvedTexture = resolved != null && resolved.texture() != null ? resolved.texture() : skinTexture;
+        Identifier resolvedBoxTexture = resolved != null && resolved.boxTexture() != null ? resolved.boxTexture() : resolvedTexture;
         PlayerSkin skin = PlayerSkin.insecure(body, cape, body, ClientSkinAssets.resolveModelType(selectionId, resolved));
         submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, yawOffset, crouching, attackTime, showCape));
     }
@@ -66,7 +66,7 @@ public final class GuiDollRender {
         gui.submitEntityRenderState(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left, layout.expandedTop(), right, layout.expandedBottom());
     }
 
-    private static AvatarRenderState buildState(PlayerSkin skin, String selectionId, ResourceLocation texture, ResourceLocation boxTexture, ResourceLocation modelId, wily.legacy.skins.client.render.boxloader.BuiltBoxModel boxModel, float bboxHeight, float bboxWidth, float yawOffset, boolean crouching, float attackTime, boolean showCape) {
+    private static AvatarRenderState buildState(PlayerSkin skin, String selectionId, Identifier texture, Identifier boxTexture, Identifier modelId, wily.legacy.skins.client.render.boxloader.BuiltBoxModel boxModel, float bboxHeight, float bboxWidth, float yawOffset, boolean crouching, float attackTime, boolean showCape) {
         AvatarRenderState state = new AvatarRenderState();
         if (state instanceof RenderStateSkinIdAccess access) {
             access.consoleskins$setSkinId(selectionId);

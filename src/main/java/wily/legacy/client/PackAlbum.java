@@ -10,7 +10,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,7 +25,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -63,9 +63,9 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
 
 public record PackAlbum(String id, int version, Component displayName, Component description,
-                        Optional<ResourceLocation> iconSprite, Optional<ResourceLocation> backgroundSprite,
+                        Optional<Identifier> iconSprite, Optional<Identifier> backgroundSprite,
                         List<String> packs, Optional<String> displayPack) {
-    public static final Codec<PackAlbum> CODEC = RecordCodecBuilder.create(i -> i.group(Codec.STRING.fieldOf("id").forGetter(PackAlbum::id), Codec.INT.optionalFieldOf("version", 0).forGetter(PackAlbum::version), DynamicUtil.getComponentCodec().fieldOf("name").forGetter(PackAlbum::displayName), DynamicUtil.getComponentCodec().fieldOf("description").forGetter(PackAlbum::description), ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(PackAlbum::iconSprite), ResourceLocation.CODEC.optionalFieldOf("background").forGetter(PackAlbum::backgroundSprite), Codec.STRING.listOf().fieldOf("packs").forGetter(PackAlbum::packs), Codec.STRING.optionalFieldOf("displayPack").forGetter(PackAlbum::displayPack)).apply(i, PackAlbum::new));
+    public static final Codec<PackAlbum> CODEC = RecordCodecBuilder.create(i -> i.group(Codec.STRING.fieldOf("id").forGetter(PackAlbum::id), Codec.INT.optionalFieldOf("version", 0).forGetter(PackAlbum::version), DynamicUtil.getComponentCodec().fieldOf("name").forGetter(PackAlbum::displayName), DynamicUtil.getComponentCodec().fieldOf("description").forGetter(PackAlbum::description), Identifier.CODEC.optionalFieldOf("icon").forGetter(PackAlbum::iconSprite), Identifier.CODEC.optionalFieldOf("background").forGetter(PackAlbum::backgroundSprite), Codec.STRING.listOf().fieldOf("packs").forGetter(PackAlbum::packs), Codec.STRING.optionalFieldOf("displayPack").forGetter(PackAlbum::displayPack)).apply(i, PackAlbum::new));
     public static final Codec<List<PackAlbum>> LIST_CODEC = CODEC.listOf();
     public static final ListMap<String, PackAlbum> resourceAlbums = new ListMap<>();
     public static final List<PackAlbum> DEFAULT_RESOURCE_ALBUMS = new ArrayList<>();
@@ -211,7 +211,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         return a;
     }
 
-    public static PackAlbum registerDefaultResource(String id, int version, Component displayName, Component description, ResourceLocation iconSprite, ResourceLocation backgroundSprite, List<String> packs, String displayPack) {
+    public static PackAlbum registerDefaultResource(String id, int version, Component displayName, Component description, Identifier iconSprite, Identifier backgroundSprite, List<String> packs, String displayPack) {
         return registerDefaultResource(new PackAlbum(id, version, displayName, description, Optional.ofNullable(iconSprite), Optional.ofNullable(backgroundSprite), packs, Optional.ofNullable(displayPack)));
     }
 
@@ -301,9 +301,9 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
     public static class Selector extends AbstractWidget implements ActionHolder {
         public static final String TEMPLATE_ALBUM = "template_album";
-        public static final ResourceLocation DEFAULT_ICON = FactoryAPI.createVanillaLocation("textures/misc/unknown_pack.png");
-        private static final Map<String, ResourceLocation> packIcons = Maps.newHashMap();
-        private static final Map<String, ResourceLocation> packBackgrounds = Maps.newHashMap();
+        public static final Identifier DEFAULT_ICON = FactoryAPI.createVanillaLocation("textures/misc/unknown_pack.png");
+        private static final Map<String, Identifier> packIcons = Maps.newHashMap();
+        private static final Map<String, Identifier> packBackgrounds = Maps.newHashMap();
         public final Stocker.Sizeable scrolledList;
         protected final PackAlbum initialAlbum;
         protected final List<String> oldSelection;
@@ -406,15 +406,15 @@ public record PackAlbum(String id, int version, Component displayName, Component
             }
         }
 
-        public static ResourceLocation loadPackIcon(TextureManager textureManager, Pack pack, String icon, ResourceLocation fallback) {
+        public static Identifier loadPackIcon(TextureManager textureManager, Pack pack, String icon, Identifier fallback) {
             try (PackResources packResources = pack.open()) {
-                ResourceLocation resourceLocation;
+                Identifier resourceLocation;
                 {
                     IoSupplier<InputStream> ioSupplier = packResources.getRootResource(icon);
                     if (ioSupplier == null)
                         return fallback;
                     String string = pack.getId();
-                    ResourceLocation resourceLocation3 = FactoryAPI.createLocation("minecraft", icon + "/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
+                    Identifier resourceLocation3 = FactoryAPI.createLocation("minecraft", icon + "/" + Util.sanitizeName(string, Identifier::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
                     InputStream inputStream = ioSupplier.get();
                     try {
                         NativeImage nativeImage = NativeImage.read(inputStream);
@@ -437,20 +437,20 @@ public record PackAlbum(String id, int version, Component displayName, Component
             }
         }
 
-        public static ResourceLocation getPackIcon(Pack pack) {
+        public static Identifier getPackIcon(Pack pack) {
             return packIcons.computeIfAbsent(pack.getId(), string -> loadPackIcon(Minecraft.getInstance().getTextureManager(), pack, "pack.png", DEFAULT_ICON));
         }
 
-        public static ResourceLocation getPackBackground(Pack pack) {
+        public static Identifier getPackBackground(Pack pack) {
             return packBackgrounds.computeIfAbsent(pack.getId(), string -> loadPackIcon(Minecraft.getInstance().getTextureManager(), pack, "background.png", null));
         }
 
-        private static @Nullable ResourceLocation getExistingSprite(ResourceLocation sprite) {
+        private static @Nullable Identifier getExistingSprite(Identifier sprite) {
             return FactoryGuiGraphics.getSprites().texturesByName.containsKey(sprite) ? sprite : null;
         }
 
         private static void renderAlbumIcon(GuiGraphics graphics, PackAlbum album, @Nullable Pack displayPack, int x, int y, int width, int height) {
-            ResourceLocation iconSprite = album.iconSprite().map(Selector::getExistingSprite).orElse(null);
+            Identifier iconSprite = album.iconSprite().map(Selector::getExistingSprite).orElse(null);
             if (iconSprite != null) {
                 FactoryGuiGraphics.of(graphics).blitSprite(iconSprite, x, y, width, height);
                 return;
@@ -458,12 +458,12 @@ public record PackAlbum(String id, int version, Component displayName, Component
             FactoryGuiGraphics.of(graphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, x, y, 0.0f, 0.0f, width, height, width, height);
         }
 
-        private static @Nullable ResourceLocation getAlbumBackground(PackAlbum album, @Nullable Pack displayPack) {
-            ResourceLocation backgroundSprite = album.backgroundSprite().map(Selector::getExistingSprite).orElse(null);
+        private static @Nullable Identifier getAlbumBackground(PackAlbum album, @Nullable Pack displayPack) {
+            Identifier backgroundSprite = album.backgroundSprite().map(Selector::getExistingSprite).orElse(null);
             return backgroundSprite != null ? backgroundSprite : displayPack != null ? getPackBackground(displayPack) : null;
         }
 
-        private static void renderAlbumBackground(GuiGraphics graphics, PackAlbum album, @Nullable ResourceLocation background, int x, int y, int width, int height) {
+        private static void renderAlbumBackground(GuiGraphics graphics, PackAlbum album, @Nullable Identifier background, int x, int y, int width, int height) {
             if (background == null) return;
             if (album.backgroundSprite().map(Selector::getExistingSprite).filter(background::equals).isPresent()) {
                 FactoryGuiGraphics.of(graphics).blitSprite(background, x, y, width, height);
@@ -513,7 +513,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             int descriptionWidth = width - 16;
             MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(album.description(), descriptionWidth);
             int descriptionFromBottom = sd ? 52 : 78;
-            ResourceLocation background = getAlbumBackground(album, displayPack);
+            Identifier background = getAlbumBackground(album, displayPack);
             int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;

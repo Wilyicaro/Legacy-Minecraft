@@ -13,7 +13,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.Slot;
@@ -67,7 +67,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             if (i == 0) {
                 LegacySlotDisplay.override(s, sd ? 10 : 19, sd ? 49 : 66, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.hasItem() ? null : LegacySprites.ENCHANTING_SLOT;
                     }
 
@@ -112,17 +112,17 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         cir.setReturnValue(super.mouseClicked(event, bl));
     }
 
-    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 2)
+    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 2)
     public float changeBookScale(float original) {
         return LegacyOptions.getUIMode().isSD() ? original : original * 1.25f;
     }
 
-    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 7)
+    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 7)
     public int changeBookX1(int original) {
         return original + (LegacyOptions.getUIMode().isSD() ? 0 : 6);
     }
 
-    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 8)
+    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 8)
     public int changeBookY1(int original) {
         return original + (LegacyOptions.getUIMode().isSD() ? 0 : 9);
     }

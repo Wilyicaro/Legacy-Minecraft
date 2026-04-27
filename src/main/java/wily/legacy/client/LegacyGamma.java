@@ -38,7 +38,6 @@ public class LegacyGamma implements AutoCloseable {
             renderPass.setPipeline(LegacyRenderPipelines.GAMMA);
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("GammaInfo", this.ubo.currentBuffer());
-            renderPass.bindSampler("InSampler", target.getColorTextureView());
             renderPass.draw(0, 3);
         }
         this.ubo.rotate();
