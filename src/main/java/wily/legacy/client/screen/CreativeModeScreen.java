@@ -138,7 +138,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
 
     public static boolean canDisplayVanillaCreativeTab(CreativeModeTab c) {
         Identifier location = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(c);
-        return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (LegacyOptions.vanillaTabs.get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.location()));
+        return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (LegacyOptions.vanillaTabs.get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.identifier()));
     }
 
     public static List<ItemStack> getItemsSearchResult(Minecraft minecraft, String value) {

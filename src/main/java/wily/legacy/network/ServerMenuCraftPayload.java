@@ -21,7 +21,7 @@ public record ServerMenuCraftPayload(Optional<Identifier> craftId, List<Optional
     public static final CommonNetwork.Identifier<ServerMenuCraftPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_menu_craft"), ServerMenuCraftPayload::new);
 
     public ServerMenuCraftPayload(CommonNetwork.PlayBuf buf) {
-        this(buf.get().readOptional(FriendlyByteBuf::readResourceLocation), buf.get().readList(b -> buf.get().readOptional(b1 -> FactoryIngredient.decode(buf).toIngredient())), buf.get().readVarInt(), buf.get().readBoolean());
+        this(buf.get().readOptional(FriendlyByteBuf::readIdentifier), buf.get().readList(b -> buf.get().readOptional(b1 -> FactoryIngredient.decode(buf).toIngredient())), buf.get().readVarInt(), buf.get().readBoolean());
     }
 
     public ServerMenuCraftPayload(List<Optional<Ingredient>> ingredients, int button, boolean max) {
@@ -38,7 +38,7 @@ public record ServerMenuCraftPayload(Optional<Identifier> craftId, List<Optional
 
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeOptional(craftId, FriendlyByteBuf::writeResourceLocation);
+        buf.get().writeOptional(craftId, FriendlyByteBuf::writeIdentifier);
         buf.get().writeCollection(customIngredients, (r, o) -> r.writeOptional(o, (b, i) -> FactoryIngredient.encode(buf, FactoryIngredient.of(i))));
         buf.get().writeVarInt(button);
         buf.get().writeBoolean(max);

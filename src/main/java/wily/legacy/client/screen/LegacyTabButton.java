@@ -115,7 +115,7 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
         FactoryScreenUtil.enableBlend();
@@ -148,7 +148,6 @@ public class LegacyTabButton extends AbstractButton {
         narrationElementOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.tab", this.getMessage().getString()));
     }
 
-    @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         renderString(guiGraphics, font, i, false);
     }

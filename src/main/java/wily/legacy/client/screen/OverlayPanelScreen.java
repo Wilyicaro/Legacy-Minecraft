@@ -37,7 +37,7 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen {
     @Override
     protected void init() {
         super.init();
-        if (parent != null) parent.init(minecraft, width, height);
+        if (parent != null) parent.init(width, height);
     }
 
     @Override

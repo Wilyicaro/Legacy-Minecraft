@@ -159,9 +159,9 @@ public class LegacyItemUtil {
             return potionContents.customEffects().stream().mapToInt(MobEffectInstance::getAmplifier).max().orElse(-1) + 1;
         }
         int level;
-        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("strong_")) {
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key().identifier().getPath().startsWith("strong_")) {
             level = 2;
-        } else if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("long_")) {
+        } else if (potion instanceof Holder.Reference<Potion> reference && reference.key().identifier().getPath().startsWith("long_")) {
             level = 3;
         } else if (!potionContents.customEffects().isEmpty()) {
             level = potionContents.customEffects().stream().mapToInt(MobEffectInstance::getAmplifier).max().orElse(0) + 1;

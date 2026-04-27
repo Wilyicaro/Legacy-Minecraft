@@ -84,11 +84,11 @@ public final class SkinPackLang {
         Map<Identifier, Resource> packLang = new HashMap<>();
         packLang.putAll(listResources(rm, "skinpacks", rl -> {
             String path = rl.getPath();
-            return path.contains("/lang/") && path.endsWith(".json");
+            return path.contains("/lang/") && matchesLocale(path, locale);
         }));
         packLang.putAll(listResources(rm, "default_skinpacks", rl -> {
             String path = rl.getPath();
-            return path.contains("/lang/") && path.endsWith(".json");
+            return path.contains("/lang/") && matchesLocale(path, locale);
         }));
 
         Map<Identifier, Resource> vanilla = listResources(rm, "lang", rl -> {
@@ -136,6 +136,12 @@ public final class SkinPackLang {
         } catch (RuntimeException ignored) {
             return Map.of();
         }
+    }
+
+    private static boolean matchesLocale(String path, String locale) {
+        int slash = path.lastIndexOf('/');
+        String file = slash >= 0 ? path.substring(slash + 1) : path;
+        return file.equals(locale + ".json") || file.startsWith(locale + ".") && file.endsWith(".json");
     }
 
     private static String stringValue(JsonElement element) {

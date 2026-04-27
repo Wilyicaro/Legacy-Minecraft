@@ -124,8 +124,8 @@ public class ModsScreen extends PanelVListScreen {
                 }
 
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
+                protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                    super.renderContents(guiGraphics, i, j, f);
                     if (isFocused()) focusedMod = mod;
                     FactoryScreenUtil.enableBlend();
                     SizedLocation logo = modLogosCache.apply(mod);

@@ -11,7 +11,10 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import wily.legacy.client.LegacyRenderPipelines;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderPass;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SkyRenderer;
+import net.minecraft.client.renderer.state.SkyRenderState;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyCloudAtmosphere;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(SkyRenderer.class)
@@ -50,6 +54,14 @@ public class SkyRendererMixin {
     @ModifyArg(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V", remap = false))
     private RenderPipeline changeSkyRenderPipeline(RenderPipeline renderPipeline) {
         return legacySkyShape ? LegacyRenderPipelines.LEGACY_SKY : renderPipeline;
+    }
+
+    @Inject(method = "extractRenderState", at = @At("RETURN"))
+    private void useLegacySunriseColor(ClientLevel level, float partialTick, Camera camera, SkyRenderState state, CallbackInfo ci) {
+        if (LegacyCloudAtmosphere.shouldUseConsoleAtmosphere(level)) {
+            state.sunriseAndSunsetColor = LegacyCloudAtmosphere.getSunriseAndSunsetColor(level, partialTick);
+            state.skyColor = LegacyCloudAtmosphere.getSkyColor(level, camera.position(), partialTick);
+        }
     }
 
     @Inject(method = "buildSkyDisc", at = @At("HEAD"), cancellable = true)

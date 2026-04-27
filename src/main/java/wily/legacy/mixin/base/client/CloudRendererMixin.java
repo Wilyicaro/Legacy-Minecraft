@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CloudRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Direction;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,6 +14,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -45,6 +47,8 @@ public abstract class CloudRendererMixin {
     private int legacy$lastRelativeCameraPos = Integer.MIN_VALUE;
     @Unique
     private boolean legacy$useWarmCloudPipelines;
+    @Unique
+    private float legacy$currentPartialTick;
 
     @Shadow
     private boolean needsRebuild;
@@ -53,8 +57,9 @@ public abstract class CloudRendererMixin {
     private CloudRenderer.TextureData texture;
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, Vec3 cameraPosition, float ticks, CallbackInfo ci) {
+    private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, Vec3 cameraPosition, long packedRelativeCameraPos, float ticks, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
+        legacy$currentPartialTick = ticks;
         legacy$useWarmCloudPipelines = minecraft.level != null && LegacyCloudAtmosphere.shouldUseWarmCloudTransparency(minecraft.level, ticks);
         boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
         boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
@@ -77,6 +82,16 @@ public abstract class CloudRendererMixin {
         }
 
         return cloudStatus == CloudStatus.OFF ? cloudStatus : CloudStatus.FANCY;
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;vector4fFromARGB32(I)Lorg/joml/Vector4f;"))
+    private int legacy$useConsoleCloudColor(int color) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null) {
+            return color;
+        }
+
+        return LegacyCloudAtmosphere.getCloudColor(minecraft.level, legacy$currentPartialTick, color);
     }
 
     @Redirect(
@@ -117,12 +132,12 @@ public abstract class CloudRendererMixin {
         return legacy$useWarmCloudPipelines ? LegacyRenderPipelines.LEGACY_WARM_FLAT_CLOUDS : LegacyRenderPipelines.LEGACY_FLAT_CLOUDS;
     }
 
-    @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 6)
+    @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 8)
     private int legacy$useRenderDistanceCloudDistanceBlocks(int cloudDistanceBlocks) {
         return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudDistanceBlocks() : cloudDistanceBlocks;
     }
 
-    @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 7)
+    @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 9)
     private int legacy$useRenderDistanceCloudRadius(int cloudRadius) {
         return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudRadius() : cloudRadius;
     }
@@ -252,8 +267,8 @@ public abstract class CloudRendererMixin {
             return 0;
         }
 
-        double cameraY = minecraft.gameRenderer.getMainCamera().getPosition().y;
-        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : (float) minecraft.level.dimensionType().cloudHeight().orElse((int) LEGACY_CLOUD_HEIGHT);
+        double cameraY = minecraft.gameRenderer.getMainCamera().position().y;
+        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : minecraft.level.environmentAttributes().getDimensionValue(EnvironmentAttributes.CLOUD_HEIGHT);
         double top = cloudHeight + CLOUD_BASE_HEIGHT + CLOUD_TOP_EXTENSION;
         double bottom = cloudHeight - CLOUD_BOTTOM_EXTENSION;
 

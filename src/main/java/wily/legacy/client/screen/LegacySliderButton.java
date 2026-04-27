@@ -132,11 +132,6 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     @Override
-    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-        LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingString(guiGraphics, font, i, j));
-    }
-
-    @Override
     public boolean keyReleased(KeyEvent keyEvent) {
         if (this.canChangeValue && (keyEvent.isLeft() || keyEvent.isRight())) slidingMul = 1;
         return false;

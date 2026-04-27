@@ -157,7 +157,6 @@ public class KeyboardScreen extends OverlayPanelScreen {
             setFocused(l);
     }
 
-    @Override
     public void resize(Minecraft minecraft, int i, int j) {
         onClose();
     }
@@ -272,10 +271,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
             FactoryScreenUtil.enableBlend();
-            renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            LegacyRenderUtil.renderScrollingString(guiGraphics, Minecraft.getInstance().font, getMessage(), getX() + 2, getY(), getX() + getWidth() - 2, getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
             FactoryScreenUtil.disableBlend();
         }
 
@@ -355,7 +354,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 bindingOffset = binding.getIcon().render(guiGraphics, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
 
             if (iconSprite == null)
-                renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
             else {
                 TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
                 if (sprite == null) return;
@@ -365,6 +364,12 @@ public class KeyboardScreen extends OverlayPanelScreen {
                     FactoryScreenUtil.disableBlend();
                 }
             }
+        }
+
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON, getX(), getY(), getWidth(), getHeight());
+            renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
         }
 
         @Override

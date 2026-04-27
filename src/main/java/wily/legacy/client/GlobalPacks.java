@@ -139,7 +139,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getTitle(selectedPack), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getTitle(selectedPack), nameWidth).visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, graphics.textRenderer());
                 graphics.disableScissor();
                 Identifier background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
@@ -149,7 +149,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
                 scrollableRenderer.lineHeight = lineHeight;
                 int left = x + (sd ? 5 : 8);
-                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
+                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, left, y + 40, lineHeight, graphics.textRenderer()));
                 if (background != null)
                     FactoryGuiGraphics.of(graphics).blit(background, left, y + height - descriptionFromBottom, 0.0f, 0.0f, descriptionWidth, sd ? 47 : 72, descriptionWidth, sd ? 47 : 72);
             }

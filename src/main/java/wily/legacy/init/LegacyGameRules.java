@@ -73,6 +73,11 @@ public class LegacyGameRules {
         return clientRuleResolver.test(key);
     }
 
+
+    public static boolean getSidedBooleanGamerule(Entity entity, RegisterListing.Holder<GameRule<Boolean>> key) {
+        return getSidedBooleanGamerule(entity, key.get());
+    }
+
     public static void setClientRuleResolver(Predicate<GameRule<Boolean>> resolver) {
         clientRuleResolver = resolver == null ? key -> false : resolver;
     }

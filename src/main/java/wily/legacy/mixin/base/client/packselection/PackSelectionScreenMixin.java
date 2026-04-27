@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.client.packselection;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -151,8 +152,9 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
             if (!descriptionText.getString().isEmpty()) description.add(descriptionText);
             AbstractButton button = new AbstractButton(0, 0, 180, 30, title) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-                    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+                protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+                    renderDefaultSprite(guiGraphics);
+                    renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) : 0xFF0000FF);
                     FactoryScreenUtil.enableBlend();
                     FactoryGuiGraphics.of(guiGraphics).blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
                     FactoryScreenUtil.disableBlend();

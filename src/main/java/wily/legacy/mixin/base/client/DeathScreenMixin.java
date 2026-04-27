@@ -1,11 +1,11 @@
 package wily.legacy.mixin.base.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.ControlTooltip;
@@ -85,28 +86,22 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 0))
-    private void renderLegacyTitle(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
-        LegacyRenderUtil.drawOutlinedString(guiGraphics, font, component, i - font.width(component) / 2, this.height / 8 + 10, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/DeathScreen;visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", shift = At.Shift.AFTER))
+    private void renderLegacyTitle(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, this.width / 2 - this.font.width(this.title) / 2, this.height / 8 + 10, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 1))
-    private void renderLegacyCauseOfDeath(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
-        original.call(guiGraphics, font, component, i, this.height / 2 - 24, k);
+    @WrapOperation(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V", ordinal = 0))
+    private void hideVanillaTitle(ActiveTextCollector collector, TextAlignment alignment, int x, int y, Component component, Operation<Void> original) {
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 2))
-    private void hideDeathScore(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
-    }
-
-    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "CONSTANT", args = "doubleValue=85.0"))
-    private double legacyCauseOfDeathClickY(double d) {
-        return this.height / 2.0 - 24.0;
-    }
-
-    @ModifyExpressionValue(method = {"render", "mouseClicked"}, at = @At(value = "CONSTANT", args = "intValue=85"))
-    private int legacyCauseOfDeathY(int i) {
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V", ordinal = 1), index = 2)
+    private int legacyCauseOfDeathY(int y) {
         return this.height / 2 - 24;
+    }
+
+    @WrapOperation(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V", ordinal = 2))
+    private void hideDeathScore(ActiveTextCollector collector, TextAlignment alignment, int x, int y, Component component, Operation<Void> original) {
     }
 
 }

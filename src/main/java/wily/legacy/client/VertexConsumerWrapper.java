@@ -28,6 +28,11 @@ public class VertexConsumerWrapper implements VertexConsumer {
     }
 
     @Override
+    public VertexConsumer setColor(int color) {
+        return setColor(ColorUtil.getR(color), ColorUtil.getG(color), ColorUtil.getB(color), ColorUtil.getA(color));
+    }
+
+    @Override
     public VertexConsumer setUv(float f, float g) {
         return consumer.setUv(f, g);
     }
@@ -45,5 +50,10 @@ public class VertexConsumerWrapper implements VertexConsumer {
     @Override
     public VertexConsumer setNormal(float f, float g, float h) {
         return consumer.setNormal(f, g, h);
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float width) {
+        return consumer.setLineWidth(width);
     }
 }

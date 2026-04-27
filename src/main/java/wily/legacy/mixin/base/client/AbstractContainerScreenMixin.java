@@ -194,7 +194,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     //?}
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    private void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
+    private void renderSlot(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         ci.cancel();
         LegacySlotWidget widget = slotWidgets.get(slot.index);
         ItemStack itemStack = slot.getItem();

@@ -245,8 +245,8 @@ public abstract class MinecraftMixin {
         return LegacyMusicFader.musicManagerShouldTick;
     }
 
-    @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
-    private void disconnectFadeMusic(CallbackInfo ci) {
+    @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
+    private void disconnectFadeMusic(Screen disconnectScreen, boolean retainDownloadedResourcePacks, boolean updateLevelInEngines, CallbackInfo ci) {
         ConduitRotationCache.clear();
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
@@ -292,10 +292,10 @@ public abstract class MinecraftMixin {
         LegacyTipManager.resetTipOffset(true);
     }
 
-    @WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(Lnet/minecraft/client/Minecraft;II)V"))
-    private boolean initScreen(Screen instance, Minecraft minecraft, int i, int j) {
+    @WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(II)V"))
+    private boolean initScreen(Screen instance, int i, int j) {
         if (oldScreen instanceof OverlayPanelScreen s && s.parent == instance) {
-            instance.resize(minecraft, i, j);
+            instance.resize(i, j);
             return false;
         }
         return true;
@@ -308,7 +308,7 @@ public abstract class MinecraftMixin {
         gui.getChat().rescaleChat();
     }
 
-    @ModifyArg(method = "disconnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
+    @ModifyArg(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreenAndShow(Lnet/minecraft/client/gui/screens/Screen;)V"))
     private Screen changeGenericScreen(Screen arg, @Local(argsOnly = true) Screen disconnectScreen) {
         return disconnectScreen instanceof LegacyLoadingScreen ? disconnectScreen : arg;
     }
@@ -331,12 +331,12 @@ public abstract class MinecraftMixin {
         }
     }
 
-    @WrapWithCondition(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;pauseAllExcept([Lnet/minecraft/sounds/SoundSource;)V"))
+    @WrapWithCondition(method = "runTick(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;pauseAllExcept([Lnet/minecraft/sounds/SoundSource;)V"))
     public boolean pauseGame(SoundManager instance, SoundSource[] soundSources) {
         return false;
     }
 
-    @WrapWithCondition(method = "updateLevelInEngines", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
+    @WrapWithCondition(method = "updateLevelInEngines(Lnet/minecraft/client/multiplayer/ClientLevel;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
     public boolean updateScreenAndTick(SoundManager instance) {
         SoundManagerAccessor.of(instance).stopAllSound();
         return false;

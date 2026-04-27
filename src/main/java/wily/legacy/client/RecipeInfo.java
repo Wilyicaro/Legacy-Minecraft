@@ -44,7 +44,7 @@ import java.util.function.Supplier;
 
 public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
     static <T> RecipeInfo<T> create(ResourceKey<Recipe<?>> id, T value, List<Optional<Ingredient>> ings, ItemStack result) {
-        return create(id.location(), value, ings, result, () -> null);
+        return create(id.identifier(), value, ings, result, () -> null);
     }
 
     static <T> RecipeInfo<T> create(Identifier id, T value, List<Optional<Ingredient>> ings, ItemStack result) {

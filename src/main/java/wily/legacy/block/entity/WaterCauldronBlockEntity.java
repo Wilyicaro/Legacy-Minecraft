@@ -103,7 +103,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         if (waterColor != null) {
             output.putInt("dyeColor", waterColor);
         }
-        potion.unwrapKey().ifPresent(r -> output.putString("potion", r.location().toString()));
-        lastPotionItemUsed.unwrapKey().ifPresent(r -> output.putString("lastPotionItemUsed", r.location().toString()));
+        potion.unwrapKey().ifPresent(r -> output.putString("potion", r.identifier().toString()));
+        lastPotionItemUsed.unwrapKey().ifPresent(r -> output.putString("lastPotionItemUsed", r.identifier().toString()));
     }
 }

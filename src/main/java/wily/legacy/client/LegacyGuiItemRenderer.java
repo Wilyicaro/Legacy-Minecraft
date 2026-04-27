@@ -101,7 +101,6 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     private void createAtlasTextures(int i) {
         GpuDevice gpuDevice = RenderSystem.getDevice();
         this.itemsAtlas = gpuDevice.createTexture("UI items atlas", 12, TextureFormat.RGBA8, i, i, 1, 1);
-        this.itemsAtlas.setTextureFilter(FilterMode.NEAREST, false);
         this.itemsAtlasView = gpuDevice.createTextureView(this.itemsAtlas);
         this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", 8, TextureFormat.DEPTH32, i, i, 1, 1);
         this.itemsAtlasDepthView = gpuDevice.createTextureView(this.itemsAtlasDepth);
@@ -213,7 +212,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                 .submitBlitToCurrentLayer(
                         new BlitRenderState(
                                 opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA : RenderPipelines.GUI_TEXTURED,
-                                TextureSetup.singleTexture(this.itemsAtlasView),
+                                TextureSetup.singleTexture(this.itemsAtlasView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)),
                                 guiItemRenderState.pose(),
                                 guiItemRenderState.x(),
                                 guiItemRenderState.y(),

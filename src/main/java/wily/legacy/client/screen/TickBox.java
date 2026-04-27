@@ -70,7 +70,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
         Minecraft minecraft = Minecraft.getInstance();
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
@@ -108,7 +108,6 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
         }
     }
 
-    @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i, isHoveredOrFocused()));
     }

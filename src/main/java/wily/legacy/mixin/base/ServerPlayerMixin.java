@@ -171,7 +171,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)
     public void startSleepInBed(BlockPos blockPos, CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
         Either<BedSleepingProblem, Unit> either = cir.getReturnValue();
-        if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
+        if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.OTHER_PROBLEM && !this.isCreative()) {
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
             if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(level(), this)).isEmpty()) {
                 cir.setReturnValue(Either.left(BedSleepingProblem.NOT_SAFE));
