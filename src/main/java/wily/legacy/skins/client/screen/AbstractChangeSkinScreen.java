@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -599,24 +600,24 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         String skinId = centerSkinId();
         if (isEditingCustomPack()) {
             if (skinId == null || !customPacks.isEditableSkinSelection(skinId)) return null;
-            return Component.translatable("legacy.menu.remove_custom_skin");
+            return LegacyComponents.REMOVE_CUSTOM_SKIN;
         }
         if (skinId != null && customPacks.isImportSkinSelection(skinId))
-            return Component.translatable("legacy.menu.import_skin");
+            return LegacyComponents.IMPORT_SKIN;
         if (!source.supportsFavorites()) return null;
         return isSkinFavorite(skinId)
-                ? Component.literal("Remove Favorite")
-                : Component.literal("Add Favorite");
+                ? LegacyComponents.REMOVE_FAVORITE
+                : LegacyComponents.ADD_FAVORITE;
     }
 
     protected Component selectActionLabel() {
-        if (isReorderingCustomPack()) return Component.translatable("gui.done");
+        if (isReorderingCustomPack()) return CommonComponents.GUI_DONE;
         String skinId = centerSkinId();
         if (skinId != null && customPacks.isImportSkinSelection(skinId))
-            return Component.translatable("legacy.menu.import_skin");
+            return LegacyComponents.IMPORT_SKIN;
         if (customPacks.isLockedSkinSelection(skinId)) return null;
-        if (isEditingCustomPack()) return Component.translatable("legacy.menu.edit_custom_skin");
-        return Component.literal("Select");
+        if (isEditingCustomPack()) return LegacyComponents.EDIT_CUSTOM_SKIN;
+        return LegacyComponents.SELECT_SKIN;
     }
 
     protected int resolveFocusedPackSkinIndex(String skinId) {
@@ -752,23 +753,22 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void addCommonControlTooltips(ControlTooltip.Renderer r, Supplier<ControlTooltip.Icon> navigateIcon, Supplier<Component> navigateLabel) {
-        boolean kbm = ControlType.getActiveType().isKbm();
-        r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), this::selectActionLabel);
-        r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.cancel"));
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), this::selectActionLabel);
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> CommonComponents.GUI_CANCEL);
         if (isEditingCustomPack() || source.supportsFavorites()) {
-            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_F) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), this::favoriteActionLabel);
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_F) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), this::favoriteActionLabel);
         }
         if (isEditingCustomPack()) {
-            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_left") : null);
-            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? Component.translatable("legacy.action.move_right") : null);
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? LegacyComponents.MOVE_LEFT : null);
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? LegacyComponents.MOVE_RIGHT : null);
         }
         if (source.supportsCustomPackOptions() && LegacyOptions.showCustomPackOptionsTooltip.get()) {
-            r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : ControllerBinding.BACK.getIcon(), () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
+            r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : ControllerBinding.BACK.getIcon(), () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
         }
         r.add(navigateIcon, navigateLabel);
         if (!source.supportsAdvancedOptions() || LegacyOptions.hideAdvancedOptionsTooltip.get() || LegacyOptions.legacySettingsMenus.get())
             return;
-        r.add(() -> kbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> LegacyComponents.SHOW_ADVANCED_OPTIONS);
+        r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> LegacyComponents.SHOW_ADVANCED_OPTIONS);
     }
 
     private boolean movableCustomSkinSelected() {

@@ -158,12 +158,12 @@ public class Legacy4JClient {
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, KeyMapping.Category.MISC);
-    public static KeyMapping keyHostOptions = new KeyMapping(MOD_ID + ".key.host_options", InputConstants.KEY_H, KeyMapping.Category.MISC);
-    public static KeyMapping keyLegacy4JSettings = new KeyMapping(MOD_ID + ".key.legacy4JSettings", InputConstants.KEY_Y, KeyMapping.Category.MISC);
-    public static KeyMapping keyFlyUp = new KeyMapping(MOD_ID + ".key.flyUp", InputConstants.KEY_UP, KeyMapping.Category.MOVEMENT);
-    public static KeyMapping keyFlyDown = new KeyMapping(MOD_ID + ".key.flyDown", InputConstants.KEY_DOWN, KeyMapping.Category.MOVEMENT);
-    public static KeyMapping keyFlyLeft = new KeyMapping(MOD_ID + ".key.flyLeft", InputConstants.KEY_LEFT, KeyMapping.Category.MOVEMENT);
-    public static KeyMapping keyFlyRight = new KeyMapping(MOD_ID + ".key.flyRight", InputConstants.KEY_RIGHT, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyHostOptions = new KeyMapping(MOD_ID + ".key.host_options", InputConstants.KEY_H, KeyMapping.Category.MISC);
+    public static final KeyMapping keyLegacy4JSettings = new KeyMapping(MOD_ID + ".key.legacy4JSettings", InputConstants.KEY_Y, KeyMapping.Category.MISC);
+    public static final KeyMapping keyFlyUp = new KeyMapping(MOD_ID + ".key.flyUp", InputConstants.KEY_UP, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyFlyDown = new KeyMapping(MOD_ID + ".key.flyDown", InputConstants.KEY_DOWN, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyFlyLeft = new KeyMapping(MOD_ID + ".key.flyLeft", InputConstants.KEY_LEFT, KeyMapping.Category.MOVEMENT);
+    public static final KeyMapping keyFlyRight = new KeyMapping(MOD_ID + ".key.flyRight", InputConstants.KEY_RIGHT, KeyMapping.Category.MOVEMENT);
     public static boolean isNewerVersion = false;
     public static boolean isNewerMinecraftVersion = false;
     public static ControlType lastControlType;

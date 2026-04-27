@@ -20,6 +20,7 @@ import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
 import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.skin.*;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -503,7 +504,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (center != null) {
             String skinId = center.skinId.get();
             SkinEntry entry = skinId == null ? null : source.skin(skinId);
-            String name = SkinIdUtil.isAutoSelect(skinId) ? "Auto Selected" : entry == null ? String.valueOf(skinId) : source.skinName(entry);
+            String name = entry == null ? String.valueOf(skinId) : source.skinName(entry);
             int mid = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
             float mainTextScale = mainTextScale();
@@ -542,7 +543,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         addCommonControlTooltips(
                 r,
                 ControlTooltip.POINTER_MOVEMENT::get,
-                () -> Component.literal("Navigate")
+                () -> LegacyComponents.NAVIGATE
         );
     }
 

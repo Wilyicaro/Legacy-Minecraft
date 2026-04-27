@@ -1,0 +1,22 @@
+{
+  "legacy.default.pack": "Nenhum Pacote: Capas Padrão",
+  "legacy.default.steve": "Steve",
+  "legacy.default.tennis_steve": "Steve tenista",
+  "legacy.default.tux_steve": "Steve de smoking",
+  "legacy.default.athlete_steve": "Steve atleta",
+  "legacy.default.scottish_steve": "Steve sueco",
+  "legacy.default.jail_steve": "Steve prisioneiro",
+  "legacy.default.cyclist_steve": "Steve ciclista",
+  "legacy.default.boxer_steve": "Steve boxeador",
+  "legacy.default.alex": "Alex",
+  "legacy.default.tennis_alex": "Alex tenista",
+  "legacy.default.tux_alex": "Alex de smoking",
+  "legacy.default.athlete_alex": "Alex atleta",
+  "legacy.default.swedish_alex": "Alex sueca",
+  "legacy.default.prisoner_alex": "Alex prisioneira",
+  "legacy.default.cyclist_alex": "Alex ciclista",
+  "legacy.default.boxer_alex": "Alex boxeadora",
+  "legacy.default.dev_steve": "Desenvolvedor Steve",
+  "legacy.default.dev_alex": "Desenvolvedor Alex",
+  "legacy.default.auto_select": "Seleção automática"
+}

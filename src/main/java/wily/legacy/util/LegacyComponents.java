@@ -235,6 +235,15 @@ public class LegacyComponents {
     public static final Component UNLEASH = Component.translatable("legacy.action.unleash");
     public static final Component DETACH = Component.translatable("legacy.action.detach");
     public static final Component CLOSE = Component.translatable("legacy.action.close");
+    public static final Component NAVIGATE = Component.translatable("legacy.action.navigate");
+    public static final Component ADD_FAVORITE = Component.translatable("legacy.action.add_favorite");
+    public static final Component REMOVE_FAVORITE = Component.translatable("legacy.action.remove_favorite");
+    public static final Component SELECT_SKIN = Component.translatable("legacy.action.select_skin");
+    public static final Component IMPORT_SKIN = Component.translatable("legacy.menu.import_skin");
+    public static final Component REMOVE_CUSTOM_SKIN = Component.translatable("legacy.menu.remove_custom_skin");
+    public static final Component EDIT_CUSTOM_SKIN = Component.translatable("legacy.menu.edit_custom_skin");
+    public static final Component MOVE_LEFT = Component.translatable("legacy.action.move_left");
+    public static final Component MOVE_RIGHT = Component.translatable("legacy.action.move_right");
 
     public static Component getResourceAlbums() {
         return Component.translatable(LegacyOptions.legacySettingsMenus.get() ? "legacy.menu.albums.texture_packs" : "legacy.menu.albums.resource");
