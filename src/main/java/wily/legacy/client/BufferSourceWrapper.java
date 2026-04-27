@@ -28,9 +28,9 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {
                 if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentBlockItemSheet());
-                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && !((RenderSetupAccessor)(Object) ((RenderTypeAccessor) renderType).getState()).getTextureBindings().isEmpty())
+                else if (renderType.format() == DefaultVertexFormat./*? if >=26.1 {*/ENTITY/*?} else {*//*NEW_ENTITY*//*?}*/ && !((RenderSetupAccessor)(Object) ((RenderTypeAccessor) renderType).getState()).getTextureBindings().isEmpty())
                     return super.getBuffer(
-                            RenderTypes.itemEntityTranslucentCull(
+                            RenderTypes./*? if >=26.1 {*/entityTranslucentCullItemTarget/*?} else {*//*itemEntityTranslucentCull*//*?}*/(
                                     ((RenderSetupAccessor)(Object) ((RenderTypeAccessor) renderType).getState()).getTextureBindings().get("Sampler0").location()));
                 return super.getBuffer(renderType);
             }
