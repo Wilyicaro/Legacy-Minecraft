@@ -343,7 +343,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.lineHeight = lineHeight;
 
             scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
+                label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, guiGraphics.textRenderer())
             );
         }
     }
@@ -393,8 +393,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
             if (downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category)) {
                 int size = 16;
                 int x = this.getX() + this.width - size - 11;
@@ -408,7 +408,6 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             }
         }
 
-        @Override
         public void renderString(GuiGraphics guiGraphics, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             int textX = this.getX() + 8;

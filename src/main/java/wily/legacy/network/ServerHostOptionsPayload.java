@@ -3,6 +3,7 @@ package wily.legacy.network;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -61,7 +62,7 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
 
     @Override
     public void apply(Context context) {
-        if (!(context.player() instanceof ServerPlayer sp) || !sp.hasPermissions(2)) return;
+        if (!(context.player() instanceof ServerPlayer sp) || !sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
         var server = FactoryAPIPlatform.getEntityServer(sp);
         var source = sp.createCommandSourceStack().withSuppressedOutput();
         BlockPos pos = sp.blockPosition();

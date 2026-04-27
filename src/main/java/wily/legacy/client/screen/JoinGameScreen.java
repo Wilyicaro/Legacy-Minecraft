@@ -34,6 +34,10 @@ public class JoinGameScreen extends PanelVListScreen {
                 }
 
                 @Override
+                protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, Minecraft.getInstance().font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+                }
+
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                     LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
                 }
@@ -62,6 +66,6 @@ public class JoinGameScreen extends PanelVListScreen {
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
         tooltipBox.render(guiGraphics, i, j, f);
-        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, true, 0xFFFFFFFF));
+        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, guiGraphics.textRenderer()));
     }
 }

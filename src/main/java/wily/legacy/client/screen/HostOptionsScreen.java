@@ -13,6 +13,7 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.util.Mth;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.network.CommonNetwork;
@@ -118,7 +119,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     protected void addPlayerButtons() {
         addPlayerButtons(true, (playerInfo, b) -> {
-            if (!minecraft.player.hasPermissions(2)) return;
+            if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
             minecraft.setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
         });
     }
@@ -188,9 +189,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isHoveredOrFocused()) shouldFade = true;
-            super.renderWidget(guiGraphics, i, j, f);
+            super.renderContents(guiGraphics, i, j, f);
             drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics,
                     getX() + list.accessor.getInteger(list.name + ".playerIcon.x", 6),
                     getY() + list.accessor.getInteger(list.name + ".playerIcon.y", 5),

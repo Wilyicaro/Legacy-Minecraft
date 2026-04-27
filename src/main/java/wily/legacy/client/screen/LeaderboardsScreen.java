@@ -471,7 +471,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 h.itemIcon = i.asItem().getDefaultInstance();
                 return h;
             } else if (stat.getValue() instanceof EntityType<?> e) {
-                Identifier entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().location().getPath());
+                Identifier entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().identifier().getPath());
                 if (FactoryGuiGraphics.getSprites().texturesByName.containsKey(entityIcon)) {
                     LegacyIconHolder h = new LegacyIconHolder(24, 24);
                     h.iconSprite = entityIcon;

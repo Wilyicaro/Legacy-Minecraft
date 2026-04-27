@@ -33,7 +33,7 @@ public class KnownListing<T> {
 
     public KnownListing(Registry<T> registry, Path path) {
         this.registry = registry;
-        listingFile = "known_" + this.registry.key().location().getPath() + ".json";
+        listingFile = "known_" + this.registry.key().identifier().getPath() + ".json";
         this.path = path.resolve(listingFile);
         if (Files.exists(this.path)) {
             try (BufferedReader bufferedReader = Files.newBufferedReader(this.path, Charsets.UTF_8)) {
@@ -43,7 +43,7 @@ public class KnownListing<T> {
                         list.add(FactoryAPI.createLocation(p.getAsString()));
                 });
             } catch (Exception exception) {
-                LOGGER.error("Failed to read {}, known {} will be reset", listingFile, this.registry.key().location().getPath(), exception);
+                LOGGER.error("Failed to read {}, known {} will be reset", listingFile, this.registry.key().identifier().getPath(), exception);
             }
         }
     }
@@ -63,7 +63,7 @@ public class KnownListing<T> {
             list.forEach(l -> a.add(l.toString()));
             GsonHelper.writeValue(new JsonWriter(bufferedWriter), a, String::compareTo);
         } catch (IOException iOException) {
-            LOGGER.error("Failed to write {}, new known {} won't be present", listingFile, registry.key().location().getPath(), iOException);
+            LOGGER.error("Failed to write {}, new known {} won't be present", listingFile, registry.key().identifier().getPath(), iOException);
         }
     }
 }

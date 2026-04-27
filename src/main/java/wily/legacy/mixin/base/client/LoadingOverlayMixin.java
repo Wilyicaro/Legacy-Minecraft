@@ -102,7 +102,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 }
                 this.fadeOutStart = Util.getMillis();
                 if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    this.minecraft.screen.init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }
             }
         }

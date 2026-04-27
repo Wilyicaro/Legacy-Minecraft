@@ -42,7 +42,7 @@ public class ConduitRotationCache {
     }
 
     private static String key(ClientLevel level, BlockPos pos) {
-        return worldId() + "|" + level.dimension().location() + ":" + pos.asLong();
+        return worldId() + "|" + level.dimension().identifier() + ":" + pos.asLong();
     }
 
     private static String worldId() {

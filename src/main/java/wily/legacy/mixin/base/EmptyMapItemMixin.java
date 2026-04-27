@@ -27,7 +27,7 @@ public class EmptyMapItemMixin {
     public ItemStack use(Level level, int arg, int i, byte j, boolean b, boolean bl, Level level1, Player player, InteractionHand interactionHand) {
         ItemStack map = player.getItemInHand(interactionHand);
         byte newScale = map.getOrCreateTag().getByte(MapItem.MAP_SCALE_TAG);
-        return MapItem.create(level, arg, i, newScale > 0 ? newScale : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
+        return MapItem.create(level, arg, i, newScale > 0 ? newScale : (byte) level.getGameRules().get(LegacyGameRules.DEFAULT_MAP_SIZE.get()).intValue(), b, bl);
     }
     *///?} else {
     @Redirect(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))
@@ -40,7 +40,7 @@ public class EmptyMapItemMixin {
         ItemStack map = player.getItemInHand(interactionHand);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         map.consume(1, player);
-        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
+        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().get(LegacyGameRules.DEFAULT_MAP_SIZE.get()).intValue(), b, bl);
     }
     //?}
 }

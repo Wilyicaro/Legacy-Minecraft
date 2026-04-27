@@ -51,9 +51,9 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
     }
 
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    public void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
+    public void renderSlot(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         ci.cancel();
-        super.renderSlot(guiGraphics, slot);
+        super.renderSlot(guiGraphics, slot, mouseX, mouseY);
     }
 
     @Override

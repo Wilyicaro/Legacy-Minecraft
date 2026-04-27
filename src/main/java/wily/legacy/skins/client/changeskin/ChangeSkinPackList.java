@@ -3,6 +3,7 @@ package wily.legacy.skins.client.changeskin;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.ControlType;
@@ -11,6 +12,7 @@ import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -293,8 +295,9 @@ public final class ChangeSkinPackList {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(graphics, mouseX, mouseY, partialTick);
+        protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            renderDefaultSprite(graphics);
+            renderString(graphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             if (isDimmedPack()) graphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), DIM_OVERLAY);
             if (!owner.reorderMode && !ControlType.getActiveType().isKbm() && isFocused() && packIndex >= 0 && owner.focusedPackIndex != packIndex)
                 owner.setFocusedPackIndex(packIndex, false);
@@ -304,7 +307,6 @@ public final class ChangeSkinPackList {
         public void playDownSound(SoundManager soundManager) {
         }
 
-        @Override
         public void renderString(GuiGraphics graphics, Font font, int color) {
             String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
             float textScale = height < 20 && LegacyOptions.getUIMode().isSD() ? 0.84f : 1.0f;

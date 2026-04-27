@@ -224,7 +224,6 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
 
     @Override
     protected void updateRecipes() {
-        minecraft = Minecraft.getInstance();
         stackedContents.clear();
         inventory.fillStackedContents(stackedContents);
         menu.fillCraftSlotsStackedContents(stackedContents);

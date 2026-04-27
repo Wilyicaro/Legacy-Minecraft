@@ -33,7 +33,7 @@ public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optio
     }
 
     public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey) {
-        return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().location());
+        return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().identifier());
     }
 
     public static LegacyBiomeOverride getOrDefault(Identifier location) {

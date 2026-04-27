@@ -109,8 +109,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
             private void addFriendButton(FriendListFriend friend) {
                 renderableVList.addRenderable(new FriendButton(0, 0, 230, 30, friend) {
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderWidget(guiGraphics, i, j, f);
+                    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                        super.renderContents(guiGraphics, i, j, f);
                         FactoryScreenUtil.enableBlend();
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 30, this.getY() + (height - 12) / 2, 12, 12);
                         if (friendsToAdd.contains(friend))
@@ -223,12 +223,12 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            renderDefaultSprite(guiGraphics);
+            renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             profileInfo.iconRenderer().draw(guiGraphics, getX() + 5, getY() + 5, 20, 20);
         }
 
-        @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
         }

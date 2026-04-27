@@ -25,7 +25,7 @@ public record ClientAdvancementsPayload(/*? if >1.20.1 {*/List<AdvancementHolder
 
     public ClientAdvancementsPayload(CommonNetwork.PlayBuf buf) {
         this(/*? if >1.20.1 {*/buf.get().readList(b -> {
-            return /*? if <1.20.5 {*//*AdvancementHolder.read(b)*//*?} else {*/new AdvancementHolder(b.readResourceLocation(), Advancement.STREAM_CODEC.decode(buf.get()))/*?}*/;
+            return /*? if <1.20.5 {*//*AdvancementHolder.read(b)*//*?} else {*/new AdvancementHolder(b.readIdentifier(), Advancement.STREAM_CODEC.decode(buf.get()))/*?}*/;
         })/*?} else {*//*buf.get().readMap(FriendlyByteBuf::readResourceLocation,Advancement.Builder::fromNetwork)*//*?}*/);
     }
 
@@ -36,7 +36,7 @@ public record ClientAdvancementsPayload(/*? if >1.20.1 {*/List<AdvancementHolder
             //? if <1.20.5 {
             /*h.write(b);
              *///?} else {
-            b.writeResourceLocation(h.id());
+            b.writeIdentifier(h.id());
             Advancement.STREAM_CODEC.encode(buf.get(), h.value());
             //?}
         });

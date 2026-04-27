@@ -28,11 +28,11 @@ public class TntBlockMixin {
     //? if <1.21.5 {
     /*@Inject(method = "explode(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("HEAD"), cancellable = true)
     private static void explode(Level level, BlockPos blockPos, LivingEntity livingEntity, CallbackInfo ci) {
-        if (level instanceof ServerLevel serverLevel && (!serverLevel.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) || serverLevel.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get() > 0 && level.getEntitiesOfClass(PrimedTnt.class,tntDetectBounding.move(blockPos)).size() >= serverLevel.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get())) ci.cancel();
+        if (level instanceof ServerLevel serverLevel && (!serverLevel.getGameRules().get(LegacyGameRules.TNT_EXPLODES.get()) || serverLevel.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()) > 0 && level.getEntitiesOfClass(PrimedTnt.class,tntDetectBounding.move(blockPos)).size() >= serverLevel.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()))) ci.cancel();
     }
     @Inject(method = "neighborChanged", at = @At("HEAD"), cancellable = true)
     protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,/^? if >=1.21.2 {^/Orientation orientation/^?} else {^//^BlockPos blockPos2^//^?}^/, boolean bl, CallbackInfo ci) {
-        if (level instanceof ServerLevel serverLevel && !serverLevel.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES)) ci.cancel();
+        if (level instanceof ServerLevel serverLevel && !serverLevel.getGameRules().get(LegacyGameRules.TNT_EXPLODES.get())) ci.cancel();
     }
     *///?} else {
     @ModifyExpressionValue(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/gamerules/GameRules;get(Lnet/minecraft/world/level/gamerules/GameRule;)Ljava/lang/Object;"))

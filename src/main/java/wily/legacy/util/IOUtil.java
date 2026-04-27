@@ -30,7 +30,7 @@ public class IOUtil {
 
     //TODO: Replace this with a Codec, like RecipeInfo.Filter
     public static <T> Predicate<T> registryMatches(Registry<T> registry, JsonObject o) {
-        String name = registry.key().location().getPath();
+        String name = registry.key().identifier().getPath();
         if (!o.has(name) && !o.has(name + "s")) return t -> false;
         List<T> tip = new ArrayList<>();
         List<T> tipExclusions = new ArrayList<>();

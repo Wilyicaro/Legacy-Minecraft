@@ -35,7 +35,7 @@ public abstract class FallingBlockEntityMixin {
 
     @Inject(method = "fall", at = @At("HEAD"), cancellable = true)
     private static void fall(Level level, BlockPos blockPos, BlockState blockState, CallbackInfoReturnable<FallingBlockEntity> cir) {
-        if (level instanceof ServerLevel serverLevel && serverLevel.getGameRules().getRule(LegacyGameRules.FALLING_BLOCK_LIMIT).get() > 0 && level.getEntitiesOfClass(FallingBlockEntity.class, fallingBlockDetectBounding.move(blockPos)).size() >= serverLevel.getGameRules().getRule(LegacyGameRules.FALLING_BLOCK_LIMIT).get()) {
+        if (level instanceof ServerLevel serverLevel && serverLevel.getGameRules().get(LegacyGameRules.FALLING_BLOCK_LIMIT.get()) > 0 && level.getEntitiesOfClass(FallingBlockEntity.class, fallingBlockDetectBounding.move(blockPos)).size() >= serverLevel.getGameRules().get(LegacyGameRules.FALLING_BLOCK_LIMIT.get())) {
             serverLevel.scheduleTick(blockPos, blockState.getBlock(), 2);
             cir.setReturnValue(null);
         }
