@@ -544,6 +544,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         List<String> ids = collectPackSkinIds(pack);
         if (ids.isEmpty()) {
             if (playerSkinWidgetList != null) {
+                playerSkinWidgetList.setUiScale(uiScale);
                 playerSkinWidgetList.setSkinIds(List.of(), true);
                 playerSkinWidgetList.sortForIndex(0, true);
             }

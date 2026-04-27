@@ -131,7 +131,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private int centerTextX() {
-        if (playerSkinWidgetList != null) return playerSkinWidgetList.getCenterAnchorX();
+        if (playerSkinWidgetList != null && playerSkinWidgetList.getCenter() != null) return playerSkinWidgetList.getCenterAnchorX();
         return tooltipBox.x - sc(normalLayout.infoCenterInsetX()) + (tooltipBox.getWidth() - sc(normalLayout.infoCenterWidthTrim())) / 2;
     }
 
@@ -180,7 +180,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 panel.x = desiredGroupX;
                 int minX = sc(layoutProfile.tooltipGroupMargin()), maxX = ChangeSkinScreen.this.width - groupWidth - sc(layoutProfile.tooltipGroupMargin());
                 if (maxX < minX) maxX = minX;
-                panel.x = Math.max(minX, Math.min(panel.x, maxX));
+                panel.x = Math.clamp(panel.x, minX, maxX);
                 int minY = sc(layoutProfile.tooltipGroupMargin());
                 int groupBottomTrim = Math.max(0, sc(layoutProfile.tooltipYOffset() - layoutProfile.tooltipHeightInset()));
                 int groupHeight = panel.height + groupBottomTrim;
@@ -188,7 +188,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 panel.y = desiredGroupY;
                 int maxY = ChangeSkinScreen.this.height - controlTooltipFooterReserve() - groupHeight - sc(layoutProfile.tooltipGroupMargin());
                 if (maxY < minY) maxY = minY;
-                panel.y = Math.max(minY, Math.min(panel.y, maxY));
+                panel.y = Math.clamp(panel.y, minY, maxY);
                 appearance(LegacySprites.POINTER_PANEL, tooltipWidth, panel.height - sc(layoutProfile.tooltipHeightInset()));
                 pos(panel.x + panel.width - 2, panel.y + sc(layoutProfile.tooltipYOffset()));
             }
