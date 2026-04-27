@@ -145,7 +145,7 @@ public abstract class MinecraftMixin {
     private Supplier<Overlay> init(Supplier<Minecraft> mc, Supplier<ReloadInstance> ri, Consumer<Optional<Throwable>> ex, boolean fade) {
         return ()-> new LoadingOverlay(mc.get(),ri.get(),ex,fade);
     }
-    *///?} elif neoforge {
+    *///?} elif neoforge && <26.1 {
     /*@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;createLoadingOverlay(Lnet/minecraft/client/Minecraft;Lnet/minecraft/server/packs/resources/ReloadInstance;Ljava/util/function/Consumer;Z)Lnet/minecraft/client/gui/screens/Overlay;", remap = false))
     private Overlay init(Minecraft minecraft, ReloadInstance reloadInstance, Consumer consumer, boolean b) {
         return new LoadingOverlay(minecraft, reloadInstance, consumer, b);

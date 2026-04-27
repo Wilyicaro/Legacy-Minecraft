@@ -15,6 +15,9 @@ credits="${mod_credits}"
 [[mixins]]
 config="${mod_id}.mixins.json"
 
+[[accessTransformers]]
+file="aw/${mod_id}.cfg"
+
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 type="required"

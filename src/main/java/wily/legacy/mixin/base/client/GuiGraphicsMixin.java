@@ -61,7 +61,7 @@ public abstract class GuiGraphicsMixin {
         LegacyFontUtil.enableLegacyFont();
     }
 
-    @Inject(method = /*? if forge || neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"tooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
+    @Inject(method = /*? if (forge || neoforge) && <26.1 {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else if forge || neoforge {*/ /*"tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Lnet/minecraft/world/item/ItemStack;)V" *//*?} else {*/"tooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, Identifier location/*? if forge || neoforge {*//*, ItemStack tooltipStack*//*?}*/, CallbackInfo ci) {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
