@@ -125,3 +125,5 @@ accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
 accessible class net/minecraft/client/Minecraft$GameLoadCookie
 accessible method net/minecraft/client/Minecraft$GameLoadCookie <init> (Lcom/mojang/realmsclient/client/RealmsClient;Lnet/minecraft/client/main/GameConfig$QuickPlayData;)V
 accessible class net/minecraft/client/gui/GuiGraphics$RenderingTextCollector
+accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding
+accessible method net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding <init> (Lnet/minecraft/resources/Identifier;Ljava/util/function/Supplier;)V

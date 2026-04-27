@@ -424,7 +424,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             @Override
             public void visitBoolean(GameRule<Boolean> key) {
                 if (!allowGamerule.test(key)) return;
-                boolean value = gameRules.get(key);
                 boolean defaultValue = key.defaultValue();
                 Component message = Component.translatable(key.getDescriptionId());
                 Tooltip tooltip = Tooltip.create(
