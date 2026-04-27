@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.client.input.KeyEvent;
@@ -80,25 +80,25 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     }
 
     @Shadow
-    protected abstract void renderVignette(GuiGraphics arg);
+    protected abstract void extractVignette(GuiGraphicsExtractor arg);
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         this.scroll = Math.max(0.0F, this.scroll + f * this.scrollSpeed * (poem ? 1.0f : 4f));
         float g = -this.scroll;
         int m = height;
         if (poem) {
-            FactoryGuiGraphics.of(guiGraphics).blit(POEM_BACKGROUND, 0, 0, 0, Util.getMillis() / 280f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 80, 80);
-            renderVignette(guiGraphics);
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(0.0F, g);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(POEM_BACKGROUND, 0, 0, 0, Util.getMillis() / 280f, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), 80, 80);
+            extractVignette(GuiGraphicsExtractor);
+            GuiGraphicsExtractor.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().translate(0.0F, g);
             LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
             int k = this.width / 2 - 161;
             for (int n = 0; n < this.lines.size(); ++n) {
                 if (n == this.lines.size() - 1) {
                     float h = (float) m + g - (float) (this.height / 2 - 6);
                     if (h < 0.0F) {
-                        guiGraphics.pose().translate(0.0F, -h);
+                        GuiGraphicsExtractor.pose().translate(0.0F, -h);
                     }
                 }
 
@@ -110,15 +110,15 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                     }
 
                     boolean centered = this.centeredLines.contains(n);
-                    guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(k, centered ? width / 2 : m);
-                    guiGraphics.pose().scale(2, 2);
+                    GuiGraphicsExtractor.pose().pushMatrix();
+                    GuiGraphicsExtractor.pose().translate(k, centered ? width / 2 : m);
+                    GuiGraphicsExtractor.pose().scale(2, 2);
                     if (centered) {
-                        guiGraphics.drawCenteredString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
+                        GuiGraphicsExtractor.centeredText(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
                     } else {
-                        guiGraphics.drawString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
+                        GuiGraphicsExtractor.text(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
                     }
-                    guiGraphics.pose().popMatrix();
+                    GuiGraphicsExtractor.pose().popMatrix();
 
                     if (n + 1 < lines.size() && lines.get(n + 1) == FormattedCharSequence.EMPTY) {
                         m += 100;
@@ -128,44 +128,44 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
 
                 m += 16;
             }
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().popMatrix();
             LegacyFontUtil.defaultFontOverride = null;
         } else {
-            int fixedWidth = Math.max(guiGraphics.guiHeight() * 16 / 9, guiGraphics.guiWidth());
-            int fixedHeight = Math.max(guiGraphics.guiWidth() * 9 / 16, guiGraphics.guiHeight());
-            float x = (fixedWidth - guiGraphics.guiWidth()) / 2f;
-            float y = (fixedHeight - guiGraphics.guiHeight()) / 2f;
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND, 0, 0, x, y, guiGraphics.guiWidth(), guiGraphics.guiHeight(), fixedWidth, fixedHeight);
+            int fixedWidth = Math.max(GuiGraphicsExtractor.guiHeight() * 16 / 9, GuiGraphicsExtractor.guiWidth());
+            int fixedHeight = Math.max(GuiGraphicsExtractor.guiWidth() * 9 / 16, GuiGraphicsExtractor.guiHeight());
+            float x = (fixedWidth - GuiGraphicsExtractor.guiWidth()) / 2f;
+            float y = (fixedHeight - GuiGraphicsExtractor.guiHeight()) / 2f;
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(CREDITS_BACKGROUND, 0, 0, x, y, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), fixedWidth, fixedHeight);
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(0.0F, g);
+            GuiGraphicsExtractor.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().translate(0.0F, g);
             int k = this.width / 2;
 
             for (int n = 0; n < this.lines.size(); ++n) {
                 if (n == this.lines.size() - 1) {
                     float h = (float) m + g - (float) (this.height / 2 - 6);
                     if (h < 0.0F) {
-                        guiGraphics.pose().translate(0.0F, -h);
+                        GuiGraphicsExtractor.pose().translate(0.0F, -h);
                     }
                 }
 
                 if ((float) m + g + 12.0F + 8.0F > 0.0F && (float) m + g < (float) this.height) {
                     FormattedCharSequence formattedCharSequence = this.lines.get(n);
                     boolean title = titleLines.contains(n);
-                    guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(k - font.width(formattedCharSequence) * (title ? 1.5f : 1) / 2, m);
-                    if (title) guiGraphics.pose().scale(1.5f, 1.5f);
-                    LegacyRenderUtil.drawOutlinedString(guiGraphics, font, formattedCharSequence, 0, 0, (nameLines.contains(n) ? CommonColor.YELLOW : CommonColor.WHITE).get(), 0xFF000000, 0.4f);
-                    guiGraphics.pose().popMatrix();
+                    GuiGraphicsExtractor.pose().pushMatrix();
+                    GuiGraphicsExtractor.pose().translate(k - font.width(formattedCharSequence) * (title ? 1.5f : 1) / 2, m);
+                    if (title) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+                    LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, font, formattedCharSequence, 0, 0, (nameLines.contains(n) ? CommonColor.YELLOW : CommonColor.WHITE).get(), 0xFF000000, 0.4f);
+                    GuiGraphicsExtractor.pose().popMatrix();
                 }
 
                 m += 18;
             }
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().popMatrix();
             FactoryScreenUtil.enableBlend();
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE, 0, 0, x, y, guiGraphics.guiWidth(), guiGraphics.guiHeight(), fixedWidth, fixedHeight);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(CREDITS_BACKGROUND_FADE, 0, 0, x, y, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), fixedWidth, fixedHeight);
             FactoryScreenUtil.disableBlend();
-            LegacyRenderUtil.renderLogo(guiGraphics);
+            LegacyRenderUtil.renderLogo(GuiGraphicsExtractor);
         }
         ci.cancel();
     }

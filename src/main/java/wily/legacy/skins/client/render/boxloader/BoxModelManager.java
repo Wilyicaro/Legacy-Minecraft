@@ -475,7 +475,7 @@ public final class BoxModelManager {
         EnumMap<AttachSlot, List<ModelPart>> parts = new EnumMap<>(AttachSlot.class);
         for (Map.Entry<AttachSlot, String> entry : childNames.entrySet()) {
             ModelPart child = getChild(bakedRoot, entry.getValue());
-            if (child != null) parts.put(entry.getKey(), List.of(child));
+                    if (child != null) parts.put(entry.getKey(), List.of(child));
         }
         float bboxH = 1.8F;
         float bboxW = 0.6F;

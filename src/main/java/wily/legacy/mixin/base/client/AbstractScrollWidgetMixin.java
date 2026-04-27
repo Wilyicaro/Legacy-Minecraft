@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 //? if <1.21.4 {
 /*import net.minecraft.client.gui.components.AbstractScrollWidget;
  *///?} else {
@@ -23,10 +23,10 @@ public abstract class AbstractScrollWidgetMixin extends AbstractWidget {
     }
 
     @Inject(method = "renderBorder", at = @At("HEAD"), cancellable = true)
-    private void renderBorder(GuiGraphics guiGraphics, int i, int j, int k, int l, CallbackInfo ci) {
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TEXT_FIELD, i, j, k, l);
+    private void renderBorder(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, int k, int l, CallbackInfo ci) {
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TEXT_FIELD, i, j, k, l);
         if (isHoveredOrFocused())
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HIGHLIGHTED_TEXT_FIELD, i - 1, j - 1, k + 2, l + 2);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.HIGHLIGHTED_TEXT_FIELD, i - 1, j - 1, k + 2, l + 2);
         ci.cancel();
     }
 }

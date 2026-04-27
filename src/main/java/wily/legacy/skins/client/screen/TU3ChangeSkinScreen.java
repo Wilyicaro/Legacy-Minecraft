@@ -1,7 +1,7 @@
 package wily.legacy.skins.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -79,7 +79,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         tu3HorizontalHold.step();
     }
 
-    private void tintBlitSprite(GuiGraphics g, Identifier sprite, int x, int y, int w, int h, float tint) {
+    private void tintBlitSprite(GuiGraphicsExtractor g, Identifier sprite, int x, int y, int w, int h, float tint) {
         FactoryGuiGraphics.of(g).setBlitColor(tint, tint, tint, 1.0f);
         blitSprite(g, sprite, x, y, Math.max(1, w), Math.max(1, h));
         FactoryGuiGraphics.of(g).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -121,7 +121,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
             }
 
             @Override
-            public void render(GuiGraphics g, int i, int j, float f) {
+            public void extractRenderState(GuiGraphicsExtractor g, int i, int j, float f) {
             }
         };
     }
@@ -201,14 +201,14 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         return Math.max(1, sc(tu3Layout.midExtra()));
     }
 
-    private void renderTu3TabsBehindStrip(GuiGraphics g) {
+    private void renderTu3TabsBehindStrip(GuiGraphicsExtractor g) {
         computeTu3Tabs();
         float sideTint = carouselNavActive() ? TU3_GREY_TINT : TU3_SIDE_TAB_TINT;
         tintBlitSprite(g, TU3_TAB_PLATE, tu3TabLeftX - TU3_TAB_OUTSET, tu3TabY, tu3TabLeftW + TU3_TAB_OUTSET, tu3TabH, sideTint);
         tintBlitSprite(g, TU3_TAB_PLATE, tu3TabRightX, tu3TabY, tu3TabRightW + TU3_TAB_OUTSET, tu3TabH, sideTint);
     }
 
-    private void renderTu3Tabs(GuiGraphics g) {
+    private void renderTu3Tabs(GuiGraphicsExtractor g) {
         computeTu3Tabs();
         int midExtra = tu3MidExtra(), shiftUpPx = tu3Layout.activeTabLift();
         int baseY = tu3TabY - shiftUpPx;
@@ -222,14 +222,14 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         renderTu3TabLabel(g, tu3TabRightX, tu3TabRightW + TU3_TAB_OUTSET, baseLabelY, tu3PackNameAt(idx + 1), CommonColor.GRAY_TEXT.get());
     }
 
-    private void renderTu3TabLabel(GuiGraphics g, int x, int w, int y, String label, int color) {
+    private void renderTu3TabLabel(GuiGraphicsExtractor g, int x, int w, int y, String label, int color) {
         int maxPx = Math.max(1, w - sc(tu3Layout.tabLabelWidthTrim()));
         String text = PlayerSkinWidget.clipText(minecraft.font, label, maxPx);
         int drawX = x + (Math.max(1, w) - minecraft.font.width(text)) / 2;
         LegacyFontUtil.applySDFont(b -> {
             g.pose().pushMatrix();
             g.pose().translate(0.4f, 0.4f);
-            g.drawString(minecraft.font, Component.literal(text), drawX, y, color, false);
+            g.text(minecraft.font, Component.literal(text), drawX, y, color, false);
             g.pose().popMatrix();
         });
     }
@@ -406,7 +406,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
+    public void renderDefaultBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float pt) {
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
         renderTu3TabsBehindStrip(g);
         if (tu3StripH > 0)

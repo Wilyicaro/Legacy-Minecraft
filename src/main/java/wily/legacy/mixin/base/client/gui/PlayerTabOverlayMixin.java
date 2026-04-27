@@ -2,8 +2,8 @@ package wily.legacy.mixin.base.client.gui;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -53,8 +53,8 @@ public abstract class PlayerTabOverlayMixin {
     @Shadow
     public abstract Component getNameForDisplay(PlayerInfo playerInfo);
 
-    @Inject(method = "render", at = @At("HEAD"))
-    public void render(GuiGraphics guiGraphics, int i, Scoreboard scoreboard, Objective objective, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, Scoreboard scoreboard, Objective objective, CallbackInfo ci) {
         int width = 0;
         int height = 0;
 
@@ -131,22 +131,22 @@ public abstract class PlayerTabOverlayMixin {
             height += list4.size() * 9 + 1;
         }
 
-        LegacyRenderUtil.blitTranslucentSprite(guiGraphics, LegacySprites.POINTER_PANEL, (guiGraphics.guiWidth() - width) / 2, 6, width, height + 8);
+        LegacyRenderUtil.blitTranslucentSprite(GuiGraphicsExtractor, LegacySprites.POINTER_PANEL, (GuiGraphicsExtractor.guiWidth() - width) / 2, 6, width, height + 8);
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0))
-    public void noHeaderBackground(GuiGraphics instance, int i, int j, int k, int l, int m) {
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V", ordinal = 0))
+    public void noHeaderBackground(GuiGraphicsExtractor instance, int i, int j, int k, int l, int m) {
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 1))
-    public void renderBackground(GuiGraphics instance, int i, int j, int k, int l, int m) {
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V", ordinal = 1))
+    public void extractBackground(GuiGraphicsExtractor instance, int i, int j, int k, int l, int m) {
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 2))
-    public void noPlayerBackground(GuiGraphics instance, int i, int j, int k, int l, int m) {
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V", ordinal = 2))
+    public void noPlayerBackground(GuiGraphicsExtractor instance, int i, int j, int k, int l, int m) {
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 3))
-    public void noFooterBackground(GuiGraphics instance, int i, int j, int k, int l, int m) {
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V", ordinal = 3))
+    public void noFooterBackground(GuiGraphicsExtractor instance, int i, int j, int k, int l, int m) {
     }
 }

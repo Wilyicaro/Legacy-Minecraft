@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -187,8 +187,8 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         return LegacyOptions.titleScreenVersionText.get();
     }
     *///?} else {
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)V"))
-    public boolean wrapVersionText(GuiGraphics instance, Font font, String string, int i, int j, int k) {
+    @WrapWithCondition(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)V"))
+    public boolean wrapVersionText(GuiGraphicsExtractor instance, Font font, String string, int i, int j, int k) {
         return LegacyOptions.titleScreenVersionText.get();
     }
     //?}

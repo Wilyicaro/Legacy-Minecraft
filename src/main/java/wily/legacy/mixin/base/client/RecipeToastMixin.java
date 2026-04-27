@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.RecipeToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -71,22 +71,22 @@ public abstract class RecipeToastMixin implements Toast {
         return 40;
     }
 
-    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, Font font, long l, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, long l, CallbackInfo ci) {
         ci.cancel();
 
-        LegacyRenderUtil.renderPointerPanel(guiGraphics, 0, 0, width(), height());
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10);
-        guiGraphics.pose().scale(1.5f, 1.5f);
-        guiGraphics.drawString(Minecraft.getInstance().font, TITLE_TEXT, 0, 0, 0xFFFFFFFF);
-        guiGraphics.pose().popMatrix();
-        guiGraphics.drawString(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2, 27, 0xFFFFFFFF);
+        LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, 0, 0, width(), height());
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10);
+        GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+        GuiGraphicsExtractor.text(Minecraft.getInstance().font, TITLE_TEXT, 0, 0, 0xFFFFFFFF);
+        GuiGraphicsExtractor.pose().popMatrix();
+        GuiGraphicsExtractor.text(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2, 27, 0xFFFFFFFF);
         ItemStack toastSymbol = displayItems.get(displayedRecipeIndex).key();
         ItemStack resultItem = displayItems.get(displayedRecipeIndex).value();
 
-        LegacyRenderUtil.iconHolderRenderer.itemHolder(8, (height() - 27) / 2, 27, 27, toastSymbol, false, Vec2.ZERO).renderItem(guiGraphics, 0, 0, 0);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL, width() - 36, (height() - 28) / 2, 28, 28);
-        guiGraphics.renderItem(resultItem, width() - 30, (height() - 16) / 2);
+        LegacyRenderUtil.iconHolderRenderer.itemHolder(8, (height() - 27) / 2, 27, 27, toastSymbol, false, Vec2.ZERO).extractRenderState(GuiGraphicsExtractor, 0, 0, 0);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SMALL_PANEL, width() - 36, (height() - 28) / 2, 28, 28);
+        GuiGraphicsExtractor.item(resultItem, width() - 30, (height() - 16) / 2);
     }
 }

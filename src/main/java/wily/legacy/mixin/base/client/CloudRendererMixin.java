@@ -57,7 +57,7 @@ public abstract class CloudRendererMixin {
     private CloudRenderer.TextureData texture;
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, Vec3 cameraPosition, long packedRelativeCameraPos, float ticks, CallbackInfo ci) {
+    private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, int cloudDistanceBlocks, Vec3 cameraPosition, long packedRelativeCameraPos, float ticks, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
         legacy$currentPartialTick = ticks;
         legacy$useWarmCloudPipelines = minecraft.level != null && LegacyCloudAtmosphere.shouldUseWarmCloudTransparency(minecraft.level, ticks);
@@ -132,14 +132,9 @@ public abstract class CloudRendererMixin {
         return legacy$useWarmCloudPipelines ? LegacyRenderPipelines.LEGACY_WARM_FLAT_CLOUDS : LegacyRenderPipelines.LEGACY_FLAT_CLOUDS;
     }
 
-    @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 8)
-    private int legacy$useRenderDistanceCloudDistanceBlocks(int cloudDistanceBlocks) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudDistanceBlocks() : cloudDistanceBlocks;
-    }
-
-    @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 9)
-    private int legacy$useRenderDistanceCloudRadius(int cloudRadius) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudRadius() : cloudRadius;
+    @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 1)
+    private int legacy$useRenderDistanceCloudDistanceBlocks(int cloudDistanceChunks) {
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? Math.min(cloudDistanceChunks, LegacyCloudAtmosphere.getCloudDrawDistanceChunks()) : cloudDistanceChunks;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
@@ -301,16 +296,6 @@ public abstract class CloudRendererMixin {
         }
 
         return 0;
-    }
-
-    @Unique
-    private int legacy$getRenderDistanceCloudDistanceBlocks() {
-        return LegacyCloudAtmosphere.getCloudDrawDistanceBlocks();
-    }
-
-    @Unique
-    private int legacy$getRenderDistanceCloudRadius() {
-        return Math.max(1, (int) Math.ceil(legacy$getRenderDistanceCloudDistanceBlocks() / 12.0d));
     }
 
     @Unique

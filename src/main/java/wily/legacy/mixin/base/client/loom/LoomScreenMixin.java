@@ -3,19 +3,16 @@ package wily.legacy.mixin.base.client.loom;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
-import net.minecraft.client.gui.render.state.pip.GuiBannerResultRenderState;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.banner.BannerFlagModel;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BannerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
@@ -33,6 +30,8 @@ import net.minecraft.world.level.block.entity.BannerPatternLayers;
 //?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -58,8 +57,7 @@ import static wily.legacy.util.LegacySprites.*;
 @Mixin(LoomScreen.class)
 public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> {
 
-
-    @Shadow
+@Shadow
     private boolean hasMaxPatterns;
 
     @Shadow
@@ -86,13 +84,11 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
     protected abstract int totalRowCount();
 
     @Shadow
-    protected abstract void renderBannerOnButton(GuiGraphics arg, int i, int j, TextureAtlasSprite arg2);
-
     @Inject(method = "init", at = @At("HEAD"))
     public void init(CallbackInfo ci) {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 215;
-        imageHeight = sd ? 144 : 217;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 215);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 144 : 217);
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 71 : 104;
         titleLabelX = sd ? 7 : 14;
@@ -155,50 +151,47 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         int patternsPanelSize = sd ? 51 : 75;
         int patternsPanelX = leftPos + (sd ? 36 : 72);
         int patternsPanelY = topPos + (sd ? 16 : 18);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, patternsPanelX, patternsPanelY, patternsPanelSize, patternsPanelSize);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0.5f, 0);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 104 : 164), topPos + (sd ? 5 : 7), sd ? 21 : 32, sd ? 42 : 64);
-        guiGraphics.pose().popMatrix();
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(patternsPanelX + patternsPanelSize + 2.5f, patternsPanelY);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, patternsPanelX, patternsPanelY, patternsPanelSize, patternsPanelSize);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(0.5f, 0);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 104 : 164), topPos + (sd ? 5 : 7), sd ? 21 : 32, sd ? 42 : 64);
+        GuiGraphicsExtractor.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(patternsPanelX + patternsPanelSize + 2.5f, patternsPanelY);
         if (displayPatterns && menu.getSelectablePatterns().size() > 4) {
             if (startRow != totalRowCount() - 4)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, patternsPanelSize + 4);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.DOWN, 0, patternsPanelSize + 4);
             if (startRow > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, 0, -11);
-        } else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 13, patternsPanelSize);
-        guiGraphics.pose().translate(-2f, -1f + (menu.getSelectablePatterns().size() > 4 && displayPatterns ? (patternsPanelSize - LegacyScroller.SCROLLER_HEIGHT_OFFSET) * startRow / (totalRowCount() - 4) : 0));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
-        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
-        guiGraphics.pose().popMatrix();
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.UP, 0, -11);
+        } else FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 13, patternsPanelSize);
+        GuiGraphicsExtractor.pose().translate(-2f, -1f + (menu.getSelectablePatterns().size() > 4 && displayPatterns ? (patternsPanelSize - LegacyScroller.SCROLLER_HEIGHT_OFFSET) * startRow / (totalRowCount() - 4) : 0));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
+        GuiGraphicsExtractor.pose().popMatrix();
         if (this.resultBannerPatterns != null && !this.hasMaxPatterns) {
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(0.5f, 0.0f);
+            GuiGraphicsExtractor.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().translate(0.5f, 0.0f);
             DyeColor dyeColor = ((BannerItem) menu.getResultSlot().getItem().getItem()).getColor();
-            GuiBannerResultRenderState renderState = new GuiBannerResultRenderState(this.flag, dyeColor, this.resultBannerPatterns, leftPos, topPos, leftPos + (sd ? 230 : 360), topPos + (sd ? 46 : 69), guiGraphics.scissorStack.peek());
-            MutablePIPRenderState.of(renderState).setScale(sd ? 16 : 24);
-            MutablePIPRenderState.of(renderState).setPose(guiGraphics.pose());
-            guiGraphics.guiRenderState.submitPicturesInPictureState(renderState);
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.bannerPattern(this.flag, dyeColor, this.resultBannerPatterns, leftPos, topPos, leftPos + (sd ? 230 : 360), topPos + (sd ? 46 : 69));
+            GuiGraphicsExtractor.pose().popMatrix();
         } else if (this.hasMaxPatterns) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LOOM_ERROR, leftPos + menu.slots.get(3).x - 5, topPos + menu.slots.get(3).y - 5, 26, 26);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LOOM_ERROR, leftPos + menu.slots.get(3).x - 5, topPos + menu.slots.get(3).y - 5, 26, 26);
         }
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(patternsPanelX + 1.5f, patternsPanelY + 1.5f);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(patternsPanelX + 1.5f, patternsPanelY + 1.5f);
         if (this.displayPatterns) {
             int patternButtonSize = sd ? 12 : 18;
             int patternDisplayWidth = sd ? 5 : 7;
@@ -212,29 +205,22 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     if (s >= list.size()) break block0;
                     int t = q * patternButtonSize;
                     int u = p * patternButtonSize;
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i, j, patternsPanelX + 1.5f + t, patternsPanelY + 1.5f + u, patternButtonSize, patternButtonSize) ? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, patternButtonSize, patternButtonSize);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i, j, patternsPanelX + 1.5f + t, patternsPanelY + 1.5f + u, patternButtonSize, patternButtonSize) ? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, patternButtonSize, patternButtonSize);
 
-                    TextureAtlasSprite sprite = guiGraphics.getSprite(Sheets.getBannerMaterial(list.get(s)));
-                    guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(t + (patternButtonSize - patternDisplayWidth) / 2f, u + (patternButtonSize - patternDisplayHeight) / 2f);
-                    float u0 = sprite.getU0();
-                    float g = u0 + (sprite.getU1() - sprite.getU0()) * 21.0F / 64.0F;
-                    float h = sprite.getV1() - sprite.getV0();
-                    float k = sprite.getV0() + h / 64.0F;
-                    float l = k + h * 40.0F / 64.0F;
-                    guiGraphics.fill(0, 0, patternDisplayWidth, patternDisplayHeight, DyeColor.GRAY.getTextureDiffuseColor());
-                    guiGraphics.blit(sprite.atlasLocation(), 0, 0, patternDisplayWidth, patternDisplayHeight, u0, g, k, l);
-                    guiGraphics.pose().popMatrix();
+                    GuiGraphicsExtractor.pose().pushMatrix();
+                    GuiGraphicsExtractor.pose().translate(t + (patternButtonSize - patternDisplayWidth) / 2f, u + (patternButtonSize - patternDisplayHeight) / 2f);
+                    GuiGraphicsExtractor.bannerPattern(this.flag, DyeColor.GRAY, new BannerPatternLayers(List.of(new BannerPatternLayers.Layer(list.get(s), DyeColor.WHITE))), 0, 0, patternDisplayWidth, patternDisplayHeight);
+                    GuiGraphicsExtractor.pose().popMatrix();
                 }
             }
         }
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().popMatrix();
         Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

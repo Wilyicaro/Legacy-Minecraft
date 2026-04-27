@@ -280,7 +280,7 @@ public final class ConsoleMobCaps {
     }
 
     public static void sendFailure(Player player, String translationKey) {
-        player.displayClientMessage(Component.translatable(translationKey), false);
+        player.sendSystemMessage(Component.translatable(translationKey));
         syncInventory(player);
     }
 

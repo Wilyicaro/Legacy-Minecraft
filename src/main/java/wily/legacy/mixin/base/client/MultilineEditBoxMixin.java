@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
@@ -59,8 +59,8 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
         return this.isFocused() && (Util.getMillis()/*? if >1.20.1 {*/ - this.focusedTime/*?}*/) / 180L % 2 == 0L;
     }
 
-    @Redirect(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 3))
-    public void renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl) {
+    @Redirect(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 3))
+    public void extractWidgetRenderState(GuiGraphicsExtractor instance, Font arg, String string, int i, int j, int k, boolean bl) {
         instance.pose().pushMatrix();
         instance.pose().translate(i - (textField.cursor() == 0 ? 3 : 4), j + 8.5f);
         instance.pose().scale(6, 1.5f);

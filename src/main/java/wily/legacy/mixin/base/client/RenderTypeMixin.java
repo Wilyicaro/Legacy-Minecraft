@@ -19,21 +19,21 @@ public abstract class RenderTypeMixin {
 
     @Inject(method = "entityTranslucent(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/rendertype/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entityTranslucent(Identifier texture, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutoutNoCull(texture));
+        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutout(texture));
     }
 
     @Inject(method = "entityTranslucent(Lnet/minecraft/resources/Identifier;Z)Lnet/minecraft/client/renderer/rendertype/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entityTranslucent(Identifier texture, boolean outline, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutoutNoCull(texture));
+        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutout(texture));
     }
 
     @Inject(method = "entitySolid(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/rendertype/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entitySolid(Identifier texture, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutoutNoCull(texture));
+        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutout(texture));
     }
 
     @Inject(method = "entityNoOutline(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/rendertype/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entityNoOutline(Identifier texture, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutoutNoCull(texture));
+        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderTypes.entityCutout(texture));
     }
 }

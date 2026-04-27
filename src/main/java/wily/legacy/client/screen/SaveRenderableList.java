@@ -12,7 +12,7 @@ import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -319,13 +319,13 @@ public class SaveRenderableList extends RenderableVList {
         }
 
         @Override
-        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-            FactoryGuiGraphics.of(guiGraphics).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + x, getY() + y, 0, 0, width, height, width, height);
+        public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + x, getY() + y, 0, 0, width, height, width, height);
         }
 
         @Override
-        public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-            super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
+        public void renderIconHighlight(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+            super.renderIconHighlight(GuiGraphicsExtractor, mouseX, mouseY, x, y, width, height);
 
             boolean hoverIcon = LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height);
             Identifier resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
@@ -333,40 +333,40 @@ public class SaveRenderableList extends RenderableVList {
             Identifier resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
             Identifier resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
             if (summary instanceof LevelSummary.SymlinkLevelSummary/*? if >=1.20.3 {*/ || summary instanceof LevelSummary.CorruptedLevelSummary/*?}*/) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);
                 return;
             }
             if (summary.isLocked()) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
                 if (hoverIcon) {
-                    guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175), mouseX, mouseY);
+                    GuiGraphicsExtractor.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175), mouseX, mouseY);
                 }
             } else if (summary.requiresManualConversion()) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
                 if (hoverIcon) {
-                    guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175), mouseX, mouseY);
+                    GuiGraphicsExtractor.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175), mouseX, mouseY);
                 }
             } else if (!summary.isCompatible()) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
                 if (hoverIcon) {
-                    guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175), mouseX, mouseY);
+                    GuiGraphicsExtractor.setTooltipForNextFrame(minecraft.font, minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175), mouseX, mouseY);
                 }
             } else if (summary./*? if >1.20.2 {*/shouldBackup/*?} else {*//*markVersionInList*//*?}*/()) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);
                 if (summary./*? if >1.20.2 {*/isDowngrade/*?} else {*//*requiresManualConversion*//*?}*/()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
                     if (hoverIcon) {
-                        guiGraphics.setTooltipForNextFrame(minecraft.font, ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()), mouseX, mouseY);
+                        GuiGraphicsExtractor.setTooltipForNextFrame(minecraft.font, ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()), mouseX, mouseY);
                     }
                 } else if (!SharedConstants.getCurrentVersion().stable()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX() + x, getY() + y, width, height);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation2, getX() + x, getY() + y, width, height);
                     if (hoverIcon) {
-                        guiGraphics.setTooltipForNextFrame(minecraft.font, ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()), mouseX, mouseY);
+                        GuiGraphicsExtractor.setTooltipForNextFrame(minecraft.font, ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()), mouseX, mouseY);
                     }
                 }
             } else {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation, getX() + x, getY() + y, width, height);
             }
         }
 

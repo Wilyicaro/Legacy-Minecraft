@@ -3,7 +3,7 @@ package wily.legacy.skins.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -133,7 +133,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
 
-    protected static void blitSprite(GuiGraphics g, Identifier id, int x, int y, int w, int h) {
+    protected static void blitSprite(GuiGraphicsExtractor g, Identifier id, int x, int y, int w, int h) {
         FactoryGuiGraphics.of(g).blitSprite(id, x, y, w, h);
     }
 
@@ -1186,19 +1186,19 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         super.removed();
     }
 
-    protected void drawBigCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
+    protected void drawBigCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color) {
         drawScaledCentered(g, text, centerX, y, color, bigTextScale());
     }
 
-    protected void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
+    protected void drawSmallCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color) {
         drawScaledCentered(g, text, centerX, y, color, smallTextScale());
     }
 
-    protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
+    protected void drawScaledCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color, float scale) {
         drawScaledCentered(g, text, centerX, y, color, scale, false);
     }
 
-    protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale, boolean shadow) {
+    protected void drawScaledCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color, float scale, boolean shadow) {
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         int textWidth = minecraft.font.width(text);
         int textX = -textWidth / 2;
@@ -1206,7 +1206,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         pose.pushMatrix();
         pose.translate((float) centerX, (float) yAdj);
         pose.scale(scale, scale);
-        g.drawString(minecraft.font, text, textX, 0, color, shadow);
+        g.text(minecraft.font, text, textX, 0, color, shadow);
         pose.popMatrix();
     }
 

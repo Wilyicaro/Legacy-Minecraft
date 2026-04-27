@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client.sign;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -92,9 +93,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         setFocused(panel);
     }
 
-    @Inject(method = "renderSignText", at = @At("HEAD"))
-    private void renderSignText(GuiGraphics guiGraphics, CallbackInfo ci) {
-        guiGraphics.pose().translate(0, isSign() ? -14.5f : 10);
+    @Inject(method = "extractSignText", at = @At("HEAD"))
+    private void renderSignText(GuiGraphicsExtractor GuiGraphicsExtractor, Vector2f vector2f, CallbackInfo ci) {
+        GuiGraphicsExtractor.pose().translate(0, isSign() ? -14.5f : 10);
     }
 
     @Unique
@@ -102,23 +103,23 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         return this.sign.getBlockState().getBlock() instanceof StandingSignBlock || this.sign.getBlockState().getBlock() instanceof WallSignBlock;
     }
 
-    @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;getTextLineHeight()I"))
+    @Redirect(method = "extractSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;getTextLineHeight()I"))
     private int renderSignText(SignBlockEntity instance) {
         return instance.getTextLineHeight() + 5;
     }
 
-    @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 1))
-    private void renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl) {
-        if (getFocused() == panel) instance.drawString(arg, string, i, j, k, bl);
+    @Redirect(method = "extractSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"))
+    private void renderSignText(GuiGraphicsExtractor instance, Font arg, String string, int i, int j, int k, boolean bl) {
+        if (getFocused() == panel) instance.text(arg, string, i, j, k, bl);
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
-    public void render(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((width - font.width(title) * 1.5f) / 2f, height / 2f - 96);
-        guiGraphics.pose().scale(1.5f, 1.5f);
-        guiGraphics.drawString(this.font, this.title, 0, 0, -1);
-        guiGraphics.pose().popMatrix();
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;centeredText(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, Component component, int i, int j, int k) {
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate((width - font.width(title) * 1.5f) / 2f, height / 2f - 96);
+        GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+        GuiGraphicsExtractor.text(this.font, this.title, 0, 0, -1);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
@@ -137,6 +138,6 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
     }
 }

@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -111,8 +111,8 @@ public class Panel extends SimpleLayoutRenderable {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                LegacyRenderUtil.renderPointerPanel(guiGraphics, getX(), getY(), getWidth(), getHeight());
+            public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+                LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, getX(), getY(), getWidth(), getHeight());
             }
         };
         p.init();
@@ -158,8 +158,8 @@ public class Panel extends SimpleLayoutRenderable {
         init("panel");
     }
 
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(panelSprite, x, y, width, height);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(panelSprite, x, y, width, height);
     }
 
     //TODO: Replace this with some kind of builder

@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.network.chat.Component;
@@ -46,13 +46,13 @@ public class LegacyLoadingRenderer implements Renderable {
         prepareRender(minecraft, accessor, loadingHeader, loadingStage, progress, genericLoading);
     }
 
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, true, true, false);
     }
 
-    public void renderForeground(GuiGraphics guiGraphics, int i, int j, float f) {
-        int width = guiGraphics.guiWidth();
-        int height = guiGraphics.guiHeight();
+    public void renderForeground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        int width = GuiGraphicsExtractor.guiWidth();
+        int height = GuiGraphicsExtractor.guiHeight();
         ArbitrarySupplier<Identifier> fontOverride = accessor.getElement("fontOverride", Identifier.class);
         int steppedProgress = progress < 0 ? -1 : Math.clamp(Math.round(progress * 100.0f), 0, 100);
 
@@ -64,42 +64,42 @@ public class LegacyLoadingRenderer implements Renderable {
                     LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
                         int stageX = accessor.getInteger("loadingStage.x", loadingBarX + 1);
                         int stageY = accessor.getInteger("loadingStage.y", loadingBarY - 10);
-                        guiGraphics.drawString(minecraft.font, loadingStage, stageX, stageY, CommonColor.STAGE_TEXT.get());
+                        GuiGraphicsExtractor.text(minecraft.font, loadingStage, stageX, stageY, CommonColor.STAGE_TEXT.get());
                     });
                 }
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, loadingBarX, loadingBarY, 320, 320 * contents.height() / contents.width());
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LOADING_BACKGROUND, loadingBarX, loadingBarY, 320, 320 * contents.height() / contents.width());
                 }
                 if (steppedProgress > 0) {
                     try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BAR).contents()) {
                         int fillWidth = Math.min(318, Math.round(318.0f * steppedProgress / 100.0f));
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1, 0, fillWidth, 318 * contents.height() / contents.width());
+                        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1, 0, fillWidth, 318 * contents.height() / contents.width());
                     }
                 }
                 LegacyTip tip = Legacy4JClient.legacyTipManager.getLoadingTip();
                 if (tip != null) {
                     tip.setX(accessor.getInteger("loadingTip.x", (width - tip.width) / 2));
                     tip.setY(accessor.getInteger("loadingTip.y", loadingBarY + 10 + ((height - (loadingBarY + 10)) - tip.height) / 2));
-                    tip.render(guiGraphics, i, j, f);
+                    tip.extractRenderState(GuiGraphicsExtractor, i, j, f);
                 }
             }
-        } else LegacyRenderUtil.drawGenericLoading(guiGraphics, (width - 75) / 2, height / 2);
+        } else LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, (width - 75) / 2, height / 2);
 
         if (loadingHeader != null) {
             LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
-                guiGraphics.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
-                guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(loadingHeader) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
-                guiGraphics.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f));
-                LegacyRenderUtil.drawOutlinedString(guiGraphics, minecraft.font, loadingHeader, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(loadingHeader) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
+                GuiGraphicsExtractor.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f));
+                LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, minecraft.font, loadingHeader, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
+                GuiGraphicsExtractor.pose().popMatrix();
             });
         }
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBackground(guiGraphics, i, j, f);
-        renderForeground(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        extractBackground(GuiGraphicsExtractor, i, j, f);
+        renderForeground(GuiGraphicsExtractor, i, j, f);
     }
 }

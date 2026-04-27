@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
@@ -27,7 +27,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -78,7 +78,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     private CreativeInventoryListener listener;
 
     public CreativeModeScreen(Player player) {
-        super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
+        super(new CreativeModeMenu(player), player.getInventory(), Component.empty(), 321, 212);
         searchBox.setResponder(s -> {
             fillCreativeGrid();
             tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.getIndex()).set(0);
@@ -191,9 +191,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         addRenderableOnly(panel);
         addRenderableOnly(tabList::renderSelected);
         panel.init();
-        imageWidth = panel.width;
-        imageHeight = panel.height;
-        leftPos = panel.x;
+                leftPos = panel.x;
         topPos = panel.y;
         addRenderableOnly(scroller);
         scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 296), accessor.getInteger("scroller.y", panel.y + 27));
@@ -237,27 +235,26 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        renderBg(GuiGraphicsExtractor, f, i, j);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
 
-        this.renderTooltip(guiGraphics, i, j);
-        LegacyRenderUtil.renderContainerEffects(guiGraphics, leftPos, topPos, imageWidth, imageHeight, i, j);
+        this.extractTooltip(GuiGraphicsExtractor, i, j);
+        LegacyRenderUtil.renderContainerEffects(GuiGraphicsExtractor, leftPos, topPos, imageWidth, imageHeight, i, j);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         if (arrangement.get() == 2) return;
         Component tabTitle = tabList.tabButtons.get(tabList.getIndex()).getMessage();
-        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.GRAY_TEXT.get(), false));
     }
 
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    protected void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, float f, int i, int j) {
 
     }
 
@@ -312,31 +309,31 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         return super.keyPressed(keyEvent);
     }
 
-    protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {
-        boolean bl = clickType == ClickType.QUICK_MOVE;
-        clickType = i == -999 && clickType == ClickType.PICKUP ? ClickType.THROW : clickType;
-        if (slot != null || clickType == ClickType.QUICK_CRAFT) {
+    protected void slotClicked(@Nullable Slot slot, int i, int j, ContainerInput ContainerInput) {
+        boolean bl = ContainerInput == ContainerInput.QUICK_MOVE;
+        ContainerInput = i == -999 && ContainerInput == ContainerInput.PICKUP ? ContainerInput.THROW : ContainerInput;
+        if (slot != null || ContainerInput == ContainerInput.QUICK_CRAFT) {
             if (slot != null && !slot.mayPickup(this.minecraft.player)) {
                 return;
             }
-            if (clickType != ClickType.QUICK_CRAFT && slot.container == creativeModeGrid) {
+            if (ContainerInput != ContainerInput.QUICK_CRAFT && slot.container == creativeModeGrid) {
                 ItemStack itemStack = menu.getCarried();
                 ItemStack itemStack2 = slot.getItem();
-                if (clickType == ClickType.SWAP) {
+                if (ContainerInput == ContainerInput.SWAP) {
                     if (!itemStack2.isEmpty()) {
                         this.minecraft.player.getInventory().setItem(j, itemStack2.copyWithCount(itemStack2.getMaxStackSize()));
                         this.minecraft.player.inventoryMenu.broadcastChanges();
                     }
                     return;
                 }
-                if (clickType == ClickType.CLONE) {
+                if (ContainerInput == ContainerInput.CLONE) {
                     if (menu.getCarried().isEmpty() && slot.hasItem()) {
                         ItemStack itemStack3 = slot.getItem();
                         menu.setCarried(itemStack3.copyWithCount(itemStack3.getMaxStackSize()));
                     }
                     return;
                 }
-                if (clickType == ClickType.THROW) {
+                if (ContainerInput == ContainerInput.THROW) {
                     if (!itemStack2.isEmpty()/*? if >=1.21.2 {*/ && minecraft.player.canDropItems()/*?}*/) {
                         ItemStack itemStack3 = itemStack2.copyWithCount(j == 0 ? 1 : itemStack2.getMaxStackSize());
                         this.minecraft.player.drop(itemStack3, true);
@@ -371,7 +368,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
                 }
             } else {
                 ItemStack itemStack = slot == null ? ItemStack.EMPTY : menu.getSlot(slot.index).getItem();
-                menu.clicked(slot == null ? i : slot.index, j, clickType, this.minecraft.player);
+                menu.clicked(slot == null ? i : slot.index, j, ContainerInput, this.minecraft.player);
                 if (AbstractContainerMenu.getQuickcraftHeader(j) == 2) {
                     for (int m = 0; m < 9; ++m) {
                         this.minecraft.gameMode.handleCreativeModeItemAdd(menu.getSlot(50 + m).getItem(), 36 + m);
@@ -380,7 +377,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
                     ItemStack itemStack2 = menu.getSlot(slot.index).getItem();
                     this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack2, slot.index - menu.slots.size() + 9 + 36);
                     int l = 50 + j;
-                    if (clickType == ClickType.SWAP) {
+                    if (ContainerInput == ContainerInput.SWAP) {
                         this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack, l - menu.slots.size() + 9 + 36);
                     }
                     this.minecraft.player.inventoryMenu.broadcastChanges();

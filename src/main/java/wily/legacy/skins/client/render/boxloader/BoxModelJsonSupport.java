@@ -266,7 +266,7 @@ final class BoxModelJsonSupport {
         EnumMap<E, float[]> out = new EnumMap<>(type);
         try {
             for (Map.Entry<String, JsonElement> entry : el.getAsJsonObject().entrySet()) {
-                E slot = parser.apply(entry.getKey());
+            E slot = parser.apply(entry.getKey());
                 if (slot == null) continue;
                 float[] value = valueParser.apply(entry.getValue());
                 if (value != null) out.put(slot, value);

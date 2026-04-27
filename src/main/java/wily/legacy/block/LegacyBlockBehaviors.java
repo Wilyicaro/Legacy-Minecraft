@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
@@ -12,10 +13,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -33,11 +37,12 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyItemUtil;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Blocks.CAULDRON;
+import wily.legacy.mixin.base.CauldronInteractionDispatcherAccessor;
 
 public class LegacyBlockBehaviors {
     public static void setup() {
@@ -62,14 +67,16 @@ public class LegacyBlockBehaviors {
             }
         };
 
-        for (SpawnEggItem spawnEggItem : SpawnEggItem.eggs()) {
-            DispenserBlock.registerBehavior(spawnEggItem, defaultDispenseItemBehavior);
+        for (Item item : BuiltInRegistries.ITEM) {
+            if (item instanceof SpawnEggItem spawnEggItem) {
+                DispenserBlock.registerBehavior(spawnEggItem, defaultDispenseItemBehavior);
+            }
         }
 
-        Map<Item, CauldronInteraction> emptyCauldron = CauldronInteraction.EMPTY/*? if >1.20.1 {*/.map()/*?}*/;
-        Map<Item, CauldronInteraction> waterCauldron = CauldronInteraction.WATER/*? if >1.20.1 {*/.map()/*?}*/;
-        Map<Item, CauldronInteraction> powderSnowCauldron = CauldronInteraction.POWDER_SNOW/*? if >1.20.1 {*/.map()/*?}*/;
-        Map<Item, CauldronInteraction> lavaCauldron = CauldronInteraction.LAVA/*? if >1.20.1 {*/.map()/*?}*/;
+        CauldronInteraction.Dispatcher emptyCauldron = CauldronInteractions.EMPTY;
+        CauldronInteraction.Dispatcher waterCauldron = CauldronInteractions.WATER;
+        CauldronInteraction.Dispatcher powderSnowCauldron = CauldronInteractions.POWDER_SNOW;
+        CauldronInteraction.Dispatcher lavaCauldron = CauldronInteractions.LAVA;
         CauldronInteraction emptyCauldronPotion = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             Holder<Potion> p;
             if (/*? if <1.20.5 {*//*(p = BuiltInRegistries.POTION.wrapAsHolder(PotionUtils.getPotion(itemStack))).value() == Potions.EMPTY*//*?} else {*/ (p = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElse(null)) == null/*?}*/) {
@@ -78,7 +85,7 @@ public class LegacyBlockBehaviors {
             level.setBlockAndUpdate(blockPos, Blocks.WATER_CAULDRON.defaultBlockState());
             level.getBlockEntity(blockPos, LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get()).ifPresent(be -> {
                 be.potion = p;
-                be.lastPotionItemUsed = itemStack.getItemHolder();
+                be.lastPotionItemUsed = itemStack.typeHolder();
                 be.setChanged();
                 if (be.hasWater()) sendCauldronBubblesParticles(level, blockPos);
             });
@@ -131,7 +138,7 @@ public class LegacyBlockBehaviors {
                     int nextLevel = Math.min(3, currentLevel + 1);
                     level.setBlock(blockPos, currentState.setValue(LayeredCauldronBlock.LEVEL, nextLevel), 3);
                 }
-                be.lastPotionItemUsed = itemStack.getItemHolder();
+                be.lastPotionItemUsed = itemStack.typeHolder();
                 if (!level.isClientSide())
                     level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
             }
@@ -192,10 +199,10 @@ public class LegacyBlockBehaviors {
             return successInteraction();
         };
 
-        waterCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
-        emptyCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
-        powderSnowCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
-        lavaCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
+        mergeInteraction(waterCauldron, Items.WATER_BUCKET, fillWater, beforeInteraction);
+        mergeInteraction(emptyCauldron, Items.WATER_BUCKET, fillWater, beforeInteraction);
+        mergeInteraction(powderSnowCauldron, Items.WATER_BUCKET, fillWater, beforeInteraction);
+        mergeInteraction(lavaCauldron, Items.WATER_BUCKET, fillWater, beforeInteraction);
 
         CauldronInteraction fillLava = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             if (level instanceof ServerLevel sl) {
@@ -205,21 +212,21 @@ public class LegacyBlockBehaviors {
             return successInteraction();
         };
 
-        waterCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
-        emptyCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
-        powderSnowCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
-        lavaCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        mergeInteraction(waterCauldron, Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        mergeInteraction(emptyCauldron, Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        mergeInteraction(powderSnowCauldron, Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        mergeInteraction(lavaCauldron, Items.LAVA_BUCKET, fillLava, beforeInteraction);
 
         putInteractionOrFallback(waterCauldron, Items.BUCKET, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             if (!LegacyRegistries.isInvalidCauldron(blockState, level, blockPos)) {
                 sendCauldronSplashParticles(level, blockPos);
-                return CauldronInteraction.fillBucket(blockState, level, blockPos, player, interactionHand, itemStack, new ItemStack(Items.WATER_BUCKET), (blockStatex) -> blockStatex.getValue(LayeredCauldronBlock.LEVEL) == 3, SoundEvents.BUCKET_FILL);
+                return LegacyBlockBehaviors.fillBucket(blockState, level, blockPos, player, interactionHand, itemStack, new ItemStack(Items.WATER_BUCKET), (blockStatex) -> blockStatex.getValue(LayeredCauldronBlock.LEVEL) == 3, SoundEvents.BUCKET_FILL);
             }
             return consumeInteraction();
         });
 
         for (DyeColor color : DyeColor.values()) {
-            putInteractionOrFallback(waterCauldron, DyeItem.byColor(color), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            putInteractionOrFallback(waterCauldron, LegacyItemUtil.getDyeItem(color), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
                 if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !(itemStack.getItem() instanceof DyeItem) || !be.hasWater()) {
                     return defaultPassInteraction();
                 }
@@ -240,25 +247,37 @@ public class LegacyBlockBehaviors {
         }
     }
 
-    public static void putInteractionOrFallback(Map<Item, CauldronInteraction> interactionMap, Item item, CauldronInteraction cauldronInteraction) {
-        putInteractionOrFallback(interactionMap, item, cauldronInteraction, LegacyMixinToggles.legacyCauldrons::get);
+    public static void putInteractionOrFallback(CauldronInteraction.Dispatcher dispatcher, Item item, CauldronInteraction cauldronInteraction) {
+        putInteractionOrFallback(dispatcher, item, cauldronInteraction, LegacyMixinToggles.legacyCauldrons::get);
     }
 
-    public static void putInteractionOrFallback(Map<Item, CauldronInteraction> interactionMap, Item item, CauldronInteraction cauldronInteraction, BooleanSupplier supplier) {
-        interactionMap.merge(item, cauldronInteraction, (a, b) -> (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+    public static void putInteractionOrFallback(CauldronInteraction.Dispatcher dispatcher, Item item, CauldronInteraction cauldronInteraction, BooleanSupplier supplier) {
+        mergeInteraction(dispatcher, item, cauldronInteraction, (a, b) -> (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             if (supplier.getAsBoolean()) {
                 return b.interact(blockState, level, blockPos, player, interactionHand, itemStack);
             }
             return a.interact(blockState, level, blockPos, player, interactionHand, itemStack);
         });
-
     }
 
-    public static void registerDyedWaterCauldronInteraction(Map<Item, CauldronInteraction> waterCauldron) {
+    public static void mergeInteraction(CauldronInteraction.Dispatcher dispatcher, Item item, CauldronInteraction interaction, BiFunction<CauldronInteraction, CauldronInteraction, CauldronInteraction> merger) {
+        putInteraction(dispatcher, item, merger.apply(getInteraction(dispatcher, item), interaction));
+    }
+
+    public static CauldronInteraction getInteraction(CauldronInteraction.Dispatcher dispatcher, Item item) {
+        CauldronInteractionDispatcherAccessor accessor = (CauldronInteractionDispatcherAccessor) dispatcher;
+        return accessor.legacy$getItems().getOrDefault(item, CauldronInteraction.DEFAULT);
+    }
+
+    public static void putInteraction(CauldronInteraction.Dispatcher dispatcher, Item item, CauldronInteraction interaction) {
+        ((CauldronInteractionDispatcherAccessor) dispatcher).legacy$put(item, interaction);
+    }
+
+    public static void registerDyedWaterCauldronInteraction(CauldronInteraction.Dispatcher waterCauldron) {
         if (!LegacyMixinToggles.legacyCauldrons.get()) return;
         BuiltInRegistries.ITEM.asHolderIdMap().forEach(i -> {
             if (!LegacyItemUtil.isDyeableItem(i)) return;
-            waterCauldron.put(i.value(), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            putInteraction(waterCauldron, i.value(), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
                 if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !be.hasWater() || (LegacyItemUtil.isDyedItem(itemStack) && be.waterColor == null)) {
                     return defaultPassInteraction();
                 }
@@ -280,6 +299,20 @@ public class LegacyBlockBehaviors {
                 return successInteraction();
             });
         });
+    }
+
+    public static InteractionResult fillBucket(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, ItemStack itemStack, ItemStack filledStack, Predicate<BlockState> predicate, SoundEvent soundEvent) {
+        if (!predicate.test(blockState)) return defaultPassInteraction();
+        if (!level.isClientSide()) {
+            Item item = itemStack.getItem();
+            player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, filledStack));
+            player.awardStat(Stats.USE_CAULDRON);
+            player.awardStat(Stats.ITEM_USED.get(item));
+            level.setBlockAndUpdate(blockPos, Blocks.CAULDRON.defaultBlockState());
+            level.playSound(null, blockPos, soundEvent, SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.gameEvent(null, GameEvent.FLUID_PICKUP, blockPos);
+        }
+        return successInteraction();
     }
 
     public static void sendCauldronBubblesParticles(Level level, BlockPos blockPos) {

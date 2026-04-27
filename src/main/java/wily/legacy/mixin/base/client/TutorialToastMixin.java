@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.TutorialToast;
 import net.minecraft.resources.Identifier;
@@ -14,8 +14,8 @@ import java.util.function.Function;
 
 @Mixin(TutorialToast.class)
 public abstract class TutorialToastMixin implements Toast {
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"))
-    public void render(GuiGraphics instance, RenderPipeline renderPipeline, Identifier resourceLocation, int i, int j, int k, int l) {
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"))
+    public void extractRenderState(GuiGraphicsExtractor instance, RenderPipeline renderPipeline, Identifier resourceLocation, int i, int j, int k, int l) {
         LegacyRenderUtil.renderPointerPanel(instance, 0, 0, width(), height());
     }
 }

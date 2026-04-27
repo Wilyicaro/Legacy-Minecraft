@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.client.book;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
@@ -74,8 +75,8 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
 
     //? if >1.20.1 {
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
-    public void renderBackground(CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
     }
     //?}

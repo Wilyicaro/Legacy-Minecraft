@@ -8,7 +8,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -59,27 +59,27 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     public static Render iconOf(Item item) {
-        return (t, guiGraphics, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(), guiGraphics);
+        return (t, GuiGraphicsExtractor, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(), GuiGraphicsExtractor);
     }
 
     public static Render iconOf(ItemStack stack) {
-        return (t, guiGraphics, i, j, f) -> t.renderItemIcon(stack, guiGraphics);
+        return (t, GuiGraphicsExtractor, i, j, f) -> t.renderItemIcon(stack, GuiGraphicsExtractor);
     }
 
     public static Render iconOf(Supplier<ItemStack> stack) {
-        return (t, guiGraphics, i, j, f) -> t.renderItemIcon(stack.get(), guiGraphics);
+        return (t, GuiGraphicsExtractor, i, j, f) -> t.renderItemIcon(stack.get(), GuiGraphicsExtractor);
     }
 
     public static Render iconOf(Identifier sprite) {
-        return (t, guiGraphics, i, j, f) -> t.renderIconSprite(sprite, guiGraphics);
+        return (t, GuiGraphicsExtractor, i, j, f) -> t.renderIconSprite(sprite, GuiGraphicsExtractor);
     }
 
     public static Render iconOf(ModsScreen.SizedLocation sized) {
-        return (t, guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blit(sized.location(), t.getX() + t.getWidth() / 2 - 12, t.getY() + t.getHeight() / 2 - 12, 0, 0, 24, sized.getScaledHeight(24), 24, sized.getScaledHeight(24));
+        return (t, GuiGraphicsExtractor, i, j, f) -> FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(sized.location(), t.getX() + t.getWidth() / 2 - 12, t.getY() + t.getHeight() / 2 - 12, 0, 0, 24, sized.getScaledHeight(24), 24, sized.getScaledHeight(24));
     }
 
     public static Render sizeableIconOf(SizeableAsset<IconHolder<?>> sizeable) {
-        return (t, guiGraphics, i, j, f) -> sizeable.get().icon().render(t, guiGraphics, i, j, f);
+        return (t, GuiGraphicsExtractor, i, j, f) -> sizeable.get().icon().render(t, GuiGraphicsExtractor, i, j, f);
     }
 
     @Override
@@ -88,52 +88,52 @@ public class LegacyTabButton extends AbstractButton {
         onPress.accept(this);
     }
 
-    public void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow) {
-        renderString(guiGraphics, font, getX(), getY(), i, shadow);
+    public void renderString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, boolean shadow) {
+        renderString(GuiGraphicsExtractor, font, getX(), getY(), i, shadow);
     }
 
-    public void renderString(GuiGraphics guiGraphics, Font font, int x, int y, int i, boolean shadow) {
-        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), x + Math.max(6, (getWidth() - font.width(getMessage())) / 2), y - 2, x + getWidth() - 6, y + getHeight() - 1, i, shadow));
+    public void renderString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int x, int y, int i, boolean shadow) {
+        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, getMessage(), x + Math.max(6, (getWidth() - font.width(getMessage())) / 2), y - 2, x + getWidth() - 6, y + getHeight() - 1, i, shadow));
     }
 
-    public void renderIconSprite(Identifier icon, GuiGraphics guiGraphics) {
+    public void renderIconSprite(Identifier icon, GuiGraphicsExtractor GuiGraphicsExtractor) {
         if (LegacyOptions.getUIMode().isSD())
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(icon, getX() + width / 2 - 8, getY() + height / 2 - 8, 16, 16);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(icon, getX() + width / 2 - 8, getY() + height / 2 - 8, 16, 16);
         else
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
     }
 
-    public void renderItemIcon(ItemStack itemIcon, GuiGraphics guiGraphics) {
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(getX() + width / 2f, getY() + height / 2f);
+    public void renderItemIcon(ItemStack itemIcon, GuiGraphicsExtractor GuiGraphicsExtractor) {
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(getX() + width / 2f, getY() + height / 2f);
         if (LegacyOptions.getUIMode().isSD())
-            guiGraphics.pose().scale(0.75f, 0.75f);
+            GuiGraphicsExtractor.pose().scale(0.75f, 0.75f);
         else
-            guiGraphics.pose().scale(1.5f, 1.5f);
-        guiGraphics.renderItem(itemIcon, -8, -8);
-        guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+        GuiGraphicsExtractor.item(itemIcon, -8, -8);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override
-    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
         FactoryScreenUtil.enableBlend();
         FactoryScreenUtil.enableDepthTest();
-        guiGraphics.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
         Vec2 translate = offset.apply(this);
         if (!translate.equals(Vec2.ZERO)) {
-            guiGraphics.pose().translate(translate.x, translate.y);
+            GuiGraphicsExtractor.pose().translate(translate.x, translate.y);
             isHovered = isMouseOver(i, j);
         }
-        spriteRender.render(this, guiGraphics, i, j, f);
-        if (!selected) guiGraphics.pose().translate(0, -1);
+        spriteRender.render(this, GuiGraphicsExtractor, i, j, f);
+        if (!selected) GuiGraphicsExtractor.pose().translate(0, -1);
         if (active) {
             if (icon == null)
-                this.renderString(guiGraphics, minecraft.font, CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
-            else icon.render(this, guiGraphics, i, j, f);
+                this.renderString(GuiGraphicsExtractor, minecraft.font, CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
+            else icon.render(this, GuiGraphicsExtractor, i, j, f);
         }
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     public boolean isMouseOver(double d, double e) {
@@ -148,8 +148,8 @@ public class LegacyTabButton extends AbstractButton {
         narrationElementOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.tab", this.getMessage().getString()));
     }
 
-    public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        renderString(guiGraphics, font, i, false);
+    public void renderString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i) {
+        renderString(GuiGraphicsExtractor, font, i, false);
     }
 
     public enum Type {
@@ -161,7 +161,7 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     public interface Render {
-        void render(LegacyTabButton button, GuiGraphics guiGraphics, int i, int j, float f);
+        void render(LegacyTabButton button, GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f);
     }
 
     public interface Offset extends Function<LegacyTabButton, Vec2> {
@@ -172,8 +172,8 @@ public class LegacyTabButton extends AbstractButton {
         Identifier getSprite(LegacyTabButton button);
 
         @Override
-        default void render(LegacyTabButton button, GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+        default void render(LegacyTabButton button, GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
         }
     }
 
@@ -265,6 +265,6 @@ public class LegacyTabButton extends AbstractButton {
 
     public static final Codec<SizeableAsset<IconHolder<?>>> ICON_SIZEABLE_CODEC = SizeableAsset.create(ICON_HOLDER_CODEC);
 
-    public static final ListMap<Identifier, IconType<?>> ICON_TYPES = new ListMap.Builder<Identifier, IconType<?>>().put(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE).put(FactoryAPI.createVanillaLocation("item"), new IconType<>(DynamicUtil.ITEM_SUPPLIER_CODEC, LegacyTabButton::iconOf)).put(FactoryAPI.createVanillaLocation("sizeable"), new IconType<>(ICON_SIZEABLE_CODEC, LegacyTabButton::sizeableIconOf)).build();
+    public static final ListMap<Identifier, IconType<?>> ICON_TYPES = new ListMap.Builder<Identifier, IconType<?>>().put(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE).put(FactoryAPI.createVanillaLocation("item"), new IconType<>(IOUtil.LAZY_ITEM_SUPPLIER_CODEC, LegacyTabButton::iconOf)).put(FactoryAPI.createVanillaLocation("sizeable"), new IconType<>(ICON_SIZEABLE_CODEC, LegacyTabButton::sizeableIconOf)).build();
 
 }

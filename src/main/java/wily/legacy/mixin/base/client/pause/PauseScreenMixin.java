@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client.pause;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -89,19 +89,19 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
     }
 
     //? if >1.20.1 {
-    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor);
     }
     //?}
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         //? if <=1.20.1
-        /*ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);*/
-        super.render(guiGraphics, i, j, f);
+        /*ScreenUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor);*/
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)

@@ -8,6 +8,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.DynamicUtil;
 
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class LegacyTipBuilder {
-    public static final Codec<LegacyTipBuilder> COMPLETE_CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().optionalFieldOf("title").forGetter(LegacyTipBuilder::getTitle), DynamicUtil.getComponentCodec().optionalFieldOf("tip").forGetter(LegacyTipBuilder::getTip), DynamicUtil.ITEM_CODEC.fieldOf("itemIcon").orElse(ItemStack.EMPTY).forGetter(LegacyTipBuilder::getItem), Codec.INT.fieldOf("time").orElse(-1).forGetter(LegacyTipBuilder::getTime)).apply(i, LegacyTipBuilder::create));
+    public static final Codec<LegacyTipBuilder> COMPLETE_CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().optionalFieldOf("title").forGetter(LegacyTipBuilder::getTitle), DynamicUtil.getComponentCodec().optionalFieldOf("tip").forGetter(LegacyTipBuilder::getTip), IOUtil.LAZY_ITEM_SUPPLIER_CODEC.fieldOf("itemIcon").orElse(() -> ItemStack.EMPTY).forGetter(b -> b.itemIcon), Codec.INT.fieldOf("time").orElse(-1).forGetter(LegacyTipBuilder::getTime)).apply(i, LegacyTipBuilder::create));
     public static final Codec<LegacyTipBuilder> SIMPLE_CODEC = DynamicUtil.getComponentCodec().xmap(c -> new LegacyTipBuilder().tip(c), b -> b.tip);
     public static final Codec<LegacyTipBuilder> CODEC = new IOUtil.FallbackCodec<>(COMPLETE_CODEC, SIMPLE_CODEC, COMPLETE_CODEC);
     public static final Codec<Map<String, LegacyTipBuilder>> MAP_CODEC = Codec.unboundedMap(Codec.STRING, CODEC).xmap(HashMap::new, Function.identity());
@@ -26,8 +27,12 @@ public class LegacyTipBuilder {
 
     private Component title = null;
     private Component tip = null;
-    private ItemStack itemIcon = ItemStack.EMPTY;
+    private ArbitrarySupplier<ItemStack> itemIcon = () -> ItemStack.EMPTY;
     private int time = -1;
+
+    public static LegacyTipBuilder create(Optional<Component> title, Optional<Component> tip, ArbitrarySupplier<ItemStack> itemIcon, int time) {
+        return new LegacyTipBuilder().title(title.orElse(null)).tip(tip.orElse(null)).itemIcon(itemIcon).disappearTime(time);
+    }
 
     public static LegacyTipBuilder create(Optional<Component> title, Optional<Component> tip, ItemStack itemIcon, int time) {
         return create(title.orElse(null), tip.orElse(null), itemIcon, time);
@@ -67,6 +72,10 @@ public class LegacyTipBuilder {
     }
 
     public LegacyTipBuilder itemIcon(ItemStack itemIcon) {
+        return itemIcon(() -> itemIcon);
+    }
+
+    public LegacyTipBuilder itemIcon(ArbitrarySupplier<ItemStack> itemIcon) {
         this.itemIcon = itemIcon;
         return this;
     }
@@ -107,7 +116,7 @@ public class LegacyTipBuilder {
     }
 
     public ItemStack getItem() {
-        return itemIcon;
+        return itemIcon.get();
     }
 
     public int getTime() {
@@ -117,7 +126,7 @@ public class LegacyTipBuilder {
     public void encode(CommonNetwork.PlayBuf buf) {
         buf.get().writeOptional(getTitle(), (b, t) -> CommonNetwork.encodeComponent(buf, t));
         buf.get().writeOptional(getTip(), (b, t) -> CommonNetwork.encodeComponent(buf, t));
-        CommonNetwork.encodeItemStack(buf, itemIcon);
+        CommonNetwork.encodeItemStack(buf, getItem());
         buf.get().writeInt(time);
     }
 }

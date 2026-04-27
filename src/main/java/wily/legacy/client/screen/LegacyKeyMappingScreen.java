@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -140,8 +140,8 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, false);
     }
 
     public Component getCancelTooltip() {
@@ -192,18 +192,18 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
     @Override
     protected void init() {
         updateMappingTooltip();
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> {
             if (getFocused() instanceof MappingButton b && !mappingTooltipLines.getLines().isEmpty()) {
                 int tooltipHeight = mappingTooltipLines.getHeight() + 18;
                 int tooltipX = panel.getX() + panel.getWidth() - 2;
                 int tooltipY = Math.max(panel.getY() + 2, Math.min(b.getY() + (b.getHeight() - tooltipHeight) / 2, panel.getY() + panel.getHeight() - tooltipHeight - 2));
-                LegacyRenderUtil.renderPointerPanel(guiGraphics, tooltipX, tooltipY, 129, tooltipHeight);
+                LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, tooltipX, tooltipY, 129, tooltipHeight);
                 mappingTooltipLines.setPosition(tooltipX + 4, tooltipY + 9);
-                mappingTooltipLines.render(guiGraphics, i, j, f);
+                mappingTooltipLines.extractRenderState(GuiGraphicsExtractor, i, j, f);
             }
         }));
         super.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.GRAY_TEXT.get(), false)));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> GuiGraphicsExtractor.text(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.GRAY_TEXT.get(), false)));
     }
 
     @Override
@@ -246,29 +246,29 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         public abstract boolean isNone();
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (!isFocused() && isPressed()) setSelectedMapping(null);
-            renderDefaultSprite(guiGraphics);
+            extractDefaultSprite(GuiGraphicsExtractor);
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
             if (c != null) {
-                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                GuiGraphicsExtractor.text(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
             if (icon != null) {
                 FactoryScreenUtil.enableBlend();
-                icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
+                icon.render(GuiGraphicsExtractor, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
                 FactoryScreenUtil.disableBlend();
             }
-            renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
         }
 
         private boolean isPressed() {
             return selectedMapping != null && mapping == selectedMapping;
         }
 
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j, true);
+        protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
+            LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j, true);
         }
 
         @Override

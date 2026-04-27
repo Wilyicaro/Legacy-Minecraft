@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.input.KeyEvent;
@@ -39,20 +39,20 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         lastTimePressed = Util.getMillis();
     }
 
-    @ModifyExpressionValue(method = "renderDefaultLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;getMessage()Lnet/minecraft/network/chat/Component;"))
+    @ModifyExpressionValue(method = "extractDefaultLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;getMessage()Lnet/minecraft/network/chat/Component;"))
     protected Component getMessage(Component original) {
         MutableComponent copy = original.copy().withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150));
         if (!CommonValue.WIDGET_TEXT_SHADOW.get()) copy.withoutShadow();
         return copy;
     }
 
-    @Inject(method = "renderWidget", at = @At("HEAD"))
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractWidgetRenderState", at = @At("HEAD"))
+    protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         alpha = active ? 1 : 0.8f;
     }
 
-    @Redirect(method = "renderDefaultSprite", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
-    protected boolean renderDefaultSprite(AbstractButton instance) {
+    @Redirect(method = "extractDefaultSprite", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
+    protected boolean extractDefaultSprite(AbstractButton instance) {
         return true;
     }
 

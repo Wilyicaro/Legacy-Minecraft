@@ -1,6 +1,7 @@
 package wily.legacy;
 
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -163,7 +164,7 @@ public class Legacy4J {
     }
 
     public static void tagsLoaded() {
-        LegacyBlockBehaviors.registerDyedWaterCauldronInteraction(CauldronInteraction.WATER.map());
+        LegacyBlockBehaviors.registerDyedWaterCauldronInteraction(CauldronInteractions.WATER);
     }
 
     public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot) {

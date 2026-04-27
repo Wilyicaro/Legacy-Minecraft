@@ -35,17 +35,11 @@ public class CustomHeadLayerMixin {
         itemStackRenderState.submit(poseStack, submitNodeCollector, light, legacy$getOverlay(renderState), outlineColor);
     }
 
-    @Redirect(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(Lnet/minecraft/core/Direction;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
-    private void hurtOverlayOnSkulls(Direction direction, float yRot, float animationPos, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int light, SkullModelBase skullModel, RenderType renderType, int outlineColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, PoseStack ignoredPoseStack, SubmitNodeCollector ignoredCollector, int ignoredLight, LivingEntityRenderState renderState, float headYaw, float headPitch) {
-        poseStack.pushPose();
-        if (direction == null) poseStack.translate(0.5f, 0.0f, 0.5f);
-        else poseStack.translate(0.5f - direction.getStepX() * 0.25f, 0.25f, 0.5f - direction.getStepZ() * 0.25f);
-        poseStack.scale(-1.0f, -1.0f, 1.0f);
+    @Redirect(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
+    private void hurtOverlayOnSkulls(float animationPos, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int light, SkullModelBase skullModel, RenderType renderType, int outlineColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, PoseStack ignoredPoseStack, SubmitNodeCollector ignoredCollector, int ignoredLight, LivingEntityRenderState renderState, float headYaw, float headPitch) {
         SkullModelBase.State state = new SkullModelBase.State();
         state.animationPos = animationPos;
-        state.yRot = yRot;
         submitNodeCollector.submitModel(skullModel, state, poseStack, renderType, light, legacy$getOverlay(renderState), outlineColor, crumblingOverlay);
-        poseStack.popPose();
     }
 
     @Unique

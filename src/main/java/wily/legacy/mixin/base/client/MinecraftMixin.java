@@ -301,7 +301,7 @@ public abstract class MinecraftMixin {
         return true;
     }
 
-    @Inject(method = "resizeDisplay", at = @At("RETURN"))
+    @Inject(method = "resizeGui", at = @At("RETURN"))
     private void resizeDisplay(CallbackInfo ci) {
         LegacyTipManager.rebuildActual();
         LegacyTipManager.rebuildActualLoading();

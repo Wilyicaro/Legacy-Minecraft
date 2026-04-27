@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.inventory;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +33,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(HorseInventoryScreen.class)
 public abstract class HorseInventoryScreenMixin extends AbstractMountInventoryScreen<HorseInventoryMenu> {
 
-    @Unique
+@Unique
     private static Vec2 SD_SLOTS_OFFSET = new Vec2(0.5f, 0.5f);
 
     public HorseInventoryScreenMixin(HorseInventoryMenu abstractMountInventoryMenu, Inventory inventory, Component component, int i, LivingEntity livingEntity) {
@@ -42,8 +43,8 @@ public abstract class HorseInventoryScreenMixin extends AbstractMountInventorySc
     @Override
     public void init() {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 215;
-        imageHeight = sd ? 140 : 203;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 215);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 140 : 203);
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 66 : 91;
         titleLabelX = sd ? 7 : 14;
@@ -104,12 +105,12 @@ public abstract class HorseInventoryScreenMixin extends AbstractMountInventorySc
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int i, int j, float f) {
         boolean sd = LegacyOptions.getUIMode().isSD();
         FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
 

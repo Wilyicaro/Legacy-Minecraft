@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.*;
 //? if <1.21.5 {
 /*import net.minecraft.client.resources.model.BakedModel;
  *///?} else {
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 //?}
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -288,7 +288,6 @@ public class Legacy4JClient {
 
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
-        if (LegacyOptions.unfocusedInputs.get()) minecraft.setWindowActive(true);
         while (keyCrafting.consumeClick()) {
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
                 if (minecraft.player.isSpectator()) minecraft.gui.getSpectatorGui().onHotbarActionKeyPressed();
@@ -459,7 +458,6 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
-            FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
             //? if fabric || >=1.21 && neoforge {
@@ -482,24 +480,42 @@ public class Legacy4JClient {
         });
 
         FactoryAPIClient.registerBlockColor(registry -> {
-            registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos), SHRUB.get());
-            BlockColor blockColor = (blockState, blockAndTintGetter, blockPos, i) -> {
-                if (blockAndTintGetter != null && blockPos != null) {
-                    BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
-                    if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOptions.enhancedPistonMovingRenderer.get()) {
-                        blockEntity = e.getRenderingBlockEntity();
-                    }
-                    if (blockEntity instanceof WaterCauldronBlockEntity be) {
-                        if (!be.hasWater())
-                            return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*//*PotionContents.getColor*//*?} else {*/PotionContents.getColorOptional/*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*/.orElse(-13083194)/*?}*/;
-                        else if (be.waterColor != null) return be.waterColor;
-                    }
-                    return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
+            registry.accept(List.of(new BlockTintSource() {
+                @Override
+                public int color(BlockState blockState) {
+                    return GrassColor.getDefaultColor();
                 }
-                return -1;
+
+                @Override
+                public int colorInWorld(BlockState blockState, net.minecraft.client.renderer.block.BlockAndTintGetter blockAndTintGetter, BlockPos blockPos) {
+                    return blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos);
+                }
+            }), SHRUB.get());
+            BlockTintSource blockColor = new BlockTintSource() {
+                @Override
+                public int color(BlockState blockState) {
+                    return -1;
+                }
+
+                @Override
+                public int colorInWorld(BlockState blockState, net.minecraft.client.renderer.block.BlockAndTintGetter blockAndTintGetter, BlockPos blockPos) {
+                    if (blockAndTintGetter != null && blockPos != null) {
+                        BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
+                        if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOptions.enhancedPistonMovingRenderer.get()) {
+                            blockEntity = e.getRenderingBlockEntity();
+                        }
+                        if (blockEntity instanceof WaterCauldronBlockEntity be) {
+                            if (!be.hasWater())
+                                return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*//*PotionContents.getColor*//*?} else {*/PotionContents.getColorOptional/*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*/.orElse(-13083194)/*?}*/;
+                            else if (be.waterColor != null) return be.waterColor;
+                        }
+                        return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
+                    }
+                    return -1;
+                }
             };
-            registry.accept(blockColor, Blocks.WATER_CAULDRON);
-            registry.accept(blockColor, LegacyRegistries.COLORED_WATER_CAULDRON.get());
+            registry.accept(List.of(blockColor), Blocks.WATER_CAULDRON);
+            registry.accept(List.of(blockColor), LegacyRegistries.COLORED_WATER_CAULDRON.get());
         });
         fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_oak_leaves"));
         fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPI.createVanillaLocation("fast_spruce_leaves"));
@@ -589,7 +605,7 @@ public class Legacy4JClient {
             TopMessage.setMedium(null);
         });
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID), Legacy4JSettingsScreen::new);
-        FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options));
+        FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options, false));
     }
 
     public static void updateChunks() {

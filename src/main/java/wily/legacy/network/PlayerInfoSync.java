@@ -114,7 +114,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                         LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
                         if (info.isExhaustionDisabled() != disableExhaustion) {
                             info.setDisableExhaustion(disableExhaustion);
-                            affectPlayer.displayClientMessage(Component.translatable(disableExhaustion ? "legacy.menu.host_options.player.disableExhaustion.enabled" : "legacy.menu.host_options.player.disableExhaustion.disabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(disableExhaustion ? "legacy.menu.host_options.player.disableExhaustion.enabled" : "legacy.menu.host_options.player.disableExhaustion.disabled"), false);
                             shouldSyncPlayerInfo = true;
                         }
                     }
@@ -123,7 +123,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                         LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
                         if (info.mayFlySurvival() != mayFlySurvival) {
                             LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, mayFlySurvival, true);
-                            affectPlayer.displayClientMessage(Component.translatable(mayFlySurvival ? "legacy.menu.host_options.player.mayFly.enabled" : "legacy.menu.host_options.player.mayFly.disabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(mayFlySurvival ? "legacy.menu.host_options.player.mayFly.enabled" : "legacy.menu.host_options.player.mayFly.disabled"), false);
                             shouldSyncPlayerInfo = true;
                         }
                     }
@@ -132,8 +132,8 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                         LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
                         if (info.isVisible() != visible) {
                             info.setVisibility(visible);
-                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
-                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);
                             shouldSyncPlayerInfo = true;
                         }
                     }
@@ -225,7 +225,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
 
         public static All fromPlayerList(MinecraftServer server) {
-            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getWorldData().getGameRules()), server.getDefaultGameType(), All.ID_S2C);
+            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
         }
 
         @Override

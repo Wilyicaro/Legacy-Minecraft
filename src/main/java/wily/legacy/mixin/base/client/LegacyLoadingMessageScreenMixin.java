@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,13 +17,13 @@ public class LegacyLoadingMessageScreenMixin extends Screen implements LegacyLoa
         super(component);
     }
 
-    @Inject(method = /*? if <1.20.5 {*//*"render"*//*?} else {*/"renderBackground"/*?}*/, at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyLoadingAndConnecting.get()) {
             ci.cancel();
             Component header = getTitle();
             getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), header, null, 0.0F, false);
-            getLoadingRenderer().render(guiGraphics, i, j, f);
+            getLoadingRenderer().extractRenderState(GuiGraphicsExtractor, i, j, f);
         }
     }
 

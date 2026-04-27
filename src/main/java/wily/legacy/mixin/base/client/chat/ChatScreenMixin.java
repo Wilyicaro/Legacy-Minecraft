@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client.chat;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -63,15 +63,15 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
     private void setBordered(EditBox instance, boolean bl) {
     }
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"))
-    private void render(CommandSuggestions instance, GuiGraphics guiGraphics, int i, int j, Operation<Void> original) {
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0, (int) (LegacyRenderUtil.getHUDDistance() - 56));
-        original.call(instance, guiGraphics, i, j);
-        guiGraphics.pose().popMatrix();
+    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"))
+    private void render(CommandSuggestions instance, GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, Operation<Void> original) {
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(0, (int) (LegacyRenderUtil.getHUDDistance() - 56));
+        original.call(instance, GuiGraphicsExtractor, i, j);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"), index = 2)
+    @ModifyArg(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"), index = 2)
     private int render(int i) {
         return i - (int) (LegacyRenderUtil.getHUDDistance() - 56);
     }
@@ -86,8 +86,8 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
         return i - (int) (LegacyRenderUtil.getHUDDistance() - 56);
     }
 
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"))
-    private boolean render(GuiGraphics instance, int i, int j, int k, int l, int m) {
+    @WrapWithCondition(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"))
+    private boolean render(GuiGraphicsExtractor instance, int i, int j, int k, int l, int m) {
         return false;
     }
 

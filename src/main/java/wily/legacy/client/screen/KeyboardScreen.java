@@ -5,7 +5,7 @@ import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -162,9 +162,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        if (getFocused() instanceof CharButton c) c.renderTooltip(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        if (getFocused() instanceof CharButton c) c.renderTooltip(GuiGraphicsExtractor, i, j, f);
     }
 
     @Override
@@ -201,23 +201,23 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderDefaultBackground(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1f, 1f, 1f, 0.8f);
-        panel.render(guiGraphics, i, j, f);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.getX() + 4.5f, panel.getY() + 25.4f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 53, 123);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, panel.getWidth() - 62, 0, 53, 123);
-        guiGraphics.pose().translate(-4.5f, 0);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, (panel.getWidth() - 267) / 2, -1, 267, 125);
-        guiGraphics.pose().popMatrix();
-        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2, panel.getY() + 8);
-        guiGraphics.pose().scale(1.5f, 1.5f);
-        guiGraphics.drawString(font, KEYBOARD, 0, 0, CommonColor.GRAY_TEXT.get(), false);
-        guiGraphics.pose().popMatrix();
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.renderDefaultBackground(GuiGraphicsExtractor, i, j, f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1f, 1f, 1f, 0.8f);
+        panel.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(panel.getX() + 4.5f, panel.getY() + 25.4f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 53, 123);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, panel.getWidth() - 62, 0, 53, 123);
+        GuiGraphicsExtractor.pose().translate(-4.5f, 0);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL_RECESS, (panel.getWidth() - 267) / 2, -1, 267, 125);
+        GuiGraphicsExtractor.pose().popMatrix();
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2, panel.getY() + 8);
+        GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+        GuiGraphicsExtractor.text(font, KEYBOARD, 0, 0, CommonColor.GRAY_TEXT.get(), false);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override
@@ -271,10 +271,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
             FactoryScreenUtil.enableBlend();
-            LegacyRenderUtil.renderScrollingString(guiGraphics, Minecraft.getInstance().font, getMessage(), getX() + 2, getY(), getX() + getWidth() - 2, getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+            LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, getMessage(), getX() + 2, getY(), getX() + getWidth() - 2, getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
             FactoryScreenUtil.disableBlend();
         }
 
@@ -347,29 +347,52 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         }
 
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+        protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
             int bindingOffset = 0;
 
             if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
-                bindingOffset = binding.getIcon().render(guiGraphics, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
+                bindingOffset = binding.getIcon().render(GuiGraphicsExtractor, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
 
             if (iconSprite == null)
-                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
+                LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
             else {
                 TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
-                if (sprite == null) return;
-                try (SpriteContents contents = sprite.contents()) {
-                    FactoryScreenUtil.enableBlend();
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, i + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());
-                    FactoryScreenUtil.disableBlend();
+                int width = getIconWidth();
+                int height = getIconHeight();
+                if (sprite != null) {
+                    try (SpriteContents contents = sprite.contents()) {
+                        width = contents.width();
+                        height = contents.height();
+                    }
                 }
+                FactoryScreenUtil.enableBlend();
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(iconSprite, getX() + (getWidth() - width) / 2 + Math.max(0, i + bindingOffset - (getWidth() - width) / 2), getY() + (getHeight() - height) / 2, width, height);
+                FactoryScreenUtil.disableBlend();
             }
         }
 
+        private int getIconWidth() {
+            if (iconSprite.equals(LegacySprites.SCROLL_LEFT) || iconSprite.equals(LegacySprites.SCROLL_RIGHT)) return 6;
+            if (iconSprite.equals(LegacySprites.SCROLL_UP) || iconSprite.equals(LegacySprites.SCROLL_DOWN)) return 13;
+            if (iconSprite.equals(LegacySprites.SHIFT)) return 14;
+            if (iconSprite.equals(LegacySprites.BACK)) return 18;
+            if (iconSprite.equals(LegacySprites.TICK)) return 28;
+            return 16;
+        }
+
+        private int getIconHeight() {
+            if (iconSprite.equals(LegacySprites.SCROLL_LEFT) || iconSprite.equals(LegacySprites.SCROLL_RIGHT)) return 11;
+            if (iconSprite.equals(LegacySprites.SCROLL_UP) || iconSprite.equals(LegacySprites.SCROLL_DOWN)) return 7;
+            if (iconSprite.equals(LegacySprites.SHIFT)) return 14;
+            if (iconSprite.equals(LegacySprites.BACK)) return 16;
+            if (iconSprite.equals(LegacySprites.TICK)) return 24;
+            return 16;
+        }
+
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON, getX(), getY(), getWidth(), getHeight());
-            renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON, getX(), getY(), getWidth(), getHeight());
+            renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
         }
 
         @Override
@@ -400,7 +423,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             return chars.contains(characterEvent.codepointAsString()) || (shiftChars != null && shiftChars.contains(characterEvent.codepointAsString()));
         }
 
-        public void renderTooltip(GuiGraphics guiGraphics, int i, int j, float f) {
+        public void renderTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (pressTime >= 6 && getSelectedChars().length() > 1) {
                 int width = 18;
                 char[] chars = getSelectedChars().toCharArray();
@@ -409,14 +432,14 @@ public class KeyboardScreen extends OverlayPanelScreen {
                     width += font.width(s) + (i1 == 0 ? 0 : 2);
                 }
                 int diffX = 0;
-                LegacyRenderUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17, width, 15);
+                LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, getX() + (getWidth() - width) / 2, getY() - 17, width, 15);
                 for (char c : chars) {
                     String s = String.valueOf(c);
-                    guiGraphics.drawString(font, s, getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14, c == getSelectedChar() ? 0xFFFFFF00 : 0xFFFFFFFF);
+                    GuiGraphicsExtractor.text(font, s, getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14, c == getSelectedChar() ? 0xFFFFFF00 : 0xFFFFFFFF);
                     diffX += font.width(s) + 2;
                 }
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, getX() + (getWidth() - width) / 2 + 2, getY() - 15);
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + (getWidth() - width) / 2 + width - 9, getY() - 15);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.LEFT, getX() + (getWidth() - width) / 2 + 2, getY() - 15);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.RIGHT, getX() + (getWidth() - width) / 2 + width - 9, getY() - 15);
             }
         }
 
@@ -445,7 +468,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             GuiEventListener l = listenerSupplier.get();
             if (l != null) {
                 parent.setFocused(l);
-                l.charTyped(new CharacterEvent(getSelectedChar(), 0));
+                l.charTyped(new CharacterEvent(getSelectedChar()));
             }
             if (shiftChars != null && shift && !shiftLock) shift = false;
             selectedChar = 0;

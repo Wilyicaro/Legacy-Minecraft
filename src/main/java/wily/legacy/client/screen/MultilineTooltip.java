@@ -2,9 +2,6 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.narration.NarratedElementType;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.narration.NarrationThunk;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -12,13 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MultilineTooltip extends Tooltip {
+public class MultilineTooltip {
     protected final List<FormattedCharSequence> lines;
-    protected List<Component> narrationLines;
+    protected final Component narration;
 
     public MultilineTooltip(List<FormattedCharSequence> message, Component narration) {
-        super(Component.empty(), narration);
         lines = message;
+        this.narration = narration;
     }
 
     public MultilineTooltip(List<FormattedCharSequence> message) {
@@ -37,15 +34,23 @@ public class MultilineTooltip extends Tooltip {
         this(Arrays.stream(message).toList(), width);
     }
 
-    @Override
-    public void updateNarration(NarrationElementOutput narrationElementOutput) {
-        if (narrationLines != null)
-            narrationElementOutput.add(NarratedElementType.HINT, NarrationThunk.from(narrationLines));
-        else super.updateNarration(narrationElementOutput);
+    public Tooltip asTooltip() {
+        return Tooltip.create(narration);
     }
 
-    @Override
     public List<FormattedCharSequence> toCharSequence(Minecraft minecraft) {
         return lines;
+    }
+
+    public static Tooltip create(List<FormattedCharSequence> message, Component narration) {
+        return new MultilineTooltip(message, narration).asTooltip();
+    }
+
+    public static Tooltip create(List<Component> content, int width) {
+        return new MultilineTooltip(content, width).asTooltip();
+    }
+
+    public static Tooltip create(int width, Component... message) {
+        return new MultilineTooltip(width, message).asTooltip();
     }
 }

@@ -10,7 +10,7 @@ public class ImpossibleIngredient extends Ingredient {
     private final ItemStack[] stacks;
 
     public ImpossibleIngredient(ItemStack stack) {
-        super(/*? if <1.21.2 {*//*Stream.empty()*//*?} else {*/HolderSet.direct(stack.getItemHolder())/*?}*/);
+        super(/*? if <1.21.2 {*//*Stream.empty()*//*?} else {*/HolderSet.direct(stack.typeHolder())/*?}*/);
         stacks = new ItemStack[]{stack};
     }
 

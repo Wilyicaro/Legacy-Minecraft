@@ -12,12 +12,12 @@ public class ResetProfessionMixin {
     //? if fabric {
     @ModifyExpressionValue(method = "method_47038", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/villager/Villager;getVillagerXp()I"))
     private static int keepSpawnEggProfession(int original, ServerLevel level, Villager villager, long time) {
-        return villager.getTags().contains("legacy_spawn_egg_profession") ? 1 : original;
+        return villager.entityTags().contains("legacy_spawn_egg_profession") ? 1 : original;
     }
     //?} else {
     /*@ModifyExpressionValue(method = "lambda$create$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;getVillagerXp()I"))
     private static int keepSpawnEggProfession(int original, ServerLevel level, Villager villager, long time) {
-        return villager.getTags().contains("legacy_spawn_egg_profession") ? 1 : original;
+        return villager.entityTags().contains("legacy_spawn_egg_profession") ? 1 : original;
     }
     *///?}
 }

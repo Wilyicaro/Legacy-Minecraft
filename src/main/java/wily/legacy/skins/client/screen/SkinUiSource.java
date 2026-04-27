@@ -1,6 +1,6 @@
 package wily.legacy.skins.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.skins.api.ui.LegacySkinUi;
@@ -88,7 +88,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     }
 
     @Override
-    public boolean renderPreview(GuiGraphics graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
+    public boolean renderPreview(GuiGraphicsExtractor graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
         if (!skins.containsKey(skinId)) return false;
         adapter.renderPreview(new LegacySkinUi.PreviewContext(
                 graphics,
@@ -244,7 +244,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
 
     private @Nullable String findPackId(String skinId, boolean favoritesOnly) {
         for (Map.Entry<String, SkinPack> entry : packs.entrySet()) {
-            String packId = entry.getKey();
+        String packId = entry.getKey();
             if (favoritesOnly != SkinIdUtil.isFavouritesPack(packId)) continue;
             for (SkinEntry skin : entry.getValue().skins()) {
                 if (skin != null && skinId.equals(skin.id())) return packId;

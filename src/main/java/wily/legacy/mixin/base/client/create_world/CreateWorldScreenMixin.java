@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client.create_world;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
@@ -198,7 +198,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
     }
     //?}
 
@@ -208,20 +208,20 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         if (onlineTickBox != null) onlineTickBox.updateValue();
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
-        resourceAlbumSelector.renderTooltipBox(guiGraphics, panel);
-        super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor, false);
+        resourceAlbumSelector.renderTooltipBox(GuiGraphicsExtractor, panel);
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) GuiGraphicsExtractor.deferredTooltip = null;
         UIAccessor accessor = UIAccessor.of(this);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15));
-        if (LegacyOptions.getUIMode().isSD()) guiGraphics.pose().scale(0.5f, 0.5f);
-        guiGraphics.drawString(font, NAME_LABEL, 0, 0, CommonColor.GRAY_TEXT.get(), false);
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15));
+        if (LegacyOptions.getUIMode().isSD()) GuiGraphicsExtractor.pose().scale(0.5f, 0.5f);
+        GuiGraphicsExtractor.text(font, NAME_LABEL, 0, 0, CommonColor.GRAY_TEXT.get(), false);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override

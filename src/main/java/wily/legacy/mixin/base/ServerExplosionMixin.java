@@ -36,10 +36,10 @@ public abstract class ServerExplosionMixin implements Explosion {
             double d = Math.sqrt(player.distanceToSqr(center));
             if (d >= 21) return;
             for (BlockPos blockPos : list) {
-                if (level.random.nextInt(d >= 15 ? 40 : 10) != 0) continue;
-                double d0 = blockPos.getX() + level.random.nextFloat();
-                double d1 = blockPos.getY() + level.random.nextFloat();
-                double d2 = blockPos.getZ() + level.random.nextFloat();
+                if (level.getRandom().nextInt(d >= 15 ? 40 : 10) != 0) continue;
+                double d0 = blockPos.getX() + level.getRandom().nextFloat();
+                double d1 = blockPos.getY() + level.getRandom().nextFloat();
+                double d2 = blockPos.getZ() + level.getRandom().nextFloat();
                 double d3 = d0 - center.x;
                 double d4 = d1 - center.y;
                 double d5 = d2 - center.z;
@@ -48,7 +48,7 @@ public abstract class ServerExplosionMixin implements Explosion {
                 d4 = d4 / d6;
                 d5 = d5 / d6;
                 double d7 = 0.5D / (d6 / (double) this.radius + 0.1D);
-                d7 = d7 * (double) (level.random.nextFloat() * level.random.nextFloat() + 0.3F);
+                d7 = d7 * (double) (level.getRandom().nextFloat() * level.getRandom().nextFloat() + 0.3F);
                 d3 = d3 * d7;
                 d4 = d4 * d7;
                 d5 = d5 * d7;

@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.compat.nostalgic;
 
 import mod.adrenix.nostalgic.helper.candy.hud.HudHelper;
 import mod.adrenix.nostalgic.util.client.gui.GuiUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,12 +21,12 @@ public class HudHelperMixin {
 
     //? if forge || neoforge {
     /*@Inject(method = "renderArmor", at = @At("HEAD"), remap = false)
-    private static void renderArmor(CallbackInfo ci, @Local GuiGraphics graphics) {
+    private static void renderArmor(CallbackInfo ci, @Local GuiGraphicsExtractor graphics) {
         float offsetWidth = (GuiUtil.getGuiWidth() / 2f + 90);
         graphics.pose().translate(offsetWidth - offsetWidth * LegacyRenderUtil.getHUDScale() / 3, 0.0F);
     }
     @Inject(method = "renderAir", at = @At("HEAD"), remap = false)
-    private static void renderAir(CallbackInfo ci, @Local GuiGraphics graphics) {
+    private static void renderAir(CallbackInfo ci, @Local GuiGraphicsExtractor graphics) {
         float offsetWidth = (GuiUtil.getGuiWidth() / 2f - 100);
         graphics.pose().translate(offsetWidth - offsetWidth * LegacyRenderUtil.getHUDScale() / 3, 0.0F);
     }

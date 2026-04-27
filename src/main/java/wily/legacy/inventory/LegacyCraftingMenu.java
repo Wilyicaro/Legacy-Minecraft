@@ -35,6 +35,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.FactoryIngredient;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,8 +80,8 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
                 input = container.asCraftInput();
                 if (packet.craftId().isEmpty())
-                    return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h -> (customRcp = h).value().assemble(input, player.level().registryAccess())).orElse(ItemStack.EMPTY);
-                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h -> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input, player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
+                    return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h -> (customRcp = h).value().assemble(input)).orElse(ItemStack.EMPTY);
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h -> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input) : null).orElse(ItemStack.EMPTY);
             }
 
             @Override
@@ -143,7 +144,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
                 return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b ->
                         b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p -> {
                             ItemStack banner = container.getItem(0);
-                            banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, ((DyeItem) container.getItem(1).getItem()).getDyeColor()).build());
+            banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, LegacyItemUtil.getDyeColor(((DyeItem) container.getItem(1).getItem()).asItem())).build());
                             return banner;
                         })).orElse(ItemStack.EMPTY);
             }
@@ -187,7 +188,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
-                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h -> h.value() instanceof StonecutterRecipe rcp ? rcp.assemble(null, player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h -> h.value() instanceof StonecutterRecipe rcp ? rcp.assemble(new SingleRecipeInput(ItemStack.EMPTY)) : null).orElse(ItemStack.EMPTY);
             }
         };
     }
@@ -211,7 +212,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.computeIfAbsent(pattern, key -> {
             Holder<BannerPattern> holder = registryAccess.lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(pattern);
             for (Item item : BuiltInRegistries.ITEM) {
-                if (item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS)))
+                if (item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS).contains(holder))
                     return Optional.of(Ingredient.of(item));
             }
             return Optional.empty();

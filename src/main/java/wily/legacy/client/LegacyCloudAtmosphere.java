@@ -64,7 +64,11 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static int getCloudDrawDistanceBlocks() {
-        return CloudGeometry.DRAW_DISTANCE_CHUNKS * 16;
+        return getCloudDrawDistanceChunks() * 16;
+    }
+
+    public static int getCloudDrawDistanceChunks() {
+        return CloudGeometry.DRAW_DISTANCE_CHUNKS;
     }
 
     public static float getCloudFogEndBlocks(float environmentalEnd) {
@@ -247,7 +251,7 @@ public final class LegacyCloudAtmosphere {
 
 
     private static float getTimeOfDay(ClientLevel level, float partialTick) {
-        double day = Mth.frac((level.getDayTime() + partialTick) / 24000.0d - 0.25d);
+        double day = Mth.frac((level.getOverworldClockTime() + partialTick) / 24000.0d - 0.25d);
         double smoothedDay = 0.5d - Math.cos(day * Math.PI) / 2.0d;
         return (float) (day * 2.0d + smoothedDay) / 3.0f;
     }

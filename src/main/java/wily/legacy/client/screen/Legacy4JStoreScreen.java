@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.client.ContentManager;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -106,10 +106,10 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
 
     @Override
     public void renderableVListInit() {
-        addRenderableOnly((guiGraphics, i, j, f) -> {
+        addRenderableOnly((GuiGraphicsExtractor, i, j, f) -> {
             int y = panelRecess.y + 8;
             for (FormattedCharSequence formattedCharSequence : font.split(getTitle(), getRenderableVList().listWidth - 10)) {
-                guiGraphics.drawString(font, formattedCharSequence, panel.getX() + (panel.getWidth() - font.width(formattedCharSequence)) / 2, y, CommonColor.GRAY_TEXT.get(), false);
+                GuiGraphicsExtractor.text(font, formattedCharSequence, panel.getX() + (panel.getWidth() - font.width(formattedCharSequence)) / 2, y, CommonColor.GRAY_TEXT.get(), false);
                 y += 12;
             }
         });
@@ -117,13 +117,13 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
-        LegacyRenderUtil.renderLogo(guiGraphics);
-        panel.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor, false);
+        LegacyRenderUtil.renderLogo(GuiGraphicsExtractor);
+        panel.extractRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
 
         if (isLoading) {
-            LegacyRenderUtil.drawGenericLoading(guiGraphics, 
+            LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, 
                 panel.getX() + (panel.getWidth() - 75) / 2, 
                 panel.getY() + 25 + (panel.getHeight() - 35 - 75) / 2
             );
@@ -136,7 +136,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         }
 
         @Override
-        protected void renderDefaultLabel(ActiveTextCollector activeTextCollector) {
+        protected void extractDefaultLabel(ActiveTextCollector activeTextCollector) {
             int textY = this.getY() + (this.getHeight() - Minecraft.getInstance().font.lineHeight) / 2 + 1;
             activeTextCollector.accept(this.getX() + 12, textY, this.getMessage());
         }

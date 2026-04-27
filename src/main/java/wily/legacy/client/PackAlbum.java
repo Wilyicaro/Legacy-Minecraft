@@ -13,7 +13,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -449,7 +449,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             return FactoryGuiGraphics.getSprites().texturesByName.containsKey(sprite) ? sprite : null;
         }
 
-        private static void renderAlbumIcon(GuiGraphics graphics, PackAlbum album, @Nullable Pack displayPack, int x, int y, int width, int height) {
+        private static void renderAlbumIcon(GuiGraphicsExtractor graphics, PackAlbum album, @Nullable Pack displayPack, int x, int y, int width, int height) {
             Identifier iconSprite = album.iconSprite().map(Selector::getExistingSprite).orElse(null);
             if (iconSprite != null) {
                 FactoryGuiGraphics.of(graphics).blitSprite(iconSprite, x, y, width, height);
@@ -463,7 +463,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             return backgroundSprite != null ? backgroundSprite : displayPack != null ? getPackBackground(displayPack) : null;
         }
 
-        private static void renderAlbumBackground(GuiGraphics graphics, PackAlbum album, @Nullable Identifier background, int x, int y, int width, int height) {
+        private static void renderAlbumBackground(GuiGraphicsExtractor graphics, PackAlbum album, @Nullable Identifier background, int x, int y, int width, int height) {
             if (background == null) return;
             if (album.backgroundSprite().map(Selector::getExistingSprite).filter(background::equals).isPresent()) {
                 FactoryGuiGraphics.of(graphics).blitSprite(background, x, y, width, height);
@@ -489,15 +489,15 @@ public record PackAlbum(String id, int version, Component displayName, Component
             return LegacyOptions.getUIMode().isSD() ? 105 : 161;
         }
 
-        public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel) {
-            renderTooltipBox(guiGraphics, panel, 0);
+        public void renderTooltipBox(GuiGraphicsExtractor GuiGraphicsExtractor, LayoutElement panel) {
+            renderTooltipBox(GuiGraphicsExtractor, panel, 0);
         }
 
-        public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel, int xOffset) {
-            renderTooltipBox(guiGraphics, panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, getDefaultWidth(), panel.getHeight() - 10);
+        public void renderTooltipBox(GuiGraphicsExtractor GuiGraphicsExtractor, LayoutElement panel, int xOffset) {
+            renderTooltipBox(GuiGraphicsExtractor, panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, getDefaultWidth(), panel.getHeight() - 10);
         }
 
-        public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height) {
+        public void renderTooltipBox(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
             if (hasTooltip) return;
             LegacyRenderUtil.renderPointerPanel(graphics, x, y, width, height);
             PackAlbum album = getSelectedAlbum();
@@ -518,7 +518,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
             int left = x + (sd ? 5 : 8);
-            scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, left, y + 40, lineHeight, graphics.textRenderer()));
+            scrollableRenderer.extractRenderState(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, left, y + 40, lineHeight, graphics.textRenderer()));
             renderAlbumBackground(graphics, album, background, left, y + height - descriptionFromBottom, sd ? 95 : 145, sd ? 47 : 72);
         }
 
@@ -678,28 +678,28 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             Font font = minecraft.font;
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, getX() - 1, getY() + font.lineHeight - 1, width + 2, height + 2 - minecraft.font.lineHeight);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL_RECESS, getX() - 1, getY() + font.lineHeight - 1, width + 2, height + 2 - minecraft.font.lineHeight);
             int visibleCount = 0;
             for (int index = 0; index < albums.size(); index++) {
                 if (visibleCount >= getMaxPacks() || scrolledList.get() + index >= albums.size()) break;
                 PackAlbum album = albums.getByIndex(Math.min(albums.size() - 1, scrolledList.get() + index));
                 Pack displayPack = album.getDisplayPack(packRepository);
-                renderAlbumIcon(guiGraphics, album, displayPack, getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 28, 28);
+                renderAlbumIcon(GuiGraphicsExtractor, album, displayPack, getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 28, 28);
                 if (scrolledList.get() + index == selectedIndex)
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index, getY() + font.lineHeight + 3, 30, 30);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index, getY() + font.lineHeight + 3, 30, 30);
                 visibleCount++;
             }
-            guiGraphics.pose().pushMatrix();
-            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
-            guiGraphics.drawString(font, getMessage(), getX() + 2, getY(), isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get(), isHoveredOrFocused());
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().pushMatrix();
+            if (!isHoveredOrFocused()) GuiGraphicsExtractor.pose().translate(0.4f, 0.4f);
+            GuiGraphicsExtractor.text(font, getMessage(), getX() + 2, getY(), isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get(), isHoveredOrFocused());
+            GuiGraphicsExtractor.pose().popMatrix();
             if (scrolledList.max > 0) {
                 if (scrolledList.get() < scrolledList.max)
-                    scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
+                    scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
                 if (scrolledList.get() > 0)
-                    scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
+                    scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.LEFT, getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
             }
         }
 
