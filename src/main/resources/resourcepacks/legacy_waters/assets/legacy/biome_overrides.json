@@ -184,6 +184,18 @@
     "the_end": {
       "water_color": "#62529e"
     },
+    "end_barrens": {
+      "water_color": "#62529e"
+    },
+    "end_highlands": {
+      "water_color": "#62529e"
+    },
+    "end_midlands": {
+      "water_color": "#62529e"
+    },
+    "small_end_islands": {
+      "water_color": "#62529e"
+    },
     "warm_ocean": {
       "water_color": "#02B0E5",
       "water_transparency": 0.7
