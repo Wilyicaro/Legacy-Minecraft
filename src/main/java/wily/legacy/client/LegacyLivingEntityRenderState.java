@@ -12,6 +12,7 @@ public class LegacyLivingEntityRenderState implements FactoryRenderStateExtensio
     public ItemUseAnimation useAnim;
     public boolean fireImmune;
     public boolean hostInvisible;
+    public String name;
 
     @Override
     public Class<LivingEntity> getEntityClass() {
@@ -24,6 +25,7 @@ public class LegacyLivingEntityRenderState implements FactoryRenderStateExtensio
         useAnim = entity.getUseItem().getUseAnimation();
         fireImmune = entity.fireImmune();
         hostInvisible = entity instanceof Player player && Legacy4JClient.isHostInvisible(player);
+        if (entity instanceof Player player) name = player.getGameProfile().name();
     }
 }
 //?}
