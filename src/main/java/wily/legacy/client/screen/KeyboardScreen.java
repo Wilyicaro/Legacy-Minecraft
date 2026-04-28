@@ -148,13 +148,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    protected void panelInit() {
-        panel.init();
-    }
-
-    @Override
     protected void init() {
-        super.init();
+        panel.init();
         panel.setPosition((lastX = panel.getX()) + xDiff, (lastY = panel.getY()) + yDiff);
         renderableVList.init(panel.getX() + (panel.getWidth() - 259) / 2, panel.getY() + 28, 268, 124);
         leftKeyBar.init(panel.getX() + 6, panel.getY() + 27, 50, 0);
