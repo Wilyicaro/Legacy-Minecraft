@@ -117,9 +117,6 @@ public class LegacyTabButton extends AbstractButton {
     @Override
     protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
-        FactoryScreenUtil.enableBlend();
-        FactoryScreenUtil.enableDepthTest();
         guiGraphics.pose().pushMatrix();
         Vec2 translate = offset.apply(this);
         if (!translate.equals(Vec2.ZERO)) {
