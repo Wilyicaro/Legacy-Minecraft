@@ -64,6 +64,7 @@ public class LegacyComponents {
     public static final Component IGNITE = Component.translatable("legacy.action.ignite");
     public static final Component INFO = Component.translatable("legacy.action.info");
     public static final Component INVERT = Component.translatable("legacy.action.invert");
+    public static final Component JAB = Component.translatable("legacy.action.jab");
     public static final Component LAUNCH = Component.translatable("legacy.action.launch");
     public static final Component LEASH = Component.translatable("legacy.action.leash");
     public static final Component LOCK = Component.translatable("legacy.action.lock");
