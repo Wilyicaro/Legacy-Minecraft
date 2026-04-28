@@ -588,6 +588,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.renderDistance()),
                                 LegacyOptions.of(mc.options.simulationDistance()),
                                 LegacyOptions.of(mc.options.cloudRange()),
+                                LegacyOptions.of(mc.options.chunkSectionFadeInTime()),
                                 LegacyOptions.of(mc.options.prioritizeChunkUpdates()),
                                 LegacyOptions.of(mc.options.biomeBlendRadius()),
                                 LegacyOptions.of(mc.options.entityDistanceScaling()),
