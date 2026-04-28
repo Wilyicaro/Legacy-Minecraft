@@ -6,11 +6,9 @@ import io.github.gaming32.worldhost.FriendsListUpdate;
 import io.github.gaming32.worldhost.WorldHost;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.multiplayer.ServerData;
@@ -19,7 +17,7 @@ import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.client.screen.CreationList;
+import wily.legacy.client.screen.IconButton;
 import wily.legacy.client.screen.JoinGameScreen;
 import wily.legacy.client.screen.ServerRenderableList;
 import wily.legacy.util.LegacySprites;
@@ -60,7 +58,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
             WorldHost.ONLINE_FRIENDS.forEach(((uuid, id) -> {
                 AbstractButton onlineButton;
                 GameProfile profile = WorldHost.fetchProfile(minecraft.services().sessionService(), uuid);
-                addRenderable(onlineButton = new CreationList.ContentButton(this, 0, 0, 270, 30, Component.literal(profile.name())) {
+                addRenderable(onlineButton = new IconButton(this, 0, 0, 270, 30, Component.literal(profile.name())) {
                     final ServerData serverData = new ServerData("", "", /*? if >1.20.2 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/);
                     final FaviconTexture icon = FaviconTexture.forServer(minecraft.getTextureManager(), serverData.ip);
                     private byte[] lastIconBytes;
