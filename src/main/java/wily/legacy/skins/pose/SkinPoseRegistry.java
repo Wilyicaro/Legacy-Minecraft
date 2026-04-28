@@ -160,6 +160,7 @@ public final class SkinPoseRegistry {
             if (key == null) return null;
             String k = key.trim().toLowerCase(Locale.ROOT);
             String nk = k.replace("_", "");
+            if (nk.equals("weepingstatue")) return STATUE_OF_LIBERTY;
             for (PoseTag t : values()) {
                 if (t.key.equals(k)) return t;
                 if (t.key.replace("_", "").equals(nk)) return t;
