@@ -217,7 +217,8 @@
     "client.RenderTypeAccessor",
     "client.RenderSetupAccessor",
     "client.ClientBiomeMixin",
-    "client.EnvironmentAttributeMapMixin"
+    "client.EnvironmentAttributeMapMixin",
+    "client.chat.ChatComponentDrawingMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
