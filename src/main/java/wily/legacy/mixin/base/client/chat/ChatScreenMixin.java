@@ -81,11 +81,6 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
         return new MouseButtonEvent(par1.x(), par1.y() - (int) (LegacyRenderUtil.getHUDDistance() - 56), par1.buttonInfo());
     }
 
-    @ModifyArg(method = "mouseScrolled", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;scrollChat(I)V"))
-    private int mouseScrolled(int i) {
-        return i - (int) (LegacyRenderUtil.getHUDDistance() - 56);
-    }
-
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"))
     private boolean render(GuiGraphics instance, int i, int j, int k, int l, int m) {
         return false;
