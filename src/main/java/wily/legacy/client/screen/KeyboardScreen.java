@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -266,18 +267,12 @@ public class KeyboardScreen extends OverlayPanelScreen {
             this.keyListener = keyListener;
         }
 
+        @Override
         public boolean playSoundOnClick() {
             return true;
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
-            FactoryScreenUtil.enableBlend();
-            LegacyRenderUtil.renderScrollingString(guiGraphics, Minecraft.getInstance().font, getMessage(), getX() + 2, getY(), getX() + getWidth() - 2, getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
-            FactoryScreenUtil.disableBlend();
-        }
-
         public Identifier getSprite() {
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
         }
@@ -347,29 +342,29 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         }
 
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            int bindingOffset = 0;
-
-            if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
-                bindingOffset = binding.getIcon().render(guiGraphics, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
-
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
             if (iconSprite == null)
-                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
+                renderDefaultLabel(guiGraphics.textRenderer());
             else {
-                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
+                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.get(iconSprite);
                 if (sprite == null) return;
                 try (SpriteContents contents = sprite.contents()) {
+                    int bindingOffset = 0;
+
+                    if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
+                        bindingOffset = binding.getIcon().render(guiGraphics, getX() + 2, getY() + (getHeight() - 9) / 2 + 1, true);
+
                     FactoryScreenUtil.enableBlend();
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, i + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, 2 + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());
                     FactoryScreenUtil.disableBlend();
                 }
             }
         }
 
-        @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON, getX(), getY(), getWidth(), getHeight());
-            renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+        public Identifier getSprite() {
+            return isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON;
         }
 
         @Override
