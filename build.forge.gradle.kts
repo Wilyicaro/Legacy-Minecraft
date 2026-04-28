@@ -112,6 +112,9 @@ dependencies {
 	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
 	compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
 	api("jarJar"("org.apache.httpcomponents:httpclient:4.5.14") as Any)
+	api("jarJar"("org.apache.httpcomponents:httpcore:4.4.16") as Any)
+	api("jarJar"("commons-logging:commons-logging:1.2") as Any)
+	api("jarJar"("commons-codec:commons-codec:1.11") as Any)
 }
 
 if (stonecutter.eval(stonecutter.current.version, "<1.20.5")) {

@@ -42,7 +42,7 @@ public abstract class EntityMixin {
         }
     }
 
-    //? if neoforge {
+    //? if neoforge && <26.1 {
     /*@ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;canStartSwimming()Z", remap = false))
     protected boolean updateSwimming(boolean original) {
         return (LegacyGameRules.getSidedBooleanGamerule(self(), LegacyGameRules.LEGACY_SWIMMING) && (self().isInWater() && self().getXRot() > 0) || original) && !(self() instanceof Player p && p.getAbilities().flying);

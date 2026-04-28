@@ -1,5 +1,6 @@
 package wily.legacy.init;
 
+import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -166,8 +167,8 @@ public class LegacyUIElementTypes {
     public static final UIDefinitionManager.ElementType PUT_TAB_STATE_OFFSET = UIDefinitionManager.ElementType.registerCodec("put_tab_state_offset", LegacyTabButton.StateOffset.CODEC);
     private static final Container emptyFakeContainer = new SimpleContainer();
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", (s, d) -> d.asListOpt(d1 -> DynamicUtil.getItemFromDynamic(d1, true)).result().map(l -> UIDefinition.createBeforeInit(a -> a.putStaticElement(s, new SimpleContainer(l.stream().map(ArbitrarySupplier::get).toArray(ItemStack[]::new))))).orElse(null));
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", (s, d) -> UIDefinitionManager.ElementType.parseItemStackElement(s, d));
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", LegacyUIElementTypes::parseFakeContainer);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "offset", DynamicUtil.VEC3_OBJECT_CODEC);
@@ -233,6 +234,21 @@ public class LegacyUIElementTypes {
             });
         }));
     }));
+
+    private static UIDefinition parseFakeContainer(String field, Dynamic<?> dynamic) {
+        return dynamic.asListOpt(d -> d).result().map(items -> UIDefinition.createBeforeInit(a -> {
+            ItemStack[] stacks = items.stream().map(LegacyUIElementTypes::parseStack).toArray(ItemStack[]::new);
+            a.putStaticElement(field, new SimpleContainer(stacks));
+        })).orElse(null);
+    }
+
+    private static UIDefinition parseFakeItem(String field, Dynamic<?> dynamic) {
+        return UIDefinition.createBeforeInit(a -> a.putStaticElement(field, parseStack(dynamic)));
+    }
+
+    private static ItemStack parseStack(Dynamic<?> dynamic) {
+        return DynamicUtil.getItemFromDynamic(dynamic, true).get();
+    }
 
     public static void init() {
     }

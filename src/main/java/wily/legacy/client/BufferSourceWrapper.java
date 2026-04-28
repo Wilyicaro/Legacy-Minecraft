@@ -1,11 +1,15 @@
 package wily.legacy.client;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.mixin.base.client.BufferSourceAccessor;
+import wily.legacy.mixin.base.client.RenderSetupAccessor;
+import wily.legacy.mixin.base.client.RenderTypeAccessor;
 
 import java.util.function.Function;
 
@@ -23,9 +27,11 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
         return new BufferSourceWrapper(source) {
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {
-                if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentItemSheet());
-//                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
-//                    return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
+                if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentBlockItemSheet());
+                else if (renderType.format() == DefaultVertexFormat./*? if >=26.1 {*/ENTITY/*?} else {*//*NEW_ENTITY*//*?}*/ && !((RenderSetupAccessor)(Object) ((RenderTypeAccessor) renderType).getState()).getTextureBindings().isEmpty())
+                    return super.getBuffer(
+                            RenderTypes./*? if >=26.1 {*/entityTranslucentCullItemTarget/*?} else {*//*itemEntityTranslucentCull*//*?}*/(
+                                    ((RenderSetupAccessor)(Object) ((RenderTypeAccessor) renderType).getState()).getTextureBindings().get("Sampler0").location()));
                 return super.getBuffer(renderType);
             }
         }.setVertexConsumerFunction(consumer -> new VertexConsumerWrapper(consumer).setColorMultiplier(ColorUtil.withAlpha(0xFFFFFF, opacity)));

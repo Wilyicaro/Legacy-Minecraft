@@ -1,4 +1,4 @@
-//? if fabric || >=1.21 && neoforge {
+//? if fabric || >=1.21 && neoforge && <26.1 {
 /*package wily.legacy.client.screen.compat;
 
 import net.irisshaders.iris.gui.screen.ShaderPackScreen;

@@ -17,7 +17,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(Gui.class)
 public class ExperienceBarRendererMixin {
 
-    @Redirect(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
+    @Redirect(method = /*? if forge || <26.1 {*/"extractHotbarAndDecorations"/*?} else {*/ /*"extractExperienceLevel" *//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
     private void renderExperienceLevel(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i) {
         if (!LegacyRenderUtil.canDisplayHUD()) return;
 

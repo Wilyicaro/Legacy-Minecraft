@@ -49,6 +49,15 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+//? if neoforge && >=26.1 {
+/*import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.repository.KnownPack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.resource.JarContentsPackResources;
+*///?}
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.entity.Entity;
@@ -96,7 +105,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
-//? if fabric || >=1.21 && neoforge {
+//? if fabric || >=1.21 && neoforge && <26.1 {
 /*import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
 *///?}
@@ -460,7 +469,7 @@ public class Legacy4JClient {
             LegacyOptions.CLIENT_STORAGE.load();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
-            //? if fabric || >=1.21 && neoforge {
+            //? if fabric || >=1.21 && neoforge && <26.1 {
             /*if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
             *///?}
@@ -553,16 +562,7 @@ public class Legacy4JClient {
             knownBlocks.save();
             knownEntities.save();
         });
-        FactoryEvent.registerBuiltInPacks(registry -> {
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
-            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
-            if (FactoryAPI.getLoader().isForgeLike()) {
-                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
-                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
-            }
-        });
+        registerBuiltInPacks();
         LegacyUIElementTypes.init();
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(ThrownTridentRenderState.class, LoyaltyLinesRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(FireworkRocketRenderState.class, LegacyFireworkRenderState::new));
@@ -607,6 +607,53 @@ public class Legacy4JClient {
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID), Legacy4JSettingsScreen::new);
         FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options, false));
     }
+
+    private static void registerBuiltInPacks() {
+        //? if neoforge && >=26.1 {
+        /*FactoryAPIPlatform.getModEventBus().addListener(EventPriority.NORMAL, false, AddPackFindersEvent.class, event -> {
+            registerNeoForgePack(event, "resourcepacks/legacy_resources", Legacy4J.createModLocation("legacy_resources"), true);
+            registerNeoForgePack(event, "resourcepacks/legacy_waters", Legacy4J.createModLocation("legacy_waters"), true);
+            registerNeoForgePack(event, "resourcepacks/console_aspects", Legacy4J.createModLocation("console_aspects"), false);
+            registerNeoForgePack(event, "resourcepacks/rosenfeld_patch", Legacy4J.createModLocation("rosenfeld_patch"), false);
+            registerNeoForgePack(event, "programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), false);
+            registerNeoForgePack(event, "high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), false);
+        });
+        *///?} else {
+        FactoryEvent.registerBuiltInPacks(registry -> {
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
+            if (FactoryAPI.getLoader().isForgeLike()) {
+                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+            }
+        });
+        //?}
+    }
+
+    //? if neoforge && >=26.1 {
+    /*private static void registerNeoForgePack(AddPackFindersEvent event, String path, Identifier name, boolean enabledByDefault) {
+        registerNeoForgePack(event, path, name, Component.translatable(name.getNamespace() + ".builtin." + name.getPath()), enabledByDefault);
+    }
+
+    private static void registerNeoForgePack(AddPackFindersEvent event, String path, Identifier name, Component title, boolean enabledByDefault) {
+        if (event.getPackType() != PackType.CLIENT_RESOURCES) return;
+        var modFile = ModList.get().getModFileById(name.getNamespace()).getFile();
+        Pack pack = Pack.readMetaAndCreate(
+                new PackLocationInfo(
+                        name.toString(),
+                        title,
+                        PackSource.create(PackSource.BUILT_IN::decorate, enabledByDefault),
+                        Optional.of(new KnownPack(name.getNamespace(), name.toString(), SharedConstants.getCurrentVersion().id()))
+                ),
+                new JarContentsPackResources.JarContentsResourcesSupplier(modFile.getContents(), path),
+                PackType.CLIENT_RESOURCES,
+                new PackSelectionConfig(false, Pack.Position.TOP, false)
+        );
+        if (pack != null) event.addRepositorySource(packConsumer -> packConsumer.accept(pack));
+    }
+    *///?}
 
     public static void updateChunks() {
         FactoryAPIClient.SECURE_EXECUTOR.execute(() -> Minecraft.getInstance().levelRenderer.allChanged());

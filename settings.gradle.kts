@@ -29,7 +29,7 @@ stonecutter {
         fun match(version: String, vararg loaders: String) =
             loaders.forEach { version("$version-$it", version).buildscript = "build.${if (it == "fabric" && stonecutter.eval(version, ">=26.1")) "fabricmc" else it}.gradle.kts" }
 
-        match("26.1.2", "fabric")
+        match("26.1.2", "fabric", "forge", "neoforge")
         vcsVersion = "26.1.2-fabric"
     }
 }
