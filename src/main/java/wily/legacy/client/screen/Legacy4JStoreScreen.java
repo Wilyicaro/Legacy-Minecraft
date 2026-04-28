@@ -141,7 +141,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
             Font font = Minecraft.getInstance().font;
             int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
             String text = PlayerSkinWidget.clipText(font, getMessage().getString(), Math.max(0, getWidth() - 24));
-            graphics.drawString(font, text, getX() + 12, textY, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), false);
+            graphics.drawString(font, text, getX() + 12, textY, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
         }
     }
 }
