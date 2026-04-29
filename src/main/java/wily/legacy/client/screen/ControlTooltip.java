@@ -329,11 +329,11 @@ public interface ControlTooltip {
     }
 
     static Component getUseAction(Minecraft minecraft) {
-        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.JAB : getActualUse(minecraft);
+        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.CHARGE : getActualUse(minecraft);
     }
 
     static Component getAttackAction(Minecraft minecraft) {
-        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.CHARGE : getMainAction(minecraft);
+        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.JAB : getMainAction(minecraft);
     }
 
     static Component getMainAction(Minecraft minecraft) {
