@@ -274,6 +274,10 @@ public interface ControlTooltip {
         return isBundle(stack) && BundleItem.getFullnessDisplay(stack) <= (1 - (float) itemToAccept.getCount() / itemToAccept.getMaxStackSize()) && !itemToAccept.isEmpty() && itemToAccept.getItem().canFitInsideContainerItems();
     }
 
+    static boolean isSpear(ItemStack stack) {
+        return BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().endsWith("_spear");
+    }
+
     static ControlTooltip create(Supplier<Icon> icon, Supplier<Component> action) {
         return new ControlTooltip() {
             public Icon getIcon() {
@@ -322,6 +326,14 @@ public interface ControlTooltip {
             return minecraft.hitResult instanceof EntityHitResult ? LegacyComponents.PICK_ENTITY : ((LegacyKeyMapping) minecraft.options.keyPickItem).getDisplayName();
 
         return null;
+    }
+
+    static Component getUseAction(Minecraft minecraft) {
+        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.CHARGE : getActualUse(minecraft);
+    }
+
+    static Component getAttackAction(Minecraft minecraft) {
+        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.JAB : getMainAction(minecraft);
     }
 
     static Component getMainAction(Minecraft minecraft) {
@@ -1287,7 +1299,7 @@ public interface ControlTooltip {
         public static final List<ControlTooltip> controlTooltips = new ArrayList<>();
 
         public static void applyGUIControlTooltips(Renderer renderer, Minecraft minecraft) {
-            renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyUse, () -> getActualUse(minecraft)).add(minecraft.options.keyAttack, () -> getMainAction(minecraft));
+            renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyAttack, () -> getAttackAction(minecraft)).add(minecraft.options.keyUse, () -> getUseAction(minecraft));
             renderer.tooltips.addAll(controlTooltips);
             renderer.add(minecraft.options.keyShift, () -> {
                 if (minecraft.player.isPassenger()) {
@@ -1311,8 +1323,9 @@ public interface ControlTooltip {
             Predicate<Block> blockPredicate = o.has("hitBlock") ? o.get("hitBlock") instanceof JsonObject obj ? IOUtil.registryMatches(BuiltInRegistries.BLOCK, obj) : o.get("hitBlock").getAsBoolean() ? b -> !b.defaultBlockState().isAir() : b -> false : b -> true;
             Predicate<EntityType<?>> entityPredicate = o.has("hitEntity") ? o.get("hitEntity") instanceof JsonObject obj ? IOUtil.registryMatches(BuiltInRegistries.ENTITY_TYPE, obj) : staticPredicate(o.get("hitEntity").getAsBoolean()) : e -> true;
             Minecraft minecraft = Minecraft.getInstance();
-            Component c = o.get("action") instanceof JsonPrimitive p ? Component.translatable(p.getAsString()) : mapping.getDisplayName();
-            return create(mapping, () -> minecraft.player != null && itemPredicate.test(minecraft.player.getMainHandItem().getItem(), minecraft.player.getMainHandItem()./*? if <1.20.5 {*//*getTag*//*?} else {*/getComponentsPatch/*?}*/()) && ((minecraft.hitResult instanceof BlockHitResult r && blockPredicate.test(minecraft.level.getBlockState(r.getBlockPos()).getBlock())) || (minecraft.hitResult instanceof EntityHitResult er && entityPredicate.test(er.getEntity().getType()))) ? c : null);
+            String actionKey = o.get("action") instanceof JsonPrimitive p ? p.getAsString() : null;
+            Component c = actionKey == null ? mapping.getDisplayName() : Component.translatable(actionKey);
+            return create(mapping, () -> minecraft.player != null && (!"legacy.action.hit".equals(actionKey) || !isSpear(minecraft.player.getMainHandItem())) && itemPredicate.test(minecraft.player.getMainHandItem().getItem(), minecraft.player.getMainHandItem()./*? if <1.20.5 {*//*getTag*//*?} else {*/getComponentsPatch/*?}*/()) && ((minecraft.hitResult instanceof BlockHitResult r && blockPredicate.test(minecraft.level.getBlockState(r.getBlockPos()).getBlock())) || (minecraft.hitResult instanceof EntityHitResult er && entityPredicate.test(er.getEntity().getType()))) ? c : null);
         }
 
         @Override

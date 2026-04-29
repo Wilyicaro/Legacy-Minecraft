@@ -1,7 +1,6 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.util.FormattedCharSequence;
@@ -13,6 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
+import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -130,15 +130,18 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         }
     }
 
-    private static class LeftAlignedButton extends Button.Plain {
+    private static class LeftAlignedButton extends Button {
         public LeftAlignedButton(int width, int height, Component message, OnPress onPress) {
             super(0, 0, width, height, message, onPress, DEFAULT_NARRATION);
         }
 
         @Override
-        protected void extractDefaultLabel(ActiveTextCollector activeTextCollector) {
-            int textY = this.getY() + (this.getHeight() - Minecraft.getInstance().font.lineHeight) / 2 + 1;
-            activeTextCollector.accept(this.getX() + 12, textY, this.getMessage());
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+            extractDefaultSprite(GuiGraphicsExtractor);
+            Font font = Minecraft.getInstance().font;
+            int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
+            String text = PlayerSkinWidget.clipText(font, getMessage().getString(), Math.max(0, getWidth() - 24));
+            GuiGraphicsExtractor.text(font, text, getX() + 12, textY, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
         }
     }
 }

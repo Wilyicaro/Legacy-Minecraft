@@ -3,13 +3,13 @@ package wily.legacy.mixin.base.client.chat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import net.minecraft.client.multiplayer.chat.GuiMessage;
-import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -66,9 +66,10 @@ public abstract class ChatComponentMixin {
     private static void renderChatBg(Args args) {
         int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
         args.set(0, (int) args.get(0) - safeZone);
-        args.set(2, (int) args.get(2) - safeZone);
+        args.set(2, (int) args.get(2) + safeZone);
         args.set(4, ARGB.color(ARGB.alpha(args.get(4)), CommonColor.CHAT_BACKGROUND.get()));
     }
+
     @ModifyArgs(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V", ordinal = 0))
     private void renderChatBgSecond(Args args) {
         renderChatBg(args);

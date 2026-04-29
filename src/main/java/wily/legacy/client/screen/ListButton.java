@@ -35,4 +35,9 @@ public abstract class ListButton extends AbstractButton {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         defaultButtonNarrationText(narrationElementOutput);
     }
+
+    @Override
+    public Component getMessage() {
+        return message;
+    }
 }

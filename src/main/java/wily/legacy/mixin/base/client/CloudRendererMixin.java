@@ -64,7 +64,7 @@ public abstract class CloudRendererMixin {
         boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
         boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
         boolean packCloudShaderEnabled = LegacyCloudAtmosphere.shouldUsePackCloudShader();
-        int relativeCameraPos = legacy$getRelativeCameraPos();
+        int relativeCameraPos = legacy$getRelativeCameraPos(ticks);
         legacy$currentRelativeCameraPos = relativeCameraPos;
         if (legacy$lastLceCloudState != lceCloudsEnabled || legacy$lastLegacyCloudHeightAndTextureState != legacyCloudHeightAndTextureEnabled || legacy$lastPackCloudShaderState != packCloudShaderEnabled || legacy$lastRelativeCameraPos != relativeCameraPos) {
             legacy$lastLceCloudState = lceCloudsEnabled;
@@ -256,14 +256,14 @@ public abstract class CloudRendererMixin {
     }
 
     @Unique
-    private int legacy$getRelativeCameraPos() {
+    private int legacy$getRelativeCameraPos(float partialTicks) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) {
             return 0;
         }
 
         double cameraY = minecraft.gameRenderer.getMainCamera().position().y;
-        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : minecraft.level.environmentAttributes().getDimensionValue(EnvironmentAttributes.CLOUD_HEIGHT);
+        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : minecraft.gameRenderer.getMainCamera().attributeProbe().getValue(EnvironmentAttributes.CLOUD_HEIGHT, partialTicks);
         double top = cloudHeight + CLOUD_BASE_HEIGHT + CLOUD_TOP_EXTENSION;
         double bottom = cloudHeight - CLOUD_BOTTOM_EXTENSION;
 

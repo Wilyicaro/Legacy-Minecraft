@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -157,7 +158,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
             setFocused(l);
     }
 
-    public void resize(Minecraft minecraft, int i, int j) {
+    @Override
+    public void resize(int i, int j) {
         onClose();
     }
 
@@ -266,6 +268,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             this.keyListener = keyListener;
         }
 
+        @Override
         public boolean playSoundOnClick() {
             return true;
         }
@@ -391,8 +394,12 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
-            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON, getX(), getY(), getWidth(), getHeight());
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
             renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+        }
+
+        public Identifier getSprite() {
+            return isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON;
         }
 
         @Override

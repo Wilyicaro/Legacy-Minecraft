@@ -249,6 +249,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (!isFocused() && isPressed()) setSelectedMapping(null);
             extractDefaultSprite(GuiGraphicsExtractor);
+            renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
             if (c != null) {
                 GuiGraphicsExtractor.text(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
@@ -260,7 +261,6 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
                 icon.render(GuiGraphicsExtractor, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
                 FactoryScreenUtil.disableBlend();
             }
-            renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
         }
 
         private boolean isPressed() {

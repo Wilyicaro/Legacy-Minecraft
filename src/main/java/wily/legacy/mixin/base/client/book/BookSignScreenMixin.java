@@ -1,10 +1,14 @@
 package wily.legacy.mixin.base.client.book;
 
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookSignScreen;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,6 +19,8 @@ import wily.legacy.client.screen.BookPanel;
 @Mixin(BookSignScreen.class)
 public class BookSignScreenMixin extends Screen {
 
+    @Shadow
+    private EditBox titleBox;
     @Unique
     private final BookPanel panel = new BookPanel(this);
 
@@ -23,9 +29,15 @@ public class BookSignScreenMixin extends Screen {
     }
 
     @Inject(method = "init", at = @At("HEAD"))
-    private void init(CallbackInfo ci) {
+    private void init(CallbackInfo ci, @Share("oldTitleBox") LocalRef<EditBox> oldTitleBox) {
         panel.init();
         addRenderableOnly(panel);
+        oldTitleBox.set(titleBox);
+    }
+
+    @Inject(method = "init", at = @At(value = "RETURN"))
+    private void initReturn(CallbackInfo ci, @Share("oldTitleBox") LocalRef<EditBox> oldTitleBox) {
+        if (oldTitleBox.get() != null) titleBox.setValue(oldTitleBox.get().getValue());
     }
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;<init>(Lnet/minecraft/client/gui/Font;IIIILnet/minecraft/network/chat/Component;)V"), index = 1)

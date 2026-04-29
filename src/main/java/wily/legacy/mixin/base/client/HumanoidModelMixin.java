@@ -97,7 +97,7 @@ public abstract class HumanoidModelMixin {
             armModel.xRot = eased * -1.3f + (time > 1.2f ? (1 - Math.abs(Mth.sin(ageInTicks * 0.8f) * 2)) * 0.09f : 0);
             armModel.yRot = (isRightHand ? -0.45f : 0.45f) * eased;
         }
-        if (/*? if <1.21.2 {*//*livingEntity.getUseItemRemainingTicks() > 0*//*?} else {*/humanoidRenderState.isUsingItem/*?}*/ && useAnim == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.SPEAR) {
+        if (/*? if <1.21.2 {*//*livingEntity.getUseItemRemainingTicks() > 0*//*?} else {*/humanoidRenderState.isUsingItem/*?}*/ && useAnim == /*? if <1.21.2 {*//*UseAnim.SPEAR*//*?} else if <1.21.11 {*//*ItemUseAnimation.SPEAR*//*?} else {*/ItemUseAnimation.TRIDENT/*?}*/) {
             applyLegacyTridentSupportArmPose(humanoidRenderState, useArm);
             applyLegacyTridentRaise(useArm == HumanoidArm.RIGHT ? rightArm : leftArm, /*? if <1.21.2 {*//*livingEntity.getTicksUsingItem()*//*?} else {*/Math.round(humanoidRenderState.ticksUsingItem)/*?}*/);
         }

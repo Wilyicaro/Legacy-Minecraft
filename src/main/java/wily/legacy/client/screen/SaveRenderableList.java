@@ -16,7 +16,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
@@ -36,12 +35,9 @@ import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
-import wily.legacy.client.PackAlbum;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -276,7 +272,7 @@ public class SaveRenderableList extends RenderableVList {
         minecraft.setScreen(getScreen());
     }
 
-    public class SaveButton extends CreationList.ContentButton implements ControlTooltip.ActionHolder {
+    public class SaveButton extends IconButton implements ControlTooltip.ActionHolder {
         public final LevelSummary summary;
 
         public SaveButton(int i, int j, int k, int l, LevelSummary summary) {

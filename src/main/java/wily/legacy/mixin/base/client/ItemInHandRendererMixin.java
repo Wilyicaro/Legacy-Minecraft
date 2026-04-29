@@ -139,7 +139,7 @@ public abstract class ItemInHandRendererMixin {
             poseStack.popPose();
             return;
         }
-        if (!abstractClientPlayer.isUsingItem() || abstractClientPlayer.getUseItemRemainingTicks() <= 0 || abstractClientPlayer.getUsedItemHand() != interactionHand || itemStack.getUseAnimation() != ItemUseAnimation.SPEAR) {
+        if (!abstractClientPlayer.isUsingItem() || abstractClientPlayer.getUseItemRemainingTicks() <= 0 || abstractClientPlayer.getUsedItemHand() != interactionHand || itemStack.getUseAnimation() != /*? if <1.21.11 {*//*ItemUseAnimation.SPEAR*//*?} else {*/ItemUseAnimation.TRIDENT/*?}*/) {
             return;
         }
         applyLegacyTridentFirstPersonTransform(abstractClientPlayer, itemStack, humanoidArm, i, k, f, poseStack);

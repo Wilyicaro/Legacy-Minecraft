@@ -191,7 +191,7 @@ public class ChooseUserScreen extends PanelVListScreen {
             minecraft.setScreen(ChooseUserScreen.this);
         })));
         for (MCAccount account : MCAccount.list) {
-            renderableVList.addRenderable(new CreationList.ContentButton(renderableVList, 0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user", account.getProfile().name()) : Component.literal(account.getProfile().name())) {
+            renderableVList.addRenderable(new IconButton(renderableVList, 0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user", account.getProfile().name()) : Component.literal(account.getProfile().name())) {
                 @Override
                 public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
                     PlayerFaceExtractor.extractRenderState(GuiGraphicsExtractor, minecraft.getSkinManager().createLookup(account.getProfile(), true).get(), getX() + x, getY() + y, Math.max(width, height));

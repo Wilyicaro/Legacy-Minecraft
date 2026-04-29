@@ -18,7 +18,6 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.input.InputWithModifiers;
@@ -172,7 +171,7 @@ public class ServerRenderableList extends RenderableVList {
         if (lanServers != null) {
             for (LanServer lanServer : lanServers) {
                 AbstractButton lanButton;
-                addRenderable(lanButton = new CreationList.ContentButton(this, 0, 0, 0, 30, Component.literal(lanServer.getMotd())) {
+                addRenderable(lanButton = new IconButton(this, 0, 0, 0, 30, Component.literal(lanServer.getMotd())) {
                     @Override
                     protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
                         int messageX = accessor.getInteger(name + ".buttonMessage.xOffset", 35);
@@ -196,7 +195,7 @@ public class ServerRenderableList extends RenderableVList {
             }
         } else {
             AbstractButton scanningButton;
-            addRenderable(scanningButton = new CreationList.ContentButton(this, 0, 0, 0, 30, SCANNING_LABEL) {
+            addRenderable(scanningButton = new IconButton(this, 0, 0, 0, 30, SCANNING_LABEL) {
                 @Override
                 public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
                     LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, getX() + x, getY() + y, (width - 2) / 3, 1);
@@ -232,7 +231,7 @@ public class ServerRenderableList extends RenderableVList {
         ConnectScreen.startConnecting(getScreen(), this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false/*? if >=1.20.5 {*/, null/*?}*/);
     }
 
-    public class ServerButton extends CreationList.ContentButton implements ControlTooltip.ActionHolder {
+    public class ServerButton extends IconButton implements ControlTooltip.ActionHolder {
         public final ServerData server;
         public final int serverIndex;
         public final FaviconTexture icon;

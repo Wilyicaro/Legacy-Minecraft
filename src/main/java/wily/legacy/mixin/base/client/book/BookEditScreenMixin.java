@@ -160,8 +160,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
     @ModifyArg(method = "visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
     public int pageX(int anchorX) {
-        int pageWidth = this.font.width(this.numberOfPages.getVisualOrderText());
-        return panel.x + panel.width - 24 - pageWidth;
+        return panel.x + panel.width - 24;
     }
 
     @ModifyArg(method = "visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)

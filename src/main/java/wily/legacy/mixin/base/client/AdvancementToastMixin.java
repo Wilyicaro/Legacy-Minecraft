@@ -39,7 +39,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
     @Final
     private /*? if >1.20.1 {*/ AdvancementHolder/*?} else {*//*Advancement*//*?}*/ advancement;
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l, /*? if <1.21.2 {*/ /*CallbackInfoReturnable<Visibility> cir*//*?} else {*/CallbackInfo ci /*?}*/) {
         //? if <1.21.2 {
         /*Font font = Minecraft.getInstance().font;

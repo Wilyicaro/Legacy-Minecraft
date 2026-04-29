@@ -7,12 +7,14 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleType;
 import net.minecraft.world.level.gamerules.GameRules;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIDefinition;
@@ -35,7 +37,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     public static final List<GameRule<Boolean>> WORLD_RULES = new ArrayList<>(List.of(GameRules.FIRE_DAMAGE, LegacyGameRules.getTntExplodes(), GameRules.ADVANCE_TIME, GameRules.KEEP_INVENTORY, GameRules.SPAWN_MOBS, GameRules.MOB_GRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON.get(), LegacyGameRules.LEGACY_SWIMMING.get(), LegacyGameRules.LEGACY_FLIGHT.get(), LegacyGameRules.LEGACY_OFFHAND_LIMITS.get()));
     public static final List<GameRule<Boolean>> OTHER_RULES = new ArrayList<>(List.of(GameRules.ADVANCE_WEATHER, GameRules.MOB_DROPS, GameRules.BLOCK_DROPS, GameRules.NATURAL_HEALTH_REGENERATION, GameRules.IMMEDIATE_RESPAWN));
     public static final List<GameRule<Boolean>> LEGACY_WORLD_RULES = List.of(GameRules.FIRE_DAMAGE, LegacyGameRules.getTntExplodes(), GameRules.ADVANCE_TIME, GameRules.KEEP_INVENTORY, GameRules.SPAWN_MOBS, GameRules.MOB_GRIEFING);
-    public static final List<GameRule<Boolean>> LEGACY_NON_OP_RULES = List.of(GameRules.FIRE_DAMAGE, LegacyGameRules.getTntExplodes(), GameRules.MOB_DROPS, GameRules.BLOCK_DROPS, GameRules.NATURAL_HEALTH_REGENERATION, GameRules.IMMEDIATE_RESPAWN);
+    public static final List<Identifier> LEGACY_NON_OP_RULES = List.of(GameRules.FIRE_DAMAGE.getIdentifier(), LegacyGameRules.getTntExplodes().getIdentifier(), GameRules.MOB_DROPS.getIdentifier(), GameRules.BLOCK_DROPS.getIdentifier(), GameRules.NATURAL_HEALTH_REGENERATION.getIdentifier(), GameRules.IMMEDIATE_RESPAWN.getIdentifier());
     public static final List<GameRule<Boolean>> LEGACY_OTHER_RULES = List.of(GameRules.ADVANCE_WEATHER, GameRules.MOB_DROPS, GameRules.BLOCK_DROPS, GameRules.NATURAL_HEALTH_REGENERATION, GameRules.IMMEDIATE_RESPAWN);
     public static final List<String> WEATHERS = List.of("clear", "rain", "thunder");
 
@@ -52,9 +54,14 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         accessor.addStatic(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", isOp)));
 
         if (!isOp) {
-            List<GameRule<Boolean>> nonOpRules = legacyMenus ? LEGACY_NON_OP_RULES : PlayerInfoSync.All.NON_OP_GAMERULES;
-            for (GameRule<Boolean> key : nonOpRules)
-                getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.get(key), b1 -> LegacyComponents.getMenuGameRuleName(key), b1 -> null, b1 -> nonOpGamerules.put(key.getIdentifier(), b1.selected ? 1 : 0)));
+            List<Identifier> nonOpRules = legacyMenus ? LEGACY_NON_OP_RULES : PlayerInfoSync.All.NON_OP_GAMERULES;
+            for (Identifier id : nonOpRules) {
+                BuiltInRegistries.GAME_RULE.get(id).ifPresent(rule -> {
+                    if (rule.value().gameRuleType() != GameRuleType.BOOL) return;
+                    GameRule<Boolean> key = (GameRule<Boolean>) rule.value();
+                    getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.get(key), b1 -> LegacyComponents.getMenuGameRuleName(key), b1 -> null, b1 -> nonOpGamerules.put(key.getIdentifier(), b1.selected ? 1 : 0)));
+                });
+            }
             if (!legacyMenus) {
                 LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
                 Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));

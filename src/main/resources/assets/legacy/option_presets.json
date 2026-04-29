@@ -5,7 +5,22 @@
     "tooltip": {"translate": "legacy.options.optionsPreset.handheld.tooltip"},
     "vanilla": {
       "options.renderDistance": 6,
-      "options.graphics.preset": "fancy"
+      "options.biomeBlendRadius": 1,
+      "options.prioritizeChunkUpdates": 0,
+      "options.simulationDistance": 10,
+      "options.ao": true,
+      "options.renderClouds": "true",
+      "options.particles": 1,
+      "options.mipmapLevels": 3,
+      "options.entityShadows": true,
+      "options.entityDistanceScaling": 0.75,
+      "options.accessibility.menu_background_blurriness": 2,
+      "options.renderCloudsDistance": 32,
+      "options.cutoutLeaves": true,
+      "options.improvedTransparency": false,
+      "options.weatherRadius": 5,
+      "options.maxAnisotropy": 1,
+      "options.textureFiltering": 0
     },
     "legacy": {
       "autoSaveCountdown": true,
@@ -18,7 +33,22 @@
     "tooltip": {"translate": "legacy.options.optionsPreset.low.tooltip"},
     "vanilla": {
       "options.renderDistance": 10,
-      "options.graphics.preset": "fancy"
+      "options.biomeBlendRadius": 2,
+      "options.prioritizeChunkUpdates": 0,
+      "options.simulationDistance": 10,
+      "options.ao": true,
+      "options.renderClouds": "true",
+      "options.particles": 0,
+      "options.mipmapLevels": 3,
+      "options.entityShadows": true,
+      "options.entityDistanceScaling": 1.0,
+      "options.accessibility.menu_background_blurriness": 2,
+      "options.renderCloudsDistance": 64,
+      "options.cutoutLeaves": true,
+      "options.improvedTransparency": false,
+      "options.weatherRadius": 5,
+      "options.maxAnisotropy": 1,
+      "options.textureFiltering": 0
     },
     "legacy": {
       "autoSaveCountdown": true,
@@ -31,7 +61,22 @@
     "tooltip": {"translate": "legacy.options.optionsPreset.medium.tooltip"},
     "vanilla": {
       "options.renderDistance": 18,
-      "options.graphics.preset": "fancy"
+      "options.biomeBlendRadius": 2,
+      "options.prioritizeChunkUpdates": 1,
+      "options.simulationDistance": 12,
+      "options.ao": true,
+      "options.renderClouds": "true",
+      "options.particles": 0,
+      "options.mipmapLevels": 3,
+      "options.entityShadows": true,
+      "options.entityDistanceScaling": 1.25,
+      "options.accessibility.menu_background_blurriness": 5,
+      "options.renderCloudsDistance": 128,
+      "options.cutoutLeaves": true,
+      "options.improvedTransparency": false,
+      "options.weatherRadius": 5,
+      "options.maxAnisotropy": 2,
+      "options.textureFiltering": 1
     },
     "legacy": {
       "autoSaveCountdown": false,
@@ -44,7 +89,22 @@
     "tooltip": {"translate": "legacy.options.optionsPreset.high.tooltip"},
     "vanilla": {
       "options.renderDistance": 24,
-      "options.graphics.preset": "fabulous"
+      "options.biomeBlendRadius": 3,
+      "options.prioritizeChunkUpdates": 1,
+      "options.simulationDistance": 16,
+      "options.ao": true,
+      "options.renderClouds": "true",
+      "options.particles": 0,
+      "options.mipmapLevels": 4,
+      "options.entityShadows": true,
+      "options.entityDistanceScaling": 2,
+      "options.accessibility.menu_background_blurriness": 5,
+      "options.renderCloudsDistance": 128,
+      "options.cutoutLeaves": true,
+      "options.improvedTransparency": true,
+      "options.weatherRadius": 5,
+      "options.maxAnisotropy": 2,
+      "options.textureFiltering": 1
     },
     "legacy": {
       "autoSaveCountdown": false,
@@ -57,7 +117,22 @@
     "tooltip": {"translate": "legacy.options.optionsPreset.ultra.tooltip"},
     "vanilla": {
       "options.renderDistance": 32,
-      "options.graphics.preset": "fabulous"
+      "options.biomeBlendRadius": 3,
+      "options.prioritizeChunkUpdates": 1,
+      "options.simulationDistance": 18,
+      "options.ao": true,
+      "options.renderClouds": "true",
+      "options.particles": 0,
+      "options.mipmapLevels": 4,
+      "options.entityShadows": true,
+      "options.entityDistanceScaling": 2,
+      "options.accessibility.menu_background_blurriness": 5,
+      "options.renderCloudsDistance": 128,
+      "options.cutoutLeaves": true,
+      "options.improvedTransparency": true,
+      "options.weatherRadius": 5,
+      "options.maxAnisotropy": 2,
+      "options.textureFiltering": 1
     },
     "legacy": {
       "autoSaveCountdown": false,

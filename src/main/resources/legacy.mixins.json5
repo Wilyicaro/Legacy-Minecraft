@@ -152,6 +152,7 @@
     "client.MultilineEditBoxMixin",
     "client.EvokerFangsRendererMixin",
     "client.WindowMixin",
+    "client.WingsLayerMixin",
     "client.MenuScreensMixin",
     "client.MultiplayerGameModeMixin",
     "client.CameraMixin",
@@ -215,7 +216,8 @@
     "client.RenderTypeAccessor",
     "client.RenderSetupAccessor",
     "client.ClientBiomeMixin",
-    "client.EnvironmentAttributeMapMixin"
+    "client.EnvironmentAttributeMapMixin",
+    "client.chat.ChatComponentDrawingMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",

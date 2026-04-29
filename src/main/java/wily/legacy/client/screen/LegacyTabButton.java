@@ -23,7 +23,6 @@ import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.DynamicUtil;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
@@ -117,9 +116,6 @@ public class LegacyTabButton extends AbstractButton {
     @Override
     protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
-        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
-        FactoryScreenUtil.enableBlend();
-        FactoryScreenUtil.enableDepthTest();
         GuiGraphicsExtractor.pose().pushMatrix();
         Vec2 translate = offset.apply(this);
         if (!translate.equals(Vec2.ZERO)) {
