@@ -329,11 +329,11 @@ public interface ControlTooltip {
     }
 
     static Component getUseAction(Minecraft minecraft) {
-        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.CHARGE : getActualUse(minecraft);
+        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.JAB : getActualUse(minecraft);
     }
 
     static Component getAttackAction(Minecraft minecraft) {
-        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.JAB : getMainAction(minecraft);
+        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.CHARGE : getMainAction(minecraft);
     }
 
     static Component getMainAction(Minecraft minecraft) {
@@ -1299,7 +1299,7 @@ public interface ControlTooltip {
         public static final List<ControlTooltip> controlTooltips = new ArrayList<>();
 
         public static void applyGUIControlTooltips(Renderer renderer, Minecraft minecraft) {
-            renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyAttack, () -> getAttackAction(minecraft)).add(minecraft.options.keyUse, () -> getUseAction(minecraft));
+            renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyUse, () -> getUseAction(minecraft)).add(minecraft.options.keyAttack, () -> getAttackAction(minecraft));
             renderer.tooltips.addAll(controlTooltips);
             renderer.add(minecraft.options.keyShift, () -> {
                 if (minecraft.player.isPassenger()) {
