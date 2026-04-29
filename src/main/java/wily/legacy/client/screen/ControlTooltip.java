@@ -634,7 +634,7 @@ public interface ControlTooltip {
             // 5-Feeding/healing interactions (canFeed, canSetLoveMode, heal, tame)
             if (canTame(minecraft, hand, actualItem)) return LegacyComponents.TAME;
             if (canDyeEntity(minecraft, actualItem)) return LegacyComponents.DYE;
-            if (canFeed(minecraft, entity, actualItem)) return LegacyComponents.FEED;
+            if (canFeed(minecraft, entity, actualItem) || canFeedWithGoldenDandelion(entity, actualItem)) return LegacyComponents.FEED;
             if (canSetLoveMode(entity, actualItem)) return LegacyComponents.LOVE_MODE;
             if (entity instanceof TamableAnimal a && a.isTame() && a.isFood(actualItem) && a.getHealth() < a.getMaxHealth())
                 return LegacyComponents.HEAL;
@@ -716,6 +716,10 @@ public interface ControlTooltip {
 
     static boolean canFeed(Minecraft minecraft, Entity entity, ItemStack usedItem) {
         return (entity instanceof Animal a && a.isFood(usedItem) && (!(a instanceof AbstractHorse) && a.isBaby() || a instanceof AbstractHorse h && (a instanceof Llama || (a.isBaby() || !usedItem.is(Items.HAY_BLOCK))) && (!h.isTamed() || !isLoveFood(a, usedItem) && a.getHealth() < a.getMaxHealth() && !minecraft.player.isSecondaryUseActive()))) || (entity instanceof Panda panda && usedItem.is(Items.BAMBOO) && panda.isFood(usedItem) && !panda.isEating() && !panda.canFallInLove());
+    }
+
+    static boolean canFeedWithGoldenDandelion(Entity entity, ItemStack usedItem) {
+        return entity instanceof AgeableMob mob && AgeableMob.canUseGoldenDandelion(usedItem, mob.isBaby(), 0, mob);
     }
 
     static boolean isLoveFood(Animal a, ItemStack stack) {
