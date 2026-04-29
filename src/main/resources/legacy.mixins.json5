@@ -154,6 +154,7 @@
     "client.MultilineEditBoxMixin",
     "client.EvokerFangsRendererMixin",
     "client.WindowMixin",
+    "client.WingsLayerMixin",
     "client.MenuScreensMixin",
     "client.MultiplayerGameModeMixin",
     "client.CameraMixin",

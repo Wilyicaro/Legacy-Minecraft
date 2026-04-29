@@ -16,12 +16,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.FactoryRenderStateExtension;
+import wily.legacy.client.LegacyLivingEntityRenderState;
 import wily.legacy.util.client.LegacyHeadRenderState;
 
 @Mixin(CustomHeadLayer.class)
 public class CustomHeadLayerMixin {
-    @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"))
+    @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V", at = @At("HEAD"), cancellable = true)
     private void legacy$storeHeadRenderState(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int light, LivingEntityRenderState renderState, float headYaw, float headPitch, CallbackInfo ci) {
+        LegacyLivingEntityRenderState legacyState = FactoryRenderStateExtension.Accessor.of(renderState).getExtension(LegacyLivingEntityRenderState.class);
+        if (legacyState != null && legacyState.hostInvisible) {
+            ci.cancel();
+            return;
+        }
         LegacyHeadRenderState.set(renderState);
     }
 

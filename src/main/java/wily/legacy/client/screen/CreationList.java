@@ -5,11 +5,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -31,8 +29,6 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.*;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.client.LegacyFontUtil;
-import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,7 +149,7 @@ public class CreationList extends RenderableVList {
 
     public static void addIconButton(RenderableVList list, Identifier iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
         AbstractButton button;
-        list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, message) {
+        list.addRenderable(button = new IconButton(list, 0, 0, 270, 30, message) {
             @Override
             public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + x, getY() + y, width, height);
@@ -169,7 +165,7 @@ public class CreationList extends RenderableVList {
 
     public static void addTemplateButton(RenderableVList list, LegacyWorldTemplate template, Consumer<AbstractButton> onPress) {
         AbstractButton button;
-        list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, template.buttonMessage()) {
+        list.addRenderable(button = new IconButton(list, 0, 0, 270, 30, template.buttonMessage()) {
             @Override
             public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
                 Identifier icon = getTemplatePackIcon(template);
@@ -198,37 +194,6 @@ public class CreationList extends RenderableVList {
             return packIcons.getUnchecked(packId);
         } catch (Exception e) {
             return null;
-        }
-    }
-
-
-    public static abstract class ContentButton extends ListButton {
-        public ContentButton(RenderableVList list, int x, int y, int width, int height, Component component) {
-            super(list, x, y, width, height, component);
-        }
-
-        @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderContents(guiGraphics, i, j, f);
-            if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true))
-                renderIcon(guiGraphics, i, j, f);
-        }
-
-        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float f) {
-            int iconWidth = list.accessor.getInteger(list.name + ".buttonIcon.width", 20);
-            int iconHeight = list.accessor.getInteger(list.name + ".buttonIcon.height", 20);
-            int iconPos = (height - iconHeight) / 2;
-            renderIcon(guiGraphics, mouseX, mouseY, iconPos, iconPos, iconWidth, iconHeight);
-            if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
-                renderIconHighlight(guiGraphics, mouseX, mouseY, iconPos, iconPos, iconWidth, iconHeight);
-            }
-        }
-
-        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-        }
-
-        public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-            guiGraphics.fill(getX() + x, getY() + y, getX() + x + width, getY() + y + height, -1601138544);
         }
     }
 }
