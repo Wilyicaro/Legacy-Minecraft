@@ -396,7 +396,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
         @Override
         protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
-            super.extractContents(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
+            GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, isHoveredOrFocused() ? LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON_HIGHLIGHTED, LegacySprites.BUTTON_HIGHLIGHTED) : LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON, LegacySprites.BUTTON), getX(), getY(), getWidth(), getHeight(), ARGB.white(alpha));
+            renderString(GuiGraphicsExtractor, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             if (downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category)) {
                 int size = 16;
                 int x = this.getX() + this.width - size - 11;
