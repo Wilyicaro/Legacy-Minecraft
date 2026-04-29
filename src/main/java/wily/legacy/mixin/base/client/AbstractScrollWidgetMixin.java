@@ -22,7 +22,7 @@ public abstract class AbstractScrollWidgetMixin extends AbstractWidget {
         super(i, j, k, l, component);
     }
 
-    @Inject(method = "renderBorder", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractBorder", at = @At("HEAD"), cancellable = true)
     private void renderBorder(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, int k, int l, CallbackInfo ci) {
         FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TEXT_FIELD, i, j, k, l);
         if (isHoveredOrFocused())
