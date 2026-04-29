@@ -21,6 +21,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
@@ -43,8 +45,6 @@ import wily.legacy.client.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.ImpossibleIngredient;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.mixin.base.FireworkRocketRecipeAccessor;
-import wily.legacy.mixin.base.FireworkStarRecipeAccessor;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
@@ -101,8 +101,8 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         container = new TransientCraftingContainer(abstractContainerMenu, gridDimension, gridDimension);
         warningSlots = new boolean[gridDimension * gridDimension];
         if (Minecraft.getInstance().level == null) return;
-        CraftingInput input = container.asCraftInput();
-        List<RecipeInfo<CraftingRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.CRAFTING).stream().map(h -> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapedRecipe rcp ? LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(ingredientsGrid), LegacyCraftingMenu.getRecipeOptionalIngredients(rcp), gridDimension, rcp.getWidth(), rcp.getHeight()) : h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapelessRecipe r ? LegacyCraftingMenu.getRecipeOptionalIngredients(r) : Collections.emptyList(), h/*? if >1.20.1 {*/.value()/*?}*/.isSpecial() ? ItemStack.EMPTY : h/*? if >1.20.1 {*/.value()/*?}*/.assemble(input))).filter(h -> h.getOptionalIngredients().size() <= ingredientsGrid.size()).toList();
+        var context = SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
+        List<RecipeInfo<CraftingRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.CRAFTING).stream().map(h -> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapedRecipe rcp ? LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(ingredientsGrid), LegacyCraftingMenu.getRecipeOptionalIngredients(rcp), gridDimension, rcp.getWidth(), rcp.getHeight()) : h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapelessRecipe r ? LegacyCraftingMenu.getRecipeOptionalIngredients(r) : Collections.emptyList(), getRecipeResult(h/*? if >1.20.1 {*/.value()/*?}*/, context))).filter(h -> h.getOptionalIngredients().size() <= ingredientsGrid.size()).toList();
         for (LegacyCraftingTabListing listing : Legacy4JClient.legacyCraftingListingManager.map().values()) {
             List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
             listing.craftings().values().forEach(l -> {
@@ -179,7 +179,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         Consumer<CustomCraftingIconHolder> fireworkStarUpdateRecipe = h -> {
             clearIngredients(ingredientsGrid);
             if (fireworkStarButtons.isEmpty()) return;
-            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkStarButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkStarRecipeAccessor.getGunpowderIngredient())), gridDimension, 2, 2);
+            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkStarButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkCrafting.gunpowderIngredient())), gridDimension, 2, 2);
             fireworkStarButtons.forEach(CustomRecipeIconHolder::applyAddedIngredients);
             resultStack = fireworkStarButtons.get(0).hasItem() ? h.assembleCraftingResult(minecraft.level, container) : Items.FIREWORK_STAR.getDefaultInstance();
             canCraft(ingredientsGrid, true);
@@ -196,7 +196,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         Consumer<CustomCraftingIconHolder> fireworkRocketUpdateRecipe = h -> {
             clearIngredients(ingredientsGrid);
             if (fireworkButtons.isEmpty()) return;
-            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkRocketRecipeAccessor.getPaperIngredient())), gridDimension, 2, 2);
+            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkCrafting.paperIngredient())), gridDimension, 2, 2);
             fireworkButtons.forEach(CustomRecipeIconHolder::applyAddedIngredients);
             resultStack = fireworkButtons.get(0).hasItem() ? h.assembleCraftingResult(Minecraft.getInstance().level, container) : new ItemStack(Items.FIREWORK_ROCKET, 3);
             canCraft(ingredientsGrid, true);
@@ -226,13 +226,13 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         };
         List<ItemStack> dyes = Arrays.stream(DyeColor.values()).map(c -> LegacyItemUtil.getDyeItem(c).getDefaultInstance()).toList();
         fireworkStarButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, fireworkStarUpdateRecipe).enableAddIngredients());
-        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.SHAPE_TAB, FireworkStarRecipeAccessor.getShapeByItem().keySet().stream().map(ItemStack::new).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && Arrays.stream(FactoryIngredient.of(i.get()).getStacks()).anyMatch(item -> FireworkStarRecipeAccessor.getShapeByItem().containsKey(item.getItem())))));
-        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.EFFECT_TAB, Stream.concat(Arrays.stream(FactoryIngredient.of(FireworkStarRecipeAccessor.getTwinkleIngredient()).getStacks()), Arrays.stream(FactoryIngredient.of(FireworkStarRecipeAccessor.getTrailIngredient()).getStacks())).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && i.get().test(h.itemIcon))));
+        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.SHAPE_TAB, FireworkCrafting.shapesByItem().keySet().stream().map(ItemStack::new).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && Arrays.stream(FactoryIngredient.of(i.get()).getStacks()).anyMatch(item -> FireworkCrafting.shapesByItem().containsKey(item.getItem())))));
+        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.EFFECT_TAB, Stream.concat(Arrays.stream(FactoryIngredient.of(FireworkCrafting.twinkleIngredient()).getStacks()), Arrays.stream(FactoryIngredient.of(FireworkCrafting.trailIngredient()).getStacks())).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && i.get().test(h.itemIcon))));
 
         fireworkStarFadeButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_STAR_TAB, i -> i.is(Items.FIREWORK_STAR), fireworkStarFadeUpdateRecipe));
         fireworkStarFadeButtons.add(craftingButtonByList(LegacyComponents.ADD_FADE_TAB, dyes, fireworkStarFadeUpdateRecipe).enableAddIngredients());
 
-        fireworkButtons.add(craftingButtonByList(LegacyComponents.ADD_POWER_TAB, Arrays.stream(FactoryIngredient.of(FireworkRocketRecipeAccessor.getGunpowderIngredient()).getStacks()).toList(), fireworkRocketUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().filter(i -> i.isPresent() && i.get().equals(FireworkRocketRecipeAccessor.getGunpowderIngredient())).count() < 3));
+        fireworkButtons.add(craftingButtonByList(LegacyComponents.ADD_POWER_TAB, Arrays.stream(FactoryIngredient.of(FireworkCrafting.gunpowderIngredient()).getStacks()).toList(), fireworkRocketUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().filter(i -> i.isPresent() && i.get().equals(FireworkCrafting.gunpowderIngredient())).count() < 3));
         fireworkButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_STAR_TAB, i -> i.is(Items.FIREWORK_STAR) && /*? if <1.20.5 {*//*i.hasTag() && i.getTag().contains("Explosion")*//*?} else {*/i.get(DataComponents.FIREWORK_EXPLOSION) != null/*?}*/, fireworkRocketUpdateRecipe).enableAddIngredients());
 
         dyeArmorButtons.add(craftingButtonByPredicate(Component.translatable("legacy.container.tab.armour"), i -> /*? if <1.20.5 {*//*i.getItem() instanceof DyeableLeatherItem*//*?} else {*/i.is(ItemTags.CAULDRON_CAN_REMOVE_DYE)/*?}*/, dyeArmorUpdateRecipe));
@@ -278,6 +278,12 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
     public static LegacyCraftingScreen playerCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         return new LegacyCraftingScreen(abstractContainerMenu, inventory, component, true);
+    }
+
+    private static ItemStack getRecipeResult(CraftingRecipe recipe, net.minecraft.util.context.ContextMap context) {
+        if (recipe.isSpecial()) return ItemStack.EMPTY;
+        List<RecipeDisplay> displays = recipe.display();
+        return displays.isEmpty() ? ItemStack.EMPTY : displays.get(0).result().resolveForFirstStack(context);
     }
 
     public static boolean canCraft(List<ItemStack> compactItemStackList, List<Optional<Ingredient>> ings, boolean[] warningSlots) {

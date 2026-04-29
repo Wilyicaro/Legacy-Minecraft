@@ -27,7 +27,7 @@ public class GhostSlotsMixin {
     @Final
     private SlotSelectTime slotSelectTime;
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, Minecraft minecraft, boolean bl, CallbackInfo ci) {
         ci.cancel();
         ingredients.forEach((slot, ghostSlot) -> {

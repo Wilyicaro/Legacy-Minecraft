@@ -19,7 +19,7 @@ public abstract class EffectRenderingInventoryScreenMixin {
     @Final
     private AbstractContainerScreen<?> screen;
 
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, CallbackInfo ci) {
         ci.cancel();
         //? if <1.21.2 {

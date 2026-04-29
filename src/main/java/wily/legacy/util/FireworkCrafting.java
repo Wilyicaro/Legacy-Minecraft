@@ -1,29 +1,30 @@
-package wily.legacy.mixin.base;
+package wily.legacy.util;
 
-import net.minecraft.world.item.FireworkRocketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-//? if >=1.20.5 {
 import net.minecraft.world.item.component.FireworkExplosion;
-//?}
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Map;
 
-public interface FireworkStarRecipeAccessor {
-    static Ingredient getTwinkleIngredient() {
+public class FireworkCrafting {
+    public static Ingredient twinkleIngredient() {
         return Ingredient.of(Items.GLOWSTONE_DUST);
     }
 
-    static Ingredient getTrailIngredient() {
+    public static Ingredient trailIngredient() {
         return Ingredient.of(Items.DIAMOND);
     }
 
-    static Ingredient getGunpowderIngredient() {
+    public static Ingredient gunpowderIngredient() {
         return Ingredient.of(Items.GUNPOWDER);
     }
 
-    static Map<Item, /*? if >=1.20.5 {*/FireworkExplosion.Shape/*?} else {*//*FireworkRocketItem.Shape*//*?}*/> getShapeByItem() {
+    public static Ingredient paperIngredient() {
+        return Ingredient.of(Items.PAPER);
+    }
+
+    public static Map<Item, FireworkExplosion.Shape> shapesByItem() {
         return Map.of(
                 Items.FIRE_CHARGE, FireworkExplosion.Shape.LARGE_BALL,
                 Items.GOLD_NUGGET, FireworkExplosion.Shape.STAR,
