@@ -719,8 +719,8 @@ public class Legacy4JClient {
         }
         LegacyOptions.CLIENT_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyOptions.CLIENT_STORAGE.save();
-        LegacyCommonOptions.COMMON_STORAGE.save();
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(FactoryConfig::reset);
+        LegacyCommonOptions.COMMON_STORAGE.save();
         minecraft.options.save();
     }
 
