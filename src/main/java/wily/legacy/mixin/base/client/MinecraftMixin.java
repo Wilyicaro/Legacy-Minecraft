@@ -22,6 +22,7 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
@@ -170,9 +171,11 @@ public abstract class MinecraftMixin {
         if (bl) legacy$pauseShield();
     }
 
-    @Inject(method = "startAttack", at = @At("HEAD"))
+    @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
     private void startAttackHead(CallbackInfoReturnable<Boolean> cir) {
         legacy$pauseShield();
+        if (player != null && player.swinging && player.swingingArm == InteractionHand.MAIN_HAND && player.getMainHandItem().has(DataComponents.PIERCING_WEAPON))
+            cir.setReturnValue(false);
     }
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
