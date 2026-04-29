@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
@@ -75,9 +74,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         if (!LegacyOptions.saveCache.get()) return;
         try {
             LevelStorageSource.LevelStorageAccess access = LegacySaveCache.currentWorldSource.createAccess(/*? <1.21.2 {*//*uiState.getTargetFolder()*//*?} else {*/string/*?}*/);
+            Path levelDirectory = LegacySaveCache.getLevelDirectory(access);
             access.close();
-            if (Files.exists(access.getDimensionPath(Level.OVERWORLD)))
-                FileUtils.deleteDirectory(access.getDimensionPath(Level.OVERWORLD).toFile());
+            if (Files.exists(levelDirectory))
+                FileUtils.deleteDirectory(levelDirectory.toFile());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

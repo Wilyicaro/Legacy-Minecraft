@@ -18,7 +18,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -122,7 +121,7 @@ public class CreationList extends RenderableVList {
                 @Override
                 public void onClose() {
                     if (!LegacyOptions.saveCache.get())
-                        FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
+                        FileUtils.deleteQuietly(LegacySaveCache.getLevelDirectory(access).toFile());
                     super.onClose();
                 }
             });
