@@ -1,22 +1,22 @@
 package wily.legacy.skins.pose;
 
-<<<<<<< Updated upstream
-=======
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.effects.SpearAnimations;
->>>>>>> Stashed changes
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-<<<<<<< Updated upstream
-=======
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.SwingAnimationType;
->>>>>>> Stashed changes
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class ZombieArmsPose {
+    private static final int TRIDENT_RAISE_TICKS = 6;
+    private static final float TRIDENT_BACK_X_ROT = ((float) Math.PI) * 1.25F;
+    private static final float CROUCH_OFFSET = 0.2617994F;
+
     private ZombieArmsPose() {
     }
 
@@ -31,6 +31,10 @@ public final class ZombieArmsPose {
     public static void apply(PlayerModel model, AvatarRenderState state) {
         Player player = ArmPoseSupport.getPlayer(state);
         if (player != null && player.getPose() == Pose.SWIMMING) return;
+        if (isUsingTrident(player)) {
+            applyTrident(model, state, player);
+            return;
+        }
 
         ArmPoseSupport.ArmState rightState = ArmPoseSupport.ArmState.capture(model.rightArm, model.rightSleeve);
         ArmPoseSupport.ArmState leftState = ArmPoseSupport.ArmState.capture(model.leftArm, model.leftSleeve);
@@ -80,8 +84,6 @@ public final class ZombieArmsPose {
         if (blocking.left()) leftState.restore(model.leftArm, model.leftSleeve);
         else leftState.syncSleeve(model.leftArm, model.leftSleeve);
     }
-<<<<<<< Updated upstream
-=======
 
     private static boolean isUsingTrident(Player player) {
         return player != null && player.isUsingItem() && player.getUseItem().getUseAnimation() == ItemUseAnimation.TRIDENT;
@@ -129,5 +131,4 @@ public final class ZombieArmsPose {
         if (state != null && state.isUsingItem) ticks = Math.max(ticks, Math.round(state.ticksUsingItem));
         return ticks;
     }
->>>>>>> Stashed changes
 }

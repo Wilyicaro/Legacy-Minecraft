@@ -73,12 +73,18 @@ public final class SkinSync {
         acc.put(index, data);
         if (!acc.isComplete()) return;
         SERVER_ACC.remove(k);
-        SERVER_ASSETS.put(k, acc.assemble());
+        byte[] bytes = acc.assemble();
+        if (assetType == ASSET_TEXTURE && bytes.length == 0) {
+            SERVER_ASSETS.remove(k);
+            return;
+        }
+        SERVER_ASSETS.put(k, bytes);
     }
 
     public static boolean hasServerAssets(UUID owner, String skinId) {
         if (owner == null || skinId == null || skinId.isBlank()) return false;
-        return SERVER_ASSETS.containsKey(assetKey(owner, skinId, ASSET_TEXTURE))
+        byte[] texture = SERVER_ASSETS.get(assetKey(owner, skinId, ASSET_TEXTURE));
+        return texture != null && texture.length > 0
                 && SERVER_ASSETS.containsKey(assetKey(owner, skinId, ASSET_MODEL));
     }
 
