@@ -1,5 +1,7 @@
 package wily.legacy.skins.pose;
 
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.effects.SpearAnimations;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -8,6 +10,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.SwingAnimationType;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 
 public final class ZombieArmsPose {
@@ -33,6 +36,7 @@ public final class ZombieArmsPose {
             applyTrident(model, state, player);
             return;
         }
+        if (isBowAiming(state, player)) return;
 
         ArmPoseSupport.ArmState rightState = ArmPoseSupport.ArmState.capture(model.rightArm, model.rightSleeve);
         ArmPoseSupport.ArmState leftState = ArmPoseSupport.ArmState.capture(model.leftArm, model.leftSleeve);
@@ -73,7 +77,8 @@ public final class ZombieArmsPose {
                 blocking.right(),
                 blocking.left()
         );
-        ArmPoseSupport.applyAttackSwing(model, state, attackTime);
+        if (isSpearJabbing(state, attackTime)) SpearAnimations.thirdPersonAttackHand(model, state);
+        else ArmPoseSupport.applyAttackSwing(model, state, attackTime);
 
         if (blocking.right()) rightState.restore(model.rightArm, model.rightSleeve);
         else rightState.syncSleeve(model.rightArm, model.rightSleeve);
@@ -84,6 +89,15 @@ public final class ZombieArmsPose {
 
     private static boolean isUsingTrident(Player player) {
         return player != null && player.isUsingItem() && player.getUseItem().getUseAnimation() == ItemUseAnimation.TRIDENT;
+    }
+
+    private static boolean isBowAiming(AvatarRenderState state, Player player) {
+        if (state != null && (state.rightArmPose == HumanoidModel.ArmPose.BOW_AND_ARROW || state.leftArmPose == HumanoidModel.ArmPose.BOW_AND_ARROW)) return true;
+        return player != null && player.isUsingItem() && player.getUseItem().getUseAnimation() == ItemUseAnimation.BOW;
+    }
+
+    private static boolean isSpearJabbing(AvatarRenderState state, float attackTime) {
+        return state != null && attackTime > 0.0F && state.swingAnimationType == SwingAnimationType.STAB;
     }
 
     private static void applyTrident(PlayerModel model, AvatarRenderState state, Player player) {
