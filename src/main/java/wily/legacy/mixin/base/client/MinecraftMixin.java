@@ -254,22 +254,46 @@ public abstract class MinecraftMixin {
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
 
-    @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
+    @Redirect(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyInventory:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyAdvancements:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"))
     private boolean handleKeybindsInventoryKey(KeyMapping instance) {
-        if (!instance.consumeClick()) {
-            return inventoryKeyLastPressed && !instance.isDown() && !(inventoryKeyLastPressed = false);
-        }
+        boolean clicked = instance.consumeClick();
         AdvancementToast toast = FactoryAPIClient.getToasts().getToast(AdvancementToast.class, Toast.NO_TOKEN);
-        if (toast == null) return true;
-        inventoryKeyHold++;
-        if (!(inventoryKeyLastPressed = inventoryKeyHold < 10)) {
-            FactoryAPIClient.getToasts().clear();
+        if (toast == null) {
+            if (inventoryKeyLastPressed && !instance.isDown()) {
+                inventoryKeyHold = 0;
+                inventoryKeyLastPressed = false;
+                return true;
+            }
             inventoryKeyHold = 0;
-            LegacyAdvancementsScreen screen = new LegacyAdvancementsScreen(null);
-            setScreen(screen);
-            screen.focusRenderable(r -> r instanceof LegacyAdvancementsScreen.AdvancementButton b && b.id.equals(AdvancementToastAccessor.of(toast).getAdvancementId()), i -> screen.getTabList().tabButtons.get(i).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0)));
+            inventoryKeyLastPressed = false;
+            return clicked;
         }
-        return false;
+
+        if (instance.isDown() && (clicked || inventoryKeyLastPressed)) {
+            inventoryKeyLastPressed = true;
+            if (++inventoryKeyHold >= 10) {
+                openToastAdvancement(toast);
+                inventoryKeyLastPressed = false;
+                inventoryKeyHold = 0;
+            }
+            return false;
+        }
+
+        if (inventoryKeyLastPressed) {
+            inventoryKeyHold = 0;
+            inventoryKeyLastPressed = false;
+            return true;
+        }
+
+        return clicked;
+    }
+
+    @Unique
+    private void openToastAdvancement(AdvancementToast toast) {
+        FactoryAPIClient.getToasts().clear();
+        LegacyAdvancementsScreen screen = new LegacyAdvancementsScreen(null);
+        setScreen(screen);
+        screen.focusRenderable(r -> r instanceof LegacyAdvancementsScreen.AdvancementButton b && b.id.equals(AdvancementToastAccessor.of(toast).getAdvancementId()), i -> screen.getTabList().tabButtons.get(i).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0)));
     }
 
     @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1))
