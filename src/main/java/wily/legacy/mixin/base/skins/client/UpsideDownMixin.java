@@ -15,18 +15,29 @@ import wily.legacy.skins.pose.SkinPoseRegistry;
 
 @Mixin(AvatarRenderer.class)
 public abstract class UpsideDownMixin {
+    @Inject(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At("HEAD"), require = 0)
+    private void consoleskins$setupFallFlyingRotations(AvatarRenderState state, PoseStack poseStack, float f, float g, CallbackInfo ci) {
+        if (state.id != GuiDollRender.MENU_DOLL_ID && state.isFallFlying && consoleskins$isUpsideDownSkin(state)) {
+            state.isUpsideDown = true;
+        }
+    }
+
     @Inject(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At("TAIL"), require = 0)
     private void consoleskins$setupRotations(AvatarRenderState state, PoseStack poseStack, float f, float g, CallbackInfo ci) {
-        if (!LegacyOptions.customSkinAnimation.get()) return;
-        if (!(state instanceof RenderStateSkinIdAccess a)) return;
-        String skinId = a.consoleskins$getSkinId();
-        if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.UPSIDE_DOWN, skinId)) return;
+        if (!consoleskins$isUpsideDownSkin(state)) return;
         if (state.id == GuiDollRender.MENU_DOLL_ID) {
             poseStack.translate(0.0F, 2.0F, 0.0F);
             poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
             return;
         }
+        if (state.isFallFlying) return;
         poseStack.translate(0.0F, state.boundingBoxHeight + 0.1F, 0.0F);
         poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
+    }
+
+    private static boolean consoleskins$isUpsideDownSkin(AvatarRenderState state) {
+        if (!LegacyOptions.customSkinAnimation.get()) return false;
+        if (!(state instanceof RenderStateSkinIdAccess a)) return false;
+        return SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.UPSIDE_DOWN, a.consoleskins$getSkinId());
     }
 }
