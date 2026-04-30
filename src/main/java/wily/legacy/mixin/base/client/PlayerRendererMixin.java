@@ -50,11 +50,11 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
 
         AvatarRenderState state = createRenderState();
         state.swimAmount = mc.player.getSwimAmount(mc.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+        getModel().setupAnim(state);
         if (hasSkin && state instanceof RenderStateSkinIdAccess access) {
             access.consoleskins$setSkinId(skinId);
             access.consoleskins$setEntityUuid(mc.player.getUUID());
         }
-        getModel().setupAnim(state);
 
         if (!hasSkin) return;
 
