@@ -1,5 +1,6 @@
 package wily.legacy.skins.pose;
 
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.effects.SpearAnimations;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
@@ -35,6 +36,7 @@ public final class ZombieArmsPose {
             applyTrident(model, state, player);
             return;
         }
+        if (isBowAiming(state, player)) return;
 
         ArmPoseSupport.ArmState rightState = ArmPoseSupport.ArmState.capture(model.rightArm, model.rightSleeve);
         ArmPoseSupport.ArmState leftState = ArmPoseSupport.ArmState.capture(model.leftArm, model.leftSleeve);
@@ -87,6 +89,11 @@ public final class ZombieArmsPose {
 
     private static boolean isUsingTrident(Player player) {
         return player != null && player.isUsingItem() && player.getUseItem().getUseAnimation() == ItemUseAnimation.TRIDENT;
+    }
+
+    private static boolean isBowAiming(AvatarRenderState state, Player player) {
+        if (state != null && (state.rightArmPose == HumanoidModel.ArmPose.BOW_AND_ARROW || state.leftArmPose == HumanoidModel.ArmPose.BOW_AND_ARROW)) return true;
+        return player != null && player.isUsingItem() && player.getUseItem().getUseAnimation() == ItemUseAnimation.BOW;
     }
 
     private static boolean isSpearJabbing(AvatarRenderState state, float attackTime) {
