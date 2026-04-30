@@ -18,6 +18,7 @@ import wily.legacy.compat.cpm.CpmRenderCompat;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,7 @@ public class BoxAddonLayer extends RenderLayer {
         final ModelPart rightPants = snapshotPart(pm.rightPants);
         final ModelPart leftPants = snapshotPart(pm.leftPants);
         final boolean hatChildLike = isHatChildLike(head, hat);
+        final boolean hideHead = ars.wornHeadType != null || !ars.headItem.isEmpty() || LegacyItemUtil.isSkullItem(ars.headEquipment);
         collector.submitCustomGeometry(
                 poseStack,
                 RenderTypes.entityCutoutNoCull(texFinal),
@@ -124,8 +126,10 @@ public class BoxAddonLayer extends RenderLayer {
                     ps.last().set(pose);
 
                     float partScale = baked.partScale();
-                    renderSlot(head, baked.get(AttachSlot.HEAD), ps, vc, packedLight, partScale);
-                    renderHat(head, hat, hatChildLike, baked.get(AttachSlot.HAT), ps, vc, packedLight, partScale);
+                    if (!hideHead) {
+                        renderSlot(head, baked.get(AttachSlot.HEAD), ps, vc, packedLight, partScale);
+                        renderHat(head, hat, hatChildLike, baked.get(AttachSlot.HAT), ps, vc, packedLight, partScale);
+                    }
                     renderSlot(body, baked.get(AttachSlot.BODY), ps, vc, packedLight, partScale);
                     renderSlot(jacket, baked.get(AttachSlot.JACKET), ps, vc, packedLight, partScale);
                     renderSlot(rightArm, baked.get(AttachSlot.RIGHT_ARM), ps, vc, packedLight, partScale);
