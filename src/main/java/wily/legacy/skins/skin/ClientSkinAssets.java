@@ -471,5 +471,8 @@ public final class ClientSkinAssets {
     }
 
     public record AssetData(byte[] texture, byte[] model) {
+        public boolean hasTexture() {
+            return texture != null && texture.length > 0;
+        }
     }
 }
