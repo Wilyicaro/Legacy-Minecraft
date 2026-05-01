@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import wily.legacy.compat.cpm.CpmRenderCompat;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.skin.ClientSkinAssets;
@@ -85,6 +86,23 @@ public class BoxAddonLayer extends RenderLayer {
         return snapshot;
     }
 
+    private static boolean hasItem(ItemStack item) {
+        return item != null && !item.isEmpty();
+    }
+
+    private static int getArmorMask(AvatarRenderState state) {
+        int mask = 0;
+        if (hasItem(state.headEquipment)) mask |= ArmorSlot.HELMET.mask();
+        if (hasItem(state.chestEquipment)) mask |= ArmorSlot.CHESTPLATE.mask();
+        if (hasItem(state.legsEquipment)) mask |= ArmorSlot.LEGGINGS.mask();
+        if (hasItem(state.feetEquipment)) mask |= ArmorSlot.BOOTS.mask();
+        return mask;
+    }
+
+    private static boolean hasHeadItem(AvatarRenderState state) {
+        return state.wornHeadType != null || !state.headItem.isEmpty() || LegacyItemUtil.isSkullItem(state.headEquipment);
+    }
+
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, EntityRenderState state, float partialTick, float ageInTicks) {
         if (!(state instanceof AvatarRenderState ars)) return;
@@ -117,7 +135,8 @@ public class BoxAddonLayer extends RenderLayer {
         final ModelPart rightPants = snapshotPart(pm.rightPants);
         final ModelPart leftPants = snapshotPart(pm.leftPants);
         final boolean hatChildLike = isHatChildLike(head, hat);
-        final boolean hideHead = ars.wornHeadType != null || !ars.headItem.isEmpty() || LegacyItemUtil.isSkullItem(ars.headEquipment);
+        final int armorMask = getArmorMask(ars);
+        final boolean hideHead = hasHeadItem(ars);
         collector.submitCustomGeometry(
                 poseStack,
                 RenderTypes.entityCutoutNoCull(texFinal),
@@ -127,19 +146,19 @@ public class BoxAddonLayer extends RenderLayer {
 
                     float partScale = baked.partScale();
                     if (!hideHead) {
-                        renderSlot(head, baked.get(AttachSlot.HEAD), ps, vc, packedLight, partScale);
-                        renderHat(head, hat, hatChildLike, baked.get(AttachSlot.HAT), ps, vc, packedLight, partScale);
+                        renderSlot(head, baked.get(AttachSlot.HEAD, armorMask), ps, vc, packedLight, partScale);
+                        renderHat(head, hat, hatChildLike, baked.get(AttachSlot.HAT, armorMask), ps, vc, packedLight, partScale);
                     }
-                    renderSlot(body, baked.get(AttachSlot.BODY), ps, vc, packedLight, partScale);
-                    renderSlot(jacket, baked.get(AttachSlot.JACKET), ps, vc, packedLight, partScale);
-                    renderSlot(rightArm, baked.get(AttachSlot.RIGHT_ARM), ps, vc, packedLight, partScale);
-                    renderSlot(leftArm, baked.get(AttachSlot.LEFT_ARM), ps, vc, packedLight, partScale);
-                    renderSlot(rightSleeve, baked.get(AttachSlot.RIGHT_SLEEVE), ps, vc, packedLight, partScale);
-                    renderSlot(leftSleeve, baked.get(AttachSlot.LEFT_SLEEVE), ps, vc, packedLight, partScale);
-                    renderSlot(rightLeg, baked.get(AttachSlot.RIGHT_LEG), ps, vc, packedLight, partScale);
-                    renderSlot(leftLeg, baked.get(AttachSlot.LEFT_LEG), ps, vc, packedLight, partScale);
-                    renderSlot(rightPants, baked.get(AttachSlot.RIGHT_PANTS), ps, vc, packedLight, partScale);
-                    renderSlot(leftPants, baked.get(AttachSlot.LEFT_PANTS), ps, vc, packedLight, partScale);
+                    renderSlot(body, baked.get(AttachSlot.BODY, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(jacket, baked.get(AttachSlot.JACKET, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(rightArm, baked.get(AttachSlot.RIGHT_ARM, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(leftArm, baked.get(AttachSlot.LEFT_ARM, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(rightSleeve, baked.get(AttachSlot.RIGHT_SLEEVE, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(leftSleeve, baked.get(AttachSlot.LEFT_SLEEVE, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(rightLeg, baked.get(AttachSlot.RIGHT_LEG, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(leftLeg, baked.get(AttachSlot.LEFT_LEG, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(rightPants, baked.get(AttachSlot.RIGHT_PANTS, armorMask), ps, vc, packedLight, partScale);
+                    renderSlot(leftPants, baked.get(AttachSlot.LEFT_PANTS, armorMask), ps, vc, packedLight, partScale);
                 }
         );
     }
