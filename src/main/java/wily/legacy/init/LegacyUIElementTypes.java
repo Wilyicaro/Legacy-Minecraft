@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LegacyUIElementTypes {
-    public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchanting_table_book.png");
+    public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchantment/enchanting_table_book.png");
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
             a.putStaticElement(elementName + ".renderables", UIAccessor.createRenderablesWrapper(a, new ArrayList<>()));
