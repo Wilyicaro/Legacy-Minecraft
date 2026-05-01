@@ -156,6 +156,10 @@ public final class SkinPoseRegistry {
             this.key = key;
         }
 
+        public String key() {
+            return key;
+        }
+
         public static PoseTag fromKey(String key) {
             if (key == null) return null;
             String k = key.trim().toLowerCase(Locale.ROOT);
