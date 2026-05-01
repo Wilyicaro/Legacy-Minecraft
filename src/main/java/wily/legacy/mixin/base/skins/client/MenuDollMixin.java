@@ -95,9 +95,10 @@ public abstract class MenuDollMixin {
     private void consoleskins$menuDollFixHeadSpin(AvatarRenderState state, CallbackInfo ci) {
         if (state == null) return;
         PlayerModel self = (PlayerModel) (Object) this;
-        String skinId = state instanceof RenderStateSkinIdAccess access ? access.consoleskins$getSkinId() : null;
+        RenderStateSkinIdAccess access = state instanceof RenderStateSkinIdAccess skinAccess ? skinAccess : null;
+        String skinId = access == null ? null : access.consoleskins$getSkinId();
         boolean stiffLegs = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
-        boolean customAnimation = LegacyOptions.customSkinAnimation.get();
+        boolean customAnimation = LegacyOptions.customSkinAnimation.get() && (access == null || !access.consoleskins$skipCustomAnimation());
         if (state.id == GuiDollRender.MENU_DOLL_ID) {
             ModelPart head = self.head;
             head.xRot = 0.0F;

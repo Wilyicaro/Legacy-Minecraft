@@ -34,6 +34,10 @@ public interface RenderStateSkinIdAccess {
 
     void consoleskins$setBlocking(boolean blocking);
 
+    boolean consoleskins$skipCustomAnimation();
+
+    void consoleskins$setSkipCustomAnimation(boolean skip);
+
     default Identifier consoleskins$getCachedTexture() {
         return null;
     }

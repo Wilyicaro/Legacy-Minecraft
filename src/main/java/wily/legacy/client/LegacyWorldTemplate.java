@@ -60,12 +60,11 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
 
         if (checkSum().isEmpty()) return path;
 
-        boolean exists = Files.exists(path);
-        String checksum;
-        if (exists && checkSum().get().equals(readFileCheckSum(path)) || (checksum = readCheckSum(path)) == null || !checkSum().get().equals(checksum))
-            return null;
+        if (Files.exists(path) && checkSum().get().equals(readFileCheckSum(path))) return null;
 
-        return path;
+        String checksum = readCheckSum(path);
+        if (checksum == null) return path;
+        return checkSum().get().equals(checksum) ? path : null;
     }
 
     public void downloadToPathIfPossible() {
