@@ -67,7 +67,11 @@ dependencies {
 	compileOnly("maven.modrinth:sodium:${prop("sodium_version")}")
 	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
-	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") as Any)
+	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") {
+		exclude(group = "commons-codec", module = "commons-codec")
+	} as Any)
+	api(jarJar("org.apache.httpcomponents:httpcore:4.4.16") as Any)
+	api(jarJar("commons-logging:commons-logging:1.2") as Any)
 }
 
 tasks.withType<Javadoc> {
