@@ -13,6 +13,9 @@ authors="${mod_authors}"
 description="${mod_description}"
 credits="${mod_credits}"
 
+[[accessTransformers]]
+file="aw/legacy.cfg"
+
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true
