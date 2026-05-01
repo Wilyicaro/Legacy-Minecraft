@@ -42,6 +42,7 @@ import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -191,7 +192,9 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         addRenderableOnly(panel);
         addRenderableOnly(tabList::renderSelected);
         panel.init();
-                leftPos = panel.x;
+        ((AbstractContainerScreenAccessor)this).legacy$setImageWidth(panel.width);
+        ((AbstractContainerScreenAccessor)this).legacy$setImageHeight(panel.height);
+        leftPos = panel.x;
         topPos = panel.y;
         addRenderableOnly(scroller);
         scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 296), accessor.getInteger("scroller.y", panel.y + 27));

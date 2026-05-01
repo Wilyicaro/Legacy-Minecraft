@@ -22,7 +22,7 @@ import wily.legacy.util.client.LegacyFontUtil;
 @Mixin({ContainerScreen.class, ShulkerBoxScreen.class, HopperScreen.class, DispenserScreen.class})
 public abstract class ContainerScreenMixin extends AbstractContainerScreen {
 
-public ContainerScreenMixin(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component) {
+    public ContainerScreenMixin(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
