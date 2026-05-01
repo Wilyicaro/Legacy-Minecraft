@@ -44,13 +44,13 @@ public final class GuiDollRender {
         if (mc != null) mc.getTextureManager().getTexture(skinTexture);
 
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(selectionId, skinTexture, null, null);
-        var entry = resolved == null ? null : resolved.entry();
         boolean showCape = ClientSkinAssets.hasCape(resolved);
         ClientAsset.Texture body = new ClientAsset.ResourceTexture(skinTexture, skinTexture);
         ClientAsset.Texture cape = body;
-        if (showCape && entry != null && entry.cape() != null) {
-            if (mc != null) mc.getTextureManager().getTexture(entry.cape());
-            cape = new ClientAsset.ResourceTexture(entry.cape(), entry.cape());
+        Identifier capeTexture = resolved == null ? null : resolved.capeTexture();
+        if (showCape && capeTexture != null) {
+            if (mc != null) mc.getTextureManager().getTexture(capeTexture);
+            cape = new ClientAsset.ResourceTexture(capeTexture, capeTexture);
         }
         var built = resolved == null ? null : resolved.boxModel();
         float bboxHeight = built == null ? BASE_BBOX_HEIGHT : Math.max(BASE_BBOX_HEIGHT, built.bboxHeight());

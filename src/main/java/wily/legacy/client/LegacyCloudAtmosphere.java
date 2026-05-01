@@ -3,15 +3,12 @@ package wily.legacy.client;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.attribute.EnvironmentAttribute;
 import net.minecraft.world.attribute.EnvironmentAttributes;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3fc;
 
 public final class LegacyCloudAtmosphere {
@@ -101,9 +98,9 @@ public final class LegacyCloudAtmosphere {
     }
 
 
-    public static int getSkyColor(ClientLevel level, Vec3 position, float partialTick) {
+    public static int getSkyColor(ClientLevel level, Camera camera, float partialTick) {
         float brightness = getDayBrightness(getTimeOfDay(level, partialTick));
-        int skyColor = getBaseVisualColor(level, position, EnvironmentAttributes.SKY_COLOR);
+        int skyColor = getVisualColor(camera, EnvironmentAttributes.SKY_COLOR, partialTick);
         float[] rgb = new float[]{
             ARGB.redFloat(skyColor) * brightness,
             ARGB.greenFloat(skyColor) * brightness,
@@ -132,7 +129,7 @@ public final class LegacyCloudAtmosphere {
             }
         }
 
-        int skyColor = getSkyColor(level, camera.position(), partialTick);
+        int skyColor = getSkyColor(level, camera, partialTick);
         float skyBlend = getFogToSkyBlendFactor(renderDistanceChunks);
         rgb[0] += (ARGB.redFloat(skyColor) - rgb[0]) * skyBlend;
         rgb[1] += (ARGB.greenFloat(skyColor) - rgb[1]) * skyBlend;
@@ -235,7 +232,7 @@ public final class LegacyCloudAtmosphere {
         float brightness = getDayBrightness(getTimeOfDay(level, partialTick));
         float redGreenBrightness = brightness * 0.94f + 0.06f;
         float blueBrightness = brightness * 0.91f + 0.09f;
-        int fogColor = getBaseVisualColor(level, camera.position(), EnvironmentAttributes.FOG_COLOR);
+        int fogColor = getVisualColor(camera, EnvironmentAttributes.FOG_COLOR, partialTick);
         return new float[]{
             ARGB.redFloat(fogColor) * redGreenBrightness,
             ARGB.greenFloat(fogColor) * redGreenBrightness,
@@ -243,10 +240,8 @@ public final class LegacyCloudAtmosphere {
         };
     }
 
-    private static int getBaseVisualColor(ClientLevel level, Vec3 position, EnvironmentAttribute<Integer> attribute) {
-        int color = level.dimensionType().attributes().applyModifier(attribute, attribute.defaultValue());
-        Biome biome = level.getBiome(BlockPos.containing(position.x, position.y, position.z)).value();
-        return biome.getAttributes().applyModifier(attribute, color);
+    private static int getVisualColor(Camera camera, EnvironmentAttribute<Integer> attribute, float partialTick) {
+        return camera.attributeProbe().getValue(attribute, partialTick);
     }
 
 

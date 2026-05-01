@@ -70,7 +70,7 @@ final class ArmPoseSupport {
         return flags.merge(armPoseIsBlocking(state, true), armPoseIsBlocking(state, false));
     }
 
-    private static HumanoidArm getUsedArm(Player player) {
+    static HumanoidArm getUsedArm(Player player) {
         HumanoidArm mainArm = player.getMainArm();
         if (player.getUsedItemHand() == InteractionHand.MAIN_HAND) return mainArm;
         return mainArm == HumanoidArm.RIGHT ? HumanoidArm.LEFT : HumanoidArm.RIGHT;

@@ -16,6 +16,8 @@ public final class SkinSync {
     public static final String ASSET_NS = Legacy4J.MOD_ID;
     public static final int ASSET_TEXTURE = 0;
     public static final int ASSET_MODEL = 1;
+    public static final int ASSET_METADATA = 2;
+    public static final int ASSET_CAPE = 3;
     private static final int MAX_SKIN_ID_LEN = 256;
     private static final Map<UUID, String> SERVER_SKINS = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> SERVER_ASSETS = new ConcurrentHashMap<>();
@@ -73,12 +75,18 @@ public final class SkinSync {
         acc.put(index, data);
         if (!acc.isComplete()) return;
         SERVER_ACC.remove(k);
-        SERVER_ASSETS.put(k, acc.assemble());
+        byte[] bytes = acc.assemble();
+        if (assetType == ASSET_TEXTURE && bytes.length == 0) {
+            SERVER_ASSETS.remove(k);
+            return;
+        }
+        SERVER_ASSETS.put(k, bytes);
     }
 
     public static boolean hasServerAssets(UUID owner, String skinId) {
         if (owner == null || skinId == null || skinId.isBlank()) return false;
-        return SERVER_ASSETS.containsKey(assetKey(owner, skinId, ASSET_TEXTURE))
+        byte[] texture = SERVER_ASSETS.get(assetKey(owner, skinId, ASSET_TEXTURE));
+        return texture != null && texture.length > 0
                 && SERVER_ASSETS.containsKey(assetKey(owner, skinId, ASSET_MODEL));
     }
 
@@ -111,7 +119,7 @@ public final class SkinSync {
     public static void sendCachedAssetsTo(ServerPlayer to, UUID owner, String skinId) {
         if (to == null || owner == null) return;
         if (skinId == null || skinId.isBlank()) return;
-        for (int assetType = ASSET_TEXTURE; assetType <= ASSET_MODEL; assetType++) {
+        for (int assetType = ASSET_TEXTURE; assetType <= ASSET_CAPE; assetType++) {
             byte[] bytes = SERVER_ASSETS.get(assetKey(owner, skinId, assetType));
             if (bytes == null || bytes.length == 0) continue;
             int type = assetType;

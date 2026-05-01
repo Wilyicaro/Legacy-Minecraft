@@ -9,11 +9,13 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.client.render.boxloader.AttachSlot;
 import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinIdUtil;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -44,12 +46,18 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     private void renderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, Identifier resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null || mc.player == null) return;
+        String skinId = ClientSkinCache.get(mc.player.getUUID());
+        boolean hasSkin = !SkinIdUtil.isBlankOrAutoSelect(skinId);
+
         AvatarRenderState state = createRenderState();
         state.swimAmount = mc.player.getSwimAmount(mc.getDeltaTracker().getGameTimeDeltaPartialTick(true));
         getModel().setupAnim(state);
+        if (hasSkin && state instanceof RenderStateSkinIdAccess access) {
+            access.consoleskins$setSkinId(skinId);
+            access.consoleskins$setEntityUuid(mc.player.getUUID());
+        }
 
-        String skinId = ClientSkinCache.get(mc.player.getUUID());
-        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
+        if (!hasSkin) return;
 
         if (SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.HIDE_HAND, skinId)) {
             ci.cancel();

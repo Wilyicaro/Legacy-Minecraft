@@ -23,13 +23,11 @@ public final class SkinSyncClient {
         syncLocalPlayerCache(client);
         refreshKnownPlayerNames(client);
         boolean connected = isConnected(client);
-        if (connected && STATE.pendingUpload) {
-            STATE.pendingUpload = false;
+        if (connected && STATE.tickUploadRetry()) {
             onRequestSkinUpload();
         }
         if (connected && tickSnapshotRequest()) {
-            if (SkinCloudSyncClient.isActive(client)) SkinCloudSyncClient.requestSnapshot(client, true);
-            else CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
+            requestSnapshot(client, true);
         }
         if (connected && !STATE.sessionAnnounced) onRequestSkinUpload();
         if (!connected) return;
@@ -40,6 +38,7 @@ public final class SkinSyncClient {
     public static void onClientJoin() {
         Minecraft client = Minecraft.getInstance();
         if (client == null) return;
+        STATE.sentAssets.clear();
         STATE.snapshotDelay = 1;
         PendingSelection pendingSelection = takePendingSelection();
         if (pendingSelection != null) {
@@ -50,7 +49,7 @@ public final class SkinSyncClient {
         String skinId = resolveSelectedSkinId(client);
         if (!SkinIdUtil.hasSkin(skinId)) return;
         if (isConnected(client)) onRequestSkinUpload();
-        else STATE.pendingUpload = true;
+        else STATE.requestUpload();
     }
 
     public static void onClientDisconnect() {
@@ -86,14 +85,14 @@ public final class SkinSyncClient {
     public static void onRequestSkinUpload() {
         Minecraft client = Minecraft.getInstance();
         if (!isConnected(client)) {
-            STATE.pendingUpload = true;
+            STATE.requestUpload();
             return;
         }
         if (SkinCloudSyncClient.isActive(client)) {
-            sendSelection(client, resolveSelectedSkinId(client));
+            sendSelection(client, resolveSelectedSkinId(client), true);
             return;
         }
-        sendSelection(client, resolveSelectedSkinId(client));
+        sendSelection(client, resolveSelectedSkinId(client), true);
     }
 
     public static void onSkinAssetsReloaded(Minecraft client) {
@@ -103,8 +102,7 @@ public final class SkinSyncClient {
         String skinId = resolveSelectedSkinId(client);
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         sendSelection(client, skinId);
-        if (SkinCloudSyncClient.isActive(client)) SkinCloudSyncClient.requestSnapshot(client, true);
-        else CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
+        requestSnapshot(client, true);
     }
 
     public static void onSyncAssetChunk(UUID uuid, String skinId, int assetType, int index, int total, byte[] data) {
@@ -114,9 +112,13 @@ public final class SkinSyncClient {
         accumulator.put(index, data);
         if (!accumulator.isComplete()) return;
         STATE.assetChunks.remove(key);
+        byte[] bytes = accumulator.assemble();
+        if (assetType == SkinSync.ASSET_TEXTURE && bytes.length == 0) return;
         String assetKey = ClientSkinAssets.runtimeAssetKey(uuid, skinId);
-        if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(assetKey, accumulator.assemble());
-        else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, accumulator.assemble());
+        if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(assetKey, bytes);
+        else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, bytes);
+        else if (assetType == SkinSync.ASSET_METADATA) ClientSkinAssets.putMetadata(skinId, bytes);
+        else if (assetType == SkinSync.ASSET_CAPE) ClientSkinAssets.putCape(assetKey, bytes);
         ClientSkinCache.set(uuid, skinId);
     }
 
@@ -186,10 +188,22 @@ public final class SkinSyncClient {
             if (skinId.equals(STATE.lastApplied.put(player.getUUID(), skinId))) continue;
             ClientSkinCache.setName(player.getScoreboardName(), skinId);
         }
-        if (missingSkin && SkinCloudSyncClient.isActive(client)) SkinCloudSyncClient.requestSnapshot(client, false);
+        if (missingSkin) STATE.requestSnapshotRetry();
+    }
+
+    private static void requestSnapshot(Minecraft client, boolean force) {
+        if (SkinCloudSyncClient.isActive(client)) {
+            SkinCloudSyncClient.requestSnapshot(client, force);
+            return;
+        }
+        CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
     }
 
     private static void sendSelection(Minecraft client, String skinId) {
+        sendSelection(client, skinId, false);
+    }
+
+    private static void sendSelection(Minecraft client, String skinId, boolean forceAssets) {
         String id = SkinFairness.effectiveSkinId(client, skinId);
         STATE.sessionAnnounced = true;
         if (SkinCloudSyncClient.isActive(client)) {
@@ -197,15 +211,23 @@ public final class SkinSyncClient {
             return;
         }
         CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));
-        sendAssets(client, id);
+        sendAssets(client, id, forceAssets);
     }
 
-    private static void sendAssets(Minecraft client, String skinId) {
-        if (SkinIdUtil.isBlankOrAutoSelect(skinId) || STATE.sentAssets.putIfAbsent(skinId, Boolean.TRUE) != null)
-            return;
+    private static void sendAssets(Minecraft client, String skinId, boolean force) {
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        if (!force && STATE.sentAssets.containsKey(skinId)) return;
         ClientSkinAssets.AssetData assets = ClientSkinAssets.resolveAssetData(client, skinId);
+        if (!assets.hasTexture()) {
+            STATE.requestUploadRetry();
+            return;
+        }
+        if (force) STATE.sentAssets.put(skinId, Boolean.TRUE);
+        else if (STATE.sentAssets.putIfAbsent(skinId, Boolean.TRUE) != null) return;
         sendAssetChunks(skinId, SkinSync.ASSET_TEXTURE, assets.texture());
         sendAssetChunks(skinId, SkinSync.ASSET_MODEL, assets.model());
+        sendAssetChunks(skinId, SkinSync.ASSET_METADATA, assets.metadata());
+        sendAssetChunks(skinId, SkinSync.ASSET_CAPE, assets.cape());
     }
 
     private static void sendAssetChunks(String skinId, int assetType, byte[] bytes) {
@@ -232,6 +254,7 @@ public final class SkinSyncClient {
 
     private static final class State {
         private static final int SCAN_INTERVAL = 20;
+        private static final int UPLOAD_RETRY_INTERVAL = 20;
         private final ConcurrentHashMap<String, Boolean> sentAssets = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<String, SkinSync.SkinChunkAccumulator> assetChunks = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<UUID, String> lastApplied = new ConcurrentHashMap<>();
@@ -240,7 +263,30 @@ public final class SkinSyncClient {
         private boolean pendingUpload;
         private boolean sessionAnnounced;
         private int snapshotDelay = -1;
+        private int uploadRetryDelay;
         private int scanTick;
+
+        private void requestUpload() {
+            pendingUpload = true;
+            uploadRetryDelay = 0;
+        }
+
+        private void requestUploadRetry() {
+            pendingUpload = true;
+            if (uploadRetryDelay <= 0) uploadRetryDelay = UPLOAD_RETRY_INTERVAL;
+        }
+
+        private void requestSnapshotRetry() {
+            if (snapshotDelay < 0) snapshotDelay = SCAN_INTERVAL;
+        }
+
+        private boolean tickUploadRetry() {
+            if (!pendingUpload) return false;
+            if (uploadRetryDelay > 0 && --uploadRetryDelay > 0) return false;
+            pendingUpload = false;
+            uploadRetryDelay = 0;
+            return true;
+        }
 
         private void reset() {
             pendingSkinId = null;
@@ -248,6 +294,7 @@ public final class SkinSyncClient {
             pendingUpload = false;
             sessionAnnounced = false;
             snapshotDelay = -1;
+            uploadRetryDelay = 0;
             scanTick = 0;
             sentAssets.clear();
             assetChunks.clear();
