@@ -274,11 +274,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
-            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
-            FactoryScreenUtil.enableBlend();
-            renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-            FactoryScreenUtil.disableBlend();
+        protected void extractContents(GuiGraphicsExtractor graphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(graphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
+            extractDefaultLabel(graphics.textRenderer());
         }
 
         public Identifier getSprite() {

@@ -40,7 +40,7 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         lastTimePressed = Util.getMillis();
     }
 
-    @ModifyExpressionValue(method = "extractDefaultLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;getMessage()Lnet/minecraft/network/chat/Component;"))
+    @ModifyArg(method = "extractDefaultLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;extractScrollingStringOverContents(Lnet/minecraft/client/gui/ActiveTextCollector;Lnet/minecraft/network/chat/Component;I)V"))
     protected Component getMessage(Component original) {
         MutableComponent copy = original.copy().withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150));
         if (!CommonValue.WIDGET_TEXT_SHADOW.get()) copy.withoutShadow();
