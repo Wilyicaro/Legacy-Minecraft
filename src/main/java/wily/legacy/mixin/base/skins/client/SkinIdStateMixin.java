@@ -16,7 +16,7 @@ public abstract class SkinIdStateMixin implements RenderStateSkinIdAccess {
     @Unique
     private UUID consoleskins$uuid;
     @Unique
-    private boolean consoleskins$moving, consoleskins$sitting, consoleskins$usingItem, consoleskins$blocking;
+    private boolean consoleskins$moving, consoleskins$sitting, consoleskins$usingItem, consoleskins$blocking, consoleskins$skipCustomAnimation;
     @Unique
     private float consoleskins$moveSpeedSq;
     @Unique
@@ -92,6 +92,16 @@ public abstract class SkinIdStateMixin implements RenderStateSkinIdAccess {
     @Override
     public void consoleskins$setBlocking(boolean blocking) {
         consoleskins$blocking = blocking;
+    }
+
+    @Override
+    public boolean consoleskins$skipCustomAnimation() {
+        return consoleskins$skipCustomAnimation;
+    }
+
+    @Override
+    public void consoleskins$setSkipCustomAnimation(boolean skip) {
+        consoleskins$skipCustomAnimation = skip;
     }
 
     @Override
