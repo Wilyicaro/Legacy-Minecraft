@@ -6,6 +6,7 @@ public record CubeDef(
         float[] size,
         float inflate,
         boolean mirror,
-        Boolean visible
+        Boolean visible,
+        int armorMask
 ) {
 }
