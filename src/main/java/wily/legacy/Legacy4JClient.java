@@ -609,16 +609,6 @@ public class Legacy4JClient {
     }
 
     private static void registerBuiltInPacks() {
-        //? if neoforge && >=26.1 {
-        /*FactoryAPIPlatform.getModEventBus().addListener(EventPriority.NORMAL, false, AddPackFindersEvent.class, event -> {
-            registerNeoForgePack(event, "resourcepacks/legacy_resources", Legacy4J.createModLocation("legacy_resources"), true);
-            registerNeoForgePack(event, "resourcepacks/legacy_waters", Legacy4J.createModLocation("legacy_waters"), true);
-            registerNeoForgePack(event, "resourcepacks/console_aspects", Legacy4J.createModLocation("console_aspects"), false);
-            registerNeoForgePack(event, "resourcepacks/rosenfeld_patch", Legacy4J.createModLocation("rosenfeld_patch"), false);
-            registerNeoForgePack(event, "programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), false);
-            registerNeoForgePack(event, "high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), false);
-        });
-        *///?} else {
         FactoryEvent.registerBuiltInPacks(registry -> {
             registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
             registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
@@ -629,31 +619,7 @@ public class Legacy4JClient {
                 registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
             }
         });
-        //?}
     }
-
-    //? if neoforge && >=26.1 {
-    /*private static void registerNeoForgePack(AddPackFindersEvent event, String path, Identifier name, boolean enabledByDefault) {
-        registerNeoForgePack(event, path, name, Component.translatable(name.getNamespace() + ".builtin." + name.getPath()), enabledByDefault);
-    }
-
-    private static void registerNeoForgePack(AddPackFindersEvent event, String path, Identifier name, Component title, boolean enabledByDefault) {
-        if (event.getPackType() != PackType.CLIENT_RESOURCES) return;
-        var modFile = ModList.get().getModFileById(name.getNamespace()).getFile();
-        Pack pack = Pack.readMetaAndCreate(
-                new PackLocationInfo(
-                        name.toString(),
-                        title,
-                        PackSource.create(PackSource.BUILT_IN::decorate, enabledByDefault),
-                        Optional.of(new KnownPack(name.getNamespace(), name.toString(), SharedConstants.getCurrentVersion().id()))
-                ),
-                new JarContentsPackResources.JarContentsResourcesSupplier(modFile.getContents(), path),
-                PackType.CLIENT_RESOURCES,
-                new PackSelectionConfig(false, Pack.Position.TOP, false)
-        );
-        if (pack != null) event.addRepositorySource(packConsumer -> packConsumer.accept(pack));
-    }
-    *///?}
 
     public static void updateChunks() {
         FactoryAPIClient.SECURE_EXECUTOR.execute(() -> Minecraft.getInstance().levelRenderer.allChanged());

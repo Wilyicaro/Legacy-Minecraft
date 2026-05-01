@@ -82,7 +82,7 @@
     "client.GlyphInfoMixin",
     "client.grindstone.GrindstoneScreenMixin",
     "client.GuiGameRendererMixin",
-    "client.GuiGraphicsMixin",
+    "client.GuiGraphicsExtractorMixin",
     "client.gui.GuiMixin",
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",

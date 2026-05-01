@@ -179,13 +179,13 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         return Math.min(LegacyRenderUtil.getSelectedItemTooltipLines(), LegacyRenderUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*//*getSelected()*//*?} else {*/getSelectedItem()/*?}*/).size()) * instance.get();
     }
 
-    @Inject(method = /*? if forge || (neoforge && <26.1) {*/ /*"renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V" *//*?} else if neoforge {*/ /*"extractSelectedItemName(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V" *//*?} else {*/"extractSelectedItemName"/*?}*/, at = @At("HEAD"), cancellable = true/*? if forge || neoforge {*//*, remap = false*//*?}*/)
+    @Inject(method = /*? if forge {*/ /*"renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V" *//*?} else if neoforge {*/ /*"extractSelectedItemName(Lnet/minecraft/client/gui/GuiGraphicsExtractor;I)V" *//*?} else {*/"extractSelectedItemName"/*?}*/, at = @At("HEAD"), cancellable = true/*? if forge || neoforge {*//*, remap = false*//*?}*/)
     public void renderSelectedItemName(GuiGraphicsExtractor GuiGraphicsExtractor, /*? if forge || neoforge {*/ /*int shift, *//*?}*/ CallbackInfo ci) {
         ci.cancel();
         LegacyRenderUtil.renderHUDTooltip(GuiGraphicsExtractor, /*? if forge || neoforge {*/ /*shift *//*?} else {*/0/*?}*/);
     }
 
-    @Redirect(method = /*? if neoforge && <26.1 {*//*"renderHealthLevel"*//*?} else {*/"extractPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
+    @Redirect(method = /*? if neoforge {*//*"extractHealthLevel"*//*?} else {*/"extractPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
     private void renderPlayerHealth(Gui instance, long value) {
         healthBlinkTime = value - (LegacyOptions.legacyHearts.get() ? 6 : 0);
     }

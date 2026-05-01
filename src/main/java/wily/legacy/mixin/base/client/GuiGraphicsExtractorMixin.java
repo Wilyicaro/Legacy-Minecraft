@@ -36,7 +36,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.List;
 
 @Mixin(GuiGraphicsExtractor.class)
-public abstract class GuiGraphicsMixin {
+public abstract class GuiGraphicsExtractorMixin {
 
     @Shadow
     @Final

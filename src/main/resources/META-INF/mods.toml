@@ -13,9 +13,6 @@ authors="${mod_authors}"
 description="${mod_description}"
 credits="${mod_credits}"
 
-[[accessTransformers]]
-file="aw/${mod_id}.cfg"
-
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true

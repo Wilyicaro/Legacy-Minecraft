@@ -37,12 +37,13 @@ public class LegacySaveCache {
     }
 
     public static boolean isCurrentWorldSource(LevelStorageSource.LevelStorageAccess storageSource) {
-        return getLevelDirectory(storageSource).getParent().equals(currentWorldSource.getBaseDir().normalize());
+        return storageSource.parent().getBaseDir().equals(currentWorldSource.getBaseDir());
     }
 
     public static void saveLevel(LevelStorageSource.LevelStorageAccess storageSource) {
-        if (isCurrentWorldSource(storageSource))
+        if (isCurrentWorldSource(storageSource)) {
             copySaveBtwSources(storageSource, Minecraft.getInstance().getLevelSource(), false);
+        }
     }
 
     public static String importSaveFile(InputStream saveInputStream, Predicate<String> exists, LevelStorageSource source, String saveDirName) {
@@ -76,7 +77,7 @@ public class LegacySaveCache {
             FileUtils.copyDirectory(sourceLevelDirectory.toFile(), destLevelDirectory, p -> {
                 if (p.getName().equals("session.lock")) return false;
                 if (deleteOldDest) return true;
-                File destFile = destLevelDirectoryPath.resolve(sourceLevelDirectory.relativize(p.toPath())).toFile();
+                File destFile = p.toPath().relativize(destLevelDirectory.toPath()).toFile();
                 return !destFile.exists() || FileUtils.isFileNewer(p, destFile);
             });
         } catch (IOException e) {
