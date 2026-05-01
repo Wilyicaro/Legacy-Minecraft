@@ -148,6 +148,7 @@ public final class SkinPoseRegistry {
         UPSIDE_DOWN("upside_down"),
         STATUE_OF_LIBERTY("statue_of_liberty"),
         DISABLE_VIEW_BOBBING("disable_view_bobbing"),
+        HIDE_HEAD_LAYER("hide_head_layer"),
         HIDE_HAND("hide_hand");
 
         private final String key;
