@@ -1,5 +1,6 @@
 package wily.legacy.skins.skin;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class ClientSkinAssets {
     private static final Map<String, Identifier> TEXTURES = new ConcurrentHashMap<>();
     private static final Map<String, JsonObject> MODELS = new ConcurrentHashMap<>();
+    private static final Map<String, JsonObject> METADATA = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> TEXTURE_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> MODEL_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
@@ -121,8 +123,13 @@ public final class ClientSkinAssets {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
         JsonObject obj = assetKey == null ? null : MODELS.get(assetKey);
         if (obj == null) obj = MODELS.get(skinId);
-        if (obj == null) return null;
         Boolean slim = getSlimFlagFrom(obj);
+        if (slim != null) return slim;
+        slim = getSlimFlagFrom(getObject(obj, "meta"));
+        if (slim != null) return slim;
+        obj = assetKey == null ? null : METADATA.get(assetKey);
+        if (obj == null) obj = METADATA.get(skinId);
+        slim = getSlimFlagFrom(obj);
         return slim != null ? slim : getSlimFlagFrom(getObject(obj, "meta"));
     }
 
@@ -196,13 +203,12 @@ public final class ClientSkinAssets {
     public static AssetData resolveAssetData(Minecraft client, String skinId) {
         byte[] texture = TEXTURE_BYTES.get(skinId);
         byte[] model = MODEL_BYTES.get(skinId);
-        if (texture != null && model != null) return new AssetData(texture, model);
         ResolvedSkin resolved = resolveSkin(skinId);
         SkinEntry entry = resolved == null ? null : resolved.entry();
         if (texture == null)
             texture = loadBytes(client, resolved == null ? resolveTexture(skinId, entry) : resolved.texture());
         if (model == null) model = loadBytes(client, resolveModelLocation(client, skinId, entry));
-        return new AssetData(texture, model);
+        return new AssetData(texture, model, resolveMetadataBytes(skinId, resolved, entry));
     }
 
     public static Identifier getModelIdFromTexture(Identifier texture) {
@@ -245,6 +251,23 @@ public final class ClientSkinAssets {
         }
     }
 
+    public static void putMetadata(String skinId, byte[] metaJson) {
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        invalidateSkinCache(skinId);
+        if (metaJson == null) return;
+        if (metaJson.length == 0) {
+            METADATA.remove(skinId);
+            return;
+        }
+        try {
+            JsonObject obj = JsonParser.parseString(new String(metaJson, StandardCharsets.UTF_8)).getAsJsonObject();
+            METADATA.put(skinId, obj);
+            registerRuntimePoses(skinId, obj);
+        } catch (RuntimeException ex) {
+            SkinsLogger.debug("Failed to load runtime skin metadata {}", skinId);
+        }
+    }
+
     public static void clear() {
         Minecraft client = Minecraft.getInstance();
         TextureManager manager = client != null ? client.getTextureManager() : null;
@@ -254,6 +277,7 @@ public final class ClientSkinAssets {
         clearPreviewWarmup();
         TEXTURES.clear();
         MODELS.clear();
+        METADATA.clear();
         TEXTURE_BYTES.clear();
         MODEL_BYTES.clear();
         SKIN_CACHE.clear();
@@ -382,6 +406,27 @@ public final class ClientSkinAssets {
         return null;
     }
 
+    private static byte[] resolveMetadataBytes(String skinId, ResolvedSkin resolved, SkinEntry entry) {
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return new byte[0];
+        JsonObject obj = new JsonObject();
+        JsonArray poses = new JsonArray();
+        for (SkinPoseRegistry.PoseTag tag : SkinPoseRegistry.PoseTag.values()) {
+            if (SkinPoseRegistry.hasPose(tag, skinId)) poses.add(tag.key());
+        }
+        if (poses.size() > 0) obj.add("poses", poses);
+        Boolean slim = resolveSlimFlag(skinId, resolved, entry);
+        if (slim != null) obj.addProperty("slim", slim);
+        return obj.entrySet().isEmpty() ? new byte[0] : obj.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static Boolean resolveSlimFlag(String skinId, ResolvedSkin resolved, SkinEntry entry) {
+        Identifier modelId = resolved == null ? null : resolved.modelId();
+        Boolean slim = modelId == null ? null : BoxModelManager.getSlimFlag(modelId);
+        if (slim == null && entry != null && entry.modelId() != null) slim = BoxModelManager.getSlimFlag(entry.modelId());
+        if (slim == null && entry != null) return entry.slimArms();
+        return slim != null ? slim : getSlimFlag(null, skinId);
+    }
+
     private static Boolean getBoolean(JsonObject obj, String key) {
         JsonPrimitive primitive = getPrimitive(obj, key);
         if (primitive == null) return null;
@@ -470,7 +515,7 @@ public final class ClientSkinAssets {
                                Identifier modelId, BuiltBoxModel boxModel) {
     }
 
-    public record AssetData(byte[] texture, byte[] model) {
+    public record AssetData(byte[] texture, byte[] model, byte[] metadata) {
         public boolean hasTexture() {
             return texture != null && texture.length > 0;
         }
