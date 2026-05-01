@@ -168,6 +168,7 @@ public class Legacy4JClient {
     public static final KeyMapping keyFlyRight = new KeyMapping(MOD_ID + ".key.flyRight", InputConstants.KEY_RIGHT, KeyMapping.Category.MOVEMENT);
     public static boolean isNewerVersion = false;
     public static boolean isNewerMinecraftVersion = false;
+    private static boolean hideNextExperimentalWorldWarning;
     public static ControlType lastControlType;
     public static boolean canSprint = false;
     public static int sprintTicksLeft = -1;
@@ -238,7 +239,8 @@ public class Legacy4JClient {
                 }
             };
         } else if (screen instanceof BackupConfirmScreen s) {
-            if (LegacyOptions.hideExperimentalWorldWarning.get() && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+            if ((LegacyOptions.hideExperimentalWorldWarning.get() || hideNextExperimentalWorldWarning) && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+                hideNextExperimentalWorldWarning = false;
                 Minecraft minecraft = Minecraft.getInstance();
                 minecraft.execute(() -> BackupConfirmScreenAccessor.of(s).proceed(false, false));
                 return minecraft.screen;
@@ -274,6 +276,16 @@ public class Legacy4JClient {
             if (text.contains("experimental") || text.contains("data pack")) return true;
         }
         return false;
+    }
+
+    public static void hideNextExperimentalWorldWarning(Runnable runnable) {
+        boolean previous = hideNextExperimentalWorldWarning;
+        hideNextExperimentalWorldWarning = true;
+        try {
+            runnable.run();
+        } finally {
+            hideNextExperimentalWorldWarning = previous;
+        }
     }
 
     public static void preTick(Minecraft minecraft) {

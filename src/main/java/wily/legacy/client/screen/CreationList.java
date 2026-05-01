@@ -27,6 +27,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.util.LegacyComponents;
 
@@ -117,7 +118,7 @@ public class CreationList extends RenderableVList {
             album.ifPresent(LegacyClientWorldSettings.of(summary.getSettings())::setSelectedResourceAlbum);
             access.close();
             if (template.directJoin()) {
-                LoadSaveScreen.loadWorld(parent, minecraft, LegacySaveCache.getLevelStorageSource(), summary);
+                Legacy4JClient.hideNextExperimentalWorldWarning(() -> LoadSaveScreen.loadWorld(parent, minecraft, LegacySaveCache.getLevelStorageSource(), summary));
             } else minecraft.setScreen(new LoadSaveScreen(parent, summary, access, (album.isPresent() || template.albumId().isEmpty()) && template.isLocked()) {
                 @Override
                 public void onClose() {
