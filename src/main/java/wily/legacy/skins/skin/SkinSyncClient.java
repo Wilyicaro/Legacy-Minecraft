@@ -118,6 +118,7 @@ public final class SkinSyncClient {
         if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(assetKey, bytes);
         else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, bytes);
         else if (assetType == SkinSync.ASSET_METADATA) ClientSkinAssets.putMetadata(skinId, bytes);
+        else if (assetType == SkinSync.ASSET_CAPE) ClientSkinAssets.putCape(assetKey, bytes);
         ClientSkinCache.set(uuid, skinId);
     }
 
@@ -226,6 +227,7 @@ public final class SkinSyncClient {
         sendAssetChunks(skinId, SkinSync.ASSET_TEXTURE, assets.texture());
         sendAssetChunks(skinId, SkinSync.ASSET_MODEL, assets.model());
         sendAssetChunks(skinId, SkinSync.ASSET_METADATA, assets.metadata());
+        sendAssetChunks(skinId, SkinSync.ASSET_CAPE, assets.cape());
     }
 
     private static void sendAssetChunks(String skinId, int assetType, byte[] bytes) {
