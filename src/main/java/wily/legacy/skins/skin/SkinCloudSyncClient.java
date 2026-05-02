@@ -25,6 +25,7 @@ final class SkinCloudSyncClient {
     private static final Gson GSON = new Gson();
     private static final HttpClient HTTP = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     private static final AtomicBoolean SNAPSHOT_IN_FLIGHT = new AtomicBoolean(false);
+    private static final long SNAPSHOT_RETRY_INTERVAL_MS = 60000L;
     private static volatile long lastSnapshotRequestAt;
 
     private SkinCloudSyncClient() {
@@ -58,7 +59,8 @@ final class SkinCloudSyncClient {
         String serverKey = SkinFairness.resolveServerKey(client);
         if (relayUrl.isBlank() || serverKey == null) return;
         long now = System.currentTimeMillis();
-        if (!force && (SNAPSHOT_IN_FLIGHT.get() || now - lastSnapshotRequestAt < 5000L)) return;
+        if (SNAPSHOT_IN_FLIGHT.get()) return;
+        if (!force && now - lastSnapshotRequestAt < SNAPSHOT_RETRY_INTERVAL_MS) return;
         if (!SNAPSHOT_IN_FLIGHT.compareAndSet(false, true)) return;
         lastSnapshotRequestAt = now;
 
