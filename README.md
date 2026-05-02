@@ -47,6 +47,8 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
  
 - [Simply Legacy](https://modrinth.com/modpack/simply-legacy) | A faithful, fully-featured continuation of the vanilla Legacy Console Edition experience for PCs, Steam Decks and more!
 
+- [2000s Edition](https://modrinth.com/modpack/simply-legacy) | Legacy Console Edition if it was made for 2000s-era PC's and the 6th Generation of Video Game Consoles!
+
 <div align="center">
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_special_thanks.png?raw=true" width="700" >
 </div>
@@ -95,7 +97,7 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
 | How To Play Interface                                                      |      ✅      | ✅       |
 | Patch/Update Notes Interface                                               |      ✅      | ✅       |
 | Advanced Hints/Tutorial                                                    |      ❌      | ✅       |
-| Improved Change Skin Interface                                             |      ❌      | ✅       |
+| Improved Change Skin Interface                                             |      ✅      | ✅       |
 | [Legacy Edition Minigames](https://www.legacyminigames.net/) Compatibility |      ❌      | ✅       |
 | Backports that would need a full remake (<=1.16.5)                         |      ❌      | ❌       |
 
