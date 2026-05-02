@@ -76,9 +76,13 @@ public final class LegacyCloudAtmosphere {
         return areLceCloudsEnabled() && level.dimensionType().skybox() == DimensionType.Skybox.OVERWORLD;
     }
 
+    public static boolean shouldUseConsoleAtmosphereColors(ClientLevel level, float partialTick) {
+        return shouldUseConsoleAtmosphere(level) && level.getRainLevel(partialTick) <= 0.0f && level.getThunderLevel(partialTick) <= 0.0f;
+    }
+
 
     public static boolean shouldUseWarmCloudTransparency(ClientLevel level, float partialTick) {
-        if (!shouldUseConsoleAtmosphere(level)) {
+        if (!shouldUseConsoleAtmosphereColors(level, partialTick)) {
             return false;
         }
         float sampledPartialTick = partialTick - Mth.floor(partialTick);
@@ -115,6 +119,10 @@ public final class LegacyCloudAtmosphere {
 
 
     public static int getAtmosphericFogColor(ClientLevel level, Camera camera, int renderDistanceChunks, float partialTick) {
+        if (!shouldUseConsoleAtmosphereColors(level, partialTick)) {
+            return getVisualColor(camera, EnvironmentAttributes.FOG_COLOR, partialTick);
+        }
+
         float[] rgb = getDimensionFogRgb(level, camera, partialTick);
 
         if (renderDistanceChunks >= 4) {
@@ -143,7 +151,7 @@ public final class LegacyCloudAtmosphere {
 
 
     public static int getSunriseCloudColor(ClientLevel level, float partialTick, int baseCloudColor) {
-        if (!shouldUseConsoleAtmosphere(level)) {
+        if (!shouldUseConsoleAtmosphereColors(level, partialTick)) {
             return baseCloudColor;
         }
 
@@ -173,7 +181,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static int getCloudColor(ClientLevel level, float partialTick, int baseCloudColor) {
-        if (!shouldUseConsoleAtmosphere(level)) {
+        if (!shouldUseConsoleAtmosphereColors(level, partialTick)) {
             return baseCloudColor;
         }
 
