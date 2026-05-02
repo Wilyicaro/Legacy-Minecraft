@@ -2,7 +2,7 @@ package wily.legacy.skins.client.gui;
 
 import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.Identifier;
@@ -33,12 +33,12 @@ public final class GuiDollRender {
         return (yaw + 180.0F) % 360.0F - 180.0F;
     }
 
-    public static void renderDollInRect(GuiGraphics gui, String selectionId, PlayerSkin skin, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
+    public static void renderDollInRect(GuiGraphicsExtractor gui, String selectionId, PlayerSkin skin, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
         if (gui == null || skin == null) return;
         submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, null, null, null, null, BASE_BBOX_HEIGHT, BASE_BBOX_WIDTH, yawOffset, crouching, attackTime, false));
     }
 
-    public static void renderDollInRect(GuiGraphics gui, String selectionId, Identifier skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
+    public static void renderDollInRect(GuiGraphicsExtractor gui, String selectionId, Identifier skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
         if (gui == null || skinTexture == null) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc != null) mc.getTextureManager().getTexture(skinTexture);
@@ -61,9 +61,9 @@ public final class GuiDollRender {
         submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, yawOffset, crouching, attackTime, showCape));
     }
 
-    private static void submit(GuiGraphics gui, int left, int right, PreviewLayout layout, AvatarRenderState state) {
+    private static void submit(GuiGraphicsExtractor gui, int left, int right, PreviewLayout layout, AvatarRenderState state) {
         applyPreviewLighting();
-        gui.submitEntityRenderState(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left, layout.expandedTop(), right, layout.expandedBottom());
+        gui.entity(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left, layout.expandedTop(), right, layout.expandedBottom());
     }
 
     private static AvatarRenderState buildState(PlayerSkin skin, String selectionId, Identifier texture, Identifier boxTexture, Identifier modelId, wily.legacy.skins.client.render.boxloader.BuiltBoxModel boxModel, float bboxHeight, float bboxWidth, float yawOffset, boolean crouching, float attackTime, boolean showCape) {

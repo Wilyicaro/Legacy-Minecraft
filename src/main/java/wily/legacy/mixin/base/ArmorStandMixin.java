@@ -38,8 +38,8 @@ public abstract class ArmorStandMixin extends LivingEntity {
     @Shadow
     protected abstract byte setBit(byte b, int i, boolean bl);
 
-    @Inject(method = "interactAt", at = @At("HEAD"), cancellable = true)
-    public void interactAt(Player player, Vec3 vec3, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
+    @Inject(method = "interact", at = @At("HEAD"), cancellable = true)
+    public void interactAt(Player player, InteractionHand interactionHand, Vec3 vec3, CallbackInfoReturnable<InteractionResult> cir) {
         if (player.isShiftKeyDown()) {
             cir.setReturnValue(InteractionResult.SUCCESS);
             if (level().isClientSide()) return;

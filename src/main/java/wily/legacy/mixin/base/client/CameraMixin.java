@@ -2,7 +2,6 @@ package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Camera;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -16,7 +15,7 @@ public class CameraMixin {
         return LegacyRenderUtil.getFlyingViewRollingRotation(f);
     }
 
-    @ModifyExpressionValue(method = "setup", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Camera;xRot:F", opcode = Opcodes.GETFIELD))
+    @ModifyExpressionValue(method = "alignWithEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Camera;xRot:F"))
     protected float setup(float f) {
         return LegacyOptions.invertedFrontCameraPitch.get() ? f : -f;
     }

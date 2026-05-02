@@ -2,7 +2,7 @@ package wily.legacy.skins.client.preview;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -319,7 +319,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
         if (!visible) return;
         boolean clipActive = false;
         try {
@@ -369,19 +369,19 @@ public class PlayerSkinWidget extends AbstractWidget {
             float yawOffset = isUpsideDownFacingFlip(id) ? -rotationY : rotationY;
             if (CLIP_ENABLED) {
                 try {
-                    guiGraphics.disableScissor();
+                    GuiGraphicsExtractor.disableScissor();
                 } catch (IllegalStateException ignored) {
                 }
-                guiGraphics.enableScissor(CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2);
+                GuiGraphicsExtractor.enableScissor(CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2);
                 clipActive = true;
             }
-            renderDoll(guiGraphics, partialTick, id, yawOffset, attackTime, left, top, right, bottom);
-            if (CENTER_NAME_PLATE && slotOffset == 0) renderNamePlate(guiGraphics, id, left, right, bottom);
+            renderDoll(GuiGraphicsExtractor, partialTick, id, yawOffset, attackTime, left, top, right, bottom);
+            if (CENTER_NAME_PLATE && slotOffset == 0) renderNamePlate(GuiGraphicsExtractor, id, left, right, bottom);
         } catch (RuntimeException ignored) {
         } finally {
             if (clipActive) {
                 try {
-                    guiGraphics.disableScissor();
+                    GuiGraphicsExtractor.disableScissor();
                 } catch (IllegalStateException ignored) {
                 }
             }
@@ -498,11 +498,11 @@ public class PlayerSkinWidget extends AbstractWidget {
         return CENTER_NAME_PLATE_DISPLAY_ID;
     }
 
-    private void renderDoll(GuiGraphics guiGraphics, float partialTick, String id, float yawOffset, float attackTime, int left, int top, int right, int bottom) {
-        source.renderPreview(guiGraphics, id, yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom);
+    private void renderDoll(GuiGraphicsExtractor GuiGraphicsExtractor, float partialTick, String id, float yawOffset, float attackTime, int left, int top, int right, int bottom) {
+        source.renderPreview(GuiGraphicsExtractor, id, yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom);
     }
 
-    private void renderNamePlate(GuiGraphics guiGraphics, String id, int left, int right, int bottom) {
+    private void renderNamePlate(GuiGraphicsExtractor GuiGraphicsExtractor, String id, int left, int right, int bottom) {
         String displayId = resolveNamePlateId(id);
         if (displayId == null || displayId.isBlank()) return;
         String label = SkinIdUtil.isAutoSelect(displayId) ? "Current Skin" : nameLabel(displayId);
@@ -513,18 +513,18 @@ public class PlayerSkinWidget extends AbstractWidget {
         int plateX = cx - plateW / 2;
         int plateY = CENTER_NAME_PLATE_Y >= 0 ? CENTER_NAME_PLATE_Y : bottom + CENTER_NAME_PLATE_PAD_Y;
         if (CLIP_ENABLED) plateY = Math.max(CLIP_Y1, Math.min(plateY, CLIP_Y2 - plateH - 1));
-        if (CENTER_NAME_PLATE_HIGHLIGHT) renderNamePlateHighlight(guiGraphics, plateX, plateY, plateW, plateH);
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
+        if (CENTER_NAME_PLATE_HIGHLIGHT) renderNamePlateHighlight(GuiGraphicsExtractor, plateX, plateY, plateW, plateH);
+        GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
         var font = Minecraft.getInstance().font;
         int maxPx = Math.max(1, plateW - 8);
         String theme = themeLabel(displayId, label);
         String showName = clipText(font, label, maxPx);
         if (theme == null)
-            guiGraphics.drawCenteredString(font, Component.literal(showName), plateX + plateW / 2, plateY + (plateH - font.lineHeight) / 2, 0xFFFFFFFF);
+            GuiGraphicsExtractor.centeredText(font, Component.literal(showName), plateX + plateW / 2, plateY + (plateH - font.lineHeight) / 2, 0xFFFFFFFF);
         else {
             int baseY = plateY + (plateH - font.lineHeight * 2) / 2;
-            guiGraphics.drawCenteredString(font, Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
-            guiGraphics.drawCenteredString(font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
+            GuiGraphicsExtractor.centeredText(font, Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
+            GuiGraphicsExtractor.centeredText(font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
         }
         if (!CENTER_SELECTED_BADGE || !CENTER_NAME_PLATE_READY || !isCurrentSkinSelected(displayId)) return;
         int badgeW = CENTER_SELECTED_BADGE_W;
@@ -532,21 +532,21 @@ public class PlayerSkinWidget extends AbstractWidget {
         int badgeX = cx - badgeW / 2;
         int badgeY = plateY - CENTER_SELECTED_BADGE_GAP - badgeH;
         if (CLIP_ENABLED) badgeY = Math.max(CLIP_Y1, Math.min(badgeY, CLIP_Y2 - badgeH - 1));
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
-        guiGraphics.drawCenteredString(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2 + 2, 0xFFFFFFFF);
+        GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
+        GuiGraphicsExtractor.centeredText(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2 + 2, 0xFFFFFFFF);
     }
 
-    private void renderNamePlateHighlight(GuiGraphics guiGraphics, int plateX, int plateY, int plateW, int plateH) {
+    private void renderNamePlateHighlight(GuiGraphicsExtractor GuiGraphicsExtractor, int plateX, int plateY, int plateW, int plateH) {
         int pad = CENTER_NAME_PLATE_HIGHLIGHT_PAD;
         int x = plateX - pad;
         int y = plateY - pad;
         int w = plateW + pad * 2;
         int h = plateH + pad * 2;
         int thickness = Math.min(CENTER_NAME_PLATE_HIGHLIGHT_THICKNESS, Math.max(1, Math.min(w, h) / 2));
-        guiGraphics.fill(x, y, x + w, y + thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
-        guiGraphics.fill(x, y + h - thickness, x + w, y + h, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
-        guiGraphics.fill(x, y + thickness, x + thickness, y + h - thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
-        guiGraphics.fill(x + w - thickness, y + thickness, x + w, y + h - thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        GuiGraphicsExtractor.fill(x, y, x + w, y + thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        GuiGraphicsExtractor.fill(x, y + h - thickness, x + w, y + h, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        GuiGraphicsExtractor.fill(x, y + thickness, x + thickness, y + h - thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
+        GuiGraphicsExtractor.fill(x + w - thickness, y + thickness, x + w, y + h - thickness, CENTER_NAME_PLATE_HIGHLIGHT_COLOR);
     }
 
     private String nameLabel(String id) {

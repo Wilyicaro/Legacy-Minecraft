@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client.gui;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.contextualbar.ContextualBarRenderer;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
@@ -18,8 +18,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(ContextualBarRenderer.class)
 public interface ExperienceBarRendererMixin {
 
-    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
-    private static void renderExperienceLevel(GuiGraphics guiGraphics, Font font, int i, CallbackInfo ci) {
+    @Inject(method = "extractExperienceLevel", at = @At("HEAD"), cancellable = true)
+    private static void extractExperienceLevel(GuiGraphicsExtractor guiGraphics, Font font, int i, CallbackInfo ci) {
         ci.cancel();
 
         if (!LegacyRenderUtil.canDisplayHUD()) return;

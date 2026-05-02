@@ -5,7 +5,7 @@ package wily.legacy.mixin.base.client.gui;
 
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.SubtitleOverlay;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -51,8 +51,8 @@ public class SubtitleOverlayMixin {
         return (SubtitleOverlay) (Object) this;
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, CallbackInfo ci) {
         ci.cancel();
         SoundManager soundManager = this.minecraft.getSoundManager();
         if (!this.isListening && this.minecraft.options.showSubtitles().get()) {
@@ -99,11 +99,11 @@ public class SubtitleOverlayMixin {
 
                 j += 36;
                 int lineHeight = 12;
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float) (guiGraphics.guiHeight() - 35));
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(GuiGraphicsExtractor.guiWidth() - 10, (float) (GuiGraphicsExtractor.guiHeight() - 35));
                 int height = list.size() * 12;
-                LegacyRenderUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
-                guiGraphics.pose().translate(-(j / 2.0f) - 2.0f, 0);
+                LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, -j, -height, j, height + 10);
+                GuiGraphicsExtractor.pose().translate(-(j / 2.0f) - 2.0f, 0);
                 for (SubtitleOverlay.Subtitle subtitle2 : list) {
                     Component component = subtitle2.getText();
                     //? if >=1.20.5 {
@@ -124,14 +124,14 @@ public class SubtitleOverlayMixin {
 
                     int r = q - 16777216;
                     if (!bl && e != 0) {
-                        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, p / 255f);
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(e > 0 ? LegacySprites.SCROLL_RIGHT : LegacySprites.SCROLL_LEFT, e > 0 ? l - 8 : -l + 4, -n - 2, 6, 11);
-                        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+                        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, p / 255f);
+                        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(e > 0 ? LegacySprites.SCROLL_RIGHT : LegacySprites.SCROLL_LEFT, e > 0 ? l - 8 : -l + 4, -n - 2, 6, 11);
+                        FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
                     }
-                    guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, r);
-                    guiGraphics.pose().translate(0, -lineHeight);
+                    GuiGraphicsExtractor.text(this.minecraft.font, component, -o / 2, -n, r);
+                    GuiGraphicsExtractor.pose().translate(0, -lineHeight);
                 }
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().popMatrix();
             }
         }
     }

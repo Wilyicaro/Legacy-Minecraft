@@ -15,7 +15,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -238,7 +238,7 @@ public interface ControlTooltip {
             } else {
                 if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.canRepair(a.getHoveredSlot().getItem(), a.getMenu().getCarried()))
                     return LegacyComponents.REPAIR;
-                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && a.getMenu().getCarried().getItem() instanceof DyeItem)
+                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.isDyeableItem(a.getHoveredSlot().getItem().typeHolder()) && a.getMenu().getCarried().getItem() instanceof DyeItem)
                     return LegacyComponents.DYE;
                 else if (isBundle(a.getMenu().getCarried()) && BundleItem.getFullnessDisplay(a.getMenu().getCarried()) > 0 && !a.getHoveredSlot().hasItem())
                     return LegacyComponents.RELEASE;
@@ -484,7 +484,7 @@ public interface ControlTooltip {
                         return LegacyComponents.GLOW;
                     if (item.is(Items.INK_SAC) && text.hasGlowingText())
                         return LegacyComponents.REMOVE_GLOW;
-                    if (item.getItem() instanceof DyeItem dye && text.getColor() != dye.getDyeColor())
+                    if (item.getItem() instanceof DyeItem dye && text.getColor() != LegacyItemUtil.getDyeColor(dye.asItem()))
                         return LegacyComponents.DYE;
                 }
             }
@@ -580,7 +580,7 @@ public interface ControlTooltip {
             }
             if (blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
                 boolean dyedItem = LegacyItemUtil.isDyedItem(actualItem);
-                boolean isDyeable = LegacyItemUtil.isDyeableItem(actualItem.getItemHolder());
+                boolean isDyeable = LegacyItemUtil.isDyeableItem(actualItem.typeHolder());
                 if (isDyeable) {
                     if (be.waterColor == null && !dyedItem)
                         return LegacyComponents.CLEAR;
@@ -634,7 +634,7 @@ public interface ControlTooltip {
             // 5-Feeding/healing interactions (canFeed, canSetLoveMode, heal, tame)
             if (canTame(minecraft, hand, actualItem)) return LegacyComponents.TAME;
             if (canDyeEntity(minecraft, actualItem)) return LegacyComponents.DYE;
-            if (canFeed(minecraft, entity, actualItem)) return LegacyComponents.FEED;
+            if (canFeed(minecraft, entity, actualItem) || canFeedWithGoldenDandelion(entity, actualItem)) return LegacyComponents.FEED;
             if (canSetLoveMode(entity, actualItem)) return LegacyComponents.LOVE_MODE;
             if (entity instanceof TamableAnimal a && a.isTame() && a.isFood(actualItem) && a.getHealth() < a.getMaxHealth())
                 return LegacyComponents.HEAL;
@@ -718,6 +718,10 @@ public interface ControlTooltip {
         return (entity instanceof Animal a && a.isFood(usedItem) && (!(a instanceof AbstractHorse) && a.isBaby() || a instanceof AbstractHorse h && (a instanceof Llama || (a.isBaby() || !usedItem.is(Items.HAY_BLOCK))) && (!h.isTamed() || !isLoveFood(a, usedItem) && a.getHealth() < a.getMaxHealth() && !minecraft.player.isSecondaryUseActive()))) || (entity instanceof Panda panda && usedItem.is(Items.BAMBOO) && panda.isFood(usedItem) && !panda.isEating() && !panda.canFallInLove());
     }
 
+    static boolean canFeedWithGoldenDandelion(Entity entity, ItemStack usedItem) {
+        return entity instanceof AgeableMob mob && AgeableMob.canUseGoldenDandelion(usedItem, mob.isBaby(), 0, mob);
+    }
+
     static boolean isLoveFood(Animal a, ItemStack stack) {
         return (a instanceof Llama && stack.is(Items.HAY_BLOCK)) || a instanceof Horse && ((stack.is(Items.GOLDEN_CARROT) || stack.is(Items.GOLDEN_APPLE) || stack.is(Items.ENCHANTED_GOLDEN_APPLE)));
     }
@@ -755,7 +759,7 @@ public interface ControlTooltip {
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem) {
-        return usedItem.getItem() instanceof DyeItem dye && minecraft.hitResult instanceof EntityHitResult result && minecraft.player != null && (result.getEntity() instanceof Sheep sheep && sheep.getColor() != dye.getDyeColor() || result.getEntity() instanceof Wolf w && w.isTame() && w.isOwnedBy(minecraft.player) && w.getCollarColor() != dye.getDyeColor() || result.getEntity() instanceof Cat c && c.isTame() && c.isOwnedBy(minecraft.player) && c.getCollarColor() != dye.getDyeColor());
+        return usedItem.getItem() instanceof DyeItem dye && minecraft.hitResult instanceof EntityHitResult result && minecraft.player != null && (result.getEntity() instanceof Sheep sheep && sheep.getColor() != LegacyItemUtil.getDyeColor(dye.asItem()) || result.getEntity() instanceof Wolf w && w.isTame() && w.isOwnedBy(minecraft.player) && w.getCollarColor() != LegacyItemUtil.getDyeColor(dye.asItem()) || result.getEntity() instanceof Cat c && c.isTame() && c.isOwnedBy(minecraft.player) && c.getCollarColor() != LegacyItemUtil.getDyeColor(dye.asItem()));
     }
 
     Icon getIcon();
@@ -764,7 +768,7 @@ public interface ControlTooltip {
     Component getAction();
 
     interface Icon {
-        int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate);
+        int render(GuiGraphicsExtractor graphics, int x, int y, boolean allowPressed, int color, boolean simulate);
 
         default void clickIfInside(double tooltipX, MouseButtonEvent event) {
             click(event);
@@ -778,11 +782,11 @@ public interface ControlTooltip {
 
         }
 
-        default int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color) {
+        default int render(GuiGraphicsExtractor graphics, int x, int y, boolean allowPressed, int color) {
             return render(graphics, x, y, allowPressed, color, false);
         }
 
-        default int render(GuiGraphics graphics, int x, int y, boolean allowPressed) {
+        default int render(GuiGraphicsExtractor graphics, int x, int y, boolean allowPressed) {
             return render(graphics, x, y, allowPressed, 0xFFFFFFFF);
         }
 
@@ -824,7 +828,7 @@ public interface ControlTooltip {
         }
 
         @Override
-        default int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate) {
+        default int render(GuiGraphicsExtractor graphics, int x, int y, boolean allowPressed, int color, boolean simulate) {
             int totalWidth = 0;
             for (Icon icon : getIcons())
                 totalWidth += icon.render(graphics, x + totalWidth, y, allowPressed, color, simulate);
@@ -841,9 +845,9 @@ public interface ControlTooltip {
                 }
 
                 @Override
-                public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate) {
+                public int render(GuiGraphicsExtractor graphics, int x, int y, boolean allowPressed, int color, boolean simulate) {
                     Font font = Minecraft.getInstance().font;
-                    if (!simulate) graphics.drawString(font, getComponent(), x, y, color, false);
+                    if (!simulate) graphics.text(font, getComponent(), x, y, color, false);
                     return font.width(getComponent());
                 }
             };
@@ -914,8 +918,8 @@ public interface ControlTooltip {
         private boolean isAdditive = false;
 
         public CompoundComponentIcon(ComponentIcon[] componentIcons) {
-            this.componentIcons = componentIcons;
-            for (ComponentIcon componentIcon : componentIcons) {
+            this.componentIcons = Arrays.stream(componentIcons).filter(Objects::nonNull).toArray(ComponentIcon[]::new);
+            for (ComponentIcon componentIcon : this.componentIcons) {
                 component.append(componentIcon.getComponent());
                 if (componentIcon == PLUS_ICON) isAdditive = true;
             }
@@ -971,7 +975,7 @@ public interface ControlTooltip {
         }
 
         @Override
-        public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate) {
+        public int render(GuiGraphicsExtractor graphics, int x, int y, boolean allowPressed, int color, boolean simulate) {
             Component c = getComponent(allowPressed);
             Component co = getOverlayComponent(allowPressed);
             Font font = Minecraft.getInstance().font;
@@ -983,7 +987,7 @@ public interface ControlTooltip {
                 lastPressed = pressed();
 
                 if (c != null) {
-                    graphics.drawString(font, c, x + (co == null || cw > cow ? 0 : (cow - cw) / 2), y, color, false);
+                    graphics.text(font, c, x + (co == null || cw > cow ? 0 : (cow - cw) / 2), y, color, false);
                 }
                 if (co != null) {
                     float rel = startPressTime == 0 ? 0 : canLoop() ? getPressInterval() % 1 : Math.min(getPressInterval(), 1);
@@ -992,7 +996,7 @@ public interface ControlTooltip {
                     graphics.pose().pushMatrix();
                     graphics.pose().translate(x + (c == null || cow > cw ? (cow - cow * d) / 2 : (cw - cow * d) / 2f), y + (9 - 9 * d) / 2);
                     graphics.pose().scale(d, d);
-                    graphics.drawString(font, co, 0, 0, ColorUtil.withAlpha(color, ColorUtil.getAlpha(color) * (0.8f + (rel >= 0.5f ? 0.2f : 0))), false);
+                    graphics.text(font, co, 0, 0, ColorUtil.withAlpha(color, ColorUtil.getAlpha(color) * (0.8f + (rel >= 0.5f ? 0.2f : 0))), false);
                     graphics.pose().popMatrix();
                 }
             }
@@ -1229,7 +1233,7 @@ public interface ControlTooltip {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (!LegacyOptions.inGameTooltips.get() && minecraft.screen == null || !LegacyOptions.displayControlTooltips.get())
                 return;
             renderTooltips.clear();
@@ -1242,33 +1246,33 @@ public interface ControlTooltip {
                     action = action.copy().withStyle(action.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT));
                 renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOptions.displayMultipleControlsFromAction.get() ? existingIcon : CompoundIcon.of(existingIcon, SPACE_ICON, icon));
             }
-            guiGraphics.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().pushMatrix();
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
             float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2;
             float hudDiff = 1.0f - hudDistance;
             float xDiff = 32 - 30 * hudDiff;
-            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, guiGraphics.guiHeight() - (29 - (15 - ControlType.getActiveType().iconHeight()) / 2 - 16 * hudDiff));
+            GuiGraphicsExtractor.pose().translate(left ? xDiff : GuiGraphicsExtractor.guiWidth() - xDiff, GuiGraphicsExtractor.guiHeight() - (29 - (15 - ControlType.getActiveType().iconHeight()) / 2 - 16 * hudDiff));
 
             renderTooltips.forEach((action, icon) -> {
                 if (left) {
-                    int controlWidth = icon.render(guiGraphics, 0, 0, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
+                    int controlWidth = icon.render(GuiGraphicsExtractor, 0, 0, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
                     if (controlWidth > 0) {
-                        guiGraphics.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0.0f);
-                        guiGraphics.drawString(minecraft.font, action, controlWidth, 0, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
-                        guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 10, 0);
+                        GuiGraphicsExtractor.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0.0f);
+                        GuiGraphicsExtractor.text(minecraft.font, action, controlWidth, 0, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
+                        GuiGraphicsExtractor.pose().translate(controlWidth + minecraft.font.width(action) + 10, 0);
                     }
                 } else {
                     int controlWidth = icon.getWidth();
                     if (controlWidth > 0) {
-                        guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0);
-                        icon.render(guiGraphics, 0, 0, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
-                        guiGraphics.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0.0f);
-                        guiGraphics.drawString(minecraft.font, action, controlWidth, 0, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
-                        guiGraphics.pose().translate(-12, 0);
+                        GuiGraphicsExtractor.pose().translate(-controlWidth - minecraft.font.width(action), 0);
+                        icon.render(GuiGraphicsExtractor, 0, 0, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
+                        GuiGraphicsExtractor.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0.0f);
+                        GuiGraphicsExtractor.text(minecraft.font, action, controlWidth, 0, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
+                        GuiGraphicsExtractor.pose().translate(-12, 0);
                     }
                 }
             });
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().popMatrix();
         }
 
 

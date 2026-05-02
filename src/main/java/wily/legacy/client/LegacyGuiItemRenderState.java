@@ -1,6 +1,6 @@
 package wily.legacy.client;
 
-import net.minecraft.client.gui.render.state.GuiItemRenderState;
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
 
 public interface LegacyGuiItemRenderState {
 

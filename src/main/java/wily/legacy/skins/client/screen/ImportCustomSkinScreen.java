@@ -1,7 +1,7 @@
 package wily.legacy.skins.client.screen;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -183,7 +183,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
     @Override
     protected void init() {
         super.init();
-        if (editing()) addRenderableOnly((guiGraphics, mouseX, mouseY, partialTick) -> renderFormRecess(guiGraphics));
+        if (editing()) addRenderableOnly((GuiGraphicsExtractor, mouseX, mouseY, partialTick) -> renderFormRecess(GuiGraphicsExtractor));
         nameBox = new EditBox(font, fieldX(), nameY(), renderableVList.listWidth, fieldHeight(), NAME);
         nameBox.setMaxLength(64);
         nameBox.setValue(initialName);
@@ -240,23 +240,23 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
         if (skinButton == null) return;
         int textX = fieldX();
         int fileValueY = fileY();
         String fileText = skinPath == null ? null : PlayerSkinWidget.clipText(font, skinPath.getFileName().toString(), renderableVList.listWidth);
         LegacyFontUtil.applySDFont(ignored -> {
             if (editing())
-                guiGraphics.drawString(font, EDIT_TITLE, textX, titleY(), CommonColor.GRAY_TEXT.get(), false);
-            guiGraphics.drawString(font, NAME, textX, nameLabelY(), CommonColor.GRAY_TEXT.get(), false);
-            guiGraphics.drawString(font, THEME, textX, themeLabelY(), CommonColor.GRAY_TEXT.get(), false);
+                GuiGraphicsExtractor.text(font, EDIT_TITLE, textX, titleY(), CommonColor.GRAY_TEXT.get(), false);
+            GuiGraphicsExtractor.text(font, NAME, textX, nameLabelY(), CommonColor.GRAY_TEXT.get(), false);
+            GuiGraphicsExtractor.text(font, THEME, textX, themeLabelY(), CommonColor.GRAY_TEXT.get(), false);
             if (fileText != null)
-                guiGraphics.drawString(font, fileText, textX, fileValueY, CommonColor.GRAY_TEXT.get(), false);
+                GuiGraphicsExtractor.text(font, fileText, textX, fileValueY, CommonColor.GRAY_TEXT.get(), false);
         });
     }
 
-    private void renderFormRecess(GuiGraphics guiGraphics) {
+    private void renderFormRecess(GuiGraphicsExtractor GuiGraphicsExtractor) {
         if (nameBox == null || themeBox == null || skinButton == null) return;
         int insetX = sd() ? 4 : 6;
         int insetTop = sd() ? 8 : 10;
@@ -265,7 +265,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         int y = nameLabelY() - insetTop;
         int width = renderableVList.listWidth + insetX * 2;
         int height = formBottomY() + insetBottom - y;
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, x, y, width, height);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL_RECESS, x, y, width, height);
     }
 
     private void browseForSkin() {

@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.util.Mth;
 import org.joml.Math;
@@ -25,7 +25,7 @@ public class ScrollableRenderer {
         scrollRenderer = renderer;
     }
 
-    public void render(GuiGraphics graphics, int x, int y, int width, int height, Runnable scrollable) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height, Runnable scrollable) {
         FactoryGuiGraphics.of(graphics).enableScissor(x, y, x + width, y + height);
         oldSmoothScrolled = smoothScrolled;
         smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());

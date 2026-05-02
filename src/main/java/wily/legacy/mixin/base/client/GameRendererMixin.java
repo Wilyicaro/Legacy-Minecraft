@@ -7,9 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
-import org.joml.Matrix4f;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import org.joml.Matrix4fc;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,8 +44,8 @@ public abstract class GameRendererMixin {
     @Shadow
     protected abstract void takeAutoScreenshot(Path path);
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastManager;render(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
-    private void render(CallbackInfo ci, @Local(ordinal = 0) GuiGraphics graphics) {
+    @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastManager;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", shift = At.Shift.AFTER))
+    private void extractGui(DeltaTracker deltaTracker, boolean bl, boolean bl2, CallbackInfo ci, @Local GuiGraphicsExtractor graphics) {
         LegacyRenderUtil.renderGameOverlay(graphics);
         ScreenshotToast.render(graphics);
     }
@@ -55,8 +56,8 @@ public abstract class GameRendererMixin {
     }
 
     @Inject(method = "bobView", at = @At("RETURN"))
-    private void bobView(PoseStack poseStack, float f, CallbackInfo ci) {
-        float xAngle = PlayerYBobbing.getAngle(minecraft, f);
+    private void bobView(CameraRenderState cameraRenderState, PoseStack poseStack, CallbackInfo ci) {
+        float xAngle = PlayerYBobbing.getAngle(minecraft, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         if (xAngle != 0) poseStack.mulPose(Axis.XP.rotationDegrees(xAngle));
     }
 
@@ -65,8 +66,8 @@ public abstract class GameRendererMixin {
         if (!LegacyOptions.displayHUD.get()) cir.setReturnValue(false);
     }
 
-    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(FZLorg/joml/Matrix4f;)V"))
-    private boolean renderLevel(GameRenderer instance, float matrix4fstack, boolean b, Matrix4f f) {
+    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;FLorg/joml/Matrix4fc;)V"))
+    private boolean renderLevel(GameRenderer instance, CameraRenderState cameraRenderState, float f, Matrix4fc matrix4f) {
         return LegacyOptions.displayHand.get();
     }
 

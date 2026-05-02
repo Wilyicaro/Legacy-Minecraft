@@ -76,6 +76,10 @@ dependencies {
 
 	implementation(libs.moulberry.mixinconstraints)
 	include(libs.moulberry.mixinconstraints)
+	api(include("org.apache.httpcomponents:httpclient:4.5.14") as Any)
+	api(include("org.apache.httpcomponents:httpcore:4.4.16") as Any)
+	api(include("commons-logging:commons-logging:1.2") as Any)
+	api(include("commons-codec:commons-codec:1.11") as Any)
 }
 
 tasks.withType<Javadoc> {

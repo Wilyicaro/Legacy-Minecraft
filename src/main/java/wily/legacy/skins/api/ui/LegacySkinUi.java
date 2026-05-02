@@ -1,6 +1,6 @@
 package wily.legacy.skins.api.ui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -74,7 +74,7 @@ public final class LegacySkinUi {
         }
     }
 
-    public record PreviewContext(GuiGraphics graphics,
+    public record PreviewContext(GuiGraphicsExtractor graphics,
                                  String skinId,
                                  int left,
                                  int top,

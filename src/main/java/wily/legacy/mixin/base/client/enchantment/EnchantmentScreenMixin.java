@@ -2,7 +2,7 @@ package wily.legacy.mixin.base.client.enchantment;
 
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
@@ -19,6 +19,8 @@ import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,18 +41,19 @@ import java.util.Optional;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
-    public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory inventory, Component component) {
+
+public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
     @Shadow
-    protected abstract void renderBook(GuiGraphics arg, int m, int n);
+    protected abstract void extractBook(GuiGraphicsExtractor arg, int m, int n);
 
     @Inject(method = "init", at = @At("HEAD"))
     public void init(CallbackInfo ci) {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 215;
-        imageHeight = sd ? 140 : 217;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 215);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 140 : 217);
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 67 : 104;
         titleLabelX = sd ? 7 : 14;
@@ -92,8 +95,8 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
@@ -112,40 +115,40 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         cir.setReturnValue(super.mouseClicked(event, bl));
     }
 
-    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/object/book/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 2)
+    @ModifyArg(method = "extractBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;book(Lnet/minecraft/client/model/object/book/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 2)
     public float changeBookScale(float original) {
         return LegacyOptions.getUIMode().isSD() ? original : original * 1.25f;
     }
 
-    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/object/book/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 7)
+    @ModifyArg(method = "extractBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;book(Lnet/minecraft/client/model/object/book/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 7)
     public int changeBookX1(int original) {
         return original + (LegacyOptions.getUIMode().isSD() ? 0 : 6);
     }
 
-    @ModifyArg(method = "renderBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/object/book/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 8)
+    @ModifyArg(method = "extractBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;book(Lnet/minecraft/client/model/object/book/BookModel;Lnet/minecraft/resources/Identifier;FFFIIII)V"), index = 8)
     public int changeBookY1(int original) {
         return original + (LegacyOptions.getUIMode().isSD() ? 0 : 9);
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 51 : 79), topPos + (sd ? 16 : 22), sd ? 73 : 123, sd ? 48 : 66);
-        this.renderBook(guiGraphics, leftPos + (sd ? -5 : 8), topPos + (sd ? 0 : 12));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 51 : 79), topPos + (sd ? 16 : 22), sd ? 73 : 123, sd ? 48 : 66);
+        this.extractBook(GuiGraphicsExtractor, leftPos + (sd ? -5 : 8), topPos + (sd ? 0 : 12));
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
         int buttonWidth = sd ? 70 : 120;
         int buttonHeight = sd ? 15 : 21;
         int levelSize = sd ? 16 : 24;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + (LegacyRenderUtil.hasHorizontalArtifacts() ? sd ? 52.4f : 80.4f : sd ? 52.5f : 80.5f), topPos + (sd ? 17.4f : 23.4f) - buttonHeight);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + (LegacyRenderUtil.hasHorizontalArtifacts() ? sd ? 52.4f : 80.4f : sd ? 52.5f : 80.5f), topPos + (sd ? 17.4f : 23.4f) - buttonHeight);
         for (int n = 0; n < 3; ++n) {
-            guiGraphics.pose().translate(0f, buttonHeight);
+            GuiGraphicsExtractor.pose().translate(0f, buttonHeight);
             int enchantCost = this.menu.costs[n];
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_EMPTY : LegacySprites.ENCHANTMENT_BUTTON_EMPTY, 0, 0, buttonWidth, buttonHeight);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DISABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_EMPTY : LegacySprites.ENCHANTMENT_BUTTON_EMPTY, 0, 0, buttonWidth, buttonHeight);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.DISABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
             if (enchantCost == 0) {
                 continue;
             }
@@ -154,38 +157,38 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, CommonColor.INVALID_ENCHANTMENT_TEXT.get(), false);
+                GuiGraphicsExtractor.textWithWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, CommonColor.INVALID_ENCHANTMENT_TEXT.get(), false);
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + (sd ? 52.5 : 80.5));
                 double u = j - (topPos + (sd ? 17.5 : 23.5) + buttonHeight * n);
                 if (t >= 0 && u >= 0 && t < buttonWidth && u < buttonHeight) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_SELECTED : LegacySprites.ENCHANTMENT_BUTTON_SELECTED, 0, 0, buttonWidth, buttonHeight);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_SELECTED : LegacySprites.ENCHANTMENT_BUTTON_SELECTED, 0, 0, buttonWidth, buttonHeight);
                     s = CommonColor.HIGHLIGHTED_ENCHANTMENT_TEXT.get();
                 } else {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_ACTIVE : LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, buttonWidth, buttonHeight);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_ACTIVE : LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, buttonWidth, buttonHeight);
                 }
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
-                guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, s, false);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
+                GuiGraphicsExtractor.textWithWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, s, false);
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
             int color = s;
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, string, buttonWidth - this.font.width(string) - (sd ? 2 : 0), sd ? 8 : 12, color));
+            LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, string, buttonWidth - this.font.width(string) - (sd ? 2 : 0), sd ? 8 : 12, color));
         }
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        super.render(guiGraphics, i, j, f);
-        this.renderTooltip(guiGraphics, i, j);
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        this.extractTooltip(GuiGraphicsExtractor, i, j);
         boolean bl = this.minecraft.player.getAbilities().instabuild;
         int k = this.menu.getGoldCount();
         int buttonHeight = sd ? 15 : 21;
@@ -211,7 +214,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                     list.add(mutableComponent2.withStyle(ChatFormatting.GRAY));
                 }
             }
-            guiGraphics.setComponentTooltipForNextFrame(this.font, list, i, j);
+            GuiGraphicsExtractor.setComponentTooltipForNextFrame(this.font, list, i, j);
             break;
         }
     }

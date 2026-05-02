@@ -27,7 +27,7 @@ public class SpawnEggItemMixin {
             return;
         }
 
-        EntityType<?> type = ((SpawnEggItem) (Object) this).getType(player.getItemInHand(hand));
+        EntityType<?> type = SpawnEggItem.getType(player.getItemInHand(hand));
         if (type == null) {
             return;
         }
@@ -42,12 +42,12 @@ public class SpawnEggItemMixin {
     }
 
     @Inject(method = "spawnMob", at = @At("HEAD"), cancellable = true)
-    private void gateSpawnEggUse(LivingEntity user, ItemStack stack, Level level, BlockPos pos, boolean alignPosition, boolean invertY, CallbackInfoReturnable<InteractionResult> cir) {
+    private static void gateSpawnEggUse(LivingEntity user, ItemStack stack, Level level, BlockPos pos, boolean alignPosition, boolean invertY, CallbackInfoReturnable<InteractionResult> cir) {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        EntityType<?> type = ((SpawnEggItem) (Object) this).getType(stack);
+        EntityType<?> type = SpawnEggItem.getType(stack);
         if (type == null) {
             return;
         }
@@ -64,7 +64,7 @@ public class SpawnEggItemMixin {
     }
 
     @Inject(method = "spawnOffspringFromSpawnEgg", at = @At("HEAD"), cancellable = true)
-    private void gateSpawnEggOffspring(Player player, Mob parent, EntityType<? extends Mob> type, ServerLevel level, Vec3 pos, ItemStack stack, CallbackInfoReturnable<Optional<Mob>> cir) {
+    private static void gateSpawnEggOffspring(Player player, Mob parent, EntityType<? extends Mob> type, ServerLevel level, Vec3 pos, ItemStack stack, CallbackInfoReturnable<Optional<Mob>> cir) {
         String failure = ConsoleMobCaps.spawnEggFailure(level, type);
         if (failure == null) {
             return;

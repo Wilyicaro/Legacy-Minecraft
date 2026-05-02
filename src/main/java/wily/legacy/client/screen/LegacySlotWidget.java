@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.inventory.Slot;
@@ -27,7 +27,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     }
 
     @Override
-    public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+    public void renderItem(GuiGraphicsExtractor graphics, int i, int j, float f) {
         if (isHovered)
             renderHighlight(graphics);
         if (quickCraftHighlight)
@@ -73,11 +73,11 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     }
 
     @Override
-    public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning) {
+    public void renderItem(GuiGraphicsExtractor graphics, ItemStack item, int x, int y, boolean isWarning) {
         if (!item.isEmpty()) renderItem(graphics, () -> {
-            graphics.renderItem(item, 0, 0, itemSeed);
+            graphics.item(item, 0, 0, itemSeed);
             if (allowItemDecorations)
-                graphics.renderItemDecorations(Minecraft.getInstance().font, item, 0, 0, quickCraftText);
+                graphics.itemDecorations(Minecraft.getInstance().font, item, 0, 0, quickCraftText);
         }, x, y, isWarning);
     }
 }

@@ -124,6 +124,9 @@ if (stonecutter.eval(stonecutter.current.version, "<1.20.5")) {
 
 sourceSets {
 	main {
+		java {
+			exclude("wily/legacy/mixin/base/compat/nostalgic/HudHelperMixin.java")
+		}
 		resources.srcDir(
 			"${rootDir}/versions/datagen/${stonecutter.current.version.split("-")[0]}/src/main/generated"
 		)

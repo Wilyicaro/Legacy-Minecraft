@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.advancements.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -52,7 +52,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             DisplayInfo displayInfo = a.advancement().display().orElse(null);
             if (displayInfo == null) return;
 
-            tabList.add(LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(displayInfo.getIcon()), displayInfo.getTitle(), b -> repositionElements());
+            tabList.add(LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(displayInfo.getIcon().create()), displayInfo.getTitle(), b -> repositionElements());
             RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> 4).forceWidth(false).cyclic(false);
             renderableVLists.add(renderableVList);
             displayInfos.add(displayInfo);
@@ -120,16 +120,16 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         super.panelInit();
         panelRecess.init("panelRecess");
         addRenderableOnly(tabList::renderSelected);
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle(), panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle())) / 2, panel.y + 10, CommonColor.GRAY_TEXT.get(), false));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> {
+            LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(font, showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle(), panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle())) / 2, panel.y + 10, CommonColor.GRAY_TEXT.get(), false));
             if (!displayInfos.isEmpty()) {
                 Identifier background = displayInfos.get(tabList.getIndex()).getBackground().orElse(null).texturePath();
                 if (background != null)
-                    FactoryGuiGraphics.of(guiGraphics).blit(background, panel.x + 14, panel.y + 24, 0, 0, panelRecess.width - 4, 23, 16, 16);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(background, panel.x + 14, panel.y + 24, 0, 0, panelRecess.width - 4, 23, 16, 16);
             }
-            LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 12, panel.y + 22, panelRecess.width, 27);
+            LegacyRenderUtil.renderPanelTranslucentRecess(GuiGraphicsExtractor, panel.x + 12, panel.y + 22, panelRecess.width, 27);
             if (getFocused() instanceof AdvancementButton a)
-                guiGraphics.drawString(font, a.info.getTitle(), panel.x + (panel.width - font.width(a.info.getTitle())) / 2, panel.y + 32, 0xFFFFFFFF);
+                GuiGraphicsExtractor.text(font, a.info.getTitle(), panel.x + (panel.width - font.width(a.info.getTitle())) / 2, panel.y + 32, 0xFFFFFFFF);
         }));
         addRenderableOnly(panelRecess);
         tabList.init(panel.x, panel.y - 37, panel.width, 43, (b, i) -> {
@@ -187,14 +187,14 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, false);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        if (!showDescription) guiGraphics.deferredTooltip = null;
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        if (!showDescription) GuiGraphicsExtractor.deferredTooltip = null;
     }
 
     public static class AdvancementButton extends AbstractWidget {
@@ -219,7 +219,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             unlocked = (a = getAdvancements().get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
             if (lastUnlocked == unlocked && ((AbstractWidgetAccessor) this).getTooltip().get() != null) return;
             Component progressText = p == null || p.getProgressText() == null ? null : p.getProgressText();
-            setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(), progressText.getVisualOrderText())));
+                    setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : MultilineTooltip.create(List.of(info.getDescription().getVisualOrderText(), progressText.getVisualOrderText()), info.getDescription()));
         }
 
         public boolean isUnlocked() {
@@ -227,28 +227,28 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (isFocused()) {
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(-1.5f, -1.4f);
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(-1.5f, -1.4f);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
+                GuiGraphicsExtractor.pose().popMatrix();
             }
             FactoryScreenUtil.enableBlend();
-            if (!isUnlocked()) FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
+            if (!isUnlocked()) FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
             FactoryScreenUtil.disableDepthTest();
             if (!isUnlocked())
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
             FactoryScreenUtil.enableDepthTest();
             FactoryScreenUtil.disableBlend();
-            FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
             if (!isUnlocked()) return;
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f);
-            guiGraphics.pose().scale(2f, 2f);
-            guiGraphics.renderFakeItem(info.getIcon(), 0, 0);
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f);
+            GuiGraphicsExtractor.pose().scale(2f, 2f);
+            GuiGraphicsExtractor.fakeItem(info.getIcon().create(), 0, 0);
+            GuiGraphicsExtractor.pose().popMatrix();
         }
 
 

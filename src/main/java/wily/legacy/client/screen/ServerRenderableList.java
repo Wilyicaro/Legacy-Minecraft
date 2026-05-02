@@ -13,7 +13,7 @@ import net.minecraft.server.network.EventLoopGroupHolder;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
@@ -99,9 +99,9 @@ public class ServerRenderableList extends RenderableVList {
         updateServers();
     }
 
-    public static void drawIcon(GuiGraphics guiGraphics, int x, int y, int width, int height, Identifier resourceLocation) {
+    public static void drawIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y, int width, int height, Identifier resourceLocation) {
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blit(resourceLocation, x, y, 0.0f, 0.0f, width, height, width, height);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(resourceLocation, x, y, 0.0f, 0.0f, width, height, width, height);
         FactoryScreenUtil.disableBlend();
     }
 
@@ -173,14 +173,14 @@ public class ServerRenderableList extends RenderableVList {
                 AbstractButton lanButton;
                 addRenderable(lanButton = new IconButton(this, 0, 0, 0, 30, Component.literal(lanServer.getMotd())) {
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                    protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
                         int messageX = accessor.getInteger(name + ".buttonMessage.xOffset", 35);
-                        guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, messageX, getY() + 1, 0xFFFFFFFF, false);
-                        guiGraphics.drawString(minecraft.font, lanServer.getMotd(), messageX, getY() + 12, -8355712, false);
+                        GuiGraphicsExtractor.text(minecraft.font, LAN_SERVER_HEADER, messageX, getY() + 1, 0xFFFFFFFF, false);
+                        GuiGraphicsExtractor.text(minecraft.font, lanServer.getMotd(), messageX, getY() + 12, -8355712, false);
                         if (minecraft.options.hideServerAddress) {
-                            guiGraphics.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, getY() + 12 + 11, 0x303030, false);
+                            GuiGraphicsExtractor.text(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, getY() + 12 + 11, 0x303030, false);
                         } else {
-                            guiGraphics.drawString(minecraft.font, lanServer.getAddress(), messageX, getY() + 12 + 11, 0x303030, false);
+                            GuiGraphicsExtractor.text(minecraft.font, lanServer.getAddress(), messageX, getY() + 12 + 11, 0x303030, false);
                         }
                     }
 
@@ -197,12 +197,12 @@ public class ServerRenderableList extends RenderableVList {
             AbstractButton scanningButton;
             addRenderable(scanningButton = new IconButton(this, 0, 0, 0, 30, SCANNING_LABEL) {
                 @Override
-                public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-                    LegacyRenderUtil.drawGenericLoading(guiGraphics, getX() + x, getY() + y, (width - 2) / 3, 1);
+                public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, getX() + x, getY() + y, (width - 2) / 3, 1);
                 }
 
                 @Override
-                public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                public void renderIconHighlight(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
                 }
 
                 @Override
@@ -250,7 +250,7 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (server.state() == ServerData.State.INITIAL) {
                 server.setState(ServerData.State.PINGING);
                 server.motd = CommonComponents.EMPTY;
@@ -272,22 +272,22 @@ public class ServerRenderableList extends RenderableVList {
                     }
                 });
             }
-            super.renderContents(guiGraphics, i, j, f);
+            super.extractContents(GuiGraphicsExtractor, i, j, f);
         }
 
         @Override
-        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-            super.renderIcon(guiGraphics, x, y, width, height, mouseX, mouseY);
+        public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+            super.renderIcon(GuiGraphicsExtractor, x, y, width, height, mouseX, mouseY);
             Component component = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
             LegacyFontUtil.applySDFont(b -> {
                 int q = minecraft.font.width(component);
-                guiGraphics.drawString(minecraft.font, component, getX() + getWidth() - q - 15 - 2, getY() + 3, -8355712, false);
+                GuiGraphicsExtractor.text(minecraft.font, component, getX() + getWidth() - q - 15 - 2, getY() + 3, -8355712, false);
                 int s = mouseX - getX();
                 int t = mouseY - getY();
                 if (statusIconTooltip != null && s >= getWidth() - 15 && s <= getWidth() - 5 && t >= 2 && t <= 10) {
-                    guiGraphics.setTooltipForNextFrame(minecraft.font, statusIconTooltip, mouseX, mouseY);
+                    GuiGraphicsExtractor.setTooltipForNextFrame(minecraft.font, statusIconTooltip, mouseX, mouseY);
                 } else if (showOnlinePlayersTooltip && s >= getWidth() - q - 15 - 2 && s <= getWidth() - 15 - 2 && t >= 2 && t <= 10) {
-                    guiGraphics.setComponentTooltipForNextFrame(minecraft.font, server.playerList, mouseX, mouseY);
+                    GuiGraphicsExtractor.setComponentTooltipForNextFrame(minecraft.font, server.playerList, mouseX, mouseY);
                 }
             });
 
@@ -306,7 +306,7 @@ public class ServerRenderableList extends RenderableVList {
 
             }
             if (statusIcon != null)
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(statusIcon, getX() + getWidth() - 15, getY() + 3, 10, 8);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(statusIcon, getX() + getWidth() - 15, getY() + 3, 10, 8);
             byte[] bs = server.getIconBytes();
             if (!Arrays.equals(bs, this.lastIconBytes)) {
                 if (this.uploadServerIcon(bs)) {
@@ -317,23 +317,23 @@ public class ServerRenderableList extends RenderableVList {
                 }
             }
 
-            drawIcon(guiGraphics, getX() + x, getY() + y, width, height, icon.textureLocation());
+            drawIcon(GuiGraphicsExtractor, getX() + x, getY() + y, width, height, icon.textureLocation());
         }
 
         @Override
-        public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-            super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(
+        public void renderIconHighlight(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+            super.renderIconHighlight(GuiGraphicsExtractor, mouseX, mouseY, x, y, width, height);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(
                     LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x + width / 2, getY() + y, width / 2, height) ? LegacySprites.JOIN_HIGHLIGHTED : LegacySprites.JOIN,
                     getX() + x, getY() + y, width, height);
 
             if (serverIndex > 0) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(
                         LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width / 2, height / 2) ? LegacySprites.MOVE_UP_HIGHLIGHTED : LegacySprites.MOVE_UP,
                         getX() + x, getY() + y, width, height);
             }
             if (serverIndex < getScreen(PlayGameScreen.class).getServers().size() - 1) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(
                         LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y + height / 2, width / 2, height / 2) ? LegacySprites.MOVE_DOWN_HIGHLIGHTED : LegacySprites.MOVE_DOWN,
                         getX() + x, getY() + y, width, height);
             }
@@ -413,18 +413,18 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35), getY() + 3, j));
+        protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
+            LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(font, getMessage(), getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35), getY() + 3, j));
 
             if (getHeight() >= 30) {
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(getX() + 35, getY() + 10);
-                guiGraphics.pose().scale(2 / 3f, 2 / 3f);
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(getX() + 35, getY() + 10);
+                GuiGraphicsExtractor.pose().scale(2 / 3f, 2 / 3f);
                 List<FormattedCharSequence> list = font.split(server.motd, Math.max(width - 36, font.width(server.motd) / 2 + 20));
                 for (int p = 0; p < Math.min(2, list.size()); ++p) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, list.get(p), 0, font.lineHeight * p, width - 36, 11 + font.lineHeight * p, -8355712, false, font.width(list.get(p)) * 2 / 3);
+                    LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, list.get(p), 0, font.lineHeight * p, width - 36, 11 + font.lineHeight * p, -8355712, false, font.width(list.get(p)) * 2 / 3);
                 }
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().popMatrix();
             }
         }
 

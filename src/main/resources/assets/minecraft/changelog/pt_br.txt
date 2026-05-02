@@ -1,23 +1,18 @@
-- Adicionado a Tricky Trials! Explore as perigosas Câmaras do Desafio sozinho ou com amigos!
-- Adicionado Câmaras do Desafio, uma nova estrutura subterrânea com trilhas geradas proceduralmente, desafios de combate, e tesouros valiosos.
-- Adicionado Vórtice, um novo monstro encontrado nas Cãmaras do Desafio que ataca com projéteis energéticos de vento.
-- Adicionado Esqueleto-pantanoso, uma nova variante do Esqueleto que atira flechas venenosas, nascendo naturalmente em Pântanos e Manguezais.
-- Adicionado Clavas, uma arma pesada com ataques esmagadores únicos, e seus encantamentos únicos; Densidade, Ruptura e Rajada de Vento.
-- Adicionado Bancada Automática, um bloco que permite fabricação automática com capacidade de entrar e sair itens.
-- Adicionado novos geradores encontrados nas Câmaras do Desafio: Gerador do desafio, Gerador sombrio do desafio.
-- Adicionado novos blocos de tesouro encontrados nas Câmaras do Desafio: Cofre e Cofre sombrio.
-- Adicionado novos blocos decorativos e materiais para construção nas famílias do Cobre e do Tufo
-- Adicionado Projétil de vento, um projétil usado pelo Vórtice.
-- Adicionado Núcleo Pesado e Vara de Vórtice, itens usados na fabricação da Clava.
-- Adicionado novos Óstracos: Fluxo, Vórtice e Machado.
-- Adicionado novos desenhos para estandarte: Espiral e Vórtice
-- Adicionado novos enfeites: Parafuso e Fluxo.
-- Adicionado novas Poções e flechas com efeito: Infestação, Pegajoso, Tecitura, e Ventania.
-- Adicionado novos discos de música por Aaron Cherof e Lena Raine: Precipice, Creator e Creator (caixa musical).
-- Adicionado 20 novas pinturas pelos artistas Sarah Boeving e Kristoffer Zetterstrand.
-- Adicionado novos efeitos: Infestação, Pegajoso, Tecitura, Ventania, Presságio de Invasão, e Presságio de Desafio.
-- Adicionado 9 novas trilhas músicais por Aaron Cherof, Kumi Tanioka, e Lena Raine.
-- Adicionado 8 novos Progressos.
-- Adicionado 4 novos sons de ambiente de caverna.
-- Redesenhado Efeito de Mau Presságio para dar acesso à Eventos Sombrios.
-- Botes são laçáveis agora.
+- Adicionados novos sons de filhotes para Lobo, Gato, Porco, Cavalo e Galinha
+- Adicionado o Dente-de-leão Dourado, um novo tipo de flor que pode ser usado para impedir que filhotes de criaturas envelheçam
+- Adicionadas variantes de sons adultos para os seguintes animais:
+ - Gatos possuem uma nova variante de som
+ - Porcos possuem duas novas variantes de som
+ - Vacas possuem uma nova variante de som
+ - Galinhas possuem uma nova variante de som
+ - Os sons originais de cada animal são usados na variante chamada "classic"
+ - Cada um desses animais receberá aleatoriamente uma variante de som entre as novas e a original
+- Adicionado instrumento de trompete no Bloco de Nota quando colocado sobre um Bloco de Cobre
+ - O som muda de acordo com o nível de oxidação do Bloco de Cobre
+- Reformulados os visuais da maioria dos filhotes de criaturas
+- Etiquetas agora podem ser craftadas com 1 Papel e 1 de qualquer Pepita de Metal
+- Removidas Etiquetas dos baús de loot em Cidades Ancestrais e Mansões da Floresta
+- Ardósia agora pode ser transformada diretamente em suas variantes entulhada, polida, de tijolos e de azulejos no Cortador de Pedra
+- Pedra agora pode ser transformada diretamente em variantes entulhadas no Cortador de Pedra
+- O algoritmo que mapeia os níveis de luz de blocos e do céu para o brilho na tela foi completamente reescrito
+- Removido o Herobrine bebê

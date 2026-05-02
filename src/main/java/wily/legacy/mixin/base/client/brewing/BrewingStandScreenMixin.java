@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.brewing;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BrewingStandScreen;
 import net.minecraft.network.chat.Component;
@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,7 +30,8 @@ import static wily.legacy.util.LegacySprites.BREWING_FUEL_SLOT;
 
 @Mixin(BrewingStandScreen.class)
 public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
-    private static final Vec2 BREWING_SLOT_OFFSET = new Vec2(0, 0.5f);
+
+private static final Vec2 BREWING_SLOT_OFFSET = new Vec2(0, 0.5f);
     private static final LegacySlotDisplay FIRST_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(BREWING_SLOT_OFFSET);
     private static final LegacySlotDisplay SECOND_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(new Vec2(0.5f, 0f));
     private static final LegacySlotDisplay THIRD_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(BREWING_SLOT_OFFSET);
@@ -62,8 +64,8 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     public void init(CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 213;
-        imageHeight = sd ? 145 : 225;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 213);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 145 : 225);
         inventoryLabelX = sd ? 7 : 13;
         inventoryLabelY = sd ? 74 : 115;
         LegacyFontUtil.applySDFont(b -> this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2);
@@ -112,41 +114,41 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
 
     //?} else {
     /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor) {
     }
     *///?}
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_COIL_FLAME, sd ? 23 : 43, sd ? 25 : 42, sd ? 34 : 51, sd ? 22 : 33);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.BREWING_COIL_FLAME, sd ? 23 : 43, sd ? 25 : 42, sd ? 34 : 51, sd ? 22 : 33);
         int fuel = this.menu.getFuel();
         int fuelWidth = sd ? 18 : 27;
         int fuelHeight = sd ? 4 : 6;
         int n = Mth.clamp((fuelWidth * fuel + 20 - 1) / 20, 0, fuelWidth);
         if (n > 0) {
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(sd ? 38 : LegacyRenderUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f, sd ? 41 : 66);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FUEL_LENGTH_SPRITE, fuelWidth, fuelHeight, 0, 0, 0, 0, 0, n, fuelHeight);
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().translate(sd ? 38 : LegacyRenderUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f, sd ? 41 : 66);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.FUEL_LENGTH_SPRITE, fuelWidth, fuelHeight, 0, 0, 0, 0, 0, n, fuelHeight);
+            GuiGraphicsExtractor.pose().popMatrix();
         }
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + (sd ? 33 : LegacyRenderUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f), topPos + (sd ? 12 : 22.4f));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0, sd ? 64 : 96, sd ? 64 : 96);
-        guiGraphics.pose().popMatrix();
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 33 : LegacyRenderUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f), topPos + (sd ? 12 : 22.4f));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0, sd ? 64 : 96, sd ? 64 : 96);
+        GuiGraphicsExtractor.pose().popMatrix();
         int o;
         if ((o = this.menu.getBrewingTicks()) > 0) {
             int guiScale = minecraft.getWindow().getGuiScale();
@@ -154,19 +156,19 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
             int brewHeight = 27 * guiScale;
             int p = (int) (brewHeight * (1.0f - (float) o / 400.0f));
             if (p > 0) {
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(leftPos + (sd ? 75 : LegacyRenderUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f), topPos + (sd ? 12 : 22.4f));
-                if (!sd) guiGraphics.pose().scale(1.5f, 1.5f);
-                guiGraphics.pose().scale(1f / guiScale, 1f / guiScale);
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREW_PROGRESS_SPRITE, brewWidth, brewHeight, 0, 0, 0, 0, 0, brewWidth, p);
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 75 : LegacyRenderUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f), topPos + (sd ? 12 : 22.4f));
+                if (!sd) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+                GuiGraphicsExtractor.pose().scale(1f / guiScale, 1f / guiScale);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.BREW_PROGRESS_SPRITE, brewWidth, brewHeight, 0, 0, 0, 0, 0, brewWidth, p);
+                GuiGraphicsExtractor.pose().popMatrix();
             }
             if ((p = BUBBLELENGTHS[o / 2 % 7]) > 0) {
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(leftPos + (sd ? 41 : 71), topPos + (sd ? 11 : 21));
-                if (!sd) guiGraphics.pose().scale(1.5f, 1.5f);
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BUBBLES_SPRITE, 12, 29, 0, 29 - p, 0, 29 - p, 0, 12, p);
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 41 : 71), topPos + (sd ? 11 : 21));
+                if (!sd) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.BUBBLES_SPRITE, 12, 29, 0, 29 - p, 0, 29 - p, 0, 12, p);
+                GuiGraphicsExtractor.pose().popMatrix();
             }
         }
     }

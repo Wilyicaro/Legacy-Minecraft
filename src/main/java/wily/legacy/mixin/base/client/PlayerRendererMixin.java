@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -91,7 +92,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         final ModelPart modelPartSnapshot = snapshotPart(modelPart);
         submitNodeCollector.submitCustomGeometry(
                 poseStack,
-                RenderTypes.entityCutoutNoCull(texFinal),
+                RenderTypes.entityCutout(texFinal),
                 (pose, vc) -> {
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);

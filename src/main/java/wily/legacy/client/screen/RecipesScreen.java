@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -30,7 +30,11 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     private int updateTimer = 0;
 
     public RecipesScreen(T menu, Inventory inventory, Component component) {
-        super(menu, inventory, component);
+        this(menu, inventory, component, 348, 215);
+    }
+
+    public RecipesScreen(T menu, Inventory inventory, Component component, int width, int height) {
+        super(menu, inventory, component, width, height);
         this.inventory = inventory;
         addRecipeButtons();
     }
@@ -71,11 +75,11 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
         }
     }
 
-    public void renderRecipesScroll(GuiGraphics guiGraphics, int x, int y) {
+    public void renderRecipesScroll(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y) {
         if (recipeButtonsOffset.get() > 0)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + accessor.getInteger("horizontalScroll.x", x), topPos + accessor.getInteger("horizontalScroll.y", y));
+            scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.LEFT, leftPos + accessor.getInteger("horizontalScroll.x", x), topPos + accessor.getInteger("horizontalScroll.y", y));
         if (recipeButtonsOffset.max > 0 && recipeButtonsOffset.get() < recipeButtonsOffset.max)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 6 - accessor.getInteger("horizontalScroll.x", x), topPos + accessor.getInteger("horizontalScroll.y", y));
+            scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.RIGHT, leftPos + imageWidth - 6 - accessor.getInteger("horizontalScroll.x", x), topPos + accessor.getInteger("horizontalScroll.y", y));
     }
 
     protected abstract H createRecipeButton(int index);
@@ -106,28 +110,30 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
 
-        getRecipeButtons().forEach(h -> h.renderTooltip(minecraft, guiGraphics, i, j));
-        renderTooltip(guiGraphics, i, j);
+        getRecipeButtons().forEach(h -> h.renderTooltip(minecraft, GuiGraphicsExtractor, i, j));
+        extractTooltip(GuiGraphicsExtractor, i, j);
     }
 
     @Override
-    public void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderContents(guiGraphics, i, j, f);
+    public void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractContents(GuiGraphicsExtractor, i, j, f);
 
-        getRecipeButtons().forEach(b -> b.render(guiGraphics, i, j, 0));
+        getRecipeButtons().forEach(b -> b.extractRenderState(GuiGraphicsExtractor, i, j, 0));
         if (selectedRecipeButton < getRecipeButtons().size())
-            getRecipeButtons().get(selectedRecipeButton).renderSelection(guiGraphics, i, j, 0);
+            getRecipeButtons().get(selectedRecipeButton).renderSelection(GuiGraphicsExtractor, i, j, 0);
     }
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        renderBg(GuiGraphicsExtractor, f, i, j);
     }
     //?}
+
+    protected abstract void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, float f, int i, int j);
 
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {

@@ -14,10 +14,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.pip.OversizedItemRenderer;
-import net.minecraft.client.gui.render.state.BlitRenderState;
-import net.minecraft.client.gui.render.state.GuiItemRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.pip.OversizedItemRenderState;
+import net.minecraft.client.renderer.state.gui.BlitRenderState;
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.OversizedItemRenderState;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
@@ -44,7 +44,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     private final float opacity;
     private final Map<Object, AtlasPosition> atlasPositions = new Object2ObjectOpenHashMap<>();
     private final Map<Object, OversizedItemRenderer> oversizedItemRenderers = new Object2ObjectOpenHashMap<>();
-    private final CachedOrthoProjectionMatrixBuffer itemsProjectionMatrixBuffer = new CachedOrthoProjectionMatrixBuffer("items", -1000.0F, 1000.0F, true);
+    private final ProjectionMatrixBuffer itemsProjectionMatrixBuffer = new ProjectionMatrixBuffer("items");
+    private final Projection itemsProjection = new Projection();
     @Nullable
     private GpuTexture itemsAtlas;
     @Nullable
@@ -100,9 +101,9 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
 
     private void createAtlasTextures(int i) {
         GpuDevice gpuDevice = RenderSystem.getDevice();
-        this.itemsAtlas = gpuDevice.createTexture("UI items atlas", 12, TextureFormat.RGBA8, i, i, 1, 1);
+        this.itemsAtlas = gpuDevice.createTexture("UI items atlas", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_RENDER_ATTACHMENT, TextureFormat.RGBA8, i, i, 1, 1);
         this.itemsAtlasView = gpuDevice.createTextureView(this.itemsAtlas);
-        this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", 8, TextureFormat.DEPTH32, i, i, 1, 1);
+        this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_RENDER_ATTACHMENT, TextureFormat.DEPTH32, i, i, 1, 1);
         this.itemsAtlasDepthView = gpuDevice.createTextureView(this.itemsAtlasDepth);
         gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0);
     }
@@ -118,7 +119,9 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
 
             RenderSystem.outputColorTextureOverride = this.itemsAtlasView;
             RenderSystem.outputDepthTextureOverride = this.itemsAtlasDepthView;
-            RenderSystem.setProjectionMatrix(this.itemsProjectionMatrixBuffer.getBuffer(k, k), ProjectionType.ORTHOGRAPHIC);
+            itemsProjection.setSize(k, k);
+            itemsProjection.setupOrtho(-1000.0F, 1000.0F, k, k, true);
+            RenderSystem.setProjectionMatrix(this.itemsProjectionMatrixBuffer.getBuffer(itemsProjection), ProjectionType.ORTHOGRAPHIC);
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
             PoseStack poseStack = new PoseStack();
             MutableBoolean mutableBoolean = new MutableBoolean(false);
@@ -209,7 +212,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         }
         float opacity = LegacyGuiItemRenderState.of(guiItemRenderState).opacity();
         renderState
-                .submitBlitToCurrentLayer(
+                .addBlitToCurrentLayer(
                         new BlitRenderState(
                                 opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA : RenderPipelines.GUI_TEXTURED,
                                 TextureSetup.singleTexture(this.itemsAtlasView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)),

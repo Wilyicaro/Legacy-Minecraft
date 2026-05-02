@@ -4,14 +4,12 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.Frustum;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.entity.PlayerYBobbing;
 
-/**
- * Thanks for ABU008, from Legacy4J Group, for suggesting and creating the original code in this mixin
- */
 @Mixin(Frustum.class)
 public class FrustumMixin {
     @Shadow
@@ -19,7 +17,7 @@ public class FrustumMixin {
     private Matrix4f matrix;
 
     @ModifyExpressionValue(method = "calculateFrustum", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;Lorg/joml/Matrix4f;)Lorg/joml/Matrix4f;", remap = false))
-    private Matrix4f calculateFrustum(Matrix4f original, Matrix4f right, Matrix4f matrix4f2) {
+    private Matrix4f calculateFrustum(Matrix4f original, Matrix4fc right, Matrix4f matrix4f2) {
         float angle = PlayerYBobbing.getAngle(Minecraft.getInstance(), FactoryAPIClient.getPartialTick());
         return angle != 0 ? adjustProjectionFOV(matrix4f2, angle).mul(right, matrix) : original;
     }

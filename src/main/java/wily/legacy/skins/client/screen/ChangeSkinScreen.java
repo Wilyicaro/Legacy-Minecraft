@@ -1,7 +1,7 @@
 package wily.legacy.skins.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -199,7 +199,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             }
 
             @Override
-            public void render(GuiGraphics g, int i, int j, float f) {
+            public void extractRenderState(GuiGraphicsExtractor g, int i, int j, float f) {
                 LegacyRenderUtil.renderPointerPanel(g, getX(), getY(), getWidth(), getHeight());
             }
         };
@@ -435,7 +435,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
+    public void renderDefaultBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float pt) {
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
         int packNameX = tooltipBox.x - sc(normalLayout.packNameInsetX());
         int packNameY = panel.y + sc(normalLayout.packNameTop());
@@ -553,7 +553,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         super.removed();
     }
 
-    private void drawTick(GuiGraphics guiGraphics, int iconX, int iconY, int holder) {
+    private void drawTick(GuiGraphicsExtractor GuiGraphicsExtractor, int iconX, int iconY, int holder) {
         float targetSize = Math.max(1f, sc(SELECTION_ICON_SIZE) * 0.8f + 2.0f);
         float scale = Math.min(targetSize / BEACON_CHECK_VISIBLE_W, targetSize / BEACON_CHECK_VISIBLE_H);
         float centerX = iconX + holder / 2.0f + holder * TICK_HOLDER_OFFSET_X;
@@ -562,30 +562,30 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         float visibleCenterY = centerY + (BEACON_CHECK_VISIBLE_Y + BEACON_CHECK_VISIBLE_H / 2.0f - BEACON_CHECK_CENTER_Y) * scale;
         int left = Math.round(visibleCenterX - SKIN_TICK_W / 2.0f);
         int top = Math.round(visibleCenterY - SKIN_TICK_H / 2.0f);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, left, top,
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, left, top,
                 (float) BEACON_CHECK_VISIBLE_X, (float) BEACON_CHECK_VISIBLE_Y,
                 SKIN_TICK_W, SKIN_TICK_H,
                 BEACON_CHECK_VISIBLE_W, BEACON_CHECK_VISIBLE_H,
                 BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
     }
 
-    private void drawPadlock(GuiGraphics guiGraphics, int iconX, int iconY, int holder) {
+    private void drawPadlock(GuiGraphicsExtractor GuiGraphicsExtractor, int iconX, int iconY, int holder) {
         float size = Math.max(1f, holder - 8f);
         float scale = size / PADLOCK_TEXTURE_SIZE;
         float left = iconX + (holder - PADLOCK_TEXTURE_SIZE * scale) / 2.0f;
         float top = iconY + (holder - PADLOCK_TEXTURE_SIZE * scale) / 2.0f;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(left, top);
-        guiGraphics.pose().scale(scale, scale);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, PADLOCK, 0, 0, 0, 0, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE);
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(left, top);
+        GuiGraphicsExtractor.pose().scale(scale, scale);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, PADLOCK, 0, 0, 0, 0, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
-    private void drawActionSprite(GuiGraphics guiGraphics, Identifier sprite, int iconX, int iconY, int holder) {
+    private void drawActionSprite(GuiGraphicsExtractor GuiGraphicsExtractor, Identifier sprite, int iconX, int iconY, int holder) {
         int size = Math.max(1, holder - 8);
         int left = iconX + (holder - size) / 2;
         int top = iconY + (holder - size) / 2;
-        blitSprite(guiGraphics, sprite, left, top, size, size);
+        blitSprite(GuiGraphicsExtractor, sprite, left, top, size, size);
     }
 
     private record NormalLayoutMetrics(

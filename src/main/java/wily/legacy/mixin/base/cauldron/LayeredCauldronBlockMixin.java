@@ -38,7 +38,7 @@ import static wily.legacy.init.LegacyRegistries.isInvalidCauldron;
 
 @Mixin(LayeredCauldronBlock.class)
 public abstract class LayeredCauldronBlockMixin extends AbstractCauldronBlock implements EntityBlock {
-    public LayeredCauldronBlockMixin(Properties properties, /*? if >1.20.1 {*/CauldronInteraction.InteractionMap/*?} else {*//*Map<Item, CauldronInteraction>*//*?}*/ interactionMap) {
+    public LayeredCauldronBlockMixin(Properties properties, /*? if >1.20.1 {*/CauldronInteraction.Dispatcher/*?} else {*//*Map<Item, CauldronInteraction>*//*?}*/ interactionMap) {
         super(properties, interactionMap);
     }
 
@@ -51,11 +51,11 @@ public abstract class LayeredCauldronBlockMixin extends AbstractCauldronBlock im
             double d = (double)(i >> 16 & 0xFF) / 255.0;
             double e = (double)(i >> 8 & 0xFF) / 255.0;
             double f = (double)(i & 0xFF) / 255.0;
-            level.addParticle(ParticleTypes.ENTITY_EFFECT, (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getX(), level.random.nextDouble() + blockPos.getY(), (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getZ(), d, e, f);
+                level.addParticle(ParticleTypes.ENTITY_EFFECT, (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getX(), randomSource.nextDouble() + blockPos.getY(), (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getZ(), d, e, f);
             *///?} else {
             be.potion.value().getEffects().forEach(m -> {
-                if (level.random.nextInt(4) == 0) {
-                    level.addParticle(m.getParticleOptions(), (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getX(), level.random.nextDouble() + blockPos.getY(), (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getZ(), 1.0f, 1.0f, 1.0f);
+                if (randomSource.nextInt(4) == 0) {
+                    level.addParticle(m.getParticleOptions(), (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getX(), randomSource.nextDouble() + blockPos.getY(), (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getZ(), 1.0f, 1.0f, 1.0f);
                 }
             });
             //?}

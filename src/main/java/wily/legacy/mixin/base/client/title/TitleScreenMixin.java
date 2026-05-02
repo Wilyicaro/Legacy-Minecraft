@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -178,17 +178,17 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     //? if forge || neoforge {
-    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
+    /*@WrapWithCondition(method = /^? if >=26.1 {^/"extractRenderState"/^?} else {^//^"render"^//^?}^/, at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
     public boolean wrapVersionText(boolean includeMC, boolean reverse, /^? if forge && >=1.20.5 {^//^ObjIntConsumer<String>^//^?} else {^/BiConsumer<Integer, String>/^?}^/ lineConsumerr) {
         return LegacyOptions.titleScreenVersionText.get();
     }
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
+    @WrapWithCondition(method = /^? if >=26.1 {^/"extractRenderState"/^?} else {^//^"render"^//^?}^/, at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
     public boolean wrapBrandingOverCopyright(/^? if forge && >=1.20.5 {^//^ObjIntConsumer<String>^//^?} else {^/BiConsumer<Integer, String>/^?}^/ lineConsumer) {
         return LegacyOptions.titleScreenVersionText.get();
     }
     *///?} else {
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)V"))
-    public boolean wrapVersionText(GuiGraphics instance, Font font, String string, int i, int j, int k) {
+    @WrapWithCondition(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)V"))
+    public boolean wrapVersionText(GuiGraphicsExtractor instance, Font font, String string, int i, int j, int k) {
         return LegacyOptions.titleScreenVersionText.get();
     }
     //?}

@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -68,8 +68,8 @@ public class LegacyLanguageScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderContents(guiGraphics, i, j, f);
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+            super.extractContents(GuiGraphicsExtractor, i, j, f);
             if (manager.getSelected().equals(lang)) setFocused(true);
         }
     }

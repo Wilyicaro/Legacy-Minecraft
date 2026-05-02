@@ -3,13 +3,13 @@ package wily.legacy.mixin.base.client.chat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import net.minecraft.client.GuiMessage;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -41,9 +41,13 @@ public abstract class ChatComponentMixin {
     public abstract double getScale();
 
     @Shadow
+    protected abstract int getLineHeight();
+
+    @Shadow
     public abstract boolean isChatFocused();
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "HEAD"), cancellable = true)
+    //? if >=1.21.11 {
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void renderWithFont(CallbackInfo ci) {
         if (minecraft.screen != null && !isChatFocused()) {
             ci.cancel();
@@ -53,13 +57,12 @@ public abstract class ChatComponentMixin {
         if (LegacyOptions.getUIMode().isSD()) LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
     }
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "RETURN"))
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At(value = "RETURN"))
     private void renderWithFontReturn(CallbackInfo ci) {
         LegacyFontUtil.defaultFontOverride = null;
     }
 
-    //? if fabric {
-    @ModifyArgs(method = "method_75802", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V"))
+    @ModifyArgs(method = "lambda$extractRenderState$1", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V"))
     private static void renderChatBg(Args args) {
         int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
         args.set(0, (int) args.get(0) - safeZone);
@@ -67,29 +70,86 @@ public abstract class ChatComponentMixin {
         args.set(4, ARGB.color(ARGB.alpha(args.get(4)), CommonColor.CHAT_BACKGROUND.get()));
     }
 
-    @Inject(method = "method_75801", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;translate(FF)Lorg/joml/Matrix3x2f;"), remap = false)
+    @ModifyArgs(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V", ordinal = 0))
+    private void renderChatBgSecond(Args args) {
+        renderChatBg(args);
+    }
+
+    @Inject(method = "lambda$extractRenderState$0", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;translate(FF)Lorg/joml/Matrix3x2f;"), remap = false)
     private static void offsetChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<Matrix3x2f> matrix3x2f) {
         matrix3x2f.set(matrix3x2f.get().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42));
     }
     //?} else {
-    /*@ModifyArgs(method = "lambda$render$1", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V"))
-    private static void renderChatBg(Args args) {
-        int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
-        args.set(0, (int) args.get(0) - safeZone);
-        args.set(2, (int) args.get(2) + safeZone);
-        args.set(4, ARGB.color(ARGB.alpha(args.get(4)), CommonColor.CHAT_BACKGROUND.get()));
+    /*@Shadow
+    protected abstract void drawTagIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, GuiMessageTag.Icon icon);
+
+    @Shadow
+    protected abstract int getTagIconLeft(GuiMessage.Line line);
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 0), index = 4)
+    private ChatComponent.LineConsumer changeChatX(ChatComponent.LineConsumer lineConsumer, @Local(argsOnly = true) GuiGraphicsExtractor GuiGraphicsExtractor, @Local(ordinal = 5) int n, @Local(ordinal = 8) int q, @Local(ordinal = 9) int r, @Local(ordinal = 1) float g, @Local(ordinal = 2) float h) {
+        return (lx, mx, nx, line, ox, hx) -> {
+            int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
+            GuiGraphicsExtractor.fill(lx - 4 - safeZone, mx, lx + n + 4 + 4 + safeZone, nx, ARGB.color(hx * h, CommonColor.CHAT_BACKGROUND.get().intValue()));
+            GuiMessageTag guiMessageTag = line.tag();
+            if (guiMessageTag != null) {
+                int p = ARGB.color(hx * g, guiMessageTag.indicatorColor());
+                GuiGraphicsExtractor.fill(lx - 4 - safeZone, mx, lx - 2 - safeZone, nx, p);
+                if (ox == q && guiMessageTag.icon() != null) {
+                    this.drawTagIcon(GuiGraphicsExtractor, this.getTagIconLeft(line), nx + r + 9, guiMessageTag.icon());
+                }
+            }
+        };
     }
 
-    @Inject(method = "lambda$render$0", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;translate(FF)Lorg/joml/Matrix3x2f;"), remap = false)
-    private static void offsetChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<Matrix3x2f> matrix3x2f) {
-        matrix3x2f.set(matrix3x2f.get().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42));
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 1))
+    private void changeChatFont(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        if (LegacyOptions.getUIMode().isSD())
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 1, shift = At.Shift.AFTER))
+    private void changeChatFontAfter(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        LegacyFontUtil.defaultFontOverride = null;
+    }
+
+    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
+    private void stopRender(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        if (minecraft.screen != null && !isChatFocused()) ci.cancel();
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
+    private void changeRenderTranslation(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        GuiGraphicsExtractor.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
+    }
+
+    @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"))
+    private void changeClickedChatFont(double d, double e, CallbackInfoReturnable<Style> cir) {
+        if (LegacyOptions.getUIMode().isSD())
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "getClickedComponentStyleAt", at = @At("RETURN"))
+    private void changeClickedChatFontAfter(double d, double e, CallbackInfoReturnable<Style> cir) {
+        LegacyFontUtil.defaultFontOverride = null;
+    }
+
+    @ModifyExpressionValue(method = "getMessageTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
+    private double changeMessageTagXPos(double original) {
+        return original + Math.round(LegacyRenderUtil.getChatSafeZone());
+    }
+
+    @Inject(method = "screenToChatX", at = @At("RETURN"), cancellable = true)
+    private void screenToChatX(double d, CallbackInfoReturnable<Double> cir) {
+        cir.setReturnValue(cir.getReturnValue() - LegacyRenderUtil.getChatSafeZone());
+    }
+
+    @Inject(method = "screenToChatY", at = @At("HEAD"), cancellable = true)
+    private void screenToChatY(double d, CallbackInfoReturnable<Double> cir) {
+        double e = (double) this.minecraft.getWindow().getGuiScaledHeight() - d - 40 + LegacyRenderUtil.getHUDDistance() - 42;
+        cir.setReturnValue(e / (this.getScale() * (double) this.getLineHeight()));
     }
     *///?}
-
-    @ModifyArgs(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V", ordinal = 0))
-    private void renderChatBgSecond(Args args) {
-        renderChatBg(args);
-    }
 
     @Inject(method = "getWidth(D)I", at = @At(value = "HEAD"), cancellable = true)
     private static void getWidth(double d, CallbackInfoReturnable<Integer> cir) {

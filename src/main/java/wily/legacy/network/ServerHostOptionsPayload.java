@@ -34,7 +34,7 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
     }
 
     public static ServerHostOptionsPayload difficulty(Difficulty difficulty) {
-        return new ServerHostOptionsPayload(Action.DIFFICULTY, difficulty.getKey(), EMPTY_UUID);
+        return new ServerHostOptionsPayload(Action.DIFFICULTY, difficulty.getSerializedName(), EMPTY_UUID);
     }
 
     public static ServerHostOptionsPayload defaultGameMode(GameType gameType) {
@@ -72,16 +72,16 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
                 CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), PlayerInfoSync.All.fromPlayerList(server));
             }
             case TIME -> {
-                server.getAllLevels().forEach(level -> level.setDayTime("day".equals(value) ? 1000L : 14000L));
-                sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.set_" + value), false);
+                server.getCommands().performPrefixedCommand(source, "time set " + value);
+                sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.set_" + value), false);
             }
             case WEATHER -> {
                 server.getCommands().performPrefixedCommand(source, "weather " + value);
-                sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.weather." + value), false);
+                sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.weather." + value), false);
             }
             case DIFFICULTY -> {
                 server.getCommands().performPrefixedCommand(source, "difficulty " + value);
-                sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.difficulty", switch (value) {
+                sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.difficulty", switch (value) {
                     case "peaceful" -> Difficulty.PEACEFUL.getDisplayName();
                     case "easy" -> Difficulty.EASY.getDisplayName();
                     case "hard" -> Difficulty.HARD.getDisplayName();
@@ -92,30 +92,30 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
                 GameType gameType = gameTypeFromValue(value);
                 server.getCommands().performPrefixedCommand(source, "defaultgamemode " + gameType.getName());
                 CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), PlayerInfoSync.All.fromPlayerList(server));
-                sp.displayClientMessage(Component.translatable("commands.defaultgamemode.success", gameType.getLongDisplayName()), false);
+                sp.sendSystemMessage(Component.translatable("commands.defaultgamemode.success", gameType.getLongDisplayName()), false);
             }
             case GAME_MODE -> {
                 ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
                 GameType gameType = gameTypeFromValue(value);
                 if (affectPlayer != null && affectPlayer.setGameMode(gameType)) {
-                    affectPlayer.displayClientMessage(Component.translatable("legacy.menu.host_options.message.game_mode_changed"), false);
-                    if (sp == affectPlayer) sp.displayClientMessage(Component.translatable("commands.gamemode.success.self", gameType.getLongDisplayName()), false);
-                    else sp.displayClientMessage(Component.translatable("commands.gamemode.success.other", affectPlayer.getDisplayName(), gameType.getLongDisplayName()), false);
+                    affectPlayer.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.game_mode_changed"), false);
+                    if (sp == affectPlayer) sp.sendSystemMessage(Component.translatable("commands.gamemode.success.self", gameType.getLongDisplayName()), false);
+                    else sp.sendSystemMessage(Component.translatable("commands.gamemode.success.other", affectPlayer.getDisplayName(), gameType.getLongDisplayName()), false);
                 }
             }
             case WORLD_SPAWN -> {
                 if (sp.level().dimension() != Level.OVERWORLD) {
-                    sp.displayClientMessage(Component.translatable("commands.setworldspawn.failure.not_overworld"), false);
+                    sp.sendSystemMessage(Component.translatable("commands.setworldspawn.failure.not_overworld"), false);
                     return;
                 }
                 server.getCommands().performPrefixedCommand(source, "setworldspawn");
-                sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.world_spawn", pos.getX(), pos.getY(), pos.getZ()), false);
+                sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.world_spawn", pos.getX(), pos.getY(), pos.getZ()), false);
             }
             case PLAYER_SPAWN -> {
                 ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
                 if (affectPlayer != null) {
                     server.getCommands().performPrefixedCommand(source, "spawnpoint %s ~ ~ ~".formatted(affectPlayer.getGameProfile().name()));
-                    sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.player_spawn", affectPlayer.getGameProfile().name(), pos.getX(), pos.getY(), pos.getZ()), false);
+                    sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.player_spawn", affectPlayer.getGameProfile().name(), pos.getX(), pos.getY(), pos.getZ()), false);
                 }
             }
         }

@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.RecipeBookMenu;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -64,7 +65,7 @@ public class RecipeBookComponentMixin {
     }
     //?}
     @Inject(method = "renderGhostRecipeTooltip", at = @At("HEAD"), cancellable = true)
-    private void renderGhostRecipeTooltip(GuiGraphics guiGraphics, int leftPos, int topPos, int k, int l, CallbackInfo info) {
+    private void renderGhostRecipeTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int leftPos, int topPos, int k, int l, CallbackInfo info) {
         info.cancel();
         ItemStack itemStack = null;
         for (int m = 0; m < this.ghostRecipe.size(); ++m) {
@@ -75,7 +76,7 @@ public class RecipeBookComponentMixin {
             itemStack = ghostRecipe.get(m).getItem();
         }
         if (itemStack != null && minecraft.screen != null) {
-            guiGraphics.renderComponentTooltip(this.minecraft.font, Screen.getTooltipFromItem(this.minecraft, itemStack), k, l);
+            GuiGraphicsExtractor.renderComponentTooltip(this.minecraft.font, Screen.getTooltipFromItem(this.minecraft, itemStack), k, l);
         }
     }
     *///?} else {

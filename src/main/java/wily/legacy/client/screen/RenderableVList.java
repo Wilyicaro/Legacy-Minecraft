@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -197,11 +197,11 @@ public class RenderableVList {
         this.listWidth = accessor.getInteger(name + ".width", listWidth);
         this.listHeight = accessor.getInteger(name + ".height", listHeight);
         boolean allowScroll = this.listHeight > 0;
-        if (allowScroll) accessor.getChildrenRenderables().add(((guiGraphics, i, j, f) -> {
+        if (allowScroll) accessor.getChildrenRenderables().add(((GuiGraphicsExtractor, i, j, f) -> {
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.UP.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.UP, this.leftPos + this.listWidth - 29 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.UP.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
             if (canScrollDown)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.DOWN.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.DOWN.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
         }));
         canScrollDown = false;
         int yDiff = 0;
@@ -443,8 +443,8 @@ public class RenderableVList {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(Minecraft.getInstance().font, text, this.getX() + 1, this.getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
+        public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+            LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(Minecraft.getInstance().font, text, this.getX() + 1, this.getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
         }
 
         @Override

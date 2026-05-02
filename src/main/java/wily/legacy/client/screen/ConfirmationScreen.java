@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -144,12 +144,12 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
         int textX = panel.x + (panel.width - messageLabel.width) / 2;
         LegacyFontUtil.applySDFont(b -> {
-            LegacyRenderUtil.renderScrollingString(guiGraphics, font, title, textX, panel.y + (b ? 6 : 15), textX + messageLabel.width, panel.y + (b ? 6 : 15) + 11, CommonColor.GRAY_TEXT.get(), false);
-            messageLabel.withPos(textX, panel.y + messageYOffset.get()).withColor(CommonColor.GRAY_TEXT.get()).withShadow(false).render(guiGraphics, i, j, f);
+            LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, title, textX, panel.y + (b ? 6 : 15), textX + messageLabel.width, panel.y + (b ? 6 : 15) + 11, CommonColor.GRAY_TEXT.get(), false);
+            messageLabel.withPos(textX, panel.y + messageYOffset.get()).withColor(CommonColor.GRAY_TEXT.get()).withShadow(false).extractRenderState(GuiGraphicsExtractor, i, j, f);
         });
     }
 

@@ -1,7 +1,7 @@
 package wily.legacy.skins.client.changeskin;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
@@ -295,8 +295,8 @@ public final class ChangeSkinPackList {
         }
 
         @Override
-        protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            renderDefaultSprite(graphics);
+        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+            extractDefaultSprite(graphics);
             renderString(graphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             if (isDimmedPack()) graphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), DIM_OVERLAY);
             if (!owner.reorderMode && !ControlType.getActiveType().isKbm() && isFocused() && packIndex >= 0 && owner.focusedPackIndex != packIndex)
@@ -307,19 +307,19 @@ public final class ChangeSkinPackList {
         public void playDownSound(SoundManager soundManager) {
         }
 
-        public void renderString(GuiGraphics graphics, Font font, int color) {
+        public void renderString(GuiGraphicsExtractor graphics, Font font, int color) {
             String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
             float textScale = height < 20 && LegacyOptions.getUIMode().isSD() ? 0.84f : 1.0f;
             int centerX = getX() + getWidth() / 2;
             float textY = getY() + (getHeight() - font.lineHeight * textScale) / 2.0f;
             if (textScale == 1.0f) {
-                graphics.drawCenteredString(font, visibleText, centerX, Math.round(textY), color);
+                graphics.centeredText(font, visibleText, centerX, Math.round(textY), color);
                 return;
             }
             graphics.pose().pushMatrix();
             graphics.pose().translate(centerX, textY);
             graphics.pose().scale(textScale, textScale);
-            graphics.drawCenteredString(font, visibleText, 0, 0, color);
+            graphics.centeredText(font, visibleText, 0, 0, color);
             graphics.pose().popMatrix();
         }
     }

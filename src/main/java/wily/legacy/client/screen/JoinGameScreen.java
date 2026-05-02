@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -34,12 +34,12 @@ public class JoinGameScreen extends PanelVListScreen {
                 }
 
                 @Override
-                protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, Minecraft.getInstance().font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+                protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+                    LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
                 }
 
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
+                    LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
                 }
 
                 @Override
@@ -63,9 +63,9 @@ public class JoinGameScreen extends PanelVListScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderDefaultBackground(guiGraphics, i, j, f);
-        tooltipBox.render(guiGraphics, i, j, f);
-        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, guiGraphics.textRenderer()));
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.renderDefaultBackground(GuiGraphicsExtractor, i, j, f);
+        tooltipBox.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        scrollableRenderer.extractRenderState(GuiGraphicsExtractor, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, GuiGraphicsExtractor.textRenderer()));
     }
 }

@@ -1,7 +1,7 @@
 package wily.legacy.skins.client.screen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +50,7 @@ public interface ChangeSkinScreenSource {
 
     void prewarmPreview(String skinId);
 
-    boolean renderPreview(GuiGraphics graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom);
+    boolean renderPreview(GuiGraphicsExtractor graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom);
 
     @Nullable Component packSubtitle(SkinPack pack);
 
@@ -167,7 +167,7 @@ public interface ChangeSkinScreenSource {
         }
 
         @Override
-        public boolean renderPreview(GuiGraphics graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
+        public boolean renderPreview(GuiGraphicsExtractor graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
             if (skinId == null || skinId.isBlank()) return false;
             if (SkinIdUtil.isAutoSelect(skinId)) {
                 var playerSkin = GuiSessionSkin.getSessionPlayerSkin();

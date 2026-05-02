@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -161,7 +161,7 @@ public class ChooseUserScreen extends PanelVListScreen {
         super.panelInit();
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.GRAY_TEXT.get(), false)));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> GuiGraphicsExtractor.text(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.GRAY_TEXT.get(), false)));
 
     }
 
@@ -193,14 +193,14 @@ public class ChooseUserScreen extends PanelVListScreen {
         for (MCAccount account : MCAccount.list) {
             renderableVList.addRenderable(new IconButton(renderableVList, 0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user", account.getProfile().name()) : Component.literal(account.getProfile().name())) {
                 @Override
-                public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(account.getProfile(), true).get(), getX() + x, getY() + y, Math.max(width, height));
+                public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    PlayerFaceExtractor.extractRenderState(GuiGraphicsExtractor, minecraft.getSkinManager().createLookup(account.getProfile(), true).get(), getX() + x, getY() + y, Math.max(width, height));
                 }
 
                 @Override
-                public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-                    super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + x, getY() + y, width, height);
+                public void renderIconHighlight(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    super.renderIconHighlight(GuiGraphicsExtractor, mouseX, mouseY, x, y, width, height);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + x, getY() + y, width, height);
                 }
 
                 @Override

@@ -78,6 +78,13 @@ public class IOUtil {
         if (obj != null) consumer.accept(obj);
     }
 
+    public static final Codec<ArbitrarySupplier<ItemStack>> LAZY_ITEM_SUPPLIER_CODEC = Codec.of(DynamicUtil.ITEM_SUPPLIER_CODEC, IOUtil::decodeLazyItemSupplier);
+
+    public static <T> DataResult<Pair<ArbitrarySupplier<ItemStack>, T>> decodeLazyItemSupplier(DynamicOps<T> ops, T input) {
+        JsonElement json = ops.convertTo(JsonOps.INSTANCE, input);
+        return DataResult.success(Pair.of(() -> DynamicUtil.ITEM_CODEC.parse(DynamicUtil.getActualRegistryOps(JsonOps.INSTANCE), json).result().orElse(ItemStack.EMPTY), input));
+    }
+
     public static Stream<String> getOrderedNamespaces(ResourceManager manager) {
         return manager.getNamespaces().stream().sorted(Comparator.comparingInt(s -> s.equals("legacy") ? 0 : 1));
     }
@@ -142,13 +149,23 @@ public class IOUtil {
 
         @Override
         public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> dynamicOps, T1 t1) {
-            DataResult<Pair<T, T1>> decoded = decoder.decode(dynamicOps, t1);
+            DataResult<Pair<T, T1>> decoded;
+            try {
+                decoded = decoder.decode(dynamicOps, t1);
+            } catch (RuntimeException e) {
+                return fallback.decode(dynamicOps, t1);
+            }
             return decoded.isError() ? fallback.decode(dynamicOps, t1) : decoded;
         }
 
         @Override
         public <T1> DataResult<T1> encode(T t, DynamicOps<T1> dynamicOps, T1 t1) {
-            DataResult<T1> encoded = encoder.encode(t, dynamicOps, t1);
+            DataResult<T1> encoded;
+            try {
+                encoded = encoder.encode(t, dynamicOps, t1);
+            } catch (RuntimeException e) {
+                return fallback.encode(t, dynamicOps, t1);
+            }
             return encoded.isError() ? fallback.encode(t, dynamicOps, t1) : encoded;
         }
     }

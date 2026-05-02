@@ -1,7 +1,7 @@
 package wily.legacy.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.commons.io.FileUtils;
 import wily.legacy.Legacy4J;
@@ -32,13 +32,18 @@ public class LegacySaveCache {
         return minecraft.hasSingleplayerServer() && !minecraft.isDemo() && !minecraft.getSingleplayerServer().isHardcore() && isCurrentWorldSource(minecraft.getSingleplayerServer().storageSource);
     }
 
+    public static Path getLevelDirectory(LevelStorageSource.LevelStorageAccess storageSource) {
+        return storageSource.getLevelPath(LevelResource.ROOT).normalize();
+    }
+
     public static boolean isCurrentWorldSource(LevelStorageSource.LevelStorageAccess storageSource) {
-        return storageSource.getDimensionPath(Level.OVERWORLD).getParent().equals(currentWorldSource.getBaseDir());
+        return storageSource.parent().getBaseDir().equals(currentWorldSource.getBaseDir());
     }
 
     public static void saveLevel(LevelStorageSource.LevelStorageAccess storageSource) {
-        if (isCurrentWorldSource(storageSource))
+        if (isCurrentWorldSource(storageSource)) {
             copySaveBtwSources(storageSource, Minecraft.getInstance().getLevelSource(), false);
+        }
     }
 
     public static String importSaveFile(InputStream saveInputStream, Predicate<String> exists, LevelStorageSource source, String saveDirName) {
@@ -65,9 +70,11 @@ public class LegacySaveCache {
 
     public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource, boolean deleteOldDest) {
         try {
-            File destLevelDirectory = destSource.getBaseDir().resolve(sendSource.getLevelId()).toFile();
+            Path sourceLevelDirectory = getLevelDirectory(sendSource);
+            Path destLevelDirectoryPath = destSource.getBaseDir().resolve(sendSource.getLevelId());
+            File destLevelDirectory = destLevelDirectoryPath.toFile();
             if (deleteOldDest && destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
-            FileUtils.copyDirectory(sendSource.getDimensionPath(Level.OVERWORLD).toFile(), destLevelDirectory, p -> {
+            FileUtils.copyDirectory(sourceLevelDirectory.toFile(), destLevelDirectory, p -> {
                 if (p.getName().equals("session.lock")) return false;
                 if (deleteOldDest) return true;
                 File destFile = p.toPath().relativize(destLevelDirectory.toPath()).toFile();

@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.crafting;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,21 +31,22 @@ import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(CraftingScreen.class)
 public abstract class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
-    public CraftingScreenMixin(CraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
+
+public CraftingScreenMixin(CraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 215;
-        imageHeight = sd ? 140 : 202;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 215);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 140 : 202);
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 66 : 90;
 
@@ -83,23 +85,23 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         if (sd) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_ARROW, leftPos + 65, topPos + 31, 16, 13);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SMALL_ARROW, leftPos + 65, topPos + 31, 16, 13);
         } else {
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 105, topPos + 43);
-            guiGraphics.pose().scale(1.5f, 1.5f);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW, 0, 0, 22, 16);
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().pushMatrix();
+            GuiGraphicsExtractor.pose().translate(leftPos + 105, topPos + 43);
+            GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(ARROW, 0, 0, 22, 16);
+            GuiGraphicsExtractor.pose().popMatrix();
         }
     }
 

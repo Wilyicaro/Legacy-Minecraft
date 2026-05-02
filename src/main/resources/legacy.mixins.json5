@@ -12,23 +12,21 @@
     "client.AbstractRecipeBookScreenMixin",
     "client.crafter.CrafterScreenMixin",
     //? if >=1.21 && (fabric || neoforge) {
-    "compat.sodium.FluidRendererFactoryMixin",
-    "compat.sodium.BlockRendererMixin",
     //?}
-    //? (fabric || >=1.21 && neoforge) {
+    //? (fabric || >=1.21 && neoforge && <26.1) {
     /*"compat.sodium.OcclusionCullerMixin",
     *///?}
     //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
     //?}
     //? if fabric {
-    "client.TerrainRenderContextMixin",
     //?}
     "client.SectionOcclusionGraphMixin",
     "client.LevelEventHandlerMixin",
     "client.DragonEggBlockMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
     "client.AbstractButtonMixin",
+    "client.AbstractContainerScreenAccessor",
     "client.AbstractContainerScreenMixin",
     "client.furnace.AbstractFurnaceScreenMixin",
     "client.sign.AbstractSignEditScreenMixin",
@@ -84,7 +82,7 @@
     "client.GlyphInfoMixin",
     "client.grindstone.GrindstoneScreenMixin",
     "client.GuiGameRendererMixin",
-    "client.GuiGraphicsMixin",
+    "client.GuiGraphicsExtractorMixin",
     "client.gui.GuiMixin",
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
@@ -232,6 +230,7 @@
     "ServerExplosionMixin",
     "ItemMixin",
     "AbstractContainerMenuMixin",
+    "CauldronInteractionDispatcherAccessor",
     "AbstractArrowMixin",
     "ProjectileInvoker",
     "AbstractMinecartMixin",
@@ -286,8 +285,6 @@
     "VillagerGoalPackagesMixin",
     "VillagerMixin",
     "WoodlandMansionPiecesSecondFloor",
-    "FireworkStarRecipeAccessor",
-    "FireworkRocketRecipeAccessor",
     "ThrownTridentMixin",
     "ChangeDimensionTriggerMixin",
     "EnchantmentMixin",

@@ -27,6 +27,7 @@ import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.LegacySaveCache;
 
 import java.net.Proxy;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 @Mixin(IntegratedServer.class)
@@ -41,7 +42,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     private boolean paused;
 
     public IntegratedServerMixin(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener) {
-        super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, levelLoadListener);
+        super(thread, levelStorageAccess, packRepository, worldStem, Optional.empty(), proxy, dataFixer, services, levelLoadListener, false);
     }
 
 

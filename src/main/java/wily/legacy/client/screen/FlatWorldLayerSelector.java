@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -78,22 +78,22 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderDefaultBackground(guiGraphics, i, j, f);
-        panelRecess.render(guiGraphics, i, j, f);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.renderDefaultBackground(GuiGraphicsExtractor, i, j, f);
+        panelRecess.extractRenderState(GuiGraphicsExtractor, i, j, f);
         LegacyFontUtil.applySDFont(sd -> {
-            guiGraphics.drawString(this.font, this.title, panel.x + accessor.getInteger("title.x", (panel.width - font.width(title)) / 2), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false);
+            GuiGraphicsExtractor.text(this.font, this.title, panel.x + accessor.getInteger("title.x", (panel.width - font.width(title)) / 2), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false);
             Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", layerSlider.getObjectValue());
-            guiGraphics.drawString(this.font, layerCount, panel.x + accessor.getInteger("layerCount.x", 49) - font.width(layerCount), panelRecess.y + accessor.getInteger("layerCount.y", (panelRecess.getHeight() - font.lineHeight) / 2 + 1), 0xFFFFFFFF, true);
-            guiGraphics.drawString(this.font, selectedLayer.getName(), panel.x + accessor.getInteger("layerName.x", 70), panelRecess.y + accessor.getInteger("layerName.y", (panelRecess.getHeight() - font.lineHeight) / 2 + 1), 0xFFFFFFFF, true);
+            GuiGraphicsExtractor.text(this.font, layerCount, panel.x + accessor.getInteger("layerCount.x", 49) - font.width(layerCount), panelRecess.y + accessor.getInteger("layerCount.y", (panelRecess.getHeight() - font.lineHeight) / 2 + 1), 0xFFFFFFFF, true);
+            GuiGraphicsExtractor.text(this.font, selectedLayer.getName(), panel.x + accessor.getInteger("layerName.x", 70), panelRecess.y + accessor.getInteger("layerName.y", (panelRecess.getHeight() - font.lineHeight) / 2 + 1), 0xFFFFFFFF, true);
         });
 
         float itemScale = accessor.getFloat("layerItem.scale", 1.25f);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.x + accessor.getInteger("layerItem.x", 50), accessor.getInteger("layerItem.y", panelRecess.y + (panelRecess.height - Math.round(16 * itemScale)) / 2));
-        guiGraphics.pose().scale(itemScale, itemScale);
-        guiGraphics.renderItem(displayLayer, 0, 0);
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(panel.x + accessor.getInteger("layerItem.x", 50), accessor.getInteger("layerItem.y", panelRecess.y + (panelRecess.height - Math.round(16 * itemScale)) / 2));
+        GuiGraphicsExtractor.pose().scale(itemScale, itemScale);
+        GuiGraphicsExtractor.item(displayLayer, 0, 0);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override

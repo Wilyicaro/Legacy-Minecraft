@@ -83,7 +83,7 @@ public final class LegacyDragonEggTeleportParticles {
     }
 
     private static void spawnTeleportParticles(ClientLevel level, BlockPos sourcePos, BlockPos destinationPos) {
-        RandomSource random = level.random;
+        RandomSource random = RandomSource.create();
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             double progress = random.nextDouble();
             float velocityX = (random.nextFloat() - 0.5F) * 0.2F;

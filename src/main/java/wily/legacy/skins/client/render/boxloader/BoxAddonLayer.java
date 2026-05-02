@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -139,7 +140,7 @@ public class BoxAddonLayer extends RenderLayer {
         final boolean hideHead = hasHeadItem(ars);
         collector.submitCustomGeometry(
                 poseStack,
-                RenderTypes.entityCutoutNoCull(texFinal),
+                RenderTypes.entityCutout(texFinal),
                 (pose, vc) -> {
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);

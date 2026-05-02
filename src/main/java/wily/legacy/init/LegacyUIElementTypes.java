@@ -1,5 +1,6 @@
 package wily.legacy.init;
 
+import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LegacyUIElementTypes {
-    public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchanting_table_book.png");
+    public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchantment/enchanting_table_book.png");
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
             a.putStaticElement(elementName + ".renderables", UIAccessor.createRenderablesWrapper(a, new ArrayList<>()));
@@ -40,7 +41,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", UIDefinitionManager.ElementType::parseBoolean);
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "contentX", "contentY", "width", "height", "lineHeight");
         UIDefinitionManager.parseAllElements(uiDefinition, a -> a.getElementValue(elementName + ".renderables", a, UIAccessor.class), element, s -> s);
-        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> a.addRenderable(elementName, ((guiGraphics, i, j, f) -> {
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> a.addRenderable(elementName, ((GuiGraphicsExtractor, i, j, f) -> {
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
             int xd = a.getInteger(elementName + ".contentX", 11);
@@ -49,13 +50,13 @@ public class LegacyUIElementTypes {
             int height = a.getInteger(elementName + ".height", 0);
             int lineHeight = a.getInteger(elementName + ".lineHeight", 12);
             if (a.getBoolean(elementName + ".hasBackground", true))
-                LegacyRenderUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName + ".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height);
-            a.getElement(elementName, ScrollableRenderer.class).ifPresent(s -> s.render(guiGraphics, x + xd, y + yd, width - 2 * xd, height - 2 * yd - 6, () -> {
+                LegacyRenderUtil.blitTranslucentOverlaySprite(GuiGraphicsExtractor, a.getResourceLocation(elementName + ".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height);
+            a.getElement(elementName, ScrollableRenderer.class).ifPresent(s -> s.extractRenderState(GuiGraphicsExtractor, x + xd, y + yd, width - 2 * xd, height - 2 * yd - 6, () -> {
                 int yOffset = 0;
                 for (Renderable r : a.getElementValue(elementName + ".renderables", a, UIAccessor.class).getChildrenRenderables()) {
                     if (r instanceof LayoutElement e) {
                         e.setPosition(x + xd, y + yd + 4 + yOffset);
-                        r.render(guiGraphics, i, j + Math.round(s.getYOffset()), f);
+                        r.extractRenderState(GuiGraphicsExtractor, i, j + Math.round(s.getYOffset()), f);
                         yOffset += e.getHeight();
                     }
                 }
@@ -107,8 +108,8 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "outline");
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "color", "outlineColor", "order");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
-        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
-            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(guiGraphics, Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getFloat(elementName + ".outline", 0.5f)));
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
+            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
     public static final UIDefinitionManager.ElementType RENDER_ENCHANTED_BOOK = UIDefinitionManager.ElementType.registerConditional("render_enchanted_book", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
@@ -153,21 +154,21 @@ public class LegacyUIElementTypes {
         }));
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "scale");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
-        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
             float g = Mth.lerp(f, oOpen.get(), open.get());
             float f1 = Mth.lerp(f, oFlip.get(), flip.get());
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
             if (bookModel.isPresent())
-                guiGraphics.submitBookModelRenderState(bookModel.get(), ENCHANTING_TABLE_BOOK, a.getFloat(elementName + ".scale", 40.0f), g, f1, x, y, x + a.getInteger(elementName + ".width", 38), y + a.getInteger(elementName + ".height", 31));
+                GuiGraphicsExtractor.book(bookModel.get(), ENCHANTING_TABLE_BOOK, a.getFloat(elementName + ".scale", 40.0f), g, f1, x, y, x + a.getInteger(elementName + ".width", 38), y + a.getInteger(elementName + ".height", 31));
         }))));
     }));
     public static final UIDefinitionManager.ElementType PUT_TOGGLEABLE_TAB_SPRITES = UIDefinitionManager.ElementType.registerCodec("put_toggleable_tab_sprites", LegacyTabButton.ToggleableTabSprites.CODEC);
     public static final UIDefinitionManager.ElementType PUT_TAB_STATE_OFFSET = UIDefinitionManager.ElementType.registerCodec("put_tab_state_offset", LegacyTabButton.StateOffset.CODEC);
     private static final Container emptyFakeContainer = new SimpleContainer();
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", (s, d) -> d.asListOpt(d1 -> DynamicUtil.getItemFromDynamic(d1, true)).result().map(l -> UIDefinition.createBeforeInit(a -> a.putStaticElement(s, new SimpleContainer(l.stream().map(ArbitrarySupplier::get).toArray(ItemStack[]::new))))).orElse(null));
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", (s, d) -> UIDefinitionManager.ElementType.parseItemStackElement(s, d));
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", LegacyUIElementTypes::parseFakeContainer);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "offset", DynamicUtil.VEC3_OBJECT_CODEC);
@@ -233,6 +234,21 @@ public class LegacyUIElementTypes {
             });
         }));
     }));
+
+    private static UIDefinition parseFakeContainer(String field, Dynamic<?> dynamic) {
+        return dynamic.asListOpt(d -> d).result().map(items -> UIDefinition.createBeforeInit(a -> {
+            ItemStack[] stacks = items.stream().map(LegacyUIElementTypes::parseStack).toArray(ItemStack[]::new);
+            a.putStaticElement(field, new SimpleContainer(stacks));
+        })).orElse(null);
+    }
+
+    private static UIDefinition parseFakeItem(String field, Dynamic<?> dynamic) {
+        return UIDefinition.createBeforeInit(a -> a.putStaticElement(field, parseStack(dynamic)));
+    }
+
+    private static ItemStack parseStack(Dynamic<?> dynamic) {
+        return DynamicUtil.getItemFromDynamic(dynamic, true).get();
+    }
 
     public static void init() {
     }

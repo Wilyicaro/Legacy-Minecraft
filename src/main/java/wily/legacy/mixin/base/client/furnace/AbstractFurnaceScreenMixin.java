@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.furnace;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
@@ -13,6 +13,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,7 +33,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractFurnaceScreen.class)
 public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
-    public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
+
+public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
@@ -41,16 +45,16 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 214;
-        imageHeight = sd ? 145 : 215;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 214);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 145 : 215);
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 71 : 98;
         titleLabelX = sd ? 7 : 14;
@@ -95,41 +99,41 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
-            super.renderLabels(guiGraphics, i, j);
+            super.extractLabels(GuiGraphicsExtractor, i, j);
             Component ingredient = Component.translatable("legacy.container.ingredient");
-            guiGraphics.drawString(this.font, ingredient, (b ? 57 : 70) - font.width(ingredient), b ? 19 : 32, CommonColor.GRAY_TEXT.get(), false);
+            GuiGraphicsExtractor.text(this.font, ingredient, (b ? 57 : 70) - font.width(ingredient), b ? 19 : 32, CommonColor.GRAY_TEXT.get(), false);
             Component fuel = Component.translatable("legacy.container.fuel");
-            guiGraphics.drawString(this.font, fuel, (b ? 57 : 70) - font.width(fuel), (b ? 53 : 79), CommonColor.GRAY_TEXT.get(), false);
+            GuiGraphicsExtractor.text(this.font, fuel, (b ? 57 : 70) - font.width(fuel), (b ? 53 : 79), CommonColor.GRAY_TEXT.get(), false);
         });
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
         int guiScale = minecraft.getWindow().getGuiScale();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + (sd ? 63 : LegacyRenderUtil.hasHorizontalArtifacts() ? 75.4f : 75.5f), topPos + (sd ? 34 : 46.4f));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 63 : LegacyRenderUtil.hasHorizontalArtifacts() ? 75.4f : 75.5f), topPos + (sd ? 34 : 46.4f));
         int flameSize = sd ? 14 : 21;
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT, 0, 0, flameSize, flameSize);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.LIT, 0, 0, flameSize, flameSize);
         if (menu.isLit()) {
-            guiGraphics.pose().scale(1f / guiScale, 1f / guiScale);
+            GuiGraphicsExtractor.pose().scale(1f / guiScale, 1f / guiScale);
             int scaledSize = flameSize * guiScale;
             int n = Mth.ceil(menu.getLitProgress() * (scaledSize - guiScale)) + guiScale;
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT_PROGRESS, scaledSize, scaledSize, 0, scaledSize - n, 0, scaledSize - n, scaledSize, n);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.LIT_PROGRESS, scaledSize, scaledSize, 0, scaledSize - n, 0, scaledSize - n, scaledSize, n);
         }
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().popMatrix();
         boolean fhd = LegacyOptions.getUIMode().isFHD();
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + (sd ? 82 : fhd ? 109 : 114), topPos + (sd ? 33 : 47));
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 82 : fhd ? 109 : 114), topPos + (sd ? 33 : 47));
         int arrowWidth = sd ? 16 : 33;
         int arrowHeight = sd ? 14 : 24;
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, arrowWidth, arrowHeight);
-        guiGraphics.pose().scale(1f / guiScale, 1f / guiScale);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.FULL_SMALL_ARROW : fhd ? LegacySprites.FULL_ARROW_1080 : LegacySprites.FULL_ARROW, arrowWidth * guiScale, arrowHeight * guiScale, 0, 0, 0, 0, (int) Math.ceil(menu.getBurnProgress() * arrowWidth * guiScale), arrowHeight * guiScale);
-        guiGraphics.pose().popMatrix();
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, arrowWidth, arrowHeight);
+        GuiGraphicsExtractor.pose().scale(1f / guiScale, 1f / guiScale);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.FULL_SMALL_ARROW : fhd ? LegacySprites.FULL_ARROW_1080 : LegacySprites.FULL_ARROW, arrowWidth * guiScale, arrowHeight * guiScale, 0, 0, 0, 0, (int) Math.ceil(menu.getBurnProgress() * arrowWidth * guiScale), arrowHeight * guiScale);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 }

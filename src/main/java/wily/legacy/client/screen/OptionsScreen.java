@@ -7,7 +7,7 @@ import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
@@ -139,9 +139,9 @@ public class OptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) GuiGraphicsExtractor.deferredTooltip = null;
     }
 
     protected int getLegacyPanelHeight(int baseHeight, boolean shrinkOnly) {
@@ -179,7 +179,7 @@ public class OptionsScreen extends PanelVListScreen {
                     b -> Tooltip.create(b.getObjectValue().getInfo()),
                     minecraft.level.getDifficulty(),
                     () -> Arrays.asList(Difficulty.values()),
-                    b -> minecraft.player.connection.sendCommand("difficulty " + b.getObjectValue().getKey()),
+                    b -> minecraft.player.connection.sendCommand("difficulty " + b.getObjectValue().getSerializedName()),
                     () -> minecraft.level.getDifficulty()));
             return;
         }
@@ -533,14 +533,14 @@ public class OptionsScreen extends PanelVListScreen {
                 }
 
                 @Override
-                public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderDefaultBackground(guiGraphics, i, j, f);
+                public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+                    super.renderDefaultBackground(GuiGraphicsExtractor, i, j, f);
                     if (shouldDisplayPackManagementTooltips() && selectorTooltipVisibility > 0) {
                         if (getFocused() != globalPackSelector)
-                            selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
+                            selector.renderTooltipBox(GuiGraphicsExtractor, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
                         else
-                            globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
-                        guiGraphics.nextStratum();
+                            globalPackSelector.renderTooltipBox(GuiGraphicsExtractor, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
+                        GuiGraphicsExtractor.nextStratum();
                     }
                 }
 

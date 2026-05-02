@@ -5,9 +5,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.TextCursorUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -80,35 +81,30 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
         }
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z"))
-    private boolean renderWidget(EditBox instance, GuiGraphics guiGraphics) {
+    @Redirect(method = "extractWidgetRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z"))
+    private boolean renderWidget(EditBox instance, GuiGraphicsExtractor GuiGraphicsExtractor) {
         if (isBordered()) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TEXT_FIELD, getX(), getY(), getWidth(), getHeight());
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TEXT_FIELD, getX(), getY(), getWidth(), getHeight());
             if (isHoveredOrFocused())
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HIGHLIGHTED_TEXT_FIELD, getX() - 1, getY() - 1, getWidth() + 2, getHeight() + 2);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.HIGHLIGHTED_TEXT_FIELD, getX() - 1, getY() - 1, getWidth() + 2, getHeight() + 2);
         }
         return false;
     }
 
-    @ModifyVariable(method = "renderWidget", at = @At(value = "STORE"), ordinal = 1)
+    @ModifyVariable(method = "extractWidgetRenderState", at = @At(value = "STORE"), ordinal = 1)
     public boolean renderWidget(boolean bl) {
         int l = this.cursorPos - this.displayPos;
         String string = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());
         return l >= 0 && l <= string.length() && this.isFocused() && (Util.getMillis() - this.focusedTime) / 180L % 2 == 0L;
     }
 
-    @WrapOperation(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 1))
-    public void renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl, Operation<Void> original) {
+    @WrapOperation(method = "extractWidgetRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/TextCursorUtils;extractAppendCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZ)V"))
+    public void extractWidgetRenderState(GuiGraphicsExtractor instance, Font font, int i, int j, int k, boolean bl, Operation<Void> original) {
         instance.pose().pushMatrix();
         instance.pose().translate(i - (cursorPos == 0 ? 3 : 4), j + 8.5f);
         instance.pose().scale(6, 1.5f);
         instance.fill(0, 0, 1, 1, k);
         instance.pose().popMatrix();
-    }
-
-    @ModifyArg(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 4)
-    public int renderWidget(int i) {
-        return textColor;
     }
 
     @Override

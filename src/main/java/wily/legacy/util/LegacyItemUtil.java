@@ -40,7 +40,7 @@ public class LegacyItemUtil {
     }
 
     public static boolean isDyeableItem(Holder<Item> item) {
-        return item.is(ItemTags.DYEABLE);
+        return item.is(ItemTags.CAULDRON_CAN_REMOVE_DYE);
     }
 
     public static ItemStack dyeItem(ItemStack itemStack, int color) {
@@ -150,6 +150,71 @@ public class LegacyItemUtil {
 
     public static int getDyeColor(DyeColor dyeColor) {
         return dyeColor.getTextureDiffuseColor();
+    }
+
+    public static int getDyeColor(DyeItem dye) {
+        return getDyeColor(getDyeColor(dye.asItem()));
+    }
+
+    public static DyeColor getDyeColor(Item item) {
+        if (item == Items.WHITE_DYE) return DyeColor.WHITE;
+        if (item == Items.ORANGE_DYE) return DyeColor.ORANGE;
+        if (item == Items.MAGENTA_DYE) return DyeColor.MAGENTA;
+        if (item == Items.LIGHT_BLUE_DYE) return DyeColor.LIGHT_BLUE;
+        if (item == Items.YELLOW_DYE) return DyeColor.YELLOW;
+        if (item == Items.LIME_DYE) return DyeColor.LIME;
+        if (item == Items.PINK_DYE) return DyeColor.PINK;
+        if (item == Items.GRAY_DYE) return DyeColor.GRAY;
+        if (item == Items.LIGHT_GRAY_DYE) return DyeColor.LIGHT_GRAY;
+        if (item == Items.CYAN_DYE) return DyeColor.CYAN;
+        if (item == Items.PURPLE_DYE) return DyeColor.PURPLE;
+        if (item == Items.BLUE_DYE) return DyeColor.BLUE;
+        if (item == Items.BROWN_DYE) return DyeColor.BROWN;
+        if (item == Items.GREEN_DYE) return DyeColor.GREEN;
+        if (item == Items.RED_DYE) return DyeColor.RED;
+        return DyeColor.BLACK;
+    }
+
+    public static Item getDyeItem(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Items.WHITE_DYE;
+            case ORANGE -> Items.ORANGE_DYE;
+            case MAGENTA -> Items.MAGENTA_DYE;
+            case LIGHT_BLUE -> Items.LIGHT_BLUE_DYE;
+            case YELLOW -> Items.YELLOW_DYE;
+            case LIME -> Items.LIME_DYE;
+            case PINK -> Items.PINK_DYE;
+            case GRAY -> Items.GRAY_DYE;
+            case LIGHT_GRAY -> Items.LIGHT_GRAY_DYE;
+            case CYAN -> Items.CYAN_DYE;
+            case PURPLE -> Items.PURPLE_DYE;
+            case BLUE -> Items.BLUE_DYE;
+            case BROWN -> Items.BROWN_DYE;
+            case GREEN -> Items.GREEN_DYE;
+            case RED -> Items.RED_DYE;
+            case BLACK -> Items.BLACK_DYE;
+        };
+    }
+
+    public static Item getBannerItem(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Items.WHITE_BANNER;
+            case ORANGE -> Items.ORANGE_BANNER;
+            case MAGENTA -> Items.MAGENTA_BANNER;
+            case LIGHT_BLUE -> Items.LIGHT_BLUE_BANNER;
+            case YELLOW -> Items.YELLOW_BANNER;
+            case LIME -> Items.LIME_BANNER;
+            case PINK -> Items.PINK_BANNER;
+            case GRAY -> Items.GRAY_BANNER;
+            case LIGHT_GRAY -> Items.LIGHT_GRAY_BANNER;
+            case CYAN -> Items.CYAN_BANNER;
+            case PURPLE -> Items.PURPLE_BANNER;
+            case BLUE -> Items.BLUE_BANNER;
+            case BROWN -> Items.BROWN_BANNER;
+            case GREEN -> Items.GREEN_BANNER;
+            case RED -> Items.RED_BANNER;
+            case BLACK -> Items.BLACK_BANNER;
+        };
     }
 
     public static int getPotionLevel(ItemStack stack) {

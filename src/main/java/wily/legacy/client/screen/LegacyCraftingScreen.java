@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
@@ -21,6 +21,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
@@ -43,8 +45,6 @@ import wily.legacy.client.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.ImpossibleIngredient;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.mixin.base.FireworkRocketRecipeAccessor;
-import wily.legacy.mixin.base.FireworkStarRecipeAccessor;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
@@ -101,8 +101,8 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         container = new TransientCraftingContainer(abstractContainerMenu, gridDimension, gridDimension);
         warningSlots = new boolean[gridDimension * gridDimension];
         if (Minecraft.getInstance().level == null) return;
-        CraftingInput input = container.asCraftInput();
-        List<RecipeInfo<CraftingRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.CRAFTING).stream().map(h -> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapedRecipe rcp ? LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(ingredientsGrid), LegacyCraftingMenu.getRecipeOptionalIngredients(rcp), gridDimension, rcp.getWidth(), rcp.getHeight()) : h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapelessRecipe r ? LegacyCraftingMenu.getRecipeOptionalIngredients(r) : Collections.emptyList(), h/*? if >1.20.1 {*/.value()/*?}*/.isSpecial() ? ItemStack.EMPTY : h/*? if >1.20.1 {*/.value()/*?}*/.assemble(/*? if <1.20.5 {*//*container*//*?} else {*/input/*?}*/, Minecraft.getInstance().level.registryAccess()))).filter(h -> h.getOptionalIngredients().size() <= ingredientsGrid.size()).toList();
+        var context = SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
+        List<RecipeInfo<CraftingRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.CRAFTING).stream().map(h -> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapedRecipe rcp ? LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(ingredientsGrid), LegacyCraftingMenu.getRecipeOptionalIngredients(rcp), gridDimension, rcp.getWidth(), rcp.getHeight()) : h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapelessRecipe r ? LegacyCraftingMenu.getRecipeOptionalIngredients(r) : Collections.emptyList(), getRecipeResult(h/*? if >1.20.1 {*/.value()/*?}*/, context))).filter(h -> h.getOptionalIngredients().size() <= ingredientsGrid.size()).toList();
         for (LegacyCraftingTabListing listing : Legacy4JClient.legacyCraftingListingManager.map().values()) {
             List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
             listing.craftings().values().forEach(l -> {
@@ -179,7 +179,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         Consumer<CustomCraftingIconHolder> fireworkStarUpdateRecipe = h -> {
             clearIngredients(ingredientsGrid);
             if (fireworkStarButtons.isEmpty()) return;
-            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkStarButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkStarRecipeAccessor.getGunpowderIngredient())), gridDimension, 2, 2);
+            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkStarButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkCrafting.gunpowderIngredient())), gridDimension, 2, 2);
             fireworkStarButtons.forEach(CustomRecipeIconHolder::applyAddedIngredients);
             resultStack = fireworkStarButtons.get(0).hasItem() ? h.assembleCraftingResult(minecraft.level, container) : Items.FIREWORK_STAR.getDefaultInstance();
             canCraft(ingredientsGrid, true);
@@ -196,7 +196,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         Consumer<CustomCraftingIconHolder> fireworkRocketUpdateRecipe = h -> {
             clearIngredients(ingredientsGrid);
             if (fireworkButtons.isEmpty()) return;
-            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkRocketRecipeAccessor.getPaperIngredient())), gridDimension, 2, 2);
+            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.of(FactoryIngredient.of(fireworkButtons.get(0).itemIcon).toIngredient()), Optional.empty(), Optional.of(FireworkCrafting.paperIngredient())), gridDimension, 2, 2);
             fireworkButtons.forEach(CustomRecipeIconHolder::applyAddedIngredients);
             resultStack = fireworkButtons.get(0).hasItem() ? h.assembleCraftingResult(Minecraft.getInstance().level, container) : new ItemStack(Items.FIREWORK_ROCKET, 3);
             canCraft(ingredientsGrid, true);
@@ -224,23 +224,23 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
             canCraft(ingredientsGrid, true);
 
         };
-        List<ItemStack> dyes = Arrays.stream(DyeColor.values()).map(c -> DyeItem.byColor(c).getDefaultInstance()).toList();
+        List<ItemStack> dyes = Arrays.stream(DyeColor.values()).map(c -> LegacyItemUtil.getDyeItem(c).getDefaultInstance()).toList();
         fireworkStarButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, fireworkStarUpdateRecipe).enableAddIngredients());
-        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.SHAPE_TAB, FireworkStarRecipeAccessor.getShapeByItem().keySet().stream().map(ItemStack::new).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && Arrays.stream(FactoryIngredient.of(i.get()).getStacks()).anyMatch(item -> FireworkStarRecipeAccessor.getShapeByItem().containsKey(item.getItem())))));
-        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.EFFECT_TAB, Stream.concat(Arrays.stream(FactoryIngredient.of(FireworkStarRecipeAccessor.getTwinkleIngredient()).getStacks()), Arrays.stream(FactoryIngredient.of(FireworkStarRecipeAccessor.getTrailIngredient()).getStacks())).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && i.get().test(h.itemIcon))));
+        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.SHAPE_TAB, FireworkCrafting.shapesByItem().keySet().stream().map(ItemStack::new).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && Arrays.stream(FactoryIngredient.of(i.get()).getStacks()).anyMatch(item -> FireworkCrafting.shapesByItem().containsKey(item.getItem())))));
+        fireworkStarButtons.add(craftingButtonByList(LegacyComponents.EFFECT_TAB, Stream.concat(Arrays.stream(FactoryIngredient.of(FireworkCrafting.twinkleIngredient()).getStacks()), Arrays.stream(FactoryIngredient.of(FireworkCrafting.trailIngredient()).getStacks())).toList(), fireworkStarUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().noneMatch(i -> i.isPresent() && i.get().test(h.itemIcon))));
 
         fireworkStarFadeButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_STAR_TAB, i -> i.is(Items.FIREWORK_STAR), fireworkStarFadeUpdateRecipe));
         fireworkStarFadeButtons.add(craftingButtonByList(LegacyComponents.ADD_FADE_TAB, dyes, fireworkStarFadeUpdateRecipe).enableAddIngredients());
 
-        fireworkButtons.add(craftingButtonByList(LegacyComponents.ADD_POWER_TAB, Arrays.stream(FactoryIngredient.of(FireworkRocketRecipeAccessor.getGunpowderIngredient()).getStacks()).toList(), fireworkRocketUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().filter(i -> i.isPresent() && i.get().equals(FireworkRocketRecipeAccessor.getGunpowderIngredient())).count() < 3));
+        fireworkButtons.add(craftingButtonByList(LegacyComponents.ADD_POWER_TAB, Arrays.stream(FactoryIngredient.of(FireworkCrafting.gunpowderIngredient()).getStacks()).toList(), fireworkRocketUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().filter(i -> i.isPresent() && i.get().equals(FireworkCrafting.gunpowderIngredient())).count() < 3));
         fireworkButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_STAR_TAB, i -> i.is(Items.FIREWORK_STAR) && /*? if <1.20.5 {*//*i.hasTag() && i.getTag().contains("Explosion")*//*?} else {*/i.get(DataComponents.FIREWORK_EXPLOSION) != null/*?}*/, fireworkRocketUpdateRecipe).enableAddIngredients());
 
-        dyeArmorButtons.add(craftingButtonByPredicate(Component.translatable("legacy.container.tab.armour"), i -> /*? if <1.20.5 {*//*i.getItem() instanceof DyeableLeatherItem*//*?} else {*/i.is(ItemTags.DYEABLE)/*?}*/, dyeArmorUpdateRecipe));
+        dyeArmorButtons.add(craftingButtonByPredicate(Component.translatable("legacy.container.tab.armour"), i -> /*? if <1.20.5 {*//*i.getItem() instanceof DyeableLeatherItem*//*?} else {*/i.is(ItemTags.CAULDRON_CAN_REMOVE_DYE)/*?}*/, dyeArmorUpdateRecipe));
         dyeArmorButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, dyeArmorUpdateRecipe).enableAddIngredients());
         dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"), i -> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b && b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ || i.getItem() instanceof BundleItem/*?}*/), dyeItemUpdateRecipe));
         dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, dyeItemUpdateRecipe));
         if (!is2x2)
-            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(BannerBlock.byColor(c).asItem())))).toList()));
+            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(LegacyItemUtil.getBannerItem(c))))).toList()));
         bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i -> i.getItem() instanceof BannerItem && LegacyItemUtil.hasValidPatterns(i), h -> {
             clearIngredients(ingredientsGrid);
             if (bannerButtons.isEmpty() || h.itemIcon.isEmpty()) return;
@@ -278,6 +278,12 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
     public static LegacyCraftingScreen playerCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         return new LegacyCraftingScreen(abstractContainerMenu, inventory, component, true);
+    }
+
+    private static ItemStack getRecipeResult(CraftingRecipe recipe, net.minecraft.util.context.ContextMap context) {
+        if (recipe.isSpecial()) return ItemStack.EMPTY;
+        List<RecipeDisplay> displays = recipe.display();
+        return displays.isEmpty() ? ItemStack.EMPTY : displays.get(0).result().resolveForFirstStack(context);
     }
 
     public static boolean canCraft(List<ItemStack> compactItemStackList, List<Optional<Ingredient>> ings, boolean[] warningSlots) {
@@ -446,15 +452,15 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().getIndex()).getMessage() : getRecipeButtons().get(selectedRecipeButton) instanceof CustomCraftingIconHolder h ? h.getDisplayName() : CommonComponents.EMPTY;
-        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, title, ((typeTabList.getIndex() == 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, title, ((typeTabList.getIndex() == 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.GRAY_TEXT.get(), false));
         int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
         int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 163);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
         if (infoType.get() <= 0)
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.GRAY_TEXT.get(), false));
+            LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.GRAY_TEXT.get(), false));
         else {
             if (selectedRecipeButton < getRecipeButtons().size() && getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h) {
                 if (infoType.get() == 1 && LegacyTipManager.hasTip(h.getFocusedResult())) {
@@ -464,13 +470,13 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                         scrollableRenderer.lineHeight = lineSpacing;
                         int lineAmount = (bottomPanelHeight - 21) / lineSpacing;
                         scrollableRenderer.scrolled.max = Math.max(0, l.size() - lineAmount);
-                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 5, bottomPanelY + 2, inventoryPanelWidth - 11, lineAmount * lineSpacing + 2, () -> {
+                        scrollableRenderer.extractRenderState(GuiGraphicsExtractor, inventoryPanelX + 5, bottomPanelY + 2, inventoryPanelWidth - 11, lineAmount * lineSpacing + 2, () -> {
                             for (int i1 = 0; i1 < l.size(); i1++)
-                                guiGraphics.drawString(font, l.get(i1), inventoryPanelX + 5, bottomPanelY + 5 + i1 * (b ? 8 : 12), CommonColor.GRAY_TEXT.get(), false);
+                                GuiGraphicsExtractor.text(font, l.get(i1), inventoryPanelX + 5, bottomPanelY + 5 + i1 * (b ? 8 : 12), CommonColor.GRAY_TEXT.get(), false);
                         });
                     });
                 } else if (infoType.get() == 2) {
-                    LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, LegacyComponents.INGREDIENTS, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.INGREDIENTS)) / 2, bottomPanelY + accessor.getInteger("ingredientsTitle.y", 5), CommonColor.GRAY_TEXT.get(), false));
+                    LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, LegacyComponents.INGREDIENTS, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.INGREDIENTS)) / 2, bottomPanelY + accessor.getInteger("ingredientsTitle.y", 5), CommonColor.GRAY_TEXT.get(), false));
                     if (h.getFocusedRecipe() != null) {
                         int ingredientSize = accessor.getInteger("ingredientSlot.size", 14);
                         int ingredientX = inventoryPanelX + accessor.getInteger("ingredientSlot.x", 4);
@@ -481,18 +487,18 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                         RecipeMenu.handleCompactItemStackList(compactItemStackList, () -> h.getFocusedRecipe().getOptionalIngredients().stream().map(RecipeIconHolder::getActualItem).iterator());
                         scrollableRenderer.scrolled.max = Math.max(0, compactItemStackList.size() - 4);
                         scrollableRenderer.lineHeight = ingredientSize + 1;
-                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 2, ingredientY - 2, inventoryPanelWidth - 11, (ingredientSize + 1) * 4 + 1, () -> {
+                        scrollableRenderer.extractRenderState(GuiGraphicsExtractor, inventoryPanelX + 2, ingredientY - 2, inventoryPanelWidth - 11, (ingredientSize + 1) * 4 + 1, () -> {
                             for (int i1 = 0; i1 < compactItemStackList.size(); i1++) {
                                 ItemStack ing = compactItemStackList.get(i1);
-                                LegacyRenderUtil.iconHolderRenderer.itemHolder(ingredientX, ingredientY + (ingredientSize + 1) * i1, ingredientSize, ingredientSize, ing, false, Vec2.ZERO).render(guiGraphics, i, j, 0);
-                                guiGraphics.pose().pushMatrix();
-                                guiGraphics.pose().translate(ingredientX + ingredientSize + accessor.getInteger("ingredientText.x", 4), ingredientY + ingredientSize / 2 + (ingredientSize + 1) * i1);
+                                LegacyRenderUtil.iconHolderRenderer.itemHolder(ingredientX, ingredientY + (ingredientSize + 1) * i1, ingredientSize, ingredientSize, ing, false, Vec2.ZERO).extractRenderState(GuiGraphicsExtractor, i, j, 0);
+                                GuiGraphicsExtractor.pose().pushMatrix();
+                                GuiGraphicsExtractor.pose().translate(ingredientX + ingredientSize + accessor.getInteger("ingredientText.x", 4), ingredientY + ingredientSize / 2 + (ingredientSize + 1) * i1);
                                 LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, b -> {
-                                    guiGraphics.pose().scale(textScale);
-                                    guiGraphics.pose().translate(0, -3);
-                                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, ing.getHoverName(), 0,-2, Math.round((inventoryPanelWidth - 22 - 2) / textScale), 7, CommonColor.GRAY_TEXT.get(), false);
+                                    GuiGraphicsExtractor.pose().scale(textScale);
+                                    GuiGraphicsExtractor.pose().translate(0, -3);
+                                    LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, ing.getHoverName(), 0,-2, Math.round((inventoryPanelWidth - 22 - 2) / textScale), 7, CommonColor.GRAY_TEXT.get(), false);
                                 });
-                                guiGraphics.pose().popMatrix();
+                                GuiGraphicsExtractor.pose().popMatrix();
                             }
                         });
                     }
@@ -536,8 +542,6 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     @Override
     protected void init() {
         resultStack = ItemStack.EMPTY;
-        imageWidth = 348;
-        imageHeight = 215;
         super.init();
         LegacySlotDisplay display = new LegacySlotDisplay() {
             @Override
@@ -634,9 +638,9 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     protected RecipeIconHolder<CraftingRecipe> createRecipeButton(int index) {
         RecipeIconHolder<CraftingRecipe> h = new RecipeIconHolder<>(leftPos + 13 + index * 27, topPos + 38) {
             @Override
-            public void render(GuiGraphics graphics, int i, int j, float f) {
+            public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
                 if (isFocused()) selectedRecipeButton = index;
-                super.render(graphics, i, j, f);
+                super.extractRenderState(graphics, i, j, f);
             }
 
             protected boolean canCraft(RecipeInfo<CraftingRecipe> rcp) {
@@ -705,29 +709,29 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        if (hasTypeTabList()) typeTabList.render(guiGraphics, i, j, f);
-        getTabList().render(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        getTabList().renderSelected(guiGraphics, i, j, f);
-        if (hasTypeTabList()) typeTabList.renderSelected(guiGraphics, i, j, f);
+    protected void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, float f, int i, int j) {
+        if (hasTypeTabList()) typeTabList.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        getTabList().extractRenderState(GuiGraphicsExtractor, i, j, f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        getTabList().renderSelected(GuiGraphicsExtractor, i, j, f);
+        if (hasTypeTabList()) typeTabList.renderSelected(GuiGraphicsExtractor, i, j, f);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
         int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
         int craftingGridPanelX = accessor.getInteger("craftingGridPanel.x", 9);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + craftingGridPanelX, topPos + bottomPanelY, panelWidth, bottomPanelHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + accessor.getInteger("inventoryPanel.x", 176), topPos + bottomPanelY, accessor.getInteger("inventoryPanel.width", 163), bottomPanelHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + craftingGridPanelX, topPos + bottomPanelY, panelWidth, bottomPanelHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + accessor.getInteger("inventoryPanel.x", 176), topPos + bottomPanelY, accessor.getInteger("inventoryPanel.width", 163), bottomPanelHeight);
         int descriptionPanelWidth = accessor.getInteger("descriptionPanel.width", 163);
         int descriptionPanelHeight = accessor.getInteger("descriptionPanel.height", 93);
         int descriptionPanelX = accessor.getInteger("descriptionPanel.x", 176);
         int descriptionPanelY = accessor.getInteger("descriptionPanel.y", 8);
         if (typeTabList.getIndex() != 0 && hasTypeTabList())
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + descriptionPanelX, topPos + descriptionPanelY, descriptionPanelWidth, descriptionPanelHeight);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + descriptionPanelX, topPos + descriptionPanelY, descriptionPanelWidth, descriptionPanelHeight);
         int slotSize = accessor.getInteger("craftingGridSlot.size", 23);
         int xDiff = leftPos + craftingGridPanelX;
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_ARROW, xDiff + accessor.getInteger("craftingArrow.x", 77) + (is2x2 ? 0 : slotSize / 2), topPos + bottomPanelY + accessor.getInteger("craftingArrow.y", 57), 16, 14);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SMALL_ARROW, xDiff + accessor.getInteger("craftingArrow.x", 77) + (is2x2 ? 0 : slotSize / 2), topPos + bottomPanelY + accessor.getInteger("craftingArrow.y", 57), 16, 14);
         if (typeTabList.getIndex() == 0 || !hasTypeTabList()) {
-            renderRecipesScroll(guiGraphics, 5, 45);
+            renderRecipesScroll(GuiGraphicsExtractor, 5, 45);
         }
 
         int resultSlotSize = accessor.getInteger("craftingResultSlot.size", 36);
@@ -738,21 +742,21 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         for (int index = 0; index < ingredientsGrid.size(); index++) {
             LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + craftingGridSlotX + index % gridDimension * slotSize, yDiff + craftingGridSlotY + (is2x2 ? slotSize / 2 : 0) + index / gridDimension * slotSize, slotSize, slotSize, getActualItem(ingredientsGrid.get(index)), ((!onlyCraftableRecipes || typeTabList.getIndex() != 0) && !getActualItem(ingredientsGrid.get(index)).isEmpty() && warningSlots[index]), new Vec2(is2x2 ? 0 : LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5f, is2x2 ? 0 : 0.4f));
             if (holder.isWarning()) anyWarning = true;
-            holder.render(guiGraphics, i, j, f);
-            holder.renderTooltip(minecraft, guiGraphics, i, j);
+            holder.extractRenderState(GuiGraphicsExtractor, i, j, f);
+            holder.renderTooltip(minecraft, GuiGraphicsExtractor, i, j);
         }
 
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + accessor.getInteger("resultSlot.x", 104) + (is2x2 ? 0 : slotSize / 2), yDiff + accessor.getInteger("resultSlot.y", 48), resultSlotSize, resultSlotSize, resultStack, anyWarning, new Vec2(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5f, 0));
-        holder.render(guiGraphics, i, j, f);
-        holder.renderTooltip(minecraft, guiGraphics, i, j);
+        holder.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        holder.renderTooltip(minecraft, GuiGraphicsExtractor, i, j);
 
         if (!resultStack.isEmpty()) {
             Component resultName = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h && h.isValidIndex() ? h.getFocusedRecipe().getName() : resultStack.getHoverName();
             Component description = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h && h.isValidIndex() ? h.getFocusedRecipe().getDescription() : null;
             int titleY = bottomPanelY + accessor.getInteger("craftingTitle.y", 11) - (description == null ? 0 : 6);
-            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.GRAY_TEXT.get(), false));
+            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.GRAY_TEXT.get(), false));
             if (description != null)
-                LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, description.copy().setStyle(Style.EMPTY), xDiff + 2 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, xDiff + panelWidth - 2, topPos + titleY + 23, CommonColor.GRAY_TEXT.get(), false));
+                LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, description.copy().setStyle(Style.EMPTY), xDiff + 2 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, xDiff + panelWidth - 2, topPos + titleY + 23, CommonColor.GRAY_TEXT.get(), false));
             LegacyFontUtil.applySDFont(b -> {
                 if (typeTabList.getIndex() != 0) {
                     int descriptionTextXOffset = accessor.getInteger("descriptionText.x", 4);
@@ -763,10 +767,10 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                     int lineAmount = (descriptionPanelHeight - descriptionTextYOffset * 2 - 7) / lineSpacing;
                     List<FormattedCharSequence> list = LegacyRenderUtil.getTooltip(resultStack, descriptionTextWidth);
                     scrollableRenderer.scrolled.max = Math.max(0, list.size() - lineAmount);
-                    scrollableRenderer.render(guiGraphics, leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset, descriptionTextWidth, lineAmount * lineSpacing, () -> {
+                    scrollableRenderer.extractRenderState(GuiGraphicsExtractor, leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset, descriptionTextWidth, lineAmount * lineSpacing, () -> {
                         for (int i1 = 0; i1 < list.size(); i1++) {
                             FormattedCharSequence sequence = list.get(i1);
-                            guiGraphics.drawString(font, sink -> sequence.accept((i2, style, j1) -> sink.accept(i2, Style.EMPTY, j1)), leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset + i1 * lineSpacing, CommonColor.GRAY_TEXT.get(), false);
+                            GuiGraphicsExtractor.text(font, sink -> sequence.accept((i2, style, j1) -> sink.accept(i2, Style.EMPTY, j1)), leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset + i1 * lineSpacing, CommonColor.GRAY_TEXT.get(), false);
                         }
                     });
                 }
@@ -822,9 +826,9 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         }
 
         @Override
-        public void render(GuiGraphics graphics, int i, int j, float f) {
+        public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
             if (isFocused()) selectedRecipeButton = getRecipeButtons().indexOf(this);
-            super.render(graphics, i, j, f);
+            super.extractRenderState(graphics, i, j, f);
         }
 
         @Override

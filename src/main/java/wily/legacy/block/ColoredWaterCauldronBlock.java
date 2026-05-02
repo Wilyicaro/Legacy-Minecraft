@@ -1,6 +1,7 @@
 package wily.legacy.block;
 
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biome;
@@ -15,7 +16,7 @@ public class ColoredWaterCauldronBlock extends LayeredCauldronBlock {
     public static final BooleanProperty MID = BooleanProperty.create("mid");
 
     public ColoredWaterCauldronBlock(Properties properties) {
-        super(/*? if <1.20.2 {*//*properties, p-> p == Biome.Precipitation.NONE, CauldronInteraction.WATER*//*?} else {*/Biome.Precipitation.NONE, CauldronInteraction.WATER, properties/*?}*/);
+        super(/*? if <1.20.2 {*//*properties, p-> p == Biome.Precipitation.NONE, CauldronInteractions.WATER*//*?} else {*/Biome.Precipitation.NONE, CauldronInteractions.WATER, properties/*?}*/);
         Item.BY_BLOCK.put(this, Items.CAULDRON);
         this.registerDefaultState(defaultBlockState().setValue(MID, false));
     }

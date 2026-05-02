@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
@@ -43,7 +43,7 @@ public class ScreenshotToast {
         queuedScreenshots.add(screenshotToast);
     }
 
-    public static void render(GuiGraphics graphics) {
+    public static void render(GuiGraphicsExtractor graphics) {
         if (toastTime <= 0) toastTime = (float) (MAX_TOAST_TIME + (TOAST_HEIGHT * 2));
         if (!queuedScreenshots.isEmpty()) {
             Identifier screenshotLocation = DEFAULT_ICON;
@@ -68,8 +68,8 @@ public class ScreenshotToast {
 
             LegacyRenderUtil.renderPointerPanel(graphics, toastX, toastY, TOAST_WIDTH, TOAST_HEIGHT);
             graphics.blit(RenderPipelines.GUI_TEXTURED, screenshotLocation, toastX + 4, toastY + 4, (float)((screenshotWidth/2)-(screenshotHeight/2)), 0, 32, 32, screenshotHeight, screenshotHeight, screenshotWidth, screenshotHeight);
-            graphics.drawString(Minecraft.getInstance().font, SCREENSHOT_MESSAGE, toastX + 40, toastY + 8, 0xFFFFFFFF);
-            graphics.drawString(Minecraft.getInstance().font, screenshotToast.screenshotName, toastX + 40, toastY + 24, 0xFFFFFFFF);
+            graphics.text(Minecraft.getInstance().font, SCREENSHOT_MESSAGE, toastX + 40, toastY + 8, 0xFFFFFFFF);
+            graphics.text(Minecraft.getInstance().font, screenshotToast.screenshotName, toastX + 40, toastY + 24, 0xFFFFFFFF);
 
             if (toastTime <= 0) {
                 queuedScreenshots.removeFirst();

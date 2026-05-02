@@ -9,7 +9,7 @@ import wily.legacy.client.ContentManager;
 import wily.legacy.client.StorePreviewAtlas;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -286,7 +286,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         tooltipBox.init();
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false)));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> GuiGraphicsExtractor.text(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false)));
     }
 
     @Override
@@ -299,11 +299,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
-        LegacyRenderUtil.renderLogo(guiGraphics);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor, false);
+        LegacyRenderUtil.renderLogo(GuiGraphicsExtractor);
 
-        tooltipBox.render(guiGraphics, mouseX, mouseY, partialTick);
+        tooltipBox.extractRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
         
         if (hoveredPack != null) {
             ContentManager.Pack displayPack = hoveredPack;
@@ -319,7 +319,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 float scale = Math.min((float) width / localPreview.width(), (float) maxImgHeight / localPreview.height());
                 int imgWidth = (int) (localPreview.width() * scale);
                 int imgHeight = (int) (localPreview.height() * scale);
-                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, localPreview.resource(), x + (width - imgWidth) / 2, y, (float) localPreview.u(), localPreview.v(), imgWidth, imgHeight, localPreview.width(), localPreview.height(), localPreview.atlasWidth(), localPreview.atlasHeight());
+                GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, localPreview.resource(), x + (width - imgWidth) / 2, y, (float) localPreview.u(), localPreview.v(), imgWidth, imgHeight, localPreview.width(), localPreview.height(), localPreview.atlasWidth(), localPreview.atlasHeight());
                 imageAreaHeight = imgHeight + 10;
             } else if (displayPack.imageUrl().isPresent()) {
                 if (remoteImage != null && remoteImage.width > 0) {
@@ -327,10 +327,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     int imgWidth = (int) (remoteImage.width * scale);
                     int imgHeight = (int) (remoteImage.height * scale);
                     
-                    FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
                     imageAreaHeight = imgHeight + 10;
                 } else if (remoteImage == null) {
-                    LegacyRenderUtil.drawGenericLoading(guiGraphics, x + (width - 30) / 2, y + Math.max(0, (maxImgHeight - 30) / 2), 6, 3);
+                    LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, x + (width - 30) / 2, y + Math.max(0, (maxImgHeight - 30) / 2), 6, 3);
                     imageAreaHeight = maxImgHeight + 10;
                 }
             }
@@ -344,8 +344,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
 
-            scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, guiGraphics.textRenderer())
+            scrollableRenderer.extractRenderState(GuiGraphicsExtractor, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
+                label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, GuiGraphicsExtractor.textRenderer())
             );
         }
     }
@@ -395,29 +395,29 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, isHoveredOrFocused() ? LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON_HIGHLIGHTED, LegacySprites.BUTTON_HIGHLIGHTED) : LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON, LegacySprites.BUTTON), getX(), getY(), getWidth(), getHeight(), ARGB.white(alpha));
-            renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+            GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, isHoveredOrFocused() ? LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON_HIGHLIGHTED, LegacySprites.BUTTON_HIGHLIGHTED) : LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON, LegacySprites.BUTTON), getX(), getY(), getWidth(), getHeight(), ARGB.white(alpha));
+            renderString(GuiGraphicsExtractor, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             if (downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category)) {
                 int size = 16;
                 int x = this.getX() + this.width - size - 11;
                 int y = this.getY() + (this.height - size) / 2;
-                LegacyRenderUtil.drawGenericLoading(guiGraphics, x, y, 4, 2);
+                LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, x, y, 4, 2);
             } else if (installedPacks.getOrDefault(pack.id(), false)) {
                 int spriteSize = 18;
                 int sx = this.getX() + this.width - spriteSize - 7;
                 int sy = this.getY() + (this.height - spriteSize) / 2;
-                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
+                GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
             }
         }
 
-        public void renderString(GuiGraphics guiGraphics, Font font, int color) {
+        public void renderString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             int textX = this.getX() + 8;
             boolean hasStatusIcon = downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category) || installedPacks.getOrDefault(pack.id(), false);
             int maxWidth = this.width - (hasStatusIcon ? 44 : 16);
             String clipped = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, maxWidth));
-            guiGraphics.drawString(font, clipped, textX, textY, color, true);
+            GuiGraphicsExtractor.text(font, clipped, textX, textY, color, true);
         }
     }
 }

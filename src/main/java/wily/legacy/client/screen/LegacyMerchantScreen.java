@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
@@ -47,7 +47,7 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
     boolean initOffers = false;
 
     public LegacyMerchantScreen(LegacyMerchantMenu abstractContainerMenu, Inventory inventory, Component component) {
-        super(abstractContainerMenu, inventory, component);
+        super(abstractContainerMenu, inventory, component, 294, 181);
     }
 
     @Override
@@ -84,9 +84,9 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
             }
 
             @Override
-            public void render(GuiGraphics graphics, int i, int j, float f) {
+            public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
                 itemIcon = isValidIndex() ? menu.merchant.getOffers().get(getIndex()).getResult() : ItemStack.EMPTY;
-                super.render(graphics, i, j, f);
+                super.extractRenderState(graphics, i, j, f);
                 graphics.pose().pushMatrix();
                 graphics.nextStratum();
                 if (isValidIndex() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() > menu.merchantLevel) {
@@ -98,13 +98,13 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
             }
 
             @Override
-            public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+            public void renderItem(GuiGraphicsExtractor graphics, int i, int j, float f) {
                 if (itemIcon.isEmpty()) return;
                 LegacyGuiItemRenderer.secureTranslucentRender(isValidIndex() && menu.merchant.getOffers().get(getIndex()).isOutOfStock(), 0.5f, (u) -> super.renderItem(graphics, i, j, f));
             }
 
             @Override
-            public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+            public void renderSelection(GuiGraphicsExtractor graphics, int i, int j, float f) {
                 int xDiff = leftPos + accessor.getInteger("tradingGridPanel.x", 9);
                 int yDiff = topPos + accessor.getInteger("bottomPanel.y", 79);
                 int tradingSlotX = accessor.getInteger("tradingSlot.x", 8);
@@ -120,7 +120,7 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
                     if (index == 1 && (offer == null || offer.getCostB().isEmpty())) continue;
                     LegacyIconHolder iconHolder = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + (index == 2 ? resultSlotX : tradingSlotX), yDiff + (index == 0 ? (offer == null || offer.getCostB().isEmpty() ? tradingSlotY : firstTradingSlotY) : index == 1 ? secondTradingSlotY : resultSlotY), tradingSlotSize, tradingSlotSize, offer == null  ? ItemStack.EMPTY : index == 0 ? offer.getCostA() : index == 1 ? offer.getCostB() : offer.getResult(), offer != null && displaySlotsWarning[index], Vec2.ZERO);
                     if (index == 0) iconHolder.allowItemDecorations = false;
-                    iconHolder.render(graphics, i, j, f);
+                    iconHolder.extractRenderState(graphics, i, j, f);
                     iconHolder.renderTooltip(minecraft, graphics, i, j);
                     if (offer == null || index != 0) continue;
 
@@ -128,10 +128,10 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
                         ItemStack costA = offer.getCostA();
                         ItemStack baseCostA = offer.getBaseCostA();
                         if (baseCostA.getCount() == costA.getCount()) {
-                            graphics.renderItemDecorations(font, costA, 0, 0);
+                            graphics.itemDecorations(font, costA, 0, 0);
                         } else {
-                            graphics.renderItemDecorations(font, baseCostA, -12, 0, baseCostA.getCount() == 1 ? "1" : null);
-                            graphics.renderItemDecorations(font, costA, 0, 0, costA.getCount() == 1 ? "1" : null);
+                            graphics.itemDecorations(font, baseCostA, -12, 0, baseCostA.getCount() == 1 ? "1" : null);
+                            graphics.itemDecorations(font, costA, 0, 0, costA.getCount() == 1 ? "1" : null);
                             FactoryGuiGraphics.of(graphics).blitSprite(DISCOUNT_STRIKETHRUOGH_SPRITE, -5, 12, 0, 9, 2);
                         }
                     });
@@ -210,8 +210,6 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
 
     @Override
     protected void init() {
-        imageWidth = 294;
-        imageHeight = 181;
         LegacyFontUtil.applySDFont(b -> {
             titleLabelX = (imageWidth - font.width(title)) / 2;
             inventoryLabelX = accessor.getInteger("inventoryPanel.x", 126) + (accessor.getInteger("inventoryPanel.width", 157) - font.width(playerInventoryTitle)) / 2;
@@ -260,15 +258,15 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         if (!menu.merchant.getOffers().isEmpty() && !initOffers) {
             initOffers = true;
             updateRecipesAndResetTimer();
         }
-        super.render(guiGraphics, i, j, f);
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
     }
 
-    protected void renderProgressBar(GuiGraphics guiGraphics) {
+    protected void renderProgressBar(GuiGraphicsExtractor GuiGraphicsExtractor) {
         int k = this.menu.merchantLevel;
         int l = this.menu.merchant.getVillagerXp();
         if (k >= 5) {
@@ -278,55 +276,55 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
         int width = accessor.getInteger("progressBar.width", 243);
         int height = accessor.getInteger("progressBar.height", 6);
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + accessor.getInteger("progressBar.x", (imageWidth - width) / 2), topPos + accessor.getInteger("progressBar.y", 28));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, width, height);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + accessor.getInteger("progressBar.x", (imageWidth - width) / 2), topPos + accessor.getInteger("progressBar.y", 28));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, width, height);
         int m = VillagerData.getMinXpPerLevel(k);
         if (l < m || !VillagerData.canLevelUp(k)) {
-            guiGraphics.pose().popMatrix();
+            GuiGraphicsExtractor.pose().popMatrix();
             return;
         }
         float f = width / (float) (VillagerData.getMaxXpPerLevel(k) - m);
         int o = Math.min(Mth.floor(f * (float) (l - m)), width);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_CURRENT, width, height, 0, 0, 0, 0, 0, o, height);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.EXPERIENCE_BAR_CURRENT, width, height, 0, 0, 0, 0, 0, o, height);
         int p = getSelectedMerchantOffer() != null ? getSelectedMerchantOffer().getXp() : 0;
         if (p > 0) {
             int q = Math.min(Mth.floor((float) p * f), width - o);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT, width, height, o, 0, o, 0, 0, q, height);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT, width, height, o, 0, o, 0, 0, q, height);
         }
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    public void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
             int titleY = accessor.getInteger("title.y", 12);
             int k = this.menu.merchantLevel;
             if (k > 0 && k <= 5 && this.menu.showProgressBar) {
                 MutableComponent component = getMerchantTile(title, k);
-                guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleY, CommonColor.GRAY_TEXT.get(), false);
+                GuiGraphicsExtractor.text(this.font, component, (imageWidth - this.font.width(component)) / 2, titleY, CommonColor.GRAY_TEXT.get(), false);
             } else {
-                guiGraphics.drawString(this.font, this.title, titleLabelX, titleY, CommonColor.GRAY_TEXT.get(), false);
+                GuiGraphicsExtractor.text(this.font, this.title, titleLabelX, titleY, CommonColor.GRAY_TEXT.get(), false);
             }
             int bottomPanelY = accessor.getInteger("bottomPanel.y", 79);
-            guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, bottomPanelY  + accessor.getInteger("inventoryTitle.y", 8), CommonColor.GRAY_TEXT.get(), false);
+            GuiGraphicsExtractor.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, bottomPanelY  + accessor.getInteger("inventoryTitle.y", 8), CommonColor.GRAY_TEXT.get(), false);
             if (getSelectedMerchantOffer() != null && menu.showProgressBar) {
                 int level = ((LegacyMerchantOffer) getSelectedMerchantOffer()).getRequiredLevel();
                 if (level > 0) {
                     Component c = Component.translatable("merchant.level." + level);
                     int tradingGridPanelX = accessor.getInteger("tradingGridPanel.x", 12);
                     int tradingPanelWidth = accessor.getInteger("tradingGridPanel.width", 110);
-                    guiGraphics.drawString(this.font, c, tradingGridPanelX + (tradingPanelWidth - font.width(c)) / 2, bottomPanelY + accessor.getInteger("levelTitle.y", 21), CommonColor.GRAY_TEXT.get(), false);
+                    GuiGraphicsExtractor.text(this.font, c, tradingGridPanelX + (tradingPanelWidth - font.width(c)) / 2, bottomPanelY + accessor.getInteger("levelTitle.y", 21), CommonColor.GRAY_TEXT.get(), false);
                 }
             }
         });
     }
 
     @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, float f, int i, int j) {
         boolean sd = LegacyOptions.getUIMode().isSD();
 
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 93);
         int tradingPanelWidth = accessor.getInteger("tradingGridPanel.width", 110);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 79);
@@ -335,20 +333,20 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
         int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 157);
         int tradingArrowX = accessor.getInteger("tradingArrow.x", 35);
         int tradingArrowY = accessor.getInteger("tradingArrow.y", 52);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + tradingGridPanelX, topPos + bottomPanelY, tradingPanelWidth, bottomPanelHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + inventoryPanelX, topPos + bottomPanelY, inventoryPanelWidth, bottomPanelHeight);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + tradingGridPanelX + tradingArrowX, topPos + bottomPanelY + tradingArrowY);
-        guiGraphics.pose().scale(1.5f, 1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, sd ? 16 : 22, sd ? 14 : 15);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + tradingGridPanelX, topPos + bottomPanelY, tradingPanelWidth, bottomPanelHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + inventoryPanelX, topPos + bottomPanelY, inventoryPanelWidth, bottomPanelHeight);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + tradingGridPanelX + tradingArrowX, topPos + bottomPanelY + tradingArrowY);
+        GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, sd ? 16 : 22, sd ? 14 : 15);
         if (getSelectedMerchantOffer() != null && getSelectedMerchantOffer().isOutOfStock())
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        guiGraphics.pose().popMatrix();
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
+        GuiGraphicsExtractor.pose().popMatrix();
         if (getSelectedMerchantOffer() instanceof LegacyMerchantOffer o && o.getRequiredLevel() > menu.merchantLevel)
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, leftPos + tradingGridPanelX + tradingArrowX + 9, topPos + bottomPanelY + tradingArrowY + 3, 16, 16);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PADLOCK, leftPos + tradingGridPanelX + tradingArrowX + 9, topPos + bottomPanelY + tradingArrowY + 3, 16, 16);
         if (accessor.getBoolean("showProgressBar", menu.showProgressBar))
-            renderProgressBar(guiGraphics);
+            renderProgressBar(GuiGraphicsExtractor);
 
-        renderRecipesScroll(guiGraphics, 5, 52);
+        renderRecipesScroll(GuiGraphicsExtractor, 5, 52);
     }
 }

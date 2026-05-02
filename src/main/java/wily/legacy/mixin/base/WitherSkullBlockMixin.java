@@ -35,7 +35,7 @@ public abstract class WitherSkullBlockMixin {
     public void setPlacedBy(Level level, BlockPos blockPos, BlockState blockState, LivingEntity livingEntity, ItemStack itemStack, CallbackInfo ci) {
         if (!level.isClientSide()) {
             if (level.getDifficulty() == Difficulty.PEACEFUL && livingEntity instanceof Player player && (blockState.is(Blocks.WITHER_SKELETON_SKULL) || blockState.is(Blocks.WITHER_SKELETON_WALL_SKULL)) && getOrCreateWitherFull().find(level, blockPos) != null) {
-                player.displayClientMessage(LegacyComponents.PEACEFUL_SPAWN_TIP, true);
+                player.sendOverlayMessage(LegacyComponents.PEACEFUL_SPAWN_TIP);
             }
         }
     }

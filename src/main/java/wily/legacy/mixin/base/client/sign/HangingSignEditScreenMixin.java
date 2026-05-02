@@ -22,7 +22,7 @@ public abstract class HangingSignEditScreenMixin extends Screen {
         return height / 2f;
     }
 
-    @Redirect(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    @Redirect(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", remap = false))
     private Matrix3x2f renderSignBackground(Matrix3x2fStack instance, float x, float y) {
         return instance.scale(x * 144 / 93, y * 144 / 93);
     }

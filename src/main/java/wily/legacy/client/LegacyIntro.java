@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -34,18 +34,18 @@ public record LegacyIntro(List<Identifier> brands, Identifier background, float 
         return timer >= intro.brands().size() || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.state().pressed;
     }
 
-    public static void render(GuiGraphics guiGraphics, LegacyIntro intro, float timer) {
-        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
+    public static void render(GuiGraphicsExtractor GuiGraphicsExtractor, LegacyIntro intro, float timer) {
+        GuiGraphicsExtractor.fill(0, 0, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), 0xFFFFFFFF);
         if (intro.brands.isEmpty()) return;
         int actual = (int) (timer % intro.brands().size());
         float last = (float) Math.ceil(timer) - timer;
         if (intro.crossFade() && last <= intro.fadeOut() && actual + 1 < intro.brands().size()) {
-            FactoryGuiGraphics.of(guiGraphics).blit(intro.brands().get(actual + 1), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(intro.brands().get(actual + 1), (GuiGraphicsExtractor.guiWidth() - GuiGraphicsExtractor.guiHeight() * 320 / 180) / 2, 0, 0, 0, GuiGraphicsExtractor.guiHeight() * 320 / 180, GuiGraphicsExtractor.guiHeight(), GuiGraphicsExtractor.guiHeight() * 320 / 180, GuiGraphicsExtractor.guiHeight());
         } else
-            FactoryGuiGraphics.of(guiGraphics).blit(intro.background(), 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(intro.background(), 0, 0, 0, 0, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
         float alpha = last <= intro.fadeOut() ? last / intro.fadeOut() : last > 1 - intro.fadeIn() && !intro.crossFade() ? (1 - last) / intro.fadeIn() : 1.0f;
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, alpha);
-        FactoryGuiGraphics.of(guiGraphics).blit(intro.brands().get(actual), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
-        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, alpha);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(intro.brands().get(actual), (GuiGraphicsExtractor.guiWidth() - GuiGraphicsExtractor.guiHeight() * 320 / 180) / 2, 0, 0, 0, GuiGraphicsExtractor.guiHeight() * 320 / 180, GuiGraphicsExtractor.guiHeight(), GuiGraphicsExtractor.guiHeight() * 320 / 180, GuiGraphicsExtractor.guiHeight());
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
     }
 }

@@ -17,7 +17,7 @@ import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
@@ -262,7 +262,7 @@ public class ControllerManager {
                         minecraft.screen.mouseDragged(getMouseEvent(0), 0, 0);
 
                     if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
-                        minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
+                        minecraft.gameMode.handleContainerInput(a.getMenu().containerId, a.getHoveredSlot().index, 0, ContainerInput.QUICK_MOVE, minecraft.player);
                         minecraft.screen.mouseDragged(getMouseEvent(0), 0, 0);
                         LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
@@ -330,7 +330,7 @@ public class ControllerManager {
 
         ControllerBinding<?> binding = LegacyKeyMapping.of(minecraft.options.keyScreenshot).getBinding();
         if (binding != null && binding.state().justPressed) {
-            Screenshot.grab(this.minecraft.gameDirectory, this.minecraft.getMainRenderTarget(), component -> this.minecraft.execute(() -> this.minecraft.gui.getChat().addMessage(component)));
+            Screenshot.grab(this.minecraft.gameDirectory, this.minecraft.getMainRenderTarget(), component -> this.minecraft.execute(() -> this.minecraft.gui.getChat().addClientSystemMessage(component)));
         }
 
         if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);

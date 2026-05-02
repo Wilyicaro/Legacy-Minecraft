@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.Slot;
@@ -17,13 +17,13 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(CyclingSlotBackground.class)
 public class CyclingSlotBackgroundMixin {
     @Inject(method = "renderIcon", at = @At("HEAD"), cancellable = true)
-    private void renderIcon(Slot slot, Identifier resourceLocation, float f, GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    private void renderIcon(Slot slot, Identifier resourceLocation, float f, GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, CallbackInfo ci) {
         ci.cancel();
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
-        holder.renderScaled(guiGraphics, i + slot.x, j + slot.y, () -> {
-            FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, f);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, 0, 0, 16, 16);
-            FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+        holder.renderScaled(GuiGraphicsExtractor, i + slot.x, j + slot.y, () -> {
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, f);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(resourceLocation, 0, 0, 16, 16);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
         });
     }
 }
