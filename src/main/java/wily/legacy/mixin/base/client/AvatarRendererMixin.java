@@ -35,7 +35,7 @@ public class AvatarRendererMixin {
         }
         if (LegacyOptions.displayNameTagBorder.get()) {
             Minecraft minecraft = Minecraft.getInstance();
-            float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(FactoryRenderStateExtension.Accessor.of(avatarRenderState).getExtension(LegacyLivingEntityRenderState.class).name) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);
+            float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(FactoryRenderStateExtension.Accessor.of(avatarRenderState).getExtension(LegacyLivingEntityRenderState.class).uuid) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);
             LegacyNameTag.NEXT_SUBMIT.setNameTagColor(nameTagColor);
             original.call(instance, state, poseStack, submitNodeCollector, cameraRenderState, i);
             LegacyNameTag.NEXT_SUBMIT.setNameTagColor(null);

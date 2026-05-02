@@ -274,11 +274,6 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(graphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
-            extractDefaultLabel(graphics.textRenderer());
-        }
-
         public Identifier getSprite() {
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
         }
@@ -348,52 +343,23 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         }
 
-        protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
-            int bindingOffset = 0;
-
-            if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
-                bindingOffset = binding.getIcon().render(GuiGraphicsExtractor, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
-
-            if (iconSprite == null)
-                LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
-            else {
-                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
-                int width = getIconWidth();
-                int height = getIconHeight();
-                if (sprite != null) {
-                    try (SpriteContents contents = sprite.contents()) {
-                        width = contents.width();
-                        height = contents.height();
-                    }
-                }
-                FactoryScreenUtil.enableBlend();
-                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(iconSprite, getX() + (getWidth() - width) / 2 + Math.max(0, i + bindingOffset - (getWidth() - width) / 2), getY() + (getHeight() - height) / 2, width, height);
-                FactoryScreenUtil.disableBlend();
-            }
-        }
-
-        private int getIconWidth() {
-            if (iconSprite.equals(LegacySprites.SCROLL_LEFT) || iconSprite.equals(LegacySprites.SCROLL_RIGHT)) return 6;
-            if (iconSprite.equals(LegacySprites.SCROLL_UP) || iconSprite.equals(LegacySprites.SCROLL_DOWN)) return 13;
-            if (iconSprite.equals(LegacySprites.SHIFT)) return 14;
-            if (iconSprite.equals(LegacySprites.BACK)) return 18;
-            if (iconSprite.equals(LegacySprites.TICK)) return 28;
-            return 16;
-        }
-
-        private int getIconHeight() {
-            if (iconSprite.equals(LegacySprites.SCROLL_LEFT) || iconSprite.equals(LegacySprites.SCROLL_RIGHT)) return 11;
-            if (iconSprite.equals(LegacySprites.SCROLL_UP) || iconSprite.equals(LegacySprites.SCROLL_DOWN)) return 7;
-            if (iconSprite.equals(LegacySprites.SHIFT)) return 14;
-            if (iconSprite.equals(LegacySprites.BACK)) return 16;
-            if (iconSprite.equals(LegacySprites.TICK)) return 24;
-            return 16;
-        }
-
         @Override
-        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
-            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
-            renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+        protected void extractContents(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
+            if (iconSprite == null)
+                extractDefaultLabel(guiGraphics.textRenderer());
+            else {
+                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.get(iconSprite);
+                if (sprite == null) return;
+                try (SpriteContents contents = sprite.contents()) {
+                    int bindingOffset = 0;
+
+                    if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
+                        bindingOffset = binding.getIcon().render(guiGraphics, getX() + 2, getY() + (getHeight() - 9) / 2 + 1, true);
+
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, 2 + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());
+                }
+            }
         }
 
         public Identifier getSprite() {
