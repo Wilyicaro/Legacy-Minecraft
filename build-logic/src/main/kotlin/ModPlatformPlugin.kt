@@ -11,6 +11,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.PublishingExtension
@@ -146,6 +147,7 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 				manifest.attributes(
 					"MixinConfigs" to "${modId}.mixins.json"
 				)
+				duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 			}
 		}
 	}
