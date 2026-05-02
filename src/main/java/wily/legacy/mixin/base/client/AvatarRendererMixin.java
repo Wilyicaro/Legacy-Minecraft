@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.FactoryRenderStateExtension;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyLivingEntityRenderState;
 import wily.legacy.client.LegacyNameTag;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -28,7 +30,7 @@ public class AvatarRendererMixin {
         if (!LegacyOptions.inGameOnlineIds.get()) return;
         if (LegacyOptions.displayNameTagBorder.get()) {
             Minecraft minecraft = Minecraft.getInstance();
-            float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(avatarRenderState.nameTag.getString()) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);
+            float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(FactoryRenderStateExtension.Accessor.of(avatarRenderState).getExtension(LegacyLivingEntityRenderState.class).uuid) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);
             LegacyNameTag.NEXT_SUBMIT.setNameTagColor(nameTagColor);
             original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
             LegacyNameTag.NEXT_SUBMIT.setNameTagColor(null);
