@@ -25,10 +25,10 @@ public abstract class AvatarSkinMixin {
     private static void consoleskins$applySkinToState(Avatar avatar, AvatarRenderState state) {
         if (!(state instanceof RenderStateSkinIdAccess access)) return;
         consoleskins$clearSkinState(access);
+        access.consoleskins$setEntityUuid(avatar.getUUID());
         String skinId = SkinFairness.effectiveSkinId(Minecraft.getInstance(), consoleskins$resolveSkinId(avatar));
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         access.consoleskins$setSkinId(skinId);
-        access.consoleskins$setEntityUuid(avatar.getUUID());
         var movement = avatar.getDeltaMovement();
         float speedSq = movement == null ? 0.0F : (float) (movement.x * movement.x + movement.z * movement.z);
         access.consoleskins$setMoving(speedSq > 1.0E-4F);
