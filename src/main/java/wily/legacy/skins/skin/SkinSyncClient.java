@@ -26,9 +26,8 @@ public final class SkinSyncClient {
         if (connected && STATE.tickUploadRetry()) {
             onRequestSkinUpload();
         }
-        if (connected && tickSnapshotRequest()) {
-            requestSnapshot(client, true);
-        }
+        Boolean snapshotForce = connected ? STATE.tickSnapshotRequest() : null;
+        if (snapshotForce != null) requestSnapshot(client, snapshotForce);
         if (connected && !STATE.sessionAnnounced) onRequestSkinUpload();
         if (!connected) return;
         PendingSelection pendingSelection = takePendingSelection();
@@ -39,7 +38,7 @@ public final class SkinSyncClient {
         Minecraft client = Minecraft.getInstance();
         if (client == null) return;
         STATE.sentAssets.clear();
-        STATE.snapshotDelay = 1;
+        STATE.requestSnapshot(1, true);
         PendingSelection pendingSelection = takePendingSelection();
         if (pendingSelection != null) {
             requestSetSkin(client, pendingSelection.packId(), pendingSelection.skinId());
@@ -245,13 +244,6 @@ public final class SkinSyncClient {
         return skinId == null ? null : new PendingSelection(packId, skinId);
     }
 
-    private static boolean tickSnapshotRequest() {
-        if (STATE.snapshotDelay < 0) return false;
-        if (--STATE.snapshotDelay > 0) return false;
-        STATE.snapshotDelay = -1;
-        return true;
-    }
-
     private static final class State {
         private static final int SCAN_INTERVAL = 20;
         private static final int UPLOAD_RETRY_INTERVAL = 20;
@@ -262,6 +254,7 @@ public final class SkinSyncClient {
         private String pendingPackId;
         private boolean pendingUpload;
         private boolean sessionAnnounced;
+        private boolean snapshotForce;
         private int snapshotDelay = -1;
         private int uploadRetryDelay;
         private int scanTick;
@@ -277,7 +270,13 @@ public final class SkinSyncClient {
         }
 
         private void requestSnapshotRetry() {
-            if (snapshotDelay < 0) snapshotDelay = SCAN_INTERVAL;
+            requestSnapshot(SCAN_INTERVAL, false);
+        }
+
+        private void requestSnapshot(int delay, boolean force) {
+            if (!force && snapshotDelay >= 0) return;
+            snapshotDelay = delay;
+            snapshotForce = force;
         }
 
         private boolean tickUploadRetry() {
@@ -288,11 +287,21 @@ public final class SkinSyncClient {
             return true;
         }
 
+        private Boolean tickSnapshotRequest() {
+            if (snapshotDelay < 0) return null;
+            if (--snapshotDelay > 0) return null;
+            boolean force = snapshotForce;
+            snapshotDelay = -1;
+            snapshotForce = false;
+            return force;
+        }
+
         private void reset() {
             pendingSkinId = null;
             pendingPackId = null;
             pendingUpload = false;
             sessionAnnounced = false;
+            snapshotForce = false;
             snapshotDelay = -1;
             uploadRetryDelay = 0;
             scanTick = 0;
