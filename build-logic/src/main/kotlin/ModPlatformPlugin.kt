@@ -68,7 +68,7 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 		val awPath = "src/main/resources/${extension.commonAccessWidener.get()}"
 
 		extension.awFile.convention("${awPath}.accesswidener")
-		extension.atFile.convention("${awPath}.cfg")
+		extension.atFile.convention("src/main/resources/META-INF/accesstransformer.cfg")
 
 		if (!inferredLoaderIsFabric && inferredLoader != "fabricMC") {
 			val task = project.tasks.register("convertAccessWidener", ConvertAccessWidenerToTransformerTask::class.java) {
