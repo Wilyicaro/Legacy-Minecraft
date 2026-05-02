@@ -97,12 +97,14 @@ public class SubtitleOverlayMixin {
 
                 if (list.isEmpty()) return;
 
+                guiGraphics.nextStratum();
                 j += 36;
                 int lineHeight = 12;
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float) (guiGraphics.guiHeight() - 35));
                 int height = list.size() * 12;
                 LegacyRenderUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
+                guiGraphics.nextStratum();
                 guiGraphics.pose().translate(-(j / 2.0f) - 2.0f, 0);
                 for (SubtitleOverlay.Subtitle subtitle2 : list) {
                     Component component = subtitle2.getText();
@@ -120,15 +122,13 @@ public class SubtitleOverlayMixin {
                     int n = lineHeight / 2;
                     int o = this.minecraft.font.width(component);
                     int p = Mth.floor(Mth.clampedLerp(255.0F, 75.0F, (Util.getMillis() - /*? if <1.20.5 {*//*subtitle2.getTime()*//*?} else {*/soundPlayedAt.time()/*?}*/) / 3000.0 * d));
-                    int q = p << 16 | p << 8 | p;
 
-                    int r = q - 16777216;
                     if (!bl && e != 0) {
                         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, p / 255f);
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(e > 0 ? LegacySprites.SCROLL_RIGHT : LegacySprites.SCROLL_LEFT, e > 0 ? l - 8 : -l + 4, -n - 2, 6, 11);
                         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
                     }
-                    guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, r);
+                    guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, 0xFFFFFFFF);
                     guiGraphics.pose().translate(0, -lineHeight);
                 }
                 guiGraphics.pose().popMatrix();
