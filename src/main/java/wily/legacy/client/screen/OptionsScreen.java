@@ -621,10 +621,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 FactoryOptions.RANDOM_BLOCK_ROTATIONS,
                                 LegacyOptions.defaultParticlePhysics,
                                 LegacyOptions.of(mc.options.particles()),
-                                LegacyOptions.bubblesOutsideWater),
-                        o -> o.renderableVList.addLinkedOptions(
+                                LegacyOptions.bubblesOutsideWater,
                                 FactoryOptions.NEAREST_MIPMAP_SCALING,
-                                b -> !b.get(),
                                 LegacyOptions.of(mc.options.mipmapLevels())),
                         o -> o.renderableVList.addCategory(Component.translatable("legacy.menu.mixins")),
                         o -> Legacy4JClient.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> o.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c))))),
