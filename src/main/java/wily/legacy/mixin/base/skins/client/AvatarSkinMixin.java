@@ -59,6 +59,7 @@ public abstract class AvatarSkinMixin {
         access.consoleskins$setSitting(false);
         access.consoleskins$setUsingItem(false);
         access.consoleskins$setBlocking(false);
+        access.consoleskins$setSkipCustomAnimation(false);
         access.consoleskins$setCachedTexture(null);
         access.consoleskins$setCachedBoxTexture(null);
         access.consoleskins$setCachedModelId(null);

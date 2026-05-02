@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
 import wily.legacy.client.LegacyLivingEntityRenderState;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.util.client.LegacyHeadRenderState;
 
 @Mixin(CustomHeadLayer.class)
@@ -26,6 +28,10 @@ public class CustomHeadLayerMixin {
     private void legacy$storeHeadRenderState(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int light, LivingEntityRenderState renderState, float headYaw, float headPitch, CallbackInfo ci) {
         LegacyLivingEntityRenderState legacyState = FactoryRenderStateExtension.Accessor.of(renderState).getExtension(LegacyLivingEntityRenderState.class);
         if (legacyState != null && legacyState.hostInvisible) {
+            ci.cancel();
+            return;
+        }
+        if (renderState instanceof RenderStateSkinIdAccess access && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.HIDE_HEAD_LAYER, access.consoleskins$getSkinId())) {
             ci.cancel();
             return;
         }

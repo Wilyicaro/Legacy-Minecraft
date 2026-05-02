@@ -429,17 +429,18 @@ public final class BoxModelManager {
         float maxX = Float.NEGATIVE_INFINITY;
         float maxY = Float.NEGATIVE_INFINITY;
         float maxZ = Float.NEGATIVE_INFINITY;
-        EnumMap<AttachSlot, CubeListBuilder> builders = new EnumMap<>(AttachSlot.class);
-        EnumSet<AttachSlot> present = EnumSet.noneOf(AttachSlot.class);
+        Map<PartKey, CubeListBuilder> builders = new LinkedHashMap<>();
+        Set<PartKey> present = new LinkedHashSet<>();
         for (BoneDef bone : bones) {
             if (bone == null || bone.attach() == null || bone.cubes() == null || bone.cubes().isEmpty()) continue;
             if (Boolean.FALSE.equals(bone.visible())) continue;
-            CubeListBuilder builder = builders.computeIfAbsent(bone.attach(), ignored -> CubeListBuilder.create());
             for (CubeDef cube : bone.cubes()) {
                 if (cube == null || Boolean.FALSE.equals(cube.visible())) continue;
                 float[] origin = cube.origin();
                 float[] size = cube.size();
                 if (origin == null || size == null || origin.length < 3 || size.length < 3) continue;
+                PartKey key = new PartKey(bone.attach(), Math.max(0, cube.armorMask()));
+                CubeListBuilder builder = builders.computeIfAbsent(key, ignored -> CubeListBuilder.create());
                 int[] uv = cube.uv();
                 if (uv == null || uv.length < 2) uv = new int[]{0, 0};
                 builder = builder.texOffs(uv[0], uv[1]);
@@ -453,7 +454,8 @@ public final class BoxModelManager {
                         size[2] * texelScale,
                         new CubeDeformation(cube.inflate() * texelScale)
                 );
-                present.add(bone.attach());
+                builders.put(key, builder);
+                present.add(key);
                 minX = Math.min(minX, origin[0]);
                 minY = Math.min(minY, origin[1]);
                 minZ = Math.min(minZ, origin[2]);
@@ -461,22 +463,25 @@ public final class BoxModelManager {
                 maxY = Math.max(maxY, origin[1] + size[1]);
                 maxZ = Math.max(maxZ, origin[2] + size[2]);
             }
-            builders.put(bone.attach(), builder);
         }
-        EnumMap<AttachSlot, String> childNames = new EnumMap<>(AttachSlot.class);
-        for (AttachSlot slot : present) {
-            CubeListBuilder builder = builders.get(slot);
+        Map<PartKey, String> childNames = new LinkedHashMap<>();
+        for (PartKey key : present) {
+            CubeListBuilder builder = builders.get(key);
             if (builder == null) continue;
-            String child = "consoleskins$slot_" + slot.name();
-            childNames.put(slot, child);
+            String child = "consoleskins$slot_" + key.slot().name() + "_" + key.armorMask();
+            childNames.put(key, child);
             root.addOrReplaceChild(child, builder, PartPose.ZERO);
         }
         ModelPart bakedRoot = LayerDefinition.create(mesh, texW, texH).bakeRoot();
         EnumMap<AttachSlot, List<ModelPart>> parts = new EnumMap<>(AttachSlot.class);
-        for (Map.Entry<AttachSlot, String> entry : childNames.entrySet()) {
+        IdentityHashMap<ModelPart, Integer> armorMasks = new IdentityHashMap<>();
+        for (Map.Entry<PartKey, String> entry : childNames.entrySet()) {
             ModelPart child = getChild(bakedRoot, entry.getValue());
-                    if (child != null) parts.put(entry.getKey(), List.of(child));
+            if (child == null) continue;
+            parts.computeIfAbsent(entry.getKey().slot(), ignored -> new ArrayList<>()).add(child);
+            armorMasks.put(child, entry.getKey().armorMask());
         }
+        parts.replaceAll((slot, list) -> List.copyOf(list));
         float bboxH = 1.8F;
         float bboxW = 0.6F;
         if (minX != Float.POSITIVE_INFINITY && minY != Float.POSITIVE_INFINITY && minZ != Float.POSITIVE_INFINITY
@@ -486,7 +491,7 @@ public final class BoxModelManager {
             if (h > 0.01F) bboxH = Math.max(bboxH, h);
             if (w > 0.01F) bboxW = Math.max(bboxW, w);
         }
-        return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bboxH, bboxW, parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide);
+        return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bboxH, bboxW, parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide, armorMasks);
     }
 
     private static ModelPart getChild(ModelPart root, String name) {
@@ -503,5 +508,8 @@ public final class BoxModelManager {
         boolean isEmpty() {
             return model == null && texture == null && themeName == null && themeKey == null && offsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null;
         }
+    }
+
+    private record PartKey(AttachSlot slot, int armorMask) {
     }
 }

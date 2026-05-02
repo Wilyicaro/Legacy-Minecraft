@@ -11,10 +11,17 @@ public record BuiltBoxModel(int textureWidth,
                             float bboxHeight,
                             float bboxWidth,
                             EnumMap<AttachSlot, List<ModelPart>> bySlot,
-                            EnumSet<AttachSlot> hideSlots) {
-    private static List<ModelPart> copyParts(List<ModelPart> parts) {
+                            EnumSet<AttachSlot> hideSlots,
+                            Map<ModelPart, Integer> armorMasks) {
+    private List<ModelPart> copyParts(List<ModelPart> parts, Map<ModelPart, Integer> copiedMasks) {
         if (parts == null || parts.isEmpty()) return parts;
-        return parts.stream().map(BuiltBoxModel::copyPart).toList();
+        ArrayList<ModelPart> copied = new ArrayList<>(parts.size());
+        for (ModelPart part : parts) {
+            ModelPart copy = copyPart(part);
+            copied.add(copy);
+            copiedMasks.put(copy, armorMasks.getOrDefault(part, 0));
+        }
+        return List.copyOf(copied);
     }
 
     private static ModelPart copyPart(ModelPart source) {
@@ -41,13 +48,24 @@ public record BuiltBoxModel(int textureWidth,
         return bySlot.get(slot);
     }
 
+    public List<ModelPart> get(AttachSlot slot, int armorMask) {
+        List<ModelPart> parts = get(slot);
+        if (parts == null || parts.isEmpty() || armorMask == 0) return parts;
+        ArrayList<ModelPart> visible = new ArrayList<>(parts.size());
+        for (ModelPart part : parts) {
+            if ((armorMasks.getOrDefault(part, 0) & armorMask) == 0) visible.add(part);
+        }
+        return List.copyOf(visible);
+    }
+
     public boolean hides(AttachSlot slot) {
         return hideSlots.contains(slot);
     }
 
     public BuiltBoxModel copy() {
         EnumMap<AttachSlot, List<ModelPart>> copiedSlots = new EnumMap<>(AttachSlot.class);
-        bySlot.forEach((slot, parts) -> copiedSlots.put(slot, copyParts(parts)));
-        return new BuiltBoxModel(textureWidth, textureHeight, partScale, bboxHeight, bboxWidth, copiedSlots, hideSlots.clone());
+        IdentityHashMap<ModelPart, Integer> copiedMasks = new IdentityHashMap<>();
+        bySlot.forEach((slot, parts) -> copiedSlots.put(slot, copyParts(parts, copiedMasks)));
+        return new BuiltBoxModel(textureWidth, textureHeight, partScale, bboxHeight, bboxWidth, copiedSlots, hideSlots.clone(), copiedMasks);
     }
 }

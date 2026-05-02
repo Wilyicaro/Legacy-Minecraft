@@ -219,7 +219,7 @@ final class BoxModelJsonSupport {
                 if (origin == null || size == null || origin.length < 3 || size.length < 3) continue;
                 float[] mirroredOrigin = new float[]{-(origin[0] + size[0]), origin[1], origin[2]};
                 int[] uv = cube.uv() == null ? new int[]{0, 0} : new int[]{cube.uv()[0], cube.uv()[1]};
-                outCubes.add(new CubeDef(uv, mirroredOrigin, new float[]{size[0], size[1], size[2]}, cube.inflate(), cube.mirror(), cube.visible()));
+                outCubes.add(new CubeDef(uv, mirroredOrigin, new float[]{size[0], size[1], size[2]}, cube.inflate(), cube.mirror(), cube.visible(), cube.armorMask()));
             }
         }
         if (outCubes.isEmpty()) return null;
