@@ -54,13 +54,6 @@ jarJar.register() {
 	archiveClassifier = null
 }
 
-tasks.named<Jar>("jar") {
-	from(project.file(platform.atFile)) {
-		into("META-INF")
-		rename { "accesstransformer.cfg" }
-	}
-}
-
 minecraft {
 	mappings("official", stonecutter.current.version)
 
