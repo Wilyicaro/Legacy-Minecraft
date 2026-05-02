@@ -507,15 +507,20 @@ public class ContentManager {
                     restoreOptionalFileBytes(targetFolder.resolve("pack.png"), originalPackIcon);
                     mergeTransparencyFixPackMeta(targetFolder, originalPackMeta);
                 }
-                if (Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
-                    DownloadedPackMetadata.write(targetFolder, pack);
+                boolean rootResourcePack = Minecraft.getInstance().getResourcePackDirectory().equals(contentDir);
+                if (rootResourcePack) {
+                    DownloadedPackMetadata.write(targetFolder, pack, category);
                 }
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
                 } else if (CustomSkinPackStore.managesTargetDirectory(folderName)) {
                     CustomSkinPackStore.normalizeDownloadedPack(targetFolder);
-                } else if (syncResourceAlbum && category.useResourceAlbum() && Minecraft.getInstance().getResourcePackDirectory().equals(contentDir)) {
-                    DownloadedResourceAlbums.sync(pack);
+                } else if (rootResourcePack) {
+                    if (syncResourceAlbum && category.useResourceAlbum()) {
+                        DownloadedResourceAlbums.sync(pack);
+                    } else {
+                        DownloadedResourceAlbums.remove(pack.id());
+                    }
                 }
                 LegacyWorldTemplate.downloadDownloadedPack(pack);
                 Files.deleteIfExists(downloadedTempFile);

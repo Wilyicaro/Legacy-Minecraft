@@ -26,7 +26,7 @@ public final class DownloadedResourceAlbums {
     }
 
     public static boolean isManagedPack(String packId) {
-        return DownloadedPackMetadata.exists(packId);
+        return DownloadedPackMetadata.exists(packId) && DownloadedPackMetadata.entry(packId).useResourceAlbum();
     }
 
     public static void sync(ContentManager.Pack pack) {
@@ -70,7 +70,12 @@ public final class DownloadedResourceAlbums {
                 for (java.nio.file.Path path : (Iterable<java.nio.file.Path>) paths.filter(java.nio.file.Files::isDirectory)::iterator) {
                     String packId = path.getFileName().toString();
                     if (!DownloadedPackMetadata.exists(packId) || bundlePackIds.contains(normalize(packId))) continue;
-                    changed |= syncSingle(packId);
+                    DownloadedPackMetadata.Entry entry = DownloadedPackMetadata.entry(packId);
+                    if (!entry.useResourceAlbum()) {
+                        changed |= removeAlbumState(albumId(packId));
+                        continue;
+                    }
+                    changed |= syncSingle(packId, entry);
                 }
             } catch (java.io.IOException ignored) {
             }
@@ -88,7 +93,10 @@ public final class DownloadedResourceAlbums {
     }
 
     private static boolean syncSingle(String packId) {
-        DownloadedPackMetadata.Entry entry = DownloadedPackMetadata.entry(packId);
+        return syncSingle(packId, DownloadedPackMetadata.entry(packId));
+    }
+
+    private static boolean syncSingle(String packId, DownloadedPackMetadata.Entry entry) {
         String name = entry.name() == null || entry.name().isBlank() ? packId : entry.name();
         String description = entry.description() == null ? "" : entry.description();
         return syncSingle(packId, name, description);
@@ -117,7 +125,7 @@ public final class DownloadedResourceAlbums {
                 changed |= removeAlbumState(album.id());
                 continue;
             }
-            if (!DownloadedPackMetadata.exists(packId)) changed |= removeAlbumState(album.id());
+            if (!DownloadedPackMetadata.exists(packId) || !DownloadedPackMetadata.entry(packId).useResourceAlbum()) changed |= removeAlbumState(album.id());
         }
         return changed;
     }

@@ -8,6 +8,11 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+//? if >=26.1 {
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+//?}
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
@@ -32,6 +37,9 @@ import java.util.List;
 
 public class LegacyUIElementTypes {
     public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchantment/enchanting_table_book.png");
+    //? if >=26.1 {
+    private static boolean itemComponentsBound;
+    //?}
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
             a.putStaticElement(elementName + ".renderables", UIAccessor.createRenderablesWrapper(a, new ArrayList<>()));
@@ -247,8 +255,22 @@ public class LegacyUIElementTypes {
     }
 
     private static ItemStack parseStack(Dynamic<?> dynamic) {
+        //? if >=26.1 {
+        bindItemComponents();
+        //?}
         return DynamicUtil.getItemFromDynamic(dynamic, true).get();
     }
+
+    //? if >=26.1 {
+    private static void bindItemComponents() {
+        if (itemComponentsBound) return;
+        BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY)).forEach(components -> {
+            if (components.key().equals(Registries.ITEM))
+                components.apply();
+        });
+        itemComponentsBound = true;
+    }
+    //?}
 
     public static void init() {
     }
