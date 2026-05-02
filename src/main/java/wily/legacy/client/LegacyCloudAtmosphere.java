@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.CubicSampler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
@@ -95,15 +96,10 @@ public final class LegacyCloudAtmosphere {
 
     public static int getSkyColor(ClientLevel level, Vec3 position, float partialTick) {
         float brightness = getDayBrightness(level.getTimeOfDay(partialTick));
-        BlockPos blockPos = BlockPos.containing(position.x, position.y, position.z);
-        Biome biome = level.getBiome(blockPos).value();
-        int skyColor = biome.getSkyColor();
-        float[] rgb = new float[]{
-            ARGB.redFloat(skyColor) * brightness,
-            ARGB.greenFloat(skyColor) * brightness,
-            ARGB.blueFloat(skyColor) * brightness
-        };
+        Vec3 color = CubicSampler.gaussianSampleVec3(position.subtract(2.0F, 2.0F, 2.0F).scale(0.25F), (ix, jx, kx) -> Vec3.fromRGB24((level.getBiomeManager().getNoiseBiomeAtQuart(ix, jx, kx).value()).getSkyColor())).scale(brightness);
 
+        float[] rgb = new float[] { (float) color.x, (float) color.y, (float) color.z};
+        
         applyWeatherGreyscale(rgb, level.getRainLevel(partialTick), 0.6f);
         applyWeatherGreyscale(rgb, level.getThunderLevel(partialTick), 0.2f);
 
