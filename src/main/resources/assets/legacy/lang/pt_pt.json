@@ -1579,6 +1579,7 @@
   "legacy.menu.host_options.teleport_me": "Teleportar para mim",
   "legacy.menu.host_options.teleport_player": "Teleportar para o Jogador",
   "legacy.menu.how_to_play": "Como Jogar",
+  "legacy.menu.how_to_play.anvil": "Anvil",
   "legacy.menu.how_to_play.anvil_message": "§2HOW TO PLAY : ANVIL§f\n\nExperience Levels can be used to repair, enchant or rename items with the Anvil.\nAll items can be renamed, although only items with durability can be repaired or have enchantments from Enchanted Books applied to them.",
   "legacy.menu.how_to_play.anvil_message_1": "Um item pode ser consertado ao colocá-lo em um dos espaços à esquerda, junto com a matéria-prima do produto, como barras de ferro para uma Espada de Ferro, ou combinado com outro item do mesmo tipo.\nCombinar itens é mais eficiente quando feito com uma bigorna, e ainda, se algum dos itens tiver sido encantado, o produto final pode ter encantos de ambas as origens. Livros Encantados podem aplicar encantos a itens ao combiná-los em uma Bigorna, desde que o encanto do livro seja adequado. Livros Encantados podem ser encontrados em baús nos calabouços, ou encantados a partir de livros normais na Mesa de Encantamentos. Há uma chance da Bigorna ser danificada a cada uso, e com o uso continuado ela se destruirá.",
   "legacy.menu.how_to_play.anvil_sword_name": "Excalibur",
