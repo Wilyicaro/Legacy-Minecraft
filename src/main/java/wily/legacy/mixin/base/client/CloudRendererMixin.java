@@ -119,8 +119,8 @@ public abstract class CloudRendererMixin {
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 1)
-    private int legacy$useRenderDistanceCloudDistanceBlocks(int cloudDistanceChunks) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? Math.min(cloudDistanceChunks, LegacyCloudAtmosphere.getCloudDrawDistanceChunks()) : cloudDistanceChunks;
+    private int legacy$useExtendedCloudDistance(int cloudDistanceChunks) {
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? LegacyCloudAtmosphere.getCloudDrawDistanceChunks() : cloudDistanceChunks;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
