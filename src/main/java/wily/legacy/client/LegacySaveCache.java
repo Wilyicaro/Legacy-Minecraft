@@ -19,6 +19,7 @@ public class LegacySaveCache {
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
+    public static boolean copyOnSave = false;
 
     public static void setup(Minecraft m) {
         currentWorldSource = LevelStorageSource.createDefault(m.gameDirectory.toPath().resolve("current-world"));
@@ -77,7 +78,7 @@ public class LegacySaveCache {
             FileUtils.copyDirectory(sourceLevelDirectory.toFile(), destLevelDirectory, p -> {
                 if (p.getName().equals("session.lock")) return false;
                 if (deleteOldDest) return true;
-                File destFile = p.toPath().relativize(destLevelDirectory.toPath()).toFile();
+                File destFile = destLevelDirectoryPath.resolve(sourceLevelDirectory.relativize(p.toPath())).toFile();
                 return !destFile.exists() || FileUtils.isFileNewer(p, destFile);
             });
         } catch (IOException e) {

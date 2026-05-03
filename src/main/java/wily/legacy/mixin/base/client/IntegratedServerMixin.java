@@ -56,7 +56,12 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
             LegacySaveCache.manualSave = false;
             FactoryAPIClient.getProfiler().push("manualSave");
             LOGGER.info("Saving manually...");
-            this.saveEverything(false, true, true);
+            LegacySaveCache.copyOnSave = true;
+            try {
+                this.saveEverything(false, true, true);
+            } finally {
+                LegacySaveCache.copyOnSave = false;
+            }
             FactoryAPIClient.getProfiler().pop();
         }
     }
