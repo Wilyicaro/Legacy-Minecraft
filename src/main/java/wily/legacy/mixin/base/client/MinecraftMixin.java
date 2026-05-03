@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -223,6 +224,11 @@ public abstract class MinecraftMixin {
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSleeping()Z"))
     private boolean tick(boolean original) {
         return false;
+    }
+
+    @ModifyReturnValue(method = "isWindowActive", at = @At("RETURN"))
+    private boolean isWindowActive(boolean original) {
+        return original || LegacyOptions.unfocusedInputs.get();
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
