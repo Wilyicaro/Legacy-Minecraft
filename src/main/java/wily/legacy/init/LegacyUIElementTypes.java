@@ -6,18 +6,17 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-//? if >=26.1 {
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-//?}
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.FactoryAPI;
@@ -37,9 +36,7 @@ import java.util.List;
 
 public class LegacyUIElementTypes {
     public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchantment/enchanting_table_book.png");
-    //? if >=26.1 {
     private static boolean itemComponentsBound;
-    //?}
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
             a.putStaticElement(elementName + ".renderables", UIAccessor.createRenderablesWrapper(a, new ArrayList<>()));
@@ -255,22 +252,23 @@ public class LegacyUIElementTypes {
     }
 
     private static ItemStack parseStack(Dynamic<?> dynamic) {
-        //? if >=26.1 {
         bindItemComponents();
-        //?}
         return DynamicUtil.getItemFromDynamic(dynamic, true).get();
     }
 
-    //? if >=26.1 {
     private static void bindItemComponents() {
         if (itemComponentsBound) return;
-        BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY)).forEach(components -> {
-            if (components.key().equals(Registries.ITEM))
-                components.apply();
-        });
+        BuiltInRegistries.ITEM.stream().filter(item -> !item.builtInRegistryHolder().areComponentsBound()).forEach(item -> item.builtInRegistryHolder().bindComponents(createItemComponents(item)));
         itemComponentsBound = true;
     }
-    //?}
+
+    private static DataComponentMap createItemComponents(Item item) {
+        return DataComponentMap.builder()
+                .addAll(DataComponents.COMMON_ITEM_COMPONENTS)
+                .set(DataComponents.ITEM_NAME, Component.translatable(item.getDescriptionId()))
+                .set(DataComponents.ITEM_MODEL, BuiltInRegistries.ITEM.getKey(item))
+                .build();
+    }
 
     public static void init() {
     }
