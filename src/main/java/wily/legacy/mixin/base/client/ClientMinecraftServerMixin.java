@@ -129,9 +129,9 @@ public abstract class ClientMinecraftServerMixin {
     }
 
     @Inject(method = "saveEverything", at = @At("RETURN"))
-    public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
+    public void saveEverything(boolean silent, boolean flush, boolean force, CallbackInfoReturnable<Boolean> cir) {
         if (!LegacySaveCache.isCurrentWorldSource(storageSource)) return;
-        LegacySaveCache.saveLevel(storageSource);
+        if (LegacySaveCache.copyOnSave || !flush && !force) LegacySaveCache.saveLevel(storageSource);
     }
 
     @Inject(method = "stopServer", at = @At("HEAD"))

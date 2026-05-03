@@ -17,6 +17,7 @@ public class LegacySaveCache {
 
     public static LevelStorageSource currentWorldSource;
     public static boolean manualSave = false;
+    public static boolean copyOnSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
 
@@ -66,11 +67,13 @@ public class LegacySaveCache {
     public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource, boolean deleteOldDest) {
         try {
             File destLevelDirectory = destSource.getBaseDir().resolve(sendSource.getLevelId()).toFile();
+            Path sourceLevelDirectory = sendSource.getDimensionPath(Level.OVERWORLD);
+            Path destLevelDirectoryPath = destLevelDirectory.toPath();
             if (deleteOldDest && destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
-            FileUtils.copyDirectory(sendSource.getDimensionPath(Level.OVERWORLD).toFile(), destLevelDirectory, p -> {
+            FileUtils.copyDirectory(sourceLevelDirectory.toFile(), destLevelDirectory, p -> {
                 if (p.getName().equals("session.lock")) return false;
                 if (deleteOldDest) return true;
-                File destFile = p.toPath().relativize(destLevelDirectory.toPath()).toFile();
+                File destFile = destLevelDirectoryPath.resolve(sourceLevelDirectory.relativize(p.toPath())).toFile();
                 return !destFile.exists() || FileUtils.isFileNewer(p, destFile);
             });
         } catch (IOException e) {
