@@ -32,7 +32,7 @@ public final class BoxModelManager {
     private static final Map<String, Identifier> KEY_INDEX = new ConcurrentHashMap<>();
     private static final Set<Identifier> LOADED = ConcurrentHashMap.newKeySet();
     private static final Map<Identifier, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
-    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null);
+    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null, null);
     private static volatile boolean initialized;
 
     private BoxModelManager() {
@@ -65,6 +65,10 @@ public final class BoxModelManager {
 
     public static EnumMap<AttachSlot, float[]> getOffsets(Identifier id) {
         return getValue(id, BoxData::offsets);
+    }
+
+    public static EnumMap<ToolSlot, float[]> getToolOffsets(Identifier id) {
+        return getValue(id, BoxData::toolOffsets);
     }
 
     public static EnumMap<AttachSlot, float[]> getScales(Identifier id) {
@@ -305,6 +309,7 @@ public final class BoxModelManager {
                 readString(meta, "themeName"),
                 readString(meta, "themeNameId"),
                 nonEmpty(BoxModelJsonSupport.parseOffsets(root.get("offsets"))),
+                nonEmpty(BoxModelJsonSupport.parseToolOffsets(root.get("offsets"))),
                 nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "scales", "partScale", "part_scale"))),
                 nonEmpty(BoxModelJsonSupport.parseArmorOffsets(getAny(root, "armor_offsets", "armorOffsets"))),
                 nonEmpty(BoxModelJsonSupport.parseArmorHideSlots(getAny(root, "hidearmour", "hideArmour", "hide_armor"))),
@@ -503,10 +508,11 @@ public final class BoxModelManager {
     }
 
     private record BoxData(BuiltBoxModel model, Identifier texture, String themeName, String themeKey,
-                           EnumMap<AttachSlot, float[]> offsets, EnumMap<AttachSlot, float[]> scales,
+                           EnumMap<AttachSlot, float[]> offsets, EnumMap<ToolSlot, float[]> toolOffsets,
+                           EnumMap<AttachSlot, float[]> scales,
                            EnumMap<ArmorSlot, float[]> armorOffsets, EnumSet<ArmorSlot> armorHide, Boolean slim) {
         boolean isEmpty() {
-            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null;
+            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && toolOffsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null;
         }
     }
 

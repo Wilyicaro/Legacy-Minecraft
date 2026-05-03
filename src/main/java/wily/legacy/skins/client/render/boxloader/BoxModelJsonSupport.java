@@ -77,6 +77,10 @@ final class BoxModelJsonSupport {
         return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseVec3);
     }
 
+    static EnumMap<ToolSlot, float[]> parseToolOffsets(JsonElement el) {
+        return parseMap(el, ToolSlot.class, ToolSlot::fromString, BoxModelJsonSupport::parseVec3);
+    }
+
     static EnumMap<AttachSlot, float[]> parseScales(JsonElement el) {
         return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseScale3);
     }
