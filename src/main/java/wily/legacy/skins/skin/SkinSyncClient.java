@@ -2,9 +2,9 @@ package wily.legacy.skins.skin;
 
 import net.minecraft.client.Minecraft;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.skins.client.util.ViewBobbingSkinOverride;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -87,10 +87,6 @@ public final class SkinSyncClient {
             STATE.requestUpload();
             return;
         }
-        if (SkinCloudSyncClient.isActive(client)) {
-            sendSelection(client, resolveSelectedSkinId(client), true);
-            return;
-        }
         sendSelection(client, resolveSelectedSkinId(client), true);
     }
 
@@ -123,11 +119,6 @@ public final class SkinSyncClient {
 
     public static void onSyncSkin(UUID uuid, String skinId) {
         ClientSkinCache.set(uuid, skinId);
-    }
-
-    static void onCloudSnapshot(Map<UUID, String> skins) {
-        if (skins == null || skins.isEmpty()) return;
-        skins.forEach(ClientSkinCache::set);
     }
 
     private static UUID getUserId(Minecraft client) {
@@ -191,10 +182,7 @@ public final class SkinSyncClient {
     }
 
     private static void requestSnapshot(Minecraft client, boolean force) {
-        if (SkinCloudSyncClient.isActive(client)) {
-            SkinCloudSyncClient.requestSnapshot(client, force);
-            return;
-        }
+        if (!Legacy4JClient.hasModOnServer()) return;
         CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
     }
 
@@ -205,10 +193,7 @@ public final class SkinSyncClient {
     private static void sendSelection(Minecraft client, String skinId, boolean forceAssets) {
         String id = SkinFairness.effectiveSkinId(client, skinId);
         STATE.sessionAnnounced = true;
-        if (SkinCloudSyncClient.isActive(client)) {
-            SkinCloudSyncClient.submitSelection(client, id);
-            return;
-        }
+        if (!Legacy4JClient.hasModOnServer()) return;
         CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));
         sendAssets(client, id, forceAssets);
     }
