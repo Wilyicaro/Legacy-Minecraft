@@ -1579,6 +1579,7 @@
   "legacy.menu.host_options.teleport_me": "Teleportaa Luokseni",
   "legacy.menu.host_options.teleport_player": "Teleportaa Pelaajaan",
   "legacy.menu.how_to_play": "Kuinka Pelata",
+  "legacy.menu.how_to_play.anvil": "Anvil",
   "legacy.menu.how_to_play.anvil_message": "§2HOW TO PLAY : ANVIL§f\n\nExperience Levels can be used to repair, enchant or rename items with the Anvil.\nAll items can be renamed, although only items with durability can be repaired or have enchantments from Enchanted Books applied to them.",
   "legacy.menu.how_to_play.anvil_message_1": "Esine voidaan korjata asettamalla se yhteen vasemmalla olevista syöttöpaikoista yhdessä joko esineen raaka-aineiden, kuten Rautaharkkojen Rautamiekalle, tai saman tyyppisen toisen esineen kanssa.\nEsineiden yhdistäminen on tehokkaampaa Alasimella, ja lisäksi jos jompikumpi esineistä oli lumottu, lopputuotteessa voi olla lumotuksia kummasta tahansa syötteestä. Lumokirjat voivat soveltaa lumotuksia esineisiin yhdistämällä ne Alasimella, jos Kirjan lumous on sopiva. Lumokirjoja löytyy Arkuista luolastoissa tai niitä voi lumouttaa tavallisista Kirjoista Lumousliinalla. On mahdollista, että Alasin vahingoittuu jokaisella käyttökerralla ja riittävän kulutuksen jälkeen se tuhoutuu.",
   "legacy.menu.how_to_play.anvil_sword_name": "Excalibur",
