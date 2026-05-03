@@ -185,6 +185,19 @@ public class RenderableVList {
         }
     }
 
+    private boolean focusEdgeRenderable(boolean last) {
+        int start = last ? renderables.size() - 1 : 0;
+        int step = last ? -1 : 1;
+        for (int i = start; i >= 0 && i < renderables.size(); i += step) {
+            Renderable renderable = renderables.get(i);
+            if (renderable instanceof GuiEventListener) {
+                focusRenderable(renderable);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void init(int leftPos, int topPos, int listWidth, int listHeight) {
         init("renderableVList", leftPos, topPos, listWidth, listHeight);
@@ -277,9 +290,19 @@ public class RenderableVList {
 
     private void revealRenderable(int index) {
         if (listHeight <= 0) return;
-        if (index < 0) return;
-        while (index < scrolledList.get() && scrolledList.get() > 0) mouseScrolled(false);
-        while (index >= scrolledList.get() + renderablesCount && canScrollDown) mouseScrolled(true);
+        if (index < 0 || index >= renderables.size()) return;
+        int visibleCount = Math.max(1, renderablesCount);
+        int scroll = scrolledList.get();
+        if (index < scroll) {
+            scroll = index;
+        } else if (index >= scroll + visibleCount) {
+            scroll = index - visibleCount + 1;
+        }
+        scroll = Math.max(0, Math.min(scroll, renderables.size() - 1));
+        if (scroll != scrolledList.get()) {
+            scrolledList.set(scroll);
+            accessor.reloadUI();
+        }
     }
 
     public void resetScroll() {
@@ -328,11 +351,7 @@ public class RenderableVList {
                     if (canScrollDown) {
                         while (canScrollDown && isDirectionFocused(ScreenDirection.DOWN, true)) mouseScrolled(true);
                     } else if (cyclic) {
-                        if (path == null && scrolledList.get() > 0) {
-                            scrolledList.set(0);
-                            accessor.reloadUI();
-                            setLastFocusInDirection(ScreenDirection.DOWN);
-                        }
+                        if (path == null && focusEdgeRenderable(false)) return true;
                     } else if (path == null) return true;
                 }
             }
@@ -343,10 +362,7 @@ public class RenderableVList {
                         while (scrolledList.get() > 0 && isDirectionFocused(ScreenDirection.UP, true))
                             mouseScrolled(false);
                     } else if (cyclic) {
-                        if (path == null) {
-                            while (canScrollDown)
-                                mouseScrolled(true);
-                        }
+                        if (path == null && focusEdgeRenderable(true)) return true;
                     } else if (path == null) return true;
                 }
             }

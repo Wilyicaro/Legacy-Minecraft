@@ -8,6 +8,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
@@ -297,6 +299,46 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         }
     }
 
+    @Unique
+    private boolean legacy$wrapPackFocus(KeyEvent keyEvent) {
+        boolean up = keyEvent.key() == InputConstants.KEY_UP;
+        boolean down = keyEvent.key() == InputConstants.KEY_DOWN;
+        if (!up && !down) return false;
+        if (!(getFocused() instanceof GuiEventListener focused)) return false;
+        for (RenderableVList list : renderableVLists) {
+            int index = list.renderables.indexOf(focused);
+            if (index < 0) continue;
+            int first = legacy$getPackEdge(list, false);
+            int last = legacy$getPackEdge(list, true);
+            if (up && index == first) return legacy$focusPack(list, last);
+            if (down && index == last) return legacy$focusPack(list, first);
+            return false;
+        }
+        return false;
+    }
+
+    @Unique
+    private int legacy$getPackEdge(RenderableVList list, boolean last) {
+        int start = last ? list.renderables.size() - 1 : 0;
+        int step = last ? -1 : 1;
+        for (int i = start; i >= 0 && i < list.renderables.size(); i += step) {
+            if (list.renderables.get(i) instanceof GuiEventListener) return i;
+        }
+        return -1;
+    }
+
+    @Unique
+    private boolean legacy$focusPack(RenderableVList list, int index) {
+        if (index < 0 || index >= list.renderables.size()) return false;
+        Renderable renderable = list.renderables.get(index);
+        if (!(renderable instanceof GuiEventListener listener)) return false;
+        if (renderable instanceof AbstractButton button) lastFocusedPackId = packIds.get(button);
+        setFocused(listener);
+        list.focusRenderable(renderable);
+        setFocused(listener);
+        return true;
+    }
+
 
     @Override
     public RenderableVList getRenderableVList() {
@@ -317,6 +359,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
+        if (legacy$wrapPackFocus(keyEvent)) return true;
         for (RenderableVList renderableVList : getRenderableVLists()) {
             if (renderableVList.keyPressed(keyEvent.key())) return true;
         }
