@@ -1579,6 +1579,7 @@
   "legacy.menu.host_options.teleport_me": "Teleportuj do mnie",
   "legacy.menu.host_options.teleport_player": "Teleportuj do gracza",
   "legacy.menu.how_to_play": "Instrukcja",
+  "legacy.menu.how_to_play.anvil": "Anvil",
   "legacy.menu.how_to_play.anvil_message": "§2HOW TO PLAY : ANVIL§f\n\nExperience Levels can be used to repair, enchant or rename items with the Anvil.\nAll items can be renamed, although only items with durability can be repaired or have enchantments from Enchanted Books applied to them.",
   "legacy.menu.how_to_play.anvil_message_1": "An item can be repaired by placing it in one of the input slots on the left, along with either some raw materials of the item, like Iron Ingots for an Iron Sword, or combined with another item of the same type.\nCombining items is more efficient when done with an Anvil, and additionally, if either of the items were enchanted, the finished product may have enchantments from either of the inputs. Enchanted Books can apply enchantments to items by combining them at an Anvil if the Book's enchantment is suitable. Enchanted Books can be found in Chests within dungeons, or enchanted from normal Books at the Enchantment Table. There is a chance that the Anvil will be damaged with each use and after enough punishment, it will be destroyed.",
   "legacy.menu.how_to_play.anvil_sword_name": "Excalibur",
