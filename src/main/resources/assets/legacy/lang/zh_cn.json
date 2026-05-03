@@ -1579,6 +1579,7 @@
   "legacy.menu.host_options.teleport_me": "传送到我这里",
   "legacy.menu.host_options.teleport_player": "传送到玩家",
   "legacy.menu.how_to_play": "如何游玩",
+  "legacy.menu.how_to_play.anvil": "Anvil",
   "legacy.menu.how_to_play.anvil_message": "§2HOW TO PLAY : ANVIL§f\n\nExperience Levels can be used to repair, enchant or rename items with the Anvil.\nAll items can be renamed, although only items with durability can be repaired or have enchantments from Enchanted Books applied to them.",
   "legacy.menu.how_to_play.anvil_message_1": "将物品放置在左侧的输入槽之一中，可以使用该物品的原材料（如铁剑的铁锭）或与同类型的另一个物品组合来修复物品。\n使用铁砧组合物品更高效，如果其中任何物品被附魔，最终产品可能会继承输入物品的附魔。附魔书可以通过铁砧与物品组合来应用附魔，前提是附魔书的附魔适合该物品。附魔书可以在地牢的宝箱中找到，也可以在附魔台上从普通书附魔获得。每次使用铁砧时，铁砧可能会损坏，经过足够的使用后，它将被摧毁。",
   "legacy.menu.how_to_play.anvil_sword_name": "Excalibur",
