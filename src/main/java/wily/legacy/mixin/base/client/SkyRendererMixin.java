@@ -58,9 +58,8 @@ public class SkyRendererMixin {
 
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void useLegacySunriseColor(ClientLevel level, float partialTick, Camera camera, SkyRenderState state, CallbackInfo ci) {
-        if (LegacyCloudAtmosphere.shouldUseConsoleAtmosphereColors(level, partialTick)) {
+        if (LegacyCloudAtmosphere.shouldUseConsoleAtmosphere(level)) {
             state.sunriseAndSunsetColor = LegacyCloudAtmosphere.getSunriseAndSunsetColor(level, partialTick);
-            state.skyColor = LegacyCloudAtmosphere.getSkyColor(level, camera, partialTick);
         }
     }
 
