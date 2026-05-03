@@ -119,13 +119,13 @@ public abstract class CloudRendererMixin {
     }
 
     @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 8)
-    private int legacy$useRenderDistanceCloudDistanceBlocks(int cloudDistanceBlocks) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudDistanceBlocks() : cloudDistanceBlocks;
+    private int legacy$useExtendedCloudDistanceBlocks(int cloudDistanceBlocks) {
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getExtendedCloudDistanceBlocks() : cloudDistanceBlocks;
     }
 
     @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 9)
-    private int legacy$useRenderDistanceCloudRadius(int cloudRadius) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudRadius() : cloudRadius;
+    private int legacy$useExtendedCloudRadius(int cloudRadius) {
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getExtendedCloudRadius() : cloudRadius;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
@@ -290,13 +290,13 @@ public abstract class CloudRendererMixin {
     }
 
     @Unique
-    private int legacy$getRenderDistanceCloudDistanceBlocks() {
+    private int legacy$getExtendedCloudDistanceBlocks() {
         return LegacyCloudAtmosphere.getCloudDrawDistanceBlocks();
     }
 
     @Unique
-    private int legacy$getRenderDistanceCloudRadius() {
-        return Math.max(1, (int) Math.ceil(legacy$getRenderDistanceCloudDistanceBlocks() / 12.0d));
+    private int legacy$getExtendedCloudRadius() {
+        return Math.max(1, (int) Math.ceil(legacy$getExtendedCloudDistanceBlocks() / 12.0d));
     }
 
     @Unique

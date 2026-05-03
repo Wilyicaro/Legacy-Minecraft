@@ -17,7 +17,7 @@ public final class LegacyCloudAtmosphere {
 
     private static final class CloudGeometry {
         private static final float LEGACY_HEIGHT = 128.0f;
-        private static final int DRAW_DISTANCE_CHUNKS = 14;
+        private static final int DRAW_DISTANCE_EXTENSION_CHUNKS = 16;
 
         private CloudGeometry() {
         }
@@ -59,7 +59,19 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static int getCloudDrawDistanceBlocks() {
-        return CloudGeometry.DRAW_DISTANCE_CHUNKS * 16;
+        return getCloudDrawDistanceBlocks(Minecraft.getInstance().options.getEffectiveRenderDistance());
+    }
+
+    public static int getCloudDrawDistanceBlocks(int renderDistanceChunks) {
+        return getCloudDrawDistanceChunks(renderDistanceChunks) * 16;
+    }
+
+    public static int getCloudDrawDistanceChunks() {
+        return getCloudDrawDistanceChunks(Minecraft.getInstance().options.getEffectiveRenderDistance());
+    }
+
+    public static int getCloudDrawDistanceChunks(int renderDistanceChunks) {
+        return Math.max(0, renderDistanceChunks) + CloudGeometry.DRAW_DISTANCE_EXTENSION_CHUNKS;
     }
 
     public static float getCloudFogEndBlocks(float environmentalEnd) {
