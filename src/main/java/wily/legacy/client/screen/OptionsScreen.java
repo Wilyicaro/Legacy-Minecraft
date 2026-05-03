@@ -509,57 +509,48 @@ public class OptionsScreen extends PanelVListScreen {
 
                 @Override
                 public boolean mouseScrolled(double d, double e, double f, double g) {
-                    return shouldDisplayPackManagementTooltips() && selectorTooltipVisibility > 0 && (globalPackSelector.scrollableRenderer.mouseScrolled(g) || selector.scrollableRenderer.mouseScrolled(g)) || super.mouseScrolled(d, e, f, g);
+                    return selectorTooltipVisibility > 0 && (globalPackSelector.scrollableRenderer.mouseScrolled(g) || selector.scrollableRenderer.mouseScrolled(g)) || super.mouseScrolled(d, e, f, g);
                 }
 
                 @Override
                 protected boolean shouldAddSelectorControlTooltips() {
-                    return shouldDisplayPackManagementTooltips();
+                    return LegacyOptions.displayPackManagementTooltips.get();
                 }
 
                 @Override
                 protected void panelInit() {
                     super.panelInit();
-                    if (shouldDisplayPackManagementTooltips()) {
-                        panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 20f * PackAlbum.Selector.getDefaultWidth());
-                    }
+                    panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 20f * PackAlbum.Selector.getDefaultWidth());
                 }
 
                 private float getSelectorTooltipVisibility() {
-                    if (!shouldDisplayPackManagementTooltips()) {
-                        return 0;
-                    }
                     return selectorTooltipVisibility == 0 ? selectorTooltipVisibility : selectorTooltipVisibility + FactoryAPIClient.getPartialTick();
                 }
 
                 @Override
-                public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
-                    super.renderDefaultBackground(GuiGraphicsExtractor, i, j, f);
-                    if (shouldDisplayPackManagementTooltips() && selectorTooltipVisibility > 0) {
+                public void renderDefaultBackground(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
+                    super.renderDefaultBackground(guiGraphics, i, j, f);
+                    if (selectorTooltipVisibility > 0) {
                         if (getFocused() != globalPackSelector)
-                            selector.renderTooltipBox(GuiGraphicsExtractor, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
+                            selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
                         else
-                            globalPackSelector.renderTooltipBox(GuiGraphicsExtractor, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
-                        GuiGraphicsExtractor.nextStratum();
+                            globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
+                        guiGraphics.nextStratum();
                     }
                 }
 
 
                 @Override
                 public void tick() {
-                    if (shouldDisplayPackManagementTooltips() && ((getFocused() == selector || getFocused() == globalPackSelector) || selectorTooltipVisibility > 0) && selectorTooltipVisibility < 10) {
+                    if (((getFocused() == selector || getFocused() == globalPackSelector) || selectorTooltipVisibility > 0) && selectorTooltipVisibility < 10) {
                         selectorTooltipVisibility++;
                     }
 
-                    if (shouldDisplayPackManagementTooltips() && !finishedAnimation && selectorTooltipVisibility > 0) {
+                    if (!finishedAnimation && selectorTooltipVisibility > 0) {
                         repositionElements();
                         if (selectorTooltipVisibility == 10) finishedAnimation = true;
                     }
                     super.tick();
-                }
-
-                private boolean shouldDisplayPackManagementTooltips() {
-                    return LegacyOptions.displayPackManagementTooltips.get();
                 }
             };
             screen.renderableVList.addRenderables(globalPackSelector, selector);
