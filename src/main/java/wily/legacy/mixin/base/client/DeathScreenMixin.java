@@ -89,7 +89,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/DeathScreen;visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", shift = At.Shift.AFTER))
     private void renderLegacyTitle(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(this.width / 2 - this.font.width(this.title), this.height / 8 + 10);
+        guiGraphics.pose().translate(this.width / 2 - this.font.width(this.title), this.height / 4 + 20);
         guiGraphics.pose().scale(2.0f);
         LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
         guiGraphics.pose().popMatrix();
