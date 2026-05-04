@@ -18,6 +18,7 @@ public final class SkinSync {
     public static final int ASSET_MODEL = 1;
     public static final int ASSET_METADATA = 2;
     public static final int ASSET_CAPE = 3;
+    public static final int ASSET_BOX_TEXTURE = 4;
     private static final int MAX_SKIN_ID_LEN = 256;
     private static final Map<UUID, String> SERVER_SKINS = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> SERVER_ASSETS = new ConcurrentHashMap<>();
@@ -76,7 +77,7 @@ public final class SkinSync {
         if (!acc.isComplete()) return;
         SERVER_ACC.remove(k);
         byte[] bytes = acc.assemble();
-        if (assetType == ASSET_TEXTURE && bytes.length == 0) {
+        if ((assetType == ASSET_TEXTURE || assetType == ASSET_BOX_TEXTURE) && bytes.length == 0) {
             SERVER_ASSETS.remove(k);
             return;
         }
@@ -119,7 +120,7 @@ public final class SkinSync {
     public static void sendCachedAssetsTo(ServerPlayer to, UUID owner, String skinId) {
         if (to == null || owner == null) return;
         if (skinId == null || skinId.isBlank()) return;
-        for (int assetType = ASSET_TEXTURE; assetType <= ASSET_CAPE; assetType++) {
+        for (int assetType = ASSET_TEXTURE; assetType <= ASSET_BOX_TEXTURE; assetType++) {
             byte[] bytes = SERVER_ASSETS.get(assetKey(owner, skinId, assetType));
             if (bytes == null || bytes.length == 0) continue;
             int type = assetType;
