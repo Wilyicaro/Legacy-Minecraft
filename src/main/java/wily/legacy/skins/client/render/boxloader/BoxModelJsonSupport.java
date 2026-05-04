@@ -227,7 +227,17 @@ final class BoxModelJsonSupport {
             }
         }
         if (outCubes.isEmpty()) return null;
-        return new BoneDef(name, dstAttach, outCubes, src.visible());
+        return new BoneDef(name, src.parent(), dstAttach, mirrorPivot(src.pivot()), mirrorRotation(src.rotation()), outCubes, src.visible());
+    }
+
+    private static float[] mirrorPivot(float[] pivot) {
+        if (pivot == null || pivot.length < 3) return pivot;
+        return new float[]{-pivot[0], pivot[1], pivot[2]};
+    }
+
+    private static float[] mirrorRotation(float[] rotation) {
+        if (rotation == null || rotation.length < 3) return rotation;
+        return new float[]{rotation[0], -rotation[1], -rotation[2]};
     }
 
     private static <E extends Enum<E>> EnumSet<E> parseEnumFlags(JsonElement el, Class<E> type, BiConsumer<EnumSet<E>, String> tokenReader) {
