@@ -100,8 +100,8 @@ dependencies {
         modApi "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
         modImplementation("com.terraformersmc:modmenu:${modmenu_version}")
         if (stonecutter.eval(stonecutter.current.version, ">=1.21") || stonecutter.eval(stonecutter.current.version, "1.20.1")) {
-            modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
-            modCompileOnly("dev.architectury:architectury-fabric:${architectury_version}")
+            modImplementation("maven.modrinth:nostalgic-tweaks:${nt_version}")
+            modImplementation("dev.architectury:architectury-fabric:${architectury_version}")
         }
 
     } else if (loader == "forge") {
@@ -117,7 +117,7 @@ dependencies {
 
     if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, ">=1.21")) {
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-api-base:0.4.42+d1308ded19")
-        modCompileOnly("org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:4.0.3+63dbf70448")
+        modCompileOnly("org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:3.4.0+9c40919e19")
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-rendering-data-attachment-v1:0.3.48+73761d2e19")
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-block-view-api-v2:1.0.10+9afaaf8c19")
         modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")

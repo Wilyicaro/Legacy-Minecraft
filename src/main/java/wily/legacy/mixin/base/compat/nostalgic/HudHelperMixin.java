@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.llamalad7.mixinextras.sugar.Local;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(HudHelper.class)
@@ -20,12 +21,12 @@ public class HudHelperMixin {
 
     //? if forge || neoforge {
     /*@Inject(method = "renderArmor", at = @At("HEAD"), remap = false)
-    private static void renderArmor(GuiGraphics graphics, int offsetHeight, CallbackInfo ci) {
+    private static void renderArmor(CallbackInfo ci, @Local GuiGraphics graphics) {
         float offsetWidth = (GuiUtil.getGuiWidth() / 2f + 90);
         graphics.pose().translate( offsetWidth - offsetWidth * ScreenUtil.getHUDScale() / 3, 0.0F, 0.0F);
     }
     @Inject(method = "renderAir", at = @At("HEAD"), remap = false)
-    private static void renderAir(GuiGraphics graphics, int offsetHeight, CallbackInfo ci) {
+    private static void renderAir(CallbackInfo ci, @Local GuiGraphics graphics) {
         float offsetWidth = (GuiUtil.getGuiWidth() / 2f - 100);
         graphics.pose().translate( offsetWidth - offsetWidth * ScreenUtil.getHUDScale() / 3, 0.0F, 0.0F);
     }

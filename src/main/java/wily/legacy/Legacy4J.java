@@ -178,7 +178,7 @@ public class Legacy4J {
         FactoryEvent.setItemComponent(Items.CAKE,DataComponents.MAX_STACK_SIZE,64);
         //?} else {
         /*ItemAccessor.of(Items.CAKE).setMaxStackSize(64);
-        ItemAccessor.of(Items.MUSIC_DISC_CAT).setRecordLengthInTicks(330);
+        ItemAccessor.of(Items.MUSIC_DISC_CAT).setRecordLengthInTicks(330 * 20);
         *///?}
         FactoryEvent.registerCommands((dispatcher,context,selection)->{
             TipCommand.register(dispatcher,context,selection);
