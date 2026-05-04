@@ -31,19 +31,19 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     private static Screen createMouseSettingsScreen(Screen parent) {
         return new OptionsScreen(parent, new OptionsScreen.Section(
                 Component.translatable("options.mouse_settings.title"),
-                s -> Panel.centered(s, 250, 130),
+                s -> Panel.centered(s, 250, 175, 0, 10),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.sensitivity()), 2),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.mouseWheelSensitivity()), 2),
                         o -> o.renderableVList.addOptions(
-                                LegacyOptions.of(Minecraft.getInstance().options.rawMouseInput()),
+                                LegacyOptions.cursorAtFirstInventorySlot,
+                                LegacyOptions.systemCursor,
                                 LegacyOptions.of(Minecraft.getInstance().options.allowCursorChanges()),
                                 LegacyOptions.of(Minecraft.getInstance().options.invertMouseX()),
                                 LegacyOptions.of(Minecraft.getInstance().options.invertMouseY()),
+                                LegacyOptions.of(Minecraft.getInstance().options.rawMouseInput()),
                                 LegacyOptions.of(Minecraft.getInstance().options.discreteMouseScroll()),
-                                LegacyOptions.of(Minecraft.getInstance().options.touchscreen()),
-                                LegacyOptions.cursorAtFirstInventorySlot,
-                                LegacyOptions.systemCursor
+                                LegacyOptions.of(Minecraft.getInstance().options.touchscreen())
                         )))));
     }
 
