@@ -217,7 +217,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected void init() {
         addRenderableWidget(tabList);
         super.init();
-        tabList.init(panel.x,panel.y - 24,panel.width);
+        tabList.init(panel.x, panel.y - 24, panel.width, 30);
     }
 
     @Override

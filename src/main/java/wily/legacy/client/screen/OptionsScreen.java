@@ -332,9 +332,11 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.hudOpacity,
                                 LegacyOptions.hudDistance),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
-                        o-> o.renderableVList.addLinkedOptions(
-                                LegacyOptions.autoResolution, b-> !b.get(),
-                                LegacyOptions.interfaceResolution),
+                        o-> o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(LegacyOptions.create(mc.options.guiScale()), i -> {
+                            //? if <1.20.4 {
+                            /*mc.resizeDisplay();
+                            *///?}
+                        })),
                         o-> o.getRenderableVList().addLinkedOptions(
                                 LegacyOptions.legacyItemTooltips,
                                 FactoryConfig::get,

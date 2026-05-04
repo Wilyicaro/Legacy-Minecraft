@@ -71,12 +71,13 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     protected final Stocker.Sizeable arrangement = new Stocker.Sizeable(0,2);
     protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, LegacyComponents.SEARCH_ITEMS);
     boolean canRemoveSearch = false;
+    protected final UIAccessor accessor = UIAccessor.of(this);
 
     public CreativeModeScreen(Player player) {
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
         searchBox.setResponder(s-> {
             fillCreativeGrid();
-            tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).set(0);
+            tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab).set(0);
         });
         searchBox.setMaxLength(50);
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
@@ -190,11 +191,11 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         this.minecraft.player.inventoryMenu.removeSlotListener(this.listener);
         this.listener = new CreativeInventoryListener(this.minecraft);
         this.minecraft.player.inventoryMenu.addSlotListener(this.listener);
-        tabList.init(panel.x,panel.y - 33, panel.width,(t,i)->{
+        tabList.init(panel.x,panel.y - 33, panel.width, 39, (t,i)->{
             int index = tabList.tabButtons.indexOf(t);
-            t.type = LegacyTabButton.Type.bySize(index, 7);
+            t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
             t.offset = (b)-> {
-                if (!t.selected) return new Vec3(0,1.5,0);
+                if (!t.selected) return new Vec3(0,1.4,0);
                 return Vec3.ZERO;
             };
             t.setWidth(41);
@@ -203,15 +204,19 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         fillCreativeGrid();
     }
 
+    protected int getMaxTabCount() {
+        return accessor.getInteger("maxTabCount", 8);
+    }
+
     public void fillCreativeGrid(){
         if (displayListing.isEmpty()) return;
-        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab);
+        List<ItemStack> list = displayListing.get(page.get() * getMaxTabCount() + tabList.selectedTab);
         if (arrangement.get() != 0 && (arrangement.get() == 1 || !searchBox.getValue().isEmpty() && minecraft.getConnection() != null)) list = arrangement.get() == 1 ? list.stream().sorted(Comparator.comparing(i->i.getDisplayName().getString())).toList() : getItemsSearchResult(minecraft,searchBox.getValue());
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
-            int index = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).get() * 50 + i;
+            int index = tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab).get() * 50 + i;
             creativeModeGrid.setItem(i,list.size() > index ?  list.get(index) : ItemStack.EMPTY);
         }
-        tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).max = Math.max(0, (list.size() - 1) / creativeModeGrid.getContainerSize());
+        tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab).max = Math.max(0, (list.size() - 1) / creativeModeGrid.getContainerSize());
     }
 
     public static List<ItemStack> getItemsSearchResult(Minecraft minecraft, String value){

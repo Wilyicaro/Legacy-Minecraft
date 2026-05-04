@@ -14,6 +14,7 @@ import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
@@ -38,7 +39,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 public class LegacyAdvancementsScreen extends PanelVListScreen implements TabList.Access {
     public static final Component TITLE = Component.translatable("gui.advancements");
     protected final Stocker.Sizeable page = new Stocker.Sizeable(0);
-    protected final TabList tabList = new TabList(accessor, new PagedList<>(page,10));
+    protected final TabList tabList = new TabList(accessor, new PagedList<>(page, this::getMaxTabCount));
     protected final List<DisplayInfo> displayInfos = new ArrayList<>();
     protected boolean showDescription = false;
     protected boolean oldLegacyTooltipsValue;
@@ -90,7 +91,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(page.get() * 10 + tabList.selectedTab);
+        return getRenderableVLists().get(page.get() * getMaxTabCount() + tabList.selectedTab);
     }
 
     public static class AdvancementButton extends AbstractWidget {
@@ -176,12 +177,16 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));
-        tabList.init(panel.x,panel.y - 37,panel.width,(b,i)->{
+        tabList.init(panel.x, panel.y - 37, panel.width, 43, (b, i) -> {
             int index = tabList.tabButtons.indexOf(b);
-            b.type = LegacyTabButton.Type.bySize(index, 9);
-            b.setWidth(45);
-            b.offset = (t1) -> new Vec3(0, t1.selected ? 0 : 4.5, 0);
+            b.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
+            b.setWidth(accessor.getInteger("tabList.buttonWidth", 45));
+            b.offset = (t1) -> new Vec3(0, t1.selected ? 0 : 4.4f, 0);
         });
+    }
+
+    protected int getMaxTabCount() {
+        return accessor.getInteger("maxTabCount", 10);
     }
 
     @Override

@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
 //?}
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.StackIngredient;
@@ -141,7 +142,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     protected List<List<RecipeInfo<BannerRecipe>>> recipesByGroup = new ArrayList<>();
     protected final Stocker.Sizeable page =  new Stocker.Sizeable(0);
     protected final Stocker.Sizeable craftingButtonsOffset =  new Stocker.Sizeable(0);
-    protected final TabList craftingTabList = new TabList(accessor, new PagedList<>(page,7));
+    protected final TabList craftingTabList = new TabList(accessor, new PagedList<>(page, this::getMaxTabCount));
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final boolean[] warningSlots = new boolean[9];
     protected final ContainerListener listener = new ContainerListener() {
@@ -302,7 +303,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         menu.inventoryActive = selectedStack.isEmpty();
         if (selectedCraftingButton < getCraftingButtons().size()) setFocused(getCraftingButtons().get(selectedCraftingButton));
         if (craftingTabList.selectedTab != 0) {
-            craftingButtonsOffset.max = Math.max(0,loomTabListings.get(page.get() * 7 + craftingTabList.selectedTab - 1).patterns().size() - 12);
+            craftingButtonsOffset.max = Math.max(0,loomTabListings.get(page.get() * getMaxTabCount() + craftingTabList.selectedTab - 1).patterns().size() - 12);
             craftingButtons.forEach(b->{
                 b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
                 addWidget(b);
@@ -317,14 +318,19 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         }
 
         addWidget(craftingTabList);
-        craftingTabList.init(leftPos, topPos - 37, imageWidth, (t, i) -> {
-            int index = craftingTabList.tabButtons.indexOf(t);
+        getTabList().init(leftPos, topPos - 37, imageWidth, 43, (t, i) -> {
+            int index = getTabList().tabButtons.indexOf(t);
             t.active = index == 0 && selectedStack.isEmpty() || index != 0 && !selectedStack.isEmpty();
-            t.type = LegacyTabButton.Type.bySize(index, 6);
-            t.setWidth(51);
-            t.offset = (t1) -> new Vec3(-1.5 * craftingTabList.tabButtons.indexOf(t), t1.active ? t1.selected ? 0 : 4.5: 26.5, 0);
+            t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
+            t.setWidth(accessor.getInteger("tabList.buttonWidth", 51));
+            t.offset = (t1) -> new Vec3((ScreenUtil.hasHorizontalArtifacts() && index % 2 != 0 ? 0.0125f : 0.0f) + accessor.getFloat("tabList.buttonOffset.x", -1.5f) * index, t1.active ? t1.selected ? 0 : accessor.getFloat("tabList.selectedOffset.y", 4.4f) : accessor.getFloat("tabList.inactiveOffset.y", 26.4f), 0);
         });
     }
+
+    protected int getMaxTabCount() {
+        return accessor.getInteger("maxTabCount", 7);
+    }
+
     protected boolean canCraft(){
         return selectedIngredients.size() > 1 && LegacyLoomScreen.this.canCraft(selectedIngredients,false);
     }

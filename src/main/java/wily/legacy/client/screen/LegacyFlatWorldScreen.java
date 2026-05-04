@@ -293,7 +293,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         }));
         addRenderableWidget(tabList);
         super.init();
-        tabList.init(panel.x,panel.y - 24, panel.width);
+        tabList.init(panel.x, panel.y - 24, panel.width, 30);
         this.generator.updateLayers();
     }
 

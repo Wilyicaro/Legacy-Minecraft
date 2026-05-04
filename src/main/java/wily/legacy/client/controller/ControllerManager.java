@@ -108,27 +108,29 @@ public class ControllerManager {
         });
     }
 
-    public void setPointerPos(double x, double y){
-        setPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
+    public void setPointerPos(double x, double y) {
+        setRawPointerPos(x * getGuiScaleX(), y * getGuiScaleY());
     }
 
-    public void setPointerPos(double x, double y, boolean onlyVirtual) {
+    public void setRawPointerPos(double x, double y) {
+        setRawPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
+    }
+
+    public void setRawPointerPos(double x, double y, boolean onlyVirtual) {
         Window window = minecraft.getWindow();
         if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
             ScreenRectangle rect = a.getMenuRectangle();
             double scaleX = getGuiScaleX();
             double scaleY = getGuiScaleY();
-            int left = rect.left() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabXOffset() * 2 : 0);
-            int top = rect.top() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabYOffset() * 2 : 0);
-            int paddingH = 20;
-            int paddingV = 10;
-            minecraft.mouseHandler.xpos = Mth.clamp(x, (left - paddingH) * scaleX, (rect.right() + paddingH) * scaleX);
-            minecraft.mouseHandler.ypos = Mth.clamp(y, (top - paddingV) * scaleY, (rect.bottom() + paddingV) * scaleY);
+            minecraft.mouseHandler.xpos = Mth.clamp(x, rect.left() * scaleX,rect.right() * scaleX);
+            minecraft.mouseHandler.ypos = Mth.clamp(y, rect.top() * scaleY, rect.bottom() * scaleY);
         } else {
             minecraft.mouseHandler.xpos = Mth.clamp(x, 0, window.getScreenWidth());
             minecraft.mouseHandler.ypos = Mth.clamp(y, 0, window.getScreenHeight());
         }
-        if (!onlyVirtual) GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+        if (!onlyVirtual) {
+            GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+        }
     }
 
     public synchronized void updateBindings() {
@@ -174,7 +176,6 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
                         double moveX;
                         double moveY;
-                        double scale = ScreenUtil.getGuiScale();
                         double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5;
                         double deadzone = stick.getDeadZone();
                         double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 1, 0.35));
@@ -202,8 +203,8 @@ public class ControllerManager {
                             moveX = stick.x * moveSensitivity;
                             moveY = stick.y * moveSensitivity;
                         }
-                        setPointerPos(minecraft.mouseHandler.xpos() + moveX * scale,
-                                minecraft.mouseHandler.ypos() + moveY * scale);
+                        setRawPointerPos(minecraft.mouseHandler.xpos() + moveX * getGuiScaleX(),
+                                minecraft.mouseHandler.ypos() + moveY * getGuiScaleY());
                     }
 
                     if (minecraft.screen instanceof LegacyMenuAccess<?> screen) {

@@ -558,7 +558,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             }
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
-            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f,0f);
+            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
             guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
             guiGraphics.pose().popPose();
             if (scrolledList.max > 0){

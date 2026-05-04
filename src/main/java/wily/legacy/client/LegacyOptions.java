@@ -206,7 +206,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> hudScale = CLIENT_STORAGE.register(createInteger("hudScale", Options::genericValueLabel, 1, ()->3, 2));
     public static final FactoryConfig<Double> hudOpacity = CLIENT_STORAGE.register(createDouble("hudOpacity", LegacyOptions::percentValueLabel, 0.8));
     public static final FactoryConfig<Double> hudDistance = CLIENT_STORAGE.register(createDouble("hudDistance", LegacyOptions::percentValueLabel, 1.0));
-    public static final FactoryConfig<Double> interfaceResolution = CLIENT_STORAGE.register(createDouble("interfaceResolution", (c, d)-> percentValueLabel(c, 0.5 + d), 0.5, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay)));
     public static final FactoryConfig<Double> interfaceSensitivity = CLIENT_STORAGE.register(createDouble("interfaceSensitivity", (c, d)-> percentValueLabel(c, d*2), 0.5, d -> {}));
     public static final FactoryConfig<Double> controllerSensitivity = CLIENT_STORAGE.register(FactoryConfig.create("controllerSensitivity", new FactoryConfigDisplay.Instance<>(Component.translatable("options.sensitivity"), (c, d)-> percentValueLabel(c, d*2)), FactoryConfigControl.createDouble(), 0.5, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> overrideTerrainFogStart = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogStart", true));
@@ -219,7 +218,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> forceSmoothMovement = CLIENT_STORAGE.register(createBoolean("forceSmoothMovement", b-> LegacyComponents.MAY_BE_A_CHEAT,false));
     public static final FactoryConfig<Boolean> legacyCreativeBlockPlacing = CLIENT_STORAGE.register(createBoolean("legacyCreativeBlockPlacing",true));
     public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
-    public static final FactoryConfig<Boolean> autoResolution = CLIENT_STORAGE.register(createBoolean("autoResolution", true, b-> Minecraft.getInstance().execute(()-> Minecraft.getInstance().resizeDisplay())));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));

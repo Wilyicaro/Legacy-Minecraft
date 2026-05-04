@@ -6,6 +6,17 @@
     "panel.sprite": {
       "type": "put_resource_location",
       "value": "legacy:tiles/panel"
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_vert_tab_left",
+          "middle": "legacy:tiles/big_high_vert_tab_middle",
+          "right": "legacy:tiles/big_high_vert_tab_right"
+        },
+        "down": "legacy:tiles/big_low_vert_tab"
+      }
     }
   }
 }

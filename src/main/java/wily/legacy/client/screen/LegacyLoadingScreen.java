@@ -99,7 +99,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         if (!isGenericLoading()) {
             if (getProgress() != -1) {
                 if (getLoadingStage() != null)
-                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
+                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",y - 10), CommonColor.STAGE_TEXT.get()));
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()){
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y - 1, 320, 320 * contents.height() / contents.width());
                 }

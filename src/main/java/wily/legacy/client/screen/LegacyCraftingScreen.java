@@ -31,6 +31,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.FactoryAPIPlatform;
@@ -40,6 +41,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.factoryapi.util.ModInfo;
@@ -494,35 +496,50 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         menu.inventoryActive = infoType.get() <= 0;
         menu.inventoryOffset = accessor.getElementValue("inventoryOffset",LegacyCraftingMenu.DEFAULT_INVENTORY_OFFSET, Vec3.class);
         if (hasTypeTabList()) addWidget(typeTabList);
+        int count = getCraftingButtons().size();
         if (selectedCraftingButton < getCraftingButtons().size()) setFocused(getCraftingButtons().get(selectedCraftingButton));
+        int craftingButtonsX = accessor.getInteger("craftingButtons.x", 13);
+        int craftingButtonsY = accessor.getInteger("craftingButtons.y", 38);
+        int craftingButtonsSize = accessor.getInteger("craftingButtons.size", 27);
         if (typeTabList.selectedTab == 0 || !hasTypeTabList()) {
-            craftingButtonsOffset.max = Math.max(0,recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.selectedTab).size() - 12);
-            craftingButtons.forEach(b->{
-                b.setPos(leftPos + accessor.getInteger("craftingButtonsX",13) + craftingButtons.indexOf(b) * 27,topPos + 38);
+            craftingButtonsOffset.max = Math.max(0, recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.selectedTab).size() - 12);
+            craftingButtons.forEach(b -> {
+                b.width = b.height = craftingButtonsSize;
+                b.setPos(leftPos + craftingButtonsX + craftingButtons.indexOf(b) * b.width, topPos + craftingButtonsY);
                 addWidget(b);
             });
         }else {
-            int size = getCraftingButtons().size();
-            getCraftingButtons().forEach(b->{
-                b.setPos(leftPos + (size == 1 ? 77 : size == 2 ? 52 : size == 3 ? 21 : 8) + getCraftingButtons().indexOf(b) * (size == 2 ? 62 : size == 3 ? 55 : 45),topPos + 39);
-                if (size == 3) b.offset = new Vec3(0.5 + getCraftingButtons().indexOf(b) * 0.5,0,0);
+            int slotX = accessor.getInteger("customCraftingButtons.x", (count == 1 ? 77 : count == 2 ? 52 : count == 3 ? 21 : 8));
+            int xOffset = accessor.getInteger("customCraftingButtons.offset.x", (count == 2 ? 35 : count == 3 ? 28 : 18));
+            getCraftingButtons().forEach(b -> {
+                b.width = b.height = craftingButtonsSize;
+                int index = getCraftingButtons().indexOf(b);
+                b.setPos(leftPos + slotX + index * (b.width + xOffset), topPos + craftingButtonsY);
+                if (count == 3)
+                    b.offset = new Vec3((ScreenUtil.hasHorizontalArtifacts() ? 0.0125f : 0.0f) + 0.5f + index * 0.5f, 0, 0);
                 b.init();
                 addWidget(b);
             });
         }
         addWidget(getTabList());
-        getTabList().init(leftPos, topPos - 37, imageWidth, (t, i) -> {
+        getTabList().init(leftPos, topPos - 37, imageWidth, 43, (t, i) -> {
             int index = getTabList().tabButtons.indexOf(t);
-            t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount() - 1);
-            t.setWidth(51);
-            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset",-1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset",4.5), 0);
+            t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
+            t.setWidth(accessor.getInteger("tabList.buttonWidth", 51));
+            t.offset = (t1) -> new Vec3((ScreenUtil.hasHorizontalArtifacts() && index % 2 != 0 ? 0.0125f : 0.0f) + accessor.getFloat("tabList.buttonOffset.x", -1.5f) * index, t1.selected ? 0 : accessor.getFloat("tabList.selectedOffset.y", 4.4f), 0.0f);
         });
-        if (hasTypeTabList()) typeTabList.init((b, i)->{
-            b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
+        if (hasTypeTabList()) typeTabList.init((b, i) -> {
+            b.setWidth(accessor.getInteger("typeTabList.buttonWidth", 42));
+            //? if <=1.20.1 {
+            /*((WidgetAccessor)b).setHeight(accessor.getInteger("typeTabList.height", 42));
+             *///?} else {
+            b.setHeight(accessor.getInteger("typeTabList.height", 42));
+            //?}
+            b.spriteRender = accessor.getElementValue("typeTabList.sprites", LegacyTabButton.ToggleableTabSprites.VERTICAL, LegacyTabButton.Render.class);
             b.setX(leftPos - b.getWidth() + 6);
             b.setY(topPos + i + 4);
-            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.5, 0.5, 0);
-        },true);
+            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4f, 0.4f, 0.0f);
+        }, true);
     }
 
     public TabList getTabList(){

@@ -119,7 +119,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         if (hasTabList()) addWidget(tabList);
         panel.init();
         renderableVListInit();
-        if (hasTabList()) tabList.init(panel.x,panel.y - 25,panel.width);
+        if (hasTabList()) tabList.init(panel.x, panel.y - 25, panel.width, 31);
     }
 
     @Override

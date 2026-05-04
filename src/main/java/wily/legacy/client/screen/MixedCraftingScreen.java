@@ -41,6 +41,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 
 
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -493,11 +494,11 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             addWidget(b);
         });
         addWidget(getTabList());
-        getTabList().init(leftPos, topPos - 37, imageWidth, (t, i) -> {
+        getTabList().init(leftPos, topPos - 37, imageWidth, 43, (t, i) -> {
             int index = getTabList().tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
-            t.setWidth(accessor.getInteger("tabListButtonWidth", 71));
-            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.5), 0);
+            t.setWidth(accessor.getInteger("tabList.buttonWidth", 71));
+            t.offset = (t1) -> new Vec3((ScreenUtil.hasHorizontalArtifacts() && index % 2 != 0 ? 0.0125f : 0.0f) + accessor.getFloat("tabList.buttonOffset.x", -1.5f) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getFloat("tabList.selectedOffset.y", 4.4f), 0);
         });
     }
 

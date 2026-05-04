@@ -60,6 +60,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import oshi.SystemInfo;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Bearer;
@@ -90,6 +91,7 @@ import java.util.stream.Collectors;
 import static wily.legacy.client.screen.ControlTooltip.MORE;
 
 public class ScreenUtil {
+    public static final boolean isNvidia;
     public static final ResourceLocation GUI_ATLAS = FactoryAPI.createVanillaLocation("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     public static long lastHotbarSelectionChange = -1;
@@ -108,6 +110,10 @@ public class ScreenUtil {
 
     public static final Bearer<Integer> actualPlayerTabWidth = Bearer.of(0);
     public static final Bearer<Integer> actualPlayerTabHeight = Bearer.of(0);
+
+    static {
+        isNvidia = new SystemInfo().getHardware().getGraphicsCards().stream().anyMatch(s -> s.getVendor().contains("nvidia") || s.getVendor().contains("NVIDIA"));
+    }
 
     public static void updateAnimatedCharacterTime(long remainingTime){
         animatedCharacterTime = Util.getMillis();
@@ -456,23 +462,8 @@ public class ScreenUtil {
         PlayerFaceRenderer.draw(guiGraphics, mc.player./*? if >1.20.1 {*/getSkin/*?} else {*//*getSkinTextureLocation*//*?}*/(), x, y, size);
     }
 
-    public static double getInterfaceResolution(){
-        return 1.5 - LegacyOptions.interfaceResolution.get();
-    }
-
-    public static double getGuiScale(){
-        int h = (LegacyOptions.autoResolution.get() ? ScreenUtil.getStandardHeight() : mc.getWindow().getHeight());
-        return h / 360d * ScreenUtil.getTweakedHeightScale(h) * CommonValue.SCALE_MULTIPLIER.get();
-    }
-
-    public static double getTweakedHeightScale(int height) {
-        if (LegacyOptions.autoResolution.get()){
-            if (height == 1080) return 0.999623452;
-            else if (height % 720 != 0) return 1.001d;
-
-            return 1d;
-        }
-        return getInterfaceResolution();
+    public static float getAutoGuiScale() {
+        return getStandardHeight() / 360.0f;
     }
 
     public static int getStandardHeight(){
@@ -761,5 +752,9 @@ public class ScreenUtil {
 
     public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {
         SoundManagerAccessor.of(mc.getSoundManager()).setVolume(soundInstance, volume);
+    }
+
+    public static boolean hasHorizontalArtifacts() {
+        return isNvidia;
     }
 }

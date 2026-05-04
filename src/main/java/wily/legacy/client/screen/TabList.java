@@ -12,6 +12,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
@@ -78,29 +79,37 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         return add(0,0,0,height,type,null,message,null,onPress);
     }
 
-    public void init(int leftPos, int topPos, int width){
-        init(leftPos,topPos,width,(t,i)->{});
+    public void init(int leftPos, int topPos, int width, int height) {
+        init(leftPos, topPos, width, height, (t, i) -> {
+        });
     }
 
-    public void init(int leftPos, int topPos, int width, BiConsumer<LegacyTabButton, Integer> buttonManager){
-        init("tabList", leftPos, topPos, width, buttonManager);
+    public void init(int leftPos, int topPos, int width, int height, BiConsumer<LegacyTabButton, Integer> buttonManager) {
+        init("tabList", leftPos, topPos, width, height, buttonManager);
     }
 
-    public void init(String name, int leftPos, int topPos, int width, BiConsumer<LegacyTabButton, Integer> buttonManager){
-        init((b,i)->{
+    public void init(String name, int leftPos, int topPos, int width, int height, BiConsumer<LegacyTabButton, Integer> buttonManager) {
+        init((b, i) -> {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor)b).setHeight(accessor.getInteger(name + ".height", height));
+            *///?} else {
+            b.setHeight(accessor.getInteger(name + ".height", height));
+            //?}
             b.setWidth(width / tabButtons.size());
-            b.setX(accessor.getInteger(name+".leftPos", leftPos) + i);
-            b.setY(accessor.getInteger(name+".topPos", topPos));
-            b.spriteRender = accessor.getElementValue(name+".sprites", LegacyTabButton.ToggleableTabSprites.DEFAULT, LegacyTabButton.Render.class);
-            buttonManager.accept(b,i);
-        },false);
+            b.setX(accessor.getInteger(name + ".x", leftPos) + i);
+            b.setY(accessor.getInteger(name + ".y", topPos));
+            //Backport?
+            //b.offset = accessor.getElementValue(name + ".offset", LegacyTabButton.StateOffset.DEFAULT, LegacyTabButton.StateOffset.class);
+            b.spriteRender = accessor.getElementValue(name + ".sprites", LegacyTabButton.ToggleableTabSprites.DEFAULT, LegacyTabButton.Render.class);
+            buttonManager.accept(b, i);
+        }, false);
     }
 
     public void init(BiConsumer<LegacyTabButton, Integer> buttonManager, boolean vertical) {
         int position = 0;
         for (LegacyTabButton b : tabButtons) {
-            buttonManager.accept(b,position);
-            position+=vertical ? b.getHeight() : b.getWidth();
+            buttonManager.accept(b, position);
+            position += vertical ? b.getHeight() : b.getWidth();
         }
     }
 

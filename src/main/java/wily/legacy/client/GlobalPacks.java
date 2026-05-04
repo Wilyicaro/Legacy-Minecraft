@@ -276,7 +276,10 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 visibleCount++;
             }
             FactoryScreenUtil.disableBlend();
-            guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            guiGraphics.pose().pushPose();
+            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
+            guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            guiGraphics.pose().popPose();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
                 if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

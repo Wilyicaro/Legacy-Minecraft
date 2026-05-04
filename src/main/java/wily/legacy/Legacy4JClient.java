@@ -544,7 +544,6 @@ public class Legacy4JClient {
                 for (KeyMapping keyMapping : Minecraft.getInstance().options.keyMappings) {
                     a.getElements().put("controlIcon."+keyMapping.getName(), ()-> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));
                 }
-                a.getElements().put("interfaceResolution", ScreenUtil::getInterfaceResolution);
                 ControlType.types.forEach((s,c)->{
                     a.getElements().put("activeControlType."+s, ()-> ControlType.getActiveType().equals(c));
                 });
