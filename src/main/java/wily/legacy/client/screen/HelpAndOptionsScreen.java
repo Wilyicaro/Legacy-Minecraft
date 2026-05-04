@@ -36,11 +36,11 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.sensitivity()), 2),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.mouseWheelSensitivity()), 2),
                         o -> o.renderableVList.addOptions(
-                                LegacyOptions.cursorAtFirstInventorySlot,
-                                LegacyOptions.systemCursor,
-                                LegacyOptions.of(Minecraft.getInstance().options.allowCursorChanges()),
                                 LegacyOptions.of(Minecraft.getInstance().options.invertMouseX()),
                                 LegacyOptions.of(Minecraft.getInstance().options.invertMouseY()),
+                                LegacyOptions.systemCursor,
+                                LegacyOptions.of(Minecraft.getInstance().options.allowCursorChanges()),
+                                LegacyOptions.cursorAtFirstInventorySlot,
                                 LegacyOptions.of(Minecraft.getInstance().options.rawMouseInput()),
                                 LegacyOptions.of(Minecraft.getInstance().options.discreteMouseScroll()),
                                 LegacyOptions.of(Minecraft.getInstance().options.touchscreen())
