@@ -5,9 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -304,7 +301,7 @@ public final class BoxModelManager {
                 : null;
         JsonObject meta = getObject(root, "meta");
         BoxData data = new BoxData(
-                bones == null ? null : bake(texW, texH, texelScale, BoxModelJsonSupport.expandMirrors(root, bones), BoxModelJsonSupport.parseHideSlots(root.get("hide"))),
+                bones == null ? null : BoxModelBaker.bake(texW, texH, texelScale, BoxModelJsonSupport.expandMirrors(root, bones), BoxModelJsonSupport.parseHideSlots(root.get("hide"))),
                 readTexture(texture),
                 readString(meta, "themeName"),
                 readString(meta, "themeNameId"),
@@ -425,88 +422,6 @@ public final class BoxModelManager {
         return set == null || set.isEmpty() ? null : set;
     }
 
-    private static BuiltBoxModel bake(int texW, int texH, float texelScale, List<BoneDef> bones, EnumSet<AttachSlot> hide) {
-        MeshDefinition mesh = new MeshDefinition();
-        PartDefinition root = mesh.getRoot();
-        float minX = Float.POSITIVE_INFINITY;
-        float minY = Float.POSITIVE_INFINITY;
-        float minZ = Float.POSITIVE_INFINITY;
-        float maxX = Float.NEGATIVE_INFINITY;
-        float maxY = Float.NEGATIVE_INFINITY;
-        float maxZ = Float.NEGATIVE_INFINITY;
-        Map<PartKey, CubeListBuilder> builders = new LinkedHashMap<>();
-        Set<PartKey> present = new LinkedHashSet<>();
-        for (BoneDef bone : bones) {
-            if (bone == null || bone.attach() == null || bone.cubes() == null || bone.cubes().isEmpty()) continue;
-            if (Boolean.FALSE.equals(bone.visible())) continue;
-            for (CubeDef cube : bone.cubes()) {
-                if (cube == null || Boolean.FALSE.equals(cube.visible())) continue;
-                float[] origin = cube.origin();
-                float[] size = cube.size();
-                if (origin == null || size == null || origin.length < 3 || size.length < 3) continue;
-                PartKey key = new PartKey(bone.attach(), Math.max(0, cube.armorMask()));
-                CubeListBuilder builder = builders.computeIfAbsent(key, ignored -> CubeListBuilder.create());
-                int[] uv = cube.uv();
-                if (uv == null || uv.length < 2) uv = new int[]{0, 0};
-                builder = builder.texOffs(uv[0], uv[1]);
-                builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
-                builder = builder.addBox(
-                        origin[0] * texelScale,
-                        origin[1] * texelScale,
-                        origin[2] * texelScale,
-                        size[0] * texelScale,
-                        size[1] * texelScale,
-                        size[2] * texelScale,
-                        new CubeDeformation(cube.inflate() * texelScale)
-                );
-                builders.put(key, builder);
-                present.add(key);
-                minX = Math.min(minX, origin[0]);
-                minY = Math.min(minY, origin[1]);
-                minZ = Math.min(minZ, origin[2]);
-                maxX = Math.max(maxX, origin[0] + size[0]);
-                maxY = Math.max(maxY, origin[1] + size[1]);
-                maxZ = Math.max(maxZ, origin[2] + size[2]);
-            }
-        }
-        Map<PartKey, String> childNames = new LinkedHashMap<>();
-        for (PartKey key : present) {
-            CubeListBuilder builder = builders.get(key);
-            if (builder == null) continue;
-            String child = "consoleskins$slot_" + key.slot().name() + "_" + key.armorMask();
-            childNames.put(key, child);
-            root.addOrReplaceChild(child, builder, PartPose.ZERO);
-        }
-        ModelPart bakedRoot = LayerDefinition.create(mesh, texW, texH).bakeRoot();
-        EnumMap<AttachSlot, List<ModelPart>> parts = new EnumMap<>(AttachSlot.class);
-        IdentityHashMap<ModelPart, Integer> armorMasks = new IdentityHashMap<>();
-        for (Map.Entry<PartKey, String> entry : childNames.entrySet()) {
-            ModelPart child = getChild(bakedRoot, entry.getValue());
-            if (child == null) continue;
-            parts.computeIfAbsent(entry.getKey().slot(), ignored -> new ArrayList<>()).add(child);
-            armorMasks.put(child, entry.getKey().armorMask());
-        }
-        parts.replaceAll((slot, list) -> List.copyOf(list));
-        float bboxH = 1.8F;
-        float bboxW = 0.6F;
-        if (minX != Float.POSITIVE_INFINITY && minY != Float.POSITIVE_INFINITY && minZ != Float.POSITIVE_INFINITY
-                && maxX != Float.NEGATIVE_INFINITY && maxY != Float.NEGATIVE_INFINITY && maxZ != Float.NEGATIVE_INFINITY) {
-            float h = Math.max(0.0F, maxY - minY) / 16.0F;
-            float w = Math.max(Math.max(0.0F, maxX - minX), Math.max(0.0F, maxZ - minZ)) / 16.0F;
-            if (h > 0.01F) bboxH = Math.max(bboxH, h);
-            if (w > 0.01F) bboxW = Math.max(bboxW, w);
-        }
-        return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bboxH, bboxW, parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide, armorMasks);
-    }
-
-    private static ModelPart getChild(ModelPart root, String name) {
-        try {
-            return root.getChild(name);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
-    }
-
     private record BoxData(BuiltBoxModel model, Identifier texture, String themeName, String themeKey,
                            EnumMap<AttachSlot, float[]> offsets, EnumMap<ToolSlot, float[]> toolOffsets,
                            EnumMap<AttachSlot, float[]> scales,
@@ -516,6 +431,4 @@ public final class BoxModelManager {
         }
     }
 
-    private record PartKey(AttachSlot slot, int armorMask) {
-    }
 }
