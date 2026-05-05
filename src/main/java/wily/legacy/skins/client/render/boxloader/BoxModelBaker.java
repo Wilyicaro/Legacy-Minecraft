@@ -26,9 +26,10 @@ final class BoxModelBaker {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
         Bounds bounds = new Bounds();
+        EnumMap<AttachSlot, Bounds> coreSlotBounds = new EnumMap<>(AttachSlot.class);
         Map<BoneKey, BoneBuild> builds = collectBuilds(bones);
         for (BoneBuild build : builds.values()) {
-            addCubes(build, texelScale, bounds);
+            addCubes(build, texelScale, bounds, coreSlotBounds);
         }
         for (BoneBuild build : builds.values()) {
             addPart(root, builds, build, texelScale, new LinkedHashSet<>());
@@ -44,7 +45,7 @@ final class BoxModelBaker {
             armorMasks.put(child, build.key.armorMask());
         }
         parts.replaceAll((slot, list) -> List.copyOf(list));
-        return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bounds.height(), bounds.width(), parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide, armorMasks);
+        return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bounds.height(), bounds.width(), parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide, armorMasks, slotSizes(coreSlotBounds));
     }
 
     private static Map<BoneKey, BoneBuild> collectBuilds(List<BoneDef> bones) {
@@ -75,7 +76,8 @@ final class BoxModelBaker {
         return masks;
     }
 
-    private static void addCubes(BoneBuild build, float texelScale, Bounds bounds) {
+    private static void addCubes(BoneBuild build, float texelScale, Bounds bounds,
+                                 EnumMap<AttachSlot, Bounds> coreSlotBounds) {
         if (build.bone.cubes() == null) return;
         float[] pivot = vec3(build.bone.pivot());
         CubeListBuilder builder = build.builder;
@@ -97,8 +99,18 @@ final class BoxModelBaker {
                     new CubeDeformation(cube.inflate() * texelScale)
             );
             bounds.add(origin, size);
+            coreSlotBounds.merge(build.key.slot(), Bounds.of(origin, size), Bounds::larger);
         }
         build.builder = builder;
+    }
+
+    private static EnumMap<AttachSlot, float[]> slotSizes(EnumMap<AttachSlot, Bounds> bounds) {
+        if (bounds == null || bounds.isEmpty()) return new EnumMap<>(AttachSlot.class);
+        EnumMap<AttachSlot, float[]> sizes = new EnumMap<>(AttachSlot.class);
+        bounds.forEach((slot, value) -> {
+            if (value.hasBounds()) sizes.put(slot, value.size());
+        });
+        return sizes;
     }
 
     private static void addPart(PartDefinition root, Map<BoneKey, BoneBuild> builds, BoneBuild build, float texelScale, Set<BoneKey> stack) {
@@ -204,6 +216,18 @@ final class BoxModelBaker {
             maxZ = Math.max(maxZ, origin[2] + size[2]);
         }
 
+        static Bounds of(float[] origin, float[] size) {
+            Bounds bounds = new Bounds();
+            bounds.add(origin, size);
+            return bounds;
+        }
+
+        Bounds larger(Bounds other) {
+            if (other == null || !other.hasBounds()) return this;
+            if (!hasBounds()) return other;
+            return other.volume() > volume() ? other : this;
+        }
+
         float height() {
             if (!hasBounds()) return 1.8F;
             float h = Math.max(0.0F, maxY - minY) / 16.0F;
@@ -219,6 +243,16 @@ final class BoxModelBaker {
         boolean hasBounds() {
             return minX != Float.POSITIVE_INFINITY && minY != Float.POSITIVE_INFINITY && minZ != Float.POSITIVE_INFINITY
                     && maxX != Float.NEGATIVE_INFINITY && maxY != Float.NEGATIVE_INFINITY && maxZ != Float.NEGATIVE_INFINITY;
+        }
+
+        float[] size() {
+            if (!hasBounds()) return null;
+            return new float[]{Math.max(0.0F, maxX - minX), Math.max(0.0F, maxY - minY), Math.max(0.0F, maxZ - minZ)};
+        }
+
+        float volume() {
+            float[] size = size();
+            return size == null ? 0.0F : size[0] * size[1] * size[2];
         }
     }
 

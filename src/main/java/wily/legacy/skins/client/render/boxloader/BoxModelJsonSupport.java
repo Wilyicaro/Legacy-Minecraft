@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager.PivotAnimation;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 
 import java.util.*;
@@ -77,6 +78,10 @@ final class BoxModelJsonSupport {
         return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parseVec3);
     }
 
+    static EnumMap<AttachSlot, PivotAnimation> parsePivotAnimations(JsonElement el) {
+        return parseMap(el, AttachSlot.class, AttachSlot::fromString, BoxModelJsonSupport::parsePivotAnimation);
+    }
+
     static EnumMap<ToolSlot, float[]> parseToolOffsets(JsonElement el) {
         return parseMap(el, ToolSlot.class, ToolSlot::fromString, BoxModelJsonSupport::parseVec3);
     }
@@ -117,6 +122,23 @@ final class BoxModelJsonSupport {
         } catch (RuntimeException ignored) {
         }
         return null;
+    }
+
+    private static PivotAnimation parsePivotAnimation(JsonElement el) {
+        if (el == null || el.isJsonNull()) return null;
+        if (el.isJsonArray() || el.isJsonPrimitive()) {
+            float[] amplitude = parseVec3(el);
+            return amplitude == null ? null : new PivotAnimation(null, amplitude, 1.0F, 0.0F, false);
+        }
+        if (!el.isJsonObject()) return null;
+        JsonObject obj = el.getAsJsonObject();
+        float[] offset = parseVec3(getAny(obj, "offset", "rotation", "base"));
+        float[] amplitude = parseVec3(getAny(obj, "amplitude", "range", "amount", "value"));
+        if (offset == null && amplitude == null) return null;
+        float speed = readFloat(obj, 1.0F, "speed", "frequency");
+        float phase = readFloat(obj, 0.0F, "phase");
+        boolean movingOnly = readMovingOnly(obj);
+        return new PivotAnimation(offset, amplitude, speed, phase, movingOnly);
     }
 
     static void addHideToken(EnumSet<AttachSlot> out, String token) {
@@ -275,14 +297,14 @@ final class BoxModelJsonSupport {
         }
     }
 
-    private static <E extends Enum<E>> EnumMap<E, float[]> parseMap(JsonElement el, Class<E> type, Function<String, E> parser, Function<JsonElement, float[]> valueParser) {
+    private static <E extends Enum<E>, V> EnumMap<E, V> parseMap(JsonElement el, Class<E> type, Function<String, E> parser, Function<JsonElement, V> valueParser) {
         if (el == null || el.isJsonNull() || !el.isJsonObject()) return null;
-        EnumMap<E, float[]> out = new EnumMap<>(type);
+        EnumMap<E, V> out = new EnumMap<>(type);
         try {
             for (Map.Entry<String, JsonElement> entry : el.getAsJsonObject().entrySet()) {
                 E slot = parser.apply(entry.getKey());
                 if (slot == null) continue;
-                float[] value = valueParser.apply(entry.getValue());
+                V value = valueParser.apply(entry.getValue());
                 if (value != null) out.put(slot, value);
             }
         } catch (RuntimeException ignored) {
@@ -376,6 +398,39 @@ final class BoxModelJsonSupport {
         if (isTrue(root, limbsSnake) || isTrue(root, limbsCamel)) return true;
         if (isTrue(root, directSnake) || isTrue(root, directCamel)) return true;
         return mirror != null && (isTrue(mirror, nestedSnake) || isTrue(mirror, nestedCamel));
+    }
+
+    private static JsonElement getAny(JsonObject obj, String... keys) {
+        if (obj == null || keys == null) return null;
+        for (String key : keys) {
+            if (key != null && obj.has(key)) return obj.get(key);
+        }
+        return null;
+    }
+
+    private static float readFloat(JsonObject obj, float fallback, String... keys) {
+        if (obj == null || keys == null) return fallback;
+        for (String key : keys) {
+            if (key == null || !obj.has(key) || !obj.get(key).isJsonPrimitive()) continue;
+            try {
+                return obj.get(key).getAsFloat();
+            } catch (RuntimeException ignored) {
+            }
+        }
+        return fallback;
+    }
+
+    private static boolean readMovingOnly(JsonObject obj) {
+        if (obj == null) return false;
+        for (String key : new String[]{"whenMoving", "whileMoving", "moving"}) {
+            if (!obj.has(key) || !obj.get(key).isJsonPrimitive()) continue;
+            JsonPrimitive primitive = obj.getAsJsonPrimitive(key);
+            if (primitive.isBoolean()) return primitive.getAsBoolean();
+            if (primitive.isString()) return primitive.getAsString().equalsIgnoreCase("true");
+        }
+        if (!obj.has("when") || !obj.get("when").isJsonPrimitive()) return false;
+        String value = obj.get("when").getAsString();
+        return value != null && value.equalsIgnoreCase("moving");
     }
 
     private static float readAxis(JsonObject obj, String lower, String upper) {
