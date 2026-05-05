@@ -109,8 +109,9 @@ dependencies {
 	//implementation(libs.moulberry.mixinconstraints)
 	api("jarJar"(prop("sdl_dependency")) as Any)
 	api("wily.factory_api:factory_api-forge:${stonecutter.current.version}-${prop("factory_api_version")}")
-	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
+//	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
 	compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
+	compileOnly("maven.modrinth:bisect-mod:z62iwoR1")
 	api("jarJar"("org.apache.httpcomponents:httpclient:4.5.14") {
 		exclude(group = "commons-codec", module = "commons-codec")
 	} as Any)

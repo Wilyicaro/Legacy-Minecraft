@@ -62,11 +62,12 @@ dependencies {
 	api(jarJar(prop("sdl_dependency")) as Any)
 	api("wily.factory_api:factory_api-neoforge:${stonecutter.current.version}-${prop("factory_api_version")}")
 
-	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
+//	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
 	compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
 	compileOnly("maven.modrinth:sodium:${prop("sodium_version")}")
 	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
+	compileOnly("maven.modrinth:bisect-mod:lhJ7xU8k")
 	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") {
 		exclude(group = "commons-codec", module = "commons-codec")
 	} as Any)
