@@ -2,13 +2,11 @@ package wily.legacy.mixin.base.client.smithing;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.SmithingMenu;
@@ -16,7 +14,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,7 +28,7 @@ import wily.legacy.util.client.LegacyFontUtil;
 @Mixin(SmithingScreen.class)
 public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMenu> {
 
-private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
+    private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
         public int getWidth() {
             return 30;
         }
@@ -63,9 +60,6 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
     public SmithingScreenMixin(SmithingMenu itemCombinerMenu, Inventory inventory, Component component, Identifier resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
-
-    @Shadow
-    protected abstract boolean hasRecipeError();
 
     @Override
     public void init() {
@@ -132,7 +126,7 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
         GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 54 : 82), topPos + (sd ? 38 : 59));
         if (!sd) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
         FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, sd ? 16 : 22, sd ? 14 : 15);
-        if (hasRecipeError())
+        if (menu.hasRecipeError())
             FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         GuiGraphicsExtractor.pose().popMatrix();
         GuiGraphicsExtractor.entity(armorStandPreview, sd ? 20 : 35, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.leftPos, this.topPos, this.leftPos + (sd ? 228 : 364), this.topPos + (sd ? 100 : 150));
