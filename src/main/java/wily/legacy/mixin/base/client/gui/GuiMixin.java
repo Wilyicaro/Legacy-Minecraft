@@ -14,6 +14,8 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
@@ -167,6 +169,11 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     @Inject(method = "renderSavingIndicator", at = @At("HEAD"), cancellable = true)
     public void renderAutoSaveIndicator(GuiGraphics guiGraphics,/*? if >=1.21 {*/ DeltaTracker deltaTracker,/*?}*/ CallbackInfo ci) {
         ci.cancel();
+    }
+
+    @WrapWithCondition(method = "extractDebugOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"))
+    private boolean extractDebugOverlay(DebugScreenOverlay instance, GuiGraphicsExtractor GuiGraphicsExtractor) {
+        return minecraft.level != null;
     }
 
     @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
