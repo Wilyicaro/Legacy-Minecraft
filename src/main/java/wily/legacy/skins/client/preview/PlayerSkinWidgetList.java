@@ -215,6 +215,9 @@ public class PlayerSkinWidgetList {
             }
         }
         clearVisibleElements();
+        boolean sparse = isSparseCarousel(n);
+        int sparseStart = sparse ? sparseStartOffset(n) : -visibleRadius;
+        int sparseEnd = sparse ? sparseEndOffset(n) : visibleRadius;
         boolean avoid = avoidRepeatsWhenFew && n <= avoidRepeatsThreshold;
         String[] avoidIds = null;
         if (avoid) {
@@ -227,7 +230,8 @@ public class PlayerSkinWidgetList {
                     dir < 0 ? -2 : 2, dir < 0 ? 2 : -2,
                     dir < 0 ? -3 : 3, dir < 0 ? 3 : -3};
             for (int off : order) {
-                if (Math.abs(off) >= 4) continue;
+                if (Math.abs(off) > visibleRadius) continue;
+                if (off < sparseStart || off > sparseEnd) continue;
                 int idx = off + 4;
                 if (idx < 0 || idx >= 9) continue;
                 int skinIndex = Math.floorMod(this.index + off, n);
@@ -240,9 +244,6 @@ public class PlayerSkinWidgetList {
         }
         for (int pos = 0; pos < ring.size(); pos++) {
             int offset = pos - 4;
-            boolean sparse = isSparseCarousel(n);
-            int sparseStart = sparseStartOffset(n);
-            int sparseEnd = sparseEndOffset(n);
             PlayerSkinWidget w = ring.get(pos);
             String id;
             if (sparse && (offset < sparseStart || offset > sparseEnd)) {
