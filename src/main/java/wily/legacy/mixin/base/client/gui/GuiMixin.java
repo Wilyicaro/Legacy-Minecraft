@@ -14,7 +14,6 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -171,8 +170,8 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         ci.cancel();
     }
 
-    @WrapWithCondition(method = "extractDebugOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"))
-    private boolean extractDebugOverlay(DebugScreenOverlay instance, GuiGraphicsExtractor GuiGraphicsExtractor) {
+    @WrapWithCondition(method = "renderDebugOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
+    private boolean renderDebugOverlay(DebugScreenOverlay instance, GuiGraphics guiGraphics) {
         return minecraft.level != null;
     }
 
