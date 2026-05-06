@@ -248,8 +248,20 @@ final class BoxModelJsonSupport {
                 outCubes.add(new CubeDef(uv, mirroredOrigin, new float[]{size[0], size[1], size[2]}, cube.inflate(), cube.mirror(), cube.visible(), cube.armorMask()));
             }
         }
-        if (outCubes.isEmpty()) return null;
-        return new BoneDef(name, src.parent(), dstAttach, mirrorPivot(src.pivot()), mirrorRotation(src.rotation()), outCubes, src.visible());
+        List<PlaneDef> outPlanes = new ArrayList<>();
+        if (src.planes() != null) {
+            for (PlaneDef plane : src.planes()) {
+                if (plane == null) continue;
+                float[] origin = plane.origin();
+                float[] size = plane.size();
+                if (origin == null || size == null || origin.length < 3 || size.length < 3) continue;
+                float[] mirroredOrigin = new float[]{-(origin[0] + size[0]), origin[1], origin[2]};
+                int[] uv = plane.uv() == null || plane.uv().length < 2 ? new int[]{0, 0} : new int[]{plane.uv()[0], plane.uv()[1]};
+                outPlanes.add(new PlaneDef(uv, mirroredOrigin, new float[]{size[0], size[1], size[2]}, mirrorFace(plane.face()), plane.mirror(), plane.visible(), plane.armorMask()));
+            }
+        }
+        if (outCubes.isEmpty() && outPlanes.isEmpty()) return null;
+        return new BoneDef(name, src.parent(), dstAttach, mirrorPivot(src.pivot()), mirrorRotation(src.rotation()), outCubes, outPlanes, src.visible());
     }
 
     private static float[] mirrorPivot(float[] pivot) {
@@ -260,6 +272,14 @@ final class BoxModelJsonSupport {
     private static float[] mirrorRotation(float[] rotation) {
         if (rotation == null || rotation.length < 3) return rotation;
         return new float[]{rotation[0], -rotation[1], -rotation[2]};
+    }
+
+    private static String mirrorFace(String face) {
+        if (face == null) return null;
+        String value = face.trim().toUpperCase(Locale.ROOT);
+        if ("EAST".equals(value)) return "WEST";
+        if ("WEST".equals(value)) return "EAST";
+        return face;
     }
 
     private static <E extends Enum<E>> EnumSet<E> parseEnumFlags(JsonElement el, Class<E> type, BiConsumer<EnumSet<E>, String> tokenReader) {

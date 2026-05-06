@@ -7,6 +7,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.core.Direction;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -72,34 +73,61 @@ final class BoxModelBaker {
                 if (validCube(cube)) masks.add(Math.max(0, cube.armorMask()));
             }
         }
+        if (bone.planes() != null) {
+            for (PlaneDef plane : bone.planes()) {
+                if (validPlane(plane)) masks.add(Math.max(0, plane.armorMask()));
+            }
+        }
         if (masks.isEmpty()) masks.add(0);
         return masks;
     }
 
     private static void addCubes(BoneBuild build, float texelScale, Bounds bounds,
                                  EnumMap<AttachSlot, Bounds> coreSlotBounds) {
-        if (build.bone.cubes() == null) return;
         float[] pivot = vec3(build.bone.pivot());
         CubeListBuilder builder = build.builder;
-        for (CubeDef cube : build.bone.cubes()) {
-            if (!validCube(cube) || Math.max(0, cube.armorMask()) != build.key.armorMask()) continue;
-            float[] origin = cube.origin();
-            float[] size = cube.size();
-            int[] uv = cube.uv();
-            if (uv == null || uv.length < 2) uv = new int[]{0, 0};
-            builder = builder.texOffs(uv[0], uv[1]);
-            builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
-            builder = builder.addBox(
-                    (origin[0] - pivot[0]) * texelScale,
-                    (origin[1] - pivot[1]) * texelScale,
-                    (origin[2] - pivot[2]) * texelScale,
-                    size[0] * texelScale,
-                    size[1] * texelScale,
-                    size[2] * texelScale,
-                    new CubeDeformation(cube.inflate() * texelScale)
-            );
-            bounds.add(origin, size);
-            coreSlotBounds.merge(build.key.slot(), Bounds.of(origin, size), Bounds::larger);
+        if (build.bone.cubes() != null) {
+            for (CubeDef cube : build.bone.cubes()) {
+                if (!validCube(cube) || Math.max(0, cube.armorMask()) != build.key.armorMask()) continue;
+                float[] origin = cube.origin();
+                float[] size = cube.size();
+                int[] uv = uv(cube.uv());
+                builder = builder.texOffs(uv[0], uv[1]);
+                builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
+                builder = builder.addBox(
+                        (origin[0] - pivot[0]) * texelScale,
+                        (origin[1] - pivot[1]) * texelScale,
+                        (origin[2] - pivot[2]) * texelScale,
+                        size[0] * texelScale,
+                        size[1] * texelScale,
+                        size[2] * texelScale,
+                        new CubeDeformation(cube.inflate() * texelScale)
+                );
+                bounds.add(origin, size);
+                coreSlotBounds.merge(build.key.slot(), Bounds.of(origin, size), Bounds::larger);
+            }
+        }
+        if (build.bone.planes() != null) {
+            for (PlaneDef plane : build.bone.planes()) {
+                if (!validPlane(plane) || Math.max(0, plane.armorMask()) != build.key.armorMask()) continue;
+                float[] origin = plane.origin();
+                float[] size = plane.size();
+                int[] uv = uv(plane.uv());
+                Direction face = face(plane.face());
+                builder = builder.texOffs(uv[0], uv[1]);
+                builder = plane.mirror() ? builder.mirror() : builder.mirror(false);
+                builder = builder.addBox(
+                        (origin[0] - pivot[0]) * texelScale,
+                        (origin[1] - pivot[1]) * texelScale,
+                        (origin[2] - pivot[2]) * texelScale,
+                        size[0] * texelScale,
+                        size[1] * texelScale,
+                        size[2] * texelScale,
+                        EnumSet.of(face)
+                );
+                bounds.add(origin, size);
+                coreSlotBounds.merge(build.key.slot(), Bounds.of(origin, size), Bounds::larger);
+            }
         }
         build.builder = builder;
     }
@@ -156,6 +184,26 @@ final class BoxModelBaker {
         float[] origin = cube.origin();
         float[] size = cube.size();
         return origin != null && size != null && origin.length >= 3 && size.length >= 3;
+    }
+
+    private static boolean validPlane(PlaneDef plane) {
+        if (plane == null || Boolean.FALSE.equals(plane.visible())) return false;
+        float[] origin = plane.origin();
+        float[] size = plane.size();
+        return origin != null && size != null && origin.length >= 3 && size.length >= 3;
+    }
+
+    private static int[] uv(int[] value) {
+        return value == null || value.length < 2 ? new int[]{0, 0} : value;
+    }
+
+    private static Direction face(String value) {
+        if (value == null || value.isBlank()) return Direction.NORTH;
+        try {
+            return Direction.valueOf(value.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return Direction.NORTH;
+        }
     }
 
     private static float[] vec3(float[] value) {
