@@ -9,6 +9,7 @@ public record BoneDef(
         float[] pivot,
         float[] rotation,
         List<CubeDef> cubes,
+        List<PlaneDef> planes,
         Boolean visible
 ) {
 }
