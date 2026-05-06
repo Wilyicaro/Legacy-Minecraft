@@ -1,5 +1,5 @@
-//? if fabric || >=1.21 && neoforge && <26.1 {
-/*package wily.legacy.client.screen.compat;
+//? if fabric || neoforge {
+package wily.legacy.client.screen.compat;
 
 import net.irisshaders.iris.gui.screen.ShaderPackScreen;
 import net.minecraft.network.chat.Component;
@@ -10,4 +10,4 @@ public class IrisCompat {
         SodiumCompat.SODIUM.elements().add(o -> o.getRenderableVList().addRenderables(0, RenderableVListScreen.openScreenButton(Component.translatable("options.iris.shaderPackSelection"), () -> new ShaderPackScreen(o)).build()));
     }
 }
-*///?}
+//?}

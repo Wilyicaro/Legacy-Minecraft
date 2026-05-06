@@ -6,9 +6,9 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-//? if fabric || >=1.21 && neoforge && <26.1 {
-/*import wily.legacy.client.screen.compat.SodiumCompat;
-*///?}
+//? if fabric || (>=1.21 && neoforge) {
+import wily.legacy.client.screen.compat.SodiumCompat;
+//?}
 
 
 import java.util.List;
@@ -33,11 +33,11 @@ public class SettingsScreen extends RenderableVListScreen {
 
     private static boolean shouldHideSection(OptionsScreen.Section section) {
         if (!LegacyOptions.legacySettingsMenus.get() && !LegacyOptions.hideSodiumSettings.get()) return false;
-        //? if fabric || >=1.21 && neoforge && <26.1 {
-        /*return FactoryAPI.isModLoaded("sodium") && section == SodiumCompat.SODIUM;
-        *///?} else {
-        return false;
-        //?}
+        //? if fabric || (>=1.21 && neoforge) {
+        return FactoryAPI.isModLoaded("sodium") && section == SodiumCompat.SODIUM;
+        //?} else {
+        /*return false;
+        *///?}
     }
 
 }

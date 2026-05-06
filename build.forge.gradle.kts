@@ -16,6 +16,10 @@ platform {
 		required("forge") {
 			forgeVersionRange = "[1,)"
 		}
+		required("factory_api") {
+			slug("factory-api")
+			versionRange = ">=${prop("factory_api_version")}"
+		}
 	}
 }
 

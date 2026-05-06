@@ -17,7 +17,7 @@ public class BisectModCompat {
     private static final Identifier BISECT_ICON = ModRef.res("textures/gui/serverlistbanner/icon.png");
 
     public static AbstractWidget createButton(ServerRenderableList list) {
-        return new IconButton(list, 0, 0, 270, 30, ModRoot.INSTANCE.modules.serverCreatorBanner.getTitle()) {
+        return new IconButton(list, 0, 0, 270, 30, /*? if neoforge {*//*ModRoot.get().clientModRoot*//*?} else {*/ModRoot.INSTANCE/*?}*/.modules.serverCreatorBanner.getTitle()) {
             @Override
             public void onPress(InputWithModifiers input) {
                 Minecraft.getInstance().setScreen(new BHOrderScreen(list.getScreen()));
