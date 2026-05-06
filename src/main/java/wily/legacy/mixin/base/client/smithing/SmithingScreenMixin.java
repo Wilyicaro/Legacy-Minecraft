@@ -2,13 +2,11 @@ package wily.legacy.mixin.base.client.smithing;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.SmithingMenu;
@@ -62,9 +60,6 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     public SmithingScreenMixin(SmithingMenu itemCombinerMenu, Inventory inventory, Component component, Identifier resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
-
-    @Shadow
-    protected abstract boolean hasRecipeError();
 
     @Override
     public void init() {
@@ -131,7 +126,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
         guiGraphics.pose().translate(leftPos + (sd ? 54 : 82), topPos + (sd ? 38 : 59));
         if (!sd) guiGraphics.pose().scale(1.5f, 1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, sd ? 16 : 22, sd ? 14 : 15);
-        if (hasRecipeError())
+        if (menu.hasRecipeError())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popMatrix();
         guiGraphics.submitEntityRenderState(armorStandPreview, sd ? 20 : 35, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.leftPos, this.topPos, this.leftPos + (sd ? 228 : 364), this.topPos + (sd ? 100 : 150));
