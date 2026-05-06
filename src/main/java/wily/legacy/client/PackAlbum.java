@@ -44,6 +44,7 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.*;
+import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
@@ -248,7 +249,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
     }
 
     public static List<String> getSelectableIds(PackRepository packRepository) {
-        return packRepository.getSelectedPacks().stream().filter(pack -> !FactoryAPIPlatform.isPackHidden(pack) && !DownloadedResourceAlbums.isManagedPack(pack.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(pack.getId())).map(Pack::getId).toList();
+        return packRepository.getSelectedPacks().stream().filter(pack -> !FactoryAPIPlatform.isPackHidden(pack) && !DownloadedResourceAlbums.isManagedPack(pack.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(pack.getId()) && !CustomSkinPackStore.isManagedResourcePackId(pack.getId())).map(Pack::getId).toList();
     }
 
     public static ConfirmationScreen createAlbumEditScreen(Screen parent, Component title, Component defaultName, Component defaultDescription, BiConsumer<Component, Component> editAlbum) {
@@ -614,7 +615,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             if (DownloadedResourceAlbums.isManagedAlbum(getSelectedAlbum().id())) return;
             if (minecraft.screen != null) {
                 Screen screen = minecraft.screen;
-                packRepository.setSelected(DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedAlbum().packs()));
+                packRepository.setSelected(CustomSkinPackStore.preserveSelection(packRepository, DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedAlbum().packs())));
                 List<String> oldSelection = getSelectedIds(packRepository);
                 minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
                     if (!oldSelection.equals(getSelectedIds(p))) {

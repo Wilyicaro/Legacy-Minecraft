@@ -34,6 +34,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.DownloadedPackMetadata;
 import wily.legacy.client.DownloadedResourceAlbums;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -144,6 +145,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         stream.forEach(e -> {
             if (DownloadedResourceAlbums.isManagedPack(e.getId())) return;
             if (DownloadedSkinPackStore.isManagedResourcePackId(e.getId())) return;
+            if (CustomSkinPackStore.isManagedResourcePackId(e.getId())) return;
             Component title = DownloadedPackMetadata.getTitle(e.getId(), e.getTitle());
             Component descriptionText = DownloadedPackMetadata.getDescription(e.getId(), e.getExtendedDescription());
             List<Component> description = new ArrayList<>();
