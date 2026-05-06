@@ -177,13 +177,14 @@ public class ServerRenderableList extends RenderableVList {
                 addRenderable(lanButton = new IconButton(this, 0, 0, 0, 30, Component.literal(lanServer.getMotd())) {
                     @Override
                     protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
-                        int messageX = accessor.getInteger(name + ".buttonMessage.xOffset", 35);
-                        GuiGraphicsExtractor.text(minecraft.font, LAN_SERVER_HEADER, messageX, getY() + 1, 0xFFFFFFFF, false);
-                        GuiGraphicsExtractor.text(minecraft.font, lanServer.getMotd(), messageX, getY() + 12, -8355712, false);
+                        int messageX = getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35);
+                        int messageY = getY() + 3;
+                        GuiGraphicsExtractor.text(minecraft.font, LAN_SERVER_HEADER, messageX, messageY, 0xFFFFFFFF, false);
+                        GuiGraphicsExtractor.text(minecraft.font, lanServer.getMotd(), messageX, messageY + 11, -8355712, false);
                         if (minecraft.options.hideServerAddress) {
-                            GuiGraphicsExtractor.text(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, getY() + 12 + 11, 0x303030, false);
+                            GuiGraphicsExtractor.text(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, messageY + 20, 0x303030, false);
                         } else {
-                            GuiGraphicsExtractor.text(minecraft.font, lanServer.getAddress(), messageX, getY() + 12 + 11, 0x303030, false);
+                            GuiGraphicsExtractor.text(minecraft.font, lanServer.getAddress(), messageX, messageY + 20, 0x303030, false);
                         }
                     }
 
