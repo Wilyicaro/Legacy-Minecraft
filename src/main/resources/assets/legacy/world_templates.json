@@ -5,7 +5,7 @@
     "templateLocation": "world_templates/tutorial.mcsave",
     "folderName": "Tutorial",
     "isGamePath": true,
-    "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial.mcsave?checksum=90bf144ff67d736f1641a0a2b2e8f69a",
+    "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/1.21.11/world_templates/tutorial.mcsave?checksum=90bf144ff67d736f1641a0a2b2e8f69a",
     "directJoin": true,
     "preDownload": true
   }
