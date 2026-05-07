@@ -7,8 +7,10 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -93,6 +95,16 @@ public abstract class GuiGraphicsExtractorMixin {
     private GuiRenderState submitEntityRenderState(GuiRenderState instance, PictureInPictureRenderState pictureInPictureRenderState) {
         MutablePIPRenderState.of(pictureInPictureRenderState).setPose(self().pose());
         return instance;
+    }
+
+    @ModifyArg(method = "entity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;addPicturesInPictureState(Lnet/minecraft/client/renderer/state/gui/pip/PictureInPictureRenderState;)V"))
+    private PictureInPictureRenderState submitEntityRenderState(PictureInPictureRenderState state) {
+        if (!(state instanceof GuiEntityRenderState entityState)) return state;
+        ScreenRectangle bounds = new ScreenRectangle(state.x0(), state.y0(), state.x1() - state.x0(), state.y1() - state.y0()).transformAxisAligned(self().pose());
+        if (state.scissorArea() != null) bounds = state.scissorArea().intersection(bounds);
+        GuiEntityRenderState shiftedState = new GuiEntityRenderState(entityState.renderState(), entityState.translation(), entityState.rotation(), entityState.overrideCameraAngle(), state.x0(), state.y0(), state.x1(), state.y1(), state.scale(), state.scissorArea(), bounds);
+        MutablePIPRenderState.of(shiftedState).setPose(self().pose());
+        return shiftedState;
     }
 
     @WrapOperation(method = {"itemBar", "itemCooldown"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(Lcom/mojang/blaze3d/pipeline/RenderPipeline;IIIII)V"))
