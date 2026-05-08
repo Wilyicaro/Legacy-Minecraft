@@ -38,6 +38,13 @@
 - Added Decay potions and tipped arrows, thanks to Creepereater201
 - Added all the missing SD UIs, including How To Play, More World Options and Host Options interfaces
 - Added Mushroom Pore
+- Added SD Control Icons for Keyboard & Mouse, Steam, and PlayStation 4/5
+  - KBM by Cjnator38
+  - PS4/PS5 and initial Steam designs by NicSonic-_-
+- Added descriptons for entries in More World Options (Nabouna32)
+- Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
+- Reordered options and unified the size of advanced options panels, thanks to Cjnator38
+- A sizable amount of new Control Tooltip actions and fixes (Nabouna32)
 
 ## Parity Changes (thanks to Creepereater201)
 
@@ -52,6 +59,13 @@
 - Fish drops bones
 - ID in the Map name
 - Host Options command outputs
+
+## General Changes
+
+- Remastered Stadia Control Icons (NicSonic-_-)
+- Touched up PlayStation 5 Control Icons (NicSonic-_-)
+- Remastered Steam Control Icons (Cjnator38)
+- Integration with Bisect Hosting Menu
 
 ## Fixed
 
