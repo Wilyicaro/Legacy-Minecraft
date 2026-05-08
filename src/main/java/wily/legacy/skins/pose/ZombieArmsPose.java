@@ -64,19 +64,21 @@ public final class ZombieArmsPose {
             if (holding.left() && !blocking.left()) model.leftArm.xRot += adjust;
         }
 
-        ArmPoseSupport.applyIdleSway(
-                model,
-                ArmPoseSupport.getAgeInTicks(state),
-                attackTime,
-                0.95F,
-                0.02F,
-                0.85F,
-                0.015F,
-                0.75F,
-                0.012F,
-                blocking.right(),
-                blocking.left()
-        );
+        if (!hasNoIdleSway(state)) {
+            ArmPoseSupport.applyIdleSway(
+                    model,
+                    ArmPoseSupport.getAgeInTicks(state),
+                    attackTime,
+                    0.95F,
+                    0.02F,
+                    0.85F,
+                    0.015F,
+                    0.75F,
+                    0.012F,
+                    blocking.right(),
+                    blocking.left()
+            );
+        }
         if (isSpearJabbing(state, attackTime)) SpearAnimations.thirdPersonAttackHand(model, state);
         else ArmPoseSupport.applyAttackSwing(model, state, attackTime);
 
@@ -85,6 +87,11 @@ public final class ZombieArmsPose {
 
         if (blocking.left()) leftState.restore(model.leftArm, model.leftSleeve);
         else leftState.syncSleeve(model.leftArm, model.leftSleeve);
+    }
+
+    private static boolean hasNoIdleSway(AvatarRenderState state) {
+        if (!(state instanceof RenderStateSkinIdAccess access)) return false;
+        return SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.NO_IDLE_SWAY, access.consoleskins$getSkinId());
     }
 
     private static boolean isUsingTrident(Player player) {

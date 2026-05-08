@@ -12,7 +12,8 @@ public record BuiltBoxModel(int textureWidth,
                             float bboxWidth,
                             EnumMap<AttachSlot, List<ModelPart>> bySlot,
                             EnumSet<AttachSlot> hideSlots,
-                            Map<ModelPart, Integer> armorMasks) {
+                            Map<ModelPart, Integer> armorMasks,
+                            EnumMap<AttachSlot, float[]> coreSlotSizes) {
     private List<ModelPart> copyParts(List<ModelPart> parts, Map<ModelPart, Integer> copiedMasks) {
         if (parts == null || parts.isEmpty()) return parts;
         ArrayList<ModelPart> copied = new ArrayList<>(parts.size());
@@ -62,10 +63,21 @@ public record BuiltBoxModel(int textureWidth,
         return hideSlots.contains(slot);
     }
 
+    public float[] coreSlotSize(AttachSlot slot) {
+        return coreSlotSizes == null ? null : coreSlotSizes.get(slot);
+    }
+
     public BuiltBoxModel copy() {
         EnumMap<AttachSlot, List<ModelPart>> copiedSlots = new EnumMap<>(AttachSlot.class);
         IdentityHashMap<ModelPart, Integer> copiedMasks = new IdentityHashMap<>();
         bySlot.forEach((slot, parts) -> copiedSlots.put(slot, copyParts(parts, copiedMasks)));
-        return new BuiltBoxModel(textureWidth, textureHeight, partScale, bboxHeight, bboxWidth, copiedSlots, hideSlots.clone(), copiedMasks);
+        return new BuiltBoxModel(textureWidth, textureHeight, partScale, bboxHeight, bboxWidth, copiedSlots, hideSlots.clone(), copiedMasks, copySlotSizes(coreSlotSizes));
+    }
+
+    private static EnumMap<AttachSlot, float[]> copySlotSizes(EnumMap<AttachSlot, float[]> sizes) {
+        if (sizes == null) return null;
+        EnumMap<AttachSlot, float[]> copied = new EnumMap<>(AttachSlot.class);
+        sizes.forEach((slot, size) -> copied.put(slot, size == null ? null : Arrays.copyOf(size, size.length)));
+        return copied;
     }
 }

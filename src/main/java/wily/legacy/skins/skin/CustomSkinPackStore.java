@@ -3,6 +3,7 @@ package wily.legacy.skins.skin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.repository.PackRepository;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 
 import java.io.IOException;
@@ -73,6 +74,18 @@ public final class CustomSkinPackStore {
 
     public static boolean managesTargetDirectory(String folderName) {
         return SkinPackFiles.managesTargetDirectory(folderName, TARGET_DIRECTORY_NAME);
+    }
+
+    public static boolean isManagedResourcePackId(String packId) {
+        return RESOURCE_PACK_ID.equals(packId) || RESOURCE_PACK_DIR.equals(packId);
+    }
+
+    public static List<String> preserveSelection(PackRepository repository, List<String> selectedIds) {
+        ArrayList<String> selected = new ArrayList<>(selectedIds);
+        if (repository == null) return selected;
+        String resolvedId = repository.getPack(RESOURCE_PACK_ID) != null ? RESOURCE_PACK_ID : repository.getPack(RESOURCE_PACK_DIR) != null ? RESOURCE_PACK_DIR : null;
+        if (resolvedId != null && !selected.contains(resolvedId)) selected.add(resolvedId);
+        return selected;
     }
 
     public static void normalizeDownloadedPack(Path packDir) throws IOException {

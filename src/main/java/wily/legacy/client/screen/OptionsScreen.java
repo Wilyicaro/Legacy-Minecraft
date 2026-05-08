@@ -381,7 +381,7 @@ public class OptionsScreen extends PanelVListScreen {
                 () -> Section.ADVANCED_GAME_OPTIONS));
         public static final Section ADVANCED_GAME_OPTIONS = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options", GAME_OPTIONS.title()),
-                s -> Panel.centered(s, 250, 172),
+                s -> Panel.centered(s, 250, 215, 0, 20),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),
@@ -445,7 +445,7 @@ public class OptionsScreen extends PanelVListScreen {
                 () -> Section.ADVANCED_AUDIO));
         public static final Section ADVANCED_AUDIO = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options", AUDIO.title()),
-                s -> Panel.centered(s, 250, 198, 0, 30),
+                s -> Panel.centered(s, 250, 215, 0, 20),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.of(mc.options.soundDevice()),
@@ -701,7 +701,7 @@ public class OptionsScreen extends PanelVListScreen {
                 () -> Section.ADVANCED_USER_INTERFACE));
         public static final Section ADVANCED_USER_INTERFACE = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options", USER_INTERFACE.title()),
-                s -> Panel.centered(s, 250, 184, 0, 18),
+                s -> Panel.centered(s, 250, 215, 0, 20),
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),

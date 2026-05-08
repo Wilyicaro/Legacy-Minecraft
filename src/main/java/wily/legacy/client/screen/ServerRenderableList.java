@@ -43,6 +43,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.compat.BisectModCompat;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -161,6 +162,8 @@ public class ServerRenderableList extends RenderableVList {
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
         if (LegacyOptions.displayRealmsButton.get())
             addIconButton(this, Legacy4J.createModLocation("creation_list/realms"), Component.translatable("menu.online"), b -> minecraft.setScreen(new RealmsMainScreen(getScreen())), tooltip);
+        if (FactoryAPI.isModLoaded("bhmenu"))
+            addRenderable(BisectModCompat.createButton(this));
         for (int i = 0; i < servers.size(); i++) {
             addRenderable(new ServerButton(0, 0, 0, 30, i));
         }
@@ -174,13 +177,14 @@ public class ServerRenderableList extends RenderableVList {
                 addRenderable(lanButton = new IconButton(this, 0, 0, 0, 30, Component.literal(lanServer.getMotd())) {
                     @Override
                     protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
-                        int messageX = accessor.getInteger(name + ".buttonMessage.xOffset", 35);
-                        GuiGraphicsExtractor.text(minecraft.font, LAN_SERVER_HEADER, messageX, getY() + 1, 0xFFFFFFFF, false);
-                        GuiGraphicsExtractor.text(minecraft.font, lanServer.getMotd(), messageX, getY() + 12, -8355712, false);
+                        int messageX = getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35);
+                        int messageY = getY() + 3;
+                        GuiGraphicsExtractor.text(minecraft.font, LAN_SERVER_HEADER, messageX, messageY, 0xFFFFFFFF, false);
+                        GuiGraphicsExtractor.text(minecraft.font, lanServer.getMotd(), messageX, messageY + 11, -8355712, false);
                         if (minecraft.options.hideServerAddress) {
-                            GuiGraphicsExtractor.text(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, getY() + 12 + 11, 0x303030, false);
+                            GuiGraphicsExtractor.text(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, messageY + 20, 0x303030, false);
                         } else {
-                            GuiGraphicsExtractor.text(minecraft.font, lanServer.getAddress(), messageX, getY() + 12 + 11, 0x303030, false);
+                            GuiGraphicsExtractor.text(minecraft.font, lanServer.getAddress(), messageX, messageY + 20, 0x303030, false);
                         }
                     }
 

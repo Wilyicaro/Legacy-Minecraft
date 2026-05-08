@@ -11,7 +11,10 @@
     "client.MapDecorationRenderStateMixin",
     "client.AbstractRecipeBookScreenMixin",
     "client.crafter.CrafterScreenMixin",
-    //? if >=1.21 && (fabric || neoforge) {
+    //? fabric || neoforge {
+    "compat.sodium.FluidRendererFactoryMixin",
+    "compat.sodium.BlockRendererMixin",
+    "compat.sodium.OcclusionCullerMixin",
     //?}
     //? (fabric || >=1.21 && neoforge && <26.1) {
     /*"compat.sodium.OcclusionCullerMixin",
@@ -206,7 +209,11 @@
     "skins.client.HumanoidArmorLayerAccessor",
     "skins.client.ModelPartAccessor",
     "skins.client.SkipRenderMixin",
+    "skins.client.PartRenderOffsetMixin",
     "skins.client.PlayerPartsMixin",
+    "skins.client.ArmorModelOffsetsMixin",
+    "skins.client.ArmorOffsetSubmitMixin",
+    "skins.client.ArmorOffsetRenderMixin",
     "skins.client.ArmorOffsetsMixin",
     "client.ScreenshotMixin",
     "client.AbstractClientPlayerMixin",
