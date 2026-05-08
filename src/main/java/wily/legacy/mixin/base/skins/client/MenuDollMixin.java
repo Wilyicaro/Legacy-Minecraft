@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.resources.Identifier;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
@@ -11,9 +12,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.client.gui.GuiDollRender;
+import wily.legacy.skins.client.render.PlayerModelParts;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.boxloader.AttachSlot;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager.PivotAnimation;
 import wily.legacy.skins.pose.*;
 import wily.legacy.skins.skin.SkinIdUtil;
+
+import java.util.EnumMap;
 
 @Mixin(PlayerModel.class)
 public abstract class MenuDollMixin {
@@ -91,6 +98,73 @@ public abstract class MenuDollMixin {
         model.leftPants.z = model.leftLeg.z;
     }
 
+    private static void consoleskins$applyBoxPivotAnimations(PlayerModel model, AvatarRenderState state, RenderStateSkinIdAccess access) {
+        if (model == null || access == null) return;
+        Identifier modelId = access.consoleskins$getCachedModelId();
+        if (modelId == null) return;
+        EnumMap<AttachSlot, float[]> scales = BoxModelManager.getAnimationScales(modelId);
+        EnumMap<AttachSlot, float[]> offsets = BoxModelManager.getAnimationOffsets(modelId);
+        EnumMap<AttachSlot, PivotAnimation> animations = BoxModelManager.getPivotAnimations(modelId);
+        if ((scales == null || scales.isEmpty()) && (offsets == null || offsets.isEmpty()) && (animations == null || animations.isEmpty())) return;
+        float time = consoleskins$animationTime(state);
+        boolean moving = state != null && state.id == GuiDollRender.MENU_DOLL_ID || access.consoleskins$isMoving() || access.consoleskins$getMoveSpeedSq() > 1.0E-4F;
+        for (AttachSlot slot : PlayerModelParts.ALL) {
+            ModelPart part = PlayerModelParts.get(model, slot);
+            if (part == null) continue;
+            consoleskins$applyBoxAnimation(part, scales == null ? null : scales.get(slot), offsets == null ? null : offsets.get(slot), animations == null ? null : animations.get(slot), time, moving);
+        }
+    }
+
+    private static void consoleskins$applyBoxAnimation(ModelPart part, float[] scale, float[] offset, PivotAnimation animation, float time, boolean moving) {
+        if (scale != null) {
+            part.xRot *= axis(scale, 0, 1.0F);
+            part.yRot *= axis(scale, 1, 1.0F);
+            part.zRot *= axis(scale, 2, 1.0F);
+        }
+        if (offset != null) {
+            part.xRot += degrees(axis(offset, 0, 0.0F));
+            part.yRot += degrees(axis(offset, 1, 0.0F));
+            part.zRot += degrees(axis(offset, 2, 0.0F));
+        }
+        if (animation == null || animation.movingOnly() && !moving) return;
+        float wave = Mth.sin(time * animation.speed() + animation.phase());
+        float[] base = animation.offset();
+        float[] amplitude = animation.amplitude();
+        part.xRot += degrees(axis(base, 0, 0.0F) + axis(amplitude, 0, 0.0F) * wave);
+        part.yRot += degrees(axis(base, 1, 0.0F) + axis(amplitude, 1, 0.0F) * wave);
+        part.zRot += degrees(axis(base, 2, 0.0F) + axis(amplitude, 2, 0.0F) * wave);
+    }
+
+    private static float consoleskins$animationTime(AvatarRenderState state) {
+        if (state != null && state.id == GuiDollRender.MENU_DOLL_ID) {
+            return state.ageInTicks == 0.0F ? (System.currentTimeMillis() % 1_000_000L) / 300.0F : state.ageInTicks * 0.16F;
+        }
+        return StiffArmsPose.getAgeInTicks(state);
+    }
+
+    private static float axis(float[] value, int index, float fallback) {
+        return value != null && value.length > index ? value[index] : fallback;
+    }
+
+    private static float degrees(float value) {
+        return value * ((float) Math.PI / 180.0F);
+    }
+
+    private static void consoleskins$removeIdleSway(PlayerModel model, AvatarRenderState state) {
+        if (model == null) return;
+        float ageInTicks = state == null ? 0.0F : state.ageInTicks;
+        float zRot = Mth.cos(ageInTicks * 0.09F) * 0.05F + 0.05F;
+        float xRot = Mth.sin(ageInTicks * 0.067F) * 0.05F;
+        model.rightArm.zRot -= zRot;
+        model.leftArm.zRot += zRot;
+        model.rightArm.xRot -= xRot;
+        model.leftArm.xRot += xRot;
+        model.rightSleeve.zRot = model.rightArm.zRot;
+        model.leftSleeve.zRot = model.leftArm.zRot;
+        model.rightSleeve.xRot = model.rightArm.xRot;
+        model.leftSleeve.xRot = model.leftArm.xRot;
+    }
+
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
     private void consoleskins$menuDollFixHeadSpin(AvatarRenderState state, CallbackInfo ci) {
         if (state == null) return;
@@ -99,6 +173,7 @@ public abstract class MenuDollMixin {
         String skinId = access == null ? null : access.consoleskins$getSkinId();
         boolean stiffLegs = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
         boolean customAnimation = LegacyOptions.customSkinAnimation.get() && (access == null || !access.consoleskins$skipCustomAnimation());
+        boolean noIdleSway = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.NO_IDLE_SWAY, skinId);
         if (state.id == GuiDollRender.MENU_DOLL_ID) {
             ModelPart head = self.head;
             head.xRot = 0.0F;
@@ -131,7 +206,10 @@ public abstract class MenuDollMixin {
         } else if (customAnimation && stiffLegs) {
             consoleskins$applyStiffLegs(self, state);
         }
-        if (!customAnimation) return;
+        if (!customAnimation) {
+            if (noIdleSway && state.id != GuiDollRender.MENU_DOLL_ID) consoleskins$removeIdleSway(self, state);
+            return;
+        }
         boolean zombieArms = ZombieArmsPose.shouldApply(state);
         if (zombieArms) ZombieArmsPose.apply(self, state);
         if (IdleSitPose.shouldApply(state)) {
@@ -153,5 +231,9 @@ public abstract class MenuDollMixin {
         if (SyncLegsPose.shouldApply(state)) {
             SyncLegsPose.apply(self);
         }
+        if (noIdleSway && !zombieArms && state.id != GuiDollRender.MENU_DOLL_ID) {
+            consoleskins$removeIdleSway(self, state);
+        }
+        consoleskins$applyBoxPivotAnimations(self, state, access);
     }
 }

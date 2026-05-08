@@ -59,6 +59,7 @@ public class ControllerManager {
     protected Minecraft minecraft;
     protected boolean isControllerTheLastInput = false;
     private KeyMapping[] orderedKeyMappings;
+    private KeyMapping controllerDebugOverlayKey;
 
     public static Controller.Handler getHandler() {
         return LegacyOptions.selectedControllerHandler.get();
@@ -316,6 +317,7 @@ public class ControllerManager {
                 if (state.is(ControllerBinding.START) && state.pressed) {
                     keyMapping.setDown(false);
                 } else {
+                    if (handleDebugKeyMapping(keyMapping, state)) continue;
                     if (state.canClick()) keyMapping.clickCount++;
                     if (state.pressed && state.canDownKeyMapping(keyMapping)) keyMapping.setDown(true);
                     else if (state.canReleaseKeyMapping(keyMapping)) keyMapping.setDown(false);
@@ -335,6 +337,48 @@ public class ControllerManager {
 
         if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);
         if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().controllerTick(controller);
+    }
+
+    private boolean handleDebugKeyMapping(KeyMapping keyMapping, BindingState state) {
+        if (!isDebugKeyMapping(keyMapping)) return false;
+        if (keyMapping == minecraft.options.keyDebugOverlay) {
+            if (state.justPressed && !state.isBlocked()) {
+                minecraft.debugEntries.toggleDebugOverlay();
+                controllerDebugOverlayKey = null;
+                state.block();
+            }
+            return true;
+        }
+        if (keyMapping == minecraft.options.keyDebugCrash) return true;
+        if (state.justPressed && !state.isBlocked()) {
+            boolean wasOverlayVisible = minecraft.debugEntries.isOverlayVisible();
+            boolean shouldCloseOverlay = wasOverlayVisible && keyMapping == controllerDebugOverlayKey;
+            KeyEvent event = createKeyEvent(keyMapping);
+            if (((KeyboardHandlerAccessor) minecraft.keyboardHandler).invokeHandleDebugKeys(event)) {
+                state.block();
+                if (shouldCloseOverlay) {
+                    minecraft.debugEntries.setOverlayVisible(false);
+                    controllerDebugOverlayKey = null;
+                } else if (!wasOverlayVisible && minecraft.debugEntries.isOverlayVisible()) {
+                    controllerDebugOverlayKey = keyMapping;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isDebugKeyMapping(KeyMapping keyMapping) {
+        if (keyMapping == minecraft.options.keyDebugOverlay) return true;
+        for (KeyMapping debugKey : minecraft.options.debugKeys)
+            if (keyMapping == debugKey) return true;
+        return false;
+    }
+
+    private KeyEvent createKeyEvent(KeyMapping keyMapping) {
+        InputConstants.Key key = LegacyKeyMapping.of(keyMapping).getKey();
+        if (key.getType() == InputConstants.Type.SCANCODE)
+            return new KeyEvent(InputConstants.UNKNOWN.getValue(), key.getValue(), 0);
+        return new KeyEvent(key.getValue(), 0, 0);
     }
 
     public boolean isHoveringWidget() {

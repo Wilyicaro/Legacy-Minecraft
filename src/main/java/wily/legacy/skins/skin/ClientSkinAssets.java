@@ -32,10 +32,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class ClientSkinAssets {
     private static final Map<String, Identifier> TEXTURES = new ConcurrentHashMap<>();
+    private static final Map<String, Identifier> BOX_TEXTURES = new ConcurrentHashMap<>();
     private static final Map<String, Identifier> CAPES = new ConcurrentHashMap<>();
     private static final Map<String, JsonObject> MODELS = new ConcurrentHashMap<>();
     private static final Map<String, JsonObject> METADATA = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> TEXTURE_BYTES = new ConcurrentHashMap<>();
+    private static final Map<String, byte[]> BOX_TEXTURE_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> CAPE_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> MODEL_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
@@ -98,8 +100,8 @@ public final class ClientSkinAssets {
         if (boxModel == null) boxModel = resolveBoxModel(assetKey, skinId, modelId);
         Identifier cape = resolveCape(assetKey, skinId, entry);
         if (entry == null && texture == null && modelId == null && boxModel == null && cape == null) return null;
-        Identifier boxTexture = modelId == null ? texture : BoxModelManager.getTexture(modelId);
-        return new ResolvedSkin(entry, texture, boxTexture == null ? texture : boxTexture, modelId, boxModel, cape);
+        Identifier boxTexture = resolveBoxTexture(assetKey, skinId, modelId, texture);
+        return new ResolvedSkin(entry, texture, boxTexture, modelId, boxModel, cape);
     }
 
     private static Identifier resolveTexture(String assetKey, String skinId, SkinEntry entry) {
@@ -116,6 +118,16 @@ public final class ClientSkinAssets {
         if (cape != null) return cape;
         cape = CAPES.get(skinId);
         return cape != null ? cape : entry != null ? entry.cape() : null;
+    }
+
+    private static Identifier resolveBoxTexture(String assetKey, String skinId, Identifier modelId, Identifier texture) {
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return texture;
+        Identifier boxTexture = assetKey == null ? null : BOX_TEXTURES.get(assetKey);
+        if (boxTexture != null) return boxTexture;
+        boxTexture = BOX_TEXTURES.get(skinId);
+        if (boxTexture != null) return boxTexture;
+        boxTexture = modelId == null ? null : BoxModelManager.getTexture(modelId);
+        return boxTexture == null ? texture : boxTexture;
     }
 
     private static BuiltBoxModel resolveBoxModel(String assetKey, String skinId, Identifier modelId) {
@@ -213,15 +225,17 @@ public final class ClientSkinAssets {
 
     public static AssetData resolveAssetData(Minecraft client, String skinId) {
         byte[] texture = TEXTURE_BYTES.get(skinId);
+        byte[] boxTexture = BOX_TEXTURE_BYTES.get(skinId);
         byte[] cape = CAPE_BYTES.get(skinId);
         byte[] model = MODEL_BYTES.get(skinId);
         ResolvedSkin resolved = resolveSkin(skinId);
         SkinEntry entry = resolved == null ? null : resolved.entry();
         if (texture == null)
             texture = loadBytes(client, resolved == null ? resolveTexture(skinId, entry) : resolved.texture());
+        if (boxTexture == null) boxTexture = resolveBoxTextureBytes(client, resolved);
         if (cape == null) cape = loadBytes(client, entry == null ? null : entry.cape());
         if (model == null) model = loadBytes(client, resolveModelLocation(client, skinId, entry));
-        return new AssetData(texture, model, resolveMetadataBytes(skinId, resolved, entry), cape);
+        return new AssetData(texture, model, resolveMetadataBytes(skinId, resolved, entry), cape, boxTexture);
     }
 
     public static Identifier getModelIdFromTexture(Identifier texture) {
@@ -243,6 +257,12 @@ public final class ClientSkinAssets {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         invalidateSkinCache(skinId);
         putTextureInternal(skinId, texturePng, TEXTURE_BYTES, TEXTURES, skinId, "legacy_runtime_texture_");
+    }
+
+    public static void putBoxTexture(String skinId, byte[] texturePng) {
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        invalidateSkinCache(skinId);
+        putTextureInternal(skinId, texturePng, BOX_TEXTURE_BYTES, BOX_TEXTURES, "box|" + skinId, "legacy_runtime_box_texture_");
     }
 
     public static void putCape(String skinId, byte[] capePng) {
@@ -293,15 +313,20 @@ public final class ClientSkinAssets {
         for (Identifier texture : TEXTURES.values()) {
             releaseTexture(manager, texture);
         }
+        for (Identifier texture : BOX_TEXTURES.values()) {
+            releaseTexture(manager, texture);
+        }
         for (Identifier cape : CAPES.values()) {
             releaseTexture(manager, cape);
         }
         clearPreviewWarmup();
         TEXTURES.clear();
+        BOX_TEXTURES.clear();
         CAPES.clear();
         MODELS.clear();
         METADATA.clear();
         TEXTURE_BYTES.clear();
+        BOX_TEXTURE_BYTES.clear();
         CAPE_BYTES.clear();
         MODEL_BYTES.clear();
         SKIN_CACHE.clear();
@@ -450,6 +475,13 @@ public final class ClientSkinAssets {
         return slim != null ? slim : getSlimFlag(null, skinId);
     }
 
+    private static byte[] resolveBoxTextureBytes(Minecraft client, ResolvedSkin resolved) {
+        if (client == null || resolved == null || resolved.modelId() == null) return new byte[0];
+        Identifier boxTexture = BoxModelManager.getTexture(resolved.modelId());
+        if (boxTexture == null || boxTexture.equals(resolved.texture())) return new byte[0];
+        return loadBytes(client, boxTexture);
+    }
+
     private static Boolean getBoolean(JsonObject obj, String key) {
         JsonPrimitive primitive = getPrimitive(obj, key);
         if (primitive == null) return null;
@@ -526,7 +558,7 @@ public final class ClientSkinAssets {
 
     private static Identifier runtimeTextureId(String key) {
         String safeKey = UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8)).toString();
-        String folder = key.startsWith("cape|") ? "runtime_capes/" : "runtime_skins/";
+        String folder = key.startsWith("cape|") ? "runtime_capes/" : key.startsWith("box|") ? "runtime_box_textures/" : "runtime_skins/";
         return Identifier.fromNamespaceAndPath("legacy", folder + safeKey);
     }
 
@@ -539,7 +571,7 @@ public final class ClientSkinAssets {
                                Identifier modelId, BuiltBoxModel boxModel, Identifier capeTexture) {
     }
 
-    public record AssetData(byte[] texture, byte[] model, byte[] metadata, byte[] cape) {
+    public record AssetData(byte[] texture, byte[] model, byte[] metadata, byte[] cape, byte[] boxTexture) {
         public boolean hasTexture() {
             return texture != null && texture.length > 0;
         }

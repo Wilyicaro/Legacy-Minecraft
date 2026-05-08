@@ -126,6 +126,7 @@ public abstract class ClientMinecraftServerMixin {
             LegacySaveCache.saveExit = false;
             LegacySaveCache.saveLevel(storageSource);
         }
+        LegacySaveCache.copyOnSave = false;
     }
 
     @Inject(method = "saveEverything", at = @At("RETURN"))

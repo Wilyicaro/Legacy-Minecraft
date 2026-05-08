@@ -32,6 +32,7 @@ import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.ScrollableRenderer;
 import wily.legacy.init.LegacyRegistries;
+import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -57,7 +58,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         List<String> packs = new ArrayList<>(list());
         packs.removeIf(additional::contains);
         packs.addAll(applyOnTop ? 0 : packs.size(), additional);
-        repository.setSelected(DownloadedSkinPackStore.preserveSelection(repository, packs));
+        repository.setSelected(CustomSkinPackStore.preserveSelection(repository, DownloadedSkinPackStore.preserveSelection(repository, packs)));
     }
 
     public GlobalPacks withPacks(List<String> packs) {
@@ -115,7 +116,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<Pack> getDisplayPacks() {
-            return Stream.concat(model.selected.stream(), model.unselected.stream()).filter(pack -> !DownloadedResourceAlbums.isManagedPack(pack.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(pack.getId())).toList();
+            return Stream.concat(model.selected.stream(), model.unselected.stream()).filter(pack -> !DownloadedResourceAlbums.isManagedPack(pack.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(pack.getId()) && !CustomSkinPackStore.isManagedResourcePackId(pack.getId())).toList();
         }
 
         public void updateTooltip() {
@@ -202,7 +203,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<String> getSelectedIds() {
-            return model.selected.stream().filter(p -> !FactoryAPIPlatform.isPackHidden(p) && !DownloadedResourceAlbums.isManagedPack(p.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(p.getId()) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+            return model.selected.stream().filter(p -> !FactoryAPIPlatform.isPackHidden(p) && !DownloadedResourceAlbums.isManagedPack(p.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(p.getId()) && !CustomSkinPackStore.isManagedResourcePackId(p.getId()) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
                 Collections.reverse(l);
                 return l;
             }));
@@ -228,7 +229,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             if (minecraft.screen != null) {
                 Screen screen = minecraft.screen;
                 Collection<String> packs = packRepository.getSelectedIds();
-                packRepository.setSelected(DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedIds()));
+                packRepository.setSelected(CustomSkinPackStore.preserveSelection(packRepository, DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedIds())));
                 minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
                     updateModel();
                     packRepository.setSelected(packs);

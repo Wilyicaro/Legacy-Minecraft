@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -47,8 +46,6 @@ public abstract class CloudRendererMixin {
     private int legacy$lastRelativeCameraPos = Integer.MIN_VALUE;
     @Unique
     private boolean legacy$useWarmCloudPipelines;
-    @Unique
-    private float legacy$currentPartialTick;
 
     @Shadow
     private boolean needsRebuild;
@@ -59,7 +56,6 @@ public abstract class CloudRendererMixin {
     @Inject(method = "render", at = @At("HEAD"))
     private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, Vec3 cameraPosition, long packedRelativeCameraPos, float ticks, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
-        legacy$currentPartialTick = ticks;
         legacy$useWarmCloudPipelines = minecraft.level != null && LegacyCloudAtmosphere.shouldUseWarmCloudTransparency(minecraft.level, ticks);
         boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
         boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
@@ -82,16 +78,6 @@ public abstract class CloudRendererMixin {
         }
 
         return cloudStatus == CloudStatus.OFF ? cloudStatus : CloudStatus.FANCY;
-    }
-
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;vector4fFromARGB32(I)Lorg/joml/Vector4f;"))
-    private int legacy$useConsoleCloudColor(int color) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level == null) {
-            return color;
-        }
-
-        return LegacyCloudAtmosphere.getCloudColor(minecraft.level, legacy$currentPartialTick, color);
     }
 
     @Redirect(
@@ -133,13 +119,13 @@ public abstract class CloudRendererMixin {
     }
 
     @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 8)
-    private int legacy$useRenderDistanceCloudDistanceBlocks(int cloudDistanceBlocks) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudDistanceBlocks() : cloudDistanceBlocks;
+    private int legacy$useExtendedCloudDistanceBlocks(int cloudDistanceBlocks) {
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getExtendedCloudDistanceBlocks() : cloudDistanceBlocks;
     }
 
     @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 9)
-    private int legacy$useRenderDistanceCloudRadius(int cloudRadius) {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getRenderDistanceCloudRadius() : cloudRadius;
+    private int legacy$useExtendedCloudRadius(int cloudRadius) {
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? legacy$getExtendedCloudRadius() : cloudRadius;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
@@ -304,13 +290,13 @@ public abstract class CloudRendererMixin {
     }
 
     @Unique
-    private int legacy$getRenderDistanceCloudDistanceBlocks() {
+    private int legacy$getExtendedCloudDistanceBlocks() {
         return LegacyCloudAtmosphere.getCloudDrawDistanceBlocks();
     }
 
     @Unique
-    private int legacy$getRenderDistanceCloudRadius() {
-        return Math.max(1, (int) Math.ceil(legacy$getRenderDistanceCloudDistanceBlocks() / 12.0d));
+    private int legacy$getExtendedCloudRadius() {
+        return Math.max(1, (int) Math.ceil(legacy$getExtendedCloudDistanceBlocks() / 12.0d));
     }
 
     @Unique

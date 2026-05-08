@@ -185,14 +185,16 @@ public class CreationList extends RenderableVList {
     }
 
     private static Identifier getTemplatePackIcon(LegacyWorldTemplate template) {
-        String packId = template.albumId()
-            .map(PackAlbum::resourceById)
-            .map(PackAlbum::getDisplayPackId)
-            .orElse(null);
+        Optional<String> albumId = template.albumId();
+        if (albumId.isEmpty()) return null;
+        PackAlbum album = PackAlbum.resourceAlbums.get(albumId.get());
+        if (album == null) return null;
+        String packId = album.getDisplayPackId();
         if (packId == null || packId.isBlank()) return null;
         if (packId.startsWith("file/")) packId = packId.substring(5);
         try {
-            return packIcons.getUnchecked(packId);
+            Identifier icon = packIcons.getUnchecked(packId);
+            return PackAlbum.Selector.DEFAULT_ICON.equals(icon) ? null : icon;
         } catch (Exception e) {
             return null;
         }

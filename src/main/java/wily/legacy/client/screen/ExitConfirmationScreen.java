@@ -22,7 +22,11 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
             return;
         }
 
-        if (save) LegacySaveCache.saveExit = LegacySaveCache.retakeWorldIcon = true;
+        if (save) {
+            LegacySaveCache.saveExit = true;
+            LegacySaveCache.copyOnSave = true;
+            LegacySaveCache.retakeWorldIcon = true;
+        }
 
         if (minecraft.level != null) {
             minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
