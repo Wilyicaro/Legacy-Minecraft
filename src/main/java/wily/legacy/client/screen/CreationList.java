@@ -66,7 +66,7 @@ public class CreationList extends RenderableVList {
         LegacyWorldTemplate.list.forEach(t -> addTemplateButton(this, t, c -> {
             if (t.isGamePath() && !Files.exists(t.getPath())) {
                 Path path = t.getDownloadPath();
-                if (path == null || t.preDownload()) {
+                if (path == null) {
                     minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", t.buttonMessage())));
                 } else {
                     File file = path.toFile();
