@@ -62,6 +62,7 @@
 - Remastered Stadia Control Icons (NicSonic-_-)
 - Touched up PlayStation 5 Control Icons (NicSonic-_-)
 - Remastered Steam Control Icons (Cjnator38)
+- A sizable amount of new Control Tooltip actions and fixes (Nabouna32)
 
 ## Fixed
 
