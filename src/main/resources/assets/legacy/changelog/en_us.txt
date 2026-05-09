@@ -81,3 +81,4 @@
 - Fixed default map size being 3 by default, instead of 1 like in PS4 Edition, thanks to Creepereater201 (only new worlds will be applied)
 - Fixed y view bobbing not working anymore
 - Fixed Death screen not having the reason
+- Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds dissapear
