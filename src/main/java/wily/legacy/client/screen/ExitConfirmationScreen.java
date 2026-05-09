@@ -28,7 +28,11 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
             minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
         }
 
-        minecraft.disconnect(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel" : "disconnect.quitting"), Component.empty()), false);
+        if (save) {
+            minecraft.disconnectWithSavingScreen();
+        } else {
+            minecraft.disconnect(new LegacyLoadingScreen(Component.translatable("disconnect.quitting"), Component.empty()), false);
+        }
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();
         if (serverData != null && serverData.isRealm()) {
