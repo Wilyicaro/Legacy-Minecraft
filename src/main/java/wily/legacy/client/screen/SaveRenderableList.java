@@ -407,7 +407,8 @@ public class SaveRenderableList extends RenderableVList {
     public void loadWorld(LevelSummary summary){
         SaveRenderableList.this.reloadSaveList();
         if (LegacyOptions.directSaveLoad.get()){
-            Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.getLevelStorageSource());
+            if (LegacyOptions.saveCache.get())
+                Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.getLevelStorageSource());
             LoadSaveScreen.loadWorld(getScreen(),minecraft,Legacy4JClient.getLevelStorageSource(),summary);
         }else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, Legacy4JClient.getLevelStorageSource()){
             @Override
