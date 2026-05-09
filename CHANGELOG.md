@@ -5,7 +5,6 @@
 ## Changes
 
 - Reordered options and unified the size of advanced options panels, thanks to Cjnator38
-- A sizable amount of new Control Tooltip actions and fixes (Nabouna32)
 - Integration with Bisect Hosting Menu
 
 ## Fixes
