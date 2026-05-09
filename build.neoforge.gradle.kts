@@ -12,6 +12,10 @@ platform {
 		required("neoforge") {
 			forgeVersionRange = "[1,)"
 		}
+		required("factory_api") {
+			slug("factory-api")
+			versionRange = ">=${prop("factory_api_version")}"
+		}
 	}
 }
 

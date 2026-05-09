@@ -16,6 +16,10 @@ platform {
 		required("forge") {
 			forgeVersionRange = "[1,)"
 		}
+		required("factory_api") {
+			slug("factory-api")
+			versionRange = ">=${prop("factory_api_version")}"
+		}
 	}
 }
 
@@ -44,6 +48,10 @@ if (stonecutter.eval(stonecutter.current.version, "<1.20.5")) {
 	// Fixes the maven publishing using a broken jar
 	tasks.named<Jar>("sourcesJar") {
 		dependsOn("renameJar")
+	}
+} else {
+	tasks.named<Jar>("sourcesJar") {
+		dependsOn("jarJar")
 	}
 }
 
