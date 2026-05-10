@@ -191,7 +191,12 @@ public class RenderableVList {
         for (int i = start; i >= 0 && i < renderables.size(); i += step) {
             Renderable renderable = renderables.get(i);
             if (renderable instanceof GuiEventListener) {
-                focusRenderable(renderable);
+                revealRenderable(renderable);
+                if (renderable instanceof GuiEventListener listener && getScreen().children().contains(listener)) {
+                    getScreen().changeFocus(ComponentPath.path(listener, getScreen()));
+                } else {
+                    focusRenderable(renderable);
+                }
                 return true;
             }
         }

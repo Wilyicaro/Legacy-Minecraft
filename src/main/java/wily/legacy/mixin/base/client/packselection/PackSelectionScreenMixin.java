@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -337,7 +338,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         if (renderable instanceof AbstractButton button) lastFocusedPackId = packIds.get(button);
         setFocused(listener);
         list.focusRenderable(renderable);
-        setFocused(listener);
+        changeFocus(ComponentPath.path(listener, this));
         return true;
     }
 
