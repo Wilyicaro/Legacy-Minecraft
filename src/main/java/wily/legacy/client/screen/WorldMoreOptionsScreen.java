@@ -352,7 +352,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
         tabList.setSelected(1);
-        GameRules gameRules = loadSavedGameRules(parent);
+        GameRules gameRules = parent.gameRules == null ? loadSavedGameRules(parent) : parent.gameRules;
+        parent.gameRules = gameRules;
         if (LegacyOptions.legacySettingsMenus.get()) {
             initLegacyLoadSaveOptions(parent, gameRules);
         } else {

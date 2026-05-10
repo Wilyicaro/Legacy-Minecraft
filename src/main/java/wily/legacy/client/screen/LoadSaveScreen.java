@@ -56,9 +56,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected final PublishScreen publishScreen;
     public BiConsumer<GameRules, MinecraftServer> applyGameRules = (r, s) -> {
     };
+    public GameRules gameRules;
     public boolean trustPlayers;
     public boolean hostPrivileges;
     public Difficulty difficulty;
+    protected boolean focusMoreOptionsButton;
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
         super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
@@ -187,7 +189,10 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.setPosition(layoutX, panel.y + 65);
         gameTypeSlider.setWidth(getLayoutWidth());
         addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, panel.y + 90, getLayoutWidth(), 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(difficulty.getInfo()), difficulty, () -> Arrays.asList(Difficulty.values()), b -> difficulty = b.getObjectValue()))).active = !LegacyClientWorldSettings.of(summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
-        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(this))).bounds(layoutX, panel.y + 178, getLayoutWidth(), 20).build()));
+        Button moreOptionsButton = addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> {
+            focusMoreOptionsButton = true;
+            minecraft.setScreen(new WorldMoreOptionsScreen(this));
+        }).bounds(layoutX, panel.y + 178, getLayoutWidth(), 20).build()));
         Button loadButton = addRenderableWidget(accessor.putWidget("loadButton", Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> onLoad()).bounds(layoutX, panel.y + 203, getLayoutWidth(), 20).build()));
         addRenderableWidget(accessor.putWidget("gameTypeSlider", gameTypeSlider));
         onlineTickBox.selected = publishScreen.publish;
@@ -195,7 +200,10 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         onlineTickBox.updateHeight();
         onlineTickBox.setWidth(getLayoutWidth());
         addRenderableWidget(accessor.putWidget("onlineTickBox", onlineTickBox));
-        setInitialFocus(loadButton);
+        if (focusMoreOptionsButton) {
+            setFocused(moreOptionsButton);
+            focusMoreOptionsButton = false;
+        } else setInitialFocus(loadButton);
         resourceAlbumSelector.setX(layoutX);
         resourceAlbumSelector.setY(panel.y + 112);
         resourceAlbumSelector.setWidth(getLayoutWidth());
