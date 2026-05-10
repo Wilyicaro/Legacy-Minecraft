@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
@@ -10,6 +11,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
@@ -43,7 +45,9 @@ public class ContentManager {
     private static final String STARTERPACKS_CATEGORY_ID = "starterpacks";
     private static final String STARTERPACKS_PACK_ID = "starterpacks_bundle";
     private static final java.util.Set<String> ACTIVE_DOWNLOADS = ConcurrentHashMap.newKeySet();
+    private static final java.util.Set<String> AUTO_APPLY_RESOURCE_PACKS = ConcurrentHashMap.newKeySet();
     private static final String TRANSPARENCY_FIX_URL = "https://cdn.modrinth.com/data/MK3k9U5o/versions/BdYLypGY/Transparency%20Fix.zip";
+    private static final String AUTO_APPLY_RESOURCE_PACK_TAG = "auto_apply_resource_pack";
 
     public record Category(
         String id,
@@ -210,22 +214,45 @@ public class ContentManager {
         if (STARTERPACKS_CATEGORY_ID.equals(category.id())) {
             return fetchStarterpacksIndex(category);
         }
-        return fetchRemoteIndex(category.indexUrl());
+        return fetchRemoteIndex(category);
     }
 
-    private static CompletableFuture<List<Pack>> fetchRemoteIndex(String indexUrl) {
+    private static CompletableFuture<List<Pack>> fetchRemoteIndex(Category category) {
         return CompletableFuture.supplyAsync(() -> {
-            try (InputStream stream = openRemoteStream(new URL(indexUrl), 5000, 10000);
+            try (InputStream stream = openRemoteStream(new URL(category.indexUrl()), 5000, 10000);
                  InputStreamReader reader = new InputStreamReader(stream)) {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-                return Pack.LIST_CODEC.parse(JsonOps.INSTANCE, json.get("packs"))
+                List<Pack> packs = Pack.LIST_CODEC.parse(JsonOps.INSTANCE, json.get("packs"))
                         .resultOrPartial(Legacy4J.LOGGER::warn)
                         .orElseGet(ArrayList::new);
+                loadAutoApplyTags(category, json);
+                return packs;
             } catch (Exception e) {
-                Legacy4J.LOGGER.warn("Failed to fetch content index from {}: {}", indexUrl, e.getMessage());
+                Legacy4J.LOGGER.warn("Failed to fetch content index from {}: {}", category.indexUrl(), e.getMessage());
                 return new ArrayList<>();
             }
         });
+    }
+
+    private static void loadAutoApplyTags(Category category, JsonObject json) {
+        String prefix = category.id() + ":";
+        AUTO_APPLY_RESOURCE_PACKS.removeIf(key -> key.startsWith(prefix));
+        if (!json.has("packs") || !json.get("packs").isJsonArray()) return;
+        for (JsonElement element : json.getAsJsonArray("packs")) {
+            if (!element.isJsonObject()) continue;
+            JsonObject packJson = element.getAsJsonObject();
+            if (packJson.has("id") && hasAutoApplyResourcePackTag(packJson)) {
+                AUTO_APPLY_RESOURCE_PACKS.add(prefix + packJson.get("id").getAsString());
+            }
+        }
+    }
+
+    private static boolean hasAutoApplyResourcePackTag(JsonObject packJson) {
+        if (!packJson.has("tags") || !packJson.get("tags").isJsonArray()) return false;
+        for (JsonElement tag : packJson.getAsJsonArray("tags")) {
+            if (tag.isJsonPrimitive() && AUTO_APPLY_RESOURCE_PACK_TAG.equals(tag.getAsString())) return true;
+        }
+        return false;
     }
 
     private static CompletableFuture<List<Pack>> fetchStarterpacksIndex(Category category) {
@@ -417,6 +444,54 @@ public class ContentManager {
         downloadPackInternal(pack, category).whenComplete((installedAnything, throwable) ->
             Minecraft.getInstance().execute(() -> onComplete.accept(installedAnything != null && installedAnything))
         );
+    }
+
+    public static boolean applyAutoResourcePacks(Pack pack, Category category) {
+        if (!isRootResourcePackCategory(category) || !AUTO_APPLY_RESOURCE_PACKS.contains(downloadKey(category, pack))) return false;
+        Minecraft minecraft = Minecraft.getInstance();
+        PackRepository repository = minecraft.getResourcePackRepository();
+        if (repository == null) return false;
+        repository.reload();
+        String resolvedId = resolveResourcePackId(repository, pack.id());
+        if (resolvedId == null) return false;
+        List<String> globalPacks = new ArrayList<>(GlobalPacks.globalResources.get().list());
+        boolean configChanged = removePackId(globalPacks, pack.id());
+        if (!globalPacks.contains(resolvedId)) {
+            globalPacks.add(resolvedId);
+            configChanged = true;
+        }
+        if (configChanged) {
+            GlobalPacks.globalResources.set(GlobalPacks.globalResources.get().withPacks(globalPacks));
+            GlobalPacks.globalResources.save();
+        }
+        List<String> oldSelection = PackAlbum.getSelectedIds(repository);
+        GlobalPacks.globalResources.get().applyPacks(repository, PackAlbum.getDefaultResourceAlbum().packs());
+        boolean selectionChanged = !oldSelection.equals(PackAlbum.getSelectedIds(repository));
+        if (selectionChanged) PackAlbum.updateSavedResourcePacks();
+        return selectionChanged;
+    }
+
+    private static boolean isRootResourcePackCategory(Category category) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft != null && minecraft.getResourcePackDirectory() != null && minecraft.getResourcePackDirectory().equals(getContentDir(category.targetDirectoryName()));
+    }
+
+    private static String resolveResourcePackId(PackRepository repository, String packId) {
+        String normalized = normalizeFilePackId(packId);
+        String fileId = "file/" + normalized;
+        if (repository.getPack(fileId) != null) return fileId;
+        if (repository.getPack(normalized) != null) return normalized;
+        if (repository.getPack(packId) != null) return packId;
+        return null;
+    }
+
+    private static boolean removePackId(List<String> packs, String packId) {
+        String normalized = normalizeFilePackId(packId);
+        return packs.remove(normalized) | packs.remove("file/" + normalized);
+    }
+
+    private static String normalizeFilePackId(String packId) {
+        return packId.startsWith("file/") ? packId.substring(5) : packId;
     }
 
     private static CompletableFuture<Boolean> downloadPackInternal(Pack pack, Category category) {
