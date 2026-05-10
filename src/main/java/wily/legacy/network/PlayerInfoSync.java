@@ -246,13 +246,15 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                 return false;
             });
             context.executor().execute(() -> {
+                MinecraftServer server = context.player() instanceof ServerPlayer sp ? FactoryAPIPlatform.getEntityServer(sp) : null;
                 GameRules displayRules = context.player() instanceof ServerPlayer sp ? sp.level().getGameRules() : Legacy4JClient.gameRules;
+                boolean[] changed = {false};
                 displayRules.visitGameRuleTypes(new GameRuleTypeVisitor() {
                     @Override
                     public void visitBoolean(GameRule<Boolean> gameRule) {
                         Identifier id = gameRule.getIdentifier();
                         if (gameRules.containsKey(id) && (context.player().level().isClientSide() || NON_OP_GAMERULES.contains(gameRule.getIdentifier()) || context.player().permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))) {
-                            displayRules.set(gameRule, gameRules.get(id) == 1, null);
+                            changed[0] |= setGameRule(displayRules, gameRule, gameRules.get(id) == 1, server);
                         }
                     }
 
@@ -260,11 +262,20 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                     public void visitInteger(GameRule<Integer> gameRule) {
                         Identifier id = gameRule.getIdentifier();
                         if (gameRules.containsKey(id) && (context.player().level().isClientSide() || NON_OP_GAMERULES.contains(gameRule.getIdentifier()) || context.player().permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))) {
-                            displayRules.set(gameRule, gameRules.get(id), null);
+                            changed[0] |= setGameRule(displayRules, gameRule, gameRules.get(id), server);
                         }
                     }
                 });
+                if (changed[0] && server != null && identifier == ID_C2S) {
+                    CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), All.fromPlayerList(server));
+                }
             });
+        }
+
+        private static <T> boolean setGameRule(GameRules gameRules, GameRule<T> gameRule, T value, MinecraftServer server) {
+            if (Objects.equals(gameRules.get(gameRule), value)) return false;
+            gameRules.set(gameRule, value, server);
+            return true;
         }
     }
 }
