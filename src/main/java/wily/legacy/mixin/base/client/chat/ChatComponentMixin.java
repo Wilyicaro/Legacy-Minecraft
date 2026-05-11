@@ -68,8 +68,9 @@ public abstract class ChatComponentMixin {
     }
 
     @Inject(method = "method_75801", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2f;translate(FF)Lorg/joml/Matrix3x2f;"), remap = false)
-    private static void offsetChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<Matrix3x2f> matrix3x2f) {
-        matrix3x2f.set(matrix3x2f.get().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42));
+    private static void offsetChat(CallbackInfo ci, @Local(argsOnly = true, ordinal = 0) float scale, @Local(argsOnly = true) LocalRef<Matrix3x2f> matrix3x2f) {
+        float appliedScale = Math.max(scale, 0.0001f);
+        matrix3x2f.set(matrix3x2f.get().translate(LegacyRenderUtil.getChatSafeZone() / appliedScale, (LegacyRenderUtil.getHUDDistance() - 42) / appliedScale));
     }
     //?} else {
     /*@ModifyArgs(method = "lambda$render$1", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;fill(IIIII)V"))
