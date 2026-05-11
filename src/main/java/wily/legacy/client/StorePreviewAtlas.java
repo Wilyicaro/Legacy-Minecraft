@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class StorePreviewAtlas {
-    public static final int TILE_SIZE = 360;
+    public static final int TILE_SIZE = 128;
     public static final int COLUMNS = 5;
     public static final int ROWS = 5;
     public static final int ATLAS_WIDTH = TILE_SIZE * COLUMNS;
