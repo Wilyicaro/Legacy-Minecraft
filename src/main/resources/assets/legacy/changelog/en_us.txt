@@ -1,6 +1,6 @@
 ## Additions
 
-- Added an accurate and builtin Change Skin screen, with a lot of customization options, thanks to Creepereater201
+- Added an accurate and built-in Change Skin screen, with a lot of customization options
 - Some of the Change Skin options:
   - `TU3 Change Skin Screen`
   - `Smooth Preview Scroll`
@@ -8,16 +8,17 @@
   - `Custom Skin Animation`
   - `Custom Pack Options`
 - Added Screenshot Toasts (enabled by the `Show Screenshot Toasts` option), thanks to RedRain0o0
-- Added Rosenfeld Patch builtin resource pack, for removing newer musics, thanks to Cjnator38
-- Added some options to Game Options section, thanks to Creepereater201:
- - `Force Legacy Flight`
+- Added Rosenfeld Patch built-in resource pack, for removing newer music, thanks to Cjnator38
+- Added some options to Game Options section:
+ - `Force Legacy Flight`, thanks to Sowgro
+ - `Force Legacy Swimming`, thanks to Sowgro
  - `Force Legacy Shield Controls`
  - `Force Legacy Offhand Limits`
-- Added some options to Graphics section, thanks to Creepereater201:
+- Added some options to Graphics section:
  - `Legacy Clouds` (with changes to the sky color)
  - `Legacy Clouds Height`
  - `Legacy Zombie Aggression Animation`
-- Added some options to User Interface section, thanks to Creepereater201:
+- Added some options to User Interface section:
   - `Display Realms Button`
   - `Hide Sodium Settings`
   - `Hide Experimental World Settings`
@@ -27,15 +28,15 @@
   - `Fake Manual Save Screen`
   - `Legacy Font`
   - `Legacy Settings Menus`, a menu purist mode for accuracy with LE
-- Added some gamerules (all disabled by default), thanks to Creepereater201:
+- Added some gamerules (all disabled by default):
  - `Legacy Shield Controls`
  - `Legacy Mobcap Limits`
  - `Falling Block Limit`
  - `Legacy Offhand Limits`
-- Added `Minecraft Store`, with a lot of packs and resource albums available by default for download, thanks to Creepereater201 and BrandonItaly
+- Added `Minecraft Store`, with a lot of packs and resource albums available by default for download, thanks to BrandonItaly
 - Added `Advanced Options` for the controller section
 - Added Controller LED RGB sliders with a preview
-- Added Decay potions and tipped arrows, thanks to Creepereater201
+- Added Decay potions and tipped arrows
 - Added all the missing SD UIs, including How To Play, More World Options and Host Options interfaces
 - Added Mushroom Pore
 - Added SD Control Icons for Keyboard & Mouse, Steam, and PlayStation 4/5
@@ -44,7 +45,7 @@
 - Added descriptions for entries in More World Options (Nabouna32)
 - Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
 
-## Parity Changes (thanks to Creepereater201)
+## Parity Changes
 
 - Player body no longer renders in first person when sleeping
 - Beacon beam will be visible from the inside
@@ -53,10 +54,13 @@
 - Trident sits higher up in the hand and slightly more pointed
 - Dispensers can fire tridents
 - Tweaked trident third person wind up animation
-- Players don't have fire anim with fire resistance effect applied
+- Players don't have fire animation with fire resistance effect applied
 - Fish drops bones
 - ID in the Map name
+- Head layer items such as mob heads now receive damage tint
 - Host Options command outputs
+- Music and Sound sliders are no longer linked
+- Experience pick up sound has been pitched up, thanks to Cjnator38
 
 ## General Changes
 
@@ -70,15 +74,17 @@
 ## Fixed
 
 - Fixed snow layers don't stack
-- Fixed Crafting tables can't be open with crafting key binding on kbm
+- Fixed chat scrolling getting stuck
+- Fixed Crafting tables can't be open with crafting key binding on KBM
 - Fixed multiline text fields breaks arrow navigation
 - Fixed not being able to sign books with a controller
 - Fixed world Resource Album not being applied in-game when it's direct join
 - Fixed missing `Raw Input` and `Allow Cursor Changes` in Mouse Settings section
 - Fixed lag when rendering entities on the screen
 - Fixed enchanting table invalid enchantment text having an incorrect color
-- Fixed crouch toggle resetting when opening a screen, thanks to Creepereater201
-- Fixed default map size being 3 by default, instead of 1 like in PS4 Edition, thanks to Creepereater201 (only new worlds will be applied)
+- Fixed crouch toggle resetting when opening a screen
+- Fixed default map size being 3 by default, instead of 1 like in PS4 Edition (only new worlds will be applied)
+- Fixed Dragon egg teleport particles being random
 - Fixed y view bobbing not working anymore
 - Fixed Death screen not having the reason
 - Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
