@@ -23,6 +23,7 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         }
 
         if (save) LegacySaveCache.saveExit = LegacySaveCache.retakeWorldIcon = true;
+        if (save) LegacySaveCache.clearWorldOrderSnapshot();
 
         if (minecraft.level != null) {
             minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
@@ -32,6 +33,7 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
             minecraft.disconnectWithSavingScreen();
         } else {
             minecraft.disconnect(new LegacyLoadingScreen(Component.translatable("disconnect.quitting"), Component.empty()), false);
+            LegacySaveCache.restoreWorldOrderSnapshot();
         }
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();
