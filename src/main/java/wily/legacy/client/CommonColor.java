@@ -1,11 +1,11 @@
 package wily.legacy.client;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.util.IOUtil;
 
 import java.util.Locale;
 
@@ -22,7 +22,7 @@ public class CommonColor extends CommonValue<Integer> {
             }
         }
     }, i -> String.format(Locale.ROOT, "#%08X", i));
-    public static final Codec<Integer> INT_COLOR_CODEC = IOUtil.createFallbackCodec(RGBA_INT_COLOR_CODEC, Codec.INT);
+    public static final Codec<Integer> INT_COLOR_CODEC = Codec.either(RGBA_INT_COLOR_CODEC, Codec.INT).xmap(e -> e.map(i -> i, i -> i), Either::left);
 
     public static final ListMap<Identifier, CommonColor> COMMON_COLORS = new ListMap<>();
 
