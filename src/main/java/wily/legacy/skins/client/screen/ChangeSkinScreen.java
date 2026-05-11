@@ -466,12 +466,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             boolean locked = customPacks.isLockedSkinSelection(selected);
 
             if (reordering) {
-                drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             } else if (editing) {
                 if (isImport || locked)
                     drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
                 else if (selected != null)
-                    drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                    drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
                 if (!isImport && !locked && selected != null)
                     drawActionSprite(g, LegacySprites.ERROR_CROSS, iconX, iconBaseY + sc(normalLayout.actionHolderGap()), holder);
             } else if (isImport) drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
