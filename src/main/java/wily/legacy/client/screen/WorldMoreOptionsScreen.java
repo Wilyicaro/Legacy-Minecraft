@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -191,6 +192,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
         gameRenderables.addRenderable(new TickBox(0, 0, 200, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), b -> onlineGame.set(b.selected), onlineGame::get));
+        addLegacyOnlineOptions(gameRenderables);
         addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
         gameRenderables.addRenderable(createHostPrivilegesTickBox(parent));
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.ADVANCE_TIME, () -> parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/());
@@ -417,6 +419,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (b.selected) parent.publishScreen.setGameType(parent.gameTypeSlider.getObjectValue());
             parent.publishScreen.publish = b.selected;
         }, () -> parent.publishScreen.publish));
+        addLegacyOnlineOptions(gameRenderables);
         addBooleanGameRuleOption(gameRenderables, gameRules, LegacyGameRules.getPvp());
         handleHostPrivilegesToggle(gameRules, parent.hostPrivileges);
         gameRenderables.addRenderable(new TickBox(0, 0, parent.hostPrivileges, b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> {
@@ -432,6 +435,26 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.BLOCK_DROPS);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.NATURAL_HEALTH_REGENERATION);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.IMMEDIATE_RESPAWN);
+    }
+
+    private void addLegacyOnlineOptions(RenderableVList list) {
+        list.addRenderable(createDisabledLegacyOnlineOption("invite_only"));
+        list.addRenderable(createDisabledLegacyOnlineOption("allow_friends_of_friends"));
+    }
+
+    private TickBox createDisabledLegacyOnlineOption(String key) {
+        return new TickBox(0, 0, 200, false, b -> Component.translatable("legacy.menu.online." + key), b -> Tooltip.create(Component.translatable("legacy.menu.online." + key + ".description")), b -> {}) {
+            @Override
+            public void onPress(InputWithModifiers input) {
+            }
+
+            @Override
+            protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+                active = false;
+                super.extractContents(GuiGraphicsExtractor, i, j, f);
+                active = true;
+            }
+        };
     }
 
     protected int getLegacyPanelHeight(int baseHeight, boolean shrinkOnly) {
