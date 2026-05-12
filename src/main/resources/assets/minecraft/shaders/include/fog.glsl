@@ -16,17 +16,29 @@ float linear_fog_value(float vertexDistance, float fogStart, float fogEnd) {
     }
     float value = clamp((vertexDistance - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
     float curve = value * value * (3.0 - 2.0 * value);
-    float limit = fogStart >= 16.0 && fogEnd >= 128.0 ? 0.32 : 1.0;
-    return curve * limit;
+    float dense = curve * (0.55 + value * 0.45);
+    float limit = fogStart >= 16.0 && fogEnd >= 128.0 ? 0.92 : 1.0;
+    return dense * limit;
+}
+
+float edge_fog_value(float vertexDistance, float fogStart, float fogEnd) {
+    if (fogEnd <= fogStart) {
+        return 1.0;
+    }
+    if (fogStart < 16.0 || fogEnd < 128.0) {
+        return linear_fog_value(vertexDistance, fogStart, fogEnd);
+    }
+    float value = clamp((vertexDistance - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
+    float edgeStart = max(0.0, 1.0 - 160.0 / (fogEnd - fogStart));
+    return smoothstep(edgeStart, 1.0, value);
 }
 
 float total_fog_value(float sphericalVertexDistance, float cylindricalVertexDistance, float environmentalStart, float environmantalEnd, float renderDistanceStart, float renderDistanceEnd) {
-    return max(linear_fog_value(cylindricalVertexDistance, environmentalStart, environmantalEnd), linear_fog_value(cylindricalVertexDistance, renderDistanceStart, renderDistanceEnd));
+    return max(linear_fog_value(sphericalVertexDistance, environmentalStart, environmantalEnd), edge_fog_value(cylindricalVertexDistance, renderDistanceStart, renderDistanceEnd));
 }
 
-float fog_planar_distance(vec4 viewPos) {
-    float depth = max(0.0, -viewPos.z);
-    return mix(depth, length(viewPos.xyz), 0.25);
+float fog_legacy_distance(vec4 viewPos) {
+    return length(viewPos.xyz);
 }
 
 vec4 apply_fog(vec4 inColor, float sphericalVertexDistance, float cylindricalVertexDistance, float environmentalStart, float environmantalEnd, float renderDistanceStart, float renderDistanceEnd, vec4 fogColor) {

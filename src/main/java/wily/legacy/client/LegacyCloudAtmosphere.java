@@ -93,7 +93,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static float getTerrainFogFadeEndBlocks() {
-        return Math.min(getTerrainFogEndBlocks(), getEffectiveRenderDistanceBlocks());
+        return getTerrainFogEndBlocks();
     }
 
     public static float getSkyFogEndBlocks() {
@@ -214,10 +214,6 @@ public final class LegacyCloudAtmosphere {
 
     private static int getRenderDistanceBlocks() {
         return CloudGeometry.LEGACY_RENDER_DISTANCE_CHUNKS * 16;
-    }
-
-    private static int getEffectiveRenderDistanceBlocks() {
-        return Minecraft.getInstance().options.getEffectiveRenderDistance() * 16;
     }
 
     private static float[] getVisualRgb(Camera camera, EnvironmentAttribute<Integer> attribute, float partialTick) {

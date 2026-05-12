@@ -22,12 +22,13 @@ public abstract class ShaderManagerMixin {
     }
 
     private static String patchDistance(String source, String value) {
+        String distance = "fog_legacy_distance(ModelViewMat * vec4(" + value + ", 1.0))";
         return source
-                .replace("sphericalVertexDistance = fog_spherical_distance(" + value + ");", "sphericalVertexDistance = fog_planar_distance(ModelViewMat * vec4(" + value + ", 1.0));")
-                .replace("cylindricalVertexDistance = fog_cylindrical_distance(" + value + ");", "cylindricalVertexDistance = fog_planar_distance(ModelViewMat * vec4(" + value + ", 1.0));");
+                .replace("sphericalVertexDistance = fog_spherical_distance(" + value + ");", "sphericalVertexDistance = " + distance + ";")
+                .replace("cylindricalVertexDistance = fog_cylindrical_distance(" + value + ");", "cylindricalVertexDistance = " + distance + ";");
     }
 
     private static String patchSingleDistance(String source, String value) {
-        return source.replace("vertexDistance = fog_spherical_distance(" + value + ");", "vertexDistance = fog_planar_distance(ModelViewMat * vec4(" + value + ", 1.0));");
+        return source.replace("vertexDistance = fog_spherical_distance(" + value + ");", "vertexDistance = fog_legacy_distance(ModelViewMat * vec4(" + value + ", 1.0));");
     }
 }
