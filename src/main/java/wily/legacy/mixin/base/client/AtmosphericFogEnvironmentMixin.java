@@ -6,7 +6,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.AtmosphericFogEnvironment;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import wily.legacy.client.LegacyOptions;
@@ -14,22 +13,22 @@ import wily.legacy.client.LegacyCloudAtmosphere;
 
 @Mixin(AtmosphericFogEnvironment.class)
 public abstract class AtmosphericFogEnvironmentMixin {
-    @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalStart:F", ordinal = 1, opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
-    private void setupFogStart(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (LegacyOptions.overrideTerrainFogStart.get())
-            fogData.environmentalStart = LegacyOptions.getTerrainFogStart() * 16;
-    }
-
-    @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalEnd:F", ordinal = 1, opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
-    private void setupFogEnd(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (LegacyOptions.overrideTerrainFogEnd.get())
-            fogData.environmentalEnd = LegacyOptions.terrainFogEnd.get().floatValue() * 16;
-    }
-
     @Inject(method = "setupFog", at = @At("TAIL"))
-    private void setupCloudFogOptions(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
+    private void setupFogOptions(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
+        float cloudFogEnd = fogData.environmentalEnd;
+        if (LegacyOptions.overrideTerrainFogEnd.get()) {
+            cloudFogEnd = LegacyCloudAtmosphere.getTerrainFogEndBlocks();
+            float terrainFadeEnd = LegacyCloudAtmosphere.getTerrainFogFadeEndBlocks();
+            fogData.environmentalEnd = terrainFadeEnd;
+            fogData.renderDistanceEnd = terrainFadeEnd;
+        }
+        if (LegacyOptions.overrideTerrainFogStart.get()) {
+            fogData.environmentalStart = Math.min(LegacyCloudAtmosphere.getTerrainFogFadeStartBlocks(), Math.max(0.0f, fogData.environmentalEnd - 1.0f));
+            fogData.renderDistanceStart = fogData.environmentalStart;
+        }
         if (LegacyCloudAtmosphere.areLceCloudsEnabled()) {
-            fogData.cloudEnd = LegacyCloudAtmosphere.getCloudFogEndBlocks(fogData.environmentalEnd);
+            fogData.skyEnd = Math.min(fogData.skyEnd, LegacyCloudAtmosphere.getSkyFogEndBlocks());
+            fogData.cloudEnd = LegacyCloudAtmosphere.getCloudFogEndBlocks(cloudFogEnd);
         }
     }
 

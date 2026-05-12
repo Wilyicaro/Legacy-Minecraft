@@ -17,6 +17,7 @@ public final class LegacyCloudAtmosphere {
 
     private static final class CloudGeometry {
         private static final float LEGACY_HEIGHT = 128.0f;
+        private static final int LEGACY_RENDER_DISTANCE_CHUNKS = 32;
         private static final int DRAW_DISTANCE_EXTENSION_CHUNKS = 16;
 
         private CloudGeometry() {
@@ -33,6 +34,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     private static final class FogTuning {
+        private static final float SKY_END_FACTOR = 0.45f;
         private static final float SUNRISE_TINT_STRENGTH = 0.96f;
 
         private FogTuning() {
@@ -76,6 +78,26 @@ public final class LegacyCloudAtmosphere {
 
     public static float getCloudFogEndBlocks(float environmentalEnd) {
         return Math.max(environmentalEnd, getCloudDrawDistanceBlocks());
+    }
+
+    public static float getTerrainFogStartBlocks() {
+        return LegacyOptions.getTerrainFogStart() * 16.0f;
+    }
+
+    public static float getTerrainFogEndBlocks() {
+        return LegacyOptions.terrainFogEnd.get().floatValue() * 16.0f;
+    }
+
+    public static float getTerrainFogFadeStartBlocks() {
+        return getTerrainFogStartBlocks();
+    }
+
+    public static float getTerrainFogFadeEndBlocks() {
+        return Math.min(getTerrainFogEndBlocks(), getEffectiveRenderDistanceBlocks());
+    }
+
+    public static float getSkyFogEndBlocks() {
+        return getRenderDistanceBlocks() * FogTuning.SKY_END_FACTOR;
     }
 
     public static boolean shouldUseConsoleAtmosphere(ClientLevel level) {
@@ -190,6 +212,13 @@ public final class LegacyCloudAtmosphere {
         return camera.attributeProbe().getValue(attribute, partialTick);
     }
 
+    private static int getRenderDistanceBlocks() {
+        return CloudGeometry.LEGACY_RENDER_DISTANCE_CHUNKS * 16;
+    }
+
+    private static int getEffectiveRenderDistanceBlocks() {
+        return Minecraft.getInstance().options.getEffectiveRenderDistance() * 16;
+    }
 
     private static float[] getVisualRgb(Camera camera, EnvironmentAttribute<Integer> attribute, float partialTick) {
         int color = getVisualColor(camera, attribute, partialTick);
