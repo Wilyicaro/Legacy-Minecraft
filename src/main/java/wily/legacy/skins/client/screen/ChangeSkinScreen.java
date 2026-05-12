@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
@@ -140,11 +139,11 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private float mainTextScale() {
-        return bigTextScale();
+        return bigTextScale() * 1.05f;
     }
 
     private float packTypeTextScale() {
-        return Math.min(1.0f, smallTextScale());
+        return smallTextScale() * 1.05f;
     }
 
     private Component packLabel(SkinPack pack) {
@@ -466,12 +465,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             boolean locked = customPacks.isLockedSkinSelection(selected);
 
             if (reordering) {
-                drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             } else if (editing) {
                 if (isImport || locked)
                     drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
                 else if (selected != null)
-                    drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                    drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
                 if (!isImport && !locked && selected != null)
                     drawActionSprite(g, LegacySprites.ERROR_CROSS, iconX, iconBaseY + sc(normalLayout.actionHolderGap()), holder);
             } else if (isImport) drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
@@ -534,7 +533,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             drawScaledCentered(g, Component.literal(packName), packMid, packTitleY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             Component label = packLabel(pack);
             if (label != null)
-                drawScaledCentered(g, label, packMid, packMetaY, ColorUtil.withAlpha(LegacyRenderUtil.getDefaultTextColor(true), 0.8f), packTypeTextScale(), true);
+                drawScaledCentered(g, label, packMid, packMetaY, LegacyRenderUtil.getDefaultTextColor(true), packTypeTextScale(), true);
         }
     }
 

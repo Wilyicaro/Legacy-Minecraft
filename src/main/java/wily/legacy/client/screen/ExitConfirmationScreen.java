@@ -14,6 +14,7 @@ import wily.legacy.client.LegacySaveCache;
 public class ExitConfirmationScreen extends ConfirmationScreen {
     public ExitConfirmationScreen(Screen parent) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> getBaseHeight() + (LegacySaveCache.hasSaveSystem(Minecraft.getInstance()) ? LegacyOptions.getUIMode().isSD() ? 19 : 33 : 0), Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && LegacyOptions.autoSaveInterval.get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b -> {});
+        if (LegacySaveCache.hasSaveSystem(Minecraft.getInstance())) LegacySaveCache.retakeWorldIcon = true;
     }
 
     public static void exit(Minecraft minecraft, boolean save) {
@@ -22,7 +23,8 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
             return;
         }
 
-        if (save) LegacySaveCache.saveExit = LegacySaveCache.retakeWorldIcon = true;
+        if (save) LegacySaveCache.saveExit = true;
+        if (save) LegacySaveCache.clearWorldOrderSnapshot();
 
         if (minecraft.level != null) {
             minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
@@ -31,7 +33,9 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         if (save) {
             minecraft.disconnectWithSavingScreen();
         } else {
+            LegacySaveCache.retakeWorldIcon = false;
             minecraft.disconnect(new LegacyLoadingScreen(Component.translatable("disconnect.quitting"), Component.empty()), false);
+            LegacySaveCache.restoreWorldOrderSnapshot();
         }
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();

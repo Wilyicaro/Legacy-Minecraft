@@ -1,6 +1,9 @@
 package wily.legacy.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +22,8 @@ public class LegacySaveCache {
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
+    private static String worldOrderLevelId;
+    private static long worldOrderLastPlayed;
 
     public static void setup(Minecraft m) {
         currentWorldSource = LevelStorageSource.createDefault(m.gameDirectory.toPath().resolve("current-world"));
@@ -46,6 +51,24 @@ public class LegacySaveCache {
         }
     }
 
+    public static void clearWorldOrderSnapshot() {
+        worldOrderLevelId = null;
+    }
+
+    public static void restoreWorldOrderSnapshot() {
+        if (worldOrderLevelId == null) return;
+        try {
+            Path dataPath = Minecraft.getInstance().getLevelSource().getBaseDir().resolve(worldOrderLevelId).resolve(LevelResource.LEVEL_DATA_FILE.id());
+            CompoundTag root = NbtIo.readCompressed(dataPath, NbtAccounter.unlimitedHeap());
+            root.getCompoundOrEmpty("Data").putLong("LastPlayed", worldOrderLastPlayed);
+            NbtIo.writeCompressed(root, dataPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            clearWorldOrderSnapshot();
+        }
+    }
+
     public static String importSaveFile(InputStream saveInputStream, Predicate<String> exists, LevelStorageSource source, String saveDirName) {
         return Legacy4JClient.manageAvailableSaveDirName(f -> Legacy4J.copySaveToDirectory(saveInputStream, f), exists, source, saveDirName);
     }
@@ -70,6 +93,12 @@ public class LegacySaveCache {
 
     public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource, boolean deleteOldDest) {
         try {
+            if (deleteOldDest && currentWorldSource != null && destSource.getBaseDir().equals(currentWorldSource.getBaseDir()) && sendSource.parent().getBaseDir().equals(Minecraft.getInstance().getLevelSource().getBaseDir())) {
+                clearWorldOrderSnapshot();
+                CompoundTag data = NbtIo.readCompressed(sendSource.getLevelPath(LevelResource.LEVEL_DATA_FILE), NbtAccounter.unlimitedHeap()).getCompoundOrEmpty("Data");
+                worldOrderLevelId = sendSource.getLevelId();
+                worldOrderLastPlayed = data.getLongOr("LastPlayed", 0L);
+            }
             Path sourceLevelDirectory = getLevelDirectory(sendSource);
             Path destLevelDirectoryPath = destSource.getBaseDir().resolve(sendSource.getLevelId());
             File destLevelDirectory = destLevelDirectoryPath.toFile();
