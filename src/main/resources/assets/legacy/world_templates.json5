@@ -12,7 +12,7 @@
     //? if >=26.1 {
     "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial26.mcsave?checksum=b802b32e731b4c34faabebdae81dd504",
     //?} else {
-    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial.mcsave?checksum=f7ac417c99ec18675bafceff68baf0e1",
+    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial.mcsave?checksum=8bf45b115173cf2172f8a87c98dc6783",
     *///?}
     "directJoin": true,
     "preDownload": true
