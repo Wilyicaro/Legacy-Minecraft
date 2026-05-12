@@ -14,27 +14,43 @@ float linear_fog_value(float vertexDistance, float fogStart, float fogEnd) {
     if (fogEnd <= fogStart) {
         return 1.0;
     }
-    float value = clamp((vertexDistance - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
-    float curve = value * value * (3.0 - 2.0 * value);
-    float dense = curve * (0.55 + value * 0.45);
-    float limit = fogStart >= 16.0 && fogEnd >= 128.0 ? 0.92 : 1.0;
-    return dense * limit;
+    if (vertexDistance <= fogStart) {
+        return 0.0;
+    }
+    if (vertexDistance >= fogEnd) {
+        return 1.0;
+    }
+    return (vertexDistance - fogStart) / (fogEnd - fogStart);
 }
 
-float edge_fog_value(float vertexDistance, float fogStart, float fogEnd) {
+float legacy_fog_value(float vertexDistance, float fogStart, float fogEnd) {
     if (fogEnd <= fogStart) {
         return 1.0;
     }
-    if (fogStart < 16.0 || fogEnd < 128.0) {
-        return linear_fog_value(vertexDistance, fogStart, fogEnd);
+    float value = clamp((vertexDistance - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
+    float curve = value * value * (3.0 - 2.0 * value);
+    float dense = curve * (0.55 + value * 0.45);
+    return dense * 0.92;
+}
+
+float legacy_edge_fog_value(float vertexDistance, float fogStart, float fogEnd) {
+    if (fogEnd <= fogStart) {
+        return 1.0;
     }
     float value = clamp((vertexDistance - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
     float edgeStart = max(0.0, 1.0 - 160.0 / (fogEnd - fogStart));
     return smoothstep(edgeStart, 1.0, value);
 }
 
+bool legacy_fog_enabled(float environmentalStart, float environmentalEnd, float renderDistanceStart, float renderDistanceEnd) {
+    return environmentalStart >= 16.0 && environmentalEnd >= 128.0 && abs(environmentalStart - renderDistanceStart) < 0.5 && abs(environmentalEnd - renderDistanceEnd) < 0.5;
+}
+
 float total_fog_value(float sphericalVertexDistance, float cylindricalVertexDistance, float environmentalStart, float environmantalEnd, float renderDistanceStart, float renderDistanceEnd) {
-    return max(linear_fog_value(sphericalVertexDistance, environmentalStart, environmantalEnd), edge_fog_value(cylindricalVertexDistance, renderDistanceStart, renderDistanceEnd));
+    if (legacy_fog_enabled(environmentalStart, environmantalEnd, renderDistanceStart, renderDistanceEnd)) {
+        return max(legacy_fog_value(sphericalVertexDistance, environmentalStart, environmantalEnd), legacy_edge_fog_value(cylindricalVertexDistance, renderDistanceStart, renderDistanceEnd));
+    }
+    return max(linear_fog_value(sphericalVertexDistance, environmentalStart, environmantalEnd), linear_fog_value(cylindricalVertexDistance, renderDistanceStart, renderDistanceEnd));
 }
 
 float fog_legacy_distance(vec4 viewPos) {

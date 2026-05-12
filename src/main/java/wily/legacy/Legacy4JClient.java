@@ -641,6 +641,16 @@ public class Legacy4JClient {
         Minecraft.getInstance().execute(() -> ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).updateSkyBuffers());
     }
 
+    public static void updateSkyShapeAndShaders() {
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            if (minecraft.levelRenderer != null) {
+                ((LevelRendererAccessor) minecraft.levelRenderer).updateSkyBuffers();
+            }
+            minecraft.reloadResourcePacks();
+        });
+    }
+
     public static void buildLegacySkyDisc(VertexConsumer consumer, float f) {
         for (int k = -384; k <= 384; k += 64) {
             for (int l = -256; l <= 384; l += 64) {

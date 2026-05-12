@@ -302,7 +302,11 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> headFollowsTheCamera = CLIENT_STORAGE.register(createBoolean("headFollowsTheCamera", true));
     public static final FactoryConfig<Boolean> fastLeavesWhenBlocked = CLIENT_STORAGE.register(createBoolean("fastLeavesWhenBlocked", true, b -> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> invertedFrontCameraPitch = CLIENT_STORAGE.register(createBoolean("invertedFrontCameraPitch", true, b -> {}));
-    public static final FactoryConfig<Boolean> legacySkyShape = CLIENT_STORAGE.register(createBoolean("legacySkyShape", true, b -> Legacy4JClient.updateSkyShape()));
+    public static final FactoryConfig<Boolean> legacySkyShape = CLIENT_STORAGE.register(createBoolean("legacySkyShape", true, b -> {
+        if (!loadingClientOptions) {
+            Legacy4JClient.updateSkyShapeAndShaders();
+        }
+    }));
     public static final FactoryConfig<Boolean> fastLeavesCustomModels = CLIENT_STORAGE.register(createBoolean("fastLeavesCustomModels", true, b -> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> skipIntro = CLIENT_STORAGE.register(createBoolean("skipIntro", false));
     public static final FactoryConfig<Boolean> legacyIntroAndReloading = CLIENT_STORAGE.register(createBoolean("legacyIntroAndReloading", true));
