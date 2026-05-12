@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPI;
 import wily.legacy.client.LegacyGamma;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
@@ -52,7 +53,11 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
     private void render(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
-        if (minecraft.isGameLoadFinished() && LegacyOptions.displayLegacyGamma.get()) LegacyGamma.INSTANCE.render();
+        if (canRenderLegacyGamma()) LegacyGamma.INSTANCE.render();
+    }
+
+    private boolean canRenderLegacyGamma() {
+        return minecraft.isGameLoadFinished() && LegacyOptions.displayLegacyGamma.get() && !FactoryAPI.isModLoaded("vulkanmod");
     }
 
     @Inject(method = "bobView", at = @At("RETURN"))
