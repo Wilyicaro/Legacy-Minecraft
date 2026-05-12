@@ -346,6 +346,11 @@ public abstract class MinecraftMixin {
         return disconnectScreen instanceof LegacyLoadingScreen ? disconnectScreen : arg;
     }
 
+    @ModifyArg(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
+    private Screen changeSavingScreen(Screen arg, @Local(argsOnly = true) Screen disconnectScreen) {
+        return disconnectScreen instanceof LegacyLoadingScreen ? disconnectScreen : arg;
+    }
+
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
         oldScreen = this.screen;

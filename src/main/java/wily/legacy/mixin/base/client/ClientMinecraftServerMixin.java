@@ -133,6 +133,8 @@ public abstract class ClientMinecraftServerMixin {
     @Inject(method = "saveEverything", at = @At("RETURN"))
     public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
         if (!LegacySaveCache.isCurrentWorldSource(storageSource)) return;
+        boolean requested = LegacySaveCache.consumeSaveCopyRequest();
+        if (!requested && LegacyOptions.autoSaveInterval.get() == 0) return;
         LegacySaveCache.saveLevel(storageSource);
     }
 

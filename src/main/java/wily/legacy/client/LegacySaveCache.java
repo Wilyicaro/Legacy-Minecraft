@@ -22,6 +22,7 @@ public class LegacySaveCache {
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
+    private static boolean saveCopyRequested = false;
     private static String worldOrderLevelId;
     private static long worldOrderLastPlayed;
 
@@ -49,6 +50,16 @@ public class LegacySaveCache {
         if (isCurrentWorldSource(storageSource)) {
             copySaveBtwSources(storageSource, Minecraft.getInstance().getLevelSource(), false);
         }
+    }
+
+    public static void requestSaveCopy() {
+        saveCopyRequested = true;
+    }
+
+    public static boolean consumeSaveCopyRequest() {
+        boolean requested = saveCopyRequested;
+        saveCopyRequested = false;
+        return requested;
     }
 
     public static void clearWorldOrderSnapshot() {

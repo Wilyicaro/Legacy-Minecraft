@@ -54,6 +54,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     public void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci) {
         if (LegacySaveCache.manualSave) {
             LegacySaveCache.manualSave = false;
+            LegacySaveCache.requestSaveCopy();
             FactoryAPIClient.getProfiler().push("manualSave");
             LOGGER.info("Saving manually...");
             this.saveEverything(false, true, true);
