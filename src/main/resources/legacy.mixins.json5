@@ -231,6 +231,7 @@
     "AbstractContainerMenuMixin",
     "AbstractArrowMixin",
     "ProjectileInvoker",
+    "AbstractHorseMixin",
     "AbstractMinecartMixin",
     "AbstractVillagerMixin",
     "AnimalMixin",
