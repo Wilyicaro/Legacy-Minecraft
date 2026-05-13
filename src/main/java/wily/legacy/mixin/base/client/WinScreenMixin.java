@@ -48,9 +48,9 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Unique
     Identifier POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
     @Unique
-    Identifier CREDITS_BACKGROUND = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
+    Identifier CREDITS_BACKGROUND = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_121.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
     @Unique
-    Identifier CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
+    Identifier CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_fade_121.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
     @Shadow
     @Final
     private boolean poem;
