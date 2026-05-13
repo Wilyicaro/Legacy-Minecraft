@@ -63,6 +63,14 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
     @Inject(method = "setupResultSlot", at = @At("RETURN"))
     private void setupResultSlot(ItemStack itemStack, ItemStack itemStack2, ItemStack itemStack3, CallbackInfo ci) {
         access.execute(((level, blockPos) -> {
+            if (itemStack.is(Items.PAPER)) {
+                ItemStack result = itemStack2.isEmpty() ? Items.MAP.getDefaultInstance() : ItemStack.EMPTY;
+                if (!ItemStack.matches(result, itemStack3)) {
+                    resultContainer.setItem(0, result);
+                    broadcastChanges();
+                }
+                return;
+            }
             MapItemSavedData data = MapItem.getSavedData(itemStack, level);
             if (data == null || data.locked) return;
             ItemStack result = resultContainer.getItem(0);
