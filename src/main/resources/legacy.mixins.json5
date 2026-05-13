@@ -240,6 +240,7 @@
     "CauldronInteractionDispatcherAccessor",
     "AbstractArrowMixin",
     "ProjectileInvoker",
+    "AbstractHorseMixin",
     "AbstractMinecartMixin",
     "AbstractVillagerMixin",
     "AnimalMixin",
