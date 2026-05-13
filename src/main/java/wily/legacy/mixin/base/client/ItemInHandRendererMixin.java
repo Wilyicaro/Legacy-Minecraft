@@ -100,7 +100,7 @@ public abstract class ItemInHandRendererMixin {
         HumanoidArm humanoidArm = interactionHand == InteractionHand.MAIN_HAND ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
         if (interactionHand == InteractionHand.MAIN_HAND && FirstPersonDropAnimation.isActive() && !abstractClientPlayer.isUsingItem()) {
-            renderDropAnimation(abstractClientPlayer, itemStack, humanoidArm, i, poseStack, submitNodeCollector, j);
+            renderDropAnimation(abstractClientPlayer, itemStack, humanoidArm, h, i, poseStack, submitNodeCollector, j);
             ci.cancel();
             poseStack.popPose();
             return;
@@ -157,16 +157,17 @@ public abstract class ItemInHandRendererMixin {
     }
 
     @Unique
-    private void renderDropAnimation(AbstractClientPlayer player, ItemStack itemStack, HumanoidArm arm, float equipProgress, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+    private void renderDropAnimation(AbstractClientPlayer player, ItemStack itemStack, HumanoidArm arm, float swingProgress, float equipProgress, PoseStack poseStack, SubmitNodeCollector collector, int light) {
         float progress = FirstPersonDropAnimation.progress();
         float offset = Mth.sin(progress * (float) Math.PI);
+        if (itemStack.isEmpty()) {
+            poseStack.translate(0.0F, -0.5F * offset, 0.0F);
+            if (!player.isInvisible() || Legacy4JClient.isHostInvisible(player)) renderPlayerArm(poseStack, collector, light, equipProgress, swingProgress, arm);
+            return;
+        }
         applyItemArmTransform(poseStack, arm, equipProgress);
         poseStack.translate(0.0F, -0.5F * offset, 0.0F);
-        if (itemStack.isEmpty()) {
-            if (!player.isInvisible() || Legacy4JClient.isHostInvisible(player)) renderPlayerArm(poseStack, collector, light, 0.0F, equipProgress, arm);
-        } else {
-            renderItem(player, itemStack, arm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, collector, light);
-        }
+        renderItem(player, itemStack, arm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, collector, light);
     }
 
     @Unique
