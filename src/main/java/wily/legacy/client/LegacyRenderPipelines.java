@@ -11,7 +11,7 @@ import wily.factoryapi.mixin.base.RenderPipelinesAccessor;
 import wily.legacy.Legacy4J;
 
 public class LegacyRenderPipelines {
-    public static final RenderPipeline LEGACY_SKY = RenderPipelinesAccessor.register(RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET).withLocation(Legacy4J.createModLocation("pipeline/sky")).withVertexShader("core/position").withFragmentShader("core/position").withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false)).withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS).build());
+    public static final RenderPipeline LEGACY_SKY = RenderPipelinesAccessor.register(RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET).withLocation(Legacy4J.createModLocation("pipeline/sky")).withVertexShader("core/sky").withFragmentShader("core/sky").withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS).build());
     public static final RenderPipeline LEGACY_FLAT_CLOUDS = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/flat_clouds"))

@@ -5,6 +5,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.AtmosphericFogEnvironment;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,6 +26,13 @@ public abstract class AtmosphericFogEnvironmentMixin {
         if (LegacyOptions.overrideTerrainFogEnd.get())
             fogData.environmentalEnd = LegacyOptions.terrainFogEnd.get().floatValue() * 16;
     }
+
+    @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;skyEnd:F", ordinal = 0, opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
+    private void setupSkyFogEnd(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (LegacyOptions.overrideTerrainFogEnd.get())
+            fogData.skyEnd = Math.min(LegacyOptions.terrainFogEnd.get().floatValue() * 16, camera.attributeProbe().getValue(EnvironmentAttributes.SKY_FOG_END_DISTANCE, f));
+    }
+
 
     @Inject(method = "setupFog", at = @At("TAIL"))
     private void setupCloudFogOptions(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
