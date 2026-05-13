@@ -14,6 +14,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     private final LegacySkinUi.Adapter adapter;
     private final LinkedHashMap<String, SkinPack> packs = new LinkedHashMap<>();
     private final LinkedHashMap<String, SkinEntry> skins = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> skinThemes = new LinkedHashMap<>();
     private final LinkedHashMap<String, String> packSubtitles = new LinkedHashMap<>();
     private final Set<String> favoriteSkinIds = new LinkedHashSet<>();
     private int stateHash = Integer.MIN_VALUE;
@@ -41,6 +42,21 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     public @Nullable SkinEntry skin(String id) {
         refresh();
         return id == null ? null : skins.get(id);
+    }
+
+    @Override
+    public String skinName(@Nullable String skinId) {
+        refresh();
+        SkinEntry entry = skinId == null ? null : skins.get(skinId);
+        return entry == null ? (skinId == null ? "" : skinId) : entry.name();
+    }
+
+    @Override
+    public @Nullable String skinTheme(@Nullable String skinId) {
+        refresh();
+        if (skinId == null) return null;
+        String theme = skinThemes.get(skinId);
+        return theme == null ? ChangeSkinScreenSource.super.skinTheme(skins.get(skinId)) : theme;
     }
 
     @Override
@@ -190,7 +206,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     }
                     String skinId = SkinIdUtil.trimToNull(apiSkin.id());
                     boolean favorite = favorites && skinId != null && adapter.isFavorite(skinId);
-                    nextStateHash = 31 * nextStateHash + Objects.hash(skinId, apiSkin.title(), favorite);
+                    nextStateHash = 31 * nextStateHash + Objects.hash(skinId, apiSkin.title(), apiSkin.theme(), favorite);
                 }
             }
         }
@@ -198,6 +214,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
         stateHash = nextStateHash;
         packs.clear();
         skins.clear();
+        skinThemes.clear();
         packSubtitles.clear();
         favoriteSkinIds.clear();
         appliedSkinId = selectedSkinId == null ? null : SkinIdUtil.isAutoSelect(selectedSkinId) ? "" : selectedSkinId;
@@ -218,6 +235,8 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     skin = new SkinEntry(skinId, skinId, apiSkin.title(), null, null, null, false, order, false);
                     skins.put(skinId, skin);
                 }
+                String theme = SkinIdUtil.trimToNull(apiSkin.theme());
+                if (theme != null) skinThemes.putIfAbsent(skinId, theme);
                 if (favorites && adapter.isFavorite(skinId)) favoriteSkinIds.add(skinId);
                 packSkins.put(skinId, skin.order() == order ? skin : orderedSkin(skin, order));
             }

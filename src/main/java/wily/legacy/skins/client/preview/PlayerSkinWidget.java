@@ -13,12 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.pose.SkinPoseRegistry;
-import wily.legacy.skins.skin.ClientSkinAssets;
-import wily.legacy.skins.skin.SkinEntry;
 import wily.legacy.skins.skin.SkinIdUtil;
-import wily.legacy.skins.skin.SkinSync;
 
 import java.util.function.Supplier;
 
@@ -39,9 +35,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     public int slotOffset;
     public int renderRadius = 4;
     public float progress;
-    private String skinIdValue, cachedEntryId;
-    private int cachedEntryVersion = -1;
-    private SkinEntry cachedEntry;
+    private String skinIdValue;
     private int sourceSlotOffset;
     private float rotationX, rotationY, prevPosX, prevPosY, prevRotationX, prevRotationY, prevScale;
     private float targetRotationX = Float.NEGATIVE_INFINITY, targetRotationY = Float.NEGATIVE_INFINITY, targetPosX = Float.NEGATIVE_INFINITY,
@@ -148,25 +142,10 @@ public class PlayerSkinWidget extends AbstractWidget {
 
     public void setSkinId(String id) {
         this.skinIdValue = (id == null || id.isBlank()) ? null : id;
-        if (this.skinIdValue == null || !this.skinIdValue.equals(cachedEntryId)) {
-            cachedEntryId = null;
-            cachedEntry = null;
-            cachedEntryVersion = -1;
-        }
     }
 
     public void setSourceSlotOffset(int offset) {
         this.sourceSlotOffset = offset;
-    }
-
-    private SkinEntry getCachedEntry(String id) {
-        if (SkinIdUtil.isBlankOrAutoSelect(id)) return null;
-        int version = source.version();
-        if (id.equals(cachedEntryId) && cachedEntryVersion == version) return cachedEntry;
-        cachedEntryId = id;
-        cachedEntryVersion = version;
-        cachedEntry = source.skin(id);
-        return cachedEntry;
     }
 
     public void prewarm() {
@@ -550,20 +529,12 @@ public class PlayerSkinWidget extends AbstractWidget {
     }
 
     private String nameLabel(String id) {
-        SkinEntry entry = getCachedEntry(id);
-        return entry == null ? null : source.skinName(entry);
+        return source.skinName(id);
     }
 
     private String themeLabel(String id, String label) {
         if (SkinIdUtil.isAutoSelect(id)) return null;
-        SkinEntry entry = getCachedEntry(id);
-        Identifier modelId = entry == null ? null : entry.modelId();
-        if (modelId == null) {
-            String ns = entry != null && entry.texture() != null ? entry.texture().getNamespace() : SkinSync.ASSET_NS;
-            Identifier texture = entry != null && entry.texture() != null ? entry.texture() : Identifier.fromNamespaceAndPath(ns, id);
-            modelId = ClientSkinAssets.getModelIdFromTexture(texture);
-        }
-        String theme = BoxModelManager.getThemeText(modelId);
+        String theme = source.skinTheme(id);
         return theme == null || theme.isBlank() || theme.equals(label) ? null : theme;
     }
 }

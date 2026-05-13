@@ -67,7 +67,11 @@ public final class LegacySkinUi {
         }
     }
 
-    public record Skin(String id, String title) {
+    public record Skin(String id, String title, @Nullable String theme) {
+        public Skin(String id, String title) {
+            this(id, title, null);
+        }
+
         public Skin {
             Objects.requireNonNull(id, "id");
             Objects.requireNonNull(title, "title");

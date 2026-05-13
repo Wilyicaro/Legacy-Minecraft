@@ -17,7 +17,6 @@ import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.skins.client.changeskin.ChangeSkinPackList;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
-import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.skin.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -502,19 +501,14 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         center = getCenterWidget();
         if (center != null) {
             String skinId = center.skinId.get();
-            SkinEntry entry = skinId == null ? null : source.skin(skinId);
-            String name = entry == null ? String.valueOf(skinId) : source.skinName(entry);
+            String name = source.skinName(skinId);
             int mid = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
             float mainTextScale = mainTextScale();
             int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
             drawScaledCentered(g, Component.literal(PlayerSkinWidget.clipText(minecraft.font, name, maxNameWidth)), mid, skinNameY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
 
-            Identifier modelId = entry == null ? null : entry.modelId();
-            if (modelId == null && entry != null && entry.texture() != null)
-                modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
-
-            String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
+            String theme = source.skinTheme(skinId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
                 int maxThemeWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
                 String show = PlayerSkinWidget.clipText(minecraft.font, theme, maxThemeWidth);
