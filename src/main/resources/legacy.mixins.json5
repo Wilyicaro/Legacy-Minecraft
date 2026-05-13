@@ -246,6 +246,7 @@
     "ArmorStandMixin",
     "BonusChestFeatureMixin",
     "CartographyTableMenuMixin",
+    "CartographyTableMapSlotMixin",
     "CraftingTableBlockMixin",
     "CriteriaTriggersMixin",
     "EmptyMapItemMixin",
