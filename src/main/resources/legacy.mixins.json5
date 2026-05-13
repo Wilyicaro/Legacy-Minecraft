@@ -246,6 +246,7 @@
     "BonusChestFeatureMixin",
     "CampfireBlockMixin",
     "CartographyTableMenuMixin",
+    "CartographyTableMapSlotMixin",
     "CraftingTableBlockMixin",
     "CriteriaTriggersMixin",
     "DoublePlantBlockMixin",
