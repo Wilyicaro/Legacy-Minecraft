@@ -67,14 +67,23 @@ public final class LegacySkinUi {
         }
     }
 
-    public record Skin(String id, String title, @Nullable String theme) {
+    public record Skin(String id, String title, @Nullable String theme, List<String> poses) {
         public Skin(String id, String title) {
-            this(id, title, null);
+            this(id, title, null, List.of());
+        }
+
+        public Skin(String id, String title, @Nullable String theme) {
+            this(id, title, theme, List.of());
+        }
+
+        public Skin(String id, String title, List<String> poses) {
+            this(id, title, null, poses);
         }
 
         public Skin {
             Objects.requireNonNull(id, "id");
             Objects.requireNonNull(title, "title");
+            poses = poses == null ? List.of() : List.copyOf(poses);
         }
     }
 

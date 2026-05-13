@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.skins.api.ui.LegacySkinUi;
+import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.SkinEntry;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
@@ -15,6 +16,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     private final LinkedHashMap<String, SkinPack> packs = new LinkedHashMap<>();
     private final LinkedHashMap<String, SkinEntry> skins = new LinkedHashMap<>();
     private final LinkedHashMap<String, String> skinThemes = new LinkedHashMap<>();
+    private final LinkedHashMap<String, EnumSet<SkinPoseRegistry.PoseTag>> skinPoses = new LinkedHashMap<>();
     private final LinkedHashMap<String, String> packSubtitles = new LinkedHashMap<>();
     private final Set<String> favoriteSkinIds = new LinkedHashSet<>();
     private int stateHash = Integer.MIN_VALUE;
@@ -30,6 +32,23 @@ final class SkinUiSource implements ChangeSkinScreenSource {
 
     private static SkinEntry orderedSkin(SkinEntry skin, int order) {
         return new SkinEntry(skin.id(), skin.sourceId(), skin.name(), skin.texture(), skin.modelId(), skin.cape(), skin.slimArms(), order, skin.fair());
+    }
+
+    private static EnumSet<SkinPoseRegistry.PoseTag> poseTags(List<String> poses) {
+        EnumSet<SkinPoseRegistry.PoseTag> out = EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
+        if (poses == null || poses.isEmpty()) return out;
+        for (String pose : poses) {
+            SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(pose);
+            if (tag != null) out.add(tag);
+        }
+        return out;
+    }
+
+    private static void addPoseTags(Map<String, EnumSet<SkinPoseRegistry.PoseTag>> poses, String skinId, EnumSet<SkinPoseRegistry.PoseTag> tags) {
+        if (skinId == null || tags == null || tags.isEmpty()) return;
+        EnumSet<SkinPoseRegistry.PoseTag> existing = poses.get(skinId);
+        if (existing == null) poses.put(skinId, EnumSet.copyOf(tags));
+        else existing.addAll(tags);
     }
 
     @Override
@@ -206,7 +225,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     }
                     String skinId = SkinIdUtil.trimToNull(apiSkin.id());
                     boolean favorite = favorites && skinId != null && adapter.isFavorite(skinId);
-                    nextStateHash = 31 * nextStateHash + Objects.hash(skinId, apiSkin.title(), apiSkin.theme(), favorite);
+                    nextStateHash = 31 * nextStateHash + Objects.hash(skinId, apiSkin.title(), apiSkin.theme(), apiSkin.poses(), favorite);
                 }
             }
         }
@@ -215,11 +234,15 @@ final class SkinUiSource implements ChangeSkinScreenSource {
         packs.clear();
         skins.clear();
         skinThemes.clear();
+        skinPoses.clear();
         packSubtitles.clear();
         favoriteSkinIds.clear();
         appliedSkinId = selectedSkinId == null ? null : SkinIdUtil.isAutoSelect(selectedSkinId) ? "" : selectedSkinId;
         int packOrder = 0;
-        if (adapterPacks == null) return;
+        if (adapterPacks == null) {
+            SkinPoseRegistry.setApiPoseTags(skinPoses);
+            return;
+        }
         for (LegacySkinUi.Pack apiPack : adapterPacks) {
             String packId = SkinIdUtil.trimToNull(apiPack == null ? null : apiPack.id());
             if (packId == null || packs.containsKey(packId)) continue;
@@ -237,6 +260,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                 }
                 String theme = SkinIdUtil.trimToNull(apiSkin.theme());
                 if (theme != null) skinThemes.putIfAbsent(skinId, theme);
+                addPoseTags(skinPoses, skinId, poseTags(apiSkin.poses()));
                 if (favorites && adapter.isFavorite(skinId)) favoriteSkinIds.add(skinId);
                 packSkins.put(skinId, skin.order() == order ? skin : orderedSkin(skin, order));
             }
@@ -253,6 +277,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     0
             ));
         }
+        SkinPoseRegistry.setApiPoseTags(skinPoses);
     }
 
     private @Nullable String findPackId(String skinId) {
