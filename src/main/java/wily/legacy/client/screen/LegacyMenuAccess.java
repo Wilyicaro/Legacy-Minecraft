@@ -59,7 +59,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         if (s == null || (!allowHovered && s == findHoveredSlot()) || !LegacySlotDisplay.isVisibleAndActive(s)) return false;
         Minecraft minecraft = Minecraft.getInstance();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
-        Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
+        Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX(), holder.getMiddleY());
         return true;
     }
     default void movePointerToNextSlot(){

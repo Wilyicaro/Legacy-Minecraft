@@ -43,7 +43,6 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "renderWithTooltip",at = @At("HEAD"))
     private void renderWithTooltip(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
-        LegacyTipManager.tipDiffPercentage = Math.max(-0.5f,Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * f,1.5f));
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(),0,0);
     }

@@ -33,6 +33,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -182,8 +183,10 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         leftPos = panel.x;
         topPos = panel.y;
         addRenderableOnly(scroller);
-        scroller.setPosition(panel.x + 296, panel.y + 27);
-        scroller.offset(new Vec3(0.5f, 0.5f, 0));
+        scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 296), accessor.getInteger("scroller.y", panel.y + 27));
+        scroller.height = accessor.getInteger("scroller.height", 135);
+        scroller.width = accessor.getInteger("scroller.width", 13);
+        scroller.offset(new Vec3(ScreenUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0.0f));
         if (arrangement.get() == 2){
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);
             addRenderableWidget(searchBox);
