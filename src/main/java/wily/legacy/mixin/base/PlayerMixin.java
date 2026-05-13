@@ -4,8 +4,11 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -67,6 +70,13 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
     @Inject(method = "tick", at = @At("RETURN"))
     protected void tickShieldControls(CallbackInfo ci) {
         legacy$updateShieldControls();
+    }
+
+    @Inject(method = "blockUsingItem", at = @At("RETURN"))
+    protected void blockUsingItem(ServerLevel level, LivingEntity attacker, CallbackInfo ci) {
+        ItemStack blockingItem = getItemBlockingWith();
+        if (blockingItem == null || !(blockingItem.getItem() instanceof ShieldItem) || !(attacker instanceof Mob)) return;
+        attacker.knockback(0.5D, getX() - attacker.getX(), getZ() - attacker.getZ());
     }
 
     @Inject(method = "getCurrentItemAttackStrengthDelay", at = @At(value = "HEAD"), cancellable = true)
