@@ -262,6 +262,7 @@
     "mobcaps.HangingEntityItemMixin",
     "mobcaps.ItemFrameItemMixin",
     "mobcaps.NaturalSpawnerMixin",
+    "mobcaps.ServerChunkCacheMixin",
     "mobcaps.ServerLevelMixin",
     "mobcaps.SpawnEggItemMixin",
     "mobcaps.ThrownEggMixin",
