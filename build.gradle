@@ -173,31 +173,7 @@ remapJar {
 }
 ext {
     releaseChangelog = {
-        def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
-        def branch
-        if (System.env.BRANCH_NAME) {
-            branch = System.env.BRANCH_NAME
-            branch = branch.substring(branch.lastIndexOf("/") + 1)
-        } else {
-            branch = "git rev-parse --abbrev-ref HEAD".execute().in.text.trim()
-        }
-        if (branch == "HEAD") {
-            branch = "git rev-parse --short HEAD".execute().in.text.trim()
-        }
-        def time = dateFormat.format(new Date())
-        def changes = new StringBuilder()
-        changes << "## " + stage.capitalize() + " $version  \nUpdated at **$time**.  \n**Changelog**  "
-        def proc = "git log --max-count=4 --pretty=format:%s".execute()
-        proc.in.eachLine { line ->
-            def processedLine = line.toString()
-            def lines = processedLine.split(" -")
-            changes << "\n**${lines[0]}**  "
-            lines.each {s-> if (s != lines[0]) changes << "\n- " + s + "  "}
-        }
-        changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
-        proc.waitFor()
-        return changes.toString()
+        return rootProject.file("CHANGELOG.md").text
     }
 }
 
