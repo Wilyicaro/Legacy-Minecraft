@@ -284,6 +284,7 @@
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "SnowLayerBlockMixin",
+    "SpiderMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
     "SugarCanesBlockMixin",
