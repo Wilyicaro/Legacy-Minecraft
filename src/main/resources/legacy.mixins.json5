@@ -304,6 +304,7 @@
     "WitherSkullBlockMixin",
     "EntityAccessor",
     "EndPortalBlockMixin",
+    "EnderChestBlockMixin",
     "ScaffoldingBlockItemMixin",
     "FlowerPotBlockAccessor",
     "HangingEntityItemAccessor",
