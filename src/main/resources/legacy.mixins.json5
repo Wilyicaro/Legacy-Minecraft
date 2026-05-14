@@ -245,6 +245,7 @@
     "FallingBlockEntityMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
+    "GrowingPlantBlockMixin",
     "AnvilMenuMixin",
     "mobcaps.ArmorStandItemMixin",
     "mobcaps.BoatItemMixin",
