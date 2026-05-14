@@ -238,7 +238,7 @@ public interface ControlTooltip {
             } else {
                 if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.canRepair(a.getHoveredSlot().getItem(), a.getMenu().getCarried()))
                     return LegacyComponents.REPAIR;
-                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && a.getMenu().getCarried().getItem() instanceof DyeItem)
+                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && LegacyItemUtil.getDyeColorOrNull(a.getMenu().getCarried().getItem()) != null)
                     return LegacyComponents.DYE;
                 else if (isBundle(a.getMenu().getCarried()) && BundleItem.getFullnessDisplay(a.getMenu().getCarried()) > 0 && !a.getHoveredSlot().hasItem())
                     return LegacyComponents.RELEASE;
@@ -484,7 +484,7 @@ public interface ControlTooltip {
                         return LegacyComponents.GLOW;
                     if (item.is(Items.INK_SAC) && text.hasGlowingText())
                         return LegacyComponents.REMOVE_GLOW;
-                    if (item.getItem() instanceof DyeItem dye && text.getColor() != dye.getDyeColor())
+                    if (LegacyItemUtil.getDyeColorOrNull(item.getItem()) != null && text.getColor() != LegacyItemUtil.getDyeColor(item.getItem()))
                         return LegacyComponents.DYE;
                 }
             }
@@ -587,7 +587,7 @@ public interface ControlTooltip {
                     if (be.waterColor != null)
                         return LegacyComponents.DYE;
                 }
-                if (actualItem.getItem() instanceof DyeItem)
+                if (LegacyItemUtil.getDyeColorOrNull(actualItem.getItem()) != null)
                     return LegacyComponents.MIX;
             }
             if (blockState != null && blockState.getBlock() == Blocks.LODESTONE && actualItem.is(Items.COMPASS))
@@ -755,7 +755,7 @@ public interface ControlTooltip {
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem) {
-        return usedItem.getItem() instanceof DyeItem dye && minecraft.hitResult instanceof EntityHitResult result && minecraft.player != null && (result.getEntity() instanceof Sheep sheep && sheep.getColor() != dye.getDyeColor() || result.getEntity() instanceof Wolf w && w.isTame() && w.isOwnedBy(minecraft.player) && w.getCollarColor() != dye.getDyeColor() || result.getEntity() instanceof Cat c && c.isTame() && c.isOwnedBy(minecraft.player) && c.getCollarColor() != dye.getDyeColor());
+        return LegacyItemUtil.getDyeColorOrNull(usedItem.getItem()) != null && minecraft.hitResult instanceof EntityHitResult result && minecraft.player != null && (result.getEntity() instanceof Sheep sheep && sheep.getColor() != LegacyItemUtil.getDyeColor(usedItem.getItem()) || result.getEntity() instanceof Wolf w && w.isTame() && w.isOwnedBy(minecraft.player) && w.getCollarColor() != LegacyItemUtil.getDyeColor(usedItem.getItem()) || result.getEntity() instanceof Cat c && c.isTame() && c.isOwnedBy(minecraft.player) && c.getCollarColor() != LegacyItemUtil.getDyeColor(usedItem.getItem()));
     }
 
     Icon getIcon();

@@ -219,11 +219,12 @@ public class LegacyBlockBehaviors {
         });
 
         for (DyeColor color : DyeColor.values()) {
-            putInteractionOrFallback(waterCauldron, DyeItem.byColor(color), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
-                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !(itemStack.getItem() instanceof DyeItem) || !be.hasWater()) {
+            CauldronInteraction interaction = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+                DyeColor stackColor = LegacyItemUtil.getDyeColorOrNull(itemStack.getItem());
+                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || stackColor == null || !be.hasWater()) {
                     return defaultPassInteraction();
                 }
-                int dyeColor = LegacyItemUtil.getDyeColor(color);
+                int dyeColor = LegacyItemUtil.getDyeColor(stackColor);
                 if (be.waterColor == null) be.setWaterColor(dyeColor);
                 else
                     be.setWaterColor(be.waterColor = LegacyItemUtil.mixColors(List.of(be.waterColor, dyeColor).iterator()));
@@ -236,7 +237,12 @@ public class LegacyBlockBehaviors {
                 }
 
                 return level.isClientSide() ? successInteraction() : consumeInteraction();
-            });
+            };
+            putInteractionOrFallback(waterCauldron, LegacyItemUtil.getDyeItem(color), interaction);
+            Item legacyDye = LegacyItemUtil.getLegacyDyeItem(color);
+            if (legacyDye != null) {
+                putInteractionOrFallback(waterCauldron, legacyDye, interaction);
+            }
         }
     }
 

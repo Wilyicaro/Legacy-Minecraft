@@ -35,6 +35,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.FactoryIngredient;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -125,7 +126,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
                 List<Optional<Ingredient>> customIngredients = super.getIngredients(player, packet);
-                if (packet.craftId().isPresent() && customIngredients.size() == 2 && Arrays.stream(FactoryIngredient.of(customIngredients.get(0).get()).getStacks()).allMatch(i -> i.getItem() instanceof BannerItem) && Arrays.stream(FactoryIngredient.of(customIngredients.get(1).get()).getStacks()).allMatch(i -> i.getItem() instanceof DyeItem)) {
+                if (packet.craftId().isPresent() && customIngredients.size() == 2 && Arrays.stream(FactoryIngredient.of(customIngredients.get(0).get()).getStacks()).allMatch(i -> i.getItem() instanceof BannerItem) && Arrays.stream(FactoryIngredient.of(customIngredients.get(1).get()).getStacks()).allMatch(i -> LegacyItemUtil.getDyeColorOrNull(i.getItem()) != null)) {
                     return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b ->
                             b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p -> {
                                         Optional<Ingredient> extraIng = getBannerPatternExtraIngredient(player.level().registryAccess(), p.key());
@@ -143,7 +144,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
                 return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b ->
                         b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p -> {
                             ItemStack banner = container.getItem(0);
-                            banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, ((DyeItem) container.getItem(1).getItem()).getDyeColor()).build());
+                            banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, LegacyItemUtil.getDyeColor(container.getItem(1).getItem())).build());
                             return banner;
                         })).orElse(ItemStack.EMPTY);
             }
