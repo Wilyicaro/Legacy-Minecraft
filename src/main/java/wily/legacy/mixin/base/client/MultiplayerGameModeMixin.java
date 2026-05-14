@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.init.LegacyGameRules;
-import wily.legacy.util.LegacyBedrockProtection;
+import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(MultiPlayerGameMode.class)
@@ -45,7 +45,7 @@ public class MultiplayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (minecraft.player != null && minecraft.player.getAbilities().instabuild && minecraft.level != null && LegacyBedrockProtection.blocksCreativeBreak(minecraft.level, pos, minecraft.level.getBlockState(pos))) {
+        if (minecraft.player != null && minecraft.level != null && LegacyBlockProtection.blocksBreak(minecraft.level, pos, minecraft.level.getBlockState(pos), minecraft.player.getAbilities().instabuild)) {
             cir.setReturnValue(false);
         }
     }

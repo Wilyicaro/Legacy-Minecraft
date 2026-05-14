@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.util.LegacyBedrockProtection;
+import wily.legacy.util.LegacyBlockProtection;
 
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeMixin {
@@ -34,7 +34,7 @@ public abstract class ServerPlayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     protected void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (isCreative() && LegacyBedrockProtection.blocksCreativeBreak(level, pos, level.getBlockState(pos))) {
+        if (LegacyBlockProtection.blocksBreak(level, pos, level.getBlockState(pos), isCreative())) {
             cir.setReturnValue(false);
         }
     }

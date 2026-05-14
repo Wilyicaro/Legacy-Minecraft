@@ -83,6 +83,7 @@ import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.network.ServerPlayerShieldPausePayload;
+import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -334,6 +335,14 @@ public abstract class MinecraftMixin {
     @Inject(method = "continueAttack", at = @At("HEAD"))
     private void continueAttack(boolean bl, CallbackInfo ci) {
         if (bl) legacy$pauseShield();
+    }
+
+    @Inject(method = "pick", at = @At("RETURN"))
+    private void pick(float tickDelta, CallbackInfo ci) {
+        if (level == null || !(hitResult instanceof BlockHitResult blockHit)) return;
+        if (LegacyBlockProtection.blocksNetherPortalBreak(level.getBlockState(blockHit.getBlockPos()))) {
+            hitResult = BlockHitResult.miss(blockHit.getLocation(), blockHit.getDirection(), blockHit.getBlockPos());
+        }
     }
 
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
