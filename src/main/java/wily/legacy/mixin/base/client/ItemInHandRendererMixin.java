@@ -10,6 +10,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.Mth;
@@ -17,6 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
+import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(ItemInHandRenderer.class)
@@ -49,6 +52,12 @@ public abstract class ItemInHandRendererMixin {
     @Shadow
     public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3, PoseStack arg4, SubmitNodeCollector arg5, int i);
 
+    @Unique
+    private boolean legacy$mainHandWasEmptyMap;
+
+    @Unique
+    private boolean legacy$offHandWasEmptyMap;
+
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
@@ -64,11 +73,27 @@ public abstract class ItemInHandRendererMixin {
         int light = getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
         if (LegacyOptions.itemLightingInHand.get() && light > 0)
             original.set(LightTexture.pack(light, LightTexture.sky(i)));
+        updateMapFillAnimation(localPlayer.getMainHandItem(), true);
+        updateMapFillAnimation(localPlayer.getOffhandItem(), false);
     }
 
     @Unique
     private int getLight(ItemStack mainHand, ItemStack offHand) {
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
+    }
+
+    @Unique
+    private void updateMapFillAnimation(ItemStack itemStack, boolean mainHand) {
+        boolean wasEmptyMap = mainHand ? legacy$mainHandWasEmptyMap : legacy$offHandWasEmptyMap;
+        if (wasEmptyMap && itemStack.is(Items.FILLED_MAP)) {
+            MapId mapId = itemStack.get(DataComponents.MAP_ID);
+            if (mapId != null) LegacyMapFillAnimation.start(mapId);
+        }
+        if (mainHand) {
+            legacy$mainHandWasEmptyMap = itemStack.is(Items.MAP);
+        } else {
+            legacy$offHandWasEmptyMap = itemStack.is(Items.MAP);
+        }
     }
 
     @ModifyExpressionValue(method = "renderOneHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
