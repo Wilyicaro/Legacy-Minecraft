@@ -45,7 +45,6 @@ import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
@@ -287,7 +286,7 @@ public abstract class MinecraftMixin {
         if (entity instanceof Wolf wolf && !wolf.isTame() && item.is(Items.BONE)) return true;
         if (entity instanceof Sheep sheep) {
             if (item.getItem() instanceof ShearsItem && sheep.readyForShearing()) return true;
-            if (item.getItem() instanceof DyeItem dye && sheep.getColor() != LegacyItemUtil.getDyeColor(dye.asItem())) return true;
+            if (LegacyItemUtil.getDyeColorOrNull(item.getItem()) != null && sheep.getColor() != LegacyItemUtil.getDyeColor(item.getItem())) return true;
         }
         if (legacy$canToggleTamedSitting(entity, item)) return true;
         return entity instanceof Animal animal && animal.isFood(item);
@@ -304,9 +303,9 @@ public abstract class MinecraftMixin {
 
     @Unique
     private boolean legacy$canDyeCollar(Entity entity, ItemStack item) {
-        if (!(item.getItem() instanceof DyeItem dye)) return false;
-        if (entity instanceof Wolf wolf) return wolf.getCollarColor() != LegacyItemUtil.getDyeColor(dye.asItem());
-        return entity instanceof Cat cat && cat.getCollarColor() != LegacyItemUtil.getDyeColor(dye.asItem());
+        if (LegacyItemUtil.getDyeColorOrNull(item.getItem()) == null) return false;
+        if (entity instanceof Wolf wolf) return wolf.getCollarColor() != LegacyItemUtil.getDyeColor(item.getItem());
+        return entity instanceof Cat cat && cat.getCollarColor() != LegacyItemUtil.getDyeColor(item.getItem());
     }
 
     @Unique

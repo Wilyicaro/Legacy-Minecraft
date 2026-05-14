@@ -2,13 +2,11 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentHolder;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.entity.EquipmentSlotGroup;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -49,17 +47,6 @@ public abstract class ItemStackMixin implements DataComponentHolder {
         if (self().is(Items.FILLED_MAP) && !self().has(DataComponents.CUSTOM_NAME) && !self().has(DataComponents.MAP_POST_PROCESSING)) {
             MapId mapId = self().get(DataComponents.MAP_ID);
             if (mapId != null) cir.setReturnValue(self().getItem().getName(self()).copy().append(Component.translatable("legacy.map.id", mapId.id())));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Inject(method = "get", at = @At("HEAD"), cancellable = true)
-    private <T> void get(DataComponentType<? extends T> dataComponentType, CallbackInfoReturnable<T> cir) {
-        if (dataComponentType == DataComponents.DYE) {
-            DyeColor color = LegacyItemUtil.getDyeColorOrNull(self().getItem());
-            if (color != null && self().getItem() != LegacyItemUtil.getDyeItem(color)) {
-                cir.setReturnValue((T) color);
-            }
         }
     }
 
