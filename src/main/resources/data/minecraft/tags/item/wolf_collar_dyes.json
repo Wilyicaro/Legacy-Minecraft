@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:bone_meal",
+    "minecraft:ink_sac",
+    "minecraft:lapis_lazuli",
+    "minecraft:cocoa_beans"
+  ]
+}

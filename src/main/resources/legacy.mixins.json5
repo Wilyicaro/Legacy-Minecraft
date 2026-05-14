@@ -229,6 +229,8 @@
     "ServerExplosionMixin",
     "ItemMixin",
     "AbstractContainerMenuMixin",
+    "IngredientMixin",
+    "CauldronInteractionDispatcherAccessor",
     "AbstractArrowMixin",
     "ProjectileInvoker",
     "AbstractHorseMixin",
