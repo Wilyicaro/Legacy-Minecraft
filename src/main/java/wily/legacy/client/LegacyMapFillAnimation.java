@@ -62,16 +62,19 @@ public class LegacyMapFillAnimation {
 
     private static void startWhenReady(MapId id, MapItemSavedData data) {
         if (id == null || !id.equals(pendingMapId)) return;
-        if (pendingReusedMap && data.scale >= 3) {
-            pendingMapId = null;
-            pendingReusedMap = false;
+        if (data.scale < 3 || pendingReusedMap) {
+            clearPending();
             return;
         }
         if (!hasPixels(data.colors)) return;
         mapId = id;
+        clearPending();
+        startTime = Util.getMillis();
+    }
+
+    private static void clearPending() {
         pendingMapId = null;
         pendingReusedMap = false;
-        startTime = Util.getMillis();
     }
 
     private static boolean hasPixels(byte[] colors) {
