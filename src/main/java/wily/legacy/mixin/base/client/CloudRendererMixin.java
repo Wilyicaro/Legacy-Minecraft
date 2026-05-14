@@ -46,10 +46,6 @@ public abstract class CloudRendererMixin {
     private int legacy$lastRelativeCameraPos = Integer.MIN_VALUE;
     @Unique
     private boolean legacy$useWarmCloudPipelines;
-    @Unique
-    private CloudRenderer.TextureData legacy$lastTintTexture;
-    @Unique
-    private int legacy$lastTextureColor = -1;
 
     @Shadow
     private boolean needsRebuild;
@@ -82,16 +78,6 @@ public abstract class CloudRendererMixin {
         }
 
         return cloudStatus == CloudStatus.OFF ? cloudStatus : CloudStatus.FANCY;
-    }
-
-    @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-    private int legacy$useCloudTextureColor(int color) {
-        if (!LegacyCloudAtmosphere.areLceCloudsEnabled() || texture == null) {
-            return color;
-        }
-
-        int textureColor = legacy$getCloudTextureColor();
-        return textureColor < 0 ? color : (color & 0xFF000000) | textureColor;
     }
 
     @Redirect(
@@ -326,33 +312,5 @@ public abstract class CloudRendererMixin {
     @Unique
     private static boolean legacy$isWestEmpty(long cellData) {
         return (cellData & 1L) != 0L;
-    }
-
-    @Unique
-    private int legacy$getCloudTextureColor() {
-        if (texture == legacy$lastTintTexture) {
-            return legacy$lastTextureColor;
-        }
-
-        legacy$lastTintTexture = texture;
-        long red = 0;
-        long green = 0;
-        long blue = 0;
-        long count = 0;
-        long[] cells = ((CloudTextureDataAccessor) (Object) texture).legacy$getCells();
-        for (long cell : cells) {
-            if (cell == 0L) {
-                continue;
-            }
-
-            int color = (int) (cell >> 4);
-            red += color >> 16 & 0xFF;
-            green += color >> 8 & 0xFF;
-            blue += color & 0xFF;
-            count++;
-        }
-
-        legacy$lastTextureColor = count == 0 ? -1 : ((int) (red / count) << 16) | ((int) (green / count) << 8) | (int) (blue / count);
-        return legacy$lastTextureColor;
     }
 }
