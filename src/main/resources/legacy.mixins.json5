@@ -299,6 +299,7 @@
     "TntBlockMixin",
     "VillagerGoalPackagesMixin",
     "VillagerMixin",
+    "VindicatorMixin",
     "WolfMixin",
     "WoodlandMansionPiecesSecondFloor",
     "ThrownTridentMixin",
