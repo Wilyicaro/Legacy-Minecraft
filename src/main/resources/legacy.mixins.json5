@@ -247,6 +247,7 @@
     "CartographyTableMenuMixin",
     "CraftingTableBlockMixin",
     "CriteriaTriggersMixin",
+    "DoublePlantBlockMixin",
     "EmptyMapItemMixin",
     "EntityTypeMixin",
     "FallingBlockEntityMixin",
