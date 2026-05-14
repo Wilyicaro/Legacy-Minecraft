@@ -99,6 +99,8 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
     }
 
     public static void resetTipOffset(boolean resetStart) {
+        if (actualTip != null && actualTip.canRemove.get())
+            updateTip();
         if (resetStart)
             startTipOffset = false;
         returningTip = false;
