@@ -4,7 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TurtleEggBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,8 +42,26 @@ public abstract class ServerPlayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     protected void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyBlockProtection.blocksBreak(level, pos, level.getBlockState(pos), isCreative())) {
+        BlockState state = level.getBlockState(pos);
+        if (decreaseCreativeTurtleEggs(pos, state)) {
+            cir.setReturnValue(true);
+        } else if (LegacyBlockProtection.blocksBreak(level, pos, state, isCreative())) {
             cir.setReturnValue(false);
         }
+    }
+
+    private boolean decreaseCreativeTurtleEggs(BlockPos pos, BlockState state) {
+        if (!isCreative() || !state.is(Blocks.TURTLE_EGG)) return false;
+        int eggs = state.getValue(TurtleEggBlock.EGGS);
+        if (eggs <= 1) return false;
+        level.playSound(null, pos, SoundEvents.TURTLE_EGG_BREAK, SoundSource.BLOCKS, 0.7f, 0.9f + level.getRandom().nextFloat() * 0.2f);
+        if (player.getMainHandItem().isEmpty()) {
+            SoundType soundType = SoundType.METAL;
+            level.playSound(null, pos, soundType.getBreakSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0f) / 2.0f, soundType.getPitch() * 0.8f);
+        }
+        level.setBlock(pos, state.setValue(TurtleEggBlock.EGGS, eggs - 1), 2);
+        level.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(state));
+        level.levelEvent(2001, pos, Block.getId(state));
+        return true;
     }
 }
