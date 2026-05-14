@@ -8,6 +8,7 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.level.block.ComposterBlock;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import net.minecraft.world.item.*;
 import net.minecraft.world.phys.Vec3;
@@ -152,6 +153,7 @@ public class Legacy4J {
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
 
         LegacyBlockBehaviors.setup();
+        ComposterBlock.COMPOSTABLES.put(Items.GRASS_BLOCK, 0.3f);
     }
 
     public static boolean isChunkPosVisibleInSquare(int centerX, int centerZ, int viewDistance, int x, int z, boolean offset) {
