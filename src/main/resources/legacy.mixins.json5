@@ -261,6 +261,7 @@
     "FoodDataMixin",
     "GrowingPlantBlockMixin",
     "AnvilMenuMixin",
+    "BlockStateBaseMixin",
     "mobcaps.ArmorStandItemMixin",
     "mobcaps.BoatItemMixin",
     "mobcaps.CarvedPumpkinBlockMixin",
