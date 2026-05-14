@@ -17,6 +17,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import org.spongepowered.asm.mixin.Final;
@@ -87,13 +88,27 @@ public abstract class ItemInHandRendererMixin {
         boolean wasEmptyMap = mainHand ? legacy$mainHandWasEmptyMap : legacy$offHandWasEmptyMap;
         if (wasEmptyMap && itemStack.is(Items.FILLED_MAP)) {
             MapId mapId = itemStack.get(DataComponents.MAP_ID);
-            if (mapId != null) LegacyMapFillAnimation.start(mapId);
+            if (mapId != null) LegacyMapFillAnimation.start(mapId, legacy$isStackedMap(itemStack, mapId));
         }
         if (mainHand) {
             legacy$mainHandWasEmptyMap = itemStack.is(Items.MAP);
         } else {
             legacy$offHandWasEmptyMap = itemStack.is(Items.MAP);
         }
+    }
+
+    @Unique
+    private boolean legacy$isStackedMap(ItemStack itemStack, MapId mapId) {
+        if (minecraft.player == null) return false;
+        int count = 0;
+        Inventory inventory = minecraft.player.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            if (stack.is(Items.FILLED_MAP) && mapId.equals(stack.get(DataComponents.MAP_ID))) {
+                count += stack.getCount();
+            }
+        }
+        return count > itemStack.getCount();
     }
 
     @ModifyExpressionValue(method = "renderOneHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))

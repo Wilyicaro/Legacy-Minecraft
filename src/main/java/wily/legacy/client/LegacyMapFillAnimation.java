@@ -14,15 +14,21 @@ public class LegacyMapFillAnimation {
     private static final Map<MapRenderState, State> STATES = new WeakHashMap<>();
     private static MapId mapId;
     private static MapId pendingMapId;
+    private static boolean pendingReusedMap;
     private static long startTime;
 
     public static void start(MapId id) {
+        start(id, false);
+    }
+
+    public static void start(MapId id, boolean reusedMap) {
         pendingMapId = id;
+        pendingReusedMap = reusedMap;
         mapId = null;
     }
 
     public static void track(MapRenderState state, MapId id, MapItemSavedData data) {
-        startWhenReady(id, data.colors);
+        startWhenReady(id, data);
         if (isActive(id)) {
             STATES.put(state, new State(id, data.colors));
         } else {
@@ -54,10 +60,17 @@ public class LegacyMapFillAnimation {
         return id != null && id.equals(mapId) && Util.getMillis() - startTime < DURATION;
     }
 
-    private static void startWhenReady(MapId id, byte[] colors) {
-        if (id == null || !id.equals(pendingMapId) || !hasPixels(colors)) return;
+    private static void startWhenReady(MapId id, MapItemSavedData data) {
+        if (id == null || !id.equals(pendingMapId)) return;
+        if (pendingReusedMap && data.scale >= 3) {
+            pendingMapId = null;
+            pendingReusedMap = false;
+            return;
+        }
+        if (!hasPixels(data.colors)) return;
         mapId = id;
         pendingMapId = null;
+        pendingReusedMap = false;
         startTime = Util.getMillis();
     }
 
