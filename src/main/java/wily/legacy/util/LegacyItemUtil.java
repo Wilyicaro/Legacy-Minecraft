@@ -157,6 +157,15 @@ public class LegacyItemUtil {
     }
 
     public static DyeColor getDyeColor(Item item) {
+        DyeColor color = getDyeColorOrNull(item);
+        return color == null ? DyeColor.BLACK : color;
+    }
+
+    public static DyeColor getDyeColorOrNull(Item item) {
+        if (item == Items.BONE_MEAL) return DyeColor.WHITE;
+        if (item == Items.INK_SAC) return DyeColor.BLACK;
+        if (item == Items.LAPIS_LAZULI) return DyeColor.BLUE;
+        if (item == Items.COCOA_BEANS) return DyeColor.BROWN;
         if (item == Items.WHITE_DYE) return DyeColor.WHITE;
         if (item == Items.ORANGE_DYE) return DyeColor.ORANGE;
         if (item == Items.MAGENTA_DYE) return DyeColor.MAGENTA;
@@ -172,7 +181,18 @@ public class LegacyItemUtil {
         if (item == Items.BROWN_DYE) return DyeColor.BROWN;
         if (item == Items.GREEN_DYE) return DyeColor.GREEN;
         if (item == Items.RED_DYE) return DyeColor.RED;
-        return DyeColor.BLACK;
+        if (item == Items.BLACK_DYE) return DyeColor.BLACK;
+        return null;
+    }
+
+    public static Item getLegacyDyeItem(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Items.BONE_MEAL;
+            case BLACK -> Items.INK_SAC;
+            case BLUE -> Items.LAPIS_LAZULI;
+            case BROWN -> Items.COCOA_BEANS;
+            default -> null;
+        };
     }
 
     public static Item getDyeItem(DyeColor color) {

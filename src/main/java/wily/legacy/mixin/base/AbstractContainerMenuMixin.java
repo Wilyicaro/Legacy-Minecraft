@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,8 +59,9 @@ public abstract class AbstractContainerMenuMixin {
                 if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
                     setCarried(ItemStack.EMPTY);
                 ci.cancel();
-            } else if (LegacyItemUtil.isDyeableItem(slot.getItem().typeHolder()) && getCarried().getItem() instanceof DyeItem d) {
-                LegacyItemUtil.dyeItem(slot.getItem(), LegacyItemUtil.getDyeColor(d));
+            } else if (LegacyItemUtil.isDyeableItem(slot.getItem().typeHolder()) && LegacyItemUtil.getDyeColorOrNull(getCarried().getItem()) != null) {
+                DyeColor color = LegacyItemUtil.getDyeColorOrNull(getCarried().getItem());
+                LegacyItemUtil.dyeItem(slot.getItem(), LegacyItemUtil.getDyeColor(color));
                 slot.setChanged();
                 if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
                     getCarried().shrink(1);
