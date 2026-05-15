@@ -59,7 +59,7 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
     private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
-        return sound.getIdentifier().equals(SoundEvents.ITEM_PICKUP.location()) ? 4.0f : max;
+        return sound.getLocation().equals(SoundEvents.ITEM_PICKUP.location()) ? 4.0f : max;
     }
 
     @Override

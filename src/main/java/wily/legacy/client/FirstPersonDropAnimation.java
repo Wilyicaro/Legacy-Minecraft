@@ -1,7 +1,7 @@
 package wily.legacy.client;
 
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 
 public class FirstPersonDropAnimation {
     private static final long DURATION = 450L;

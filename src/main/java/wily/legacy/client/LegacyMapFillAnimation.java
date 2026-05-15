@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 

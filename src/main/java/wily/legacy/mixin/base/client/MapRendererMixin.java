@@ -14,7 +14,7 @@ import wily.legacy.client.LegacyMapDecorationRenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.saveddata.maps.*;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +35,7 @@ import java.util.List;
 @Mixin(MapRenderer.class)
 public abstract class MapRendererMixin {
     @Unique
-    private static final Identifier LEGACY_MAP_BACKGROUND = Identifier.withDefaultNamespace("textures/map/map_background_checkerboard.png");
+    private static final ResourceLocation LEGACY_MAP_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/map/map_background_checkerboard.png");
 
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void extractRenderState(MapId mapId, MapItemSavedData mapItemSavedData, MapRenderState mapRenderState, CallbackInfo ci) {
@@ -67,7 +67,7 @@ public abstract class MapRendererMixin {
     @Unique
     private void drawHiddenMapPixels(MapRenderState mapRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, byte[] colors, int light) {
         if (!hasHiddenMapPixels(mapRenderState, colors)) return;
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.text(LEGACY_MAP_BACKGROUND), (pose, vertexConsumer) -> {
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderType.text(LEGACY_MAP_BACKGROUND), (pose, vertexConsumer) -> {
             for (int x = 0; x < 128; x++) {
                 if (LegacyMapFillAnimation.isColumnVisible(mapRenderState, x)) continue;
                 int y = 0;

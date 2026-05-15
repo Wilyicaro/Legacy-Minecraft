@@ -12,13 +12,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.SnowGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.material.Fluid;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "die", at = @At("HEAD"))
     private void die(DamageSource damageSource, CallbackInfo ci) {
         if (!((Object) this instanceof AbstractHorse horse)) return;
-        if (!(level() instanceof ServerLevel level) || !level.getGameRules().get(GameRules.SHOW_DEATH_MESSAGES)) return;
+        if (!(level() instanceof ServerLevel level) || !level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES)) return;
         LivingEntity owner = horse.getOwner();
         if (horse.isTamed() && owner instanceof ServerPlayer player) {
             player.sendSystemMessage(((LivingEntity) (Object) this).getCombatTracker().getDeathMessage());

@@ -6,8 +6,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
-import net.minecraft.world.entity.animal.equine.SkeletonHorse;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.SkeletonHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class AbstractHorseMixin {
         if ((Object)this instanceof SkeletonHorse) cir.setReturnValue(true);
     }
 
-    @ModifyExpressionValue(method = {"getControllingPassenger", "canJump", "onPlayerJump"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/equine/AbstractHorse;isSaddled()Z"))
+    @ModifyExpressionValue(method = {"getControllingPassenger", "canJump", "onPlayerJump"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;isSaddled()Z"))
     private boolean skeletonHorseRidesWithoutSaddle(boolean saddled) {
         return saddled || (Object)this instanceof SkeletonHorse;
     }

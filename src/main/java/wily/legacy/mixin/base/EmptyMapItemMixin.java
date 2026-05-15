@@ -42,7 +42,7 @@ public class EmptyMapItemMixin {
     public ItemStack use(/*? if <1.21.5 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, int arg, int i, byte j, boolean b, boolean bl, Operation<ItemStack> original, Level level1, Player player, InteractionHand interactionHand) {
         ItemStack map = player.getItemInHand(interactionHand);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        byte scale = custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().get(LegacyGameRules.DEFAULT_MAP_SIZE.get()).intValue();
+        byte scale = custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE);
         map.consume(1, player);
         ItemStack existingMap = legacy$getExistingMap(level, player, arg, i, scale, b, bl);
         return existingMap.isEmpty() ? original.call(level, arg, i, scale, b, bl) : existingMap.copyWithCount(1);

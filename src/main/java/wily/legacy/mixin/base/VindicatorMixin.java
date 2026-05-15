@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base;
 
-import net.minecraft.world.entity.monster.illager.Vindicator;
+import net.minecraft.world.entity.monster.Vindicator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
