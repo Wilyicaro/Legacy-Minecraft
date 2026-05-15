@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CloudRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,6 +47,10 @@ public abstract class CloudRendererMixin {
     private int legacy$lastRelativeCameraPos = Integer.MIN_VALUE;
     @Unique
     private boolean legacy$useWarmCloudPipelines;
+    @Unique
+    private CloudRenderer.TextureData legacy$lastTintTexture;
+    @Unique
+    private int legacy$cloudTextureTint = 0xFFFFFFFF;
 
     @Shadow
     private boolean needsRebuild;
@@ -57,6 +62,7 @@ public abstract class CloudRendererMixin {
     private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, int cloudDistanceBlocks, Vec3 cameraPosition, long packedRelativeCameraPos, float ticks, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
         legacy$useWarmCloudPipelines = minecraft.level != null && LegacyCloudAtmosphere.shouldUseWarmCloudTransparency(minecraft.level, ticks);
+        legacy$updateCloudTextureTint();
         boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
         boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
         boolean packCloudShaderEnabled = LegacyCloudAtmosphere.shouldUsePackCloudShader();
@@ -78,6 +84,20 @@ public abstract class CloudRendererMixin {
         }
 
         return cloudStatus == CloudStatus.OFF ? cloudStatus : CloudStatus.FANCY;
+    }
+
+    @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private int legacy$useCloudTextureTint(int color) {
+        if (!LegacyCloudAtmosphere.areLceCloudsEnabled()) {
+            return color;
+        }
+
+        return ARGB.colorFromFloat(
+            ARGB.alphaFloat(color),
+            ARGB.redFloat(color) * ARGB.redFloat(legacy$cloudTextureTint),
+            ARGB.greenFloat(color) * ARGB.greenFloat(legacy$cloudTextureTint),
+            ARGB.blueFloat(color) * ARGB.blueFloat(legacy$cloudTextureTint)
+        );
     }
 
     @Redirect(
@@ -195,6 +215,42 @@ public abstract class CloudRendererMixin {
         }
 
         legacy$encodeFace(buffer, offsetX, offsetZ, Direction.DOWN, 32);
+    }
+
+    @Unique
+    private void legacy$updateCloudTextureTint() {
+        if (legacy$lastTintTexture == texture) {
+            return;
+        }
+
+        legacy$lastTintTexture = texture;
+        legacy$cloudTextureTint = 0xFFFFFFFF;
+        if (texture == null) {
+            return;
+        }
+
+        long red = 0;
+        long green = 0;
+        long blue = 0;
+        long weight = 0;
+        for (long cell : ((CloudTextureDataAccessor) (Object) texture).legacy$getCells()) {
+            if (cell == 0L) {
+                continue;
+            }
+
+            int color = (int) (cell >> 4);
+            int alpha = ARGB.alpha(color);
+            red += (long) ARGB.red(color) * alpha;
+            green += (long) ARGB.green(color) * alpha;
+            blue += (long) ARGB.blue(color) * alpha;
+            weight += alpha;
+        }
+
+        if (weight == 0) {
+            return;
+        }
+
+        legacy$cloudTextureTint = ARGB.color(255, (int) (red / weight), (int) (green / weight), (int) (blue / weight));
     }
 
     @Unique
