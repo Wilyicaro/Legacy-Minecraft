@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.entity.LegacyVillager;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.mobcaps.ConsoleMobCaps;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Mixin(Villager.class)
-public abstract class VillagerMixin extends AbstractVillager {
+public abstract class VillagerMixin extends AbstractVillager implements LegacyVillager {
     @Unique
     private boolean legacy$trackedPoiMemories;
     @Unique
@@ -78,12 +79,20 @@ public abstract class VillagerMixin extends AbstractVillager {
             if (this.offers == null) {
                 this.offers = new MerchantOffers();
                 this.updateTrades(serverLevel);
-                updateTrades(getLevel() + 1);
+                legacy$updateLockedTradePreviews(serverLevel);
             }
 
             return this.offers;
         } else {
             throw new IllegalStateException("Cannot load Villager offers on the client");
+        }
+    }
+
+    @Override
+    public void legacy$updateLockedTradePreviews(ServerLevel level) {
+        int nextLevel = getLevel() + 1;
+        if (getLevel() < 5 && !legacy$hasOffersForLevel(self().getOffers(), nextLevel)) {
+            updateTrades(nextLevel);
         }
     }
 
@@ -116,6 +125,16 @@ public abstract class VillagerMixin extends AbstractVillager {
             ++j;
         }
 
+    }
+
+    @Unique
+    private static boolean legacy$hasOffersForLevel(MerchantOffers offers, int level) {
+        for (MerchantOffer offer : offers) {
+            if (((LegacyMerchantOffer) offer).getRequiredLevel() == level) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Unique
