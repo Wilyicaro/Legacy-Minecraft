@@ -181,6 +181,9 @@ public final class ConsoleMobCaps {
     }
 
     public static String spawnEggFailure(ServerLevel level, EntityType<?> type) {
+        if (isHostile(type) && level.getDifficulty() == Difficulty.PEACEFUL) {
+            return CANT_SPAWN_IN_PEACEFUL;
+        }
         if (!LegacyMobCaps.isEnabled(level)) {
             return null;
         }
@@ -188,9 +191,6 @@ public final class ConsoleMobCaps {
         WorldMobCapTracker tracker = LegacyMobCaps.tracker(level);
         TrackedMobCap bucket = bucketForType(type);
 
-        if (isHostile(type) && level.getDifficulty() == Difficulty.PEACEFUL) {
-            return CANT_SPAWN_IN_PEACEFUL;
-        }
         if (bucket == TrackedMobCap.CHICKENS && tracker.count(TrackedMobCap.CHICKENS) >= TrackedMobCap.CHICKENS.manualLimit()) {
             return MAX_CHICKENS_SPAWNED;
         }
@@ -303,6 +303,10 @@ public final class ConsoleMobCaps {
 
     public static String maxArmorStandsMessage() {
         return MAX_ARMOR_STANDS;
+    }
+
+    public static String peacefulSpawnMessage() {
+        return CANT_SPAWN_IN_PEACEFUL;
     }
 
     private static boolean isHostile(EntityType<?> type) {

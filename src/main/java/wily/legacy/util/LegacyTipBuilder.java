@@ -43,7 +43,9 @@ public class LegacyTipBuilder {
 
     public static Component getTip(ItemStack stack) {
         if (stack.getHoverName().getContents() instanceof TranslatableContents contents) {
-            return Component.translatable(contents.getKey() + ".tip");
+            String key = contents.getKey() + ".tip";
+            if ("item.minecraft.spawn_egg.peaceful.tip".equals(key)) key = "item.minecraft.spawn_egg.tip";
+            return Component.translatable(key);
         }
         return Component.translatable(getTipId(stack.getItem()));
     }
