@@ -243,6 +243,7 @@
     "ProjectileInvoker",
     "AbstractHorseMixin",
     "AbstractMinecartMixin",
+    "AbstractVillagerAccessor",
     "AbstractVillagerMixin",
     "AnimalMixin",
     "ArmorStandMixin",
@@ -333,4 +334,3 @@
     "defaultRequire": 1
   }
 }
-

@@ -254,7 +254,8 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
     }
 
     public MerchantOffer getSelectedMerchantOffer() {
-        return selectedRecipeButton < menu.merchant.getOffers().size() ? menu.merchant.getOffers().get(selectedRecipeButton) : null;
+        int index = recipeButtonsOffset.get() + selectedRecipeButton;
+        return index < menu.merchant.getOffers().size() ? menu.merchant.getOffers().get(index) : null;
     }
 
     @Override
