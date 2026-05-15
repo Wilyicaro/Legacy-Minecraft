@@ -7,6 +7,7 @@ import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -81,6 +82,7 @@ public class LegacyBlockBehaviors {
                 be.lastPotionItemUsed = itemStack.getItemHolder();
                 be.setChanged();
                 if (be.hasWater()) sendCauldronBubblesParticles(level, blockPos);
+                else sendCauldronPotionParticles(level, blockPos, p);
             });
             if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
@@ -101,11 +103,14 @@ public class LegacyBlockBehaviors {
                 return defaultPassInteraction();
             if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
+                Holder<Potion> potion = be.potion;
+                boolean water = be.hasWater();
                 player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, LegacyItemUtil.setItemStackPotion(new ItemStack(be.lastPotionItemUsed), be.potion)));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
                 LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
-                sendCauldronSplashParticles(level, blockPos);
+                if (water) sendCauldronSplashParticles(level, blockPos);
+                else sendCauldronPotionParticles(level, blockPos, potion);
                 level.playSound(null, blockPos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0f, 1.0f);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, blockPos);
                 return consumeInteraction();
@@ -140,7 +145,10 @@ public class LegacyBlockBehaviors {
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
                 level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
-                if (be.hasWater() && !be.isRemoved()) sendCauldronBubblesParticles(level, blockPos);
+                if (!be.isRemoved()) {
+                    if (be.hasWater()) sendCauldronBubblesParticles(level, blockPos);
+                    else sendCauldronPotionParticles(level, blockPos, p);
+                }
                 return consumeInteraction();
             }
             return successInteraction();
@@ -180,8 +188,10 @@ public class LegacyBlockBehaviors {
         };
 
         CauldronInteraction fillWater = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
-            sendCauldronBubblesParticles(level, blockPos);
             if (level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) {
+                if (be.hasWater()) {
+                    sendCauldronBubblesParticles(level, blockPos);
+                }
                 be.setWaterColor(null);
                 if (!be.hasWater()) {
                     be.potion = be.getDefaultPotion();
@@ -299,6 +309,14 @@ public class LegacyBlockBehaviors {
         if (level instanceof ServerLevel sl) {
             Vec3 center = blockPos.getCenter();
             sl.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.2, 0.2, 1);
+        }
+    }
+
+    public static void sendCauldronPotionParticles(Level level, BlockPos blockPos, Holder<Potion> potion) {
+        if (level instanceof ServerLevel sl) {
+            Vec3 center = blockPos.getCenter();
+            int color = /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*//*PotionContents.getColor*//*?} else {*/PotionContents.getColorOptional/*?}*/(potion.value().getEffects())/*? if >=1.21.4 {*/.orElse(-13083194)/*?}*/;
+            sl.sendParticles(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, color), center.x, center.y + 0.5F, center.z, 6, 0.2, 0.1, 0.2, 0.02f);
         }
     }
 
