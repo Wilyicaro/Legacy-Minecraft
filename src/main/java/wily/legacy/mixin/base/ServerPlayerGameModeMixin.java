@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.util.LegacyBlockProtection;
 
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeMixin {
@@ -41,7 +42,12 @@ public abstract class ServerPlayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     protected void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (decreaseCreativeTurtleEggs(pos, level.getBlockState(pos))) {
+        BlockState state = level.getBlockState(pos);
+        if (LegacyBlockProtection.blocksBreak(level, pos, state, isCreative())) {
+            cir.setReturnValue(false);
+            return;
+        }
+        if (decreaseCreativeTurtleEggs(pos, state)) {
             cir.setReturnValue(true);
         }
     }
