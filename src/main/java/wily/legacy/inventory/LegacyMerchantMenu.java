@@ -42,7 +42,7 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
 
     @Override
     public boolean canCraft(List<Optional<Ingredient>> ingredients, Player player, ServerMenuCraftPayload packet) {
-        return packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty() && !merchant.getOffers().get(packet.button()).isOutOfStock() && super.canCraft(ingredients, player, packet);
+        return getOffer(packet) instanceof MerchantOffer offer && isUnlocked(offer) && !offer.isOutOfStock() && super.canCraft(ingredients, player, packet);
     }
 
     @Override
@@ -65,15 +65,27 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
 
     @Override
     public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
-        if (player instanceof ServerPlayer && packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty())
-            return merchant.getOffers().get(packet.button()).getResult();
+        if (player instanceof ServerPlayer && getOffer(packet) instanceof MerchantOffer offer && isUnlocked(offer))
+            return offer.getResult();
         return ItemStack.EMPTY;
     }
 
     @Override
     public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
-        if (player instanceof ServerPlayer && packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty())
-            return ingredientsFromStacks(merchant.getOffers().get(packet.button()).getCostA(), merchant.getOffers().get(packet.button()).getCostB());
+        if (player instanceof ServerPlayer && getOffer(packet) instanceof MerchantOffer offer && isUnlocked(offer))
+            return ingredientsFromStacks(offer.getCostA(), offer.getCostB());
         return super.getIngredients(player, packet);
+    }
+
+    private MerchantOffer getOffer(ServerMenuCraftPayload packet) {
+        return packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty() ? merchant.getOffers().get(packet.button()) : null;
+    }
+
+    private boolean isUnlocked(MerchantOffer offer) {
+        return !(offer instanceof LegacyMerchantOffer legacyOffer) || legacyOffer.getRequiredLevel() <= getMerchantLevel();
+    }
+
+    private int getMerchantLevel() {
+        return merchant instanceof Villager v ? v.getVillagerData().level() : merchantLevel;
     }
 }
