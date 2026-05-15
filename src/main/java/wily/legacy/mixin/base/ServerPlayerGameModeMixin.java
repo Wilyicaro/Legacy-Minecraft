@@ -1,6 +1,8 @@
 package wily.legacy.mixin.base;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -49,6 +51,13 @@ public abstract class ServerPlayerGameModeMixin {
         }
         if (decreaseCreativeTurtleEggs(pos, state)) {
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "handleBlockBreakAction", at = @At("HEAD"), cancellable = true)
+    protected void handleBlockBreakAction(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction direction, int maxBuildHeight, int sequence, CallbackInfo ci) {
+        if (LegacyBlockProtection.blocksBreak(level, pos, level.getBlockState(pos), isCreative())) {
+            ci.cancel();
         }
     }
 

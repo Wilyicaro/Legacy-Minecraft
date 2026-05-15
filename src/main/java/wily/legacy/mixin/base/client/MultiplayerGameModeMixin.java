@@ -3,6 +3,7 @@ package wily.legacy.mixin.base.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -45,7 +46,21 @@ public class MultiplayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (minecraft.player != null && minecraft.level != null && LegacyBlockProtection.blocksBreak(minecraft.level, pos, minecraft.level.getBlockState(pos), minecraft.player.getAbilities().instabuild)) {
+        if (blocksBreak(pos)) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"), cancellable = true)
+    private void startDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (blocksBreak(pos)) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "continueDestroyBlock", at = @At("HEAD"), cancellable = true)
+    private void continueDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (blocksBreak(pos)) {
             cir.setReturnValue(false);
         }
     }
@@ -70,5 +85,9 @@ public class MultiplayerGameModeMixin {
 
     private static boolean isOffhandSlot(Slot slot) {
         return slot.container instanceof Inventory && slot.getContainerSlot() == 40;
+    }
+
+    private boolean blocksBreak(BlockPos pos) {
+        return minecraft.player != null && minecraft.level != null && LegacyBlockProtection.blocksBreak(minecraft.level, pos, minecraft.level.getBlockState(pos), minecraft.player.getAbilities().instabuild);
     }
 }
