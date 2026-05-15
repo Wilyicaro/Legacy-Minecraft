@@ -62,6 +62,7 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.space")));
     public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.backspace")));
     public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.screenshot")));
+    public static final RegisterListing.Holder<SoundEvent> ENTITY_GENERIC_OLD_SPLASH = SOUND_EVENT_REGISTER.add("entity.generic.old_splash", ()-> SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("entity.generic.old_splash")));
     public static final RegisterListing.Holder<LootItemConditionType> RANDOM_DIFFICULTY_CHANCE = LOOT_CONDITION_REGISTER.add("random_difficulty_chance", () -> new LootItemConditionType(RandomDifficultyChanceCondition.CODEC));
 
 
