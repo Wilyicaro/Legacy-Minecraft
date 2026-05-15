@@ -93,5 +93,7 @@ void main() {
 
     vertexDistance = fog_spherical_distance(pos);
     vertexColor = (useTopColor ? faceColors[1] : faceColors[direction]) * CloudColor;
+    float cloudFog = FogCloudsEnd <= 0.0 ? 0.0 : linear_fog_value(vertexDistance, 0.0, FogCloudsEnd);
+    vertexColor.a = mix(0.92, vertexColor.a, smoothstep(0.72, 1.0, cloudFog));
     outerBandColor = vec4(CloudColor.rgb * 0.85, CloudColor.a);
 }
