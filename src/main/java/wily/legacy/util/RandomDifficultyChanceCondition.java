@@ -6,6 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import wily.legacy.init.LegacyRegistries;
 
 public record RandomDifficultyChanceCondition(float peaceful, float easy, float normal, float hard) implements LootItemCondition {
     public static final MapCodec<RandomDifficultyChanceCondition> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
@@ -27,7 +29,7 @@ public record RandomDifficultyChanceCondition(float peaceful, float easy, float 
     }
 
     @Override
-    public MapCodec<? extends LootItemCondition> codec() {
-        return CODEC;
+    public LootItemConditionType getType() {
+        return LegacyRegistries.RANDOM_DIFFICULTY_CHANCE.get();
     }
 }

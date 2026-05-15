@@ -33,6 +33,6 @@ public class AbstractHorseMixin {
         AbstractHorse horse = (AbstractHorse) (Object) this;
         horse.level().playSound(null, horse.getX(), horse.getY(), horse.getZ(), SoundEvents.GENERIC_EAT, SoundSource.NEUTRAL, 1.0f, 1.0f);
         if (!(horse.level() instanceof ServerLevel level)) return;
-        level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, itemStack.getItem()), horse.getX(), horse.getEyeY(), horse.getZ(), 8, horse.getBbWidth() * 0.25, 0.1, horse.getBbWidth() * 0.25, 0.03);
+        level.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, itemStack.copyWithCount(1)), horse.getX(), horse.getEyeY(), horse.getZ(), 8, horse.getBbWidth() * 0.25, 0.1, horse.getBbWidth() * 0.25, 0.03);
     }
 }
