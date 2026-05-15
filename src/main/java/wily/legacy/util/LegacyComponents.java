@@ -47,6 +47,7 @@ public class LegacyComponents {
     public static final Component DROP_ALL = Component.translatable("legacy.action.drop_all");
     public static final Component DROP_ONE = Component.translatable("legacy.action.drop_one");
     public static final Component DYE = Component.translatable("legacy.action.dye");
+    public static final Component DYE_COLLAR = Component.translatable("legacy.action.dye_collar");
     public static final Component EAT = Component.translatable("legacy.action.eat");
     public static final Component EJECT = Component.translatable("legacy.action.eject");
     public static final Component EMPTY = Component.translatable("legacy.action.empty");
