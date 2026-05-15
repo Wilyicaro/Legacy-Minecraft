@@ -6,7 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.world.level.Level;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,13 +19,6 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
-    @Shadow
-    private Entity entity;
-
-    @Shadow
-    @Final
-    private Minecraft minecraft;
-
     @Shadow
     private float yRot;
 
@@ -39,9 +33,9 @@ public abstract class CameraMixin {
         return LegacyRenderUtil.getFlyingViewRollingRotation(f);
     }
 
-    @Inject(method = "alignWithEntity", at = @At("TAIL"))
-    private void alignWithEntity(float partialTicks, CallbackInfo ci) {
-        if (!(entity instanceof LocalPlayer player) || !player.isSleeping() || !minecraft.options.getCameraType().isFirstPerson()) {
+    @Inject(method = "setup", at = @At("TAIL"))
+    private void setup(Level level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTicks, CallbackInfo ci) {
+        if (!(entity instanceof LocalPlayer player) || !player.isSleeping() || !Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
             return;
         }
         float progress = Mth.clamp((player.getSleepTimer() + partialTicks) / 90.0F, 0.0F, 1.0F);
@@ -50,8 +44,8 @@ public abstract class CameraMixin {
         setRotation(yRot, Mth.lerp(eased, 0.0F, 14.0F));
     }
 
-    @ModifyExpressionValue(method = "alignWithEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Camera;xRot:F"))
-    protected float setup(float f) {
+    @ModifyExpressionValue(method = "setup", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Camera;xRot:F", opcode = Opcodes.GETFIELD))
+    protected float invertFrontCameraPitch(float f) {
         return LegacyOptions.invertedFrontCameraPitch.get() ? f : -f;
     }
 }
