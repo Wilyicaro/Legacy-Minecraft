@@ -75,5 +75,12 @@
         "name": "legacy:screenshot"
       }
     ]
+  },
+  "entity.generic.old_splash": {
+    "sounds": [
+      {
+        "name": "legacy:entity/generic/old_splash"
+      }
+    ]
   }
 }
