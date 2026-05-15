@@ -25,7 +25,10 @@ public abstract class DoublePlantBlockMixin extends VegetationBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if ((Object) this instanceof TallFlowerBlock || state.is(Blocks.TALL_GRASS) || state.is(Blocks.LARGE_FERN)) {
+        if ((Object) this instanceof TallFlowerBlock) {
+            return LEGACY_TALL_FLOWER_SHAPE;
+        }
+        if (state.is(Blocks.TALL_GRASS) || state.is(Blocks.LARGE_FERN)) {
             Vec3 offset = state.getOffset(pos);
             return LEGACY_TALL_FLOWER_SHAPE.move(offset.x, offset.y, offset.z);
         }
