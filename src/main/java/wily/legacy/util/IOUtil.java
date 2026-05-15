@@ -82,7 +82,7 @@ public class IOUtil {
 
     public static <T> DataResult<Pair<ArbitrarySupplier<ItemStack>, T>> decodeLazyItemSupplier(DynamicOps<T> ops, T input) {
         JsonElement json = ops.convertTo(JsonOps.INSTANCE, input);
-        return DataResult.success(Pair.of(() -> DynamicUtil.ITEM_CODEC.parse(DynamicUtil.getActualRegistryOps(JsonOps.INSTANCE), json).result().orElse(ItemStack.EMPTY), input));
+        return DataResult.success(Pair.of(() -> DynamicUtil.ITEM_SUPPLIER_CODEC.parse(DynamicUtil.getActualRegistryOps(JsonOps.INSTANCE), json).result().map(ArbitrarySupplier::get).orElse(ItemStack.EMPTY), input));
     }
 
     public static Stream<String> getOrderedNamespaces(ResourceManager manager) {
