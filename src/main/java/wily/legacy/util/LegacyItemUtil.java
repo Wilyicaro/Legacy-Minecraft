@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -30,6 +31,7 @@ public class LegacyItemUtil {
     public static final int DECAY_EFFECT_DURATION = 800;
     public static final int DECAY_EFFECT_AMPLIFIER = 1;
     public static final TagKey<Item> LCE_OFFHAND = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("legacy", "lce_offhand"));
+    private static final Set<String> PEACEFUL_SPAWN_EGG_TIPS = Set.of("item.spawn_egg.peaceful", "item.minecraft.spawn_egg.peaceful.tip");
 
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient) {
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted() && !ingredient.isEnchanted();
@@ -277,7 +279,17 @@ public class LegacyItemUtil {
     }
 
     public static List<Component> sanitizeTooltip(ItemStack stack, List<Component> tooltip) {
+        if (tooltip.stream().anyMatch(LegacyItemUtil::isPeacefulSpawnEggTip)) {
+            tooltip = tooltip.stream().filter(component -> !isPeacefulSpawnEggTip(component)).toList();
+        }
         if (!isSkullItem(stack) || tooltip.size() < 2) return tooltip;
         return List.of(tooltip.getFirst());
+    }
+
+    private static boolean isPeacefulSpawnEggTip(Component component) {
+        if (component.getContents() instanceof TranslatableContents contents && PEACEFUL_SPAWN_EGG_TIPS.contains(contents.getKey())) {
+            return true;
+        }
+        return component.getSiblings().stream().anyMatch(LegacyItemUtil::isPeacefulSpawnEggTip);
     }
 }
