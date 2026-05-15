@@ -1148,6 +1148,7 @@
   "legacy.action.drop_all": "全部丟棄",
   "legacy.action.drop_one": "丟棄一格",
   "legacy.action.dye": "染色",
+  "legacy.action.dye_collar": "Dye Collar",
   "legacy.action.eat": "吃",
   "legacy.action.edit": "Edit",
   "legacy.action.eject": "退出",
