@@ -9,6 +9,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.BrewingStandMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,9 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -40,6 +43,23 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
 
     public BrewingStandScreenMixin(BrewingStandMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
+    }
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this).replace(3, i -> i, this::getQuickMoveLabel);
+    }
+
+    private Component getQuickMoveLabel(Component fallback) {
+        if (hoveredSlot == null || hoveredSlot.getItem().isEmpty() || hoveredSlot.container != minecraft.player.getInventory())
+            return fallback;
+        ItemStack item = hoveredSlot.getItem();
+        if (menu.getSlot(4).mayPlace(item))
+            return LegacyComponents.MOVE_FUEL;
+        if (menu.getSlot(3).mayPlace(item) || menu.getSlot(0).mayPlace(item) || menu.getSlot(1).mayPlace(item) || menu.getSlot(2).mayPlace(item))
+            return LegacyComponents.MOVE_INGREDIENT;
+        return fallback;
     }
 
     private static LegacySlotDisplay createBrewingSlotDisplay(Vec2 offset) {
