@@ -9,7 +9,10 @@
     "minecraft:bee",
     "minecraft:breeze_wind_charge",
     "minecraft:camel",
-    "minecraft:camel_husk",
+    {
+      "id": "minecraft:camel_husk",
+      "required": false
+    },
     "minecraft:cat",
     "minecraft:chicken",
     "minecraft:cod",
