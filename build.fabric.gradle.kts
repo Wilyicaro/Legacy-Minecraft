@@ -67,6 +67,7 @@ repositories {
 	strictMaven("https://api.modrinth.com/maven", "maven.modrinth") { name = "Modrinth" }
 	maven("https://raw.githubusercontent.com/Kyubion-Studios/Mod-Resources/main/maven/") { name = "Kyubion Mod Resources" }
 	maven("https://maven.isxander.dev/releases")
+	maven("https://maven.caffeinemc.net/releases") { name = "CaffeineMC" }
 }
 
 dependencies {
@@ -84,7 +85,7 @@ dependencies {
 
 	modCompileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
 	modCompileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
-	modCompileOnly("maven.modrinth:sodium:${prop("sodium_version")}")
+	modCompileOnly("net.caffeinemc:sodium-fabric:${prop("sodium_version")}")
 	modCompileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	modCompileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
 

@@ -97,10 +97,10 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
-//? if fabric || >=1.21 && neoforge {
-/*import wily.legacy.client.screen.compat.IrisCompat;
+//? if fabric || (>=1.21 && neoforge) {
+import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
-*///?}
+//?}
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -476,10 +476,10 @@ public class Legacy4JClient {
             FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
-            //? if fabric || >=1.21 && neoforge {
-            /*if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+            //? if fabric || (>=1.21 && neoforge) {
+            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            *///?}
+            //?}
             LegacyGuiElements.setup(m);
 
             HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {

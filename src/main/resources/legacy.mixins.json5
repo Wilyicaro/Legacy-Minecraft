@@ -14,10 +14,8 @@
     //? if >=1.21 && (fabric || neoforge) {
     "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.BlockRendererMixin",
+    "compat.sodium.OcclusionCullerMixin",
     //?}
-    //? (fabric || >=1.21 && neoforge) {
-    /*"compat.sodium.OcclusionCullerMixin",
-    *///?}
     //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
     //?}
