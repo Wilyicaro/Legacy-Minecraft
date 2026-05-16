@@ -284,16 +284,19 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
    }
 
    private void changeStatBoard(boolean left) {
-      if (LeaderboardsScreen.statsBoards.isEmpty()) {
+      List<LeaderboardsScreen.StatsBoard> boards = GlobalLeaderboardBoardRegistry.statsBoards();
+      if (boards.isEmpty()) {
          return;
       }
 
       int initial = this.selectedStatBoard;
-      while (this.selectedStatBoard != (this.selectedStatBoard = Stocker.cyclic(0, this.selectedStatBoard + (left ? -1 : 1), LeaderboardsScreen.statsBoards.size())) && this.selectedStatBoard != initial) {
-         this.page = 0;
-         this.rebuildRenderableVList(this.minecraft);
-         this.repositionElements();
-         return;
+      while (this.selectedStatBoard != (this.selectedStatBoard = Stocker.cyclic(0, this.selectedStatBoard + (left ? -1 : 1), boards.size())) && this.selectedStatBoard != initial) {
+         if (!boards.get(this.selectedStatBoard).statsList.isEmpty()) {
+            this.page = 0;
+            this.rebuildRenderableVList(this.minecraft);
+            this.repositionElements();
+            return;
+         }
       }
    }
 
@@ -316,13 +319,14 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
 
    private void selectFirstNonEmptyBoard() {
       int defaultBoard = GlobalLeaderboardBoardRegistry.defaultBoardIndex();
-      if (defaultBoard >= 0 && defaultBoard < LeaderboardsScreen.statsBoards.size() && !LeaderboardsScreen.statsBoards.get(defaultBoard).statsList.isEmpty()) {
+      List<LeaderboardsScreen.StatsBoard> boards = GlobalLeaderboardBoardRegistry.statsBoards();
+      if (defaultBoard >= 0 && defaultBoard < boards.size() && !boards.get(defaultBoard).statsList.isEmpty()) {
          this.selectedStatBoard = defaultBoard;
          return;
       }
 
-      for (int i = 0; i < LeaderboardsScreen.statsBoards.size(); i++) {
-         if (!LeaderboardsScreen.statsBoards.get(i).statsList.isEmpty()) {
+      for (int i = 0; i < boards.size(); i++) {
+         if (!boards.get(i).statsList.isEmpty()) {
             this.selectedStatBoard = i;
             return;
          }
@@ -332,7 +336,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
    }
 
    private LeaderboardsScreen.StatsBoard selectedBoard() {
-      return this.selectedStatBoard >= 0 && this.selectedStatBoard < LeaderboardsScreen.statsBoards.size() ? LeaderboardsScreen.statsBoards.get(this.selectedStatBoard) : null;
+      return GlobalLeaderboardBoardRegistry.statsBoard(this.selectedStatBoard);
    }
 
    private String boardId() {
@@ -345,7 +349,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
          this.requestBoard(boardId);
          List<GlobalLeaderboardsScreen.DisplayedEntry> resolved = new ArrayList<>();
          cachedEntries.forEach(entry -> resolved.add(new GlobalLeaderboardsScreen.DisplayedEntry(entry.rank(), entry.playerName(), GlobalLeaderboardStatCodec.decodeMap(entry.statValues()), entry.totalScore())));
-         this.appendLocalPlayerRowIfMissing(boardId, resolved);
+         this.applyLocalPlayerRow(boardId, resolved);
          resolved.sort(Comparator.comparingInt(GlobalLeaderboardsScreen.DisplayedEntry::rank));
          return resolved;
       }
@@ -353,7 +357,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
       this.requestBoard(boardId);
 
       GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(boardId);
-      if (snapshot == null) {
+      if (snapshot == null || snapshot.totalScore() <= 0) {
          return List.of();
       }
 
@@ -364,23 +368,28 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
       GlobalLeaderboardsFeature.requestBoard(boardId, this.viewMode);
    }
 
-   private void appendLocalPlayerRowIfMissing(String boardId, List<GlobalLeaderboardsScreen.DisplayedEntry> resolved) {
-      if (this.viewMode != GlobalLeaderboardsScreen.ViewMode.AROUND_ME) {
+   private void applyLocalPlayerRow(String boardId, List<GlobalLeaderboardsScreen.DisplayedEntry> resolved) {
+      GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(boardId);
+      if (snapshot == null || snapshot.totalScore() <= 0) {
          return;
       }
 
       String localName = GlobalLeaderboardsFeature.playerName().isBlank() ? this.minecraft.getUser().getName() : GlobalLeaderboardsFeature.playerName();
-      if (resolved.stream().anyMatch(entry -> entry.name().equals(localName))) {
-         return;
+      Object2IntOpenHashMap<Stat<?>> localStats = GlobalLeaderboardStatCodec.decodeMap(snapshot.statValues());
+      for (int i = 0; i < resolved.size(); i++) {
+         GlobalLeaderboardsScreen.DisplayedEntry entry = resolved.get(i);
+         if (entry.name().equals(localName)) {
+            resolved.set(i, new GlobalLeaderboardsScreen.DisplayedEntry(entry.rank(), localName, localStats, snapshot.totalScore()));
+            return;
+         }
       }
 
-      GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(boardId);
-      if (snapshot == null) {
+      if (this.viewMode != GlobalLeaderboardsScreen.ViewMode.AROUND_ME) {
          return;
       }
 
       int nextRank = resolved.stream().mapToInt(GlobalLeaderboardsScreen.DisplayedEntry::rank).max().orElse(0) + 1;
-      resolved.add(new GlobalLeaderboardsScreen.DisplayedEntry(nextRank, localName, GlobalLeaderboardStatCodec.decodeMap(snapshot.statValues()), snapshot.totalScore()));
+      resolved.add(new GlobalLeaderboardsScreen.DisplayedEntry(nextRank, localName, localStats, snapshot.totalScore()));
    }
 
    private void ensureBoardStats(List<GlobalLeaderboardsScreen.DisplayedEntry> entries) {

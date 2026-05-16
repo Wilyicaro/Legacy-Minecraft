@@ -98,7 +98,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     public static Screen getOverallLeaderboardsScreenInstance(Screen parent) {
-        return GlobalLeaderboardsFeature.createScreen(parent, () -> getOverallFallbackLeaderboardsScreenInstance(parent));
+        return LegacyOptions.legacyLeaderboards.get() ? GlobalLeaderboardsFeature.createScreen(parent, () -> getOverallFallbackLeaderboardsScreenInstance(parent)) : getOverallFallbackLeaderboardsScreenInstance(parent);
     }
 
     public static Screen getOverallFallbackLeaderboardsScreenInstance(Screen parent) {
