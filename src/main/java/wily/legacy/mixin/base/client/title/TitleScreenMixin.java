@@ -71,7 +71,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
             } else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         Button modButton;
-        modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build();
+        modButton = Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
         if (LegacyOptions.legacySettingsMenus.get()) {
             renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
         }
