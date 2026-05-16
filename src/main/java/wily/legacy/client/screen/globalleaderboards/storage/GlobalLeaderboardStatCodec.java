@@ -85,4 +85,3 @@ public final class GlobalLeaderboardStatCodec {
       return registry == null || value == null ? null : ((Registry<Object>)registry).getKey(value);
    }
 }
-

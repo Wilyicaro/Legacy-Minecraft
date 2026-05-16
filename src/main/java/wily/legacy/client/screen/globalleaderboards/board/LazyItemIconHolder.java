@@ -1,6 +1,6 @@
 package wily.legacy.client.screen.globalleaderboards.board;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -14,9 +14,9 @@ public final class LazyItemIconHolder extends LegacyIconHolder {
    }
 
    @Override
-   public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+   public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
       this.itemIcon = this.itemStack();
-      super.extractRenderState(graphics, mouseX, mouseY, delta);
+      super.render(graphics, mouseX, mouseY, delta);
    }
 
    private ItemStack itemStack() {
