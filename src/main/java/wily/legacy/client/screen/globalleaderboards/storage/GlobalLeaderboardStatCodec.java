@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
 import wily.factoryapi.FactoryAPIPlatform;
@@ -18,12 +18,12 @@ public final class GlobalLeaderboardStatCodec {
    }
 
    public static String encode(Stat<?> stat) {
-      Identifier typeId = BuiltInRegistries.STAT_TYPE.getKey(stat.getType());
+      ResourceLocation typeId = BuiltInRegistries.STAT_TYPE.getKey(stat.getType());
       if (typeId == null) {
          return "";
       }
 
-      Identifier valueId = encodeValueId(stat);
+      ResourceLocation valueId = encodeValueId(stat);
       return valueId == null ? "" : typeId + DELIMITER + valueId;
    }
 
@@ -38,8 +38,8 @@ public final class GlobalLeaderboardStatCodec {
          return null;
       }
 
-      Identifier typeId = Identifier.tryParse(encoded.substring(0, separator));
-      Identifier valueId = Identifier.tryParse(encoded.substring(separator + 1));
+      ResourceLocation typeId = ResourceLocation.tryParse(encoded.substring(0, separator));
+      ResourceLocation valueId = ResourceLocation.tryParse(encoded.substring(separator + 1));
       if (typeId == null || valueId == null) {
          return null;
       }
@@ -79,10 +79,9 @@ public final class GlobalLeaderboardStatCodec {
       return decoded;
    }
 
-   private static Identifier encodeValueId(Stat<?> stat) {
+   private static ResourceLocation encodeValueId(Stat<?> stat) {
       Registry<?> registry = stat.getType().getRegistry();
       Object value = stat.getValue();
       return registry == null || value == null ? null : ((Registry<Object>)registry).getKey(value);
    }
 }
-

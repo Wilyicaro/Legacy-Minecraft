@@ -19,7 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
@@ -36,7 +36,7 @@ import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.IOUtil;
 
 public final class GlobalLeaderboardBoardRegistry {
-   private static final Identifier LISTING_ID = Identifier.fromNamespaceAndPath("legacy", "leaderboard_listing.json");
+   private static final ResourceLocation LISTING_ID = ResourceLocation.fromNamespaceAndPath("legacy", "leaderboard_listing.json");
    private static final String FARMING_BOARD = "legacy.menu.leaderboard.farming";
    private static final String MINING_BOARD = "legacy.menu.leaderboard.mining_blocks";
    private static final String KILLS_BOARD = "legacy.menu.leaderboard.kills";
@@ -175,7 +175,7 @@ public final class GlobalLeaderboardBoardRegistry {
 
    @SuppressWarnings({"rawtypes", "unchecked"})
    private static LeaderboardsScreen.StatsBoard statsBoardFromJson(String boardId, JsonObject object) {
-      StatType<?> statType = FactoryAPIPlatform.getRegistryValue(Identifier.tryParse(GsonHelper.getAsString(object, "type")), BuiltInRegistries.STAT_TYPE);
+      StatType<?> statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(object, "type")), BuiltInRegistries.STAT_TYPE);
       if (statType == null) {
          throw new IllegalStateException("Missing stat type for leaderboard board");
       }
@@ -220,7 +220,7 @@ public final class GlobalLeaderboardBoardRegistry {
    private static void addTrackedStats(String boardId, LeaderboardsScreen.StatsBoard board) {
       StatType statType = board.type;
       for (String path : trackedPaths(boardId)) {
-         Object value = FactoryAPIPlatform.getRegistryValue(Identifier.withDefaultNamespace(path), statType.getRegistry());
+         Object value = FactoryAPIPlatform.getRegistryValue(ResourceLocation.withDefaultNamespace(path), statType.getRegistry());
          if (value != null) {
             addStat(board, statType.get(value));
          }
@@ -281,7 +281,7 @@ public final class GlobalLeaderboardBoardRegistry {
    }
 
    @SuppressWarnings({"rawtypes", "unchecked"})
-   private static void addSpriteOverride(LeaderboardsScreen.StatsBoard board, String path, Identifier sprite) {
+   private static void addSpriteOverride(LeaderboardsScreen.StatsBoard board, String path, ResourceLocation sprite) {
       LegacyIconHolder iconHolder = new LegacyIconHolder(24, 24);
       iconHolder.iconSprite = sprite;
       board.statIconOverrides.add(new LeaderboardsScreen.StatIconOverride(board.type, value -> registryValueMatches(board.type.getRegistry(), value, path), iconHolder));
@@ -293,8 +293,8 @@ public final class GlobalLeaderboardBoardRegistry {
       board.statIconOverrides.add(new LeaderboardsScreen.StatIconOverride(board.type, value -> registryValueMatches(board.type.getRegistry(), value, path), iconHolder));
    }
 
-   private static Identifier lceSprite(String path) {
-      return Identifier.fromNamespaceAndPath("legacy", "icon/leaderboards/lce/" + path);
+   private static ResourceLocation lceSprite(String path) {
+      return ResourceLocation.fromNamespaceAndPath("legacy", "icon/leaderboards/lce/" + path);
    }
 
    @SuppressWarnings("unchecked")
@@ -303,7 +303,7 @@ public final class GlobalLeaderboardBoardRegistry {
          return false;
       }
 
-      Identifier valueId = registry.getKey(value);
+      ResourceLocation valueId = registry.getKey(value);
       return valueId != null && expectedPath.equals(valueId.getPath());
    }
 
@@ -314,8 +314,7 @@ public final class GlobalLeaderboardBoardRegistry {
          return false;
       }
 
-      Identifier valueId = registry.getKey(stat.getValue());
+      ResourceLocation valueId = registry.getKey(stat.getValue());
       return valueId != null && allowedPaths.contains(valueId.getPath());
    }
 }
-

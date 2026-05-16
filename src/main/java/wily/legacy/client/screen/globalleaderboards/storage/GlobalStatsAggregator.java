@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
 import net.minecraft.util.GsonHelper;
@@ -76,7 +76,7 @@ public final class GlobalStatsAggregator {
                continue;
             }
 
-            Identifier statTypeId = Identifier.tryParse(statTypeEntry.getKey());
+            ResourceLocation statTypeId = ResourceLocation.tryParse(statTypeEntry.getKey());
             if (statTypeId != null) {
                addStatsByType(aggregateStats, statTypeId, statsByValue);
             }
@@ -86,7 +86,7 @@ public final class GlobalStatsAggregator {
    }
 
    @SuppressWarnings({"rawtypes", "unchecked"})
-   private static void addStatsByType(Object2IntOpenHashMap<Stat<?>> aggregateStats, Identifier statTypeId, JsonObject statsByValue) {
+   private static void addStatsByType(Object2IntOpenHashMap<Stat<?>> aggregateStats, ResourceLocation statTypeId, JsonObject statsByValue) {
       StatType statType = FactoryAPIPlatform.getRegistryValue(statTypeId, BuiltInRegistries.STAT_TYPE);
       if (statType == null) {
          return;
@@ -97,7 +97,7 @@ public final class GlobalStatsAggregator {
             continue;
          }
 
-         Identifier statValueId = Identifier.tryParse(statEntry.getKey());
+         ResourceLocation statValueId = ResourceLocation.tryParse(statEntry.getKey());
          if (statValueId == null) {
             continue;
          }
@@ -112,4 +112,3 @@ public final class GlobalStatsAggregator {
       }
    }
 }
-
