@@ -314,7 +314,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                             Stat<?> stat = board.statsList.get(index);
                             Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format(info.statsMap().getInt(stat)), Style.EMPTY).getComponent();
                             SimpleLayoutRenderable renderable = board.renderables.get(index);
-                            renderStatValue(guiGraphics, value, renderable, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                            renderStatValue(guiGraphics, value, renderable, getY(), getHeight(), y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                             if (LegacyRenderUtil.isMouseOver(i, j, renderable.getX(), getY(), renderable.getWidth(), getHeight()))
                                 hoveredValue = value;
                             added++;
@@ -331,19 +331,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
     }
 
-    private void renderStatValue(GuiGraphics guiGraphics, Component value, SimpleLayoutRenderable renderable, int y, int color) {
+    private void renderStatValue(GuiGraphics guiGraphics, Component value, SimpleLayoutRenderable renderable, int rowY, int rowHeight, int y, int color) {
         int width = font.width(value);
         int available = renderable.getWidth();
-        if (width <= available) {
-            guiGraphics.drawString(font, value, renderable.getX() + (available - width) / 2, y, color, true);
-            return;
-        }
-        float scale = Math.max(0.1f, (available - 2) / (float) width);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(renderable.getX() + (available - width * scale) / 2, y + font.lineHeight * (1 - scale) / 2);
-        guiGraphics.pose().scale(scale, scale);
-        guiGraphics.drawString(font, value, 0, 0, color, true);
-        guiGraphics.pose().popMatrix();
+        int x = renderable.getX() + (available - width) / 2;
+        FactoryGuiGraphics.of(guiGraphics).enableScissor(renderable.getX(), rowY, renderable.getX() + available, rowY + rowHeight);
+        guiGraphics.drawString(font, value, x, y, color, true);
+        guiGraphics.disableScissor();
     }
 
     protected List<LeaderboardEntry> resolveRankBoard(Minecraft minecraft) {
