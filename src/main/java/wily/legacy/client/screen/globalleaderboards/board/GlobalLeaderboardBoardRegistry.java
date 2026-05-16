@@ -318,4 +318,3 @@ public final class GlobalLeaderboardBoardRegistry {
       return valueId != null && allowedPaths.contains(valueId.getPath());
    }
 }
-

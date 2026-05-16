@@ -36,8 +36,6 @@ public final class GlobalLeaderboardsFeature {
    private static final Set<String> IN_FLIGHT_REQUESTS = ConcurrentHashMap.newKeySet();
    private static final Map<String, Long> REQUEST_TIMES = new ConcurrentHashMap<>();
    private static final AtomicInteger CACHE_VERSION = new AtomicInteger();
-   private static final GlobalLeaderboardsConfig.Values CONFIG = GlobalLeaderboardsConfig.get();
-   private static final GlobalLeaderboardApiClient API_CLIENT = new GlobalLeaderboardApiClient(CONFIG);
    private static volatile boolean started;
    private static volatile boolean launchTaskScheduled;
    private static volatile String playerUuid = "";
@@ -48,6 +46,8 @@ public final class GlobalLeaderboardsFeature {
    private static volatile Map<String, GlobalLeaderboardBoardCache> boardCaches = Map.of();
    private static volatile String lastSyncHash = "";
    private static volatile long lastSyncAt;
+   private static volatile GlobalLeaderboardsConfig.Values apiConfig;
+   private static volatile GlobalLeaderboardApiClient apiClient;
 
    private GlobalLeaderboardsFeature() {
    }
@@ -143,11 +143,12 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static boolean hasEndpoint() {
-      return CONFIG.hasEndpoint();
+      return GlobalLeaderboardsConfig.get().hasEndpoint();
    }
 
    public static void requestBoard(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode) {
-      if (!shouldRequestBoard(boardId, viewMode)) {
+      GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
+      if (!shouldRequestBoard(boardId, viewMode, config)) {
          return;
       }
 
@@ -161,7 +162,7 @@ public final class GlobalLeaderboardsFeature {
 
       CompletableFuture.runAsync(() -> {
          try {
-            GlobalLeaderboardApiClient.FetchResult result = API_CLIENT.fetchBoard(boardId, requestPlayerUuid, viewMode, CONFIG.aroundWindow(), CONFIG.topLimit());
+            GlobalLeaderboardApiClient.FetchResult result = apiClient(config).fetchBoard(boardId, requestPlayerUuid, viewMode, config.aroundWindow(), config.topLimit());
             if (result.successful() && requestPlayerKey.equals(playerKey())) {
                mergeBoardCache(boardId, viewMode, result.entries());
             }
@@ -188,18 +189,19 @@ public final class GlobalLeaderboardsFeature {
          boardIds = List.copyOf(GlobalLeaderboardBoardRegistry.loadBoardIds(minecraft));
          boardSnapshots = Map.copyOf(GlobalLeaderboardBoardRegistry.buildSnapshots(aggregateStats, boardIds));
          Legacy4J.LOGGER.debug("Global leaderboards startup aggregated {} stats into {} board snapshots", aggregateStats.size(), boardSnapshots.size());
-         if (CONFIG.syncOnLaunch()) {
-            syncChangedBoards();
+         GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
+         if (config.syncOnLaunch()) {
+            syncChangedBoards(config);
          }
 
-         if (CONFIG.prefetchAroundOnLaunch()) {
+         if (config.prefetchAroundOnLaunch()) {
             String initialBoardId = initialBoardId();
             if (!initialBoardId.isBlank()) {
                requestBoard(initialBoardId, GlobalLeaderboardsScreen.ViewMode.AROUND_ME);
             }
          }
 
-         if (CONFIG.prefetchTopOnLaunch()) {
+         if (config.prefetchTopOnLaunch()) {
             String initialBoardId = initialBoardId();
             if (!initialBoardId.isBlank()) {
                requestBoard(initialBoardId, GlobalLeaderboardsScreen.ViewMode.TOP);
@@ -226,32 +228,47 @@ public final class GlobalLeaderboardsFeature {
       return boardIds.isEmpty() ? "" : boardIds.getFirst();
    }
 
-   private static void syncChangedBoards() {
+   private static void syncChangedBoards(GlobalLeaderboardsConfig.Values config) {
       String syncHash = String.valueOf(Objects.hash(playerUuid, playerName, boardSnapshots));
       if (syncHash.equals(lastSyncHash)) {
          return;
       }
 
       long now = System.currentTimeMillis();
-      long cooldown = Math.max(0, CONFIG.syncCooldownSeconds()) * 1000L;
+      long cooldown = Math.max(0, config.syncCooldownSeconds()) * 1000L;
       if (lastSyncAt > 0 && now - lastSyncAt < cooldown) {
          return;
       }
 
-      if (API_CLIENT.syncBoards(playerUuid, playerName, boardSnapshots)) {
+      if (apiClient(config).syncBoards(playerUuid, playerName, boardSnapshots)) {
          lastSyncHash = syncHash;
          lastSyncAt = now;
       }
    }
 
-   private static boolean shouldRequestBoard(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode) {
-      if (!CONFIG.hasEndpoint() || boardId.isBlank()) {
+   private static GlobalLeaderboardApiClient apiClient(GlobalLeaderboardsConfig.Values config) {
+      GlobalLeaderboardApiClient client = apiClient;
+      if (client != null && config.equals(apiConfig)) {
+         return client;
+      }
+
+      synchronized (GlobalLeaderboardsFeature.class) {
+         if (apiClient == null || !config.equals(apiConfig)) {
+            apiConfig = config;
+            apiClient = new GlobalLeaderboardApiClient(config);
+         }
+         return apiClient;
+      }
+   }
+
+   private static boolean shouldRequestBoard(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode, GlobalLeaderboardsConfig.Values config) {
+      if (!config.hasEndpoint() || boardId.isBlank()) {
          return false;
       }
 
       String requestKey = requestKey(boardId, viewMode);
       long now = System.currentTimeMillis();
-      long cooldown = Math.max(0, CONFIG.fetchCooldownSeconds()) * 1000L;
+      long cooldown = Math.max(0, config.fetchCooldownSeconds()) * 1000L;
       Long requestedAt = REQUEST_TIMES.get(requestKey);
       if (requestedAt != null && now - requestedAt < cooldown) {
          return false;

@@ -23,11 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 public final class GlobalLeaderboardApiClient {
-   private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+   private final HttpClient httpClient;
    private final GlobalLeaderboardsConfig.Values config;
 
    public GlobalLeaderboardApiClient(GlobalLeaderboardsConfig.Values config) {
       this.config = config;
+      this.httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).connectTimeout(Duration.ofSeconds(timeoutSeconds(config.connectTimeoutSeconds()))).build();
    }
 
    public boolean syncBoards(String playerUuid, String playerName, Map<String, GlobalLeaderboardBoardSnapshot> boardSnapshots) {
@@ -82,7 +83,7 @@ public final class GlobalLeaderboardApiClient {
       }
 
       HttpRequest request = HttpRequest.newBuilder(this.resolve("/leaderboards/board/" + encode(boardId) + "?" + query))
-         .timeout(Duration.ofSeconds(this.config.readTimeoutSeconds()))
+         .timeout(Duration.ofSeconds(timeoutSeconds(this.config.readTimeoutSeconds())))
          .GET()
          .build();
 
@@ -128,7 +129,7 @@ public final class GlobalLeaderboardApiClient {
 
    private boolean sendJson(URI uri, JsonObject body) {
       HttpRequest request = HttpRequest.newBuilder(uri)
-         .timeout(Duration.ofSeconds(this.config.readTimeoutSeconds()))
+         .timeout(Duration.ofSeconds(timeoutSeconds(this.config.readTimeoutSeconds())))
          .header("Content-Type", "application/json")
          .POST(HttpRequest.BodyPublishers.ofString(body.toString(), StandardCharsets.UTF_8))
          .build();
@@ -171,6 +172,10 @@ public final class GlobalLeaderboardApiClient {
    private static int intValue(JsonObject object, String key) {
       JsonElement element = object.get(key);
       return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber() ? element.getAsInt() : 0;
+   }
+
+   private static int timeoutSeconds(int seconds) {
+      return Math.max(1, seconds);
    }
 
    public record FetchResult(boolean successful, List<GlobalLeaderboardEntry> entries) {

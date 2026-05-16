@@ -76,11 +76,17 @@ public class LeaderboardsScreen extends PanelVListScreen {
     protected final LeaderboardEntry localAggregateEntry;
 
     public LeaderboardsScreen(Screen parent) {
+        this(parent, true);
+    }
+
+    protected LeaderboardsScreen(Screen parent, boolean build) {
         super(parent, s -> Panel.createPanel(s, p -> p.appearance(568, 275)), CommonComponents.EMPTY);
         localAggregateMode = false;
         localAggregateEntry = null;
-        rebuildRenderableVList(Minecraft.getInstance());
-        renderableVList.layoutSpacing(l -> 1);
+        if (build) {
+            rebuildRenderableVList(Minecraft.getInstance());
+            renderableVList.layoutSpacing(l -> 1);
+        }
     }
 
     public LeaderboardsScreen(Screen parent, LeaderboardEntry localAggregateEntry) {
@@ -187,9 +193,19 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
     }
 
-    private void selectFirstNonEmptyBoard() {
-        for (int i = 0; i < statsBoards.size(); i++) {
-            if (!statsBoards.get(i).statsList.isEmpty()) {
+    protected List<StatsBoard> statsBoards() {
+        return statsBoards;
+    }
+
+    protected StatsBoard selectedBoard() {
+        List<StatsBoard> boards = statsBoards();
+        return selectedStatBoard >= 0 && selectedStatBoard < boards.size() ? boards.get(selectedStatBoard) : null;
+    }
+
+    protected void selectFirstNonEmptyBoard() {
+        List<StatsBoard> boards = statsBoards();
+        for (int i = 0; i < boards.size(); i++) {
+            if (!boards.get(i).statsList.isEmpty()) {
                 selectedStatBoard = i;
                 return;
             }
@@ -200,17 +216,36 @@ public class LeaderboardsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> LegacyComponents.CHANGE_FILTER);
+        renderer.add(this::filterControlIcon, this::filterControlTooltip);
+    }
+
+    protected ControlTooltip.Icon filterControlIcon() {
+        return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(filterKey()) : ControllerBinding.LEFT_BUTTON.getIcon();
+    }
+
+    protected Component filterControlTooltip() {
+        return LegacyComponents.CHANGE_FILTER;
+    }
+
+    protected int filterKey() {
+        return InputConstants.KEY_X;
+    }
+
+    protected void cycleFilter() {
+        filter.add(1, true);
     }
 
     public int changedPage(int count) {
-        return Math.max(0, (page + count) >= statsBoards.get(selectedStatBoard).renderables.size() ? page : page + count);
+        StatsBoard board = selectedBoard();
+        return board == null ? 0 : Math.max(0, (page + count) >= board.renderables.size() ? page : page + count);
     }
 
     public void changeStatBoard(boolean left) {
+        List<StatsBoard> boards = statsBoards();
+        if (boards.isEmpty()) return;
         int initialSelectedStatBoard = selectedStatBoard;
-        while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0, selectedStatBoard + (left ? -1 : 1), statsBoards.size())) && selectedStatBoard != initialSelectedStatBoard) {
-            if (!statsBoards.get(selectedStatBoard).statsList.isEmpty()) {
+        while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0, selectedStatBoard + (left ? -1 : 1), boards.size())) && selectedStatBoard != initialSelectedStatBoard) {
+            if (!boards.get(selectedStatBoard).statsList.isEmpty()) {
                 page = 0;
                 rebuildRenderableVList(minecraft);
                 repositionElements();
@@ -221,17 +256,19 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.key() == InputConstants.KEY_X) {
-            filter.add(1, true);
+        if (keyEvent.key() == filterKey()) {
+            cycleFilter();
             rebuildRenderableVList(minecraft);
             repositionElements();
+            return true;
         }
         if (keyEvent.isLeft() || keyEvent.isRight()) {
             changeStatBoard(keyEvent.isLeft());
             return true;
         }
         if (keyEvent.key() == InputConstants.KEY_LBRACKET || keyEvent.key() == InputConstants.KEY_RBRACKET) {
-            if (selectedStatBoard < statsBoards.size() && !statsBoards.get(selectedStatBoard).renderables.isEmpty()) {
+            StatsBoard board = selectedBoard();
+            if (board != null && !board.renderables.isEmpty()) {
                 int newPage = changedPage(keyEvent.key() == InputConstants.KEY_LBRACKET ? -lastStatsInScreen : statsInScreen);
                 if (newPage != page) {
                     lastStatsInScreen = statsInScreen;
@@ -252,28 +289,15 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     public void rebuildRenderableVList(Minecraft minecraft) {
         renderableVList.renderables.clear();
-        if (statsBoards.get(selectedStatBoard).statsList.isEmpty()) {
+        StatsBoard board = selectedBoard();
+        if (board == null || board.statsList.isEmpty()) {
             actualRankBoard = Collections.emptyList();
             return;
         }
-        if (localAggregateMode) {
-            actualRankBoard = localAggregateEntry == null || localAggregateEntry.statsMap().isEmpty() ? Collections.emptyList() : List.of(localAggregateEntry);
-        } else {
-            if (minecraft.getConnection() == null) {
-                actualRankBoard = Collections.emptyList();
-                return;
-            }
-            actualRankBoard = Legacy4JClient.hasModOnServer() && filter.get() != 1
-                    ? minecraft.getConnection().getOnlinePlayers().stream()
-                    .map(p -> new LeaderboardEntry(((LegacyPlayerInfo) p).legacyMinecraft$getProfile().name(), ((LegacyPlayerInfo) p).getStatsMap()))
-                    .filter(entry -> entry.statsMap().object2IntEntrySet().stream().filter(s -> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0)
-                    .sorted(filter.get() == 0 ? Comparator.comparingInt((LeaderboardEntry entry) -> entry.statsMap().object2IntEntrySet().stream().filter(s -> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing(LeaderboardEntry::name))
-                    .toList()
-                    : List.of(new LeaderboardEntry(minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()).getProfile().name(), minecraft.player.getStats().stats));
-        }
+        actualRankBoard = resolveRankBoard(minecraft);
         for (int i = 0; i < actualRankBoard.size(); i++) {
             LeaderboardEntry info = actualRankBoard.get(i);
-            String rank = i + 1 + "";
+            String rank = Integer.toString(info.rank() > 0 ? info.rank() : i + 1);
             renderableVList.renderables.add(new AbstractWidget(0, 0, 551, 20, Component.literal(info.name())) {
                 @Override
                 protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
@@ -285,11 +309,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
                         int added = 0;
                         Component hoveredValue = null;
-                        for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
+                        for (int index = page; index < board.statsList.size(); index++) {
                             if (added >= statsInScreen) break;
-                            Stat<?> stat = statsBoards.get(selectedStatBoard).statsList.get(index);
+                            Stat<?> stat = board.statsList.get(index);
                             Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format(info.statsMap().getInt(stat)), Style.EMPTY).getComponent();
-                            SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
+                            SimpleLayoutRenderable renderable = board.renderables.get(index);
                             int w = font.width(value);
                             LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, value, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), renderable.getX() + Math.min(renderable.getWidth(), (renderable.getWidth() - w) / 2 + getWidth()), getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
                             if (LegacyRenderUtil.isMouseOver(i, j, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), Math.min(renderable.getWidth(), w), getHeight()))
@@ -308,17 +332,39 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
     }
 
+    protected List<LeaderboardEntry> resolveRankBoard(Minecraft minecraft) {
+        if (localAggregateMode) {
+            return localAggregateEntry == null || localAggregateEntry.statsMap().isEmpty() ? Collections.emptyList() : List.of(localAggregateEntry);
+        }
+        if (minecraft.getConnection() == null) {
+            return Collections.emptyList();
+        }
+        StatsBoard board = selectedBoard();
+        if (board == null) return Collections.emptyList();
+        return Legacy4JClient.hasModOnServer() && filter.get() != 1
+                ? minecraft.getConnection().getOnlinePlayers().stream()
+                .map(p -> new LeaderboardEntry(((LegacyPlayerInfo) p).legacyMinecraft$getProfile().name(), ((LegacyPlayerInfo) p).getStatsMap()))
+                .filter(entry -> entry.statsMap().object2IntEntrySet().stream().filter(s -> board.statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0)
+                .sorted(filter.get() == 0 ? Comparator.comparingInt((LeaderboardEntry entry) -> entry.statsMap().object2IntEntrySet().stream().filter(s -> board.statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing(LeaderboardEntry::name))
+                .toList()
+                : List.of(new LeaderboardEntry(minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()).getProfile().name(), minecraft.player.getStats().stats));
+    }
+
 
     @Override
     public void tick() {
         super.tick();
-        if (localAggregateMode) return;
+        if (!refreshesOnlineStats()) return;
         if (updateTimer <= 0) {
             updateTimer = 20;
             if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
             else
-                minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
+            minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
         } else updateTimer--;
+    }
+
+    protected boolean refreshesOnlineStats() {
+        return !localAggregateMode;
     }
 
     @Override
@@ -336,12 +382,14 @@ public class LeaderboardsScreen extends PanelVListScreen {
             LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, filterTooltipX, topTooltipY, filterTooltipWidth, topTooltipHeight);
             LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, boardTooltipX, topTooltipY, boardTooltipWidth, topTooltipHeight);
             LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, entriesTooltipX, topTooltipY, entriesTooltipWidth, topTooltipHeight);
-            if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()) {
-                StatsBoard board = statsBoards.get(selectedStatBoard);
+            List<StatsBoard> boards = statsBoards();
+            if (!boards.isEmpty() && selectedStatBoard < boards.size()) {
+                StatsBoard board = selectedBoard();
+                if (board == null) return;
                 LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, b -> {
                     float topTooltipScale = accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isFHD() ? 2 / 3f : 1.0f);
                     GuiGraphicsExtractor.pose().pushMatrix();
-                    Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL : MY_SCORE);
+                    Component filter = filterText();
                     GuiGraphicsExtractor.pose().translate(filterTooltipX + (filterTooltipWidth - font.width(filter) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("filterText.y", 6));
                     if (!b) GuiGraphicsExtractor.pose().scale(topTooltipScale);
                     GuiGraphicsExtractor.text(font, filter, 0, 0, 0xFFFFFFFF);
@@ -390,7 +438,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     GuiGraphicsExtractor.pose().scale(0.5f, 0.5f);
                 (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(GuiGraphicsExtractor, 4, 0, false);
                 GuiGraphicsExtractor.pose().popMatrix();
-                if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
+                if (statsInScreen < board.renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
                     GuiGraphicsExtractor.pose().pushMatrix();
                     GuiGraphicsExtractor.pose().translate(boardTooltipX + boardTooltipWidth + accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
@@ -431,11 +479,16 @@ public class LeaderboardsScreen extends PanelVListScreen {
         LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, false);
     }
 
+    protected Component filterText() {
+        return Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL : MY_SCORE);
+    }
+
     public void onStatsUpdated() {
-        if (localAggregateMode) return;
+        if (!refreshesOnlineStats()) return;
         if (!Legacy4JClient.hasModOnServer()) {
             refreshStatsBoards(minecraft);
-            if (LeaderboardsScreen.statsBoards.get(selectedStatBoard).statsList.isEmpty())
+            StatsBoard board = selectedBoard();
+            if (board == null || board.statsList.isEmpty())
                 minecraft.executeIfPossible(() -> changeStatBoard(false));
         }
     }
@@ -596,7 +649,10 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
     }
 
-    public record LeaderboardEntry(String name, Object2IntMap<Stat<?>> statsMap) {
+    public record LeaderboardEntry(int rank, String uuid, String name, Object2IntMap<Stat<?>> statsMap) {
+        public LeaderboardEntry(String name, Object2IntMap<Stat<?>> statsMap) {
+            this(0, "", name, statsMap);
+        }
     }
 
 }
