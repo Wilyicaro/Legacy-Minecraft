@@ -49,6 +49,7 @@ public final class GlobalLeaderboardBoardRegistry {
    private static final List<String> KILL_ENTITIES = List.of("zombie", "skeleton", "creeper", "spider", "zombified_piglin", "slime");
    private static final List<String> TRAVEL_STATS = List.of("walk_one_cm", "fall_one_cm", "minecart_one_cm", "boat_one_cm");
    private static final List<String> GENERAL_STATS = List.of("play_time", "total_world_time", "time_since_death", "time_since_rest");
+   private static volatile List<LeaderboardsScreen.StatsBoard> statsBoards = List.of();
 
    private GlobalLeaderboardBoardRegistry() {
    }
@@ -70,13 +71,21 @@ public final class GlobalLeaderboardBoardRegistry {
       return TRACKED_BOARD_IDS.indexOf(TRAVELLING_BOARD);
    }
 
+   public static List<LeaderboardsScreen.StatsBoard> statsBoards() {
+      return statsBoards;
+   }
+
+   public static LeaderboardsScreen.StatsBoard statsBoard(int index) {
+      return index >= 0 && index < statsBoards.size() ? statsBoards.get(index) : null;
+   }
+
    public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Object2IntMap<Stat<?>> aggregateStats, List<String> boardIds) {
       ensureStatsBoards(Minecraft.getInstance());
       LinkedHashMap<String, GlobalLeaderboardBoardSnapshot> snapshots = new LinkedHashMap<>();
       ensureTrackedBoardStats(Minecraft.getInstance());
 
-      for (int i = 0; i < LeaderboardsScreen.statsBoards.size(); i++) {
-         LeaderboardsScreen.StatsBoard board = LeaderboardsScreen.statsBoards.get(i);
+      for (int i = 0; i < statsBoards.size(); i++) {
+         LeaderboardsScreen.StatsBoard board = statsBoards.get(i);
          String boardId = i < TRACKED_BOARD_IDS.size() ? boardId(i) : i < boardIds.size() ? boardIds.get(i) : "board_" + i;
          LinkedHashMap<String, Integer> encodedStats = new LinkedHashMap<>();
          int total = 0;
@@ -132,8 +141,7 @@ public final class GlobalLeaderboardBoardRegistry {
             }
          }
          if (!boards.isEmpty()) {
-            LeaderboardsScreen.statsBoards.clear();
-            LeaderboardsScreen.statsBoards.addAll(boards);
+            statsBoards = List.copyOf(boards);
          }
       } catch (IOException | RuntimeException err) {
          Legacy4J.LOGGER.warn("Failed to load global leaderboard boards", err);
@@ -141,12 +149,12 @@ public final class GlobalLeaderboardBoardRegistry {
    }
 
    public static void ensureTrackedBoardStats(Minecraft minecraft) {
-      if (minecraft == null || LeaderboardsScreen.statsBoards.isEmpty()) {
+      if (minecraft == null || statsBoards.isEmpty()) {
          return;
       }
 
-      for (int index = 0; index < LeaderboardsScreen.statsBoards.size() && index < TRACKED_BOARD_IDS.size(); index++) {
-         addTrackedStats(TRACKED_BOARD_IDS.get(index), LeaderboardsScreen.statsBoards.get(index));
+      for (int index = 0; index < statsBoards.size() && index < TRACKED_BOARD_IDS.size(); index++) {
+         addTrackedStats(TRACKED_BOARD_IDS.get(index), statsBoards.get(index));
       }
    }
 

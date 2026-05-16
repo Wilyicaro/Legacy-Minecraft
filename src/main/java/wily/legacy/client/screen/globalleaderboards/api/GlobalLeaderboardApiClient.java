@@ -64,9 +64,9 @@ public final class GlobalLeaderboardApiClient {
       return this.sendJson(this.resolve("/leaderboards/sync"), root);
    }
 
-   public List<GlobalLeaderboardEntry> fetchBoard(String boardId, String playerUuid, GlobalLeaderboardsScreen.ViewMode viewMode, int aroundWindow, int topLimit) {
+   public GlobalLeaderboardApiClient.FetchResult fetchBoard(String boardId, String playerUuid, GlobalLeaderboardsScreen.ViewMode viewMode, int aroundWindow, int topLimit) {
       if (!this.config.hasEndpoint() || boardId.isBlank()) {
-         return List.of();
+         return GlobalLeaderboardApiClient.FetchResult.failed();
       }
 
       String mode = viewMode == GlobalLeaderboardsScreen.ViewMode.TOP ? "top" : "around";
@@ -89,12 +89,12 @@ public final class GlobalLeaderboardApiClient {
       try {
          HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
          if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            return List.of();
+            return GlobalLeaderboardApiClient.FetchResult.failed();
          }
 
          JsonElement root = JsonParser.parseString(response.body());
          if (!root.isJsonObject()) {
-            return List.of();
+            return GlobalLeaderboardApiClient.FetchResult.failed();
          }
 
          JsonObject object = root.getAsJsonObject();
@@ -115,14 +115,14 @@ public final class GlobalLeaderboardApiClient {
             });
             parsed.add(new GlobalLeaderboardEntry(intValue(entry, "rank"), stringValue(entry, "playerUuid"), stringValue(entry, "playerName"), intValue(entry, "totalScore"), statValues));
          });
-         return parsed;
+         return new GlobalLeaderboardApiClient.FetchResult(true, parsed);
       } catch (IOException | InterruptedException | RuntimeException err) {
          if (err instanceof InterruptedException) {
             Thread.currentThread().interrupt();
          }
 
          Legacy4J.LOGGER.warn("Failed to fetch global leaderboard board {}", boardId, err);
-         return List.of();
+         return GlobalLeaderboardApiClient.FetchResult.failed();
       }
    }
 
@@ -171,5 +171,11 @@ public final class GlobalLeaderboardApiClient {
    private static int intValue(JsonObject object, String key) {
       JsonElement element = object.get(key);
       return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber() ? element.getAsInt() : 0;
+   }
+
+   public record FetchResult(boolean successful, List<GlobalLeaderboardEntry> entries) {
+      private static GlobalLeaderboardApiClient.FetchResult failed() {
+         return new GlobalLeaderboardApiClient.FetchResult(false, List.of());
+      }
    }
 }
