@@ -94,6 +94,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 //? if fabric || >=1.21 && neoforge {
 /*import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
@@ -402,6 +403,7 @@ public class Legacy4JClient {
 
     public static void init() {
         SkinsClientBootstrap.init();
+        GlobalLeaderboardsFeature.init();
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
             if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;

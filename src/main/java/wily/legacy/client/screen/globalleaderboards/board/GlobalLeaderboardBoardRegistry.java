@@ -1,0 +1,313 @@
+package wily.legacy.client.screen.globalleaderboards.board;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
+import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardStatCodec;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.stats.Stat;
+import net.minecraft.stats.StatType;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.Nullable;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.FactoryAPIPlatform;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.screen.LeaderboardsScreen;
+import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.util.IOUtil;
+
+public final class GlobalLeaderboardBoardRegistry {
+   private static final Identifier LISTING_ID = Identifier.fromNamespaceAndPath("legacy", "leaderboard_listing.json");
+   private static final String FARMING_BOARD = "legacy.menu.leaderboard.farming";
+   private static final String MINING_BOARD = "legacy.menu.leaderboard.mining_blocks";
+   private static final String KILLS_BOARD = "legacy.menu.leaderboard.kills";
+   private static final String TRAVELLING_BOARD = "legacy.menu.leaderboard.travelling";
+   private static final String GENERAL_BOARD = "stat.generalButton";
+   private static final List<String> TRACKED_BOARD_IDS = List.of(FARMING_BOARD, MINING_BOARD, KILLS_BOARD, TRAVELLING_BOARD, GENERAL_BOARD);
+   private static final Set<String> TRACKED_BOARDS = Set.copyOf(TRACKED_BOARD_IDS);
+   private static final List<String> FARMING_ITEMS = List.of("egg", "wheat", "brown_mushroom", "red_mushroom", "sugar_cane", "milk_bucket", "pumpkin");
+   private static final List<String> MINING_BLOCKS = List.of("dirt", "cobblestone", "sand", "stone", "gravel", "clay", "obsidian");
+   private static final List<String> KILL_ENTITIES = List.of("zombie", "skeleton", "creeper", "spider", "zombified_piglin", "slime");
+   private static final List<String> TRAVEL_STATS = List.of("walk_one_cm", "fall_one_cm", "minecart_one_cm", "boat_one_cm");
+   private static final List<String> GENERAL_STATS = List.of("play_time", "total_world_time", "time_since_death", "time_since_rest");
+
+   private GlobalLeaderboardBoardRegistry() {
+   }
+
+   public static List<String> loadBoardIds(Minecraft minecraft) {
+      ensureStatsBoards(minecraft);
+      return new ArrayList<>(TRACKED_BOARD_IDS);
+   }
+
+   public static List<String> trackedBoardIds() {
+      return TRACKED_BOARD_IDS;
+   }
+
+   public static String boardId(int index) {
+      return index >= 0 && index < TRACKED_BOARD_IDS.size() ? TRACKED_BOARD_IDS.get(index) : "board_" + index;
+   }
+
+   public static int defaultBoardIndex() {
+      return TRACKED_BOARD_IDS.indexOf(TRAVELLING_BOARD);
+   }
+
+   public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Object2IntMap<Stat<?>> aggregateStats, List<String> boardIds) {
+      ensureStatsBoards(Minecraft.getInstance());
+      LinkedHashMap<String, GlobalLeaderboardBoardSnapshot> snapshots = new LinkedHashMap<>();
+      ensureTrackedBoardStats(Minecraft.getInstance());
+
+      for (int i = 0; i < LeaderboardsScreen.statsBoards.size(); i++) {
+         LeaderboardsScreen.StatsBoard board = LeaderboardsScreen.statsBoards.get(i);
+         String boardId = i < TRACKED_BOARD_IDS.size() ? boardId(i) : i < boardIds.size() ? boardIds.get(i) : "board_" + i;
+         LinkedHashMap<String, Integer> encodedStats = new LinkedHashMap<>();
+         int total = 0;
+         for (Stat<?> stat : board.statsList) {
+            int value = aggregateStats.getInt(stat);
+            if (value <= 0) {
+               continue;
+            }
+
+            String encoded = GlobalLeaderboardStatCodec.encode(stat);
+            if (!encoded.isBlank()) {
+               encodedStats.put(encoded, value);
+               total += value;
+            }
+         }
+         snapshots.put(boardId, new GlobalLeaderboardBoardSnapshot(boardId, boardId, total, encodedStats));
+      }
+
+      return snapshots;
+   }
+
+   public static synchronized void ensureStatsBoards(Minecraft minecraft) {
+      if (minecraft == null) {
+         return;
+      }
+
+      @Nullable Resource resource = minecraft.getResourceManager().getResource(LISTING_ID).orElse(null);
+      if (resource == null) {
+         return;
+      }
+
+      try (BufferedReader reader = resource.openAsReader()) {
+         List<LeaderboardsScreen.StatsBoard> boards = new ArrayList<>();
+         JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+         JsonArray listing = root.has("listing") && root.get("listing").isJsonArray() ? root.getAsJsonArray("listing") : new JsonArray();
+         LinkedHashMap<String, JsonObject> definitions = new LinkedHashMap<>();
+         int index = 0;
+         for (JsonElement element : listing) {
+            if (element.isJsonObject()) {
+               JsonObject object = element.getAsJsonObject();
+               String boardId = boardId(object, index);
+               if (TRACKED_BOARDS.contains(boardId)) {
+                  definitions.put(boardId, object);
+               }
+            }
+            index++;
+         }
+
+         for (String boardId : TRACKED_BOARD_IDS) {
+            JsonObject object = definitions.get(boardId);
+            if (object != null) {
+               boards.add(statsBoardFromJson(boardId, object));
+            }
+         }
+         if (!boards.isEmpty()) {
+            LeaderboardsScreen.statsBoards.clear();
+            LeaderboardsScreen.statsBoards.addAll(boards);
+         }
+      } catch (IOException | RuntimeException err) {
+         Legacy4J.LOGGER.warn("Failed to load global leaderboard boards", err);
+      }
+   }
+
+   public static void ensureTrackedBoardStats(Minecraft minecraft) {
+      if (minecraft == null || LeaderboardsScreen.statsBoards.isEmpty()) {
+         return;
+      }
+
+      for (int index = 0; index < LeaderboardsScreen.statsBoards.size() && index < TRACKED_BOARD_IDS.size(); index++) {
+         addTrackedStats(TRACKED_BOARD_IDS.get(index), LeaderboardsScreen.statsBoards.get(index));
+      }
+   }
+
+   public static boolean addStat(LeaderboardsScreen.StatsBoard board, Stat<?> stat) {
+      if (!board.canAdd(stat) || board.statsList.contains(stat)) {
+         return false;
+      }
+
+      board.statsList.add(stat);
+      try {
+         board.renderables.add(board.getRenderable(stat));
+      } catch (RuntimeException ex) {
+         board.renderables.add(SimpleLayoutRenderable.createDrawString(Component.literal("?"), 0, 0, 24, 24, 0xFFFFFFFF, false));
+      }
+
+      return true;
+   }
+
+   @SuppressWarnings({"rawtypes", "unchecked"})
+   private static LeaderboardsScreen.StatsBoard statsBoardFromJson(String boardId, JsonObject object) {
+      StatType<?> statType = FactoryAPIPlatform.getRegistryValue(Identifier.tryParse(GsonHelper.getAsString(object, "type")), BuiltInRegistries.STAT_TYPE);
+      if (statType == null) {
+         throw new IllegalStateException("Missing stat type for leaderboard board");
+      }
+
+      Component displayName = object.has("displayName") ? Component.translatable(GsonHelper.getAsString(object, "displayName")) : statType.getDisplayName();
+      Predicate<Stat<?>> trackedPredicate = trackedBoardPredicate(boardId);
+      LeaderboardsScreen.StatsBoard board;
+      if (object.get("predicate") instanceof JsonObject predicateObject) {
+         java.util.function.Predicate predicate = IOUtil.registryMatches(statType.getRegistry(), predicateObject);
+         board = LeaderboardsScreen.StatsBoard.create(statType, displayName, stat -> predicate.test(stat.getValue()) && trackedPredicate.test(stat));
+      } else {
+         board = LeaderboardsScreen.StatsBoard.create(statType, displayName, trackedPredicate);
+      }
+      applyTrackedBoardIcons(boardId, board);
+      return board;
+   }
+
+   private static String boardId(JsonObject object, int index) {
+      if (object.has("displayName") && object.get("displayName").isJsonPrimitive()) {
+         return object.get("displayName").getAsString();
+      }
+
+      if (object.has("type") && object.get("type").isJsonPrimitive()) {
+         return object.get("type").getAsString() + "_" + index;
+      }
+
+      return "board_" + index;
+   }
+
+   private static Predicate<Stat<?>> trackedBoardPredicate(String boardId) {
+      return switch (boardId) {
+         case FARMING_BOARD -> stat -> hasValuePath(stat, FARMING_ITEMS);
+         case MINING_BOARD -> stat -> hasValuePath(stat, MINING_BLOCKS);
+         case KILLS_BOARD -> stat -> hasValuePath(stat, KILL_ENTITIES);
+         case TRAVELLING_BOARD -> stat -> hasValuePath(stat, TRAVEL_STATS);
+         case GENERAL_BOARD -> stat -> hasValuePath(stat, GENERAL_STATS);
+         default -> stat -> false;
+      };
+   }
+
+   @SuppressWarnings({"rawtypes", "unchecked"})
+   private static void addTrackedStats(String boardId, LeaderboardsScreen.StatsBoard board) {
+      StatType statType = board.type;
+      for (String path : trackedPaths(boardId)) {
+         Object value = FactoryAPIPlatform.getRegistryValue(Identifier.withDefaultNamespace(path), statType.getRegistry());
+         if (value != null) {
+            addStat(board, statType.get(value));
+         }
+      }
+   }
+
+   private static List<String> trackedPaths(String boardId) {
+      return switch (boardId) {
+         case FARMING_BOARD -> FARMING_ITEMS;
+         case MINING_BOARD -> MINING_BLOCKS;
+         case KILLS_BOARD -> KILL_ENTITIES;
+         case TRAVELLING_BOARD -> TRAVEL_STATS;
+         case GENERAL_BOARD -> GENERAL_STATS;
+         default -> List.of();
+      };
+   }
+
+   @SuppressWarnings({"rawtypes", "unchecked"})
+   private static void applyTrackedBoardIcons(String boardId, LeaderboardsScreen.StatsBoard board) {
+      if (FARMING_BOARD.equals(boardId)) {
+         addItemOverride(board, "egg", Items.EGG);
+         addItemOverride(board, "wheat", Items.WHEAT);
+         addItemOverride(board, "brown_mushroom", Items.BROWN_MUSHROOM);
+         addItemOverride(board, "red_mushroom", Items.RED_MUSHROOM);
+         addItemOverride(board, "sugar_cane", Items.SUGAR_CANE);
+         addItemOverride(board, "milk_bucket", Items.MILK_BUCKET);
+         addItemOverride(board, "pumpkin", Items.PUMPKIN);
+         return;
+      }
+
+      if (MINING_BOARD.equals(boardId)) {
+         addItemOverride(board, "dirt", Blocks.DIRT);
+         addItemOverride(board, "cobblestone", Blocks.COBBLESTONE);
+         addItemOverride(board, "sand", Blocks.SAND);
+         addItemOverride(board, "stone", Blocks.STONE);
+         addItemOverride(board, "gravel", Blocks.GRAVEL);
+         addItemOverride(board, "clay", Blocks.CLAY);
+         addItemOverride(board, "obsidian", Blocks.OBSIDIAN);
+         return;
+      }
+
+      if (TRAVELLING_BOARD.equals(boardId)) {
+         addSpriteOverride(board, "walk_one_cm", lceSprite("travel/walk_one_cm"));
+         addSpriteOverride(board, "fall_one_cm", lceSprite("travel/fall_one_cm"));
+         addItemOverride(board, "minecart_one_cm", Items.MINECART);
+         addItemOverride(board, "boat_one_cm", Items.OAK_BOAT);
+         return;
+      }
+
+      if (KILLS_BOARD.equals(boardId)) {
+         addSpriteOverride(board, "zombie", lceSprite("kills/zombie"));
+         addSpriteOverride(board, "skeleton", lceSprite("kills/skeleton"));
+         addSpriteOverride(board, "creeper", lceSprite("kills/creeper"));
+         addSpriteOverride(board, "spider", lceSprite("kills/spider"));
+         addSpriteOverride(board, "zombified_piglin", lceSprite("kills/zombified_piglin"));
+         addSpriteOverride(board, "slime", lceSprite("kills/slime"));
+      }
+   }
+
+   @SuppressWarnings({"rawtypes", "unchecked"})
+   private static void addSpriteOverride(LeaderboardsScreen.StatsBoard board, String path, Identifier sprite) {
+      LegacyIconHolder iconHolder = new LegacyIconHolder(24, 24);
+      iconHolder.iconSprite = sprite;
+      board.statIconOverrides.add(new LeaderboardsScreen.StatIconOverride(board.type, value -> registryValueMatches(board.type.getRegistry(), value, path), iconHolder));
+   }
+
+   @SuppressWarnings({"rawtypes", "unchecked"})
+   private static void addItemOverride(LeaderboardsScreen.StatsBoard board, String path, ItemLike itemLike) {
+      LegacyIconHolder iconHolder = new LazyItemIconHolder(24, 24, itemLike);
+      board.statIconOverrides.add(new LeaderboardsScreen.StatIconOverride(board.type, value -> registryValueMatches(board.type.getRegistry(), value, path), iconHolder));
+   }
+
+   private static Identifier lceSprite(String path) {
+      return Identifier.fromNamespaceAndPath("legacy", "icon/leaderboards/lce/" + path);
+   }
+
+   @SuppressWarnings("unchecked")
+   private static boolean registryValueMatches(Registry registry, Object value, String expectedPath) {
+      if (registry == null || value == null) {
+         return false;
+      }
+
+      Identifier valueId = registry.getKey(value);
+      return valueId != null && expectedPath.equals(valueId.getPath());
+   }
+
+   @SuppressWarnings("unchecked")
+   private static boolean hasValuePath(Stat<?> stat, List<String> allowedPaths) {
+      Registry<Object> registry = (Registry<Object>) stat.getType().getRegistry();
+      if (registry == null || stat.getValue() == null) {
+         return false;
+      }
+
+      Identifier valueId = registry.getKey(stat.getValue());
+      return valueId != null && allowedPaths.contains(valueId.getPath());
+   }
+}
+
