@@ -152,12 +152,12 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
     }
 
     private static void setClearWeather(MinecraftServer server, ServerPlayer player) {
-        server.setWeatherParameters(duration(player, ServerLevel.RAIN_DELAY), 0, false, false);
+        server.overworld().setWeatherParameters(duration(player, ServerLevel.RAIN_DELAY), 0, false, false);
         applyWeather(server, 0.0f, 0.0f);
     }
 
     private static void setWeather(MinecraftServer server, int duration, boolean raining, boolean thundering) {
-        server.setWeatherParameters(0, duration, raining, thundering);
+        server.overworld().setWeatherParameters(0, duration, raining, thundering);
         applyWeather(server, raining ? 1.0f : 0.0f, thundering ? 1.0f : 0.0f);
     }
 
