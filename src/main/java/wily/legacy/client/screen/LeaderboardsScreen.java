@@ -44,6 +44,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -93,10 +94,14 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     public static Screen getActualLeaderboardsScreenInstance(Screen parent) {
-        return LegacyOptions.legacyLeaderboards.get() ? new LeaderboardsScreen(parent) : new StatsScreen(parent, Minecraft.getInstance().player.getStats());
+        return LegacyOptions.legacyLeaderboards.get() ? GlobalLeaderboardsFeature.createScreen(parent, () -> new LeaderboardsScreen(parent)) : new StatsScreen(parent, Minecraft.getInstance().player.getStats());
     }
 
     public static Screen getOverallLeaderboardsScreenInstance(Screen parent) {
+        return GlobalLeaderboardsFeature.createScreen(parent, () -> getOverallFallbackLeaderboardsScreenInstance(parent));
+    }
+
+    public static Screen getOverallFallbackLeaderboardsScreenInstance(Screen parent) {
         Minecraft minecraft = Minecraft.getInstance();
         Object2IntMap<Stat<?>> aggregateStats = loadOverallStats(minecraft);
         return new LeaderboardsScreen(parent, createAggregateEntry(minecraft, aggregateStats));
@@ -137,15 +142,21 @@ public class LeaderboardsScreen extends PanelVListScreen {
         if (profileId == null) return aggregateStats;
         Path savesPath = minecraft.gameDirectory.toPath().resolve("saves");
         if (!Files.isDirectory(savesPath)) return aggregateStats;
+        Set<Path> loadedStats = new HashSet<>();
+        String statsFile = profileId + ".json";
         try (var worlds = Files.list(savesPath)) {
-            worlds.filter(Files::isDirectory).forEach(worldPath -> loadWorldStats(worldPath.resolve("stats").resolve(profileId + ".json"), aggregateStats));
+            worlds.filter(Files::isDirectory).forEach(worldPath -> {
+                loadWorldStats(worldPath.resolve("stats").resolve(statsFile), aggregateStats, loadedStats);
+                loadWorldStats(worldPath.resolve("players").resolve("stats").resolve(statsFile), aggregateStats, loadedStats);
+            });
         } catch (IOException e) {
             Legacy4J.LOGGER.warn("Failed to scan save stats for main-menu leaderboards", e);
         }
         return aggregateStats;
     }
 
-    private static void loadWorldStats(Path statsPath, Object2IntOpenHashMap<Stat<?>> aggregateStats) {
+    private static void loadWorldStats(Path statsPath, Object2IntOpenHashMap<Stat<?>> aggregateStats, Set<Path> loadedStats) {
+        if (!loadedStats.add(statsPath.toAbsolutePath().normalize())) return;
         if (!Files.isRegularFile(statsPath)) return;
         try (BufferedReader reader = Files.newBufferedReader(statsPath)) {
             JsonObject root = GsonHelper.parse(reader);
