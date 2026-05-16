@@ -76,18 +76,24 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static synchronized void ensureStarted(Minecraft minecraft) {
-      if (launchTaskScheduled) {
+      String nextPlayerUuid = minecraft.getUser().getProfileId() == null ? "" : minecraft.getUser().getProfileId().toString();
+      String nextPlayerName = minecraft.getUser().getName();
+      boolean playerChanged = !playerKey(nextPlayerUuid, nextPlayerName).equals(playerKey());
+      boolean nameChanged = !nextPlayerName.equals(playerName);
+      if (launchTaskScheduled && !playerChanged && !nameChanged) {
          return;
       }
 
-      launchTaskScheduled = true;
-      String cachedPlayerUuid = playerUuid;
-      playerUuid = minecraft.getUser().getProfileId() == null ? "" : minecraft.getUser().getProfileId().toString();
-      playerName = minecraft.getUser().getName();
-      if (!playerUuid.equals(cachedPlayerUuid)) {
+      playerUuid = nextPlayerUuid;
+      playerName = nextPlayerName;
+      if (playerChanged) {
          lastSyncHash = "";
          lastSyncAt = 0L;
+         boardCaches = Map.of();
+         REQUEST_TIMES.clear();
+         CACHE_VERSION.incrementAndGet();
       }
+      launchTaskScheduled = true;
       CompletableFuture.runAsync(() -> startupSync(minecraft), EXECUTOR);
    }
 
@@ -145,7 +151,9 @@ public final class GlobalLeaderboardsFeature {
          return;
       }
 
-      String requestKey = boardId + "|" + viewMode.name();
+      String requestKey = requestKey(boardId, viewMode);
+      String requestPlayerUuid = playerUuid;
+      String requestPlayerKey = playerKey();
       if (!IN_FLIGHT_REQUESTS.add(requestKey)) {
          return;
       }
@@ -153,9 +161,9 @@ public final class GlobalLeaderboardsFeature {
 
       CompletableFuture.runAsync(() -> {
          try {
-            List<GlobalLeaderboardEntry> entries = API_CLIENT.fetchBoard(boardId, playerUuid, viewMode, CONFIG.aroundWindow(), CONFIG.topLimit());
-            if (!entries.isEmpty()) {
-               mergeBoardCache(boardId, viewMode, entries);
+            GlobalLeaderboardApiClient.FetchResult result = API_CLIENT.fetchBoard(boardId, requestPlayerUuid, viewMode, CONFIG.aroundWindow(), CONFIG.topLimit());
+            if (result.successful() && requestPlayerKey.equals(playerKey())) {
+               mergeBoardCache(boardId, viewMode, result.entries());
             }
          } finally {
             IN_FLIGHT_REQUESTS.remove(requestKey);
@@ -192,8 +200,9 @@ public final class GlobalLeaderboardsFeature {
          }
 
          if (CONFIG.prefetchTopOnLaunch()) {
-            for (String boardId : boardSnapshots.keySet()) {
-               requestBoard(boardId, GlobalLeaderboardsScreen.ViewMode.TOP);
+            String initialBoardId = initialBoardId();
+            if (!initialBoardId.isBlank()) {
+               requestBoard(initialBoardId, GlobalLeaderboardsScreen.ViewMode.TOP);
             }
          }
       } catch (Exception err) {
@@ -240,7 +249,7 @@ public final class GlobalLeaderboardsFeature {
          return false;
       }
 
-      String requestKey = boardId + "|" + viewMode.name();
+      String requestKey = requestKey(boardId, viewMode);
       long now = System.currentTimeMillis();
       long cooldown = Math.max(0, CONFIG.fetchCooldownSeconds()) * 1000L;
       Long requestedAt = REQUEST_TIMES.get(requestKey);
@@ -253,9 +262,8 @@ public final class GlobalLeaderboardsFeature {
          return true;
       }
 
-      List<GlobalLeaderboardEntry> entries = viewMode == GlobalLeaderboardsScreen.ViewMode.TOP ? cache.topEntries() : cache.aroundEntries();
       long fetchedAt = viewMode == GlobalLeaderboardsScreen.ViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
-      return entries.isEmpty() || fetchedAt <= 0 || now - fetchedAt >= cooldown;
+      return fetchedAt <= 0 || now - fetchedAt >= cooldown;
    }
 
    private static synchronized void mergeBoardCache(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode, List<GlobalLeaderboardEntry> entries) {
@@ -277,5 +285,17 @@ public final class GlobalLeaderboardsFeature {
 
    private static void persistCache() {
       GlobalLeaderboardCacheStore.save(new GlobalLeaderboardCacheStore.State(playerUuid, playerName, System.currentTimeMillis(), lastSyncHash, lastSyncAt, boardCaches));
+   }
+
+   private static String requestKey(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode) {
+      return viewMode == GlobalLeaderboardsScreen.ViewMode.AROUND_ME ? boardId + "|" + viewMode.name() + "|" + playerKey() : boardId + "|" + viewMode.name();
+   }
+
+   private static String playerKey() {
+      return playerKey(playerUuid, playerName);
+   }
+
+   private static String playerKey(String uuid, String name) {
+      return uuid.isBlank() ? "name:" + name : "uuid:" + uuid;
    }
 }

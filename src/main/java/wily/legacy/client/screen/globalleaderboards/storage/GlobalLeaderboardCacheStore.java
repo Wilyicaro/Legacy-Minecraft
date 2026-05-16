@@ -49,7 +49,7 @@ public final class GlobalLeaderboardCacheStore {
          JsonObject boardsObject = root.has("boards") && root.get("boards").isJsonObject() ? root.getAsJsonObject("boards") : new JsonObject();
          boardsObject.entrySet().forEach(entry -> boardCaches.put(entry.getKey(), readBoardCache(entry.getKey(), entry.getValue().getAsJsonObject())));
          return new GlobalLeaderboardCacheStore.State(playerUuid, playerName, updatedAt, lastSyncHash, lastSyncAt, boardCaches);
-      } catch (IOException err) {
+      } catch (IOException | RuntimeException err) {
          Legacy4J.LOGGER.warn("Failed to read global leaderboard cache {}", path, err);
          return new GlobalLeaderboardCacheStore.State("", "", 0L, "", 0L, Map.of());
       }
