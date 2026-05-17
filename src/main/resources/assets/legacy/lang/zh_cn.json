@@ -2100,6 +2100,7 @@
   "legacy.options.showVanillaRecipeBook": "显示原版配方书",
   "legacy.options.skipInitialSaveWarning": "Skip Initial Save Warning",
   "legacy.options.skipIntro": "Skip Intro",
+  "legacy.options.slowChunkLoading": "Slow Chunk Loading",
   "legacy.options.smoothAnimatedCharacter": "平滑动画角色",
   "legacy.options.smoothMovement": "平滑移动",
   "legacy.options.squaredRenderDistance": "方形渲染距离",
