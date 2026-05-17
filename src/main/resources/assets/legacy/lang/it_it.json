@@ -2100,6 +2100,7 @@
   "legacy.options.showVanillaRecipeBook": "Mostra Ricettario Vanilla",
   "legacy.options.skipInitialSaveWarning": "Salta Avviso di Salvataggio Iniziale",
   "legacy.options.skipIntro": "Salta Intro",
+  "legacy.options.slowChunkLoading": "Slow Chunk Loading",
   "legacy.options.smoothAnimatedCharacter": "Animazione Personaggio Fluida",
   "legacy.options.smoothMovement": "Movimento Fluido",
   "legacy.options.squaredRenderDistance": "Distanza di Rendering Quadrata",
