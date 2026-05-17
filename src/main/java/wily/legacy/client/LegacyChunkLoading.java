@@ -10,11 +10,17 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Arrays;
 import java.util.List;
 
 public final class LegacyChunkLoading {
-    private static final int STEP_MILLIS = 100;
-    private static final int SECTIONS_PER_STEP = 1;
+    private static final int STEP_MILLIS = 75;
+    private static final int BASE_SECTIONS_PER_STEP = 2;
+    private static final int MID_SECTIONS_PER_STEP = 3;
+    private static final int MAX_SECTIONS_PER_STEP = 4;
+    private static final int MID_BACKLOG = 96;
+    private static final int HIGH_BACKLOG = 256;
+    private static final int MAX_CATCH_UP_STEPS = 4;
     private static final int IMMEDIATE_DISTANCE = 20;
     private static final int EXTRA_TRIM_DISTANCE = 6;
     private static final LongOpenHashSet revealed = new LongOpenHashSet();
@@ -46,9 +52,10 @@ public final class LegacyChunkLoading {
 
         long step = Util.getMillis() / STEP_MILLIS;
         if (step != lastStep) {
+            int steps = stepCount(step);
             lastStep = step;
             trim(centerSection, minecraft.options.renderDistance().get() + EXTRA_TRIM_DISTANCE);
-            reveal(centerSection);
+            reveal(centerSection, steps);
         }
 
         visible.removeIf(section -> !isRevealed(section));
@@ -78,29 +85,64 @@ public final class LegacyChunkLoading {
         }
     }
 
-    private static void reveal(long centerSection) {
-        for (int i = 0; i < SECTIONS_PER_STEP && !pending.isEmpty(); i++) {
-            long nearest = nearest(centerSection);
-            pending.remove(nearest);
-            revealed.add(nearest);
+    private static int stepCount(long step) {
+        if (lastStep == Long.MIN_VALUE) {
+            return 1;
         }
+        long steps = Math.max(1, step - lastStep);
+        return (int) Math.min(steps, MAX_CATCH_UP_STEPS);
     }
 
-    private static long nearest(long centerSection) {
+    private static void reveal(long centerSection, int steps) {
+        int count = Math.min(pending.size(), revealBudget() * steps);
+        if (count <= 0) {
+            return;
+        }
+
+        long[] nearest = new long[count];
+        int[] distances = new int[count];
+        Arrays.fill(nearest, Long.MIN_VALUE);
+        Arrays.fill(distances, Integer.MAX_VALUE);
+
         LongIterator iterator = pending.iterator();
-        long nearest = iterator.nextLong();
-        int distance = weightedDistance(nearest, centerSection);
 
         while (iterator.hasNext()) {
             long key = iterator.nextLong();
-            int nextDistance = weightedDistance(key, centerSection);
-            if (nextDistance < distance) {
-                nearest = key;
-                distance = nextDistance;
+            int distance = weightedDistance(key, centerSection);
+            int slot = farthestSlot(distances);
+            if (distance < distances[slot]) {
+                nearest[slot] = key;
+                distances[slot] = distance;
             }
         }
 
-        return nearest;
+        for (long key : nearest) {
+            if (key != Long.MIN_VALUE) {
+                pending.remove(key);
+                revealed.add(key);
+            }
+        }
+    }
+
+    private static int revealBudget() {
+        int size = pending.size();
+        if (size >= HIGH_BACKLOG) {
+            return MAX_SECTIONS_PER_STEP;
+        }
+        if (size >= MID_BACKLOG) {
+            return MID_SECTIONS_PER_STEP;
+        }
+        return BASE_SECTIONS_PER_STEP;
+    }
+
+    private static int farthestSlot(int[] distances) {
+        int slot = 0;
+        for (int i = 1; i < distances.length; i++) {
+            if (distances[i] > distances[slot]) {
+                slot = i;
+            }
+        }
+        return slot;
     }
 
     private static void trim(long centerSection, int distance) {
