@@ -481,6 +481,7 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            LegacyRenderDistance.initDefault();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
             //? if fabric || (>=1.21 && neoforge) {
