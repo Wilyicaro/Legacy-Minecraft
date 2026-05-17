@@ -602,6 +602,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyCloudHeightAndTexture),
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.legacySkyShape,
+                                LegacyOptions.slowChunkLoading,
                                 LegacyOptions.fastLeavesWhenBlocked,
                                 LegacyOptions.fastLeavesCustomModels,
                                 LegacyOptions.displayNameTagBorder,
