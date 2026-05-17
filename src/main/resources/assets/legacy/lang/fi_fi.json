@@ -2100,6 +2100,7 @@
   "legacy.options.showVanillaRecipeBook": "Näytä Vanilla-reseptikirja",
   "legacy.options.skipInitialSaveWarning": "Ohita Alkuperäinen Tallennusvaroitus",
   "legacy.options.skipIntro": "Ohita Intro",
+  "legacy.options.slowChunkLoading": "Slow Chunk Loading",
   "legacy.options.smoothAnimatedCharacter": "Sujuva Hahmoanimaatio",
   "legacy.options.smoothMovement": "Sujuva Liike",
   "legacy.options.squaredRenderDistance": "Neliöity Renderöintietäisyys",
