@@ -473,6 +473,7 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            LegacyRenderDistance.initDefault();
             FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
