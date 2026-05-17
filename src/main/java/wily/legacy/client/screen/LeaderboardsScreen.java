@@ -315,8 +315,9 @@ public class LeaderboardsScreen extends PanelVListScreen {
                             Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format(info.statsMap().getInt(stat)), Style.EMPTY).getComponent();
                             SimpleLayoutRenderable renderable = board.renderables.get(index);
                             int w = font.width(value);
-                            LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, value, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), renderable.getX() + Math.min(renderable.getWidth(), (renderable.getWidth() - w) / 2 + getWidth()), getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
-                            if (LegacyRenderUtil.isMouseOver(i, j, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), Math.min(renderable.getWidth(), w), getHeight()))
+                            int valueX = renderable.getX() + (renderable.getWidth() - w) / 2;
+                            GuiGraphicsExtractor.text(font, value, valueX, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                            if (LegacyRenderUtil.isMouseOver(i, j, valueX, getY(), w, getHeight()))
                                 hoveredValue = value;
                             added++;
                         }
