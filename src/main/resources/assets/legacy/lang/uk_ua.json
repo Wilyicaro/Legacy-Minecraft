@@ -2100,6 +2100,7 @@
   "legacy.options.showVanillaRecipeBook": "Показувати ванільну книгу рецептів",
   "legacy.options.skipInitialSaveWarning": "Пропустити стартове попередження про збереження",
   "legacy.options.skipIntro": "Пропустити вступ",
+  "legacy.options.slowChunkLoading": "Slow Chunk Loading",
   "legacy.options.smoothAnimatedCharacter": "Плавний анімований персонаж",
   "legacy.options.smoothMovement": "Плавний рух",
   "legacy.options.squaredRenderDistance": "Квадратна дистанція рендеру",
