@@ -14,10 +14,12 @@
  - `Force Legacy Swimming`, thanks to Sowgro
  - `Force Legacy Shield Controls`
  - `Force Legacy Offhand Limits`
+ - `Legacy block protection`
 - Added some options to Graphics section:
  - `Legacy Clouds` (with changes to the sky color)
  - `Legacy Clouds Height`
  - `Legacy Zombie Aggression Animation`
+ - `Slow Chunk Loading`
 - Added some options to User Interface section:
   - `Display Realms Button`
   - `Hide Sodium Settings`
@@ -43,10 +45,15 @@
   - KBM by Cjnator38
   - PS4/PS5 and initial Steam designs by NicSonic-_-
 - Added descriptions for entries in More World Options (Nabouna32)
+- Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
+- The leaderboard now globally tracks stats of survival mode players
+	- Due to this the mods button can now only be accessed from advanced game options
 
 ## Parity Changes
 
 - Player body no longer renders in first person when sleeping
+- The legacy sleep animation will now play in first person
+- Legacy drop item animation
 - Beacon beam will be visible from the inside
 - Trident killers will be possible
 - Tweaked elytra momentum
@@ -54,12 +61,26 @@
 - Dispensers can fire tridents
 - Tweaked trident third person wind up animation
 - Players don't have fire animation with fire resistance effect applied
+- Ignited players or mobs will light campfires
+- Sand / Red sand can be blast smelted into glass
+- Cartography table can now turn paper into maps
+- Strongholds can now generate emeralds and ink sacs
+- Lapis, Squid ink, cocoa beans and bonemeal can directly be used as dye
 - Fish drops bones
+- Raiders drop arrows, iron armor and more emeralds scaling with difficultly level
+- Vindicators deal legacy damage values
 - ID in the Map name
+- Initial open map animation
+- Maps opened in the same area stack
 - Head layer items such as mob heads now receive damage tint
 - Host Options command outputs
+- Wandering traders can sell more trades
+- Adjusted hitbox of tall plants and kelp
+- The interact animation will be suppressed on various actions
 - Music and Sound sliders are no longer linked
-- Experience pick up sound has been pitched up, thanks to Cjnator38
+- Experience orb and item pick up sound has been pitched up, thanks to Cjnator38
+- Skeleton horses can be ridden without a saddle
+- Spider Jockeys in the nether will become Wither Jockeys
 
 ## General Changes
 
@@ -72,6 +93,7 @@
 
 - Fixed snow layers don't stack
 - Fixed chat scrolling getting stuck
+- Fixed chat position being moved by chat scaling
 - Fixed Crafting tables can't be open with crafting key binding on KBM
 - Fixed multiline text fields breaks arrow navigation
 - Fixed not being able to sign books with a controller
@@ -82,6 +104,7 @@
 - Fixed crouch toggle resetting when opening a screen
 - Fixed default map size being 3 by default, instead of 1 like in PS4 Edition (only new worlds will be applied)
 - Fixed Dragon egg teleport particles being random
+- Fixed tnt not applying knockback through blocks (Halloween Mash-up TNT launcher)
 - Fixed y view bobbing not working anymore
 - Fixed Death screen not having the reason
 - Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
