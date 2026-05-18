@@ -2029,6 +2029,7 @@
   "legacy.options.legacyDrowned": "Legacy утопленик",
   "legacy.options.legacyDrownedAnimation": "Legacy анімація утопленика",
   "legacy.options.legacyEnchantmentScreen": "Legacy інтерфейс зачарування",
+  "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
   "legacy.options.legacyEntityFireTint": "Legacy відтінок вогню сутності",
   "legacy.options.legacyEvokerFangs": "Legacy ікла заклинача",
   "legacy.options.legacyFireworks": "Legacy феєрверки",
