@@ -1,24 +1,18 @@
 package wily.legacy.mixin.base.client;
 
-import com.mojang.serialization.Codec;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
@@ -59,15 +53,6 @@ public abstract class OptionsMixin {
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Ljava/lang/Object;Ljava/util/function/Consumer;)V", ordinal = 8), index = 4)
     protected Object initChatSpacingOption(Object object) {
         return 1.0d;
-    }
-
-    @ModifyArgs(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V", ordinal = 0), slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=options.entityDistanceScaling")))
-    protected void initEntityDistance(Args args) {
-        OptionInstance.CaptionBasedToString<Double> caption = args.get(2);
-        args.set(2, (OptionInstance.CaptionBasedToString<Double>) (component, value) -> value <= 0.0 ? Options.genericValueLabel(component, Component.literal("Legacy")) : caption.toString(component, value));
-        args.set(3, new OptionInstance.IntRange(0, 19).xmap(i -> i == 0 ? 0.0 : (i + 1) * 0.25, value -> value <= 0.0 ? 0 : Mth.clamp((int) Math.round(value * 4) - 1, 1, 19)/*? if >=1.21.11 {*//*, true*//*?}*/));
-        args.set(4, Codec.doubleRange(0.0, 5.0));
-        args.set(5, 0.0d);
     }
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V", ordinal = 0), slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=options.chunkFade")), index = 5)
