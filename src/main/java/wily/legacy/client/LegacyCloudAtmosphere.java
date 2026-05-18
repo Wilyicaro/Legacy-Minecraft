@@ -10,6 +10,10 @@ import net.minecraft.world.attribute.EnvironmentAttribute;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.joml.Vector3fc;
+import wily.factoryapi.FactoryAPI;
+//? if fabric || (>=1.21 && neoforge) {
+import wily.legacy.client.screen.compat.IrisCompat;
+//?}
 
 public final class LegacyCloudAtmosphere {
     private static final float TWO_PI = 6.2831855f;
@@ -51,7 +55,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static boolean areLceCloudsEnabled() {
-        return LegacyOptions.lceClouds.get();
+        return LegacyOptions.lceClouds.get() && !isShaderPackInUse();
     }
 
     public static boolean areLegacyCloudHeightAndTextureEnabled() {
@@ -199,6 +203,17 @@ public final class LegacyCloudAtmosphere {
 
     private static boolean isWeatherActive(ClientLevel level, float partialTick) {
         return level.getRainLevel(partialTick) > 0.0f || level.getThunderLevel(partialTick) > 0.0f;
+    }
+
+    private static boolean isShaderPackInUse() {
+        if (!FactoryAPI.isModLoaded("iris")) {
+            return false;
+        }
+        //? if fabric || (>=1.21 && neoforge) {
+        return IrisCompat.isShaderPackInUse();
+        //?} else {
+        /*return false;
+        *///?}
     }
 
 
