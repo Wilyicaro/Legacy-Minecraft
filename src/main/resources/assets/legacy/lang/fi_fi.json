@@ -2029,6 +2029,7 @@
   "legacy.options.legacyDrowned": "Perinteiset Hukkuneet",
   "legacy.options.legacyDrownedAnimation": "Perinteinen Hukkuneen Animaatio",
   "legacy.options.legacyEnchantmentScreen": "Perinteinen Lumousnäyttö",
+  "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
   "legacy.options.legacyEntityFireTint": "Perinteinen Entiteetin Tulisävy",
   "legacy.options.legacyEvokerFangs": "Perinteinen Evoker Hampaat",
   "legacy.options.legacyFireworks": "Legacy Fireworks",
