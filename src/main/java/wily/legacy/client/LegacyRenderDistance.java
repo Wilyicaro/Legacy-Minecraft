@@ -46,13 +46,11 @@ public final class LegacyRenderDistance {
     }
 
     public static void initDefault() {
-        if (LegacyOptions.legacyEntityDistanceInitialized.get()) return;
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft != null && minecraft.options != null) {
-            minecraft.options.entityDistanceScaling().set(0.0);
-            minecraft.options.save();
-        }
-        LegacyOptions.legacyEntityDistanceInitialized.set(true);
+        if (minecraft == null || minecraft.options == null || minecraft.options.entityDistanceScaling().get() >= 0.5) return;
+        minecraft.options.entityDistanceScaling().set(1.0);
+        LegacyOptions.legacyEntityDistance.set(true);
+        minecraft.options.save();
         LegacyOptions.CLIENT_STORAGE.save();
     }
 
@@ -69,8 +67,7 @@ public final class LegacyRenderDistance {
     }
 
     public static boolean usingLegacyEntityDistance() {
-        Minecraft minecraft = Minecraft.getInstance();
-        return minecraft == null || minecraft.options == null || minecraft.options.entityDistanceScaling().get() <= 0.0;
+        return LegacyOptions.legacyEntityDistance.get();
     }
 
     private static int cap(Entity entity) {
