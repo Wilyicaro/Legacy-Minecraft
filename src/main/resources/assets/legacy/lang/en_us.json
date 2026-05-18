@@ -2020,6 +2020,7 @@
   "legacy.options.legacyDrowned": "Legacy Drowned",
   "legacy.options.legacyDrownedAnimation": "Legacy Drowned Animation",
   "legacy.options.legacyEnchantmentScreen": "Legacy Enchanting Screen",
+  "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
   "legacy.options.legacyEntityFireTint": "Legacy Entity Fire Tint",
   "legacy.options.legacyEvokerFangs": "Legacy Evoker Fangs",
   "legacy.options.legacyFireworks": "Legacy Fireworks",
