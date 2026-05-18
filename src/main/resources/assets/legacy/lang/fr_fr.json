@@ -2029,6 +2029,7 @@
   "legacy.options.legacyDrowned": "Noyés legacy",
   "legacy.options.legacyDrownedAnimation": "Animation des noyés legacy",
   "legacy.options.legacyEnchantmentScreen": "Écran d'enchantement legacy",
+  "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
   "legacy.options.legacyEntityFireTint": "Teinte de feu d'entité legacy",
   "legacy.options.legacyEvokerFangs": "Crocs d'évocateur legacy",
   "legacy.options.legacyFireworks": "Feux d'artifice legacy",
