@@ -1,5 +1,8 @@
 package wily.legacy.client;
 
+//? if fabric || (>=1.21 && neoforge) {
+import net.irisshaders.iris.api.v0.IrisApi;
+//?}
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -12,6 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import wily.factoryapi.FactoryAPI;
 
 public final class LegacyCloudAtmosphere {
     private static final float TWO_PI = 6.2831855f;
@@ -55,7 +59,7 @@ public final class LegacyCloudAtmosphere {
     }
 
     public static boolean areLceCloudsEnabled() {
-        return LegacyOptions.lceClouds.get();
+        return LegacyOptions.lceClouds.get() && !isShaderPackInUse();
     }
 
     public static boolean areLegacyCloudHeightAndTextureEnabled() {
@@ -195,6 +199,17 @@ public final class LegacyCloudAtmosphere {
             (float) fogColor.y,
             (float) fogColor.z
         };
+    }
+
+    private static boolean isShaderPackInUse() {
+        if (!FactoryAPI.isModLoaded("iris")) {
+            return false;
+        }
+        //? if fabric || (>=1.21 && neoforge) {
+        return IrisApi.getInstance().isShaderPackInUse();
+        //?} else {
+        /*return false;
+        *///?}
     }
 
     private static float getDayBrightness(float timeOfDay) {
