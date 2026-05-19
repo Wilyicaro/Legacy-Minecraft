@@ -298,6 +298,7 @@
     "VillagerGoalPackagesMixin",
     "VillagerMixin",
     "VindicatorMixin",
+    "WanderingTraderMixin",
     "WolfMixin",
     "WoodlandMansionPiecesSecondFloor",
     "FireworkStarRecipeAccessor",
