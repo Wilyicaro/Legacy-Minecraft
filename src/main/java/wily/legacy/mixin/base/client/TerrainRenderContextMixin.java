@@ -22,7 +22,7 @@ import wily.legacy.Legacy4JClient;
 public class TerrainRenderContextMixin {
     @Inject(method = "bufferModel", at = @At("HEAD"))
     public void bufferModel(BlockStateModel model, BlockState blockState, BlockPos blockPos, CallbackInfo ci, @Local(argsOnly = true) LocalRef<BlockStateModel> bakedModelLocalRef) {
-        bakedModelLocalRef.set(Legacy4JClient.getFastLeavesModelReplacement(Minecraft.getInstance().level, blockPos, blockState, model));
+        bakedModelLocalRef.set(Legacy4JClient.getBlockModelReplacement(Minecraft.getInstance().level, blockPos, blockState, model));
     }
 }
 //?}
