@@ -1,0 +1,22 @@
+{
+  "legacy.default.pack": "デフォルト スキン",
+  "legacy.default.steve": "Steve",
+  "legacy.default.tennis_steve": "テニスSteve",
+  "legacy.default.tux_steve": "タキシードSteve",
+  "legacy.default.athlete_steve": "アスリートSteve",
+  "legacy.default.scottish_steve": "スコットランドのSteve",
+  "legacy.default.jail_steve": "囚人Steve",
+  "legacy.default.cyclist_steve": "サイクリストSteve",
+  "legacy.default.boxer_steve": "ボクサーSteve",
+  "legacy.default.alex": "Alex",
+  "legacy.default.tennis_alex": "テニスAlex",
+  "legacy.default.tux_alex": "タキシードAlex",
+  "legacy.default.athlete_alex": "アスリートAlex",
+  "legacy.default.swedish_alex": "スコットランドのAlex",
+  "legacy.default.prisoner_alex": "囚人Alex",
+  "legacy.default.cyclist_alex": "サイクリストAlex",
+  "legacy.default.boxer_alex": "ボクサーAlex",
+  "legacy.default.dev_steve": "Dev Steve",
+  "legacy.default.dev_alex": "Dev Alex",
+  "legacy.default.auto_select": "自動選択されました"
+}
