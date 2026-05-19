@@ -16,6 +16,6 @@ import wily.legacy.Legacy4JClient;
 public class SectionCompilerMixin {
     @ModifyExpressionValue(method = /*? if neoforge {*//*"compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;Ljava/util/List;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;"*//*?} else {*/"compile"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockStateModelSet;get(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;"))
     public BlockStateModel compile(BlockStateModel original, SectionPos sectionPos, RenderSectionRegion renderChunkRegion, @Local(ordinal = 2) BlockPos pos, @Local BlockState blockState) {
-        return Legacy4JClient.getFastLeavesModelReplacement(renderChunkRegion, pos, blockState, original);
+        return Legacy4JClient.getBlockModelReplacement(renderChunkRegion, pos, blockState, original);
     }
 }

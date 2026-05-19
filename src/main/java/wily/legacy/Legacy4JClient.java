@@ -657,7 +657,10 @@ public class Legacy4JClient {
         }
     }
 
-    public static BlockStateModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
+    public static BlockStateModel getBlockModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
+        BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
+        if (torchModel != model) return torchModel;
+
         boolean fastGraphics = !Minecraft.getInstance().options.cutoutLeaves().get();
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())) {
             if (!fastGraphics && blockGetter != null) {
