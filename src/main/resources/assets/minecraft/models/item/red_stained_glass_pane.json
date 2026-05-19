@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/template_glass_pane",
+  "textures": {
+    "layer0": "minecraft:block/red_stained_glass"
+  }
+}
