@@ -22,6 +22,7 @@ import wily.legacy.client.LegacyLivingEntityRenderState;
 //?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
@@ -64,7 +65,7 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
     public void render(LivingEntityRenderState livingEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft != null && minecraft.player != null && minecraft.getCameraEntity() == minecraft.player && minecraft.options.getCameraType() == CameraType.FIRST_PERSON && minecraft.player.isSleeping() && livingEntityRenderState instanceof AvatarRenderState avatarRenderState && avatarRenderState.id == minecraft.player.getId()) {
+        if (minecraft != null && minecraft.player != null && minecraft.getCameraEntity() == minecraft.player && minecraft.options.getCameraType() == CameraType.FIRST_PERSON && minecraft.player.isSleeping() && livingEntityRenderState instanceof AvatarRenderState avatarRenderState && avatarRenderState.id == minecraft.player.getId() && avatarRenderState.hasPose(Pose.SLEEPING)) {
             ci.cancel();
             return;
         }
