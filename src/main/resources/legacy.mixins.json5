@@ -294,6 +294,7 @@
     "SquidMixin",
     "StonecutterBlockMixin",
     "SugarCanesBlockMixin",
+    "SweetBerryBushBlockMixin",
     "TntBlockMixin",
     "VillagerGoalPackagesMixin",
     "VillagerMixin",
