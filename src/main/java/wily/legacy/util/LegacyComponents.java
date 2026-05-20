@@ -34,6 +34,7 @@ public class LegacyComponents {
     public static final Component CHANGE_PITCH = Component.translatable("legacy.action.change_pitch");
     public static final Component CHANGE_POSE = Component.translatable("legacy.action.change_pose");
     public static final Component CHARGE = Component.translatable("legacy.action.charge");
+    public static final Component CLEAN = Component.translatable("legacy.action.clean");
     public static final Component CLEAR = Component.translatable("legacy.action.clear");
     public static final Component CLEAR_QUICK_SELECT = Component.translatable("legacy.action.clear_quick_select");
     public static final Component COLLECT = Component.translatable("legacy.action.collect");
@@ -57,6 +58,7 @@ public class LegacyComponents {
     public static final Component EXIT_SEARCH_MODE = Component.translatable("legacy.action.exit_search_mode");
     public static final Component FEED = Component.translatable("legacy.action.feed");
     public static final Component FILL = Component.translatable("legacy.action.fill");
+    public static final Component FLUSH = Component.translatable("legacy.action.flush");
     public static final Component FOLLOW_ME = Component.translatable("legacy.action.follow_me");
     public static final Component GROUP = Component.translatable("legacy.action.group");
     public static final Component GROW = Component.translatable("legacy.action.grow");
@@ -130,6 +132,7 @@ public class LegacyComponents {
     public static final Component THROW = Component.translatable("legacy.action.throw");
     public static final Component TILL = Component.translatable("legacy.action.till");
     public static final Component TIP_ARROW = Component.translatable("legacy.action.tip_arrow");
+    public static final Component TIP_ARROWS = Component.translatable("legacy.action.tip_arrows");
     public static final Component TRADE = Component.translatable("legacy.action.trade");
     public static final Component TYPE = Component.translatable("legacy.action.type");
     public static final Component UNLOCK = Component.translatable("legacy.action.unlock");
