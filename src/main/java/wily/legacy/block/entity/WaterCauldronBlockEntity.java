@@ -74,8 +74,12 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         if (waterColor == null) {
             convertTo((LayeredCauldronBlock) Blocks.WATER_CAULDRON);
         } else convertToColored();
-        this.waterColor = waterColor;
+        this.waterColor = waterColor == null ? null : getOpaqueColor(waterColor);
         setChanged();
+    }
+
+    public static int getOpaqueColor(int color) {
+        return 0xFF000000 | color & 0xFFFFFF;
     }
 
     public Holder<Potion> getDefaultPotion() {
@@ -117,7 +121,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         super.loadAdditional(input);
         waterColor = null;
         setPotion(getDefaultPotion());
-        input.getInt("dyeColor").ifPresent(i -> waterColor = i);
+        input.getInt("dyeColor").ifPresent(i -> waterColor = getOpaqueColor(i));
         input.read("potionContents", PotionContents.CODEC).ifPresentOrElse(this::setPotion, () -> input.getString("potion").flatMap(id -> BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(id)))).ifPresent(this::setPotion));
         input.getString("lastPotionItemUsed").flatMap(id -> BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(id)))).ifPresent(p -> lastPotionItemUsed = p);
     }
