@@ -32,6 +32,7 @@ public class LegacyComponents {
     public static final Component CARVE = Component.translatable("legacy.action.carve");
     public static final Component CHANGE_FILTER = Component.translatable("legacy.action.change_filter");
     public static final Component CHANGE_PITCH = Component.translatable("legacy.action.change_pitch");
+    public static final Component CHANGE_POSE = Component.translatable("legacy.action.change_pose");
     public static final Component CHARGE = Component.translatable("legacy.action.charge");
     public static final Component CLEAR = Component.translatable("legacy.action.clear");
     public static final Component CLEAR_QUICK_SELECT = Component.translatable("legacy.action.clear_quick_select");
