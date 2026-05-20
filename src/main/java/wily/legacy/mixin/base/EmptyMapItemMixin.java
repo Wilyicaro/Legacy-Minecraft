@@ -3,6 +3,7 @@ package wily.legacy.mixin.base;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,11 +42,16 @@ public class EmptyMapItemMixin {
     @WrapOperation(method = "use", at = @At(value = "INVOKE", target = /*? if <1.21.5 {*//*"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/world/level/Level;IIBZZ)Lnet/minecraft/world/item/ItemStack;"*//*?} else {*/"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/server/level/ServerLevel;IIBZZ)Lnet/minecraft/world/item/ItemStack;"/*?}*/))
     public ItemStack use(/*? if <1.21.5 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, int arg, int i, byte j, boolean b, boolean bl, Operation<ItemStack> original, Level level1, Player player, InteractionHand interactionHand) {
         ItemStack map = player.getItemInHand(interactionHand);
+        Component name = map.get(DataComponents.CUSTOM_NAME);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         byte scale = custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().get(LegacyGameRules.DEFAULT_MAP_SIZE.get()).intValue();
         map.consume(1, player);
         ItemStack existingMap = legacy$getExistingMap(level, player, arg, i, scale, b, bl);
-        return existingMap.isEmpty() ? original.call(level, arg, i, scale, b, bl) : existingMap.copyWithCount(1);
+        ItemStack result = existingMap.isEmpty() ? original.call(level, arg, i, scale, b, bl) : existingMap.copyWithCount(1);
+        if (name != null) {
+            result.set(DataComponents.CUSTOM_NAME, name);
+        }
+        return result;
     }
 
     @Unique

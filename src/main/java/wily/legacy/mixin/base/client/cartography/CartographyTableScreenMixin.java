@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.resources.Identifier;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryItemUtil;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
@@ -54,11 +56,17 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
     };
 
     private EditBox name;
+    private boolean updatingName;
+    private ItemStack lastInput = ItemStack.EMPTY;
     private final ContainerListener listener = new ContainerListener() {
         @Override
         public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
             if (i == 0) {
-                name.setValue(itemStack.isEmpty() ? "" : RenameItemMenu.getItemName(itemStack));
+                ItemStack input = itemStack.isEmpty() ? ItemStack.EMPTY : itemStack.copyWithCount(1);
+                if (!ItemStack.matches(input, lastInput) && !name.isFocused()) {
+                    setNameValue(itemStack.isEmpty() ? "" : RenameItemMenu.getItemName(itemStack));
+                }
+                lastInput = input;
                 name.setEditable(!itemStack.isEmpty());
             }
         }
@@ -109,12 +117,14 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
                 LegacySlotDisplay.override(s, inventoryLabelX + s.getContainerSlot() * slotsSize, sd ? 148 : 225, defaultDisplay);
             }
         }
-        menu.addSlotListener(listener);
         this.name = new EditBox(this.font, leftPos + inventoryLabelX, topPos + (sd ? 25 : 38), sd ? 70 : 120, sd ? 13 : 18, Component.empty());
         this.name.setTextColor(-1);
         this.name.setTextColorUneditable(-1);
         this.name.setMaxLength(50);
         this.name.setResponder(s -> {
+            if (updatingName) {
+                return;
+            }
             Slot slot = menu.getSlot(0);
             if (!slot.hasItem())
                 return;
@@ -125,14 +135,25 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
             ((RenameItemMenu) menu).setResultItemName(s);
             minecraft.player.connection.send(new ServerboundRenameItemPacket(s));
         });
-        this.name.setValue("");
+        setNameValue("");
         this.addWidget(this.name);
         this.name.setEditable(this.menu.getSlot(0).hasItem());
+        menu.addSlotListener(listener);
+    }
+
+    @Override
+    protected void setInitialFocus() {
+        super.setInitialFocus();
+        setFocused(null);
+        name.setFocused(false);
     }
 
     public Component getCartographyAction() {
         ItemStack input = menu.getSlot(0).getItem();
         ItemStack input2 = menu.getSlot(1).getItem();
+        if (canUsePaperConversion(input, input2)) {
+            return LegacyComponents.BASIC_MAP;
+        }
         if (input.is(Items.FILLED_MAP)) {
             if (input2.is(Items.PAPER)) return LegacyComponents.ZOOM_MAP;
             else if (input2.is(Items.MAP)) return LegacyComponents.COPY_MAP;
@@ -140,6 +161,10 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
             return LegacyComponents.RENAME_MAP;
         }
         return null;
+    }
+
+    private boolean canUsePaperConversion(ItemStack input, ItemStack input2) {
+        return Legacy4JClient.hasModOnServer() && input.is(Items.PAPER) && input2.isEmpty();
     }
 
     @Override
@@ -150,6 +175,15 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
         return super.keyPressed(keyEvent);
     }
 
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        boolean result = super.mouseClicked(event, bl);
+        if (name.isFocused() && !name.isMouseOver(event.x(), event.y())) {
+            setFocused(null);
+            name.setFocused(false);
+        }
+        return result;
+    }
 
     public void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
@@ -176,7 +210,13 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
     public void repositionElements() {
         String string = this.name.getValue();
         super.repositionElements();
-        this.name.setValue(string);
+        setNameValue(string);
+    }
+
+    private void setNameValue(String value) {
+        updatingName = true;
+        name.setValue(value);
+        updatingName = false;
     }
 
     @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
@@ -201,7 +241,9 @@ private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
             if (mapItemSavedData != null && (mapItemSavedData.locked && (zoom || lock) || zoom && mapItemSavedData.scale >= 4))
                 FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ERROR_CROSS, leftPos + (sd ? 26 : 40), arrowY, 15, 15);
             cartographySprite = copy ? LegacySprites.CARTOGRAPHY_TABLE_COPY : zoom ? LegacySprites.CARTOGRAPHY_TABLE_ZOOM : lock ? LegacySprites.CARTOGRAPHY_TABLE_LOCKED : LegacySprites.CARTOGRAPHY_TABLE_MAP;
-        } else
+        } else if (canUsePaperConversion(input, input2))
+            cartographySprite = LegacySprites.CARTOGRAPHY_TABLE_MAP;
+        else
             cartographySprite = LegacySprites.CARTOGRAPHY_TABLE;
 
         FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(cartographySprite, leftPos + (sd ? 43 : 70), topPos + (sd ? 40 : 61), sd ? 44 : 66, sd ? 44 : 66);

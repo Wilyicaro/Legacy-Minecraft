@@ -1274,6 +1274,7 @@
   "legacy.commands.legacyTip.success.remove": "Custom tip \"%s\" has been removed successfully.",
   "legacy.commands.legacyTip.success.reset": "Custom tip \"%s\" has been reset successfully.",
   "legacy.connect.initializing": "Initializing server",
+  "legacy.container.basicMap": "Basic Map",
   "legacy.container.copyMap": "Copy",
   "legacy.container.fuel": "Fuel",
   "legacy.container.ingredient": "Ingredient",
