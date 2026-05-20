@@ -296,6 +296,7 @@
     "VindicatorMixin",
     "WanderingTraderMixin",
     "WolfMixin",
+    "ZombieMixin",
     "WoodlandMansionPiecesSecondFloor",
     "FireworkStarRecipeAccessor",
     "FireworkRocketRecipeAccessor",
