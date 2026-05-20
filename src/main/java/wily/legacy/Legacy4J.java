@@ -137,7 +137,6 @@ public class Legacy4J {
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
         FactoryEvent.registerCommands(TipCommand::register);
         FactoryEvent.setup(Legacy4J::setup);
-        FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
