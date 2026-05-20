@@ -72,11 +72,14 @@ public class LegacyComponents {
     public static final Component MINE = Component.translatable("legacy.action.mine");
     public static final Component MIX = Component.translatable("legacy.action.mix");
     public static final Component MOUNT = Component.translatable("legacy.action.mount");
+    public static final Component MOVE_ARMOR = Component.translatable("legacy.action.move_armor");
     public static final Component MOVE_FUEL = Component.translatable("legacy.action.move_fuel");
     public static final Component MOVE_INGREDIENT = Component.translatable("legacy.action.move_ingredient");
     public static final Component MOVE_KEYBOARD = Component.translatable("legacy.action.move_keyboard");
     public static final Component MOVE_LAYER = Component.translatable("legacy.action.move_layer");
+    public static final Component MOVE_TOOL = Component.translatable("legacy.action.move_tool");
     public static final Component MOVE_UP_DOWN = Component.translatable("legacy.action.move_up_down");
+    public static final Component MOVE_WEAPON = Component.translatable("legacy.action.move_weapon");
     public static final Component NAME = Component.translatable("legacy.action.name");
     public static final Component NEXT_PAGE = Component.translatable("legacy.action.next_page");
     public static final Component OPEN = Component.translatable("legacy.action.open");
