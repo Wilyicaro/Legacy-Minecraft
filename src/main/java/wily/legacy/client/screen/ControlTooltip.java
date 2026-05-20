@@ -673,8 +673,12 @@ public interface ControlTooltip {
                 return LegacyComponents.NAME;
             // 8-Projection items (bow, crossbow, trident, snowball, egg)
             if (actualItem.getItem() instanceof TridentItem) {
-                if (minecraft.player.getUseItem() == actualItem) return LegacyComponents.THROW;
-                else if (EnchantmentHelper./*? if <1.20.5 {*//*getRiptide(actualItem)*//*?} else {*/getTridentSpinAttackStrength(actualItem, minecraft.player)/*?}*/ <= 0.0F || minecraft.player.isInWaterOrRain())
+                float riptide = EnchantmentHelper./*? if <1.20.5 {*//*getRiptide(actualItem)*//*?} else {*/getTridentSpinAttackStrength(actualItem, minecraft.player)/*?}*/;
+                if (minecraft.player.getUseItem() == actualItem) {
+                    if (riptide > 0.0F)
+                        return minecraft.player.getTicksUsingItem() >= 10 ? LegacyComponents.DASH : LegacyComponents.CHARGE;
+                    return LegacyComponents.THROW;
+                } else if (riptide <= 0.0F || minecraft.player.isInWaterOrRain())
                     return LegacyComponents.CHARGE;
             }
             if (actualItem.getItem() instanceof EggItem || actualItem.getItem() instanceof SnowballItem || actualItem.getItem() instanceof EnderpearlItem || actualItem.getItem() instanceof EnderEyeItem || actualItem.getItem() instanceof ThrowablePotionItem || actualItem.getItem() instanceof ExperienceBottleItem)
