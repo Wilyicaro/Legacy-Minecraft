@@ -123,6 +123,7 @@ public class LegacyComponents {
     public static final Component TAME = Component.translatable("legacy.action.tame");
     public static final Component THROW = Component.translatable("legacy.action.throw");
     public static final Component TILL = Component.translatable("legacy.action.till");
+    public static final Component TIP_ARROW = Component.translatable("legacy.action.tip_arrow");
     public static final Component TRADE = Component.translatable("legacy.action.trade");
     public static final Component TYPE = Component.translatable("legacy.action.type");
     public static final Component UNLOCK = Component.translatable("legacy.action.unlock");

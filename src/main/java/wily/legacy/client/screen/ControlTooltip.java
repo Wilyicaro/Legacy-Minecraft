@@ -536,10 +536,13 @@ public interface ControlTooltip {
                 boolean isPowderBucket = actualItem.is(Items.POWDER_SNOW_BUCKET);
                 boolean isLavaBucket = actualItem.is(Items.LAVA_BUCKET);
                 boolean isOtherPotion = (actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION)) && !isWaterBottle;
+                boolean isArrow = actualItem.is(Items.ARROW);
                 WaterCauldronBlockEntity be = null;
                 if (blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity wbe) be = wbe;
                 int level = blockState.hasProperty(LayeredCauldronBlock.LEVEL) ? blockState.getValue(LayeredCauldronBlock.LEVEL) : 0;
                 boolean isDyed = be != null && be.waterColor != null;
+                if (isArrow && be != null && !be.hasWater() && level > 0)
+                    return LegacyComponents.TIP_ARROW;
                 if (isEmptyBottle && block == Blocks.WATER_CAULDRON && !isDyed && level > 0)
                     return LegacyComponents.COLLECT;
                 if (isEmptyBucket) {
