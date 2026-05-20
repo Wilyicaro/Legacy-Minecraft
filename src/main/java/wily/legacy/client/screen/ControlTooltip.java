@@ -372,6 +372,8 @@ public interface ControlTooltip {
             return LegacyComponents.DETACH;
         }
         if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof ArmorStand stand) {
+            if (minecraft.player.isShiftKeyDown())
+                return LegacyComponents.CHANGE_POSE;
             double hitY = r.getLocation().y - stand.getY();
             return mainHand.isEmpty() ? switch ((int) (hitY * 10)) {
                 case 16, 17, 18, 19 -> !stand.getItemBySlot(EquipmentSlot.HEAD).isEmpty() ? LegacyComponents.TAKE : null;
