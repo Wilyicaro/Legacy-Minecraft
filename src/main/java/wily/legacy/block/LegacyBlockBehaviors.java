@@ -119,7 +119,7 @@ public class LegacyBlockBehaviors {
         });
         CauldronInteraction waterCauldronPotion = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             PotionContents contents;
-            if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || (contents = LegacyItemUtil.getPotionContents(itemStack)) == null || (blockState.getValue(LayeredCauldronBlock.LEVEL) == 3 && be.hasPotion(contents))) {
+            if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || (contents = LegacyItemUtil.getPotionContents(itemStack)) == null || (blockState.getValue(LayeredCauldronBlock.LEVEL) == 3 && be.hasPotion(contents) && be.waterColor == null)) {
                 return defaultPassInteraction();
             }
             if (!be.hasPotion(contents)) {

@@ -568,8 +568,10 @@ public interface ControlTooltip {
                 if (blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity wbe) be = wbe;
                 int level = blockState.hasProperty(LayeredCauldronBlock.LEVEL) ? blockState.getValue(LayeredCauldronBlock.LEVEL) : 0;
                 boolean isDyed = be != null && be.waterColor != null;
+                if (isDyed && (isWaterBottle || isWaterBucket))
+                    return LegacyComponents.FLUSH;
                 if (isArrow && be != null && !be.hasWater() && level > 0)
-                    return LegacyComponents.TIP_ARROW;
+                    return actualItem.getCount() > 1 ? LegacyComponents.TIP_ARROWS : LegacyComponents.TIP_ARROW;
                 if (isEmptyBottle && block == Blocks.WATER_CAULDRON && !isDyed && level > 0)
                     return LegacyComponents.COLLECT;
                 if (isEmptyBucket) {
@@ -600,7 +602,7 @@ public interface ControlTooltip {
                 boolean isDyeable = LegacyItemUtil.isDyeableItem(actualItem.getItemHolder());
                 if (isDyeable) {
                     if (be.waterColor == null && !dyedItem)
-                        return LegacyComponents.CLEAR;
+                        return LegacyComponents.CLEAN;
                     if (be.waterColor != null)
                         return LegacyComponents.DYE;
                 }
