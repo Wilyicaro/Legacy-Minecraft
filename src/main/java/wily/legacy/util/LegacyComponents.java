@@ -42,6 +42,7 @@ public class LegacyComponents {
     public static final Component COOK = Component.translatable("legacy.action.cook");
     public static final Component CREATE = Component.translatable("legacy.action.create");
     public static final Component CURE = Component.translatable("legacy.action.cure");
+    public static final Component DASH = Component.translatable("legacy.action.dash");
     public static final Component DIG_PATH = Component.translatable("legacy.action.dig_path");
     public static final Component DISMOUNT = Component.translatable("legacy.action.dismount");
     public static final Component DISTRIBUTE = Component.translatable("legacy.action.distribute");
