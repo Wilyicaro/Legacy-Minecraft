@@ -43,6 +43,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.Allay;
 import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.equine.Llama;
@@ -412,6 +413,8 @@ public interface ControlTooltip {
             if (allayItem.isEmpty() && !main.isEmpty() && !main.is(Items.LEAD))
                 return LegacyComponents.GIVE;
         }
+        if (entity instanceof AbstractChestedHorse horse && mainHand.is(Items.CHEST) && horse.isTamed() && !horse.hasChest() && !horse.isVehicle() && !minecraft.player.isSecondaryUseActive())
+            return LegacyComponents.ATTACH_CHEST;
         if (entity != null && entity.getType() == EntityType.COMMAND_BLOCK_MINECART) {
             if (minecraft.player.canUseGameMasterBlocks())
                 return LegacyComponents.EDIT;
