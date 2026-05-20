@@ -20,6 +20,7 @@
  - `Legacy Clouds Height`
  - `Legacy Zombie Aggression Animation`
  - `Slow Chunk Loading`
+ - `Legacy Entity Distance`
 - Added some options to User Interface section:
   - `Display Realms Button`
   - `Hide Sodium Settings`
@@ -48,6 +49,7 @@
 - Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
 - The leaderboard now globally tracks stats of survival mode players
 	- Due to this the mods button can now only be accessed from advanced game options
+- Added a new Tiny Take-over credits background art, thanks to Cjnator38
 
 ## Parity Changes
 
@@ -75,12 +77,16 @@
 - Head layer items such as mob heads now receive damage tint
 - Host Options command outputs
 - Wandering traders can sell more trades
+- Wandering traders will preview trades like villagers
+- Wandering traders will have llamas when spawned with an egg
 - Adjusted hitbox of tall plants and kelp
+- Adjusted the model in the inventory of various things to match PS4 edition
 - The interact animation will be suppressed on various actions
 - Music and Sound sliders are no longer linked
 - Experience orb and item pick up sound has been pitched up, thanks to Cjnator38
 - Skeleton horses can be ridden without a saddle
 - Spider Jockeys in the nether will become Wither Jockeys
+- Baby zombies have a 15% to become a jockey , they will seek out the nearest rideable mob
 
 ## General Changes
 
@@ -97,6 +103,7 @@
 - Fixed chat scrolling getting stuck
 - Fixed chat position being moved by chat scaling
 - Fixed Crafting tables can't be open with crafting key binding on KBM
+- Fixed missing copper ingot using nugget recipe 
 - Fixed multiline text fields breaks arrow navigation
 - Fixed not being able to sign books with a controller
 - Fixed world Resource Album not being applied in-game when it's direct join
@@ -104,9 +111,10 @@
 - Fixed lag when rendering entities on the screen
 - Fixed enchanting table invalid enchantment text having an incorrect color
 - Fixed crouch toggle resetting when opening a screen
-- Fixed default map size being 3 by default, instead of 1 like in PS4 Edition (only new worlds will be applied)
+- Fixed default map size being 3 by default, instead of 0 like in PS4 Edition (only new worlds will be applied)
 - Fixed Dragon egg teleport particles being random
 - Fixed tnt not applying knockback through blocks (Halloween Mash-up TNT launcher) 
+- Fixed Minecarts having collision with carpets ( Halloween Mash-up Roller Coaster)
 - Fixed y view bobbing not working anymore
 - Fixed Death screen not having the reason
 - Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
