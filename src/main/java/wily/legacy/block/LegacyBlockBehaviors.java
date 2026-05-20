@@ -241,7 +241,7 @@ public class LegacyBlockBehaviors {
                 int dyeColor = LegacyItemUtil.getDyeColor(stackColor);
                 if (be.waterColor == null) be.setWaterColor(dyeColor);
                 else
-                    be.setWaterColor(be.waterColor = LegacyItemUtil.mixColors(List.of(be.waterColor, dyeColor).iterator()));
+                    be.setWaterColor(LegacyItemUtil.mixColors(List.of(be.waterColor, dyeColor).iterator()));
                 be.setChanged();
                 level.sendBlockUpdated(blockPos, blockState, blockState, 3);
 
@@ -290,7 +290,7 @@ public class LegacyBlockBehaviors {
                     if (be.waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/
                         itemStack.remove(DataComponents.DYED_COLOR)/*?}*/;
                     else {
-                        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(be.waterColor));
+                        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(be.waterColor & 0xFFFFFF));
                         level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
                         sendCauldronSplashParticles(level, blockPos);
                     }
