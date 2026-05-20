@@ -122,6 +122,8 @@ public class LegacyComponents {
     public static final Component SHOW_CHAT = Component.translatable("legacy.action.show_chat");
     public static final Component SHOW_CRAFTABLE_RECIPES = Component.translatable("legacy.action.show_craftable_recipes");
     public static final Component SHOW_DESCRIPTION = Component.translatable("legacy.action.show_description");
+    public static final Component SHOW_INGREDIENTS = Component.translatable("legacy.action.show_ingredients");
+    public static final Component SHOW_INVENTORY = Component.translatable("legacy.action.show_inventory");
     public static final Component SHOW_KEYBOARD = Component.translatable("legacy.action.show_keyboard");
     public static final Component SHOW_RESOURCE_PACKS = Component.translatable("legacy.action.show_resource_packs");
     public static final Component SIT = Component.translatable("legacy.action.sit");
@@ -314,6 +316,14 @@ public class LegacyComponents {
 
     public static Component optionName(String key) {
         return Component.translatable("legacy.options." + key);
+    }
+
+    public static Component craftingInfoAction(int infoType) {
+        return switch (infoType) {
+            case 1 -> SHOW_INGREDIENTS;
+            case 2 -> SHOW_INVENTORY;
+            default -> SHOW_DESCRIPTION;
+        };
     }
 
     public static Component getMenuGameRuleName(GameRule<?> key) {

@@ -128,7 +128,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
     public void addControlTooltips(Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.
-                add(EXTRA::get, () -> LegacyComponents.INFO).
+                add(EXTRA::get, () -> LegacyComponents.craftingInfoAction(infoType.get())).
                 add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
                 add(() -> searchMode ? VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
                 add(CONTROL_TAB::get, () -> LegacyComponents.GROUP);
