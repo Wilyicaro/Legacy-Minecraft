@@ -57,6 +57,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.*;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.monster.zombie.ZombieVillager;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
@@ -622,6 +623,8 @@ public interface ControlTooltip {
                 return null;
             }
             // 3-Interactions with specific entities (Piglin barter, bucket, bucketable mobs, cow for milk)
+            if (entity instanceof ZombieVillager zombieVillager && actualItem.is(Items.GOLDEN_APPLE) && !zombieVillager.isConverting())
+                return LegacyComponents.CURE;
             if (entity instanceof Piglin piglin && actualItem.is(Items.GOLD_INGOT) && !piglin.isBaby() && piglin.getOffhandItem().isEmpty())
                 return LegacyComponents.BARTER;
             Set<EntityType<?>> bucketable = Set.of(EntityType.AXOLOTL, EntityType.COD, EntityType.SALMON, EntityType.TROPICAL_FISH, EntityType.PUFFERFISH, EntityType.TADPOLE);

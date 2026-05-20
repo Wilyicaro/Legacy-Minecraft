@@ -1138,6 +1138,7 @@
   "legacy.action.configure": "Configure",
   "legacy.action.cook": "Cook",
   "legacy.action.create": "Create",
+  "legacy.action.cure": "Cure",
   "legacy.action.detach": "Detach",
   "legacy.action.dig_path": "Dig Path",
   "legacy.action.direct": "Direct",
