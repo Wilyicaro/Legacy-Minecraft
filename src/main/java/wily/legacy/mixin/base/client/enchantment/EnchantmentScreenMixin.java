@@ -14,9 +14,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Final;
@@ -31,7 +34,9 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -44,6 +49,31 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
 
 public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
+    }
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this).replace(3, i -> i, this::getQuickMoveLabel);
+    }
+
+    private Component getQuickMoveLabel(Component fallback) {
+        if (hoveredSlot == null || hoveredSlot.getItem().isEmpty() || hoveredSlot.container != minecraft.player.getInventory())
+            return fallback;
+        ItemStack item = hoveredSlot.getItem();
+        if (item.isEnchantable() && menu.getSlot(0).mayPlace(item))
+            return isWeapon(item) ? LegacyComponents.MOVE_WEAPON : isArmor(item) ? LegacyComponents.MOVE_ARMOR : LegacyComponents.MOVE_TOOL;
+        if (menu.getSlot(1).mayPlace(item))
+            return LegacyComponents.MOVE_INGREDIENT;
+        return fallback;
+    }
+
+    private static boolean isArmor(ItemStack item) {
+        return item.is(ItemTags.ARMOR_ENCHANTABLE);
+    }
+
+    private static boolean isWeapon(ItemStack item) {
+        return item.is(ItemTags.SWORDS) || item.is(Items.BOW) || item.is(Items.CROSSBOW) || item.is(Items.TRIDENT) || item.is(Items.MACE);
     }
 
     @Shadow
