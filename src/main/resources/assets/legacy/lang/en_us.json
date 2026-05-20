@@ -1243,6 +1243,8 @@
   "legacy.action.show_chat": "Show Chat",
   "legacy.action.show_craftable_recipes": "Show Craftable Recipes",
   "legacy.action.show_description": "Show Description",
+  "legacy.action.show_ingredients": "Show Ingredients",
+  "legacy.action.show_inventory": "Show Inventory",
   "legacy.action.show_keyboard": "Show Keyboard",
   "legacy.action.show_resource_packs": "Show Resource Packs",
   "legacy.action.show_texture_packs": "Show Texture Packs",
