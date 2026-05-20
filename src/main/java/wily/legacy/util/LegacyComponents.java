@@ -205,6 +205,7 @@ public class LegacyComponents {
     public static final Component FINALIZING = Component.translatable("legacy.menu.savingLevel.finalizing");
     public static final Component SPAWN_EGG_TIP = Component.translatable("item.minecraft.spawn_egg.tip");
     public static final Component MAP_NAME = Component.translatable("legacy.container.mapName");
+    public static final Component BASIC_MAP = Component.translatable("legacy.container.basicMap");
     public static final Component RENAME_MAP = Component.translatable("legacy.container.renameMap");
     public static final Component ZOOM_MAP = Component.translatable("legacy.container.zoomMap");
     public static final Component COPY_MAP = Component.translatable("legacy.container.copyMap");
