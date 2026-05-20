@@ -22,6 +22,7 @@ public class LegacyComponents {
     public static final Component ACTION = Component.translatable("key.attack");
     public static final Component ADD = Component.translatable("legacy.action.add");
     public static final Component ADD_PAGE = Component.translatable("legacy.action.add_page");
+    public static final Component ADD_PATTERN = Component.translatable("legacy.action.add_pattern");
     public static final Component ATTACH = Component.translatable("legacy.action.attach");
     public static final Component ATTACH_CHEST = Component.translatable("legacy.action.attach_chest");
     public static final Component ALL_RECIPES = Component.translatable("legacy.action.all_recipes");
@@ -31,6 +32,7 @@ public class LegacyComponents {
     public static final Component CANCEL = Component.translatable("legacy.action.cancel");
     public static final Component CARVE = Component.translatable("legacy.action.carve");
     public static final Component CHANGE_FILTER = Component.translatable("legacy.action.change_filter");
+    public static final Component CHANGE_GROUP = Component.translatable("legacy.action.change_group");
     public static final Component CHANGE_PITCH = Component.translatable("legacy.action.change_pitch");
     public static final Component CHANGE_POSE = Component.translatable("legacy.action.change_pose");
     public static final Component CHARGE = Component.translatable("legacy.action.charge");
@@ -106,6 +108,7 @@ public class LegacyComponents {
     public static final Component QUICK_MOVE = Component.translatable("legacy.action.quick_move");
     public static final Component RELEASE = Component.translatable("legacy.action.release");
     public static final Component REMOVE = Component.translatable("legacy.action.remove");
+    public static final Component REMOVE_PATTERN = Component.translatable("legacy.action.remove_pattern");
     public static final Component REPAIR = Component.translatable("legacy.action.repair");
     public static final Component RIDE = Component.translatable("legacy.action.ride");
     public static final Component ROTATE = Component.translatable("legacy.action.rotate");

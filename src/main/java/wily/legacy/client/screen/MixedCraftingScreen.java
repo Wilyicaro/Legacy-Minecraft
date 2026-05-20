@@ -131,7 +131,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
                 add(EXTRA::get, () -> LegacyComponents.craftingInfoAction(infoType.get())).
                 add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
                 add(() -> searchMode ? VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
-                add(CONTROL_TAB::get, () -> LegacyComponents.GROUP);
+                add(CONTROL_TAB::get, () -> LegacyComponents.CHANGE_GROUP);
     }
 
     public void resetElements() {
