@@ -20,6 +20,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -255,6 +256,7 @@ public class LegacyBlockBehaviors {
                 putInteractionOrFallback(waterCauldron, legacyDye, interaction);
             }
         }
+        registerDyedWaterCauldronInteraction(waterCauldron);
     }
 
     public static void putInteractionOrFallback(Map<Item, CauldronInteraction> interactionMap, Item item, CauldronInteraction cauldronInteraction) {
@@ -276,7 +278,7 @@ public class LegacyBlockBehaviors {
         BuiltInRegistries.ITEM.asHolderIdMap().forEach(i -> {
             if (!LegacyItemUtil.isDyeableItem(i)) return;
             waterCauldron.put(i.value(), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
-                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !be.hasWater() || (LegacyItemUtil.isDyedItem(itemStack) && be.waterColor == null)) {
+                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !be.hasWater() || (be.waterColor == null && !LegacyItemUtil.isDyedItem(itemStack))) {
                     return defaultPassInteraction();
                 }
 
@@ -284,9 +286,9 @@ public class LegacyBlockBehaviors {
                     player.awardStat(Stats.USE_CAULDRON);
                     player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
                     if (be.waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/
-                        itemStack.set(DataComponents.DYED_COLOR, null)/*?}*/;
+                        itemStack.remove(DataComponents.DYED_COLOR)/*?}*/;
                     else {
-                        LegacyItemUtil.dyeItem(itemStack, be.waterColor);
+                        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(be.waterColor));
                         level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
                         sendCauldronSplashParticles(level, blockPos);
                     }
