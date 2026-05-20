@@ -1012,6 +1012,7 @@
   "legacy.action.adjust": "Adjust",
   "legacy.action.all_recipes": "Show All Recipes",
   "legacy.action.attach": "Attach",
+  "legacy.action.attach_chest": "Attach Chest",
   "legacy.action.barter": "Barter",
   "legacy.action.block": "Block",
   "legacy.action.blow": "Blow",

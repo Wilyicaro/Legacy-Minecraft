@@ -23,6 +23,7 @@ public class LegacyComponents {
     public static final Component ADD = Component.translatable("legacy.action.add");
     public static final Component ADD_PAGE = Component.translatable("legacy.action.add_page");
     public static final Component ATTACH = Component.translatable("legacy.action.attach");
+    public static final Component ATTACH_CHEST = Component.translatable("legacy.action.attach_chest");
     public static final Component ALL_RECIPES = Component.translatable("legacy.action.all_recipes");
     public static final Component BLOCK = Component.translatable("legacy.action.block");
     public static final Component BOOST = Component.translatable("legacy.action.boost");
