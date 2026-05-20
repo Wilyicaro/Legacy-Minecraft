@@ -474,6 +474,8 @@ public interface ControlTooltip {
         }
         if (blockHit != null && blockState != null && blockState.getBlock() instanceof CakeBlock && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
             return LegacyComponents.EAT;
+        if (blockState != null && blockState.getBlock() instanceof SweetBerryBushBlock && blockState.getValue(SweetBerryBushBlock.AGE) > 1)
+            return LegacyComponents.HARVEST;
         if (blockHit != null && blockState != null && minecraft.player.canUseGameMasterBlocks()) {
             if (blockState.getBlock() instanceof CommandBlock)
                 return LegacyComponents.EDIT;
