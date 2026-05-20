@@ -152,8 +152,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
         super.addControlTooltips(renderer);
         renderer.
                 add(OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
-                add(ControlTooltip.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE : null).
-                add(CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.GROUP).
+                add(ControlTooltip.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE_PATTERN : null).
+                add(CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.CHANGE_GROUP).
                 add(CONTROL_TYPE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
     }
 
@@ -347,7 +347,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
         RecipeIconHolder<BannerRecipe> h = new RecipeIconHolder<>(leftPos + 13 + index * 27, topPos + 38) {
             @Override
             public @Nullable Component getAction(Context context) {
-                return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isFocused() && LegacyLoomScreen.this.canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canCraft() ? LegacyComponents.ADD : null);
+                return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isFocused() && LegacyLoomScreen.this.canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canCraft() ? LegacyComponents.ADD_PATTERN : null);
             }
 
             @Override
