@@ -22,6 +22,7 @@ public class AssignProfessionMixin {
 
     @Inject(method = "lambda$create$6", at = @At("RETURN"))
     private static void clearSpawnEggProfessionTag(Villager villager, ServerLevel level, Holder.Reference<?> profession, CallbackInfo ci) {
+        villager.playSound(villager.getNotifyTradeSound(), 1.0f, villager.getVoicePitch());
         villager.removeTag("legacy_spawn_egg_profession");
     }
     //?} else {
@@ -32,6 +33,7 @@ public class AssignProfessionMixin {
 
     @Inject(method = "lambda$create$6", at = @At("RETURN"))
     private static void clearSpawnEggProfessionTag(Villager villager, ServerLevel level, Holder.Reference<?> profession, CallbackInfo ci) {
+        villager.playSound(villager.getNotifyTradeSound(), 1.0f, villager.getVoicePitch());
         villager.removeTag("legacy_spawn_egg_profession");
     }
     *///?}
