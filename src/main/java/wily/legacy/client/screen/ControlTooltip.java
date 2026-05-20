@@ -601,7 +601,7 @@ public interface ControlTooltip {
                 boolean dyedItem = LegacyItemUtil.isDyedItem(actualItem);
                 boolean isDyeable = LegacyItemUtil.isDyeableItem(actualItem.typeHolder());
                 if (isDyeable) {
-                    if (be.waterColor == null && !dyedItem)
+                    if (be.waterColor == null && dyedItem)
                         return LegacyComponents.CLEAN;
                     if (be.waterColor != null)
                         return LegacyComponents.DYE;

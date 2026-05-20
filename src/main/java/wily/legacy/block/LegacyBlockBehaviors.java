@@ -11,11 +11,14 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -24,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -46,6 +50,9 @@ import static net.minecraft.world.level.block.Blocks.CAULDRON;
 import wily.legacy.mixin.base.CauldronInteractionDispatcherAccessor;
 
 public class LegacyBlockBehaviors {
+    private static final TagKey<Item> CAULDRON_CAN_REMOVE_DYE = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("minecraft", "cauldron_can_remove_dye"));
+    private static final TagKey<Item> DYEABLE_ITEMS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("minecraft", "dyeable"));
+
     public static void setup() {
         DispenserBlock.registerProjectileBehavior(Items.TRIDENT);
 
@@ -262,6 +269,7 @@ public class LegacyBlockBehaviors {
                 putInteractionOrFallback(waterCauldron, legacyDye, interaction);
             }
         }
+        registerDyedWaterCauldronInteraction(waterCauldron);
     }
 
     public static void putInteractionOrFallback(CauldronInteraction.Dispatcher dispatcher, Item item, CauldronInteraction cauldronInteraction) {
@@ -281,41 +289,56 @@ public class LegacyBlockBehaviors {
         putInteraction(dispatcher, item, merger.apply(getInteraction(dispatcher, item), interaction));
     }
 
+    public static void mergeInteraction(CauldronInteraction.Dispatcher dispatcher, TagKey<Item> tag, CauldronInteraction interaction, BiFunction<CauldronInteraction, CauldronInteraction, CauldronInteraction> merger) {
+        putInteraction(dispatcher, tag, merger.apply(getInteraction(dispatcher, tag), interaction));
+    }
+
     public static CauldronInteraction getInteraction(CauldronInteraction.Dispatcher dispatcher, Item item) {
         CauldronInteractionDispatcherAccessor accessor = (CauldronInteractionDispatcherAccessor) dispatcher;
         return accessor.legacy$getItems().getOrDefault(item, CauldronInteraction.DEFAULT);
+    }
+
+    public static CauldronInteraction getInteraction(CauldronInteraction.Dispatcher dispatcher, TagKey<Item> tag) {
+        CauldronInteractionDispatcherAccessor accessor = (CauldronInteractionDispatcherAccessor) dispatcher;
+        return accessor.legacy$getTags().getOrDefault(tag, CauldronInteraction.DEFAULT);
     }
 
     public static void putInteraction(CauldronInteraction.Dispatcher dispatcher, Item item, CauldronInteraction interaction) {
         ((CauldronInteractionDispatcherAccessor) dispatcher).legacy$put(item, interaction);
     }
 
-    public static void registerDyedWaterCauldronInteraction(CauldronInteraction.Dispatcher waterCauldron) {
-        if (!LegacyMixinToggles.legacyCauldrons.get()) return;
-        BuiltInRegistries.ITEM.asHolderIdMap().forEach(i -> {
-            if (!LegacyItemUtil.isDyeableItem(i)) return;
-            putInteraction(waterCauldron, i.value(), (blockState, level, blockPos, player, interactionHand, itemStack) -> {
-                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !be.hasWater() || (LegacyItemUtil.isDyedItem(itemStack) && be.waterColor == null)) {
-                    return defaultPassInteraction();
-                }
+    public static void putInteraction(CauldronInteraction.Dispatcher dispatcher, TagKey<Item> tag, CauldronInteraction interaction) {
+        ((CauldronInteractionDispatcherAccessor) dispatcher).legacy$getTags().put(tag, interaction);
+    }
 
-                if (!level.isClientSide()) {
-                    player.awardStat(Stats.USE_CAULDRON);
-                    player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
-                    if (be.waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/
-                        itemStack.set(DataComponents.DYED_COLOR, null)/*?}*/;
-                    else {
-                        LegacyItemUtil.dyeItem(itemStack, be.waterColor);
-                        level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
-                        sendCauldronSplashParticles(level, blockPos);
-                    }
-                    ColoredWaterCauldronBlock.lowerFillLevel(be);
-                    be.setChanged();
-                    level.sendBlockUpdated(blockPos, level.getBlockState(blockPos), level.getBlockState(blockPos), 3);
+    public static void registerDyedWaterCauldronInteraction(CauldronInteraction.Dispatcher waterCauldron) {
+        CauldronInteraction interaction = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !be.hasWater() || (be.waterColor == null && !LegacyItemUtil.isDyedItem(itemStack))) {
+                return defaultPassInteraction();
+            }
+
+            if (!level.isClientSide()) {
+                player.awardStat(Stats.USE_CAULDRON);
+                player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
+                if (be.waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/
+                    itemStack.remove(DataComponents.DYED_COLOR)/*?}*/;
+                else {
+                    itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(be.waterColor));
+                    level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
+                    sendCauldronSplashParticles(level, blockPos);
                 }
-                return successInteraction();
-            });
-        });
+                ColoredWaterCauldronBlock.lowerFillLevel(be);
+                be.setChanged();
+                level.sendBlockUpdated(blockPos, level.getBlockState(blockPos), level.getBlockState(blockPos), 3);
+            }
+            return successInteraction();
+        };
+        BiFunction<CauldronInteraction, CauldronInteraction, CauldronInteraction> merger = (vanilla, legacy) -> (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            InteractionResult result = legacy.interact(blockState, level, blockPos, player, interactionHand, itemStack);
+            return result instanceof InteractionResult.Pass ? vanilla.interact(blockState, level, blockPos, player, interactionHand, itemStack) : result;
+        };
+        mergeInteraction(waterCauldron, CAULDRON_CAN_REMOVE_DYE, interaction, merger);
+        mergeInteraction(waterCauldron, DYEABLE_ITEMS, interaction, merger);
     }
 
     public static InteractionResult fillBucket(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, ItemStack itemStack, ItemStack filledStack, Predicate<BlockState> predicate, SoundEvent soundEvent) {

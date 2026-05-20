@@ -1,7 +1,5 @@
 package wily.legacy;
 
-import net.minecraft.core.cauldron.CauldronInteraction;
-import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -138,7 +136,6 @@ public class Legacy4J {
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
         FactoryEvent.registerCommands(TipCommand::register);
         FactoryEvent.setup(Legacy4J::setup);
-        FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
@@ -163,10 +160,6 @@ public class Legacy4J {
         long p = Math.max(0, Math.max(n, o) - (offset ? 1 : 0));
         long q = Math.min(n, o);
         return Math.max(p, q) < viewDistance;
-    }
-
-    public static void tagsLoaded() {
-        LegacyBlockBehaviors.registerDyedWaterCauldronInteraction(CauldronInteractions.WATER);
     }
 
     public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot) {

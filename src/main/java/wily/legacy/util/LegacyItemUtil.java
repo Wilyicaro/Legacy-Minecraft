@@ -38,7 +38,7 @@ public class LegacyItemUtil {
     }
 
     public static boolean isDyedItem(ItemStack itemStack) {
-        return itemStack.get(DataComponents.DYED_COLOR) == null;
+        return itemStack.has(DataComponents.DYED_COLOR);
     }
 
     public static boolean isDyeableItem(Holder<Item> item) {
