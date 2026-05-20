@@ -116,8 +116,18 @@ public class LegacyItemUtil {
         return itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElse(null);
     }
 
+    public static PotionContents getPotionContents(ItemStack itemStack) {
+        PotionContents contents = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        return contents.potion().isPresent() || contents.hasEffects() ? contents : null;
+    }
+
     public static ItemStack setItemStackPotion(ItemStack stack, Holder<Potion> potion) {
         stack.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
+        return stack;
+    }
+
+    public static ItemStack setItemStackPotion(ItemStack stack, PotionContents contents) {
+        stack.set(DataComponents.POTION_CONTENTS, contents);
         return stack;
     }
 
