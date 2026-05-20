@@ -318,7 +318,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                 add(EXTRA::get, () -> typeTabList.getIndex() == 0 ? LegacyComponents.craftingInfoAction(infoType.get()) : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
                 add(OPTION::get, () -> typeTabList.getIndex() == 0 ? onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES : ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
                 add(CONTROL_TYPE::get, () -> hasTypeTabList() ? LegacyComponents.TYPE : null).
-                add(CONTROL_TAB::get, () -> LegacyComponents.GROUP).
+                add(CONTROL_TAB::get, () -> LegacyComponents.CHANGE_GROUP).
                 add(CONTROL_PAGE::get, () -> page.max > 0 && typeTabList.getIndex() == 0 ? LegacyComponents.PAGE : null);
     }
 
