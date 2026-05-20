@@ -493,7 +493,7 @@ public class Legacy4JClient {
                     }
                     if (blockEntity instanceof WaterCauldronBlockEntity be) {
                         if (!be.hasWater())
-                            return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*//*PotionContents.getColor*//*?} else {*/PotionContents.getColorOptional/*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*/.orElse(-13083194)/*?}*/;
+                            return be.getPotionColor();
                         else if (be.waterColor != null) return be.waterColor;
                     }
                     return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
