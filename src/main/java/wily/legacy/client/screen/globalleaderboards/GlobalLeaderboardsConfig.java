@@ -9,6 +9,7 @@ public final class GlobalLeaderboardsConfig {
    public static GlobalLeaderboardsConfig.Values get() {
       String endpoint = LegacyOptions.globalLeaderboardsEndpoint.get();
       return new GlobalLeaderboardsConfig.Values(
+            LegacyOptions.globalLeaderboardsOptOut.get(),
             endpoint == null ? "" : endpoint.trim(),
             LegacyOptions.globalLeaderboardsSyncOnLaunch.get(),
             LegacyOptions.globalLeaderboardsPrefetchAroundOnLaunch.get(),
@@ -21,9 +22,9 @@ public final class GlobalLeaderboardsConfig {
             LegacyOptions.globalLeaderboardsReadTimeoutSeconds.get());
    }
 
-   public record Values(String endpoint, boolean syncOnLaunch, boolean prefetchAroundOnLaunch, boolean prefetchTopOnLaunch, int aroundWindow, int topLimit, int syncCooldownSeconds, int fetchCooldownSeconds, int connectTimeoutSeconds, int readTimeoutSeconds) {
+   public record Values(boolean optedOut, String endpoint, boolean syncOnLaunch, boolean prefetchAroundOnLaunch, boolean prefetchTopOnLaunch, int aroundWindow, int topLimit, int syncCooldownSeconds, int fetchCooldownSeconds, int connectTimeoutSeconds, int readTimeoutSeconds) {
       public boolean hasEndpoint() {
-         return !this.endpoint.isBlank();
+         return !this.optedOut && !this.endpoint.isBlank();
       }
    }
 }

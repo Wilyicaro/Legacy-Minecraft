@@ -7,8 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import wily.legacy.Legacy4J;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardRow;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardValue;
+import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardCache;
-import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardEntry;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -47,7 +49,10 @@ public final class GlobalLeaderboardCacheStore {
          long lastSyncAt = longValue(root, "lastSyncAt");
          LinkedHashMap<String, GlobalLeaderboardBoardCache> boardCaches = new LinkedHashMap<>();
          JsonObject boardsObject = root.has("boards") && root.get("boards").isJsonObject() ? root.getAsJsonObject("boards") : new JsonObject();
-         boardsObject.entrySet().forEach(entry -> boardCaches.put(entry.getKey(), readBoardCache(entry.getKey(), entry.getValue().getAsJsonObject())));
+         boardsObject.entrySet().forEach(entry -> {
+            GlobalLeaderboardBoardCache cache = readBoardCache(entry.getKey(), entry.getValue().getAsJsonObject());
+            boardCaches.put(cache.key(), cache);
+         });
          return new GlobalLeaderboardCacheStore.State(playerUuid, playerName, updatedAt, lastSyncHash, lastSyncAt, boardCaches);
       } catch (IOException | RuntimeException err) {
          Legacy4J.LOGGER.warn("Failed to read global leaderboard cache {}", path, err);
@@ -83,6 +88,8 @@ public final class GlobalLeaderboardCacheStore {
 
    private static JsonObject toJson(GlobalLeaderboardBoardCache cache) {
       JsonObject root = new JsonObject();
+      root.addProperty("providerId", cache.providerId());
+      root.addProperty("boardId", cache.boardId());
       root.addProperty("displayNameKey", cache.displayNameKey());
       root.addProperty("fetchedAt", cache.fetchedAt());
       root.addProperty("aroundFetchedAt", cache.aroundFetchedAt());
@@ -92,7 +99,7 @@ public final class GlobalLeaderboardCacheStore {
       return root;
    }
 
-   private static JsonArray toJson(List<GlobalLeaderboardEntry> entries) {
+   private static JsonArray toJson(List<GlobalLeaderboardRow> entries) {
       JsonArray array = new JsonArray();
       entries.forEach(entry -> {
          JsonObject object = new JsonObject();
@@ -101,19 +108,32 @@ public final class GlobalLeaderboardCacheStore {
          object.addProperty("playerName", entry.playerName());
          object.addProperty("totalScore", entry.totalScore());
          JsonObject statsObject = new JsonObject();
-         entry.statValues().forEach((statId, value) -> statsObject.addProperty(statId, value));
+         entry.values().forEach((statId, value) -> statsObject.add(statId, valueToJson(value)));
          object.add("statValues", statsObject);
          array.add(object);
       });
       return array;
    }
 
-   private static GlobalLeaderboardBoardCache readBoardCache(String boardId, JsonObject object) {
+   private static GlobalLeaderboardBoardCache readBoardCache(String key, JsonObject object) {
+      String providerId = stringValue(object, "providerId");
+      String boardId = stringValue(object, "boardId");
+      if (providerId.isBlank() || boardId.isBlank()) {
+         String[] parts = key.split("\\|", 2);
+         if (parts.length == 2) {
+            providerId = parts[0];
+            boardId = parts[1];
+         } else {
+            providerId = LegacyLeaderboards.LEGACY_PROVIDER;
+            boardId = key;
+         }
+      }
       String displayNameKey = stringValue(object, "displayNameKey");
       long fetchedAt = longValue(object, "fetchedAt");
       long aroundFetchedAt = longValue(object, "aroundFetchedAt", fetchedAt);
       long topFetchedAt = longValue(object, "topFetchedAt", fetchedAt);
       return new GlobalLeaderboardBoardCache(
+         providerId,
          boardId,
          displayNameKey,
          fetchedAt,
@@ -124,12 +144,12 @@ public final class GlobalLeaderboardCacheStore {
       );
    }
 
-   private static List<GlobalLeaderboardEntry> readEntries(JsonObject root, String key) {
+   private static List<GlobalLeaderboardRow> readEntries(JsonObject root, String key) {
       if (!root.has(key) || !root.get(key).isJsonArray()) {
          return List.of();
       }
 
-      List<GlobalLeaderboardEntry> entries = new ArrayList<>();
+      List<GlobalLeaderboardRow> entries = new ArrayList<>();
       JsonArray array = root.getAsJsonArray(key);
       array.forEach(element -> {
          if (!element.isJsonObject()) {
@@ -137,16 +157,45 @@ public final class GlobalLeaderboardCacheStore {
          }
 
          JsonObject object = element.getAsJsonObject();
-         LinkedHashMap<String, Integer> statValues = new LinkedHashMap<>();
+         LinkedHashMap<String, GlobalLeaderboardValue> statValues = new LinkedHashMap<>();
          JsonObject statsObject = object.has("statValues") && object.get("statValues").isJsonObject() ? object.getAsJsonObject("statValues") : new JsonObject();
-         statsObject.entrySet().forEach(entry -> {
-            if (entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isNumber()) {
-               statValues.put(entry.getKey(), entry.getValue().getAsInt());
-            }
-         });
-         entries.add(new GlobalLeaderboardEntry(intValue(object, "rank", entries.size() + 1), stringValue(object, "playerUuid"), stringValue(object, "playerName"), intValue(object, "totalScore", 0), statValues));
+         statsObject.entrySet().forEach(entry -> statValues.put(entry.getKey(), valueFromJson(entry.getValue())));
+         entries.add(new GlobalLeaderboardRow(intValue(object, "rank", entries.size() + 1), stringValue(object, "playerUuid"), stringValue(object, "playerName"), longValue(object, "totalScore", 0L), statValues));
       });
       return entries;
+   }
+
+   private static JsonElement valueToJson(GlobalLeaderboardValue value) {
+      if (value == null) {
+         return GSON.toJsonTree(0L);
+      }
+      if (!value.hasText()) {
+         return GSON.toJsonTree(value.number());
+      }
+
+      JsonObject object = new JsonObject();
+      object.addProperty("number", value.number());
+      object.addProperty("text", value.text());
+      return object;
+   }
+
+   private static GlobalLeaderboardValue valueFromJson(JsonElement element) {
+      if (element == null || element.isJsonNull()) {
+         return GlobalLeaderboardValue.EMPTY;
+      }
+      if (element.isJsonPrimitive()) {
+         if (element.getAsJsonPrimitive().isNumber()) {
+            return GlobalLeaderboardValue.number(element.getAsLong());
+         }
+         if (element.getAsJsonPrimitive().isString()) {
+            return GlobalLeaderboardValue.text(element.getAsString());
+         }
+      }
+      if (element.isJsonObject()) {
+         JsonObject object = element.getAsJsonObject();
+         return GlobalLeaderboardValue.of(longValue(object, "number", 0L), stringValue(object, "text"));
+      }
+      return GlobalLeaderboardValue.EMPTY;
    }
 
    private static String stringValue(JsonObject root, String key) {

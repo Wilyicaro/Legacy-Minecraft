@@ -1,16 +1,6 @@
 package wily.legacy.client.screen.globalleaderboards;
 
-import wily.legacy.Legacy4J;
-import wily.legacy.client.screen.globalleaderboards.api.GlobalLeaderboardApiClient;
-import wily.legacy.client.screen.globalleaderboards.board.GlobalLeaderboardBoardRegistry;
-import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardCache;
-import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
-import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardEntry;
-import wily.legacy.client.screen.globalleaderboards.screen.GlobalLeaderboardsScreen;
-import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardCacheStore;
-import wily.legacy.client.screen.globalleaderboards.storage.GlobalStatsAggregator;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +16,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.stats.Stat;
 import wily.factoryapi.FactoryAPIClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardBoard;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardPage;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardProvider;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardRequest;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardRow;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardViewMode;
+import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
+import wily.legacy.client.screen.globalleaderboards.api.GlobalLeaderboardApiClient;
+import wily.legacy.client.screen.globalleaderboards.board.GlobalLeaderboardBoardRegistry;
+import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardCache;
+import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
+import wily.legacy.client.screen.globalleaderboards.screen.GlobalLeaderboardsScreen;
+import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardCacheStore;
+import wily.legacy.client.screen.globalleaderboards.storage.GlobalStatsAggregator;
 
 public final class GlobalLeaderboardsFeature {
    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(runnable -> {
@@ -33,14 +39,29 @@ public final class GlobalLeaderboardsFeature {
       thread.setDaemon(true);
       return thread;
    });
+   private static final GlobalLeaderboardProvider LEGACY_PROVIDER = new GlobalLeaderboardProvider() {
+      @Override
+      public String id() {
+         return LegacyLeaderboards.LEGACY_PROVIDER;
+      }
+
+      @Override
+      public CompletableFuture<GlobalLeaderboardPage> fetch(GlobalLeaderboardRequest request) {
+         if (isOptedOut()) {
+            return CompletableFuture.completedFuture(GlobalLeaderboardPage.failed());
+         }
+         return CompletableFuture.completedFuture(apiClient(GlobalLeaderboardsConfig.get()).fetchBoard(request));
+      }
+   };
    private static final Set<String> IN_FLIGHT_REQUESTS = ConcurrentHashMap.newKeySet();
    private static final Map<String, Long> REQUEST_TIMES = new ConcurrentHashMap<>();
    private static final AtomicInteger CACHE_VERSION = new AtomicInteger();
    private static volatile boolean started;
    private static volatile boolean launchTaskScheduled;
+   private static volatile int leaderboardRegistryVersion = -1;
    private static volatile String playerUuid = "";
    private static volatile String playerName = "";
-   private static volatile List<String> boardIds = GlobalLeaderboardBoardRegistry.trackedBoardIds();
+   private static volatile List<GlobalLeaderboardBoard> boards = List.of();
    private static volatile Object2IntOpenHashMap<Stat<?>> aggregateStats = new Object2IntOpenHashMap<>();
    private static volatile Map<String, GlobalLeaderboardBoardSnapshot> boardSnapshots = Map.of();
    private static volatile Map<String, GlobalLeaderboardBoardCache> boardCaches = Map.of();
@@ -58,6 +79,7 @@ public final class GlobalLeaderboardsFeature {
       }
 
       started = true;
+      LegacyLeaderboards.registerProvider(LEGACY_PROVIDER);
       loadCache();
       FactoryAPIClient.setup(GlobalLeaderboardsFeature::onClientStarted);
    }
@@ -67,8 +89,11 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static Screen createScreen(Screen parent, Supplier<Screen> fallback) {
+      if (isOptedOut()) {
+         return fallback.get();
+      }
       try {
-         return new GlobalLeaderboardsScreen(parent);
+         return new GlobalLeaderboardsScreen(parent, fallback);
       } catch (RuntimeException err) {
          Legacy4J.LOGGER.warn("Falling back to legacy leaderboards", err);
          return fallback.get();
@@ -76,6 +101,9 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static synchronized void ensureStarted(Minecraft minecraft) {
+      if (isOptedOut()) {
+         return;
+      }
       String nextPlayerUuid = minecraft.getUser().getProfileId() == null ? "" : minecraft.getUser().getProfileId().toString();
       String nextPlayerName = minecraft.getUser().getName();
       boolean playerChanged = !playerKey(nextPlayerUuid, nextPlayerName).equals(playerKey());
@@ -101,12 +129,21 @@ public final class GlobalLeaderboardsFeature {
       return CACHE_VERSION.get();
    }
 
+   public static List<GlobalLeaderboardBoard> boards() {
+      return boards;
+   }
+
    public static List<String> boardIds() {
-      return boardIds;
+      return boards.stream().map(GlobalLeaderboardBoard::id).toList();
+   }
+
+   public static GlobalLeaderboardBoard board(int index) {
+      return index >= 0 && index < boards.size() ? boards.get(index) : null;
    }
 
    public static String boardId(int index) {
-      return index >= 0 && index < boardIds.size() ? boardIds.get(index) : GlobalLeaderboardBoardRegistry.boardId(index);
+      GlobalLeaderboardBoard board = board(index);
+      return board == null ? "board_" + index : board.id();
    }
 
    public static String playerUuid() {
@@ -125,35 +162,83 @@ public final class GlobalLeaderboardsFeature {
       return boardSnapshots;
    }
 
+   public static GlobalLeaderboardBoardSnapshot boardSnapshot(GlobalLeaderboardBoard board) {
+      return board == null ? null : boardSnapshots.get(board.key());
+   }
+
    public static GlobalLeaderboardBoardSnapshot boardSnapshot(String boardId) {
-      return boardSnapshots.get(boardId);
+      return boardSnapshots.get(GlobalLeaderboardBoard.key(LegacyLeaderboards.LEGACY_PROVIDER, boardId));
    }
 
-   public static GlobalLeaderboardBoardCache boardCache(String boardId) {
-      return boardCaches.get(boardId);
+   public static GlobalLeaderboardBoardCache boardCache(GlobalLeaderboardBoard board) {
+      return board == null ? null : boardCaches.get(board.key());
    }
 
-   public static List<GlobalLeaderboardEntry> entries(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode) {
-      GlobalLeaderboardBoardCache cache = boardCaches.get(boardId);
+   public static List<GlobalLeaderboardRow> entries(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
+      GlobalLeaderboardBoardCache cache = boardCache(board);
       if (cache == null) {
          return List.of();
       }
 
-      return viewMode == GlobalLeaderboardsScreen.ViewMode.TOP ? cache.topEntries() : cache.aroundEntries();
+      return viewMode == GlobalLeaderboardViewMode.TOP ? cache.topEntries() : cache.aroundEntries();
    }
 
    public static boolean hasEndpoint() {
       return GlobalLeaderboardsConfig.get().hasEndpoint();
    }
 
-   public static void requestBoard(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode) {
-      GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
-      if (!shouldRequestBoard(boardId, viewMode, config)) {
+   public static boolean isOptedOut() {
+      return LegacyOptions.globalLeaderboardsOptOut.get();
+   }
+
+   public static void optOut() {
+      LegacyOptions.globalLeaderboardsOptOut.set(true);
+      LegacyOptions.globalLeaderboardsOptOut.save();
+      launchTaskScheduled = false;
+      IN_FLIGHT_REQUESTS.clear();
+      REQUEST_TIMES.clear();
+      apiConfig = null;
+      apiClient = null;
+      CACHE_VERSION.incrementAndGet();
+   }
+
+   public static void optIn() {
+      LegacyOptions.globalLeaderboardsOptOut.set(false);
+      LegacyOptions.globalLeaderboardsOptOut.save();
+      launchTaskScheduled = false;
+      CACHE_VERSION.incrementAndGet();
+      ensureStarted(Minecraft.getInstance());
+   }
+
+   public static void setEnabled(boolean enabled) {
+      if (enabled) {
+         optIn();
+      } else {
+         optOut();
+      }
+   }
+
+   public static void refreshBoards(Minecraft minecraft) {
+      GlobalLeaderboardBoardRegistry.registerBuiltInBoards(minecraft);
+      int version = LegacyLeaderboards.version();
+      if (version == leaderboardRegistryVersion) {
          return;
       }
 
-      String requestKey = requestKey(boardId, viewMode);
+      boards = LegacyLeaderboards.boards();
+      leaderboardRegistryVersion = version;
+      boardSnapshots = Map.copyOf(GlobalLeaderboardBoardRegistry.buildSnapshots(aggregateStats, boards));
+      CACHE_VERSION.incrementAndGet();
+   }
+
+   public static void requestBoard(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
+      if (isOptedOut() || !shouldRequestBoard(board, viewMode)) {
+         return;
+      }
+
+      String requestKey = requestKey(board, viewMode);
       String requestPlayerUuid = playerUuid;
+      String requestPlayerName = playerName;
       String requestPlayerKey = playerKey();
       if (!IN_FLIGHT_REQUESTS.add(requestKey)) {
          return;
@@ -161,14 +246,43 @@ public final class GlobalLeaderboardsFeature {
       REQUEST_TIMES.put(requestKey, System.currentTimeMillis());
 
       CompletableFuture.runAsync(() -> {
-         try {
-            GlobalLeaderboardApiClient.FetchResult result = apiClient(config).fetchBoard(boardId, requestPlayerUuid, viewMode, config.aroundWindow(), config.topLimit());
-            if (result.successful() && requestPlayerKey.equals(playerKey())) {
-               mergeBoardCache(boardId, viewMode, result.entries());
-            }
-         } finally {
+         if (isOptedOut()) {
             IN_FLIGHT_REQUESTS.remove(requestKey);
+            return;
          }
+         GlobalLeaderboardProvider provider = LegacyLeaderboards.provider(board.providerId());
+         if (provider == null) {
+            IN_FLIGHT_REQUESTS.remove(requestKey);
+            return;
+         }
+
+         GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
+         GlobalLeaderboardRequest request = new GlobalLeaderboardRequest(board, viewMode, requestPlayerUuid, requestPlayerName, config.aroundWindow(), config.topLimit());
+         CompletableFuture<GlobalLeaderboardPage> future;
+         try {
+            future = provider.fetch(request);
+         } catch (RuntimeException err) {
+            Legacy4J.LOGGER.warn("Failed to request global leaderboard board {}", board.id(), err);
+            IN_FLIGHT_REQUESTS.remove(requestKey);
+            return;
+         }
+         if (future == null) {
+            Legacy4J.LOGGER.warn("Global leaderboard provider {} returned no request for board {}", board.providerId(), board.id());
+            IN_FLIGHT_REQUESTS.remove(requestKey);
+            return;
+         }
+
+         future.whenComplete((page, err) -> {
+            try {
+               if (err != null) {
+                  Legacy4J.LOGGER.warn("Failed to fetch global leaderboard board {}", board.id(), err);
+               } else if (!isOptedOut() && page != null && page.successful() && requestPlayerKey.equals(playerKey())) {
+                  mergeBoardCache(board, viewMode, page.rows());
+               }
+            } finally {
+               IN_FLIGHT_REQUESTS.remove(requestKey);
+            }
+         });
       }, EXECUTOR);
    }
 
@@ -184,10 +298,12 @@ public final class GlobalLeaderboardsFeature {
 
    private static void startupSync(Minecraft minecraft) {
       try {
+         if (isOptedOut()) {
+            return;
+         }
          aggregateStats = GlobalStatsAggregator.aggregateSurvivalStats(minecraft);
-         GlobalLeaderboardBoardRegistry.ensureStatsBoards(minecraft);
-         boardIds = List.copyOf(GlobalLeaderboardBoardRegistry.loadBoardIds(minecraft));
-         boardSnapshots = Map.copyOf(GlobalLeaderboardBoardRegistry.buildSnapshots(aggregateStats, boardIds));
+         refreshBoards(minecraft);
+         boardSnapshots = Map.copyOf(GlobalLeaderboardBoardRegistry.buildSnapshots(aggregateStats, boards));
          Legacy4J.LOGGER.debug("Global leaderboards startup aggregated {} stats into {} board snapshots", aggregateStats.size(), boardSnapshots.size());
          GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
          if (config.syncOnLaunch()) {
@@ -195,16 +311,16 @@ public final class GlobalLeaderboardsFeature {
          }
 
          if (config.prefetchAroundOnLaunch()) {
-            String initialBoardId = initialBoardId();
-            if (!initialBoardId.isBlank()) {
-               requestBoard(initialBoardId, GlobalLeaderboardsScreen.ViewMode.AROUND_ME);
+            GlobalLeaderboardBoard initialBoard = initialBoard();
+            if (initialBoard != null) {
+               requestBoard(initialBoard, GlobalLeaderboardViewMode.AROUND_ME);
             }
          }
 
          if (config.prefetchTopOnLaunch()) {
-            String initialBoardId = initialBoardId();
-            if (!initialBoardId.isBlank()) {
-               requestBoard(initialBoardId, GlobalLeaderboardsScreen.ViewMode.TOP);
+            GlobalLeaderboardBoard initialBoard = initialBoard();
+            if (initialBoard != null) {
+               requestBoard(initialBoard, GlobalLeaderboardViewMode.TOP);
             }
          }
       } catch (Exception err) {
@@ -215,21 +331,34 @@ public final class GlobalLeaderboardsFeature {
       }
    }
 
-   private static String initialBoardId() {
-      int defaultBoard = GlobalLeaderboardBoardRegistry.defaultBoardIndex();
-      if (defaultBoard >= 0 && defaultBoard < boardIds.size()) {
-         return boardIds.get(defaultBoard);
+   private static GlobalLeaderboardBoard initialBoard() {
+      for (GlobalLeaderboardBoard board : boards) {
+         if (GlobalLeaderboardBoardRegistry.defaultBoardId().equals(board.id()) && !board.columns().isEmpty()) {
+            return board;
+         }
       }
 
-      if (!boardSnapshots.isEmpty()) {
-         return new ArrayList<>(boardSnapshots.keySet()).getFirst();
+      for (GlobalLeaderboardBoard board : boards) {
+         if (!board.columns().isEmpty()) {
+            return board;
+         }
       }
 
-      return boardIds.isEmpty() ? "" : boardIds.getFirst();
+      return boards.isEmpty() ? null : boards.getFirst();
    }
 
    private static void syncChangedBoards(GlobalLeaderboardsConfig.Values config) {
-      String syncHash = String.valueOf(Objects.hash(playerUuid, playerName, boardSnapshots));
+      if (isOptedOut()) {
+         return;
+      }
+      LinkedHashMap<String, GlobalLeaderboardBoardSnapshot> legacySnapshots = new LinkedHashMap<>();
+      boardSnapshots.forEach((key, snapshot) -> {
+         if (key.startsWith(LegacyLeaderboards.LEGACY_PROVIDER + "|")) {
+            legacySnapshots.put(key, snapshot);
+         }
+      });
+
+      String syncHash = String.valueOf(Objects.hash(playerUuid, playerName, legacySnapshots));
       if (syncHash.equals(lastSyncHash)) {
          return;
       }
@@ -240,7 +369,11 @@ public final class GlobalLeaderboardsFeature {
          return;
       }
 
-      if (apiClient(config).syncBoards(playerUuid, playerName, boardSnapshots)) {
+      if (isOptedOut()) {
+         return;
+      }
+
+      if (apiClient(config).syncBoards(playerUuid, playerName, legacySnapshots)) {
          lastSyncHash = syncHash;
          lastSyncAt = now;
       }
@@ -261,40 +394,39 @@ public final class GlobalLeaderboardsFeature {
       }
    }
 
-   private static boolean shouldRequestBoard(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode, GlobalLeaderboardsConfig.Values config) {
-      if (!config.hasEndpoint() || boardId.isBlank()) {
+   private static boolean shouldRequestBoard(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
+      if (board == null || board.id().isBlank() || LegacyLeaderboards.provider(board.providerId()) == null) {
          return false;
       }
 
-      String requestKey = requestKey(boardId, viewMode);
+      String requestKey = requestKey(board, viewMode);
       long now = System.currentTimeMillis();
-      long cooldown = Math.max(0, config.fetchCooldownSeconds()) * 1000L;
+      long cooldown = Math.max(0, GlobalLeaderboardsConfig.get().fetchCooldownSeconds()) * 1000L;
       Long requestedAt = REQUEST_TIMES.get(requestKey);
       if (requestedAt != null && now - requestedAt < cooldown) {
          return false;
       }
 
-      GlobalLeaderboardBoardCache cache = boardCaches.get(boardId);
+      GlobalLeaderboardBoardCache cache = boardCaches.get(board.key());
       if (cache == null) {
          return true;
       }
 
-      long fetchedAt = viewMode == GlobalLeaderboardsScreen.ViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
+      long fetchedAt = viewMode == GlobalLeaderboardViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
       return fetchedAt <= 0 || now - fetchedAt >= cooldown;
    }
 
-   private static synchronized void mergeBoardCache(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode, List<GlobalLeaderboardEntry> entries) {
+   private static synchronized void mergeBoardCache(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, List<GlobalLeaderboardRow> entries) {
       LinkedHashMap<String, GlobalLeaderboardBoardCache> merged = new LinkedHashMap<>(boardCaches);
-      GlobalLeaderboardBoardCache existing = merged.get(boardId);
-      String displayNameKey = boardSnapshots.containsKey(boardId) ? boardSnapshots.get(boardId).displayNameKey() : boardId;
+      GlobalLeaderboardBoardCache existing = merged.get(board.key());
       if (existing == null) {
-         existing = new GlobalLeaderboardBoardCache(boardId, displayNameKey, System.currentTimeMillis(), List.of(), List.of());
+         existing = new GlobalLeaderboardBoardCache(board.providerId(), board.id(), board.id(), System.currentTimeMillis(), List.of(), List.of());
       }
 
-      GlobalLeaderboardBoardCache updated = viewMode == GlobalLeaderboardsScreen.ViewMode.TOP
+      GlobalLeaderboardBoardCache updated = viewMode == GlobalLeaderboardViewMode.TOP
          ? existing.withTopEntries(entries, System.currentTimeMillis())
          : existing.withAroundEntries(entries, System.currentTimeMillis());
-      merged.put(boardId, updated);
+      merged.put(board.key(), updated);
       boardCaches = Map.copyOf(merged);
       persistCache();
       CACHE_VERSION.incrementAndGet();
@@ -304,8 +436,8 @@ public final class GlobalLeaderboardsFeature {
       GlobalLeaderboardCacheStore.save(new GlobalLeaderboardCacheStore.State(playerUuid, playerName, System.currentTimeMillis(), lastSyncHash, lastSyncAt, boardCaches));
    }
 
-   private static String requestKey(String boardId, GlobalLeaderboardsScreen.ViewMode viewMode) {
-      return viewMode == GlobalLeaderboardsScreen.ViewMode.AROUND_ME ? boardId + "|" + viewMode.name() + "|" + playerKey() : boardId + "|" + viewMode.name();
+   private static String requestKey(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
+      return viewMode == GlobalLeaderboardViewMode.AROUND_ME ? board.key() + "|" + viewMode.name() + "|" + playerKey() : board.key() + "|" + viewMode.name();
    }
 
    private static String playerKey() {

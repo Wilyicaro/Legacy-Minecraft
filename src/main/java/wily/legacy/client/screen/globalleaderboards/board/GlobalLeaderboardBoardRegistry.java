@@ -4,6 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardBoard;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardColumn;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardIcon;
+import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
 import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardStatCodec;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -24,6 +28,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
@@ -50,6 +55,7 @@ public final class GlobalLeaderboardBoardRegistry {
    private static final List<String> TRAVEL_STATS = List.of("walk_one_cm", "fall_one_cm", "minecart_one_cm", "boat_one_cm");
    private static final List<String> GENERAL_STATS = List.of("play_time", "total_world_time", "time_since_death", "time_since_rest");
    private static volatile List<LeaderboardsScreen.StatsBoard> statsBoards = List.of();
+   private static volatile Map<String, LeaderboardsScreen.StatsBoard> statsBoardsById = Map.of();
 
    private GlobalLeaderboardBoardRegistry() {
    }
@@ -71,6 +77,10 @@ public final class GlobalLeaderboardBoardRegistry {
       return TRACKED_BOARD_IDS.indexOf(TRAVELLING_BOARD);
    }
 
+   public static String defaultBoardId() {
+      return TRAVELLING_BOARD;
+   }
+
    public static List<LeaderboardsScreen.StatsBoard> statsBoards() {
       return statsBoards;
    }
@@ -79,17 +89,38 @@ public final class GlobalLeaderboardBoardRegistry {
       return index >= 0 && index < statsBoards.size() ? statsBoards.get(index) : null;
    }
 
-   public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Object2IntMap<Stat<?>> aggregateStats, List<String> boardIds) {
+   public static LeaderboardsScreen.StatsBoard statsBoard(String boardId) {
+      return statsBoardsById.get(boardId);
+   }
+
+   public static void registerBuiltInBoards(Minecraft minecraft) {
+      ensureStatsBoards(Minecraft.getInstance());
+      ensureTrackedBoardStats(Minecraft.getInstance());
+      for (int i = 0; i < TRACKED_BOARD_IDS.size(); i++) {
+         String boardId = TRACKED_BOARD_IDS.get(i);
+         LeaderboardsScreen.StatsBoard statsBoard = statsBoardsById.get(boardId);
+         if (statsBoard != null) {
+            LegacyLeaderboards.registerBoard(createBuiltInBoard(boardId, i, statsBoard));
+         }
+      }
+   }
+
+   public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Object2IntMap<Stat<?>> aggregateStats, List<GlobalLeaderboardBoard> boards) {
       ensureStatsBoards(Minecraft.getInstance());
       LinkedHashMap<String, GlobalLeaderboardBoardSnapshot> snapshots = new LinkedHashMap<>();
       ensureTrackedBoardStats(Minecraft.getInstance());
 
-      for (int i = 0; i < statsBoards.size(); i++) {
-         LeaderboardsScreen.StatsBoard board = statsBoards.get(i);
-         String boardId = i < TRACKED_BOARD_IDS.size() ? boardId(i) : i < boardIds.size() ? boardIds.get(i) : "board_" + i;
+      for (GlobalLeaderboardBoard board : boards) {
+         if (!LegacyLeaderboards.LEGACY_PROVIDER.equals(board.providerId())) {
+            continue;
+         }
+         LeaderboardsScreen.StatsBoard statsBoard = statsBoardsById.get(board.id());
+         if (statsBoard == null) {
+            continue;
+         }
          LinkedHashMap<String, Integer> encodedStats = new LinkedHashMap<>();
          int total = 0;
-         for (Stat<?> stat : board.statsList) {
+         for (Stat<?> stat : statsBoard.statsList) {
             int value = aggregateStats.getInt(stat);
             if (value <= 0) {
                continue;
@@ -101,7 +132,7 @@ public final class GlobalLeaderboardBoardRegistry {
                total += value;
             }
          }
-         snapshots.put(boardId, new GlobalLeaderboardBoardSnapshot(boardId, boardId, total, encodedStats));
+         snapshots.put(board.key(), new GlobalLeaderboardBoardSnapshot(board.id(), board.id(), total, encodedStats));
       }
 
       return snapshots;
@@ -142,6 +173,11 @@ public final class GlobalLeaderboardBoardRegistry {
          }
          if (!boards.isEmpty()) {
             statsBoards = List.copyOf(boards);
+            LinkedHashMap<String, LeaderboardsScreen.StatsBoard> byId = new LinkedHashMap<>();
+            for (int i = 0; i < statsBoards.size() && i < TRACKED_BOARD_IDS.size(); i++) {
+               byId.put(TRACKED_BOARD_IDS.get(i), statsBoards.get(i));
+            }
+            statsBoardsById = Map.copyOf(byId);
          }
       } catch (IOException | RuntimeException err) {
          Legacy4J.LOGGER.warn("Failed to load global leaderboard boards", err);
@@ -214,6 +250,38 @@ public final class GlobalLeaderboardBoardRegistry {
          case GENERAL_BOARD -> stat -> hasValuePath(stat, GENERAL_STATS);
          default -> stat -> false;
       };
+   }
+
+   private static GlobalLeaderboardBoard createBuiltInBoard(String boardId, int order, LeaderboardsScreen.StatsBoard statsBoard) {
+      ArrayList<GlobalLeaderboardColumn> columns = new ArrayList<>();
+      for (Stat<?> stat : statsBoard.statsList) {
+         String id = GlobalLeaderboardStatCodec.encode(stat);
+         if (!id.isBlank()) {
+            columns.add(new GlobalLeaderboardColumn(id, statName(stat), GlobalLeaderboardIcon.custom((width, height) -> statsBoard.getRenderable(stat)), value -> Component.literal(stat.format(statValue(value)))));
+         }
+      }
+      return new GlobalLeaderboardBoard(LegacyLeaderboards.LEGACY_PROVIDER, boardId, statsBoard.displayName, order, columns);
+   }
+
+   private static Component statName(Stat<?> stat) {
+      Object value = stat.getValue();
+      if (value instanceof EntityType<?> entityType) {
+         return entityType.getDescription();
+      }
+      if (value instanceof ItemLike item && item.asItem() != Items.AIR) {
+         return Component.translatable(item.asItem().getDescriptionId());
+      }
+      return Component.translatable("stat." + value.toString().replace(':', '.'));
+   }
+
+   private static int statValue(long value) {
+      if (value > Integer.MAX_VALUE) {
+         return Integer.MAX_VALUE;
+      }
+      if (value < Integer.MIN_VALUE) {
+         return Integer.MIN_VALUE;
+      }
+      return (int) value;
    }
 
    @SuppressWarnings({"rawtypes", "unchecked"})
