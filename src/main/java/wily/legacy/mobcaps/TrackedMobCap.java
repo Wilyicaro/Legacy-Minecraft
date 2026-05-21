@@ -8,6 +8,7 @@ enum TrackedMobCap {
     MONSTERS(50, 0, 70),
     AMBIENT(20, 0, 28),
     SQUIDS(16, 0, 24),
+    PHANTOMS(5, 0, 5),
     VILLAGERS(0, 35, 50),
     SNOW_GOLEMS(0, 0, 16),
     IRON_GOLEMS(0, 0, 16),

@@ -57,6 +57,9 @@ public final class ConsoleMobCaps {
         if (type == EntityType.VILLAGER) {
             return TrackedMobCap.VILLAGERS;
         }
+        if (type == EntityType.PHANTOM) {
+            return TrackedMobCap.PHANTOMS;
+        }
         if (type == EntityType.ARMOR_STAND) {
             return TrackedMobCap.ARMOR_STANDS;
         }
@@ -162,6 +165,9 @@ public final class ConsoleMobCaps {
         if (type == EntityType.GHAST) {
             return tracker.count(type) < 4;
         }
+        if (bucket == TrackedMobCap.PHANTOMS) {
+            return tracker.count(bucket) < bucket.naturalLimit();
+        }
         if (type == EntityType.ENDERMAN && Level.END.equals(level.dimension())) {
             int endermanCap = TrackedMobCap.MONSTERS.naturalLimit();
             if (level.getDifficulty() == Difficulty.NORMAL) {
@@ -208,6 +214,9 @@ public final class ConsoleMobCaps {
         }
         if (bucket == TrackedMobCap.VILLAGERS && tracker.count(TrackedMobCap.VILLAGERS) >= TrackedMobCap.VILLAGERS.manualLimit()) {
             return MAX_VILLAGERS_SPAWNED;
+        }
+        if (bucket == TrackedMobCap.PHANTOMS && tracker.count(bucket) >= bucket.manualLimit()) {
+            return MAX_ENEMIES_SPAWNED;
         }
         if (bucket == TrackedMobCap.MONSTERS && tracker.count(TrackedMobCap.MONSTERS) >= TrackedMobCap.MONSTERS.manualLimit()) {
             return MAX_ENEMIES_SPAWNED;
