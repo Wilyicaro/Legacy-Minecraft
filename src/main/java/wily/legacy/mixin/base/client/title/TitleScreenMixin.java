@@ -32,6 +32,7 @@ import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.client.ContentManager;
 import wily.legacy.util.LegacyComponents;
 
@@ -70,8 +71,10 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
                 }
             } else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
-        Button modButton;
-        modButton = Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
+        boolean optedOut = GlobalLeaderboardsFeature.isOptedOut();
+        Button modButton = optedOut
+                ? Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build()
+                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
         if (LegacyOptions.legacySettingsMenus.get()) {
             renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
         }
