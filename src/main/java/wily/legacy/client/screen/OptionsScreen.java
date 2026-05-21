@@ -27,6 +27,7 @@ import wily.factoryapi.base.client.FactoryOptions;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyComponents;
 
@@ -218,6 +219,15 @@ public class OptionsScreen extends PanelVListScreen {
                 b -> FactoryConfigWidgets.getCachedTooltip(LegacyOptions.displayPackManagementTooltips.getDisplay().tooltip().apply(b)),
                 t -> FactoryConfig.saveOptionAndConsume(LegacyOptions.displayPackManagementTooltips, t.selected, v -> {}),
                 LegacyOptions.displayPackManagementTooltips::get);
+    }
+
+    private static TickBox createGlobalLeaderboardsTickBox() {
+        return new TickBox(0, 0, 200,
+                !GlobalLeaderboardsFeature.isOptedOut(),
+                b -> Component.translatable("legacy.options.globalLeaderboards"),
+                b -> FactoryConfigWidgets.getCachedTooltip(Component.translatable("legacy.options.globalLeaderboards.tooltip")),
+                t -> GlobalLeaderboardsFeature.setEnabled(t.selected),
+                () -> !GlobalLeaderboardsFeature.isOptedOut());
     }
 
     static AbstractWidget createLegacyGraphicsPresetWidget(boolean active) {
@@ -429,7 +439,8 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.misc"),
                                 LegacyOptions.of(mc.options.realmsNotifications()),
-                                LegacyOptions.of(mc.options.allowServerListing())),
+                                LegacyOptions.of(mc.options.allowServerListing()))
+                                .addRenderable(createGlobalLeaderboardsTickBox()),
                         o -> o.renderableVList.addRenderables(
                                 RenderableVListScreen.openScreenButton(LegacyComponents.RESET_KNOWN_BLOCKS_TITLE, () -> ConfirmationScreen.createResetKnownListingScreen(o, LegacyComponents.RESET_KNOWN_BLOCKS_TITLE, LegacyComponents.RESET_KNOWN_BLOCKS_MESSAGE, Legacy4JClient.knownBlocks)).build(),
                                 RenderableVListScreen.openScreenButton(LegacyComponents.RESET_KNOWN_ENTITIES_TITLE, () -> ConfirmationScreen.createResetKnownListingScreen(o, LegacyComponents.RESET_KNOWN_ENTITIES_TITLE, LegacyComponents.RESET_KNOWN_ENTITIES_MESSAGE, Legacy4JClient.knownEntities)).build()))));

@@ -100,11 +100,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     public static Screen getActualLeaderboardsScreenInstance(Screen parent) {
-        return LegacyOptions.legacyLeaderboards.get() ? GlobalLeaderboardsFeature.createScreen(parent, () -> new LeaderboardsScreen(parent)) : new StatsScreen(parent, Minecraft.getInstance().player.getStats());
+        if (!LegacyOptions.legacyLeaderboards.get())
+            return new StatsScreen(parent, Minecraft.getInstance().player.getStats());
+        return GlobalLeaderboardsFeature.isOptedOut() ? new LeaderboardsScreen(parent) : GlobalLeaderboardsFeature.createScreen(parent, () -> new LeaderboardsScreen(parent));
     }
 
     public static Screen getOverallLeaderboardsScreenInstance(Screen parent) {
-        return LegacyOptions.legacyLeaderboards.get() ? GlobalLeaderboardsFeature.createScreen(parent, () -> getOverallFallbackLeaderboardsScreenInstance(parent)) : getOverallFallbackLeaderboardsScreenInstance(parent);
+        return LegacyOptions.legacyLeaderboards.get() && !GlobalLeaderboardsFeature.isOptedOut() ? GlobalLeaderboardsFeature.createScreen(parent, () -> getOverallFallbackLeaderboardsScreenInstance(parent)) : getOverallFallbackLeaderboardsScreenInstance(parent);
     }
 
     public static Screen getOverallFallbackLeaderboardsScreenInstance(Screen parent) {

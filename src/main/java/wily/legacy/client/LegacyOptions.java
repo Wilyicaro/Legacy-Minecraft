@@ -201,6 +201,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyCreativeTab = CLIENT_STORAGE.register(createBoolean("creativeTab", true));
     public static final FactoryConfig<Boolean> legacyAdvancements = CLIENT_STORAGE.register(createBoolean("advancements", true));
     public static final FactoryConfig<Boolean> legacyLeaderboards = CLIENT_STORAGE.register(createBoolean("leaderboards", true));
+    public static final FactoryConfig<Boolean> globalLeaderboardsOptOut = FactoryConfig.<Boolean>builder().key("globalLeaderboardsOptOut").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> globalLeaderboardsEndpoint = FactoryConfig.<String>builder().key("globalLeaderboardsEndpoint").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("https://l4j-global-leaderboards-api.creepereater201.workers.dev").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> globalLeaderboardsSyncOnLaunch = FactoryConfig.<Boolean>builder().key("globalLeaderboardsSyncOnLaunch").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(true).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> globalLeaderboardsPrefetchAroundOnLaunch = FactoryConfig.<Boolean>builder().key("globalLeaderboardsPrefetchAroundOnLaunch").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
