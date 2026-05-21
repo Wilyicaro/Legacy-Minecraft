@@ -1,10 +1,18 @@
 package wily.legacy.mixin.base;
 
+import net.minecraft.core.GlobalPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.ai.Brain;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.item.trading.TradeSet;
@@ -23,9 +31,34 @@ public abstract class VillagerMixin implements LegacyVillager {
     private int legacy$offersBeforeTradeUpdate;
     @Unique
     private int legacy$levelBeforeTradeUpdate;
+    @Unique
+    private boolean legacy$trackedPoiMemories;
+    @Unique
+    private boolean legacy$wasSleeping;
+    @Unique
+    private GlobalPos legacy$home;
+    @Unique
+    private GlobalPos legacy$jobSite;
+    @Unique
+    private GlobalPos legacy$meetingPoint;
 
     @Shadow
     public abstract VillagerData getVillagerData();
+
+    @Shadow
+    public abstract Brain<Villager> getBrain();
+
+    @Shadow
+    public abstract boolean isSleeping();
+
+    @Shadow
+    public abstract void playSound(SoundEvent soundEvent, float volume, float pitch);
+
+    @Shadow
+    protected abstract float getVoicePitch();
+
+    @Shadow
+    public abstract SoundEvent getNotifyTradeSound();
 
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
     private void legacy$reuseLockedTrades(ServerLevel level, CallbackInfo ci) {
@@ -43,6 +76,37 @@ public abstract class VillagerMixin implements LegacyVillager {
         MerchantOffers offers = legacy$getOffers();
         legacy$setOfferLevel(offers, legacy$offersBeforeTradeUpdate, legacy$levelBeforeTradeUpdate);
         legacy$addLockedTrades(level, offers, legacy$levelBeforeTradeUpdate);
+    }
+
+    @Inject(method = "customServerAiStep", at = @At("TAIL"))
+    private void legacy$playPoiFeedbackSounds(ServerLevel level, CallbackInfo ci) {
+        Brain<?> brain = getBrain();
+        GlobalPos home = brain.getMemory(MemoryModuleType.HOME).orElse(null);
+        GlobalPos jobSite = brain.getMemory(MemoryModuleType.JOB_SITE).orElse(null);
+        GlobalPos meetingPoint = brain.getMemory(MemoryModuleType.MEETING_POINT).orElse(null);
+        if (!legacy$trackedPoiMemories) {
+            legacy$home = home;
+            legacy$jobSite = jobSite;
+            legacy$meetingPoint = meetingPoint;
+            legacy$wasSleeping = isSleeping();
+            legacy$trackedPoiMemories = true;
+            return;
+        }
+
+        if (legacy$home != null && home == null || legacy$jobSite != null && jobSite == null || legacy$meetingPoint != null && meetingPoint == null) {
+            playSound(SoundEvents.VILLAGER_NO, 1.0f, getVoicePitch());
+        } else if (legacy$home == null && home != null && legacy$hasNearbyBell(level, home)) {
+            playSound(getNotifyTradeSound(), 1.0f, getVoicePitch());
+        }
+
+        if (legacy$wasSleeping && !isSleeping() && brain.isActive(Activity.REST)) {
+            playSound(SoundEvents.VILLAGER_NO, 1.0f, getVoicePitch());
+        }
+
+        legacy$home = home;
+        legacy$jobSite = jobSite;
+        legacy$meetingPoint = meetingPoint;
+        legacy$wasSleeping = isSleeping();
     }
 
     @Override
@@ -76,6 +140,14 @@ public abstract class VillagerMixin implements LegacyVillager {
     @Unique
     private MerchantOffers legacy$getOffers() {
         return ((Villager) (Object) this).getOffers();
+    }
+
+    @Unique
+    private boolean legacy$hasNearbyBell(ServerLevel level, GlobalPos home) {
+        if (home.dimension() != level.dimension()) {
+            return false;
+        }
+        return getBrain().hasMemoryValue(MemoryModuleType.MEETING_POINT) || level.getPoiManager().findClosest(poi -> poi.is(PoiTypes.MEETING), home.pos(), 48, PoiManager.Occupancy.ANY).isPresent();
     }
 
     @Unique
