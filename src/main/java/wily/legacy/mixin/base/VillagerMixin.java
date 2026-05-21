@@ -2,12 +2,19 @@ package wily.legacy.mixin.base;
 
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.Brain;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.npc.*;
 import net.minecraft.world.entity.npc.villager.*;
+import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
@@ -31,6 +38,16 @@ import java.util.Optional;
 
 @Mixin(Villager.class)
 public abstract class VillagerMixin extends AbstractVillager {
+    @Unique
+    private boolean legacy$trackedPoiMemories;
+    @Unique
+    private boolean legacy$wasSleeping;
+    @Unique
+    private GlobalPos legacy$home;
+    @Unique
+    private GlobalPos legacy$jobSite;
+    @Unique
+    private GlobalPos legacy$meetingPoint;
 
     public VillagerMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
@@ -104,6 +121,45 @@ public abstract class VillagerMixin extends AbstractVillager {
     @Unique
     protected MerchantOffer getDecayArrowTrade(ServerLevel level, Entity trader, net.minecraft.util.RandomSource randomSource) {
         return new MerchantOffer(new ItemCost(Items.ARROW, 5), Optional.of(new ItemCost(Items.EMERALD, 2)), LegacyItemUtil.createDecayTippedArrow().copyWithCount(5), 12, 30, 0.2f);
+    }
+
+    @Inject(method = "customServerAiStep", at = @At("TAIL"))
+    private void customServerAiStep(ServerLevel level, CallbackInfo ci) {
+        Brain<?> brain = this.getBrain();
+        GlobalPos home = brain.getMemory(MemoryModuleType.HOME).orElse(null);
+        GlobalPos jobSite = brain.getMemory(MemoryModuleType.JOB_SITE).orElse(null);
+        GlobalPos meetingPoint = brain.getMemory(MemoryModuleType.MEETING_POINT).orElse(null);
+        if (!legacy$trackedPoiMemories) {
+            legacy$home = home;
+            legacy$jobSite = jobSite;
+            legacy$meetingPoint = meetingPoint;
+            legacy$wasSleeping = isSleeping();
+            legacy$trackedPoiMemories = true;
+            return;
+        }
+
+        if (legacy$home != null && home == null || legacy$jobSite != null && jobSite == null || legacy$meetingPoint != null && meetingPoint == null) {
+            playSound(SoundEvents.VILLAGER_NO, 1.0f, getVoicePitch());
+        } else if (legacy$home == null && home != null && legacy$hasNearbyBell(level, home)) {
+            playSound(getNotifyTradeSound(), 1.0f, getVoicePitch());
+        }
+
+        if (legacy$wasSleeping && !isSleeping() && brain.isActive(Activity.REST)) {
+            playSound(SoundEvents.VILLAGER_NO, 1.0f, getVoicePitch());
+        }
+
+        legacy$home = home;
+        legacy$jobSite = jobSite;
+        legacy$meetingPoint = meetingPoint;
+        legacy$wasSleeping = isSleeping();
+    }
+
+    @Unique
+    private boolean legacy$hasNearbyBell(ServerLevel level, GlobalPos home) {
+        if (home.dimension() != level.dimension()) {
+            return false;
+        }
+        return getBrain().hasMemoryValue(MemoryModuleType.MEETING_POINT) || level.getPoiManager().findClosest(poi -> poi.is(PoiTypes.MEETING), home.pos(), 48, PoiManager.Occupancy.ANY).isPresent();
     }
   
     @Inject(method = "getBreedOffspring*", at = @At("HEAD"), cancellable = true)
