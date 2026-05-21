@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -192,12 +192,12 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          String rank = Integer.toString(row.rank() > 0 ? row.rank() : this.rows.indexOf(row) + 1);
          this.renderableVList.renderables.add(new AbstractWidget(0, 0, 551, 20, Component.literal(row.playerName())) {
             @Override
-            protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+            protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                FactoryGuiGraphics.of(graphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON, getX(), getY(), getWidth(), getHeight());
                LegacyFontUtil.applySDFont(fontOverride -> {
-                  graphics.text(font, rank, getX() + accessor.getInteger("renderableVList.buttonRank.x", 40) - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                  graphics.text(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                  graphics.drawString(font, rank, getX() + accessor.getInteger("renderableVList.buttonRank.x", 40) - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                  graphics.drawString(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
 
                   int added = 0;
                   Component hoveredValue = null;
@@ -212,7 +212,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
                      SimpleLayoutRenderable renderable = renderables.get(index);
                      int w = font.width(value);
                      int valueX = renderable.getX() + (renderable.getWidth() - w) / 2;
-                     graphics.text(font, value, valueX, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                     graphics.drawString(font, value, valueX, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                      if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, valueX, getY(), w, getHeight())) {
                         hoveredValue = value;
                      }
@@ -279,14 +279,14 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.text(this.font, filter, 0, 0, 0xFFFFFFFF);
+            graphics.drawString(this.font, filter, 0, 0, 0xFFFFFFFF);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
             graphics.pose().translate(boardTooltipX + (boardTooltipWidth - this.font.width(board.displayName()) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("boardText.y", 6));
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.text(this.font, board.displayName(), 0, 0, 0xFFFFFFFF);
+            graphics.drawString(this.font, board.displayName(), 0, 0, 0xFFFFFFFF);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
             Component entries = Component.translatable("legacy.menu.leaderboard.entries", this.rows.size());
@@ -294,20 +294,20 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.text(this.font, entries, 0, 0, 0xFFFFFFFF);
+            graphics.drawString(this.font, entries, 0, 0, 0xFFFFFFFF);
             graphics.pose().popMatrix();
          });
          if (board.columns().isEmpty()) {
             graphics.pose().pushMatrix();
             graphics.pose().translate(this.panel.x + (this.panel.width - this.font.width(NO_RESULTS) * 1.5f) / 2f, this.panel.y + (this.panel.height - 13.5f) / 2f);
             graphics.pose().scale(1.5f, 1.5f);
-            graphics.text(this.font, NO_RESULTS, 0, 0, CommonColor.GRAY_TEXT.get(), false);
+            graphics.drawString(this.font, NO_RESULTS, 0, 0, CommonColor.GRAY_TEXT.get(), false);
             graphics.pose().popMatrix();
             return;
          }
          LegacyFontUtil.applySDFont(fontOverride -> {
-            graphics.text(this.font, RANK, this.panel.x + this.accessor.getInteger("rankText.x", 40), this.panel.y + this.accessor.getInteger("rankText.y", 20), CommonColor.GRAY_TEXT.get(), false);
-            graphics.text(this.font, USERNAME, this.panel.x + this.accessor.getInteger("usernameText.x", 108), this.panel.y + this.accessor.getInteger("usernameText.y", 20), CommonColor.GRAY_TEXT.get(), false);
+            graphics.drawString(this.font, RANK, this.panel.x + this.accessor.getInteger("rankText.x", 40), this.panel.y + this.accessor.getInteger("rankText.y", 20), CommonColor.GRAY_TEXT.get(), false);
+            graphics.drawString(this.font, USERNAME, this.panel.x + this.accessor.getInteger("usernameText.x", 108), this.panel.y + this.accessor.getInteger("usernameText.y", 20), CommonColor.GRAY_TEXT.get(), false);
          });
 
          int statsBoardX = this.accessor.getInteger("statsBoard.x", 182);
@@ -350,7 +350,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          for (int index = this.page; index < this.page + this.statsInScreen; index++) {
             SimpleLayoutRenderable renderable = renderables.get(index);
             renderable.setPosition(this.panel.x + statsBoardX + x, this.panel.y + statsBoardY - renderable.height / 2);
-            renderable.extractRenderState(graphics, mouseX, mouseY, delta);
+            renderable.render(graphics, mouseX, mouseY, delta);
             if (renderable.isHovered(mouseX, mouseY)) {
                hovered = index;
             }

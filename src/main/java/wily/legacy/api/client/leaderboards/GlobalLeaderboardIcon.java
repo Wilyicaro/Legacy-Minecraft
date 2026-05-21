@@ -2,7 +2,7 @@ package wily.legacy.api.client.leaderboards;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -41,7 +41,7 @@ public interface GlobalLeaderboardIcon {
       return (width, height) -> LegacyIconHolder.entityHolder(0, 0, width, height, entityType);
    }
 
-   static GlobalLeaderboardIcon sprite(Identifier sprite) {
+   static GlobalLeaderboardIcon sprite(ResourceLocation sprite) {
       Objects.requireNonNull(sprite, "sprite");
       return (width, height) -> {
          LegacyIconHolder holder = new LegacyIconHolder(width, height);
