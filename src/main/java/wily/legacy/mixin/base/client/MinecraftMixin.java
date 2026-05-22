@@ -22,7 +22,6 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
@@ -33,16 +32,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -62,7 +57,6 @@ import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.network.ServerPlayerShieldPausePayload;
-import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -204,27 +198,6 @@ public abstract class MinecraftMixin {
     @Inject(method = "continueAttack", at = @At("HEAD"))
     private void continueAttack(boolean bl, CallbackInfo ci) {
         if (bl) legacy$pauseShield();
-    }
-
-    @Inject(method = "pick", at = @At("RETURN"))
-    private void pick(float tickDelta, CallbackInfo ci) {
-        if (level == null || player == null || !(hitResult instanceof BlockHitResult blockHit)) return;
-        if (LegacyBlockProtection.blocksNetherPortalBreak(level.getBlockState(blockHit.getBlockPos()))) {
-            hitResult = legacy$pickThroughNetherPortal(tickDelta);
-        }
-    }
-
-    @Unique
-    private HitResult legacy$pickThroughNetherPortal(float tickDelta) {
-        Vec3 from = player.getEyePosition(tickDelta);
-        Vec3 to = from.add(player.getViewVector(tickDelta).scale(player.blockInteractionRange()));
-        return level.clip(new ClipContext(from, to, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player) {
-            @Override
-            public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
-                if (LegacyBlockProtection.blocksNetherPortalBreak(state)) return Shapes.empty();
-                return super.getBlockShape(state, level, pos);
-            }
-        });
     }
 
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)

@@ -9,11 +9,21 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -24,6 +34,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.ScreenshotToast;
 import wily.legacy.entity.PlayerYBobbing;
+import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.nio.file.Files;
@@ -68,6 +79,27 @@ public abstract class GameRendererMixin {
     @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(FZLorg/joml/Matrix4f;)V"))
     private boolean renderLevel(GameRenderer instance, float matrix4fstack, boolean b, Matrix4f f) {
         return LegacyOptions.displayHand.get();
+    }
+
+    @Inject(method = "pick", at = @At("RETURN"))
+    private void pick(float tickDelta, CallbackInfo ci) {
+        if (minecraft.level == null || minecraft.player == null || !(minecraft.hitResult instanceof BlockHitResult blockHit)) return;
+        if (LegacyBlockProtection.blocksNetherPortalBreak(minecraft.level.getBlockState(blockHit.getBlockPos()))) {
+            minecraft.hitResult = legacy$pickThroughNetherPortal(tickDelta);
+        }
+    }
+
+    @Unique
+    private HitResult legacy$pickThroughNetherPortal(float tickDelta) {
+        Vec3 from = minecraft.player.getEyePosition(tickDelta);
+        Vec3 to = from.add(minecraft.player.getViewVector(tickDelta).scale(minecraft.player.blockInteractionRange()));
+        return minecraft.level.clip(new ClipContext(from, to, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, minecraft.player) {
+            @Override
+            public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
+                if (LegacyBlockProtection.blocksNetherPortalBreak(state)) return Shapes.empty();
+                return super.getBlockShape(state, level, pos);
+            }
+        });
     }
 
     @ModifyExpressionValue(method = "tryTakeScreenshotIfNeeded", at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/client/renderer/GameRenderer;hasWorldScreenshot:Z"))
