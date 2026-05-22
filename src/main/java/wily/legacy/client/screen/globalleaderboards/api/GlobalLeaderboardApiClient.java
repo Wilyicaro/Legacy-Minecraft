@@ -146,7 +146,7 @@ public final class GlobalLeaderboardApiClient {
       try {
          HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
          if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            Legacy4J.LOGGER.warn("Global leaderboard sync failed with status {} and body {}", response.statusCode(), response.body());
+            Legacy4J.LOGGER.warn("Global leaderboard sync failed with status {}", response.statusCode());
             return false;
          } else {
             Legacy4J.LOGGER.debug("Global leaderboard sync completed with status {}", response.statusCode());

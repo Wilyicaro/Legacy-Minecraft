@@ -357,6 +357,9 @@ public final class GlobalLeaderboardsFeature {
             legacySnapshots.put(key, snapshot);
          }
       });
+      if (legacySnapshots.values().stream().noneMatch(snapshot -> snapshot.totalScore() > 0 && !snapshot.statValues().isEmpty())) {
+         return;
+      }
 
       String syncHash = String.valueOf(Objects.hash(playerUuid, playerName, legacySnapshots));
       if (syncHash.equals(lastSyncHash)) {
@@ -373,9 +376,9 @@ public final class GlobalLeaderboardsFeature {
          return;
       }
 
+      lastSyncAt = now;
       if (apiClient(config).syncBoards(playerUuid, playerName, legacySnapshots)) {
          lastSyncHash = syncHash;
-         lastSyncAt = now;
       }
    }
 
