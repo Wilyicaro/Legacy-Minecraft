@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
@@ -48,18 +49,6 @@ public abstract class VillagerMixin implements LegacyVillager {
     @Shadow
     public abstract Brain<Villager> getBrain();
 
-    @Shadow
-    public abstract boolean isSleeping();
-
-    @Shadow
-    public abstract void playSound(SoundEvent soundEvent, float volume, float pitch);
-
-    @Shadow
-    protected abstract float getVoicePitch();
-
-    @Shadow
-    public abstract SoundEvent getNotifyTradeSound();
-
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
     private void legacy$reuseLockedTrades(ServerLevel level, CallbackInfo ci) {
         MerchantOffers offers = legacy$getOffers();
@@ -88,25 +77,25 @@ public abstract class VillagerMixin implements LegacyVillager {
             legacy$home = home;
             legacy$jobSite = jobSite;
             legacy$meetingPoint = meetingPoint;
-            legacy$wasSleeping = isSleeping();
+            legacy$wasSleeping = legacy$isSleeping();
             legacy$trackedPoiMemories = true;
             return;
         }
 
         if (legacy$home != null && home == null || legacy$jobSite != null && jobSite == null || legacy$meetingPoint != null && meetingPoint == null) {
-            playSound(SoundEvents.VILLAGER_NO, 1.0f, getVoicePitch());
+            legacy$playSound(SoundEvents.VILLAGER_NO, 1.0f, legacy$getVoicePitch());
         } else if (legacy$home == null && home != null && legacy$hasNearbyBell(level, home)) {
-            playSound(getNotifyTradeSound(), 1.0f, getVoicePitch());
+            legacy$playSound(legacy$getNotifyTradeSound(), 1.0f, legacy$getVoicePitch());
         }
 
-        if (legacy$wasSleeping && !isSleeping() && brain.isActive(Activity.REST)) {
-            playSound(SoundEvents.VILLAGER_NO, 1.0f, getVoicePitch());
+        if (legacy$wasSleeping && !legacy$isSleeping() && brain.isActive(Activity.REST)) {
+            legacy$playSound(SoundEvents.VILLAGER_NO, 1.0f, legacy$getVoicePitch());
         }
 
         legacy$home = home;
         legacy$jobSite = jobSite;
         legacy$meetingPoint = meetingPoint;
-        legacy$wasSleeping = isSleeping();
+        legacy$wasSleeping = legacy$isSleeping();
     }
 
     @Override
@@ -140,6 +129,26 @@ public abstract class VillagerMixin implements LegacyVillager {
     @Unique
     private MerchantOffers legacy$getOffers() {
         return ((Villager) (Object) this).getOffers();
+    }
+
+    @Unique
+    private boolean legacy$isSleeping() {
+        return ((Villager) (Object) this).isSleeping();
+    }
+
+    @Unique
+    private void legacy$playSound(SoundEvent sound, float volume, float pitch) {
+        ((Villager) (Object) this).playSound(sound, volume, pitch);
+    }
+
+    @Unique
+    private float legacy$getVoicePitch() {
+        return ((LivingEntity) (Object) this).getVoicePitch();
+    }
+
+    @Unique
+    private SoundEvent legacy$getNotifyTradeSound() {
+        return ((Villager) (Object) this).getNotifyTradeSound();
     }
 
     @Unique
