@@ -2,15 +2,30 @@ package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.level.BlockAndLightGetter;
+import net.minecraft.world.level.block.state.BlockState;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.SkyRenderer;
 //?}
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.LegacyChunkLoading;
 import wily.legacy.client.LevelRendererAccessor;
 
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin implements LevelRendererAccessor {
+    @Inject(method = "getLightCoords(Lnet/minecraft/client/renderer/LevelRenderer$BrightnessGetter;Lnet/minecraft/world/level/BlockAndLightGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I", at = @At("RETURN"), cancellable = true)
+    private static void getLightCoords(LevelRenderer.BrightnessGetter brightnessGetter, BlockAndLightGetter level, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
+        if (LegacyChunkLoading.hasPendingFeatures(pos)) {
+            cir.setReturnValue(LightCoordsUtil.max(cir.getReturnValue(), LightCoordsUtil.FULL_SKY));
+        }
+    }
+
     //? if <1.21.2 {
     /*@Shadow protected abstract void createLightSky();
 

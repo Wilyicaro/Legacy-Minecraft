@@ -616,6 +616,9 @@ public class Legacy4JClient {
     }
 
     public static BlockStateModel getBlockModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
+        BlockStateModel featureModel = LegacyChunkLoading.getFeatureModel(pos, blockState, model);
+        if (featureModel != model) return featureModel;
+
         BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
         if (torchModel != model) return torchModel;
 
