@@ -25,6 +25,7 @@
     //? if fabric {
     //?}
     "client.SectionOcclusionGraphMixin",
+    "client.RenderSectionRegionMixin",
     "client.LevelEventHandlerMixin",
     "client.DragonEggBlockMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
