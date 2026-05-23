@@ -23,6 +23,7 @@
     "client.TerrainRenderContextMixin",
     //?}
     "client.SectionOcclusionGraphMixin",
+    "client.RenderSectionRegionMixin",
     "client.LevelEventHandlerMixin",
     "client.DragonEggBlockMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
