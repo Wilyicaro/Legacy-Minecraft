@@ -93,8 +93,7 @@ public final class LegacyChunkLoading {
         }
 
         if (Util.getMillis() >= readyAt) {
-            featureReadyAt.remove(section);
-            hiddenFeatureSections.remove(section);
+            finishFeatureDelay(section);
             return model;
         }
 
@@ -114,8 +113,7 @@ public final class LegacyChunkLoading {
         }
 
         if (Util.getMillis() >= readyAt) {
-            featureReadyAt.remove(section);
-            hiddenFeatureSections.remove(section);
+            finishFeatureDelay(section);
             return state;
         }
 
@@ -150,7 +148,7 @@ public final class LegacyChunkLoading {
             }
             if (section.getBoundingBox().distanceToSqr(center) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE) {
                 pending.remove(key);
-                revealed.add(key);
+                reveal(key);
             } else {
                 pending.add(key);
             }
@@ -191,9 +189,26 @@ public final class LegacyChunkLoading {
         for (long key : nearest) {
             if (key != Long.MIN_VALUE) {
                 pending.remove(key);
-                revealed.add(key);
+                reveal(key);
                 featureReadyAt.put(key, Util.getMillis() + delayMillis(key));
             }
+        }
+    }
+
+    private static void reveal(long section) {
+        if (revealed.add(section)) {
+            markDirty(section);
+        }
+    }
+
+    private static void markDirty(long section) {
+        Minecraft.getInstance().levelRenderer.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));
+    }
+
+    private static void finishFeatureDelay(long section) {
+        featureReadyAt.remove(section);
+        if (hiddenFeatureSections.remove(section)) {
+            markDirty(section);
         }
     }
 
@@ -235,7 +250,7 @@ public final class LegacyChunkLoading {
 
             iterator.remove();
             featureReadyAt.remove(section);
-            minecraft.levelRenderer.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));
+            markDirty(section);
         }
     }
 
