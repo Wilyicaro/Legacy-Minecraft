@@ -6,13 +6,15 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.SingleVariant;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
-import net.minecraft.util.RandomSource;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -125,7 +127,7 @@ public final class LegacyChunkLoading {
         }
 
         hiddenFeatureSections.add(section);
-        return hiddenFeatureModels.computeIfAbsent(model, HiddenFeatureModel::new);
+        return hiddenFeatureModels.computeIfAbsent(model, HiddenFeatureModel::create);
     }
 
     public static synchronized BlockState getFeatureState(BlockPos pos, BlockState state) {
@@ -386,19 +388,21 @@ public final class LegacyChunkLoading {
         return dx * dx + dy * dy + dz * dz;
     }
 
-    private record HiddenFeatureModel(BlockStateModel source) implements BlockStateModel {
-        @Override
-        public void collectParts(RandomSource randomSource, List<BlockStateModelPart> parts) {
+    private record HiddenFeatureModel(BlockStateModel source) implements BlockModelPart {
+        private static BlockStateModel create(BlockStateModel source) {
+            return new SingleVariant(new HiddenFeatureModel(source));
         }
 
-        @Override
-        public Material.Baked particleMaterial() {
-            return source.particleMaterial();
+        public List<BakedQuad> getQuads(Direction direction) {
+            return List.of();
         }
 
-        @Override
-        public int materialFlags() {
-            return source.materialFlags();
+        public boolean useAmbientOcclusion() {
+            return false;
+        }
+
+        public TextureAtlasSprite particleIcon() {
+            return source.particleIcon();
         }
     }
 }

@@ -2,9 +2,9 @@ package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.world.level.BlockAndLightGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.SkyRenderer;
@@ -19,10 +19,10 @@ import wily.legacy.client.LevelRendererAccessor;
 
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin implements LevelRendererAccessor {
-    @Inject(method = "getLightCoords(Lnet/minecraft/client/renderer/LevelRenderer$BrightnessGetter;Lnet/minecraft/world/level/BlockAndLightGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I", at = @At("RETURN"), cancellable = true)
-    private static void getLightCoords(LevelRenderer.BrightnessGetter brightnessGetter, BlockAndLightGetter level, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "getLightColor(Lnet/minecraft/client/renderer/LevelRenderer$BrightnessGetter;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I", at = @At("RETURN"), cancellable = true)
+    private static void getLightColor(LevelRenderer.BrightnessGetter brightnessGetter, BlockAndTintGetter level, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if (LegacyChunkLoading.hasPendingFeatures(pos)) {
-            cir.setReturnValue(LightCoordsUtil.max(cir.getReturnValue(), LightCoordsUtil.FULL_SKY));
+            cir.setReturnValue(LightTexture.pack(LightTexture.block(cir.getReturnValue()), 15));
         }
     }
 
