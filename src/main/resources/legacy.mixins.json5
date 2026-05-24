@@ -15,6 +15,7 @@
     "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.BlockRendererMixin",
     "compat.sodium.OcclusionCullerMixin",
+    "compat.sodium.LevelSliceMixin",
     //?}
     //? (fabric || >=1.21 && neoforge && <26.1) {
     /*"compat.sodium.OcclusionCullerMixin",
