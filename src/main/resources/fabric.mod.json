@@ -30,6 +30,9 @@
   "mixins": [
     "${mod_id}.mixins.json"
   ],
+  "sodium:options": {
+    "mixin.features.render.world.clouds": false
+  },
   "depends": {
     "fabric-api": "*",
     "factory_api": ">=${factory_api_version}",

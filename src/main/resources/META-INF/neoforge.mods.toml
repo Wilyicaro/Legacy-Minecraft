@@ -12,6 +12,10 @@ logoFile="logo.png"
 authors="${mod_authors}"
 description="${mod_description}"
 credits="${mod_credits}"
+
+[mods."sodium:options"]
+"mixin.features.render.world.clouds" = false
+
 [[mixins]]
 config="${mod_id}.mixins.json"
 
