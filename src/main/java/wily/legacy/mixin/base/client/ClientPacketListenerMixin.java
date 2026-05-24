@@ -64,8 +64,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     }
 
     @ModifyArg(method = "handleTakeItemEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 1), index = 6)
-    public float handleTakeItemEntity(float pitch) {
-        return 3.0f;
+    public float handleTakeItemEntityPitch(float pitch) {
+        return Math.max(2.0f, Math.min(4.0f, 3.0f + (pitch - 2.0f) / 1.4f));
     }
 
     @ModifyArg(method = "handleTakeItemEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 1), index = 5)
