@@ -12,13 +12,12 @@ import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import wily.legacy.util.LegacyTags;
 
 import java.util.Arrays;
 import java.util.List;
@@ -356,22 +355,7 @@ public final class LegacyChunkLoading {
     }
 
     private static boolean isFeatureState(BlockState state) {
-        if (state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.is(BlockTags.SAPLINGS) || state.is(BlockTags.FLOWERS)) {
-            return true;
-        }
-        if (state.is(BlockTags.PLANKS) || state.is(BlockTags.WOODEN_STAIRS) || state.is(BlockTags.WOODEN_SLABS) || state.is(BlockTags.WOODEN_FENCES)) {
-            return true;
-        }
-        if (state.is(BlockTags.FENCE_GATES) || state.is(BlockTags.WOODEN_DOORS) || state.is(BlockTags.WOODEN_TRAPDOORS) || state.is(BlockTags.STONE_BRICKS) || state.is(BlockTags.WALLS)) {
-            return true;
-        }
-
-        Block block = state.getBlock();
-        return block == Blocks.SHORT_GRASS || block == Blocks.TALL_GRASS || block == Blocks.FERN || block == Blocks.LARGE_FERN
-                || block == Blocks.BROWN_MUSHROOM || block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM_BLOCK || block == Blocks.RED_MUSHROOM_BLOCK || block == Blocks.MUSHROOM_STEM
-                || block == Blocks.SNOW
-                || block == Blocks.COBBLESTONE || block == Blocks.MOSSY_COBBLESTONE || block == Blocks.BOOKSHELF || block == Blocks.CHEST
-                || block == Blocks.TORCH || block == Blocks.WALL_TORCH || block == Blocks.LANTERN || block == Blocks.RAIL || block == Blocks.COBWEB || block == Blocks.IRON_BARS || block == Blocks.GLASS_PANE;
+        return state.is(LegacyTags.SLOW_CHUNK_FEATURES);
     }
 
     private static boolean isRevealed(SectionRenderDispatcher.RenderSection section) {
