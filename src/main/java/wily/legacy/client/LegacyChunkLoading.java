@@ -78,7 +78,7 @@ public final class LegacyChunkLoading {
         refreshFeatures(minecraft);
         visible.removeIf(section -> !isRevealed(section));
         nearby.removeIf(section -> !isRevealed(section));
-        return !pending.isEmpty() || !hiddenFeatureSections.isEmpty();
+        return !pending.isEmpty() || !featureReadyAt.isEmpty();
     }
 
     public static synchronized boolean filterSection(long key, int originX, int originY, int originZ, double cameraX, double cameraY, double cameraZ) {
@@ -257,9 +257,8 @@ public final class LegacyChunkLoading {
 
     private static void finishFeatureDelay(long section) {
         featureReadyAt.remove(section);
-        if (hiddenFeatureSections.remove(section)) {
-            markDirty(section);
-        }
+        hiddenFeatureSections.remove(section);
+        markDirtyAround(section);
     }
 
     private static int delayMillis(long section) {
@@ -285,23 +284,36 @@ public final class LegacyChunkLoading {
     }
 
     private static void refreshFeatures(Minecraft minecraft) {
-        if (hiddenFeatureSections.isEmpty()) {
+        if (featureReadyAt.isEmpty()) {
             return;
         }
 
         long now = Util.getMillis();
-        LongIterator iterator = hiddenFeatureSections.iterator();
+        LongIterator iterator = featureReadyAt.keySet().iterator();
         while (iterator.hasNext()) {
             long section = iterator.nextLong();
             long readyAt = featureReadyAt.get(section);
-            if (readyAt != 0 && now < readyAt) {
+            if (now < readyAt) {
                 continue;
             }
 
             iterator.remove();
-            featureReadyAt.remove(section);
-            markDirty(section);
+            hiddenFeatureSections.remove(section);
+            markDirtyAround(section);
         }
+    }
+
+    private static void markDirtyAround(long section) {
+        int x = SectionPos.x(section);
+        int y = SectionPos.y(section);
+        int z = SectionPos.z(section);
+        for (int dy = -1; dy <= 1; dy++) {
+            markDirty(SectionPos.asLong(x, y + dy, z));
+        }
+        markDirty(SectionPos.asLong(x - 1, y, z));
+        markDirty(SectionPos.asLong(x + 1, y, z));
+        markDirty(SectionPos.asLong(x, y, z - 1));
+        markDirty(SectionPos.asLong(x, y, z + 1));
     }
 
     private static int revealBudget() {
