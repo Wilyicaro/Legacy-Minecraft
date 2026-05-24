@@ -81,6 +81,34 @@ public final class LegacyChunkLoading {
         return !pending.isEmpty() || !hiddenFeatureSections.isEmpty();
     }
 
+    public static synchronized boolean filterSection(long key, int originX, int originY, int originZ, double cameraX, double cameraY, double cameraZ) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Entity cameraEntity = minecraft.getCameraEntity();
+        if (!LegacyOptions.slowChunkLoading.get() || minecraft.level == null || cameraEntity == null) {
+            reset();
+            return true;
+        }
+
+        if (level != minecraft.level) {
+            reset();
+            level = minecraft.level;
+        }
+
+        collect(key, originX, originY, originZ, cameraX, cameraY, cameraZ);
+
+        long step = Util.getMillis() / STEP_MILLIS;
+        if (step != lastStep) {
+            int steps = stepCount(step);
+            lastStep = step;
+            long centerSection = SectionPos.asLong(cameraEntity.blockPosition());
+            trim(centerSection, minecraft.options.renderDistance().get() + EXTRA_TRIM_DISTANCE);
+            reveal(centerSection, steps);
+        }
+
+        refreshFeatures(minecraft);
+        return revealed.contains(key);
+    }
+
     public static synchronized BlockStateModel getFeatureModel(BlockPos pos, BlockState state, BlockStateModel model) {
         if (!LegacyOptions.slowChunkLoading.get() || !isFeatureState(state)) {
             return model;
@@ -195,6 +223,18 @@ public final class LegacyChunkLoading {
         }
     }
 
+    private static void collect(long key, int originX, int originY, int originZ, double cameraX, double cameraY, double cameraZ) {
+        if (revealed.contains(key)) {
+            return;
+        }
+        if (distanceToSectionSqr(originX, originY, originZ, cameraX, cameraY, cameraZ) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE) {
+            pending.remove(key);
+            reveal(key);
+        } else {
+            pending.add(key);
+        }
+    }
+
     private static void reveal(long section) {
         if (revealed.add(section)) {
             markDirty(section);
@@ -202,7 +242,17 @@ public final class LegacyChunkLoading {
     }
 
     private static void markDirty(long section) {
-        Minecraft.getInstance().levelRenderer.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));
+        Minecraft minecraft = Minecraft.getInstance();
+        Runnable dirty = () -> {
+            if (minecraft.level != null) {
+                minecraft.levelRenderer.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));
+            }
+        };
+        if (minecraft.isSameThread()) {
+            dirty.run();
+        } else {
+            minecraft.execute(dirty);
+        }
     }
 
     private static void finishFeatureDelay(long section) {
@@ -331,6 +381,13 @@ public final class LegacyChunkLoading {
         int y = SectionPos.y(key) - SectionPos.y(centerSection);
         int z = SectionPos.z(key) - SectionPos.z(centerSection);
         return x * x + y * y * 4 + z * z;
+    }
+
+    private static double distanceToSectionSqr(int originX, int originY, int originZ, double x, double y, double z) {
+        double dx = Math.max(Math.max(originX - x, 0.0), x - (originX + 16));
+        double dy = Math.max(Math.max(originY - y, 0.0), y - (originY + 16));
+        double dz = Math.max(Math.max(originZ - z, 0.0), z - (originZ + 16));
+        return dx * dx + dy * dy + dz * dz;
     }
 
     private record HiddenFeatureModel(BlockStateModel source) implements BlockStateModel {
