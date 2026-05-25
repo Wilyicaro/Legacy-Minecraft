@@ -104,7 +104,7 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
         if (!pack.hasWorldTemplate()) return true;
         Path path = downloadedPackPath(pack.id());
         if (!Files.isRegularFile(path)) return false;
-        return pack.worldTemplateCheckSum().map(s -> s.equals(ContentManager.readFileCheckSum(path))).orElse(true);
+        return pack.activeWorldTemplateCheckSum().map(s -> s.equals(ContentManager.readFileCheckSum(path))).orElse(true);
     }
 
     public static void downloadDownloadedPack(ContentManager.Pack pack) throws IOException {
@@ -112,12 +112,12 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
         Path path = downloadedPackPath(pack.id());
         Path temp = Files.createTempFile("legacy_world_", ".mcsave");
         try {
-            try (InputStream stream = pack.worldTemplateDownloadURI().orElseThrow().toURL().openStream()) {
+            try (InputStream stream = pack.activeWorldTemplateDownloadURI().orElseThrow().toURL().openStream()) {
                 Files.copy(stream, temp, StandardCopyOption.REPLACE_EXISTING);
             }
-            if (pack.worldTemplateCheckSum().isPresent()) {
+            if (pack.activeWorldTemplateCheckSum().isPresent()) {
                 String fileHash = ContentManager.readFileCheckSum(temp);
-                if (!pack.worldTemplateCheckSum().get().equals(fileHash)) {
+                if (!pack.activeWorldTemplateCheckSum().get().equals(fileHash)) {
                     throw new IOException("Checksum mismatch for world template " + pack.id());
                 }
             }

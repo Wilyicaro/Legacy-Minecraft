@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -25,6 +26,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -48,6 +50,7 @@ public class ContentManager {
     private static final java.util.Set<String> AUTO_APPLY_RESOURCE_PACKS = ConcurrentHashMap.newKeySet();
     private static final String TRANSPARENCY_FIX_URL = "https://cdn.modrinth.com/data/MK3k9U5o/versions/BdYLypGY/Transparency%20Fix.zip";
     private static final String AUTO_APPLY_RESOURCE_PACK_TAG = "auto_apply_resource_pack";
+    private static final String DOWNLOAD_KEY_FILE = ".legacy4j_download_key";
 
     public record Category(
         String id,
@@ -80,8 +83,28 @@ public class ContentManager {
         Optional<String> worldTemplateCheckSum,
         Optional<String> worldTemplateFolderName,
         List<BundlePack> bundlePacks,
-        Optional<ResourceAlbum> resourceAlbum
+        Optional<ResourceAlbum> resourceAlbum,
+        List<Variant> downloadVariants,
+        List<Variant> worldTemplateVariants
     ) {
+        public record Variant(
+            Optional<String> id,
+            Optional<String> minVersion,
+            Optional<URI> downloadURI,
+            Optional<String> checkSum
+        ) {
+            public static final Codec<Variant> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.STRING.optionalFieldOf("id").forGetter(Variant::id),
+                Codec.STRING.optionalFieldOf("minVersion").forGetter(Variant::minVersion),
+                Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(Variant::downloadURI)
+            ).apply(i, Variant::create));
+
+            public static Variant create(Optional<String> id, Optional<String> minVersion, Optional<URI> compoundDownloadURI) {
+                ParsedURI download = ParsedURI.of(compoundDownloadURI);
+                return new Variant(id, minVersion, download.uri(), download.checkSum());
+            }
+        }
+
         public record ResourceAlbum(
             Optional<String> id,
             int version,
@@ -126,7 +149,9 @@ public class ContentManager {
             Optional<String> checkSum,
             Optional<URI> worldTemplateDownloadURI,
             Optional<String> worldTemplateCheckSum,
-            Optional<String> worldTemplateFolderName
+            Optional<String> worldTemplateFolderName,
+            List<Variant> downloadVariants,
+            List<Variant> worldTemplateVariants
         ) {
             public static final Codec<BundlePack> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.STRING.fieldOf("categoryId").forGetter(BundlePack::categoryId),
@@ -136,17 +161,19 @@ public class ContentManager {
                 Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(BundlePack::downloadURI),
                 Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(BundlePack::imageUrl),
                 Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(BundlePack::worldTemplateDownloadURI),
-                Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(BundlePack::worldTemplateFolderName)
+                Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(BundlePack::worldTemplateFolderName),
+                Variant.CODEC.listOf().optionalFieldOf("downloadVariants", List.of()).forGetter(BundlePack::downloadVariants),
+                Variant.CODEC.listOf().optionalFieldOf("worldTemplateVariants", List.of()).forGetter(BundlePack::worldTemplateVariants)
             ).apply(i, BundlePack::create));
 
-            public static BundlePack create(String categoryId, String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName) {
+            public static BundlePack create(String categoryId, String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
                 ParsedURI download = ParsedURI.of(compoundDownloadURI);
                 ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-                return new BundlePack(categoryId, id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName);
+                return new BundlePack(categoryId, id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, downloadVariants, worldTemplateVariants);
             }
 
             public Pack toPack() {
-                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, List.of(), Optional.empty());
+                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, List.of(), Optional.empty(), downloadVariants, worldTemplateVariants);
             }
         }
 
@@ -159,15 +186,17 @@ public class ContentManager {
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(Pack::worldTemplateDownloadURI),
             Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName),
             BundlePack.CODEC.listOf().optionalFieldOf("bundlePacks", List.of()).forGetter(Pack::bundlePacks),
-            ResourceAlbum.CODEC.optionalFieldOf("resourceAlbum").forGetter(Pack::resourceAlbum)
+            ResourceAlbum.CODEC.optionalFieldOf("resourceAlbum").forGetter(Pack::resourceAlbum),
+            Variant.CODEC.listOf().optionalFieldOf("downloadVariants", List.of()).forGetter(Pack::downloadVariants),
+            Variant.CODEC.listOf().optionalFieldOf("worldTemplateVariants", List.of()).forGetter(Pack::worldTemplateVariants)
         ).apply(i, Pack::create));
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum) {
+        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
             ParsedURI download = ParsedURI.of(compoundDownloadURI);
             ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks, resourceAlbum);
+            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks, resourceAlbum, downloadVariants, worldTemplateVariants);
         }
 
         public Component nameComponent() {
@@ -179,7 +208,7 @@ public class ContentManager {
         }
 
         public boolean hasWorldTemplate() {
-            return worldTemplateDownloadURI.isPresent();
+            return activeWorldTemplateDownloadURI().isPresent();
         }
 
         public boolean hasBundlePacks() {
@@ -188,6 +217,26 @@ public class ContentManager {
 
         public boolean hasResourceAlbum() {
             return resourceAlbum.isPresent();
+        }
+
+        public Optional<URI> activeDownloadURI() {
+            return selectVariant(downloadVariants).flatMap(Variant::downloadURI).or(() -> downloadURI);
+        }
+
+        public Optional<String> activeCheckSum() {
+            return ContentManager.activeCheckSum(downloadVariants, checkSum);
+        }
+
+        public Optional<URI> activeWorldTemplateDownloadURI() {
+            return selectVariant(worldTemplateVariants).flatMap(Variant::downloadURI).or(() -> worldTemplateDownloadURI);
+        }
+
+        public Optional<String> activeWorldTemplateCheckSum() {
+            return ContentManager.activeCheckSum(worldTemplateVariants, worldTemplateCheckSum);
+        }
+
+        public String activeDownloadKey() {
+            return selectVariant(downloadVariants).map(ContentManager::variantKey).orElse("default");
         }
     }
 
@@ -201,6 +250,40 @@ public class ContentManager {
             String[] splitURI = compoundURI.get().toString().split("\\?checksum=");
             return new ParsedURI(Optional.of(URI.create(splitURI[0])), splitURI.length < 2 ? Optional.empty() : Optional.of(splitURI[1]));
         }
+    }
+
+    private static Optional<Pack.Variant> selectVariant(List<Pack.Variant> variants) {
+        Pack.Variant selected = null;
+        for (Pack.Variant variant : variants) {
+            if (matchesVersion(variant)) selected = variant;
+        }
+        return Optional.ofNullable(selected);
+    }
+
+    private static Optional<String> activeCheckSum(List<Pack.Variant> variants, Optional<String> fallback) {
+        Optional<Pack.Variant> variant = selectVariant(variants);
+        return variant.flatMap(Pack.Variant::downloadURI).isPresent() ? variant.flatMap(Pack.Variant::checkSum) : fallback;
+    }
+
+    private static boolean matchesVersion(Pack.Variant range) {
+        String current = SharedConstants.getCurrentVersion().name();
+        return range.minVersion().isEmpty() || compareVersions(current, range.minVersion().get()) >= 0;
+    }
+
+    private static int compareVersions(String left, String right) {
+        List<Integer> a = Legacy4J.getParsedVersion(left);
+        List<Integer> b = Legacy4J.getParsedVersion(right);
+        int size = Math.max(a.size(), b.size());
+        for (int i = 0; i < size; i++) {
+            int av = i < a.size() ? a.get(i) : 0;
+            int bv = i < b.size() ? b.get(i) : 0;
+            if (av != bv) return Integer.compare(av, bv);
+        }
+        return 0;
+    }
+
+    private static String variantKey(Pack.Variant variant) {
+        return variant.id().or(() -> variant.minVersion()).or(() -> variant.checkSum()).or(() -> variant.downloadURI().map(URI::toString)).orElse("default");
     }
 
     public static InputStream openRemoteStream(URL url, int connectTimeout, int readTimeout) throws IOException {
@@ -268,7 +351,9 @@ public class ContentManager {
                 Optional.empty(),
                 Optional.empty(),
                 bundlePacks,
-                Optional.empty()
+                Optional.empty(),
+                List.of(),
+                List.of()
             ));
         });
     }
@@ -297,7 +382,9 @@ public class ContentManager {
                         pack.checkSum(),
                         pack.worldTemplateDownloadURI(),
                         pack.worldTemplateCheckSum(),
-                        pack.worldTemplateFolderName()
+                        pack.worldTemplateFolderName(),
+                        pack.downloadVariants(),
+                        pack.worldTemplateVariants()
                     ));
                 }
             }
@@ -419,13 +506,14 @@ public class ContentManager {
         if (!Files.exists(path) || !Files.isDirectory(path)) return false;
         if ((DownloadedSkinPackStore.managesTargetDirectory(folderName) || CustomSkinPackStore.managesTargetDirectory(folderName)) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
         if (pack.hasWorldTemplate() && !LegacyWorldTemplate.isDownloadedPackInstalled(pack)) return false;
+        if (!pack.downloadVariants().isEmpty() && !pack.activeDownloadKey().equals(readDownloadKey(path))) return false;
 
-        if (pack.checkSum().isPresent()) {
+        if (pack.activeCheckSum().isPresent()) {
             Path checksumFile = path.resolve(".md5");
             if (Files.exists(checksumFile)) {
                 try {
                     String existingChecksum = Files.readString(checksumFile).trim();
-                    return pack.checkSum().get().equals(existingChecksum);
+                    return pack.activeCheckSum().get().equals(existingChecksum);
                 } catch (IOException e) {
                     return false;
                 }
@@ -437,7 +525,7 @@ public class ContentManager {
     }
 
     private static boolean hasStandaloneContent(Pack pack) {
-        return pack.downloadURI().isPresent();
+        return pack.activeDownloadURI().isPresent();
     }
 
     public static void downloadPack(Pack pack, Category category, Consumer<Boolean> onComplete) {
@@ -492,6 +580,25 @@ public class ContentManager {
 
     private static String normalizeFilePackId(String packId) {
         return packId.startsWith("file/") ? packId.substring(5) : packId;
+    }
+
+    private static String readDownloadKey(Path packDir) {
+        Path path = packDir.resolve(DOWNLOAD_KEY_FILE);
+        if (!Files.isRegularFile(path)) return "default";
+        try {
+            return Files.readString(path, StandardCharsets.UTF_8).trim();
+        } catch (IOException e) {
+            return "default";
+        }
+    }
+
+    private static void writeDownloadKey(Path packDir, Pack pack) throws IOException {
+        Path path = packDir.resolve(DOWNLOAD_KEY_FILE);
+        if (pack.downloadVariants().isEmpty()) {
+            Files.deleteIfExists(path);
+            return;
+        }
+        Files.writeString(path, pack.activeDownloadKey(), StandardCharsets.UTF_8);
     }
 
     private static CompletableFuture<Boolean> downloadPackInternal(Pack pack, Category category) {
@@ -549,20 +656,22 @@ public class ContentManager {
         if (trackActiveDownload) ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
         return CompletableFuture.supplyAsync(() -> {
             try {
-                if (pack.downloadURI().isEmpty()) {
+                Optional<URI> downloadURI = pack.activeDownloadURI();
+                if (downloadURI.isEmpty()) {
                     Legacy4J.LOGGER.warn("Pack {} has no download URI.", pack.id());
                     return false;
                 }
                 Path downloadedTempFile = Files.createTempFile("legacy_pack_", ".zip");
                 
-                try (InputStream stream = pack.downloadURI().get().toURL().openStream()) {
+                try (InputStream stream = downloadURI.get().toURL().openStream()) {
                     Files.copy(stream, downloadedTempFile, StandardCopyOption.REPLACE_EXISTING);
                 }
 
-                if (pack.checkSum().isPresent()) {
+                Optional<String> checkSum = pack.activeCheckSum();
+                if (checkSum.isPresent()) {
                     String fileHash = readFileCheckSum(downloadedTempFile);
-                    if (!pack.checkSum().get().equals(fileHash)) {
-                        Legacy4J.LOGGER.warn("Checksum mismatch for pack {}. Expected {}, got {}", pack.id(), pack.checkSum().get(), fileHash);
+                    if (!checkSum.get().equals(fileHash)) {
+                        Legacy4J.LOGGER.warn("Checksum mismatch for pack {}. Expected {}, got {}", pack.id(), checkSum.get(), fileHash);
                         Files.deleteIfExists(downloadedTempFile);
                         return false;
                     }
@@ -600,8 +709,9 @@ public class ContentManager {
                 LegacyWorldTemplate.downloadDownloadedPack(pack);
                 Files.deleteIfExists(downloadedTempFile);
 
-                if (pack.checkSum().isPresent()) {
-                    Files.writeString(targetFolder.resolve(".md5"), pack.checkSum().get());
+                writeDownloadKey(targetFolder, pack);
+                if (checkSum.isPresent()) {
+                    Files.writeString(targetFolder.resolve(".md5"), checkSum.get());
                 }
 
                 PackAlbum.Selector.invalidatePackAssets(pack.id());
