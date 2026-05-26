@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -119,6 +120,19 @@ public abstract class ChatComponentMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
     private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
         guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)I"), index = 1)
+    private FormattedCharSequence changeChatTextColor(FormattedCharSequence text) {
+        if (!CommonColor.CHAT_TEXT.isOverridden())
+            return text;
+
+        int color = CommonColor.CHAT_TEXT.get() & 0x00FFFFFF;
+        return sink -> text.accept((index, style, codePoint) -> sink.accept(index, chatTextStyle(style, color), codePoint));
+    }
+
+    private static Style chatTextStyle(Style style, int color) {
+        return style.getColor() == null ? style.withColor(color) : style;
     }
 
     @Inject(method = "screenToChatX", at = @At("RETURN"), cancellable = true)

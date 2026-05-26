@@ -14,6 +14,7 @@ public class CommonValue<T> extends Stocker<T> {
     public static final CommonValue<Float> LEGACY_FONT_DIM_FACTOR = registerCommonValue("legacy_font_dim_factor", 0.0f, Codec.FLOAT);
     public final T defaultValue;
     public final Codec<T> codec;
+    private boolean overridden;
 
     public CommonValue(T defaultValue, Codec<T> codec) {
         super(defaultValue);
@@ -36,10 +37,18 @@ public class CommonValue<T> extends Stocker<T> {
 
     public void reset() {
         set(defaultValue);
+        overridden = false;
     }
 
     public void parse(Dynamic<?> dynamic) {
-        codec.parse(dynamic).result().ifPresent(this::set);
+        codec.parse(dynamic).result().ifPresent(value -> {
+            set(value);
+            overridden = true;
+        });
+    }
+
+    public boolean isOverridden() {
+        return overridden;
     }
 
     public <V> V encode(DynamicOps<V> ops) {
