@@ -553,7 +553,10 @@ public class LegacyRenderUtil {
             Object2IntMap<Component> tooltipLines = tooltip.stream().limit(LegacyRenderUtil.getSelectedItemTooltipLines()).map(c -> tooltip.indexOf(c) == LegacyRenderUtil.getSelectedItemTooltipLines() - 1 && LegacyOptions.itemTooltipEllipsis.get() ? MORE : c).collect(Collectors.toMap(Function.identity(), font::width, (a, b) -> b, Object2IntLinkedOpenHashMap::new));
             int l = Math.min((int) ((float) GuiAccessor.getInstance().getToolHighlightTimer() * 256.0f / 10.0f), 255);
             if (l > 0) {
-                int color = 0xFFFFFFFF + (Math.round(l * getHUDOpacity()) << 24);
+                int itemNameText = CommonColor.ITEM_NAME_TEXT.get();
+                int itemNameColor = (itemNameText & 0x00FFFFFF) | Math.round((itemNameText >>> 24) * l / 255f * getHUDOpacity()) << 24;
+                int defaultColor = 0x00FFFFFF | Math.round(l * getHUDOpacity()) << 24;
+                boolean overrideItemNameColor = CommonColor.ITEM_NAME_TEXT.isOverridden();
                 int height = LegacyOptions.selectedItemTooltipSpacing.get() * (tooltipLines.size() - 1);
                 GuiGraphicsExtractor.pose().translate(0, -height);
                 if (!mc.options.backgroundForChatOnly().get()) {
@@ -563,9 +566,13 @@ public class LegacyRenderUtil {
                     LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, backgroundX, -4, backgroundWidth, height + 15);
                     FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
                 }
+                int[] line = {0};
                 tooltipLines.forEach((mutableComponent, width) -> {
                     int x = (GuiGraphicsExtractor.guiWidth() - width) / 2;
-                    GuiGraphicsExtractor.text(font, mutableComponent, x, 0, color);
+                    boolean itemNameLine = line[0]++ == 0;
+                    boolean useItemNameColor = itemNameLine && overrideItemNameColor;
+                    Component text = useItemNameColor ? mutableComponent.copy().withStyle(s -> s.withColor(itemNameText & 0x00FFFFFF)) : mutableComponent;
+                    GuiGraphicsExtractor.text(font, text, x, 0, useItemNameColor ? itemNameColor : defaultColor);
                     GuiGraphicsExtractor.pose().translate(0, LegacyOptions.selectedItemTooltipSpacing.get());
                 });
             }
