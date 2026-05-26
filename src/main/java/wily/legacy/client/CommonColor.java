@@ -27,6 +27,7 @@ public class CommonColor extends CommonValue<Integer> {
     public static final ListMap<Identifier, CommonColor> COMMON_COLORS = new ListMap<>();
 
     public static final CommonColor CHAT_BACKGROUND = registerCommonColor("chat_background", 0xFF323232);
+    public static final CommonColor CHAT_TEXT = registerCommonColor("chat_text", 0xFFFFFFFF);
     public static final CommonColor GRAY_TEXT = registerCommonColor("inventory_gray_text", 0xFF323232);
     public static final CommonColor WIDGET_TEXT = registerCommonColor("widget_text", 0xFFFFFFFF);
     public static final CommonColor HIGHLIGHTED_WIDGET_TEXT = registerCommonColor("highlighted_widget_text", 0xFFFFFF00);
@@ -36,6 +37,7 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor TIP_TITLE_TEXT = registerCommonColor("tip_title_text", 0xFFFFFFFF);
     public static final CommonColor TIP_TEXT = registerCommonColor("tip_text", 0xFFFFFFFF);
     public static final CommonColor ACTION_TEXT = registerCommonColor("action_text", 0xFFFFFFFF);
+    public static final CommonColor ITEM_NAME_TEXT = registerCommonColor("item_name_text", 0xFFFFFFFF);
     public static final CommonColor SELECTED_STORAGE_SAVE = registerCommonColor("selected_storage_save", 0xFFFFFF00);
     public static final CommonColor STORAGE_SAVE = registerCommonColor("storage_save", 0xFF8C9DE2);
     public static final CommonColor EXPERIENCE_TEXT = registerCommonColor("experience_text", 0xFF80FF20);
