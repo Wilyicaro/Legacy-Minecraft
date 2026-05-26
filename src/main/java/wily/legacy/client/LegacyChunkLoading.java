@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class LegacyChunkLoading {
     private static final int STEP_MILLIS = 75;
-    private static final int FEATURE_DELAY_MILLIS = 900;
+    private static final int FEATURE_DELAY_MILLIS = 1300;
     private static final int SNOW_DELAY_MILLIS = 1200;
     private static final int BASE_SECTIONS_PER_STEP = 2;
     private static final int MID_SECTIONS_PER_STEP = 3;
@@ -155,7 +155,12 @@ public final class LegacyChunkLoading {
             return false;
         }
 
-        long readyAt = readyAt(SectionPos.asLong(pos));
+        long section = SectionPos.asLong(pos);
+        if (!hiddenFeatureSections.contains(section)) {
+            return false;
+        }
+
+        long readyAt = readyAt(section);
         return readyAt != 0 && Util.getMillis() < readyAt;
     }
 
