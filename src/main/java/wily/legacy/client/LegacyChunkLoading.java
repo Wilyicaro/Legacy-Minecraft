@@ -1,7 +1,6 @@
 package wily.legacy.client;
 
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -24,6 +23,7 @@ import wily.legacy.util.LegacyTags;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class LegacyChunkLoading {
@@ -40,8 +40,8 @@ public final class LegacyChunkLoading {
     private static final int EXTRA_TRIM_DISTANCE = 6;
     private static final LongOpenHashSet revealed = new LongOpenHashSet();
     private static final LongOpenHashSet pending = new LongOpenHashSet();
-    private static final Long2LongOpenHashMap featureReadyAt = new Long2LongOpenHashMap();
-    private static final LongOpenHashSet hiddenFeatureSections = new LongOpenHashSet();
+    private static final Map<Long, Long> featureReadyAt = new ConcurrentHashMap<>();
+    private static final Set<Long> hiddenFeatureSections = ConcurrentHashMap.newKeySet();
     private static final Map<BlockStateModel, BlockStateModel> hiddenFeatureModels = new ConcurrentHashMap<>();
     private static ClientLevel level;
     private static long lastStep = Long.MIN_VALUE;
@@ -110,13 +110,13 @@ public final class LegacyChunkLoading {
         return revealed.contains(key);
     }
 
-    public static synchronized BlockStateModel getFeatureModel(BlockPos pos, BlockState state, BlockStateModel model) {
+    public static BlockStateModel getFeatureModel(BlockPos pos, BlockState state, BlockStateModel model) {
         if (!LegacyOptions.slowChunkLoading.get() || !isFeatureState(state)) {
             return model;
         }
 
         long section = SectionPos.asLong(pos);
-        long readyAt = featureReadyAt.get(section);
+        long readyAt = readyAt(section);
         if (readyAt == 0) {
             return model;
         }
@@ -130,13 +130,13 @@ public final class LegacyChunkLoading {
         return hiddenFeatureModels.computeIfAbsent(model, HiddenFeatureModel::create);
     }
 
-    public static synchronized BlockState getFeatureState(BlockPos pos, BlockState state) {
+    public static BlockState getFeatureState(BlockPos pos, BlockState state) {
         if (!LegacyOptions.slowChunkLoading.get() || !isFeatureState(state)) {
             return state;
         }
 
         long section = SectionPos.asLong(pos);
-        long readyAt = featureReadyAt.get(section);
+        long readyAt = readyAt(section);
         if (readyAt == 0) {
             return state;
         }
@@ -150,13 +150,27 @@ public final class LegacyChunkLoading {
         return Blocks.AIR.defaultBlockState();
     }
 
-    public static synchronized boolean hasPendingFeatures(BlockPos pos) {
+    public static boolean hasPendingFeatures(BlockPos pos) {
         if (!LegacyOptions.slowChunkLoading.get()) {
             return false;
         }
 
-        long readyAt = featureReadyAt.get(SectionPos.asLong(pos));
+        long readyAt = readyAt(SectionPos.asLong(pos));
         return readyAt != 0 && Util.getMillis() < readyAt;
+    }
+
+    private static void clearSectionDelay(long section, boolean dirty) {
+        if (!hasDelayedFeatures(section) && !pending.contains(section)) {
+            return;
+        }
+
+        boolean changed = pending.remove(section);
+        revealed.add(section);
+        changed |= featureReadyAt.remove(section) != null;
+        changed |= hiddenFeatureSections.remove(section);
+        if (dirty && changed && pending.isEmpty()) {
+            markDirty(section);
+        }
     }
 
     public static synchronized void reset() {
@@ -172,10 +186,14 @@ public final class LegacyChunkLoading {
     private static void collect(List<SectionRenderDispatcher.RenderSection> sections, Vec3 center, long centerSection) {
         for (SectionRenderDispatcher.RenderSection section : sections) {
             long key = key(section);
+            boolean immediate = section.getBoundingBox().distanceToSqr(center) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE;
             if (revealed.contains(key)) {
+                if (immediate && hasDelayedFeatures(key)) {
+                    clearSectionDelay(key, false);
+                }
                 continue;
             }
-            if (section.getBoundingBox().distanceToSqr(center) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE) {
+            if (immediate) {
                 pending.remove(key);
                 reveal(key);
             } else {
@@ -225,10 +243,14 @@ public final class LegacyChunkLoading {
     }
 
     private static void collect(long key, int originX, int originY, int originZ, double cameraX, double cameraY, double cameraZ) {
+        boolean immediate = distanceToSectionSqr(originX, originY, originZ, cameraX, cameraY, cameraZ) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE;
         if (revealed.contains(key)) {
+            if (immediate && hasDelayedFeatures(key)) {
+                clearSectionDelay(key, false);
+            }
             return;
         }
-        if (distanceToSectionSqr(originX, originY, originZ, cameraX, cameraY, cameraZ) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE) {
+        if (immediate) {
             pending.remove(key);
             reveal(key);
         } else {
@@ -257,9 +279,10 @@ public final class LegacyChunkLoading {
     }
 
     private static void finishFeatureDelay(long section) {
-        featureReadyAt.remove(section);
-        hiddenFeatureSections.remove(section);
-        markDirtyAround(section);
+        if (featureReadyAt.remove(section) != null) {
+            hiddenFeatureSections.remove(section);
+            markDirtyAround(section);
+        }
     }
 
     private static int delayMillis(long section) {
@@ -290,17 +313,16 @@ public final class LegacyChunkLoading {
         }
 
         long now = Util.getMillis();
-        LongIterator iterator = featureReadyAt.keySet().iterator();
-        while (iterator.hasNext()) {
-            long section = iterator.nextLong();
-            long readyAt = featureReadyAt.get(section);
+        for (long section : featureReadyAt.keySet()) {
+            long readyAt = readyAt(section);
             if (now < readyAt) {
                 continue;
             }
 
-            iterator.remove();
-            hiddenFeatureSections.remove(section);
-            markDirtyAround(section);
+            if (featureReadyAt.remove(section, readyAt)) {
+                hiddenFeatureSections.remove(section);
+                markDirtyAround(section);
+            }
         }
     }
 
@@ -358,6 +380,15 @@ public final class LegacyChunkLoading {
 
     private static boolean isFeatureState(BlockState state) {
         return state.is(LegacyTags.SLOW_CHUNK_FEATURES);
+    }
+
+    private static boolean hasDelayedFeatures(long section) {
+        return readyAt(section) != 0 || hiddenFeatureSections.contains(section);
+    }
+
+    private static long readyAt(long section) {
+        Long readyAt = featureReadyAt.get(section);
+        return readyAt == null ? 0 : readyAt;
     }
 
     private static boolean isRevealed(SectionRenderDispatcher.RenderSection section) {
