@@ -15,9 +15,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.util.LegacyTags;
 
 import java.util.Arrays;
@@ -40,6 +42,7 @@ public final class LegacyChunkLoading {
     private static final int EXTRA_TRIM_DISTANCE = 6;
     private static final LongOpenHashSet revealed = new LongOpenHashSet();
     private static final LongOpenHashSet pending = new LongOpenHashSet();
+    private static final LongOpenHashSet freshFeatureChunks = new LongOpenHashSet();
     private static final Map<Long, Long> featureReadyAt = new ConcurrentHashMap<>();
     private static final Set<Long> hiddenFeatureSections = ConcurrentHashMap.newKeySet();
     private static final Map<BlockStateModel, BlockStateModel> hiddenFeatureModels = new ConcurrentHashMap<>();
@@ -52,8 +55,11 @@ public final class LegacyChunkLoading {
     public static synchronized boolean filter(List<SectionRenderDispatcher.RenderSection> visible, List<SectionRenderDispatcher.RenderSection> nearby) {
         Minecraft minecraft = Minecraft.getInstance();
         Entity cameraEntity = minecraft.getCameraEntity();
-        if (!LegacyOptions.slowChunkLoading.get() || minecraft.level == null || cameraEntity == null) {
+        if (!LegacyOptions.slowChunkLoading.get() || minecraft.level == null) {
             reset();
+            return false;
+        }
+        if (cameraEntity == null) {
             return false;
         }
 
@@ -85,8 +91,11 @@ public final class LegacyChunkLoading {
     public static synchronized boolean filterSection(long key, int originX, int originY, int originZ, double cameraX, double cameraY, double cameraZ) {
         Minecraft minecraft = Minecraft.getInstance();
         Entity cameraEntity = minecraft.getCameraEntity();
-        if (!LegacyOptions.slowChunkLoading.get() || minecraft.level == null || cameraEntity == null) {
+        if (!LegacyOptions.slowChunkLoading.get() || minecraft.level == null) {
             reset();
+            return true;
+        }
+        if (cameraEntity == null) {
             return true;
         }
 
@@ -164,6 +173,18 @@ public final class LegacyChunkLoading {
         return readyAt != 0 && Util.getMillis() < readyAt;
     }
 
+    public static synchronized void markFreshChunk(int x, int z) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null) {
+            return;
+        }
+        if (level != minecraft.level) {
+            reset();
+            level = minecraft.level;
+        }
+        freshFeatureChunks.add(ChunkPos.pack(x, z));
+    }
+
     private static void clearSectionDelay(long section, boolean dirty) {
         if (!hasDelayedFeatures(section) && !pending.contains(section)) {
             return;
@@ -183,6 +204,7 @@ public final class LegacyChunkLoading {
         lastStep = Long.MIN_VALUE;
         revealed.clear();
         pending.clear();
+        freshFeatureChunks.clear();
         featureReadyAt.clear();
         hiddenFeatureSections.clear();
         hiddenFeatureModels.clear();
@@ -242,7 +264,9 @@ public final class LegacyChunkLoading {
             if (key != Long.MIN_VALUE) {
                 pending.remove(key);
                 reveal(key);
-                featureReadyAt.put(key, Util.getMillis() + delayMillis(key));
+                if (shouldDelayFeatures(key)) {
+                    featureReadyAt.put(key, Util.getMillis() + delayMillis(key));
+                }
             }
         }
     }
@@ -379,8 +403,22 @@ public final class LegacyChunkLoading {
                 iterator.remove();
                 featureReadyAt.remove(section);
                 hiddenFeatureSections.remove(section);
+                freshFeatureChunks.remove(chunkKey(section));
             }
         }
+    }
+
+    private static boolean shouldDelayFeatures(long section) {
+        return !hasFreshChunkSignals() || freshFeatureChunks.contains(chunkKey(section));
+    }
+
+    private static boolean hasFreshChunkSignals() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.hasSingleplayerServer() || Legacy4JClient.hasModOnServer();
+    }
+
+    private static long chunkKey(long section) {
+        return ChunkPos.pack(SectionPos.x(section), SectionPos.z(section));
     }
 
     private static boolean isFeatureState(BlockState state) {
