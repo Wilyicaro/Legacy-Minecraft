@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import wily.legacy.client.ContentManager;
-import wily.legacy.client.StorePreviewAtlas;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -83,7 +82,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category)));
         if (!packs.isEmpty()) {
             hoveredPack = packs.get(0);
-            if (getLocalPreview(category, hoveredPack) == null) requestImage(hoveredPack.imageUrl());
+            requestImage(hoveredPack.imageUrl());
         }
         
         renderableVList.layoutSpacing(l -> 0);
@@ -106,12 +105,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
     private void selectPack(ContentManager.Pack pack) {
         if (hoveredPack == pack) {
-            if (getLocalPreview(category, pack) == null) requestImage(pack.imageUrl());
+            requestImage(pack.imageUrl());
             return;
         }
         hoveredPack = pack;
         scrollableRenderer.resetScrolled();
-        if (getLocalPreview(category, pack) == null) requestImage(pack.imageUrl());
+        requestImage(pack.imageUrl());
     }
 
     private void addMenuButton(ContentManager.Pack pack) {
@@ -204,14 +203,6 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         return null;
     }
 
-    private static StorePreviewAtlas.Entry getLocalPreview(ContentManager.Category category, ContentManager.Pack pack) {
-        if ("skinpacks".equals(category.id())) {
-            StorePreviewAtlas.Entry skinpackPreview = StorePreviewAtlas.getSkinpack(pack.id());
-            if (skinpackPreview != null) return skinpackPreview;
-        }
-        return StorePreviewAtlas.get(pack.id());
-    }
-
     private static CompletableFuture<RemoteImage> requestImage(Optional<URI> url) {
         if (url.isEmpty()) return CompletableFuture.completedFuture(null);
         String key = url.get().toString();
@@ -293,7 +284,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     @Override
     public void renderableVListInit() {
         for (int i = 0; i < Math.min(4, packs.size()); i++) {
-            if (getLocalPreview(category, packs.get(i)) == null) requestImage(packs.get(i).imageUrl());
+            requestImage(packs.get(i).imageUrl());
         }
 
         getRenderableVList().init("renderableVList", panel.getX() + LIST_X, panel.getY() + LIST_Y, LIST_WIDTH, LIST_HEIGHT);
@@ -311,18 +302,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             int x = tooltipBox.getX() + 8;
             int y = tooltipBox.getY() + 8;
             int width = tooltipBox.getWidth() - 16;
-            StorePreviewAtlas.Entry localPreview = getLocalPreview(category, displayPack);
-            RemoteImage remoteImage = localPreview == null ? getOrDownloadImage(displayPack.imageUrl()) : null;
+            RemoteImage remoteImage = getOrDownloadImage(displayPack.imageUrl());
             int imageAreaHeight = 0;
             int maxImgHeight = (tooltipBox.getHeight() * 4) / 10;
 
-            if (localPreview != null) {
-                float scale = Math.min((float) width / localPreview.width(), (float) maxImgHeight / localPreview.height());
-                int imgWidth = (int) (localPreview.width() * scale);
-                int imgHeight = (int) (localPreview.height() * scale);
-                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, localPreview.resource(), x + (width - imgWidth) / 2, y, (float) localPreview.u(), localPreview.v(), imgWidth, imgHeight, localPreview.width(), localPreview.height(), localPreview.atlasWidth(), localPreview.atlasHeight());
-                imageAreaHeight = imgHeight + 10;
-            } else if (displayPack.imageUrl().isPresent()) {
+            if (displayPack.imageUrl().isPresent()) {
                 if (remoteImage != null && remoteImage.width > 0) {
                     float scale = Math.min((float) width / remoteImage.width, (float) maxImgHeight / remoteImage.height);
                     int imgWidth = (int) (remoteImage.width * scale);
