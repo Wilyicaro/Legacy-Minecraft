@@ -1,4 +1,5 @@
 {
+  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "Бесплодные земли",
   "biome.minecraft.bamboo_jungle.description": "Редкий биом Джунглей с повышенной плотностью бамбука",
   "biome.minecraft.basalt_deltas.description": "Горячий биом, состоящий из базальта и чернита. Он полон летающим пеплом.",
