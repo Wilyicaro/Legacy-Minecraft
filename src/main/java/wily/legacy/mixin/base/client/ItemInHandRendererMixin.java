@@ -139,8 +139,8 @@ public abstract class ItemInHandRendererMixin {
     private void renderArmWithItem(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int j, CallbackInfo ci) {
         HumanoidArm humanoidArm = interactionHand == InteractionHand.MAIN_HAND ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
-        if (interactionHand == InteractionHand.MAIN_HAND && FirstPersonDropAnimation.isActive() && !abstractClientPlayer.isUsingItem()) {
-            renderDropAnimation(abstractClientPlayer, itemStack, humanoidArm, h, i, poseStack, submitNodeCollector, j);
+        if (interactionHand == InteractionHand.MAIN_HAND && FirstPersonDropAnimation.isActive(f) && !abstractClientPlayer.isUsingItem()) {
+            renderDropAnimation(abstractClientPlayer, itemStack, humanoidArm, h, i, f, poseStack, submitNodeCollector, j);
             ci.cancel();
             poseStack.popPose();
             return;
@@ -197,8 +197,8 @@ public abstract class ItemInHandRendererMixin {
     }
 
     @Unique
-    private void renderDropAnimation(AbstractClientPlayer player, ItemStack itemStack, HumanoidArm arm, float swingProgress, float equipProgress, PoseStack poseStack, SubmitNodeCollector collector, int light) {
-        float progress = FirstPersonDropAnimation.progress();
+    private void renderDropAnimation(AbstractClientPlayer player, ItemStack itemStack, HumanoidArm arm, float swingProgress, float equipProgress, float partialTick, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+        float progress = FirstPersonDropAnimation.progress(partialTick);
         float offset = Mth.sin(progress * (float) Math.PI);
         if (itemStack.isEmpty()) {
             poseStack.translate(0.0F, -0.5F * offset, 0.0F);
