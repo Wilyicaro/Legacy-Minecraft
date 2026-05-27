@@ -92,6 +92,8 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
     public static boolean suppressInventoryElytraPose;
+    @Nullable
+    public static Integer tooltipTextColorOverride;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
     public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
     public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
@@ -662,10 +664,16 @@ public class LegacyRenderUtil {
 
         int t;
         ClientTooltipComponent tooltipComponent;
-        for (t = 0; t < list.size(); ++t) {
-            tooltipComponent = list.get(t);
-            tooltipComponent.extractText(graphics, font, 0, s);
-            s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
+        try {
+            Integer itemNameText = CommonColor.ITEM_NAME_TEXT.isOverridden() ? CommonColor.ITEM_NAME_TEXT.get() : null;
+            for (t = 0; t < list.size(); ++t) {
+                tooltipComponent = list.get(t);
+                tooltipTextColorOverride = t == 0 ? itemNameText : null;
+                tooltipComponent.extractText(graphics, font, 0, s);
+                s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
+            }
+        } finally {
+            tooltipTextColorOverride = null;
         }
 
         s = 0;
