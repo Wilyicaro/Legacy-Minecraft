@@ -10,6 +10,7 @@ import wily.legacy.client.ContentManager.Pack;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 final class ContentIndexLoader {
+    private static final URI STARTERPACKS_PREVIEW = URI.create("https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/STARTERPACKS/preview_images/starterpacks_bundle_preview.png");
+
     private ContentIndexLoader() {
     }
 
@@ -68,7 +71,7 @@ final class ContentIndexLoader {
             "Download All!",
             "Download every mash-up pack, skin pack, texture pack, and more!",
             Optional.empty(),
-            Optional.empty(),
+            Optional.of(STARTERPACKS_PREVIEW),
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
