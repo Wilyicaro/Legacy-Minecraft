@@ -1,4 +1,5 @@
 {
+  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "Un biome aride et chaud.",
   "biome.minecraft.bamboo_jungle.description": "Une variante rare de jungle avec des bambous denses.",
   "biome.minecraft.basalt_deltas.description": "Un biome chaud, composé de basalte et de pierre noire. Il est plein de cendres qui passent.",
