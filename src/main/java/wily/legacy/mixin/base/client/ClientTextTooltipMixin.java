@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(ClientTextTooltip.class)
 
@@ -24,7 +25,10 @@ public class ClientTextTooltipMixin {
     public void renderText(GuiGraphics guiGraphics, Font font, int i, int j, CallbackInfo ci) {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
-        guiGraphics.drawString(font, this.text, i, j, -1, false);
+        Integer color = LegacyRenderUtil.tooltipTextColorOverride;
+        FormattedCharSequence text = color == null ? this.text : sink -> this.text.accept((index, style, codePoint) ->
+                sink.accept(index, style.withColor(color & 0x00FFFFFF), codePoint));
+        guiGraphics.drawString(font, text, i, j, color == null ? -1 : color, false);
     }
 
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true)
