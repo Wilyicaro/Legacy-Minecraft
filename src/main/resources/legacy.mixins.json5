@@ -232,6 +232,8 @@
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
+    "ChunkMapMixin",
+    "ChunkStatusTasksMixin",
     "CarpetBlockMixin",
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",
