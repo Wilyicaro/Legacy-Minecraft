@@ -31,6 +31,7 @@ import wily.legacy.skins.SkinsBootstrap;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
+import wily.legacy.world.LegacyGeneratedChunks;
 
 //? if fabric {
 //?} else if forge {
@@ -111,6 +112,7 @@ public class Legacy4J {
             r.register(false, ClientAdvancementsPayload.ID);
             r.register(false, ClientAnimalInLoveSyncPayload.ID);
             r.register(false, ClientEffectActivationPayload.ID);
+            r.register(false, LegacyGeneratedChunks.Payload.ID);
             r.register(true, ClientMerchantTradingPayload.ID_C2S);
             r.register(false, ClientMerchantTradingPayload.ID_S2C);
             r.register(true, PlayerInfoSync.ID);
