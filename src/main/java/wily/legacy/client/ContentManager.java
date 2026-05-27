@@ -2,8 +2,6 @@ package wily.legacy.client;
 
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
@@ -18,39 +16,29 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.skins.skin.CustomSkinPackStore;
-import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.IOUtil;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class ContentManager {
 
     public static final List<Category> CATEGORIES = new ArrayList<>();
     private static final String CATEGORIES_FILE = "store_categories.json";
-    private static final String STARTERPACKS_CATEGORY_ID = "starterpacks";
-    private static final String STARTERPACKS_PACK_ID = "starterpacks_bundle";
-    private static final java.util.Set<String> ACTIVE_DOWNLOADS = ConcurrentHashMap.newKeySet();
-    private static final java.util.Set<String> AUTO_APPLY_RESOURCE_PACKS = ConcurrentHashMap.newKeySet();
-    private static final String TRANSPARENCY_FIX_URL = "https://cdn.modrinth.com/data/MK3k9U5o/versions/BdYLypGY/Transparency%20Fix.zip";
-    private static final String AUTO_APPLY_RESOURCE_PACK_TAG = "auto_apply_resource_pack";
-    private static final String DOWNLOAD_KEY_FILE = ".legacy4j_download_key";
+    static final String STARTERPACKS_CATEGORY_ID = "starterpacks";
+    static final String STARTERPACKS_PACK_ID = "starterpacks_bundle";
+    static final java.util.Set<String> AUTO_APPLY_RESOURCE_PACKS = ConcurrentHashMap.newKeySet();
+    static final String AUTO_APPLY_RESOURCE_PACK_TAG = "auto_apply_resource_pack";
 
     public record Category(
         String id,
@@ -241,10 +229,6 @@ public class ContentManager {
     }
 
     private record ParsedURI(Optional<URI> uri, Optional<String> checkSum) {
-        private static ParsedURI of(URI compoundURI) {
-            return of(Optional.of(compoundURI));
-        }
-
         private static ParsedURI of(Optional<URI> compoundURI) {
             if (compoundURI.isEmpty()) return new ParsedURI(Optional.empty(), Optional.empty());
             String[] splitURI = compoundURI.get().toString().split("\\?checksum=");
@@ -294,102 +278,7 @@ public class ContentManager {
     }
 
     public static CompletableFuture<List<Pack>> fetchIndex(Category category) {
-        if (STARTERPACKS_CATEGORY_ID.equals(category.id())) {
-            return fetchStarterpacksIndex(category);
-        }
-        return fetchRemoteIndex(category);
-    }
-
-    private static CompletableFuture<List<Pack>> fetchRemoteIndex(Category category) {
-        return CompletableFuture.supplyAsync(() -> {
-            try (InputStream stream = openRemoteStream(new URL(category.indexUrl()), 5000, 10000);
-                 InputStreamReader reader = new InputStreamReader(stream)) {
-                JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-                List<Pack> packs = Pack.LIST_CODEC.parse(JsonOps.INSTANCE, json.get("packs"))
-                        .resultOrPartial(Legacy4J.LOGGER::warn)
-                        .orElseGet(ArrayList::new);
-                loadAutoApplyTags(category, json);
-                return packs;
-            } catch (Exception e) {
-                Legacy4J.LOGGER.warn("Failed to fetch content index from {}: {}", category.indexUrl(), e.getMessage());
-                return new ArrayList<>();
-            }
-        });
-    }
-
-    private static void loadAutoApplyTags(Category category, JsonObject json) {
-        String prefix = category.id() + ":";
-        AUTO_APPLY_RESOURCE_PACKS.removeIf(key -> key.startsWith(prefix));
-        if (!json.has("packs") || !json.get("packs").isJsonArray()) return;
-        for (JsonElement element : json.getAsJsonArray("packs")) {
-            if (!element.isJsonObject()) continue;
-            JsonObject packJson = element.getAsJsonObject();
-            if (packJson.has("id") && hasAutoApplyResourcePackTag(packJson)) {
-                AUTO_APPLY_RESOURCE_PACKS.add(prefix + packJson.get("id").getAsString());
-            }
-        }
-    }
-
-    private static boolean hasAutoApplyResourcePackTag(JsonObject packJson) {
-        if (!packJson.has("tags") || !packJson.get("tags").isJsonArray()) return false;
-        for (JsonElement tag : packJson.getAsJsonArray("tags")) {
-            if (tag.isJsonPrimitive() && AUTO_APPLY_RESOURCE_PACK_TAG.equals(tag.getAsString())) return true;
-        }
-        return false;
-    }
-
-    private static CompletableFuture<List<Pack>> fetchStarterpacksIndex(Category category) {
-        return fetchStarterpacksBundlePacks().thenApply(bundlePacks -> {
-            return List.of(new Pack(
-                STARTERPACKS_PACK_ID,
-                "Download All!",
-                "Download every mash-up pack, skin pack, texture pack, and more!",
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                bundlePacks,
-                Optional.empty(),
-                List.of(),
-                List.of()
-            ));
-        });
-    }
-
-    private static List<Category> getStarterpacksCategories() {
-        return CATEGORIES.stream()
-            .filter(c -> !STARTERPACKS_CATEGORY_ID.equals(c.id()) && !"bundle_packs".equals(c.id()) && !"legacy4j".equals(c.id()))
-            .toList();
-    }
-
-    private static CompletableFuture<List<Pack.BundlePack>> fetchStarterpacksBundlePacks() {
-        List<Category> categories = getStarterpacksCategories();
-        List<CompletableFuture<List<Pack>>> futures = categories.stream().map(ContentManager::fetchIndex).toList();
-        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).thenApply(v -> {
-            List<Pack.BundlePack> bundlePacks = new ArrayList<>();
-            for (int i = 0; i < categories.size(); i++) {
-                Category category = categories.get(i);
-                for (Pack pack : futures.get(i).getNow(List.of())) {
-                    bundlePacks.add(new Pack.BundlePack(
-                        category.id(),
-                        pack.id(),
-                        pack.name(),
-                        pack.description(),
-                        pack.downloadURI(),
-                        pack.imageUrl(),
-                        pack.checkSum(),
-                        pack.worldTemplateDownloadURI(),
-                        pack.worldTemplateCheckSum(),
-                        pack.worldTemplateFolderName(),
-                        pack.downloadVariants(),
-                        pack.worldTemplateVariants()
-                    ));
-                }
-            }
-            return bundlePacks;
-        });
+        return ContentIndexLoader.fetchIndex(category);
     }
 
     public static class CategoryManager implements ResourceManagerReloadListener {
@@ -437,99 +326,20 @@ public class ContentManager {
         }
     }
 
-    private static Optional<Category> getCategory(String categoryId) {
-        return CATEGORIES.stream().filter(c -> c.id().equals(categoryId)).findFirst();
-    }
-
-    private static boolean shouldApplyTransparencyFix(Category category) {
-        return "resourcepacks".equals(category.targetDirectoryName()) && ("texture_packs".equals(category.id()) || "mashup_packs".equals(category.id()));
-    }
-
-    private static void applyTransparencyFix(Path targetFolder) throws IOException {
-        Path fixTempFile = Files.createTempFile("legacy_pack_fix_", ".zip");
-        try {
-            try (InputStream stream = openRemoteStream(new URL(TRANSPARENCY_FIX_URL), 5000, 10000)) {
-                Files.copy(stream, fixTempFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-            extractZip(fixTempFile, targetFolder);
-        } finally {
-            Files.deleteIfExists(fixTempFile);
-        }
-    }
-
-    private static Optional<byte[]> readOptionalFileBytes(Path path) throws IOException {
-        return Files.isRegularFile(path) ? Optional.of(Files.readAllBytes(path)) : Optional.empty();
-    }
-
-    private static void restoreOptionalFileBytes(Path path, Optional<byte[]> bytes) throws IOException {
-        if (bytes.isPresent()) {
-            Files.write(path, bytes.get());
-        } else {
-            Files.deleteIfExists(path);
-        }
-    }
-
-    private static Optional<String> readOptionalFileText(Path path) throws IOException {
-        return Files.isRegularFile(path) ? Optional.of(Files.readString(path)) : Optional.empty();
-    }
-
-    private static void mergeTransparencyFixPackMeta(Path targetFolder, Optional<String> originalPackMeta) throws IOException {
-        if (originalPackMeta.isEmpty()) return;
-        Path packMetaPath = targetFolder.resolve("pack.mcmeta");
-        JsonObject original = JsonParser.parseString(originalPackMeta.get()).getAsJsonObject();
-        if (Files.isRegularFile(packMetaPath)) {
-            JsonObject fixed = JsonParser.parseString(Files.readString(packMetaPath)).getAsJsonObject();
-            if (fixed.has("overlays")) original.add("overlays", fixed.get("overlays").deepCopy());
-        }
-        Files.writeString(packMetaPath, original.toString());
-    }
-
     private static String downloadKey(Category category, Pack pack) {
         return category.id() + ":" + pack.id();
     }
 
     public static boolean isPackDownloading(Pack pack, Category category) {
-        return ACTIVE_DOWNLOADS.contains(downloadKey(category, pack));
+        return ContentPackDownloader.isDownloading(pack, category);
     }
 
     public static boolean isPackInstalled(Pack pack, Category category) {
-        if (pack.hasBundlePacks()) {
-            boolean standaloneInstalled = !hasStandaloneContent(pack) || isStandalonePackInstalled(pack, category);
-            return standaloneInstalled && areBundleChildrenInstalled(pack) && (!pack.hasResourceAlbum() || DownloadedResourceAlbums.hasManagedBundleAlbum(pack));
-        }
-        return isStandalonePackInstalled(pack, category);
-    }
-
-    private static boolean isStandalonePackInstalled(Pack pack, Category category) {
-        String folderName = category.targetDirectoryName();
-        Path path = getContentDir(folderName).resolve(pack.id());
-        if (!Files.exists(path) || !Files.isDirectory(path)) return false;
-        if ((DownloadedSkinPackStore.managesTargetDirectory(folderName) || CustomSkinPackStore.managesTargetDirectory(folderName)) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
-        if (pack.hasWorldTemplate() && !LegacyWorldTemplate.isDownloadedPackInstalled(pack)) return false;
-        if (!pack.downloadVariants().isEmpty() && !pack.activeDownloadKey().equals(readDownloadKey(path))) return false;
-
-        if (pack.activeCheckSum().isPresent()) {
-            Path checksumFile = path.resolve(".md5");
-            if (Files.exists(checksumFile)) {
-                try {
-                    String existingChecksum = Files.readString(checksumFile).trim();
-                    return pack.activeCheckSum().get().equals(existingChecksum);
-                } catch (IOException e) {
-                    return false;
-                }
-            }
-            return false; 
-        }
-
-        return true;
-    }
-
-    private static boolean hasStandaloneContent(Pack pack) {
-        return pack.activeDownloadURI().isPresent();
+        return ContentPackDownloader.isInstalled(pack, category);
     }
 
     public static void downloadPack(Pack pack, Category category, Consumer<Boolean> onComplete) {
-        downloadPackInternal(pack, category).whenComplete((installedAnything, throwable) ->
+        ContentPackDownloader.download(pack, category).whenComplete((installedAnything, throwable) ->
             Minecraft.getInstance().execute(() -> onComplete.accept(installedAnything != null && installedAnything))
         );
     }
@@ -560,8 +370,16 @@ public class ContentManager {
     }
 
     private static boolean isRootResourcePackCategory(Category category) {
+        return isRootResourcePackDirectory(getContentDir(category.targetDirectoryName()));
+    }
+
+    static boolean isRootResourcePackDirectory(Path path) {
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft != null && minecraft.getResourcePackDirectory() != null && minecraft.getResourcePackDirectory().equals(getContentDir(category.targetDirectoryName()));
+        return minecraft != null && samePath(minecraft.getResourcePackDirectory(), path);
+    }
+
+    private static boolean samePath(Path first, Path second) {
+        return first != null && second != null && first.toAbsolutePath().normalize().equals(second.toAbsolutePath().normalize());
     }
 
     private static String resolveResourcePackId(PackRepository repository, String packId) {
@@ -582,243 +400,7 @@ public class ContentManager {
         return packId.startsWith("file/") ? packId.substring(5) : packId;
     }
 
-    private static String readDownloadKey(Path packDir) {
-        Path path = packDir.resolve(DOWNLOAD_KEY_FILE);
-        if (!Files.isRegularFile(path)) return "default";
-        try {
-            return Files.readString(path, StandardCharsets.UTF_8).trim();
-        } catch (IOException e) {
-            return "default";
-        }
-    }
-
-    private static void writeDownloadKey(Path packDir, Pack pack) throws IOException {
-        Path path = packDir.resolve(DOWNLOAD_KEY_FILE);
-        if (pack.downloadVariants().isEmpty()) {
-            Files.deleteIfExists(path);
-            return;
-        }
-        Files.writeString(path, pack.activeDownloadKey(), StandardCharsets.UTF_8);
-    }
-
-    private static CompletableFuture<Boolean> downloadPackInternal(Pack pack, Category category) {
-        if (pack.hasBundlePacks()) {
-            return downloadBundlePack(pack, category);
-        }
-        return downloadSinglePack(pack, category);
-    }
-
-    private static CompletableFuture<Boolean> downloadBundlePack(Pack pack, Category category) {
-        List<Pack.BundlePack> bundlePacks = pack.bundlePacks();
-        if (bundlePacks.isEmpty()) return CompletableFuture.completedFuture(false);
-        ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
-        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-        if (hasStandaloneContent(pack)) futures.add(isStandalonePackInstalled(pack, category) ? CompletableFuture.completedFuture(false) : downloadPackFiles(pack, category, !pack.hasResourceAlbum(), false));
-        futures.addAll(bundlePacks.stream().map(bundlePack -> {
-            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
-            if (bundleCategory.isEmpty()) {
-                Legacy4J.LOGGER.warn("Unknown bundle pack category {} while installing {}", bundlePack.categoryId(), pack.id());
-                return CompletableFuture.completedFuture(false);
-            }
-            return downloadSinglePack(bundlePack.toPack(), bundleCategory.get(), !pack.hasResourceAlbum());
-        }).toList());
-        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).thenApply(v -> {
-            boolean installedAnything = false;
-            for (CompletableFuture<Boolean> future : futures) {
-                installedAnything |= future.getNow(false);
-            }
-            if (pack.hasResourceAlbum()) {
-                boolean standaloneInstalled = !hasStandaloneContent(pack) || isStandalonePackInstalled(pack, category);
-                if (standaloneInstalled && areBundleChildrenInstalled(pack)) {
-                    installedAnything |= DownloadedResourceAlbums.syncBundle(pack);
-                } else {
-                    DownloadedResourceAlbums.removeBundle(pack);
-                }
-            }
-            return installedAnything;
-        }).whenComplete((result, throwable) -> ACTIVE_DOWNLOADS.remove(downloadKey(category, pack)));
-    }
-
-    private static CompletableFuture<Boolean> downloadSinglePack(Pack pack, Category category) {
-        return downloadSinglePack(pack, category, true);
-    }
-
-    private static CompletableFuture<Boolean> downloadSinglePack(Pack pack, Category category, boolean syncResourceAlbum) {
-        if (isPackInstalled(pack, category)) {
-            return CompletableFuture.completedFuture(false);
-        }
-        return downloadPackFiles(pack, category, syncResourceAlbum, true);
-    }
-
-    private static CompletableFuture<Boolean> downloadPackFiles(Pack pack, Category category, boolean syncResourceAlbum, boolean trackActiveDownload) {
-        String folderName = category.targetDirectoryName();
-        Path contentDir = getContentDir(folderName);
-        if (trackActiveDownload) ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                Optional<URI> downloadURI = pack.activeDownloadURI();
-                if (downloadURI.isEmpty()) {
-                    Legacy4J.LOGGER.warn("Pack {} has no download URI.", pack.id());
-                    return false;
-                }
-                Path downloadedTempFile = Files.createTempFile("legacy_pack_", ".zip");
-                
-                try (InputStream stream = downloadURI.get().toURL().openStream()) {
-                    Files.copy(stream, downloadedTempFile, StandardCopyOption.REPLACE_EXISTING);
-                }
-
-                Optional<String> checkSum = pack.activeCheckSum();
-                if (checkSum.isPresent()) {
-                    String fileHash = readFileCheckSum(downloadedTempFile);
-                    if (!checkSum.get().equals(fileHash)) {
-                        Legacy4J.LOGGER.warn("Checksum mismatch for pack {}. Expected {}, got {}", pack.id(), checkSum.get(), fileHash);
-                        Files.deleteIfExists(downloadedTempFile);
-                        return false;
-                    }
-                }
-
-                Path targetFolder = contentDir.resolve(pack.id());
-                if (Files.exists(targetFolder)) {
-                    deleteDirectoryRecursively(targetFolder.toFile());
-                }
-                Files.createDirectories(targetFolder);
-
-                extractZip(downloadedTempFile, targetFolder);
-                if (shouldApplyTransparencyFix(category)) {
-                    Optional<byte[]> originalPackIcon = readOptionalFileBytes(targetFolder.resolve("pack.png"));
-                    Optional<String> originalPackMeta = readOptionalFileText(targetFolder.resolve("pack.mcmeta"));
-                    applyTransparencyFix(targetFolder);
-                    restoreOptionalFileBytes(targetFolder.resolve("pack.png"), originalPackIcon);
-                    mergeTransparencyFixPackMeta(targetFolder, originalPackMeta);
-                }
-                boolean rootResourcePack = Minecraft.getInstance().getResourcePackDirectory().equals(contentDir);
-                if (rootResourcePack) {
-                    DownloadedPackMetadata.write(targetFolder, pack, category);
-                }
-                if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
-                    DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
-                } else if (CustomSkinPackStore.managesTargetDirectory(folderName)) {
-                    CustomSkinPackStore.normalizeDownloadedPack(targetFolder);
-                } else if (rootResourcePack) {
-                    if (syncResourceAlbum && category.useResourceAlbum()) {
-                        DownloadedResourceAlbums.sync(pack);
-                    } else {
-                        DownloadedResourceAlbums.remove(pack.id());
-                    }
-                }
-                LegacyWorldTemplate.downloadDownloadedPack(pack);
-                Files.deleteIfExists(downloadedTempFile);
-
-                writeDownloadKey(targetFolder, pack);
-                if (checkSum.isPresent()) {
-                    Files.writeString(targetFolder.resolve(".md5"), checkSum.get());
-                }
-
-                PackAlbum.Selector.invalidatePackAssets(pack.id());
-                Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
-                return true;
-            } catch (Exception e) {
-                deleteStandalonePack(pack, category);
-                Legacy4J.LOGGER.warn("Error when downloading content pack to {}: {}", contentDir.resolve(pack.id()), e.getMessage());
-                return false;
-            }
-        }).whenComplete((result, throwable) -> {
-            if (trackActiveDownload) ACTIVE_DOWNLOADS.remove(downloadKey(category, pack));
-        });
-    }
-
     public static void deletePack(Pack pack, Category category) {
-        if (pack.hasBundlePacks()) {
-            if (hasStandaloneContent(pack)) deleteStandalonePack(pack, category);
-            DownloadedResourceAlbums.removeBundle(pack);
-            for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
-                getCategory(bundlePack.categoryId()).ifPresent(bundleCategory -> deletePack(bundlePack.toPack(), bundleCategory));
-            }
-            return;
-        }
-        deleteStandalonePack(pack, category);
-    }
-
-    private static void deleteStandalonePack(Pack pack, Category category) {
-        Path packDir = getContentDir(category.targetDirectoryName()).resolve(pack.id());
-        if (Files.exists(packDir)) {
-            deleteDirectoryRecursively(packDir.toFile());
-        }
-        DownloadedPackMetadata.clear(pack.id());
-        DownloadedResourceAlbums.remove(pack.id());
-        PackAlbum.Selector.invalidatePackAssets(pack.id());
-        LegacyWorldTemplate.removeDownloadedPack(pack.id());
-        LegacyWorldTemplate.refreshDownloadedPacks();
-    }
-
-    private static boolean areBundleChildrenInstalled(Pack pack) {
-        if (!pack.hasBundlePacks()) return false;
-        for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
-            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
-            if (bundleCategory.isEmpty() || !isPackInstalled(bundlePack.toPack(), bundleCategory.get())) return false;
-        }
-        return true;
-    }
-
-    private static void deleteDirectoryRecursively(File directory) {
-        File[] allContents = directory.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectoryRecursively(file);
-            }
-        }
-        directory.delete();
-    }
-
-    private static void extractZip(Path zipFile, Path targetDir) throws IOException {
-        try (ZipFile zip = new ZipFile(zipFile.toFile())) {
-            String rootPrefix = detectRootPrefix(zip);
-            Enumeration<? extends ZipEntry> entries = zip.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                String normalizedName = normalizeZipEntryName(entry.getName());
-                if (rootPrefix != null && normalizedName.startsWith(rootPrefix)) normalizedName = normalizedName.substring(rootPrefix.length());
-                if (normalizedName.isEmpty()) continue;
-                Path entryPath = targetDir.resolve(normalizedName);
-
-                if (!entryPath.normalize().startsWith(targetDir.normalize())) {
-                    throw new IOException("Zip entry is outside of the target directory: " + normalizedName);
-                }
-
-                if (entry.isDirectory() || normalizedName.endsWith("/")) {
-                    Files.createDirectories(entryPath);
-                } else {
-                    if (entryPath.getParent() != null) {
-                        Files.createDirectories(entryPath.getParent());
-                    }
-                    try (InputStream in = zip.getInputStream(entry)) {
-                        Files.copy(in, entryPath, StandardCopyOption.REPLACE_EXISTING);
-                    }
-                }
-            }
-        }
-    }
-
-    private static String detectRootPrefix(ZipFile zip) {
-        String root = null;
-        Enumeration<? extends ZipEntry> entries = zip.entries();
-        while (entries.hasMoreElements()) {
-            String name = normalizeZipEntryName(entries.nextElement().getName());
-            if (name.isEmpty()) continue;
-            int split = name.indexOf('/');
-            if (split < 0) return null;
-            String candidate = name.substring(0, split);
-            if (candidate.isEmpty()) return null;
-            if (root == null) root = candidate;
-            else if (!root.equals(candidate)) return null;
-        }
-        return root == null ? null : root + "/";
-    }
-
-    private static String normalizeZipEntryName(String name) {
-        if (name == null) return "";
-        String normalized = name.replace('\\', '/');
-        while (normalized.startsWith("/")) normalized = normalized.substring(1);
-        return normalized;
+        ContentPackDownloader.delete(pack, category);
     }
 }
