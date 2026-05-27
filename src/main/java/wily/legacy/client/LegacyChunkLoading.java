@@ -173,8 +173,8 @@ public final class LegacyChunkLoading {
         revealed.add(section);
         changed |= featureReadyAt.remove(section) != null;
         changed |= hiddenFeatureSections.remove(section);
-        if (dirty && changed && pending.isEmpty()) {
-            markDirty(section);
+        if (dirty && changed) {
+            markDirtyAround(section);
         }
     }
 
@@ -194,7 +194,7 @@ public final class LegacyChunkLoading {
             boolean immediate = section.getBoundingBox().distanceToSqr(center) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE;
             if (revealed.contains(key)) {
                 if (immediate && hasDelayedFeatures(key)) {
-                    clearSectionDelay(key, false);
+                    clearSectionDelay(key, true);
                 }
                 continue;
             }
@@ -251,7 +251,7 @@ public final class LegacyChunkLoading {
         boolean immediate = distanceToSectionSqr(originX, originY, originZ, cameraX, cameraY, cameraZ) <= IMMEDIATE_DISTANCE * IMMEDIATE_DISTANCE;
         if (revealed.contains(key)) {
             if (immediate && hasDelayedFeatures(key)) {
-                clearSectionDelay(key, false);
+                clearSectionDelay(key, true);
             }
             return;
         }
