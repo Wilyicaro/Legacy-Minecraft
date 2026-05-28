@@ -273,20 +273,21 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          }
          LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, fontOverride -> {
             float topTooltipScale = this.accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isFHD() ? 2 / 3f : 1.0f);
+            int topTextColor = CommonColor.ITEM_NAME_TEXT.get();
             graphics.pose().pushMatrix();
             Component filter = this.filterText();
             graphics.pose().translate(filterTooltipX + (filterTooltipWidth - this.font.width(filter) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("filterText.y", 6));
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.drawString(this.font, filter, 0, 0, 0xFFFFFFFF);
+            graphics.drawString(this.font, filter, 0, 0, topTextColor);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
             graphics.pose().translate(boardTooltipX + (boardTooltipWidth - this.font.width(board.displayName()) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("boardText.y", 6));
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.drawString(this.font, board.displayName(), 0, 0, 0xFFFFFFFF);
+            graphics.drawString(this.font, board.displayName(), 0, 0, topTextColor);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
             Component entries = Component.translatable("legacy.menu.leaderboard.entries", this.rows.size());
@@ -294,7 +295,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.drawString(this.font, entries, 0, 0, 0xFFFFFFFF);
+            graphics.drawString(this.font, entries, 0, 0, topTextColor);
             graphics.pose().popMatrix();
          });
          if (board.columns().isEmpty()) {

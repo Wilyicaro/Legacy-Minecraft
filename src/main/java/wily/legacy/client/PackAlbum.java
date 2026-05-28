@@ -508,11 +508,13 @@ public record PackAlbum(String id, int version, Component displayName, Component
             boolean sd = LegacyOptions.getUIMode().isSD();
             int nameWidth = width - 53;
             int lineHeight = sd ? 8 : 12;
+            Component displayName = album.displayName().copy().withColor(CommonColor.ITEM_NAME_TEXT.get() & 0x00FFFFFF);
+            Component description = album.description().copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
             FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-            (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(album.displayName(), nameWidth).visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, graphics.textRenderer());
+            (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(displayName, nameWidth).visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, graphics.textRenderer());
             graphics.disableScissor();
             int descriptionWidth = width - 16;
-            MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(album.description(), descriptionWidth);
+            MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(description, descriptionWidth);
             int descriptionFromBottom = sd ? 52 : 78;
             Identifier background = getAlbumBackground(album, displayPack);
             int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;

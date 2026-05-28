@@ -139,12 +139,14 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 boolean sd = LegacyOptions.getUIMode().isSD();
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
+                Component title = DownloadedPackMetadata.getTitle(selectedPack).copy().withColor(CommonColor.ITEM_NAME_TEXT.get() & 0x00FFFFFF);
+                Component description = DownloadedPackMetadata.getDescription(selectedPack).copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getTitle(selectedPack), nameWidth).visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, graphics.textRenderer());
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(title, nameWidth).visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, graphics.textRenderer());
                 graphics.disableScissor();
                 Identifier background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getDescription(selectedPack), descriptionWidth);
+                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(description, descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
