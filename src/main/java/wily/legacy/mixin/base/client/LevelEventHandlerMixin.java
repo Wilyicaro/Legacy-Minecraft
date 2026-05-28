@@ -6,6 +6,7 @@ import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import wily.legacy.client.LegacyMusicFader;
 
@@ -19,5 +20,15 @@ public abstract class LevelEventHandlerMixin {
     @Redirect(method = "stopJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
     public void fadeJukeboxSong(SoundManager instance, SoundInstance soundInstance) {
         LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
+    }
+
+    @ModifyArg(method = "levelEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 1)
+    private float legacyPortalTravelPitch(float pitch) {
+        return 1.0f;
+    }
+
+    @ModifyArg(method = "levelEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 2)
+    private float legacyPortalTravelVolume(float volume) {
+        return 1.0f;
     }
 }

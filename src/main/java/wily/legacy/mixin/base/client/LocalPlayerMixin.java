@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -272,6 +273,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isAllowedInPortal()Z"))
     public boolean handleConfusionTransitionEffect(boolean original) {
         return original || Legacy4JClient.hasModOnServer();
+    }
+
+    @ModifyArg(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 1)
+    private float legacyPortalTriggerPitch(float pitch) {
+        return 1.0f;
+    }
+
+    @ModifyArg(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 2)
+    private float legacyPortalTriggerVolume(float volume) {
+        return 1.0f;
     }
 
     @Inject(method = /*? if <1.21.5 {*//*"serverAiStep"*//*?} else {*/"applyInput"/*?}*/, at = @At("RETURN"))
