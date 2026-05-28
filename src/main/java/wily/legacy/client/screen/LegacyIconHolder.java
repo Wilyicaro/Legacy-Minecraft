@@ -308,7 +308,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     public static boolean usesSlotPadding(ItemStack item) {
-        return !item.has(DataComponents.TOOL) && !item.is(LegacyTags.FULL_SIZE_SLOT_ITEMS);
+        return item.is(LegacyTags.PADDED_SLOT_ITEMS) || (!item.has(DataComponents.TOOL) && !item.is(LegacyTags.FULL_SIZE_SLOT_ITEMS));
     }
 
     public void renderHighlight(GuiGraphics graphics) {
