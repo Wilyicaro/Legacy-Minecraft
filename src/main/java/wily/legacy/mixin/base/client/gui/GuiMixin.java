@@ -3,6 +3,7 @@ package wily.legacy.mixin.base.client.gui;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -20,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
@@ -48,6 +50,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
@@ -121,6 +124,15 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     @WrapMethod(method = "renderSlot")
     void renderSlotWithTransparency(GuiGraphics graphics, int i, int j, DeltaTracker deltaTracker, Player player, ItemStack itemStack, int k, Operation<Void> original) {
         LegacyGuiItemRenderer.secureTranslucentRender(true, LegacyRenderUtil.getHUDOpacity(), b -> original.call(graphics, i, j, deltaTracker, player, itemStack, k));
+    }
+
+    @WrapOperation(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;III)V"))
+    private void renderHotbarItem(GuiGraphics graphics, LivingEntity entity, ItemStack itemStack, int i, int j, int k, Operation<Void> original) {
+        if (!LegacyIconHolder.usesSlotPadding(itemStack)) {
+            original.call(graphics, entity, itemStack, i, j, k);
+            return;
+        }
+        LegacyIconHolder.renderPaddedItem(graphics, itemStack, i, j, () -> original.call(graphics, entity, itemStack, 0, 0, k));
     }
 
     @Inject(method = "displayScoreboardSidebar", at = @At("HEAD"), cancellable = true)

@@ -75,7 +75,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     @Override
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning) {
         if (!item.isEmpty()) renderItem(graphics, () -> {
-            graphics.renderItem(item, 0, 0, itemSeed);
+            renderPaddedItem(graphics, item, () -> graphics.renderItem(item, 0, 0, itemSeed));
             if (allowItemDecorations)
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item, 0, 0, quickCraftText);
         }, x, y, isWarning);
