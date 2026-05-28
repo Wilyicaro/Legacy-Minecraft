@@ -33,10 +33,6 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
-    private static final int LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS = 4;
-    private static final float LEGACY_TRIDENT_FIRST_PERSON_EXTRA_RAISE_TICKS = 0.75F;
-    private static final float LEGACY_TRIDENT_FIRST_PERSON_POSE_Y_OFFSET = 0.125F;
-
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -186,14 +182,6 @@ public abstract class ItemInHandRendererMixin {
             poseStack.popPose();
             return;
         }
-        if (!abstractClientPlayer.isUsingItem() || abstractClientPlayer.getUseItemRemainingTicks() <= 0 || abstractClientPlayer.getUsedItemHand() != interactionHand || itemStack.getUseAnimation() != /*? if <1.21.11 {*//*ItemUseAnimation.SPEAR*//*?} else {*/ItemUseAnimation.TRIDENT/*?}*/) {
-            return;
-        }
-        applyLegacyTridentFirstPersonTransform(abstractClientPlayer, itemStack, humanoidArm, i, k, f, poseStack);
-        this.renderItem(abstractClientPlayer, itemStack, humanoidArm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, submitNodeCollector, j);
-        ci.cancel();
-        poseStack.popPose();
-
     }
 
     @Unique
@@ -218,47 +206,6 @@ public abstract class ItemInHandRendererMixin {
         poseStack.translate((float) k * lx, mx, n);
         this.applyItemArmTransform(poseStack, humanoidArm, i);
         this.applyItemArmAttackTransform(poseStack, humanoidArm, h);
-    }
-
-    @Unique
-    private void applyLegacyTridentFirstPersonTransform(AbstractClientPlayer abstractClientPlayer, ItemStack itemStack, HumanoidArm humanoidArm, float equipProgress, int armDirection, float partialTick, PoseStack poseStack) {
-        this.applyItemArmTransform(poseStack, humanoidArm, equipProgress);
-        float useTicks = (float) itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float) abstractClientPlayer.getUseItemRemainingTicks() - partialTick + 1.0F);
-        float progress = getLegacyTridentFirstPersonProgress(useTicks);
-        poseStack.translate(0.0F, LEGACY_TRIDENT_FIRST_PERSON_POSE_Y_OFFSET, 0.0F);
-        poseStack.translate(armDirection * -0.5F * progress, 0.7F * progress, 0.1F * progress);
-        poseStack.mulPose(Axis.XP.rotationDegrees(-55.0F * progress));
-        poseStack.mulPose(Axis.YP.rotationDegrees(armDirection * 35.3F * progress));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(armDirection * -9.785F * progress));
-        if (progress > 0.1F) {
-            float bob = Mth.sin((useTicks - 0.1F) * 1.3F);
-            float bobStrength = bob * (progress - 0.1F) * progress;
-            poseStack.translate(0.0F, bobStrength * 0.004F, 0.0F);
-        }
-        poseStack.translate(0.0F, 0.0F, progress * 0.2F);
-        poseStack.scale(1.0F, 1.0F, 1.0F + progress * 0.2F);
-        poseStack.mulPose(Axis.YN.rotationDegrees(armDirection * 45.0F * progress));
-    }
-
-    @Unique
-    private float getLegacyTridentFirstPersonProgress(float useTicks) {
-        float adjustedTicks = Mth.clamp(useTicks * LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS / (LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS + LEGACY_TRIDENT_FIRST_PERSON_EXTRA_RAISE_TICKS), 0.0F, (float) LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS);
-        int lowerTick = Mth.floor(adjustedTicks);
-        int upperTick = Math.min(lowerTick + 1, LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS);
-        return Mth.lerp(adjustedTicks - lowerTick, getLegacyTridentFirstPersonRaiseSample(lowerTick), getLegacyTridentFirstPersonRaiseSample(upperTick));
-    }
-
-    @Unique
-    private float getLegacyTridentFirstPersonRaiseSample(int ticksUsingItem) {
-        return switch (ticksUsingItem) {
-            case 0 -> 0.0F;
-            case 1 -> 0.70F;
-            case 2 -> 0.76F;
-            case 3 -> 0.82F;
-            case 4 -> 0.88F;
-            case 5 -> 0.94F;
-            default -> 1.0F;
-        };
     }
 
     //? if <1.21.4 {
