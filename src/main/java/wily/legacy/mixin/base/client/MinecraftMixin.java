@@ -552,7 +552,7 @@ public abstract class MinecraftMixin {
             setScreen(replacement);
             return;
         }
-        if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen()))
+        if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && !(screen instanceof LegacyLoading) && (screen instanceof PauseScreen || !screen.isPauseScreen()))
             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
         if (screen == null && level != null) {
             LegacyGuiElements.lastGui = Util.getMillis();
