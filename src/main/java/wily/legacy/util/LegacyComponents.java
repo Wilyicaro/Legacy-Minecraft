@@ -19,7 +19,7 @@ public class LegacyComponents {
     public static final Component CUSTOM_SKIN_PACK_OPTIONS = Component.translatable("legacy.menu.custom_skin_pack_options");
     public static final Component GLOBAL_RESOURCE_PACKS = Component.translatable("legacy.menu.global_packs.resource");
     public static final Component SELECT = Component.translatable("mco.template.button.select");
-    public static final Component USE = Component.translatable("key.use");
+    public static final Component USE = Component.translatableWithFallback("legacy.action.use", "Use");
     public static final Component ACTION = Component.translatable("key.attack");
     public static final Component ADD = Component.translatable("legacy.action.add");
     public static final Component ADD_PAGE = Component.translatable("legacy.action.add_page");

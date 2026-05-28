@@ -282,7 +282,13 @@ public abstract class MinecraftMixin {
         if (player == null || level == null || hitResult == null) return false;
         ItemStack item = player.getItemInHand(hand);
         if (hitResult.getType() == HitResult.Type.ENTITY && hitResult instanceof EntityHitResult entityHit) return legacy$suppressesEntityUseAnimation(entityHit.getEntity(), item);
-        return hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHit && level.getBlockState(blockHit.getBlockPos()).getBlock() instanceof RedStoneOreBlock;
+        return hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHit && legacy$suppressesRedstoneUseAnimation(hand, item, blockHit);
+    }
+
+    @Unique
+    private boolean legacy$suppressesRedstoneUseAnimation(InteractionHand hand, ItemStack item, BlockHitResult hit) {
+        if (!(level.getBlockState(hit.getBlockPos()).getBlock() instanceof RedStoneOreBlock)) return false;
+        return !(item.getItem() instanceof BlockItem);
     }
 
     @Unique
