@@ -9,6 +9,7 @@ import wily.legacy.Legacy4J;
 
 public class LegacyTags {
     public static final TagKey<Item> FULL_SIZE_SLOT_ITEMS = TagKey.create(Registries.ITEM, Legacy4J.createModLocation("full_size_slot_items"));
+    public static final TagKey<Item> PADDED_SLOT_ITEMS = TagKey.create(Registries.ITEM, Legacy4J.createModLocation("padded_slot_items"));
     public static final TagKey<Block> PUSHABLE_BLOCK = TagKey.create(Registries.BLOCK, Legacy4J.createModLocation("pushable"));
     public static final TagKey<Block> WATER_CAULDRONS = TagKey.create(Registries.BLOCK, Legacy4J.createModLocation("water_cauldrons"));
     public static final TagKey<Block> SLOW_CHUNK_FEATURES = TagKey.create(Registries.BLOCK, Legacy4J.createModLocation("slow_chunk_features"));

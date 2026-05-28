@@ -2,6 +2,9 @@
   "values": [
     "minecraft:bow",
     "minecraft:fishing_rod",
+    "minecraft:carrot_on_a_stick",
+    "minecraft:warped_fungus_on_a_stick",
+    "minecraft:crossbow",
     "#minecraft:banners",
     "minecraft:bell"
   ]
