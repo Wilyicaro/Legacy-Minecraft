@@ -507,18 +507,20 @@ public record PackAlbum(String id, int version, Component displayName, Component
             boolean sd = LegacyOptions.getUIMode().isSD();
             int nameWidth = width - 53;
             int lineHeight = sd ? 8 : 12;
+            Component displayName = album.displayName().copy().withColor(CommonColor.ITEM_NAME_TEXT.get() & 0x00FFFFFF);
+            Component description = album.description().copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
             FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-            (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(album.displayName(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+            (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(displayName, nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, CommonColor.ITEM_NAME_TEXT.get());
             graphics.disableScissor();
             int descriptionWidth = width - 16;
-            MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(album.description(), descriptionWidth);
+            MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(description, descriptionWidth);
             int descriptionFromBottom = sd ? 52 : 78;
             ResourceLocation background = getAlbumBackground(album, displayPack);
             int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
             int left = x + (sd ? 5 : 8);
-            scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
+            scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, CommonColor.TIP_TEXT.get()));
             renderAlbumBackground(graphics, album, background, left, y + height - descriptionFromBottom, sd ? 95 : 145, sd ? 47 : 72);
         }
 

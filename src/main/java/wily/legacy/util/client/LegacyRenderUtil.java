@@ -557,9 +557,12 @@ public class LegacyRenderUtil {
             int l = Math.min((int) ((float) GuiAccessor.getInstance().getToolHighlightTimer() * 256.0f / 10.0f), 255);
             if (l > 0) {
                 int itemNameText = CommonColor.ITEM_NAME_TEXT.get();
+                int itemTooltipText = CommonColor.ITEM_TOOLTIP_TEXT.get();
                 int itemNameColor = (itemNameText & 0x00FFFFFF) | Math.round((itemNameText >>> 24) * l / 255f * getHUDOpacity()) << 24;
+                int itemTooltipColor = (itemTooltipText & 0x00FFFFFF) | Math.round((itemTooltipText >>> 24) * l / 255f * getHUDOpacity()) << 24;
                 int defaultColor = 0x00FFFFFF | Math.round(l * getHUDOpacity()) << 24;
                 boolean overrideItemNameColor = CommonColor.ITEM_NAME_TEXT.isOverridden();
+                boolean overrideItemTooltipColor = CommonColor.ITEM_TOOLTIP_TEXT.isOverridden();
                 int height = LegacyOptions.selectedItemTooltipSpacing.get() * (tooltipLines.size() - 1);
                 guiGraphics.pose().translate(0, -height);
                 if (!mc.options.backgroundForChatOnly().get()) {
@@ -574,8 +577,17 @@ public class LegacyRenderUtil {
                     int x = (guiGraphics.guiWidth() - width) / 2;
                     boolean itemNameLine = line[0]++ == 0;
                     boolean useItemNameColor = itemNameLine && overrideItemNameColor;
-                    Component text = useItemNameColor ? mutableComponent.copy().withStyle(s -> s.withColor(itemNameText & 0x00FFFFFF)) : mutableComponent;
-                    guiGraphics.drawString(font, text, x, 0, useItemNameColor ? itemNameColor : defaultColor);
+                    boolean useItemTooltipColor = !itemNameLine && overrideItemTooltipColor;
+                    Component text = mutableComponent;
+                    int color = defaultColor;
+                    if (useItemNameColor) {
+                        text = mutableComponent.copy().withStyle(s -> s.withColor(itemNameText & 0x00FFFFFF));
+                        color = itemNameColor;
+                    } else if (useItemTooltipColor) {
+                        text = mutableComponent.copy().withStyle(s -> s.withColor(itemTooltipText & 0x00FFFFFF));
+                        color = itemTooltipColor;
+                    }
+                    guiGraphics.drawString(font, text, x, 0, color);
                     guiGraphics.pose().translate(0, LegacyOptions.selectedItemTooltipSpacing.get());
                 });
             }
@@ -667,9 +679,10 @@ public class LegacyRenderUtil {
         ClientTooltipComponent tooltipComponent;
         try {
             Integer itemNameText = CommonColor.ITEM_NAME_TEXT.isOverridden() ? CommonColor.ITEM_NAME_TEXT.get() : null;
+            Integer itemTooltipText = CommonColor.ITEM_TOOLTIP_TEXT.isOverridden() ? CommonColor.ITEM_TOOLTIP_TEXT.get() : null;
             for (t = 0; t < list.size(); ++t) {
                 tooltipComponent = list.get(t);
-                tooltipTextColorOverride = t == 0 ? itemNameText : null;
+                tooltipTextColorOverride = t == 0 ? itemNameText : itemTooltipText;
                 tooltipComponent.renderText(graphics, font, 0, s);
                 s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
             }

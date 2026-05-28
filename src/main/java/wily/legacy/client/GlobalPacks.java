@@ -138,18 +138,20 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 boolean sd = LegacyOptions.getUIMode().isSD();
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
+                Component title = DownloadedPackMetadata.getTitle(selectedPack).copy().withColor(CommonColor.ITEM_NAME_TEXT.get() & 0x00FFFFFF);
+                Component description = DownloadedPackMetadata.getDescription(selectedPack).copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getTitle(selectedPack), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(title, nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, CommonColor.ITEM_NAME_TEXT.get());
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(DownloadedPackMetadata.getDescription(selectedPack), descriptionWidth);
+                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(description, descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
                 scrollableRenderer.lineHeight = lineHeight;
                 int left = x + (sd ? 5 : 8);
-                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
+                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, CommonColor.TIP_TEXT.get()));
                 if (background != null)
                     FactoryGuiGraphics.of(graphics).blit(background, left, y + height - descriptionFromBottom, 0.0f, 0.0f, descriptionWidth, sd ? 47 : 72, descriptionWidth, sd ? 47 : 72);
             }
