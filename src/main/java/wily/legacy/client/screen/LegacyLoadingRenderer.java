@@ -67,13 +67,15 @@ public class LegacyLoadingRenderer implements Renderable {
                         guiGraphics.drawString(minecraft.font, loadingStage, stageX, stageY, CommonColor.STAGE_TEXT.get());
                     });
                 }
-                try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, loadingBarX, loadingBarY, 320, 320 * contents.height() / contents.width());
+                ResourceLocation loadingBackground = accessor.getElementValue("loadingBar.backgroundSprite", LOADING_BACKGROUND, ResourceLocation.class);
+                ResourceLocation loadingBar = accessor.getElementValue("loadingBar.sprite", LOADING_BAR, ResourceLocation.class);
+                try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(loadingBackground).contents()) {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(loadingBackground, loadingBarX, loadingBarY, 320, 320 * contents.height() / contents.width());
                 }
                 if (steppedProgress > 0) {
-                    try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BAR).contents()) {
+                    try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(loadingBar).contents()) {
                         int fillWidth = Math.min(318, Math.round(318.0f * steppedProgress / 100.0f));
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1, 0, fillWidth, 318 * contents.height() / contents.width());
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(loadingBar, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1, 0, fillWidth, 318 * contents.height() / contents.width());
                     }
                 }
                 LegacyTip tip = Legacy4JClient.legacyTipManager.getLoadingTip();
