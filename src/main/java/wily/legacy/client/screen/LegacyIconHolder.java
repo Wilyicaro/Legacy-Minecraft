@@ -12,6 +12,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
@@ -37,6 +38,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
+    private static final float ITEM_PADDING = 1.0f;
+    private static final float ITEM_SCALE = 14.0f / 16.0f;
     public Vec2 offset = Vec2.ZERO;
     public Identifier iconSprite = null;
     public ArbitrarySupplier<Identifier> iconHolderOverride = null;
@@ -224,7 +227,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
 
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning) {
         if (!item.isEmpty()) renderItem(graphics, () -> {
-            graphics.renderFakeItem(item, 0, 0);
+            renderPaddedItem(graphics, item, () -> graphics.renderFakeItem(item, 0, 0));
             if (allowItemDecorations)
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item, 0, 0);
         }, x, y, isWarning);
@@ -285,6 +288,26 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         applyOffset(graphics);
         render.run();
         graphics.pose().popMatrix();
+    }
+
+    public static void renderPaddedItem(GuiGraphics graphics, ItemStack item, Runnable render) {
+        renderPaddedItem(graphics, item, 0, 0, render);
+    }
+
+    public static void renderPaddedItem(GuiGraphics graphics, ItemStack item, float x, float y, Runnable render) {
+        if (!usesSlotPadding(item)) {
+            render.run();
+            return;
+        }
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x + ITEM_PADDING, y + ITEM_PADDING);
+        graphics.pose().scale(ITEM_SCALE, ITEM_SCALE);
+        render.run();
+        graphics.pose().popMatrix();
+    }
+
+    public static boolean usesSlotPadding(ItemStack item) {
+        return !item.has(DataComponents.TOOL);
     }
 
     public void renderHighlight(GuiGraphics graphics) {
