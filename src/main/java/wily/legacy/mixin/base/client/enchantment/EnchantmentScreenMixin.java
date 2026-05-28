@@ -187,7 +187,8 @@ public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory i
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                GuiGraphicsExtractor.textWithWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, CommonColor.INVALID_ENCHANTMENT_TEXT.get(), false);
+                int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : CommonColor.INVALID_ENCHANTMENT_TEXT.get();
+                GuiGraphicsExtractor.textWithWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText, false);
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + (sd ? 52.5 : 80.5));
@@ -199,7 +200,8 @@ public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory i
                     FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_ACTIVE : LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, buttonWidth, buttonHeight);
                 }
                 FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
-                GuiGraphicsExtractor.textWithWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, s, false);
+                int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : s;
+                GuiGraphicsExtractor.textWithWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText, false);
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
             int color = s;

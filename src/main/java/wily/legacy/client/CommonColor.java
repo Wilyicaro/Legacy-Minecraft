@@ -38,12 +38,17 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor TIP_TEXT = registerCommonColor("tip_text", 0xFFFFFFFF);
     public static final CommonColor ACTION_TEXT = registerCommonColor("action_text", 0xFFFFFFFF);
     public static final CommonColor ITEM_NAME_TEXT = registerCommonColor("item_name_text", 0xFFFFFFFF);
+    public static final CommonColor ITEM_TOOLTIP_TEXT = registerCommonColor("item_tooltip_text", 0xFFFFFFFF);
+    public static final CommonColor MAP_COORDINATE_TEXT = registerCommonColor("map_coordinate_text", 0xFF000000);
+    public static final CommonColor DEATH_MESSAGE_TEXT = registerCommonColor("death_message_text", 0xFFFFFFFF);
+    public static final CommonColor BOSS_TEXT = registerCommonColor("boss_text", 0xFFFFFFFF);
     public static final CommonColor SELECTED_STORAGE_SAVE = registerCommonColor("selected_storage_save", 0xFFFFFF00);
     public static final CommonColor STORAGE_SAVE = registerCommonColor("storage_save", 0xFF8C9DE2);
     public static final CommonColor EXPERIENCE_TEXT = registerCommonColor("experience_text", 0xFF80FF20);
     public static final CommonColor INSUFFICIENT_EXPERIENCE_TEXT = registerCommonColor("insufficient_experience_text", 0xFFCF1F1D);
     public static final CommonColor ANVIL_ERROR_TEXT = registerCommonColor("anvil_error_text", 0xFFFF6060);
     public static final CommonColor ENCHANTMENT_TEXT = registerCommonColor("enchantment_text", 0xFF685E4A);
+    public static final CommonColor ENCHANTMENT_LANGUAGE_TEXT = registerCommonColor("enchantment_language_text", 0xFF685E4A);
     public static final CommonColor INVALID_ENCHANTMENT_TEXT = registerCommonColor("invalid_enchantment_text", 0xFF383222);
     public static final CommonColor HIGHLIGHTED_ENCHANTMENT_TEXT = registerCommonColor("highlighted_enchantment_text", 0xFFFFFF80);
     public static final CommonColor BLACK = registerCommonColor("black", 0xFF000000);

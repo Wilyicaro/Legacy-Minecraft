@@ -111,7 +111,7 @@ public abstract class MapRendererMixin {
             poseStack.pushPose();
             poseStack.translate(-0.2f, 0.4f, -0.1f);
             poseStack.scale(1.0f, 0.95f, 1.0f);
-            submitNodeCollector.submitText(poseStack, 0.0f, 0.0f, Component.translatable("legacy.map.coords", (int) minecraft.player.getX(), (int) minecraft.player.getEyeY(), (int) minecraft.player.getZ()).getVisualOrderText(), false, Font.DisplayMode.NORMAL, i, CommonColor.BLACK.get(), 0, 0);
+            submitNodeCollector.submitText(poseStack, 0.0f, 0.0f, Component.translatable("legacy.map.coords", (int) minecraft.player.getX(), (int) minecraft.player.getEyeY(), (int) minecraft.player.getZ()).getVisualOrderText(), false, Font.DisplayMode.NORMAL, i, CommonColor.MAP_COORDINATE_TEXT.get(), 0, 0);
             poseStack.popPose();
         }
     }

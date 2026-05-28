@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -37,7 +38,7 @@ public abstract class BossHealthOverlayMixin {
             graphics.pose().translate(graphics.guiWidth() / 2f, j);
             if (!b) graphics.pose().scale(2 / 3f, 2 / 3f);
             graphics.pose().translate(-font.width(component) / 2f, 0);
-            graphics.text(font, component, 0, 0, k);
+            graphics.text(font, component, 0, 0, CommonColor.BOSS_TEXT.isOverridden() ? CommonColor.BOSS_TEXT.get() : k);
             graphics.pose().popMatrix();
             LegacyFontUtil.forceVanillaFontShadowColor = false;
         });
