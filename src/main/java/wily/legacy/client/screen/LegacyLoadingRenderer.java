@@ -87,6 +87,15 @@ public class LegacyLoadingRenderer implements Renderable {
             }
         } else LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, (width - 75) / 2, height / 2);
 
+        Identifier loadingIcon = accessor.getElementValue("loadingIcon.sprite", null, Identifier.class);
+        if (loadingIcon != null) {
+            int iconWidth = accessor.getInteger("loadingIcon.width", 16);
+            int iconHeight = accessor.getInteger("loadingIcon.height", iconWidth);
+            int iconX = accessor.getInteger("loadingIcon.x", (width - iconWidth) / 2);
+            int iconY = accessor.getInteger("loadingIcon.y", Math.round(accessor.getFloat("loadingHeader.y", height / 2 - 23) - iconHeight - 8));
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(loadingIcon, iconX, iconY, iconWidth, iconHeight);
+        }
+
         if (loadingHeader != null) {
             LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
                 GuiGraphicsExtractor.pose().pushMatrix();
