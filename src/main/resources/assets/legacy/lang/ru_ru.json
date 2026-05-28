@@ -1781,7 +1781,7 @@
   "legacy.menu.leaderboard.username": "Имя игрока",
   "legacy.menu.leaderboard.using_items": "Использованные предметы",
   "legacy.menu.leaderboard.view.around_me": "Around Me",
-  "legacy.menu.leaderboard.view.top": "Top",
+  "legacy.menu.leaderboard.view.top": "Overall",
   "legacy.menu.leaderboards": "Списки лидеров",
   "legacy.menu.leaving": "Выход из %s",
   "legacy.menu.legacy_settings": "Legacy Settings",
