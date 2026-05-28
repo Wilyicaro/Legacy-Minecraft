@@ -142,7 +142,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         }
         Component content = clientboundSystemChatPacket.content();
         if (deathMessage && CommonColor.DEATH_MESSAGE_TEXT.isOverridden()) {
-            content = content.copy().withStyle(s -> s.withColor(CommonColor.DEATH_MESSAGE_TEXT.get() & 0x00FFFFFF));
+            content = Component.empty().withStyle(s -> s.withColor(CommonColor.DEATH_MESSAGE_TEXT.get() & 0x00FFFFFF)).append(content);
         }
         if (!LegacyOptions.systemMessagesAsOverlay.get()) {
             minecraft.getChatListener().handleSystemMessage(content, false);
@@ -154,7 +154,16 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     }
 
     private static boolean isDeathMessage(Component component) {
-        return component.getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.");
+        if (component.getContents() instanceof TranslatableContents contents) {
+            if (contents.getKey().startsWith("death.")) return true;
+            for (Object arg : contents.getArgs()) {
+                if (arg instanceof Component child && isDeathMessage(child)) return true;
+            }
+        }
+        for (Component sibling : component.getSiblings()) {
+            if (isDeathMessage(sibling)) return true;
+        }
+        return false;
     }
 
     private static boolean isAdvancementAnnouncement(Component component) {

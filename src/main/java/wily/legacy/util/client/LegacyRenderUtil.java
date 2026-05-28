@@ -94,6 +94,7 @@ public class LegacyRenderUtil {
     public static boolean suppressInventoryElytraPose;
     @Nullable
     public static Integer tooltipTextColorOverride;
+    public static boolean tooltipTextColorOverrideForcesStyle;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
     public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
     public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
@@ -682,11 +683,13 @@ public class LegacyRenderUtil {
             for (t = 0; t < list.size(); ++t) {
                 tooltipComponent = list.get(t);
                 tooltipTextColorOverride = t == 0 ? itemNameText : itemTooltipText;
+                tooltipTextColorOverrideForcesStyle = t == 0 && itemNameText != null;
                 tooltipComponent.renderText(graphics, font, 0, s);
                 s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
             }
         } finally {
             tooltipTextColorOverride = null;
+            tooltipTextColorOverrideForcesStyle = false;
         }
 
         s = 0;
