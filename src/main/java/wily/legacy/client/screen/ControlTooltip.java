@@ -366,7 +366,13 @@ public interface ControlTooltip {
         if (minecraft.player.isSleeping()) return LegacyComponents.WAKE_UP;
         if (minecraft.hitResult instanceof EntityHitResult r && (r.getEntity() instanceof AbstractVillager m && (!(m instanceof Villager v) || /*? if <1.21.5 {*//*v.getVillagerData().getProfession() != VillagerProfession.NONE*//*?} else {*/!v.getVillagerData().profession().is(VillagerProfession.NONE)/*?}*/) && !m.isTrading()))
             return LegacyComponents.TRADE;
-        if (entity instanceof ItemFrame itemFrame && !itemFrame.getItem().isEmpty()) return LegacyComponents.ROTATE;
+        if (entity instanceof ItemFrame itemFrame) {
+            if (!itemFrame.getItem().isEmpty())
+                return LegacyComponents.ROTATE;
+            if (!mainHand.isEmpty() || !minecraft.player.getOffhandItem().isEmpty())
+                return LegacyComponents.PLACE;
+            return null;
+        }
         if (entity instanceof LeashFenceKnotEntity knot) {
             BlockPos fencePos = knot.getPos();
             if (!minecraft.level.getEntities((Entity) null, new AABB(fencePos).inflate(8.0D), e -> (e instanceof Mob mob && mob.getLeashHolder() == minecraft.player) || e instanceof Boat boat && boat.getLeashHolder() == minecraft.player || e instanceof ChestBoat chestBoat && chestBoat.getLeashHolder() == minecraft.player).isEmpty())
@@ -471,6 +477,15 @@ public interface ControlTooltip {
                     if (item.is(Items.BOOK) || item.is(Items.WRITABLE_BOOK) || item.is(Items.WRITTEN_BOOK) || item.is(Items.ENCHANTED_BOOK))
                         return LegacyComponents.PLACE;
                 }
+            }
+        }
+        if (blockHit != null && blockState != null && blockState.getBlock() instanceof ShelfBlock shelf && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof ShelfBlockEntity shelfEntity) {
+            OptionalInt slot = shelf.getHitSlot(blockHit, blockState.getValue(ShelfBlock.FACING));
+            if (slot.isPresent()) {
+                ItemStack item = shelfEntity.getItem(slot.getAsInt());
+                if (mainHand.isEmpty())
+                    return item.isEmpty() ? null : LegacyComponents.TAKE;
+                return item.isEmpty() ? LegacyComponents.PLACE : LegacyComponents.SWAP;
             }
         }
         if (blockState != null) {
