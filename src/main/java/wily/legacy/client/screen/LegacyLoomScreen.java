@@ -481,8 +481,9 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
         holder.renderTooltip(minecraft, GuiGraphicsExtractor, i, j);
 
         if (!resultStack.isEmpty()) {
-            Component resultName = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe().getName() : resultStack.getHoverName();
-            Component description = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe().getDescription() : null;
+            RecipeInfo<?> focusedRecipe = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe() : null;
+            Component resultName = focusedRecipe == null ? resultStack.getHoverName() : focusedRecipe.getName();
+            Component description = focusedRecipe == null ? null : focusedRecipe.getDescription();
             int titleY = bottomPanelY + accessor.getInteger("craftingTitle.y", 11) - (description == null ? 0 : 6);
             LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.GRAY_TEXT.get(), false));
             if (description != null)
