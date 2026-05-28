@@ -22,6 +22,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -307,7 +308,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     public static boolean usesSlotPadding(ItemStack item) {
-        return !item.has(DataComponents.TOOL);
+        return !item.has(DataComponents.TOOL) && !item.is(Items.BOW) && !item.is(Items.FISHING_ROD);
     }
 
     public void renderHighlight(GuiGraphics graphics) {
