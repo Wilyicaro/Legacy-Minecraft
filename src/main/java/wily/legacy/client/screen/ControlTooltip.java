@@ -411,6 +411,12 @@ public interface ControlTooltip {
         if (/*? if <1.21.5 {*//*MainHand.getItem() instanceof SaddleItem && *//*?}*/minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s &&/*? if <1.21.5 {*//*s.isSaddleable()*//*?} else {*/s.isEquippableInSlot(mainHand, EquipmentSlot.SADDLE)/*?}*/ && !s.isSaddled() && (!(s instanceof AbstractHorse h) || h.isTamed())) {
             return LegacyComponents.SADDLE;
         }
+        if (entity instanceof LivingEntity living && mainHand.getItem() instanceof ShearsItem) {
+            if (canShearEquipment(living, EquipmentSlot.BODY) && living.getItemBySlot(EquipmentSlot.BODY).is(ItemTags.HARNESSES))
+                return LegacyComponents.REMOVE_HARNESS;
+            if (canShearEquipment(living, EquipmentSlot.SADDLE))
+                return LegacyComponents.REMOVE_SADDLE;
+        }
         if (minecraft.hitResult instanceof EntityHitResult r) {
             if (entity instanceof AbstractHorse h && h.isTamed() && !mainHand.is(Items.SADDLE) && mainHand.has(DataComponents.EQUIPPABLE) && mainHand.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) && h.isEquippableInSlot(mainHand, EquipmentSlot.BODY) && h.getItemBySlot(EquipmentSlot.BODY).isEmpty())
                 return LegacyComponents.EQUIP;
@@ -743,6 +749,11 @@ public interface ControlTooltip {
 
     static boolean isLoveFood(Animal a, ItemStack stack) {
         return (a instanceof Llama && stack.is(Items.HAY_BLOCK)) || a instanceof Horse && ((stack.is(Items.GOLDEN_CARROT) || stack.is(Items.GOLDEN_APPLE) || stack.is(Items.ENCHANTED_GOLDEN_APPLE)));
+    }
+
+    static boolean canShearEquipment(LivingEntity entity, EquipmentSlot slot) {
+        ItemStack item = entity.getItemBySlot(slot);
+        return item.has(DataComponents.EQUIPPABLE) && item.get(DataComponents.EQUIPPABLE).canBeSheared();
     }
 
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
