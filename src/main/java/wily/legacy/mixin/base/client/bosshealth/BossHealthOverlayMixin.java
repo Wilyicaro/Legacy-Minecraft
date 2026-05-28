@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -38,10 +39,19 @@ public abstract class BossHealthOverlayMixin {
             graphics.pose().translate(graphics.guiWidth() / 2f, j);
             if (!b) graphics.pose().scale(2 / 3f, 2 / 3f);
             graphics.pose().translate(-font.width(component) / 2f, 0);
-            graphics.drawString(font, component, 0, 0, CommonColor.BOSS_TEXT.isOverridden() ? CommonColor.BOSS_TEXT.get() : k);
+            if (CommonColor.BOSS_TEXT.isOverridden()) {
+                graphics.drawString(font, bossNameText(component), 0, 0, CommonColor.BOSS_TEXT.get(), false);
+            } else {
+                graphics.drawString(font, component, 0, 0, k);
+            }
             graphics.pose().popMatrix();
             LegacyFontUtil.forceVanillaFontShadowColor = false;
         });
+    }
+
+    private static FormattedCharSequence bossNameText(Component component) {
+        int color = CommonColor.BOSS_TEXT.get() & 0x00FFFFFF;
+        return sink -> component.getVisualOrderText().accept((index, style, codePoint) -> sink.accept(index, style.withColor(color), codePoint));
     }
 
     //? if >1.20.1 {

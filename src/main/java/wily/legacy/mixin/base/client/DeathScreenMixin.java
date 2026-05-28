@@ -92,6 +92,9 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V", ordinal = 1))
     private void renderLegacyCauseOfDeath(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k, Operation<Void> original) {
+        if (CommonColor.DEATH_MESSAGE_TEXT.isOverridden()) {
+            component = Component.empty().withStyle(s -> s.withColor(CommonColor.DEATH_MESSAGE_TEXT.get() & 0x00FFFFFF)).append(component);
+        }
         original.call(guiGraphics, font, component, i, this.height / 2 - 24, k);
     }
 
