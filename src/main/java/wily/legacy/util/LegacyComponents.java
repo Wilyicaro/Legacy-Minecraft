@@ -68,6 +68,7 @@ public class LegacyComponents {
     public static final Component GROUP = Component.translatable("legacy.action.group");
     public static final Component GROW = Component.translatable("legacy.action.grow");
     public static final Component HANG = Component.translatable("legacy.action.hang");
+    public static final Component HARNESS = Component.translatable("legacy.action.harness");
     public static final Component HARVEST = Component.translatable("legacy.action.harvest");
     public static final Component HEAL = Component.translatable("legacy.action.heal");
     public static final Component HIT = Component.translatable("legacy.action.hit");
