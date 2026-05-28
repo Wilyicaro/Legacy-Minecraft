@@ -76,15 +76,6 @@
               },
               "width": 120,
               "lineSpacing": 8
-            },
-            "text1": {
-              "type": "draw_multiline_string",
-              "component": {
-                "translate": "legacy.menu.how_to_play.farming-animals_message_1",
-                "font": "legacy:default_11"
-              },
-              "width": 120,
-              "lineSpacing": 8
             }
           }
         },
