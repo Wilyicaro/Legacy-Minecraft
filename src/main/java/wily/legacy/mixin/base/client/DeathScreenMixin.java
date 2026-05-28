@@ -104,6 +104,12 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         return this.height / 2 - 24;
     }
 
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V", ordinal = 1), index = 3)
+    private Component legacyCauseOfDeathColor(Component component) {
+        if (!CommonColor.DEATH_MESSAGE_TEXT.isOverridden()) return component;
+        return Component.empty().withStyle(s -> s.withColor(CommonColor.DEATH_MESSAGE_TEXT.get() & 0x00FFFFFF)).append(component);
+    }
+
     @WrapOperation(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V", ordinal = 2))
     private void hideDeathScore(ActiveTextCollector collector, TextAlignment alignment, int x, int y, Component component, Operation<Void> original) {
     }
