@@ -56,7 +56,8 @@ public final class GlobalLeaderboardBoardRegistry {
    private static final List<String> MINING_BLOCKS = List.of("dirt", "cobblestone", "sand", "stone", "gravel", "clay", "obsidian");
    private static final List<String> KILL_ENTITIES = List.of("zombie", "skeleton", "creeper", "spider", "zombified_piglin", "slime");
    private static final List<String> TRAVEL_STATS = List.of("walk_one_cm", "fall_one_cm", "minecart_one_cm", "boat_one_cm");
-   private static final List<String> GENERAL_STATS = List.of("play_time", "total_world_time", "time_since_death", "time_since_rest");
+   private static final String DAYS_PLAYED = "days_played";
+   private static final List<String> GENERAL_STATS = List.of("play_time", DAYS_PLAYED, "time_since_death", "time_since_rest");
    private static final Stat<ResourceLocation> SKELETON_JOCKEY_STAT = Stats.CUSTOM.get(LegacyRegistries.SKELETON_JOCKEY_STAT);
    private static final ResourceLocation SKELETON_JOCKEY_SPRITE = Legacy4J.createModLocation("icon/leaderboards/entity/skeleton_jockey");
    private static volatile List<LeaderboardsScreen.StatsBoard> statsBoards = List.of();
@@ -328,7 +329,7 @@ public final class GlobalLeaderboardBoardRegistry {
    private static void addTrackedStats(String boardId, LeaderboardsScreen.StatsBoard board) {
       StatType statType = board.type;
       for (String path : trackedPaths(boardId)) {
-         Object value = FactoryAPIPlatform.getRegistryValue(ResourceLocation.withDefaultNamespace(path), statType.getRegistry());
+         Object value = DAYS_PLAYED.equals(path) ? LegacyRegistries.DAYS_PLAYED_STAT : FactoryAPIPlatform.getRegistryValue(ResourceLocation.withDefaultNamespace(path), statType.getRegistry());
          if (value != null) {
             addStat(board, statType.get(value));
          }
