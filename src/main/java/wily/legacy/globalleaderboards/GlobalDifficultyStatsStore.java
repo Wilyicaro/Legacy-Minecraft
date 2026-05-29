@@ -29,6 +29,7 @@ import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardSta
 public final class GlobalDifficultyStatsStore {
    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
    private static final String FILE_NAME = "legacy_global_leaderboards.json";
+   private static final String DATA_DIR = "data";
    private static final long SAVE_INTERVAL = 30000L;
    private static final Map<Path, WorldStats> WORLDS = new LinkedHashMap<>();
    private static long lastSaveAt;
@@ -74,11 +75,11 @@ public final class GlobalDifficultyStatsStore {
    }
 
    public static Path path(MinecraftServer server) {
-      return server.getWorldPath(LevelResource.DATA).resolve(FILE_NAME);
+      return server.getWorldPath(LevelResource.ROOT).resolve(DATA_DIR).resolve(FILE_NAME);
    }
 
    public static Path path(Path worldPath) {
-      return worldPath.resolve(LevelResource.DATA.id()).resolve(FILE_NAME);
+      return worldPath.resolve(DATA_DIR).resolve(FILE_NAME);
    }
 
    private static WorldStats worldStats(Path path) {

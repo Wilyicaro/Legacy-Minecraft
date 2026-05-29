@@ -243,7 +243,7 @@ final class ContentPackDownloader {
                 }
                 boolean rootResourcePack = ContentManager.isRootResourcePackDirectory(contentDir);
                 if (rootResourcePack) {
-                    DownloadedPackMetadata.write(targetFolder, pack, category);
+                    DownloadedPackMetadata.write(targetFolder, pack);
                 }
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
