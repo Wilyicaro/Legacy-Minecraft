@@ -49,7 +49,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    private final Supplier<Screen> fallback;
    private int seenCacheVersion = -1;
    private int seenBoardsVersion = -1;
-   private GlobalLeaderboardViewMode viewMode = GlobalLeaderboardViewMode.AROUND_ME;
+   private GlobalLeaderboardViewMode viewMode = GlobalLeaderboardViewMode.TOP;
    private GlobalLeaderboardDifficulty difficulty = GlobalLeaderboardDifficulty.NORMAL;
    private List<GlobalLeaderboardRow> rows = List.of();
 
