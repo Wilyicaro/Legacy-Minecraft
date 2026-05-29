@@ -112,7 +112,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
 
    @Override
    protected Component filterText() {
-      return this.viewMode == GlobalLeaderboardViewMode.AROUND_ME ? VIEW_AROUND_ME : VIEW_TOP;
+      return Component.translatable("legacy.menu.leaderboard.filter", this.viewMode == GlobalLeaderboardViewMode.AROUND_ME ? VIEW_AROUND_ME : VIEW_TOP);
    }
 
    @Override
