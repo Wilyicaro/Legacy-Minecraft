@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -27,7 +26,6 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
@@ -41,20 +39,15 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    private static final Component VIEW_AROUND_ME = Component.translatable("legacy.menu.leaderboard.view.around_me");
    private static final Component VIEW_TOP = Component.translatable("legacy.menu.leaderboard.view.top");
    private static final Component TOGGLE_VIEW = Component.translatable("legacy.menu.leaderboard.toggle_view");
-   private static final Component OPT_OUT = Component.translatable("legacy.menu.leaderboard.opt_out");
-   private static final Component OPT_OUT_TITLE = Component.translatable("legacy.menu.leaderboard.opt_out.title");
-   private static final Component OPT_OUT_MESSAGE = Component.translatable("legacy.menu.leaderboard.opt_out.message");
    private final Map<String, List<SimpleLayoutRenderable>> columnRenderables = new HashMap<>();
-   private final Supplier<Screen> fallback;
    private int seenCacheVersion = -1;
    private int seenBoardsVersion = -1;
    private GlobalLeaderboardViewMode viewMode = GlobalLeaderboardViewMode.TOP;
    private GlobalLeaderboardDifficulty difficulty = GlobalLeaderboardDifficulty.NORMAL;
    private List<GlobalLeaderboardRow> rows = List.of();
 
-   public GlobalLeaderboardsScreen(Screen parent, Supplier<Screen> fallback) {
+   public GlobalLeaderboardsScreen(Screen parent) {
       super(parent, false);
-      this.fallback = fallback;
       GlobalLeaderboardsFeature.ensureStarted(Minecraft.getInstance());
       this.refreshBoardDefinitions();
       this.selectFirstNonEmptyBoard();
@@ -70,16 +63,6 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    @Override
    protected Component filterControlTooltip() {
       return TOGGLE_VIEW;
-   }
-
-   @Override
-   public void addControlTooltips(ControlTooltip.Renderer renderer) {
-      super.addControlTooltips(renderer);
-      renderer.add(this::optOutControlIcon, () -> OPT_OUT);
-   }
-
-   private ControlTooltip.Icon optOutControlIcon() {
-      return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon();
    }
 
    @Override
@@ -163,10 +146,6 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          this.repositionElements();
          return true;
       }
-      if (keyEvent.key() == InputConstants.KEY_X) {
-         this.openOptOutConfirmation();
-         return true;
-      }
       if (keyEvent.isLeft() || keyEvent.isRight()) {
          this.changeStatBoard(keyEvent.isLeft());
          return true;
@@ -181,13 +160,6 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          return true;
       }
       return super.keyPressed(keyEvent);
-   }
-
-   private void openOptOutConfirmation() {
-      this.minecraft.setScreen(new ConfirmationScreen(this, OPT_OUT_TITLE, OPT_OUT_MESSAGE, screen -> {
-         GlobalLeaderboardsFeature.optOut();
-         this.minecraft.setScreen(this.fallback.get());
-      }));
    }
 
    @Override
