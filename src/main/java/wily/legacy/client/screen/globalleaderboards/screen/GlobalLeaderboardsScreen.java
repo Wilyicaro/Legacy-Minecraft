@@ -229,7 +229,6 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
                   graphics.text(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
 
                   int added = 0;
-                  Component hoveredValue = null;
                   List<GlobalLeaderboardColumn> columns = board.columns();
                   List<SimpleLayoutRenderable> renderables = columnRenderables(board);
                   for (int index = page; index < columns.size(); index++) {
@@ -242,13 +241,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
                      int w = font.width(value);
                      int valueX = renderable.getX() + (renderable.getWidth() - w) / 2;
                      graphics.text(font, value, valueX, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                     if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, valueX, getY(), w, getHeight())) {
-                        hoveredValue = value;
-                     }
                      added++;
-                  }
-                  if (hoveredValue != null) {
-                     graphics.setTooltipForNextFrame(font, hoveredValue, mouseX, mouseY);
                   }
                });
             }
