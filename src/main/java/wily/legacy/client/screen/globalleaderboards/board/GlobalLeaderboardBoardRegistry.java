@@ -357,14 +357,6 @@ public final class GlobalLeaderboardBoardRegistry {
          return;
       }
 
-      if (KILLS_BOARD.equals(boardId)) {
-         addSpriteOverride(board, "zombie", lceSprite("kills/zombie"));
-         addSpriteOverride(board, "skeleton", lceSprite("kills/skeleton"));
-         addSpriteOverride(board, "creeper", lceSprite("kills/creeper"));
-         addSpriteOverride(board, "spider", lceSprite("kills/spider"));
-         addSpriteOverride(board, "zombified_piglin", lceSprite("kills/zombified_piglin"));
-         addSpriteOverride(board, "slime", lceSprite("kills/slime"));
-      }
    }
 
    @SuppressWarnings({"rawtypes", "unchecked"})
