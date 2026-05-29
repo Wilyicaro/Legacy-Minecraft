@@ -122,7 +122,7 @@ public abstract class ChatComponentMixin {
         guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)I"), index = 1)
+    @ModifyArg(method = "method_71991", at = @At(value = "INVOKE", target = "Lnet/minecraft/class_332;method_35720(Lnet/minecraft/class_327;Lnet/minecraft/class_5481;III)V", remap = false), index = 1, remap = false)
     private FormattedCharSequence changeChatTextColor(FormattedCharSequence text) {
         if (!CommonColor.CHAT_TEXT.isOverridden())
             return text;
