@@ -95,7 +95,7 @@ public final class GlobalLeaderboardsFeature {
          return fallback.get();
       }
       try {
-         return new GlobalLeaderboardsScreen(parent, fallback);
+         return new GlobalLeaderboardsScreen(parent);
       } catch (RuntimeException err) {
          Legacy4J.LOGGER.warn("Falling back to legacy leaderboards", err);
          return fallback.get();
