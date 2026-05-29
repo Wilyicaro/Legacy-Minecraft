@@ -297,6 +297,7 @@
     "ServerPlayerMixin",
     "SnowLayerBlockMixin",
     "SpiderMixin",
+    "StatsCounterMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
     "SugarCanesBlockMixin",

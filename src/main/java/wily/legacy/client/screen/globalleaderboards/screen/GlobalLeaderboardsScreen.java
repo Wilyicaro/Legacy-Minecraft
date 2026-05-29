@@ -19,8 +19,10 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardBoard;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardColumn;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardDifficulty;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardRow;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardViewMode;
+import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
@@ -39,6 +41,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    private static final Component VIEW_AROUND_ME = Component.translatable("legacy.menu.leaderboard.view.around_me");
    private static final Component VIEW_TOP = Component.translatable("legacy.menu.leaderboard.view.top");
    private static final Component TOGGLE_VIEW = Component.translatable("legacy.menu.leaderboard.toggle_view");
+   private static final Component TOGGLE_DIFFICULTY = Component.translatable("legacy.menu.leaderboard.toggle_difficulty");
    private static final Component OPT_OUT = Component.translatable("legacy.menu.leaderboard.opt_out");
    private static final Component OPT_OUT_TITLE = Component.translatable("legacy.menu.leaderboard.opt_out.title");
    private static final Component OPT_OUT_MESSAGE = Component.translatable("legacy.menu.leaderboard.opt_out.message");
@@ -47,6 +50,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    private int seenCacheVersion = -1;
    private int seenBoardsVersion = -1;
    private GlobalLeaderboardViewMode viewMode = GlobalLeaderboardViewMode.AROUND_ME;
+   private GlobalLeaderboardDifficulty difficulty = GlobalLeaderboardDifficulty.NORMAL;
    private List<GlobalLeaderboardRow> rows = List.of();
 
    public GlobalLeaderboardsScreen(Screen parent, Supplier<Screen> fallback) {
@@ -72,7 +76,12 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    @Override
    public void addControlTooltips(ControlTooltip.Renderer renderer) {
       super.addControlTooltips(renderer);
+      renderer.add(this::difficultyControlIcon, () -> TOGGLE_DIFFICULTY);
       renderer.add(this::optOutControlIcon, () -> OPT_OUT);
+   }
+
+   private ControlTooltip.Icon difficultyControlIcon() {
+      return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_D) : ControllerBinding.DOWN_BUTTON.getIcon();
    }
 
    private ControlTooltip.Icon optOutControlIcon() {
@@ -87,6 +96,17 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    @Override
    protected void cycleFilter() {
       this.viewMode = this.viewMode == GlobalLeaderboardViewMode.AROUND_ME ? GlobalLeaderboardViewMode.TOP : GlobalLeaderboardViewMode.AROUND_ME;
+      this.page = 0;
+   }
+
+   private void cycleDifficulty() {
+      GlobalLeaderboardDifficulty[] values = GlobalLeaderboardDifficulty.values();
+      GlobalLeaderboardBoard board = this.selectedGlobalBoard();
+      int index = this.difficulty.ordinal();
+      do {
+         index = wily.factoryapi.base.Stocker.cyclic(0, index + 1, values.length);
+         this.difficulty = values[index];
+      } while (board != null && !GlobalLeaderboardBoardRegistry.supportsDifficulty(board.id(), this.difficulty));
       this.page = 0;
    }
 
@@ -124,6 +144,9 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
       int initialSelectedStatBoard = this.selectedStatBoard;
       while (this.selectedStatBoard != (this.selectedStatBoard = wily.factoryapi.base.Stocker.cyclic(0, this.selectedStatBoard + (left ? -1 : 1), boards.size())) && this.selectedStatBoard != initialSelectedStatBoard) {
          if (!boards.get(this.selectedStatBoard).columns().isEmpty()) {
+            if (!GlobalLeaderboardBoardRegistry.supportsDifficulty(boards.get(this.selectedStatBoard).id(), this.difficulty)) {
+               this.difficulty = GlobalLeaderboardDifficulty.EASY;
+            }
             this.page = 0;
             this.rebuildRenderableVList(this.minecraft);
             this.repositionElements();
@@ -142,6 +165,12 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    public boolean keyPressed(KeyEvent keyEvent) {
       if (keyEvent.key() == this.filterKey()) {
          this.cycleFilter();
+         this.rebuildRenderableVList(this.minecraft);
+         this.repositionElements();
+         return true;
+      }
+      if (keyEvent.key() == InputConstants.KEY_D) {
+         this.cycleDifficulty();
          this.rebuildRenderableVList(this.minecraft);
          this.repositionElements();
          return true;
@@ -283,11 +312,12 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             graphics.drawString(this.font, filter, 0, 0, topTextColor);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
-            graphics.pose().translate(boardTooltipX + (boardTooltipWidth - this.font.width(board.displayName()) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("boardText.y", 6));
+            Component boardTitle = this.boardTitle(board);
+            graphics.pose().translate(boardTooltipX + (boardTooltipWidth - this.font.width(boardTitle) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("boardText.y", 6));
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
             }
-            graphics.drawString(this.font, board.displayName(), 0, 0, topTextColor);
+            graphics.drawString(this.font, boardTitle, 0, 0, topTextColor);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
             Component entries = Component.translatable("legacy.menu.leaderboard.entries", this.rows.size());
@@ -377,7 +407,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    }
 
    private List<GlobalLeaderboardRow> resolveRows(GlobalLeaderboardBoard board) {
-      List<GlobalLeaderboardRow> cachedEntries = GlobalLeaderboardsFeature.entries(board, this.viewMode);
+      List<GlobalLeaderboardRow> cachedEntries = GlobalLeaderboardsFeature.entries(board, this.viewMode, this.difficulty);
       if (!cachedEntries.isEmpty()) {
          this.requestBoard(board);
          List<GlobalLeaderboardRow> entries = new ArrayList<>(cachedEntries);
@@ -387,7 +417,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
       }
 
       this.requestBoard(board);
-      GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(board);
+      GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(board, this.difficulty);
       if (snapshot == null || snapshot.totalScore() <= 0) {
          return List.of();
       }
@@ -396,11 +426,11 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    }
 
    private void requestBoard(GlobalLeaderboardBoard board) {
-      GlobalLeaderboardsFeature.requestBoard(board, this.viewMode);
+      GlobalLeaderboardsFeature.requestBoard(board, this.viewMode, this.difficulty);
    }
 
    private void applyLocalPlayerRow(GlobalLeaderboardBoard board, List<GlobalLeaderboardRow> entries) {
-      GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(board);
+      GlobalLeaderboardBoardSnapshot snapshot = GlobalLeaderboardsFeature.boardSnapshot(board, this.difficulty);
       if (snapshot == null || snapshot.totalScore() <= 0) {
          return;
       }
@@ -424,6 +454,10 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    private GlobalLeaderboardRow localRow(int rank, GlobalLeaderboardBoardSnapshot snapshot) {
       String localName = GlobalLeaderboardsFeature.playerName().isBlank() ? this.minecraft.getUser().getName() : GlobalLeaderboardsFeature.playerName();
       return GlobalLeaderboardRow.fromNumbers(rank, GlobalLeaderboardsFeature.playerUuid(), localName, snapshot.totalScore(), snapshot.statValues());
+   }
+
+   private Component boardTitle(GlobalLeaderboardBoard board) {
+      return LegacyLeaderboards.LEGACY_PROVIDER.equals(board.providerId()) ? Component.translatable("legacy.menu.leaderboard.board_difficulty", board.displayName(), this.difficulty.displayName()) : board.displayName();
    }
 
    private boolean isLocalPlayer(GlobalLeaderboardRow entry, String localUuid, String localName) {
