@@ -41,7 +41,6 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    private static final Component VIEW_AROUND_ME = Component.translatable("legacy.menu.leaderboard.view.around_me");
    private static final Component VIEW_TOP = Component.translatable("legacy.menu.leaderboard.view.top");
    private static final Component TOGGLE_VIEW = Component.translatable("legacy.menu.leaderboard.toggle_view");
-   private static final Component TOGGLE_DIFFICULTY = Component.translatable("legacy.menu.leaderboard.toggle_difficulty");
    private static final Component OPT_OUT = Component.translatable("legacy.menu.leaderboard.opt_out");
    private static final Component OPT_OUT_TITLE = Component.translatable("legacy.menu.leaderboard.opt_out.title");
    private static final Component OPT_OUT_MESSAGE = Component.translatable("legacy.menu.leaderboard.opt_out.message");
@@ -76,12 +75,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    @Override
    public void addControlTooltips(ControlTooltip.Renderer renderer) {
       super.addControlTooltips(renderer);
-      renderer.add(this::difficultyControlIcon, () -> TOGGLE_DIFFICULTY);
       renderer.add(this::optOutControlIcon, () -> OPT_OUT);
-   }
-
-   private ControlTooltip.Icon difficultyControlIcon() {
-      return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_D) : ControllerBinding.DOWN_BUTTON.getIcon();
    }
 
    private ControlTooltip.Icon optOutControlIcon() {
@@ -99,12 +93,12 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
       this.page = 0;
    }
 
-   private void cycleDifficulty() {
+   private void cycleDifficulty(boolean left) {
       GlobalLeaderboardDifficulty[] values = GlobalLeaderboardDifficulty.values();
       GlobalLeaderboardBoard board = this.selectedGlobalBoard();
       int index = this.difficulty.ordinal();
       do {
-         index = wily.factoryapi.base.Stocker.cyclic(0, index + 1, values.length);
+         index = wily.factoryapi.base.Stocker.cyclic(0, index + (left ? -1 : 1), values.length);
          this.difficulty = values[index];
       } while (board != null && !GlobalLeaderboardBoardRegistry.supportsDifficulty(board.id(), this.difficulty));
       this.page = 0;
@@ -156,12 +150,6 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    }
 
    @Override
-   public int changedPage(int count) {
-      GlobalLeaderboardBoard board = this.selectedGlobalBoard();
-      return board == null ? 0 : Math.max(0, this.page + count >= board.columns().size() ? this.page : this.page + count);
-   }
-
-   @Override
    public boolean keyPressed(KeyEvent keyEvent) {
       if (keyEvent.key() == this.filterKey()) {
          this.cycleFilter();
@@ -170,7 +158,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          return true;
       }
       if (keyEvent.key() == InputConstants.KEY_D) {
-         this.cycleDifficulty();
+         this.cycleDifficulty(false);
          this.rebuildRenderableVList(this.minecraft);
          this.repositionElements();
          return true;
@@ -184,15 +172,10 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          return true;
       }
       if (keyEvent.key() == InputConstants.KEY_LBRACKET || keyEvent.key() == InputConstants.KEY_RBRACKET) {
-         GlobalLeaderboardBoard board = this.selectedGlobalBoard();
-         if (board != null && !board.columns().isEmpty()) {
-            int newPage = this.changedPage(keyEvent.key() == InputConstants.KEY_LBRACKET ? -this.lastStatsInScreen : this.statsInScreen);
-            if (newPage != this.page) {
-               this.lastStatsInScreen = this.statsInScreen;
-               this.page = newPage;
-               return true;
-            }
-         }
+         this.cycleDifficulty(keyEvent.key() == InputConstants.KEY_LBRACKET);
+         this.rebuildRenderableVList(this.minecraft);
+         this.repositionElements();
+         return true;
       }
       if (this.renderableVList.keyPressed(keyEvent.key())) {
          return true;
@@ -351,21 +334,17 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          int boardControlTooltipY = topTooltipY + this.accessor.getInteger("boardControlTooltip.y", 6);
          graphics.pose().pushMatrix();
          graphics.pose().translate(boardTooltipX + this.accessor.getInteger("boardControlTooltip.x", 2), boardControlTooltipY);
+         graphics.pose().scale(LegacyOptions.getUIMode().isSD() ? 1.2f : 0.6f);
+         (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
+         graphics.pose().popMatrix();
+         ControlTooltip.Icon difficultyControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
+         graphics.pose().pushMatrix();
+         graphics.pose().translate(boardTooltipX + boardTooltipWidth + this.accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
          if (!LegacyOptions.getUIMode().isSD()) {
             graphics.pose().scale(0.5f, 0.5f);
          }
-         (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
+         difficultyControl.render(graphics, -difficultyControl.getWidth(), 0, false);
          graphics.pose().popMatrix();
-         if (this.statsInScreen < renderables.size()) {
-            ControlTooltip.Icon pageControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(boardTooltipX + boardTooltipWidth + this.accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
-            if (!LegacyOptions.getUIMode().isSD()) {
-               graphics.pose().scale(0.5f, 0.5f);
-            }
-            pageControl.render(graphics, -pageControl.getWidth(), 0, false);
-            graphics.pose().popMatrix();
-         }
          if (this.statsInScreen == 0) {
             return;
          }
