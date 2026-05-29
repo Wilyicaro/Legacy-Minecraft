@@ -290,6 +290,7 @@
     "ServerPlayerMixin",
     "SnowLayerBlockMixin",
     "SpiderMixin",
+    "StatsCounterMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
     "SugarCanesBlockMixin",
@@ -325,7 +326,8 @@
     "villager_spawn_egg.ResetProfessionMixin",
     "BlockItemAccessor",
     "FallingBlockAccessor",
-    "FallingBlockMixin"
+    "FallingBlockMixin",
+    "MinecraftServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

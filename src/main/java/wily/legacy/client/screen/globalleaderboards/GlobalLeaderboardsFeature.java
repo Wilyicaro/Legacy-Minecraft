@@ -19,6 +19,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardBoard;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardDifficulty;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardPage;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardProvider;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardRequest;
@@ -32,6 +33,7 @@ import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoard
 import wily.legacy.client.screen.globalleaderboards.screen.GlobalLeaderboardsScreen;
 import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardCacheStore;
 import wily.legacy.client.screen.globalleaderboards.storage.GlobalStatsAggregator;
+import wily.legacy.globalleaderboards.GlobalDifficultyStatsStore;
 
 public final class GlobalLeaderboardsFeature {
    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(runnable -> {
@@ -62,7 +64,7 @@ public final class GlobalLeaderboardsFeature {
    private static volatile String playerUuid = "";
    private static volatile String playerName = "";
    private static volatile List<GlobalLeaderboardBoard> boards = List.of();
-   private static volatile Object2IntOpenHashMap<Stat<?>> aggregateStats = new Object2IntOpenHashMap<>();
+   private static volatile Map<GlobalLeaderboardDifficulty, Object2IntOpenHashMap<Stat<?>>> aggregateStats = GlobalDifficultyStatsStore.emptyStats();
    private static volatile Map<String, GlobalLeaderboardBoardSnapshot> boardSnapshots = Map.of();
    private static volatile Map<String, GlobalLeaderboardBoardCache> boardCaches = Map.of();
    private static volatile String lastSyncHash = "";
@@ -155,7 +157,9 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static Object2IntOpenHashMap<Stat<?>> aggregateStats() {
-      return new Object2IntOpenHashMap<>(aggregateStats);
+      Object2IntOpenHashMap<Stat<?>> stats = new Object2IntOpenHashMap<>();
+      aggregateStats.values().forEach(values -> values.object2IntEntrySet().forEach(entry -> stats.put(entry.getKey(), stats.getInt(entry.getKey()) + entry.getIntValue())));
+      return stats;
    }
 
    public static Map<String, GlobalLeaderboardBoardSnapshot> boardSnapshots() {
@@ -163,11 +167,19 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static GlobalLeaderboardBoardSnapshot boardSnapshot(GlobalLeaderboardBoard board) {
-      return board == null ? null : boardSnapshots.get(board.key());
+      return boardSnapshot(board, GlobalLeaderboardDifficulty.NORMAL);
+   }
+
+   public static GlobalLeaderboardBoardSnapshot boardSnapshot(GlobalLeaderboardBoard board, GlobalLeaderboardDifficulty difficulty) {
+      if (board == null) {
+         return null;
+      }
+      GlobalLeaderboardBoard requestBoard = requestBoard(board, difficulty);
+      return boardSnapshots.get(requestBoard.key());
    }
 
    public static GlobalLeaderboardBoardSnapshot boardSnapshot(String boardId) {
-      return boardSnapshots.get(GlobalLeaderboardBoard.key(LegacyLeaderboards.LEGACY_PROVIDER, boardId));
+      return boardSnapshots.get(GlobalLeaderboardBoard.key(LegacyLeaderboards.LEGACY_PROVIDER, GlobalLeaderboardDifficulty.NORMAL.boardId(boardId)));
    }
 
    public static GlobalLeaderboardBoardCache boardCache(GlobalLeaderboardBoard board) {
@@ -175,6 +187,11 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static List<GlobalLeaderboardRow> entries(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
+      return entries(board, viewMode, GlobalLeaderboardDifficulty.NORMAL);
+   }
+
+   public static List<GlobalLeaderboardRow> entries(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, GlobalLeaderboardDifficulty difficulty) {
+      board = requestBoard(board, difficulty);
       GlobalLeaderboardBoardCache cache = boardCache(board);
       if (cache == null) {
          return List.of();
@@ -232,11 +249,16 @@ public final class GlobalLeaderboardsFeature {
    }
 
    public static void requestBoard(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
-      if (isOptedOut() || !shouldRequestBoard(board, viewMode)) {
+      requestBoard(board, viewMode, GlobalLeaderboardDifficulty.NORMAL);
+   }
+
+   public static void requestBoard(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, GlobalLeaderboardDifficulty difficulty) {
+      GlobalLeaderboardBoard queryBoard = requestBoard(board, difficulty);
+      if (isOptedOut() || !shouldRequestBoard(queryBoard, viewMode)) {
          return;
       }
 
-      String requestKey = requestKey(board, viewMode);
+      String requestKey = requestKey(queryBoard, viewMode);
       String requestPlayerUuid = playerUuid;
       String requestPlayerName = playerName;
       String requestPlayerKey = playerKey();
@@ -250,24 +272,24 @@ public final class GlobalLeaderboardsFeature {
             IN_FLIGHT_REQUESTS.remove(requestKey);
             return;
          }
-         GlobalLeaderboardProvider provider = LegacyLeaderboards.provider(board.providerId());
+         GlobalLeaderboardProvider provider = LegacyLeaderboards.provider(queryBoard.providerId());
          if (provider == null) {
             IN_FLIGHT_REQUESTS.remove(requestKey);
             return;
          }
 
          GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
-         GlobalLeaderboardRequest request = new GlobalLeaderboardRequest(board, viewMode, requestPlayerUuid, requestPlayerName, config.aroundWindow(), config.topLimit());
+         GlobalLeaderboardRequest request = new GlobalLeaderboardRequest(queryBoard, viewMode, requestPlayerUuid, requestPlayerName, config.aroundWindow(), config.topLimit());
          CompletableFuture<GlobalLeaderboardPage> future;
          try {
             future = provider.fetch(request);
          } catch (RuntimeException err) {
-            Legacy4J.LOGGER.warn("Failed to request global leaderboard board {}", board.id(), err);
+            Legacy4J.LOGGER.warn("Failed to request global leaderboard board {}", queryBoard.id(), err);
             IN_FLIGHT_REQUESTS.remove(requestKey);
             return;
          }
          if (future == null) {
-            Legacy4J.LOGGER.warn("Global leaderboard provider {} returned no request for board {}", board.providerId(), board.id());
+            Legacy4J.LOGGER.warn("Global leaderboard provider {} returned no request for board {}", queryBoard.providerId(), queryBoard.id());
             IN_FLIGHT_REQUESTS.remove(requestKey);
             return;
          }
@@ -275,9 +297,9 @@ public final class GlobalLeaderboardsFeature {
          future.whenComplete((page, err) -> {
             try {
                if (err != null) {
-                  Legacy4J.LOGGER.warn("Failed to fetch global leaderboard board {}", board.id(), err);
+                  Legacy4J.LOGGER.warn("Failed to fetch global leaderboard board {}", queryBoard.id(), err);
                } else if (!isOptedOut() && page != null && page.successful() && requestPlayerKey.equals(playerKey())) {
-                  mergeBoardCache(board, viewMode, page.rows());
+                  mergeBoardCache(queryBoard, viewMode, page.rows());
                }
             } finally {
                IN_FLIGHT_REQUESTS.remove(requestKey);
@@ -292,7 +314,7 @@ public final class GlobalLeaderboardsFeature {
       playerUuid = state.playerUuid();
       playerName = state.playerName();
       lastSyncHash = state.lastSyncHash();
-      lastSyncAt = state.lastSyncAt();
+      lastSyncAt = lastSyncHash.isBlank() ? 0L : state.lastSyncAt();
       CACHE_VERSION.incrementAndGet();
    }
 
@@ -304,7 +326,7 @@ public final class GlobalLeaderboardsFeature {
          aggregateStats = GlobalStatsAggregator.aggregateSurvivalStats(minecraft);
          refreshBoards(minecraft);
          boardSnapshots = Map.copyOf(GlobalLeaderboardBoardRegistry.buildSnapshots(aggregateStats, boards));
-         Legacy4J.LOGGER.debug("Global leaderboards startup aggregated {} stats into {} board snapshots", aggregateStats.size(), boardSnapshots.size());
+         Legacy4J.LOGGER.debug("Global leaderboards startup aggregated difficulty stats into {} board snapshots", boardSnapshots.size());
          GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
          if (config.syncOnLaunch()) {
             syncChangedBoards(config);
@@ -376,8 +398,8 @@ public final class GlobalLeaderboardsFeature {
          return;
       }
 
-      lastSyncAt = now;
       if (apiClient(config).syncBoards(playerUuid, playerName, legacySnapshots)) {
+         lastSyncAt = now;
          lastSyncHash = syncHash;
       }
    }
@@ -395,6 +417,14 @@ public final class GlobalLeaderboardsFeature {
          }
          return apiClient;
       }
+   }
+
+   private static GlobalLeaderboardBoard requestBoard(GlobalLeaderboardBoard board, GlobalLeaderboardDifficulty difficulty) {
+      if (board == null || !LegacyLeaderboards.LEGACY_PROVIDER.equals(board.providerId())) {
+         return board;
+      }
+      GlobalLeaderboardDifficulty value = difficulty == null ? GlobalLeaderboardDifficulty.NORMAL : difficulty;
+      return new GlobalLeaderboardBoard(board.providerId(), value.boardId(board.id()), board.displayName(), board.order(), board.columns());
    }
 
    private static boolean shouldRequestBoard(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
@@ -415,6 +445,13 @@ public final class GlobalLeaderboardsFeature {
          return true;
       }
 
+      if (viewMode == GlobalLeaderboardViewMode.TOP && cache.topEntries().isEmpty()) {
+         return true;
+      }
+      if (viewMode == GlobalLeaderboardViewMode.AROUND_ME && cache.aroundEntries().isEmpty()) {
+         return true;
+      }
+
       long fetchedAt = viewMode == GlobalLeaderboardViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
       return fetchedAt <= 0 || now - fetchedAt >= cooldown;
    }
@@ -423,7 +460,7 @@ public final class GlobalLeaderboardsFeature {
       LinkedHashMap<String, GlobalLeaderboardBoardCache> merged = new LinkedHashMap<>(boardCaches);
       GlobalLeaderboardBoardCache existing = merged.get(board.key());
       if (existing == null) {
-         existing = new GlobalLeaderboardBoardCache(board.providerId(), board.id(), board.id(), System.currentTimeMillis(), List.of(), List.of());
+         existing = new GlobalLeaderboardBoardCache(board.providerId(), board.id(), board.id(), 0L, List.of(), List.of(), 0L, 0L);
       }
 
       GlobalLeaderboardBoardCache updated = viewMode == GlobalLeaderboardViewMode.TOP

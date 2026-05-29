@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardBoard;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardColumn;
+import wily.legacy.api.client.leaderboards.GlobalLeaderboardDifficulty;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardIcon;
 import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
@@ -106,12 +107,25 @@ public final class GlobalLeaderboardBoardRegistry {
    }
 
    public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Object2IntMap<Stat<?>> aggregateStats, List<GlobalLeaderboardBoard> boards) {
+      return buildSnapshots(aggregateStats, boards, GlobalLeaderboardDifficulty.NORMAL);
+   }
+
+   public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Map<GlobalLeaderboardDifficulty, ? extends Object2IntMap<Stat<?>>> aggregateStats, List<GlobalLeaderboardBoard> boards) {
+      LinkedHashMap<String, GlobalLeaderboardBoardSnapshot> snapshots = new LinkedHashMap<>();
+      aggregateStats.forEach((difficulty, stats) -> snapshots.putAll(buildSnapshots(stats, boards, difficulty)));
+      return snapshots;
+   }
+
+   public static Map<String, GlobalLeaderboardBoardSnapshot> buildSnapshots(Object2IntMap<Stat<?>> aggregateStats, List<GlobalLeaderboardBoard> boards, GlobalLeaderboardDifficulty difficulty) {
       ensureStatsBoards(Minecraft.getInstance());
       LinkedHashMap<String, GlobalLeaderboardBoardSnapshot> snapshots = new LinkedHashMap<>();
       ensureTrackedBoardStats(Minecraft.getInstance());
 
       for (GlobalLeaderboardBoard board : boards) {
          if (!LegacyLeaderboards.LEGACY_PROVIDER.equals(board.providerId())) {
+            continue;
+         }
+         if (!supportsDifficulty(board.id(), difficulty)) {
             continue;
          }
          LeaderboardsScreen.StatsBoard statsBoard = statsBoardsById.get(board.id());
@@ -132,10 +146,15 @@ public final class GlobalLeaderboardBoardRegistry {
                total += value;
             }
          }
-         snapshots.put(board.key(), new GlobalLeaderboardBoardSnapshot(board.id(), board.id(), total, encodedStats));
+         String boardId = difficulty.boardId(board.id());
+         snapshots.put(GlobalLeaderboardBoard.key(board.providerId(), boardId), new GlobalLeaderboardBoardSnapshot(boardId, board.id(), total, encodedStats));
       }
 
       return snapshots;
+   }
+
+   public static boolean supportsDifficulty(String boardId, GlobalLeaderboardDifficulty difficulty) {
+      return !KILLS_BOARD.equals(boardId) || difficulty != GlobalLeaderboardDifficulty.PEACEFUL;
    }
 
    public static synchronized void ensureStatsBoards(Minecraft minecraft) {
