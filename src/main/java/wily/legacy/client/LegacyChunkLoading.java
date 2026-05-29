@@ -171,6 +171,18 @@ public final class LegacyChunkLoading {
         return readyAt != 0 && Util.getMillis() < readyAt;
     }
 
+    public static synchronized boolean isSectionVisible(BlockPos pos) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!LegacyOptions.slowChunkLoading.get() || minecraft.level == null) {
+            return true;
+        }
+        if (level != minecraft.level) {
+            reset();
+            level = minecraft.level;
+        }
+        return revealed.contains(SectionPos.asLong(pos));
+    }
+
     public static synchronized void markFreshChunk(int x, int z) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null) {
