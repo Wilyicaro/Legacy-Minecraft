@@ -28,6 +28,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
@@ -39,6 +40,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.IOUtil;
 
 public final class GlobalLeaderboardBoardRegistry {
@@ -55,6 +57,8 @@ public final class GlobalLeaderboardBoardRegistry {
    private static final List<String> KILL_ENTITIES = List.of("zombie", "skeleton", "creeper", "spider", "zombified_piglin", "slime");
    private static final List<String> TRAVEL_STATS = List.of("walk_one_cm", "fall_one_cm", "minecart_one_cm", "boat_one_cm");
    private static final List<String> GENERAL_STATS = List.of("play_time", "total_world_time", "time_since_death", "time_since_rest");
+   private static final Stat<Identifier> SKELETON_JOCKEY_STAT = Stats.CUSTOM.get(LegacyRegistries.SKELETON_JOCKEY_STAT);
+   private static final Identifier SKELETON_JOCKEY_SPRITE = Legacy4J.createModLocation("icon/leaderboards/entity/skeleton_jockey");
    private static volatile List<LeaderboardsScreen.StatsBoard> statsBoards = List.of();
    private static volatile Map<String, LeaderboardsScreen.StatsBoard> statsBoardsById = Map.of();
 
@@ -134,16 +138,27 @@ public final class GlobalLeaderboardBoardRegistry {
          }
          LinkedHashMap<String, Integer> encodedStats = new LinkedHashMap<>();
          int total = 0;
+         int skeletonJockeyKills = KILLS_BOARD.equals(board.id()) ? aggregateStats.getInt(SKELETON_JOCKEY_STAT) : 0;
+         boolean skeletonJockeyAdded = false;
          for (Stat<?> stat : statsBoard.statsList) {
             int value = aggregateStats.getInt(stat);
-            if (value <= 0) {
-               continue;
+            if (skeletonJockeyKills > 0 && registryValueMatches(stat.getType().getRegistry(), stat.getValue(), "skeleton")) {
+               value = Math.max(0, value - skeletonJockeyKills);
             }
-
-            String encoded = GlobalLeaderboardStatCodec.encode(stat);
-            if (!encoded.isBlank()) {
-               encodedStats.put(encoded, value);
-               total += value;
+            if (value > 0) {
+               String encoded = GlobalLeaderboardStatCodec.encode(stat);
+               if (!encoded.isBlank()) {
+                  encodedStats.put(encoded, value);
+                  total += value;
+               }
+            }
+            if (skeletonJockeyKills > 0 && !skeletonJockeyAdded && registryValueMatches(stat.getType().getRegistry(), stat.getValue(), "spider")) {
+               String id = GlobalLeaderboardStatCodec.encode(SKELETON_JOCKEY_STAT);
+               if (!id.isBlank()) {
+                  encodedStats.put(id, skeletonJockeyKills);
+               }
+               total += skeletonJockeyKills;
+               skeletonJockeyAdded = true;
             }
          }
          String boardId = difficulty.boardId(board.id());
@@ -277,6 +292,12 @@ public final class GlobalLeaderboardBoardRegistry {
          String id = GlobalLeaderboardStatCodec.encode(stat);
          if (!id.isBlank()) {
             columns.add(new GlobalLeaderboardColumn(id, statName(stat), GlobalLeaderboardIcon.custom((width, height) -> statsBoard.getRenderable(stat)), value -> Component.literal(stat.format(statValue(value)))));
+         }
+         if (KILLS_BOARD.equals(boardId) && registryValueMatches(stat.getType().getRegistry(), stat.getValue(), "spider")) {
+            String skeletonJockeyId = GlobalLeaderboardStatCodec.encode(SKELETON_JOCKEY_STAT);
+            if (!skeletonJockeyId.isBlank()) {
+               columns.add(new GlobalLeaderboardColumn(skeletonJockeyId, Component.translatable("legacy.menu.leaderboard.skeleton_jockey"), GlobalLeaderboardIcon.sprite(SKELETON_JOCKEY_SPRITE)));
+            }
          }
       }
       return new GlobalLeaderboardBoard(LegacyLeaderboards.LEGACY_PROVIDER, boardId, statsBoard.displayName, order, columns);
