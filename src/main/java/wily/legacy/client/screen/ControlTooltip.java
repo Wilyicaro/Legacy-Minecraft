@@ -334,7 +334,11 @@ public interface ControlTooltip {
     }
 
     static Component getUseAction(Minecraft minecraft) {
-        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.CHARGE : getActualUse(minecraft);
+        if (minecraft.player == null) return null;
+        Component action = getActualUse(minecraft);
+        if (isSpear(minecraft.player.getMainHandItem()) && action != LegacyComponents.EQUIP)
+            return LegacyComponents.CHARGE;
+        return action;
     }
 
     static Component getAttackAction(Minecraft minecraft) {
