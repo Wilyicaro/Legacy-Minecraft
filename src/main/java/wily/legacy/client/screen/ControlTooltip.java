@@ -81,6 +81,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
@@ -570,6 +571,8 @@ public interface ControlTooltip {
             if (blockState != null && blockState.getBlock() instanceof RespawnAnchorBlock && actualItem.is(Items.GLOWSTONE) && blockState.getValue(RespawnAnchorBlock.CHARGE) < 4)
                 return LegacyComponents.CHARGE;
             // 2-Special block-item interactions (Jukebox, Beehive, Cauldron, Lodestone, Flower Pot)
+            if (canUnlockVault(blockState, actualItem))
+                return LegacyComponents.UNLOCK;
             if (blockState != null && blockState.getBlock() instanceof JukeboxBlock && actualItem.has(DataComponents.JUKEBOX_PLAYABLE))
                 return LegacyComponents.PLAY;
             if (blockState != null && blockState.getBlock() instanceof BeehiveBlock && actualItem.is(Items.GLASS_BOTTLE) && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5)
@@ -771,6 +774,12 @@ public interface ControlTooltip {
 
     static boolean canSetLoveMode(Entity entity, ItemStack usedItem) {
         return (entity instanceof Animal a && !a.isBaby() && a.isFood(usedItem) && a.canFallInLove() && !a.isInLove() && (!(a instanceof AbstractHorse) || isLoveFood(a, usedItem)));
+    }
+
+    static boolean canUnlockVault(BlockState state, ItemStack item) {
+        if (!(state != null && state.getBlock() instanceof VaultBlock) || state.getValue(VaultBlock.STATE) != VaultState.ACTIVE)
+            return false;
+        return state.getValue(VaultBlock.OMINOUS) ? item.is(Items.OMINOUS_TRIAL_KEY) : item.is(Items.TRIAL_KEY);
     }
 
     static boolean canFeed(Minecraft minecraft, Entity entity, ItemStack usedItem) {
