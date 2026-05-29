@@ -182,7 +182,7 @@ public final class LegacyChunkLoading {
             reset();
             level = minecraft.level;
         }
-        freshFeatureChunks.add(ChunkPos.pack(x, z));
+        freshFeatureChunks.add(ChunkPos.asLong(x, z));
     }
 
     private static void clearSectionDelay(long section, boolean dirty) {
@@ -418,7 +418,7 @@ public final class LegacyChunkLoading {
     }
 
     private static long chunkKey(long section) {
-        return ChunkPos.pack(SectionPos.x(section), SectionPos.z(section));
+        return ChunkPos.asLong(SectionPos.x(section), SectionPos.z(section));
     }
 
     private static boolean isFeatureState(BlockState state) {

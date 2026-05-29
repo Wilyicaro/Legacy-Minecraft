@@ -74,11 +74,11 @@ public final class GlobalDifficultyStatsStore {
    }
 
    public static Path path(MinecraftServer server) {
-      return server.getWorldPath(LevelResource.DATA).resolve(FILE_NAME);
+      return server.getWorldPath(LevelResource.ROOT).resolve("data").resolve(FILE_NAME);
    }
 
    public static Path path(Path worldPath) {
-      return worldPath.resolve(LevelResource.DATA.id()).resolve(FILE_NAME);
+      return worldPath.resolve("data").resolve(FILE_NAME);
    }
 
    private static WorldStats worldStats(Path path) {

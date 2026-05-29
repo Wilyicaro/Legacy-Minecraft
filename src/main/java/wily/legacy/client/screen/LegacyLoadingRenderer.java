@@ -93,7 +93,7 @@ public class LegacyLoadingRenderer implements Renderable {
             int iconHeight = accessor.getInteger("loadingIcon.height", iconWidth);
             int iconX = accessor.getInteger("loadingIcon.x", (width - iconWidth) / 2);
             int iconY = accessor.getInteger("loadingIcon.y", Math.round(accessor.getFloat("loadingHeader.y", height / 2 - 23) - iconHeight - 8));
-            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(loadingIcon, iconX, iconY, iconWidth, iconHeight);
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(loadingIcon, iconX, iconY, iconWidth, iconHeight);
         }
 
         if (loadingHeader != null) {

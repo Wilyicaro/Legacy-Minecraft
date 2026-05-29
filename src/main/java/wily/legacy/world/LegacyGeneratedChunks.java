@@ -25,7 +25,7 @@ public final class LegacyGeneratedChunks {
     }
 
     public static void mark(ServerLevel level, ChunkPos pos) {
-        chunks.computeIfAbsent(level.dimension(), key -> new ConcurrentHashMap<>()).put(pos.pack(), Util.getMillis());
+        chunks.computeIfAbsent(level.dimension(), key -> new ConcurrentHashMap<>()).put(ChunkPos.asLong(pos.x, pos.z), Util.getMillis());
     }
 
     public static void sync(ServerPlayer player, LevelChunk chunk) {
@@ -37,13 +37,13 @@ public final class LegacyGeneratedChunks {
         long now = Util.getMillis();
         prune(levelChunks, now);
 
-        Long markedAt = levelChunks.get(chunk.getPos().pack());
+        Long markedAt = levelChunks.get(ChunkPos.asLong(chunk.getPos().x, chunk.getPos().z));
         if (markedAt == null || now - markedAt > TTL_MILLIS) {
             return;
         }
 
         ChunkPos pos = chunk.getPos();
-        CommonNetwork.sendToPlayer(player, new Payload(pos.x(), pos.z()));
+        CommonNetwork.sendToPlayer(player, new Payload(pos.x, pos.z));
     }
 
     private static void prune(Map<Long, Long> levelChunks, long now) {
