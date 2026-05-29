@@ -42,7 +42,8 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.Allay;
-import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.cow.AbstractCow;
+import net.minecraft.world.entity.animal.cow.MushroomCow;
 import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.animal.equine.Horse;
@@ -667,7 +668,9 @@ public interface ControlTooltip {
                         return LegacyComponents.EMPTY;
                 } else if (state.getBlock() instanceof BucketPickup && !state.getFluidState().isEmpty()) return LegacyComponents.COLLECT;
             }
-            if (actualItem.is(Items.BUCKET) && entity instanceof Cow)
+            if (actualItem.is(Items.BOWL) && entity instanceof MushroomCow mushroomCow && !mushroomCow.isBaby())
+                return LegacyComponents.MILK;
+            if (actualItem.is(Items.BUCKET) && entity instanceof AbstractCow cow && !cow.isBaby())
                 return LegacyComponents.MILK;
             if (entity instanceof MinecartFurnace && actualItem.is(ItemTags.COALS)) return LegacyComponents.FUEL;
             // 4-Placement/Terrain modification (canPlace, canHang, canTill, strip bark, dig path)
@@ -693,7 +696,7 @@ public interface ControlTooltip {
                 return LegacyComponents.REPAIR;
             // 6-Tool use (shears, brush, bone meal)
             if (actualItem.getItem() instanceof ShearsItem) {
-                if (entity instanceof Sheep s && !s.isBaby() && !s.isSheared() || entity instanceof SnowGolem snowGolem && snowGolem.hasPumpkin())
+                if (entity instanceof Shearable shearable && shearable.readyForShearing() || entity instanceof SnowGolem snowGolem && snowGolem.hasPumpkin())
                     return LegacyComponents.SHEAR;
                 else if (blockState != null && blockState.getBlock() instanceof PumpkinBlock)
                     return LegacyComponents.CARVE;
