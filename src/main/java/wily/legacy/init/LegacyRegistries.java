@@ -38,6 +38,7 @@ public class LegacyRegistries {
     private static final RegisterListing<LootItemConditionType> LOOT_CONDITION_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.LOOT_CONDITION_TYPE);
     private static final RegisterListing<Identifier> CUSTOM_STAT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.CUSTOM_STAT);
     public static final Identifier SKELETON_JOCKEY_STAT = Legacy4J.createModLocation("skeleton_jockey");
+    public static final Identifier DAYS_PLAYED_STAT = Legacy4J.createModLocation("days_played");
 
     public static final RegisterListing.Holder<MenuType<LegacyMerchantMenu>> MERCHANT_MENU = MENU_REGISTER.add("merchant_menu", ()->new MenuType<>(LegacyMerchantMenu::new, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> STONECUTTER_PANEL_MENU = MENU_REGISTER.add("stonecutter_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::stoneCutterMenu, FeatureFlags.VANILLA_SET));
@@ -68,6 +69,7 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<SoundEvent> ENTITY_GENERIC_OLD_SPLASH = SOUND_EVENT_REGISTER.add("entity.generic.old_splash", ()-> SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("entity.generic.old_splash")));
     public static final RegisterListing.Holder<LootItemConditionType> RANDOM_DIFFICULTY_CHANCE = LOOT_CONDITION_REGISTER.add("random_difficulty_chance", () -> new LootItemConditionType(RandomDifficultyChanceCondition.CODEC));
     private static final RegisterListing.Holder<Identifier> SKELETON_JOCKEY_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("skeleton_jockey", () -> SKELETON_JOCKEY_STAT);
+    private static final RegisterListing.Holder<Identifier> DAYS_PLAYED_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("days_played", () -> DAYS_PLAYED_STAT);
 
 
     public static boolean isInvalidCauldron(BlockState blockState, Level level, BlockPos blockPos){
