@@ -20,11 +20,13 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 import wily.legacy.Legacy4J;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardDifficulty;
 import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardStatCodec;
+import wily.legacy.init.LegacyRegistries;
 
 public final class GlobalDifficultyStatsStore {
    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -47,6 +49,7 @@ public final class GlobalDifficultyStatsStore {
       GlobalLeaderboardDifficulty difficulty = GlobalLeaderboardDifficulty.of(player.level().getDifficulty(), server.isHardcore());
       Object2IntOpenHashMap<Stat<?>> values = stats.playerStats(player.getUUID(), difficulty);
       values.put(stat, (int)Math.min((long)values.getInt(stat) + amount, Integer.MAX_VALUE));
+      values.put(Stats.CUSTOM.get(LegacyRegistries.DAYS_PLAYED_STAT), (int)Math.min(Math.max(0L, player.level().getLevelData().getGameTime() / 24000L), Integer.MAX_VALUE));
       stats.dirty = true;
       saveSoon(path, stats);
    }
