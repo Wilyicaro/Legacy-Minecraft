@@ -483,6 +483,9 @@ public interface ControlTooltip {
         }
         if (blockHit != null && blockState != null && (blockState.getBlock() instanceof SignBlock || blockState.getBlock() instanceof CeilingHangingSignBlock || blockState.getBlock() instanceof WallHangingSignBlock)) {
             if (minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof SignBlockEntity sign) {
+                for (InteractionHand hand : InteractionHand.values())
+                    if (minecraft.player.getItemInHand(hand).is(Items.HONEYCOMB) && !sign.isWaxed())
+                        return LegacyComponents.WAX;
                 SignText text = sign.isFacingFrontText(minecraft.player) ? sign.getFrontText() : sign.getBackText();
                 boolean empty = true;
                 for (int i = 0; i < 4; i++)
