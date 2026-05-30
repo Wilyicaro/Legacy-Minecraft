@@ -127,6 +127,14 @@
     "ui_definition": "legacy:how_to_play/conduit"
   },
   {
+    "title": {"translate": "legacy.menu.how_to_play.scaffolding"},
+    "ui_definition": "legacy:how_to_play/scaffolding"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.raids"},
+    "ui_definition": "legacy:how_to_play/raids"
+  },
+  {
     "title": {"translate": "legacy.menu.how_to_play.host-and-player-options"},
     "ui_definition": "legacy:how_to_play/host-and-player-options"
   }
