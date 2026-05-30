@@ -742,7 +742,7 @@ public class LegacyRenderUtil {
     public static void renderGameOverlay(GuiGraphics graphics) {
         if (!MinecraftAccessor.getInstance().hasGameLoaded()) return;
         float partialTick = FactoryAPIClient.getPartialTick();
-        boolean canRenderElement = (mc.screen != null || !mc.options.hideGui);
+        boolean canRenderElement = mc.screen != null || LegacyOptions.displayHUD.get() && !mc.options.hideGui;
         LegacyTip tip = LegacyTipManager.getActualTip();
         if ((!LegacyTipManager.tips.isEmpty() || tip != null) && canRenderElement) {
             if (tip == null) tip = LegacyTipManager.updateTip();
