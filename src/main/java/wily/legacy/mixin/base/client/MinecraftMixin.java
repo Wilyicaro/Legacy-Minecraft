@@ -45,7 +45,9 @@ import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
@@ -293,12 +295,14 @@ public abstract class MinecraftMixin {
 
     @Unique
     private boolean legacy$suppressesEntityUseAnimation(Entity entity, ItemStack item) {
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(item.getItem());
         if (item.getItem() instanceof SpawnEggItem && entity instanceof Mob && entity.getType() == SpawnEggItem.getType(item)) return true;
         if (entity instanceof Wolf wolf && !wolf.isTame() && item.is(Items.BONE)) return true;
         if (entity instanceof Sheep sheep) {
             if (item.getItem() instanceof ShearsItem && sheep.readyForShearing()) return true;
-            if (LegacyItemUtil.getDyeColorOrNull(item.getItem()) != null && sheep.getColor() != LegacyItemUtil.getDyeColor(item.getItem())) return true;
+            if (color != null && sheep.getColor() != color) return true;
         }
+        if (entity instanceof Shulker shulker && color != null && shulker.getColor() != color) return true;
         if (legacy$canToggleTamedSitting(entity, item)) return true;
         return entity instanceof Animal animal && animal.isFood(item);
     }
