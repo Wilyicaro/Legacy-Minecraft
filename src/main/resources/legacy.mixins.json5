@@ -288,6 +288,7 @@
     "SlotMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
+    "ShulkerAccessor",
     "SnowLayerBlockMixin",
     "SpiderMixin",
     "StatsCounterMixin",

@@ -50,6 +50,7 @@ import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.decoration.*;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.AbstractVillager;
@@ -817,7 +818,7 @@ public interface ControlTooltip {
         if (color == null || !(minecraft.hitResult instanceof EntityHitResult result) || minecraft.player == null)
             return false;
         Entity entity = result.getEntity();
-        return entity instanceof Sheep sheep && sheep.getColor() != color || canDyeCollar(entity, minecraft.player, color);
+        return entity instanceof Sheep sheep && sheep.getColor() != color || entity instanceof Shulker shulker && shulker.getColor() != color || canDyeCollar(entity, minecraft.player, color);
     }
 
     static boolean canDyeCollar(Minecraft minecraft, ItemStack usedItem) {
