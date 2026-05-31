@@ -313,7 +313,9 @@ public class LegacyUIElementTypes {
 
     private static ItemStack parseStack(Dynamic<?> dynamic) {
         bindItemComponents();
-        return DynamicUtil.getItemFromDynamic(dynamic, true).get();
+        ItemStack stack = DynamicUtil.getItemFromDynamic(dynamic, true).get();
+        setFakeMaxDamage(stack);
+        return stack;
     }
 
     private static ItemStack createBundleStack(Container items) {
@@ -364,6 +366,28 @@ public class LegacyUIElementTypes {
                 .set(DataComponents.ITEM_NAME, Component.translatable(item.getDescriptionId()))
                 .set(DataComponents.ITEM_MODEL, BuiltInRegistries.ITEM.getKey(item))
                 .build();
+    }
+
+    private static void setFakeMaxDamage(ItemStack stack) {
+        if (!stack.has(DataComponents.DAMAGE) || stack.has(DataComponents.MAX_DAMAGE)) return;
+        int maxDamage = getFakeMaxDamage(stack.getItem());
+        if (maxDamage > 0) stack.set(DataComponents.MAX_DAMAGE, maxDamage);
+    }
+
+    private static int getFakeMaxDamage(Item item) {
+        if (item == Items.FLINT_AND_STEEL) return 64;
+        Identifier key = BuiltInRegistries.ITEM.getKey(item);
+        if (!key.getNamespace().equals("minecraft")) return 0;
+        String id = key.getPath();
+        if (id.endsWith("_sword") || id.endsWith("_shovel") || id.endsWith("_pickaxe") || id.endsWith("_axe") || id.endsWith("_hoe") || id.endsWith("_spear")) {
+            if (id.startsWith("wooden_")) return 59;
+            if (id.startsWith("stone_")) return 131;
+            if (id.startsWith("iron_")) return 250;
+            if (id.startsWith("golden_")) return 32;
+            if (id.startsWith("diamond_")) return 1561;
+            if (id.startsWith("netherite_")) return 2031;
+        }
+        return 0;
     }
 
     public static void init() {
