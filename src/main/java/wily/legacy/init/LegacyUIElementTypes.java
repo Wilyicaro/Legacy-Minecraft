@@ -12,6 +12,7 @@ import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
@@ -23,6 +24,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BundleContents;
@@ -308,6 +310,7 @@ public class LegacyUIElementTypes {
     private static ItemStack parseStack(Dynamic<?> dynamic) {
         ItemStack stack = DynamicUtil.getItemFromDynamic(dynamic, true).get();
         setFakeTrim(stack, dynamic);
+        setFakeMaxDamage(stack);
         return stack;
     }
 
@@ -351,6 +354,29 @@ public class LegacyUIElementTypes {
         }
         return armor;
     }
+
+    private static void setFakeMaxDamage(ItemStack stack) {
+        if (!stack.has(DataComponents.DAMAGE) || stack.has(DataComponents.MAX_DAMAGE)) return;
+        int maxDamage = getFakeMaxDamage(stack.getItem());
+        if (maxDamage > 0) stack.set(DataComponents.MAX_DAMAGE, maxDamage);
+    }
+
+    private static int getFakeMaxDamage(Item item) {
+        if (item == Items.FLINT_AND_STEEL) return 64;
+        Identifier key = BuiltInRegistries.ITEM.getKey(item);
+        if (!key.getNamespace().equals("minecraft")) return 0;
+        String id = key.getPath();
+        if (id.endsWith("_sword") || id.endsWith("_shovel") || id.endsWith("_pickaxe") || id.endsWith("_axe") || id.endsWith("_hoe") || id.endsWith("_spear")) {
+            if (id.startsWith("wooden_")) return 59;
+            if (id.startsWith("stone_")) return 131;
+            if (id.startsWith("iron_")) return 250;
+            if (id.startsWith("golden_")) return 32;
+            if (id.startsWith("diamond_")) return 1561;
+            if (id.startsWith("netherite_")) return 2031;
+        }
+        return 0;
+    }
+
     public static void init() {
     }
 }
