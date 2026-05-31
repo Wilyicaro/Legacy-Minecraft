@@ -2098,6 +2098,7 @@
   "legacy.options.legacyCreativeBlockPlacing": "旧版创造模式方块放置",
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "旧版溺尸",
+  "legacy.options.legacyDrownedHeight": "Legacy Drowned Height",
   "legacy.options.legacyDrownedAnimation": "旧版溺尸动画",
   "legacy.options.legacyEnchantmentScreen": "旧版附魔界面",
   "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
