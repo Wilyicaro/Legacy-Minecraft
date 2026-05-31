@@ -67,7 +67,7 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
     private void extractRenderState(LivingEntity entity, LivingEntityRenderState renderState, float f, CallbackInfo ci) {
-        if (entity.getType() == EntityType.DROWNED) renderState.scale *= DROWNED_SCALE;
+        if (LegacyOptions.legacyDrownedHeight.get() && entity.getType() == EntityType.DROWNED) renderState.scale *= DROWNED_SCALE;
     }
 
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
