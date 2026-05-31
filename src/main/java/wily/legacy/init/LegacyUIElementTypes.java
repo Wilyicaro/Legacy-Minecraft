@@ -1,24 +1,45 @@
 package wily.legacy.init;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
+import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.item.equipment.EquipmentAssets;
+import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
+import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
+import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
 import net.minecraft.world.phys.Vec2;
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
@@ -36,7 +57,16 @@ import java.util.List;
 
 public class LegacyUIElementTypes {
     public static final Identifier ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchantment/enchanting_table_book.png");
+    private static final Equippable DIAMOND_CHESTPLATE_EQUIPPABLE = Equippable.builder(EquipmentSlot.CHEST)
+            .setEquipSound(SoundEvents.ARMOR_EQUIP_DIAMOND)
+            .setAsset(EquipmentAssets.DIAMOND)
+            .build();
+    private static final ArmorTrim EMERALD_SENTRY_TRIM = new ArmorTrim(
+            Holder.direct(new TrimMaterial(MaterialAssetGroup.EMERALD, Component.translatable("trim_material.minecraft.emerald").withStyle(Style.EMPTY.withColor(1155126)))),
+            Holder.direct(new TrimPattern(Identifier.withDefaultNamespace("sentry"), Component.translatable("trim_pattern.minecraft.sentry"), false))
+    );
     private static boolean itemComponentsBound;
+    private static final Container emptyFakeContainer = new SimpleContainer();
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         bindItemComponents();
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
@@ -118,6 +148,33 @@ public class LegacyUIElementTypes {
             a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
+    public static final UIDefinitionManager.ElementType RENDER_ITEM_TOOLTIP = UIDefinitionManager.ElementType.registerConditional("render_item_tooltip", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeBundleItems", LegacyUIElementTypes::parseFakeContainer);
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y");
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
+            ItemStack stack = a.getElements().containsKey(elementName + ".fakeBundleItems") ? createBundleStack(a.getElementValue(elementName + ".fakeBundleItems", emptyFakeContainer, Container.class)) : a.getElementValue(elementName + ".fakeItem", ItemStack.EMPTY, ItemStack.class);
+            if (stack.isEmpty()) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            Font font = minecraft.font;
+            int x = a.getInteger(elementName + ".x", 0);
+            int y = a.getInteger(elementName + ".y", 0);
+            GuiGraphicsExtractor.setTooltipForNextFrame(font, Screen.getTooltipFromItem(minecraft, stack).stream().map(Component::getVisualOrderText).toList(), stack.getTooltipImage(), (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> new Vector2i(x, y), 0, 0, true, stack.get(DataComponents.TOOLTIP_STYLE));
+        }))));
+    }));
+    public static final UIDefinitionManager.ElementType RENDER_ARMOR_STAND = UIDefinitionManager.ElementType.registerConditional("render_armor_stand", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "scale");
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
+            ArmorStandRenderState state = createArmorStandState(a.getElementValue(elementName + ".fakeItem", ItemStack.EMPTY, ItemStack.class));
+            Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
+            int x = a.getInteger(elementName + ".x", 0);
+            int y = a.getInteger(elementName + ".y", 0);
+            int width = a.getInteger(elementName + ".width", 0);
+            int height = a.getInteger(elementName + ".height", 0);
+            GuiGraphicsExtractor.entity(state, a.getFloat(elementName + ".scale", 35.0f), new Vector3f(0.0F, 1.0F, 0.0F), new Quaternionf().rotationXYZ(0.43633232F, 0.0F, (float) Math.PI), null, x, y, x + width, y + height);
+        }))));
+    }));
     public static final UIDefinitionManager.ElementType RENDER_ENCHANTED_BOOK = UIDefinitionManager.ElementType.registerConditional("render_enchanted_book", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         Bearer<BookModel> bookModel = Bearer.of(null);
         Bearer<Float> flip = Bearer.of(0f);
@@ -171,10 +228,10 @@ public class LegacyUIElementTypes {
     }));
     public static final UIDefinitionManager.ElementType PUT_TOGGLEABLE_TAB_SPRITES = UIDefinitionManager.ElementType.registerCodec("put_toggleable_tab_sprites", LegacyTabButton.ToggleableTabSprites.CODEC);
     public static final UIDefinitionManager.ElementType PUT_TAB_STATE_OFFSET = UIDefinitionManager.ElementType.registerCodec("put_tab_state_offset", LegacyTabButton.StateOffset.CODEC);
-    private static final Container emptyFakeContainer = new SimpleContainer();
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", LegacyUIElementTypes::parseFakeContainer);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeBundleItems", LegacyUIElementTypes::parseFakeContainer);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", Identifier.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "offset", DynamicUtil.VEC3_OBJECT_CODEC);
@@ -196,6 +253,8 @@ public class LegacyUIElementTypes {
                 LegacySlotDisplay.override(s, a.getInteger(elementName + ".x", s.x), a.getInteger(elementName + ".y", s.y), new LegacySlotDisplay() {
                     @Override
                     public ItemStack getItemOverride() {
+                        if (a.getElements().containsKey(elementName + ".fakeBundleItems"))
+                            return createBundleStack(a.getElementValue(elementName + ".fakeBundleItems", emptyFakeContainer, Container.class));
                         return a.getElementValue(elementName + ".fakeItem", LegacySlotDisplay.super.getItemOverride(), ItemStack.class);
                     }
 
@@ -255,6 +314,42 @@ public class LegacyUIElementTypes {
     private static ItemStack parseStack(Dynamic<?> dynamic) {
         bindItemComponents();
         return DynamicUtil.getItemFromDynamic(dynamic, true).get();
+    }
+
+    private static ItemStack createBundleStack(Container items) {
+        ItemStack stack = new ItemStack(Items.BUNDLE);
+        List<ItemStackTemplate> contents = new ArrayList<>();
+        for (int i = 0; i < items.getContainerSize(); i++) {
+            ItemStack item = items.getItem(i);
+            if (!item.isEmpty()) contents.add(ItemStackTemplate.fromNonEmptyStack(item));
+        }
+        stack.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(contents));
+        return stack;
+    }
+
+    private static ArmorStandRenderState createArmorStandState(ItemStack armor) {
+        ArmorStandRenderState state = new ArmorStandRenderState();
+        state.entityType = EntityType.ARMOR_STAND;
+        state.boundingBoxWidth = 0.5F;
+        state.boundingBoxHeight = 1.975F;
+        state.eyeHeight = 1.7775F;
+        state.lightCoords = 15728880;
+        state.showBasePlate = false;
+        state.showArms = true;
+        state.xRot = 25.0F;
+        state.bodyRot = 210.0F;
+        state.chestEquipment = createArmorPreviewStack(armor);
+        return state;
+    }
+
+    private static ItemStack createArmorPreviewStack(ItemStack stack) {
+        bindItemComponents();
+        ItemStack armor = stack.isEmpty() ? new ItemStack(Items.DIAMOND_CHESTPLATE) : stack.copy();
+        if (armor.is(Items.DIAMOND_CHESTPLATE)) {
+            armor.set(DataComponents.EQUIPPABLE, DIAMOND_CHESTPLATE_EQUIPPABLE);
+            if (!armor.has(DataComponents.TRIM)) armor.set(DataComponents.TRIM, EMERALD_SENTRY_TRIM);
+        }
+        return armor;
     }
 
     private static void bindItemComponents() {
