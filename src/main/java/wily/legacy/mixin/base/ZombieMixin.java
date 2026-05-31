@@ -22,6 +22,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyTags;
 
 import java.util.List;
@@ -33,11 +35,14 @@ public class ZombieMixin {
 
     @ModifyConstant(method = "finalizeSpawn", constant = @Constant(doubleValue = 0.05))
     private double legacy$disableVanillaChickenJockey(double chance) {
-        return 0.0;
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) ? 0.0 : chance;
     }
 
     @Inject(method = "finalizeSpawn", at = @At("RETURN"))
     private void legacy$finalizeJockey(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, SpawnGroupData groupData, CallbackInfoReturnable<SpawnGroupData> cir) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions)) {
+            return;
+        }
         Zombie zombie = (Zombie) (Object) this;
         if (!(cir.getReturnValue() instanceof Zombie.ZombieGroupData data) || !data.canSpawnJockey || !zombie.isBaby()) return;
         legacy$wantsJockeyMount = level.getRandom().nextFloat() < 0.15f;
@@ -46,6 +51,10 @@ public class ZombieMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void legacy$tickJockeyMount(CallbackInfo ci) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions)) {
+            legacy$wantsJockeyMount = false;
+            return;
+        }
         Zombie zombie = (Zombie) (Object) this;
         if (!legacy$wantsJockeyMount || zombie.level().isClientSide() || zombie.tickCount % 20 != 0) return;
         if (!zombie.isBaby()) {
@@ -67,7 +76,7 @@ public class ZombieMixin {
     }
 
     public boolean canControlVehicle() {
-        return !legacy$wantsJockeyMount && !((Zombie) (Object) this).is(EntityTypeTags.NON_CONTROLLING_RIDER);
+        return (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) || !legacy$wantsJockeyMount) && !((Zombie) (Object) this).is(EntityTypeTags.NON_CONTROLLING_RIDER);
     }
 
     @Unique

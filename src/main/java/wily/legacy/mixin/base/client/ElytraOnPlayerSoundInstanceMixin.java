@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(ElytraOnPlayerSoundInstance.class)
 public abstract class ElytraOnPlayerSoundInstanceMixin extends AbstractTickableSoundInstance {
@@ -57,7 +59,7 @@ public abstract class ElytraOnPlayerSoundInstanceMixin extends AbstractTickableS
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/ElytraOnPlayerSoundInstance;stop()V"))
     private void fadeOut(ElytraOnPlayerSoundInstance instance) {
-        if (player.isRemoved()) {
+        if (player.isRemoved() || !FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio)) {
             stop();
             return;
         }

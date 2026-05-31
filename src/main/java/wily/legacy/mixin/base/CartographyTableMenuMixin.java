@@ -17,8 +17,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.inventory.RenameItemMenu;
 
 @Mixin(CartographyTableMenu.class)
@@ -59,6 +61,9 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
 
     @Inject(method = "quickMoveStack", at = @At("HEAD"), cancellable = true)
     private void quickMoveStack(Player player, int index, CallbackInfoReturnable<ItemStack> cir) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return;
+        }
         if (index < 3 || index >= slots.size()) {
             return;
         }
@@ -90,12 +95,12 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
 
     @Redirect(method = "slotsChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", ordinal = 2))
     private boolean slotsChangedIsSecondSlotEmpty(ItemStack instance) {
-        return false;
+        return !FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior) && instance.isEmpty();
     }
 
     @Redirect(method = "slotsChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", ordinal = 4))
     private boolean slotsChangedIsSecondSlotEmpty2(ItemStack instance) {
-        return false;
+        return !FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior) && instance.isEmpty();
     }
 
     @Inject(method = "setupResultSlot", at = @At("RETURN"))
@@ -150,7 +155,7 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
     }
 
     private boolean canUsePaperConversion(boolean clientSide) {
-        return !clientSide || Legacy4JClient.hasModOnServer();
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior) && (!clientSide || Legacy4JClient.hasModOnServer());
     }
 
     private void resetNameIfInputChanged() {
