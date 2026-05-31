@@ -52,6 +52,9 @@ public abstract class ItemStackMixin implements DataComponentHolder {
 
     @Inject(method = "interactLivingEntity", at = @At("HEAD"), cancellable = true)
     private void interactLivingEntity(Player player, LivingEntity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions)) {
+            return;
+        }
         DyeColor color = LegacyItemUtil.getDyeColorOrNull(self().getItem());
         if (color == null || !(entity instanceof Shulker shulker) || shulker.getColor() == color) return;
         shulker.level().playSound(player, shulker, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);

@@ -23,9 +23,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.client.PlayerIdentifier;
 import wily.legacy.entity.LegacyPlayerInfo;
 
@@ -39,7 +41,9 @@ public abstract class MapRendererMixin {
 
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     private void extractRenderState(MapId mapId, MapItemSavedData mapItemSavedData, MapRenderState mapRenderState, CallbackInfo ci) {
-        LegacyMapFillAnimation.track(mapRenderState, mapId, mapItemSavedData);
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            LegacyMapFillAnimation.track(mapRenderState, mapId, mapItemSavedData);
+        }
         int i = 0;
         for (MapDecoration decoration : mapItemSavedData.getDecorations()) {
             LegacyMapDecorationRenderState.of(mapRenderState.decorations.get(i)).extractRenderState(decoration);
@@ -54,11 +58,17 @@ public abstract class MapRendererMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
     Iterator<MapRenderState.MapDecorationRenderState> drawDecorations(List<MapRenderState.MapDecorationRenderState> iterable) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return iterable.iterator();
+        }
         return iterable.stream().filter(s -> !isPlayerDecoration(LegacyMapDecorationRenderState.of(s).getType())).iterator();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
     private void drawFillAnimation(MapRenderState mapRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean bl, int i, CallbackInfo ci) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return;
+        }
         byte[] colors = LegacyMapFillAnimation.colors(mapRenderState);
         if (colors == null) return;
         drawHiddenMapPixels(mapRenderState, poseStack, submitNodeCollector, colors, i);
@@ -118,6 +128,9 @@ public abstract class MapRendererMixin {
 
     @Inject(method = "render", at = @At("RETURN"))
     void drawReturn(MapRenderState mapRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean bl, int i, CallbackInfo ci) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return;
+        }
         int l = 0;
         for (MapRenderState.MapDecorationRenderState mapDecoration : mapRenderState.decorations) {
             if ((bl && !mapDecoration.renderOnFrame)) continue;

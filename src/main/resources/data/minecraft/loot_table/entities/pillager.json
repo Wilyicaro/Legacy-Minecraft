@@ -92,6 +92,9 @@
       "bonus_rolls": 0.0,
       "conditions": [
         {
+          "condition": "legacy:legacy_loot_tables"
+        },
+        {
           "condition": "minecraft:any_of",
           "terms": [
             {
