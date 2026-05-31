@@ -623,8 +623,9 @@
               "count": 7
             }
           ],
-          "x": "${selected_bundle.x}+14",
-          "y": "${selected_bundle.y}-18"
+          "x": "${selected_bundle.x}+12",
+          "y": "${selected_bundle.y}-14",
+          "scale": 0.35
         }
       }
     }

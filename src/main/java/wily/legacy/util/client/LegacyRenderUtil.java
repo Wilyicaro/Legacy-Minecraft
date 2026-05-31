@@ -461,6 +461,10 @@ public class LegacyRenderUtil {
         return LegacyOptions.legacyItemTooltipScaling.get() && LegacyOptions.getUIMode().isFHD() ? 2 / 3.0f : 1.0f;
     }
 
+    public interface ScaledTooltipPositioner extends ClientTooltipPositioner {
+        float scale();
+    }
+
     public static float getChatSafeZone() {
         return 29 * LegacyOptions.hudDistance.get().floatValue();
     }
@@ -658,14 +662,15 @@ public class LegacyRenderUtil {
             l += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
         }
 
-        Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(graphics.guiWidth(), graphics.guiHeight(), i, j, (int) (k * LegacyRenderUtil.getTooltipScale()), (int) (l * LegacyRenderUtil.getTooltipScale()));
+        float scale = clientTooltipPositioner instanceof ScaledTooltipPositioner scaled ? scaled.scale() : LegacyRenderUtil.getTooltipScale();
+        Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(graphics.guiWidth(), graphics.guiHeight(), i, j, (int) (k * scale), (int) (l * scale));
         int p = vector2ic.x();
         int q = vector2ic.y();
         graphics.pose().pushMatrix();
         if (p == (int) Legacy4JClient.controllerManager.getPointerX() && q == (int) Legacy4JClient.controllerManager.getPointerY())
             graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() - i), (float) (Legacy4JClient.controllerManager.getPointerY() - j));
-        int scaledWidth = Math.round(LegacyRenderUtil.getTooltipScale() * k);
-        int scaledHeight = Math.round(LegacyRenderUtil.getTooltipScale() * l);
+        int scaledWidth = Math.round(scale * k);
+        int scaledHeight = Math.round(scale * l);
         switch (LegacyOptions.getUIMode()) {
             case FHD -> LegacyRenderUtil.renderPointerPanel(graphics, p - 3, q - 6, scaledWidth + 7, scaledHeight + 9);
             case SD -> LegacyRenderUtil.renderPointerPanel(graphics, p - 3, q - 4, scaledWidth + 7, scaledHeight + 6);
@@ -673,7 +678,7 @@ public class LegacyRenderUtil {
         }
         graphics.pose().translate(p, q);
         FactoryScreenUtil.disableDepthTest();
-        graphics.pose().scale(LegacyRenderUtil.getTooltipScale(), LegacyRenderUtil.getTooltipScale());
+        graphics.pose().scale(scale, scale);
         int s = 0;
 
         int t;

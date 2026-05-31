@@ -150,11 +150,14 @@ public class LegacyUIElementTypes {
     public static final UIDefinitionManager.ElementType RENDER_ITEM_TOOLTIP = UIDefinitionManager.ElementType.registerConditional("render_item_tooltip", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeBundleItems", LegacyUIElementTypes::parseFakeContainer);
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "scale");
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             ItemStack stack = a.getElements().containsKey(elementName + ".fakeBundleItems") ? createBundleStack(a.getElementValue(elementName + ".fakeBundleItems", emptyFakeContainer, Container.class)) : a.getElementValue(elementName + ".fakeItem", ItemStack.EMPTY, ItemStack.class);
             if (stack.isEmpty()) return;
-            renderTooltip(guiGraphics, Minecraft.getInstance().font, stack, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0));
+            int x = a.getInteger(elementName + ".x", 0);
+            int y = a.getInteger(elementName + ".y", 0);
+            float scale = a.getElements().containsKey(elementName + ".scale") ? a.getFloat(elementName + ".scale", 1.0f) : 0.0f;
+            renderTooltip(guiGraphics, Minecraft.getInstance().font, stack, x, y, scale);
         }))));
     }));
     public static final UIDefinitionManager.ElementType RENDER_ARMOR_STAND = UIDefinitionManager.ElementType.registerConditional("render_armor_stand", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
@@ -324,14 +327,24 @@ public class LegacyUIElementTypes {
         return stack;
     }
 
-    private static void renderTooltip(GuiGraphics guiGraphics, Font font, ItemStack stack, int x, int y) {
+    private static void renderTooltip(GuiGraphics guiGraphics, Font font, ItemStack stack, int x, int y, float scale) {
         List<ClientTooltipComponent> components = new ArrayList<>();
         Screen.getTooltipFromItem(Minecraft.getInstance(), stack).stream()
                 .map(Component::getVisualOrderText)
                 .map(ClientTooltipComponent::create)
                 .forEach(components::add);
         stack.getTooltipImage().ifPresent(image -> components.add(Math.min(1, components.size()), ClientTooltipComponent.create(image)));
-        ClientTooltipPositioner positioner = (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> new Vector2i(x, y);
+        ClientTooltipPositioner positioner = scale > 0.0f ? new LegacyRenderUtil.ScaledTooltipPositioner() {
+            @Override
+            public float scale() {
+                return scale;
+            }
+
+            @Override
+            public Vector2i positionTooltip(int screenWidth, int screenHeight, int mouseX, int mouseY, int tooltipWidth, int tooltipHeight) {
+                return new Vector2i(x, y);
+            }
+        } : (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> new Vector2i(x, y);
         guiGraphics.renderTooltip(font, components, 0, 0, positioner, stack.get(DataComponents.TOOLTIP_STYLE));
     }
 
