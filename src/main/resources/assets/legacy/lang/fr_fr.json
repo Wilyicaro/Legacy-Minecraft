@@ -2098,6 +2098,7 @@
   "legacy.options.legacyCreativeBlockPlacing": "Placement de blocs créatif legacy",
   "legacy.options.legacyCursor": "Mouvement du curseur legacy",
   "legacy.options.legacyDrowned": "Noyés legacy",
+  "legacy.options.legacyDrownedHeight": "Legacy Drowned Height",
   "legacy.options.legacyDrownedAnimation": "Animation des noyés legacy",
   "legacy.options.legacyEnchantmentScreen": "Écran d'enchantement legacy",
   "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
