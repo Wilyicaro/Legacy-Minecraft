@@ -2098,6 +2098,7 @@
   "legacy.options.legacyCreativeBlockPlacing": "Старе розміщення блоків в режимі творчости",
   "legacy.options.legacyCursor": "Legacy рух курсора",
   "legacy.options.legacyDrowned": "Legacy утопленик",
+  "legacy.options.legacyDrownedHeight": "Legacy Drowned Height",
   "legacy.options.legacyDrownedAnimation": "Legacy анімація утопленика",
   "legacy.options.legacyEnchantmentScreen": "Legacy інтерфейс зачарування",
   "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
