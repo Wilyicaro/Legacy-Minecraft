@@ -22,6 +22,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
 
 @Mixin(EmptyMapItem.class)
@@ -36,11 +38,16 @@ public class EmptyMapItemMixin {
     *///?} else {
     @Redirect(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))
     public void useConsume(ItemStack instance, int i, LivingEntity arg) {
-
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            instance.consume(i, arg);
+        }
     }
 
     @WrapOperation(method = "use", at = @At(value = "INVOKE", target = /*? if <1.21.5 {*//*"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/world/level/Level;IIBZZ)Lnet/minecraft/world/item/ItemStack;"*//*?} else {*/"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/server/level/ServerLevel;IIBZZ)Lnet/minecraft/world/item/ItemStack;"/*?}*/))
     public ItemStack use(/*? if <1.21.5 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, int arg, int i, byte j, boolean b, boolean bl, Operation<ItemStack> original, Level level1, Player player, InteractionHand interactionHand) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return original.call(level, arg, i, j, b, bl);
+        }
         ItemStack map = player.getItemInHand(interactionHand);
         Component name = map.get(DataComponents.CUSTOM_NAME);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();

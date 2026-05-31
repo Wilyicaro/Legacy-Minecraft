@@ -15,6 +15,11 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(SweetBerryBushBlock.class)
 public abstract class SweetBerryBushBlockMixin extends VegetationBlock {
@@ -22,10 +27,10 @@ public abstract class SweetBerryBushBlockMixin extends VegetationBlock {
         super(properties);
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (state.getValue(SweetBerryBushBlock.AGE) <= 1) {
-            return super.useWithoutItem(state, level, pos, player, hitResult);
+    @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
+    private void useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyWorldInteractions) || state.getValue(SweetBerryBushBlock.AGE) <= 1) {
+            return;
         }
 
         if (level instanceof ServerLevel serverLevel) {
@@ -44,6 +49,6 @@ public abstract class SweetBerryBushBlockMixin extends VegetationBlock {
             serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
         }
 
-        return InteractionResult.SUCCESS;
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

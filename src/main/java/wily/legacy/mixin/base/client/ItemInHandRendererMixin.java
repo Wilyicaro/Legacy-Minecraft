@@ -26,10 +26,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
@@ -81,11 +83,20 @@ public abstract class ItemInHandRendererMixin {
 
     @Unique
     private void updateMapFillAnimation(ItemStack itemStack, boolean mainHand) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            legacy$setWasEmptyMap(itemStack, mainHand);
+            return;
+        }
         boolean wasEmptyMap = mainHand ? legacy$mainHandWasEmptyMap : legacy$offHandWasEmptyMap;
         if (wasEmptyMap && itemStack.is(Items.FILLED_MAP)) {
             MapId mapId = itemStack.get(DataComponents.MAP_ID);
             if (mapId != null) LegacyMapFillAnimation.start(mapId, legacy$isStackedMap(itemStack, mapId));
         }
+        legacy$setWasEmptyMap(itemStack, mainHand);
+    }
+
+    @Unique
+    private void legacy$setWasEmptyMap(ItemStack itemStack, boolean mainHand) {
         if (mainHand) {
             legacy$mainHandWasEmptyMap = itemStack.is(Items.MAP);
         } else {

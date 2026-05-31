@@ -6,7 +6,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,14 +16,29 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
+
+import java.util.Set;
 
 @Mixin(WanderingTrader.class)
 public abstract class WanderingTraderMixin extends AbstractVillager {
+    @Unique
+    private static final Set<Item> LEGACY_TRADE_RESULTS = Set.of(Items.LILAC, Items.ROSE_BUSH, Items.SUNFLOWER, Items.PEONY, Items.RED_SANDSTONE);
+
     @Unique
     private ItemStack legacy$tradePreview = ItemStack.EMPTY;
 
     protected WanderingTraderMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
+    }
+
+    @Inject(method = "updateTrades", at = @At("RETURN"))
+    private void legacy$removeLegacyTrades(ServerLevel level, CallbackInfo ci) {
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyLootTables)) {
+            return;
+        }
+        getOffers().removeIf(offer -> LEGACY_TRADE_RESULTS.contains(offer.assemble().getItem()));
     }
 
     @Inject(method = "aiStep", at = @At("TAIL"))

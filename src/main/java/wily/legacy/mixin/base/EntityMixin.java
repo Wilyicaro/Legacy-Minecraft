@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyRegistries;
@@ -58,12 +60,12 @@ public abstract class EntityMixin {
 
     @ModifyArg(method = "doWaterSplashEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"), index = 1)
     private float increaseWaterSplashVolume(float volume) {
-        return volume * 3.0f;
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) ? volume * 3.0f : volume;
     }
 
     @Unique
     private SoundEvent legacy$getSplashSound(SoundEvent original) {
-        return self().getType().builtInRegistryHolder().is(LegacyTags.OLD_SPLASH_SOUND) ? LegacyRegistries.ENTITY_GENERIC_OLD_SPLASH.get() : original;
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && self().getType().builtInRegistryHolder().is(LegacyTags.OLD_SPLASH_SOUND) ? LegacyRegistries.ENTITY_GENERIC_OLD_SPLASH.get() : original;
     }
 
     //? if neoforge {

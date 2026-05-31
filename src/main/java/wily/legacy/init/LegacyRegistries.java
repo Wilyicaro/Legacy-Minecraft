@@ -25,6 +25,7 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacyMerchantMenu;
+import wily.legacy.util.LegacyLootTablesCondition;
 import wily.legacy.util.RandomDifficultyChanceCondition;
 import wily.legacy.util.LegacyTags;
 
@@ -68,6 +69,7 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.screenshot")));
     public static final RegisterListing.Holder<SoundEvent> ENTITY_GENERIC_OLD_SPLASH = SOUND_EVENT_REGISTER.add("entity.generic.old_splash", ()-> SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("entity.generic.old_splash")));
     public static final RegisterListing.Holder<LootItemConditionType> RANDOM_DIFFICULTY_CHANCE = LOOT_CONDITION_REGISTER.add("random_difficulty_chance", () -> new LootItemConditionType(RandomDifficultyChanceCondition.CODEC));
+    public static final RegisterListing.Holder<LootItemConditionType> LEGACY_LOOT_TABLES = LOOT_CONDITION_REGISTER.add("legacy_loot_tables", () -> new LootItemConditionType(LegacyLootTablesCondition.CODEC));
     private static final RegisterListing.Holder<ResourceLocation> SKELETON_JOCKEY_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("skeleton_jockey", () -> SKELETON_JOCKEY_STAT);
     private static final RegisterListing.Holder<ResourceLocation> DAYS_PLAYED_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("days_played", () -> DAYS_PLAYED_STAT);
 

@@ -28,6 +28,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyVillager;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.util.LegacyItemUtil;
@@ -143,6 +145,10 @@ public abstract class VillagerMixin extends AbstractVillager implements LegacyVi
 
     @Inject(method = "customServerAiStep", at = @At("TAIL"))
     private void customServerAiStep(ServerLevel level, CallbackInfo ci) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio)) {
+            legacy$trackedPoiMemories = false;
+            return;
+        }
         Brain<?> brain = this.getBrain();
         GlobalPos home = brain.getMemory(MemoryModuleType.HOME).orElse(null);
         GlobalPos jobSite = brain.getMemory(MemoryModuleType.JOB_SITE).orElse(null);

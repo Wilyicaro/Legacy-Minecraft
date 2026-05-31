@@ -14,22 +14,24 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(AbstractHorse.class)
 public class AbstractHorseMixin {
     @Inject(method = "isTamed", at = @At("HEAD"), cancellable = true)
     private void isTamed(CallbackInfoReturnable<Boolean> cir) {
-        if ((Object)this instanceof SkeletonHorse) cir.setReturnValue(true);
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) && (Object)this instanceof SkeletonHorse) cir.setReturnValue(true);
     }
 
     @ModifyExpressionValue(method = {"getControllingPassenger", "canJump", "onPlayerJump"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;isSaddled()Z"))
     private boolean skeletonHorseRidesWithoutSaddle(boolean saddled) {
-        return saddled || (Object)this instanceof SkeletonHorse;
+        return saddled || FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) && (Object)this instanceof SkeletonHorse;
     }
 
     @Inject(method = "handleEating", at = @At("RETURN"))
     private void handleEating(Player player, ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValue()) return;
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) || !cir.getReturnValue()) return;
         AbstractHorse horse = (AbstractHorse) (Object) this;
         horse.level().playSound(null, horse.getX(), horse.getY(), horse.getZ(), SoundEvents.GENERIC_EAT, SoundSource.NEUTRAL, 1.0f, 1.0f);
         if (!(horse.level() instanceof ServerLevel level)) return;
