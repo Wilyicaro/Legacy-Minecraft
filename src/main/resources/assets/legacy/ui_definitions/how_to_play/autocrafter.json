@@ -1,0 +1,501 @@
+{
+  "elements": [
+    {
+      "name": "autocrafter_fhd_hd",
+      "type": "children",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "applyPrefix": false,
+      "elements": {
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-228",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+          "width": 200,
+          "height": 222,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.autocrafter_message",
+                "allowVariables": true,
+                "args": [
+                  "controlIcon.key.use"
+                ]
+              },
+              "width": 176
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.autocrafter_message_1"
+              },
+              "width": 176
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/small_panel",
+          "width": 215,
+          "height": 202,
+          "x": "${width}/2",
+          "y": "${scrollable_renderer.y}+4"
+        },
+        "autocrafter_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "block.minecraft.crafter"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+${panel.width}/2-${autocrafter_label.component.width}/2",
+          "y": "${panel.y}+11"
+        },
+        "disabled_left": {
+          "type": "put_legacy_slot",
+          "range": "[0,2]",
+          "isFake": true,
+          "spriteOverride": "legacy:container/disabled_crafter_slot",
+          "fakeContainer": [
+            "air",
+            "air",
+            "air"
+          ],
+          "x": "${panel.x}+34",
+          "y": "${panel.y}+23+${disabled_left.index}*21"
+        },
+        "disabled_right": {
+          "type": "put_legacy_slot",
+          "range": "[0,2]",
+          "isFake": true,
+          "spriteOverride": "legacy:container/disabled_crafter_slot",
+          "fakeContainer": [
+            "air",
+            "air",
+            "air"
+          ],
+          "x": "${panel.x}+76",
+          "y": "${panel.y}+23+${disabled_right.index}*21"
+        },
+        "disabled_bottom": {
+          "type": "put_legacy_slot",
+          "range": "[0,0]",
+          "isFake": true,
+          "spriteOverride": "legacy:container/disabled_crafter_slot",
+          "fakeContainer": [
+            "air"
+          ],
+          "x": "${panel.x}+55",
+          "y": "${panel.y}+65"
+        },
+        "recipe": {
+          "type": "put_legacy_slot",
+          "range": "[0,1]",
+          "isFake": true,
+          "spriteOverride": "legacy:container/crafter_slot",
+          "fakeContainer": [
+            "redstone",
+            "stick"
+          ],
+          "x": "${panel.x}+55",
+          "y": "${panel.y}+23+${recipe.index}*21"
+        },
+        "redstone": {
+          "type": "blit_sprite",
+          "sprite": "minecraft:container/crafter/powered_redstone",
+          "x": "${panel.x}+105",
+          "y": "${panel.y}+43",
+          "width": 24,
+          "height": 24
+        },
+        "result": {
+          "type": "put_legacy_slot",
+          "range": "[0,0]",
+          "isFake": true,
+          "fakeItem": "redstone_torch",
+          "spriteOverride": "legacy:container/non_interactive_result_slot",
+          "width": 32,
+          "height": 32,
+          "x": "${panel.x}+150",
+          "y": "${panel.y}+39"
+        },
+        "inventory_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "container.inventory"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+14",
+          "y": "${panel.y}+90"
+        },
+        "inventory": {
+          "type": "put_legacy_slot",
+          "range": "[0,26]",
+          "isFake": true,
+          "fakeContainer": [
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
+            "air",
+            "air",
+            "hopper",
+            "air",
+            "air",
+            {
+              "item": "redstone",
+              "count": 42
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
+            "air",
+            "lever",
+            "air",
+            "emerald",
+            "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
+            "air",
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
+          ],
+          "x": "${panel.x}+14+(${inventory.index}%9)*21",
+          "y": "${panel.y}+102+(${inventory.index}/9)*21"
+        },
+        "quick_select": {
+          "type": "put_legacy_slot",
+          "range": "[0,8]",
+          "isFake": true,
+          "fakeContainer": [
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
+          ],
+          "x": "${panel.x}+14+(${quick_select.index}%9)*21",
+          "y": "${panel.y}+171"
+        }
+      }
+    },
+    {
+      "name": "autocrafter_sd",
+      "type": "children",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "applyPrefix": false,
+      "elements": {
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-144",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+          "contentX": 10,
+          "contentY": 8,
+          "width": 140,
+          "height": 137,
+          "lineHeight": 8,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.autocrafter_message",
+                "font": "legacy:default_11",
+                "allowVariables": true,
+                "args": [
+                  "controlIcon.key.use"
+                ]
+              },
+              "width": 120,
+              "lineSpacing": 8
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.autocrafter_message_1",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/panel",
+          "width": 130,
+          "height": 140,
+          "x": "${width}/2",
+          "y": "${scrollable_renderer.y}"
+        },
+        "autocrafter_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "block.minecraft.crafter",
+            "font": "legacy:default_11"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+${panel.width}/2-${autocrafter_label.component.width}/2",
+          "y": "${panel.y}+5"
+        },
+        "disabled_left": {
+          "type": "put_legacy_slot",
+          "range": "[0,2]",
+          "isFake": true,
+          "width": 13,
+          "spriteOverride": "legacy:container/disabled_crafter_slot",
+          "fakeContainer": [
+            "air",
+            "air",
+            "air"
+          ],
+          "x": "${panel.x}+19",
+          "y": "${panel.y}+18+${disabled_left.index}*13"
+        },
+        "disabled_right": {
+          "type": "put_legacy_slot",
+          "range": "[0,2]",
+          "isFake": true,
+          "width": 13,
+          "spriteOverride": "legacy:container/disabled_crafter_slot",
+          "fakeContainer": [
+            "air",
+            "air",
+            "air"
+          ],
+          "x": "${panel.x}+45",
+          "y": "${panel.y}+18+${disabled_right.index}*13"
+        },
+        "disabled_bottom": {
+          "type": "put_legacy_slot",
+          "range": "[0,0]",
+          "isFake": true,
+          "width": 13,
+          "spriteOverride": "legacy:container/disabled_crafter_slot",
+          "fakeContainer": [
+            "air"
+          ],
+          "x": "${panel.x}+32",
+          "y": "${panel.y}+44"
+        },
+        "recipe": {
+          "type": "put_legacy_slot",
+          "range": "[0,1]",
+          "isFake": true,
+          "width": 13,
+          "spriteOverride": "legacy:container/crafter_slot",
+          "fakeContainer": [
+            "redstone",
+            "stick"
+          ],
+          "x": "${panel.x}+32",
+          "y": "${panel.y}+18+${recipe.index}*13"
+        },
+        "redstone": {
+          "type": "blit_sprite",
+          "sprite": "minecraft:container/crafter/powered_redstone",
+          "x": "${panel.x}+65",
+          "y": "${panel.y}+28",
+          "width": 16,
+          "height": 16
+        },
+        "result": {
+          "type": "put_legacy_slot",
+          "range": "[0,0]",
+          "isFake": true,
+          "fakeItem": "redstone_torch",
+          "spriteOverride": "legacy:container/non_interactive_result_slot",
+          "width": 21,
+          "height": 21,
+          "x": "${panel.x}+90",
+          "y": "${panel.y}+28"
+        },
+        "inventory_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "container.inventory",
+            "font": "legacy:default_11"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+7",
+          "y": "${panel.y}+66"
+        },
+        "inventory": {
+          "type": "put_legacy_slot",
+          "range": "[0,26]",
+          "isFake": true,
+          "width": 13,
+          "fakeContainer": [
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
+            "air",
+            "air",
+            "hopper",
+            "air",
+            "air",
+            {
+              "item": "redstone",
+              "count": 42
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
+            "air",
+            "lever",
+            "air",
+            "emerald",
+            "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
+            "air",
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
+          ],
+          "x": "${panel.x}+7+(${inventory.index}%9)*13",
+          "y": "${panel.y}+76+(${inventory.index}/9)*13"
+        },
+        "quick_select": {
+          "type": "put_legacy_slot",
+          "range": "[0,8]",
+          "isFake": true,
+          "width": 13,
+          "fakeContainer": [
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
+          ],
+          "x": "${panel.x}+7+(${quick_select.index}%9)*13",
+          "y": "${panel.y}+120"
+        }
+      }
+    }
+  ]
+}
