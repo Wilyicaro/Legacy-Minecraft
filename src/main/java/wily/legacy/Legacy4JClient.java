@@ -41,7 +41,6 @@ import wily.factoryapi.base.client.*;
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
 import net.minecraft.client.renderer.entity.DrownedRenderer;
 import net.minecraft.client.renderer.entity.GhastRenderer;
-import net.minecraft.client.renderer.entity.WitchRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
@@ -607,9 +606,6 @@ public class Legacy4JClient {
                         return DROWNED_GLOW;
                     }
                 });
-            }
-            if (r.getEntityRenderer(EntityType.WITCH) instanceof WitchRenderer renderer) {
-                r.register(renderer, new LegacyWitchHoodLayer(renderer));
             }
         });
         //? if neoforge {
