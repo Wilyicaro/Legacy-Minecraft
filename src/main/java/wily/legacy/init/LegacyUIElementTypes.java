@@ -1,6 +1,7 @@
 package wily.legacy.init;
 
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -14,11 +15,15 @@ import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderOwner;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
@@ -34,8 +39,10 @@ import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
+import net.minecraft.world.item.equipment.trim.TrimMaterials;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
+import net.minecraft.world.item.equipment.trim.TrimPatterns;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Quaternionf;
 import org.joml.Vector2i;
@@ -54,6 +61,9 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class LegacyUIElementTypes {
     public static final ResourceLocation ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchanting_table_book.png");
@@ -61,10 +71,9 @@ public class LegacyUIElementTypes {
             .setEquipSound(SoundEvents.ARMOR_EQUIP_DIAMOND)
             .setAsset(EquipmentAssets.DIAMOND)
             .build();
-    private static final ArmorTrim EMERALD_SENTRY_TRIM = new ArmorTrim(
-            Holder.direct(new TrimMaterial(MaterialAssetGroup.EMERALD, Component.translatable("trim_material.minecraft.emerald"))),
-            Holder.direct(new TrimPattern(ResourceLocation.withDefaultNamespace("sentry"), Component.translatable("trim_pattern.minecraft.sentry"), false))
-    );
+    private static final Holder<TrimMaterial> EMERALD_TRIM_MATERIAL = new KeyedHolder<>(TrimMaterials.EMERALD, new TrimMaterial(MaterialAssetGroup.EMERALD, Component.translatable("trim_material.minecraft.emerald").withStyle(Style.EMPTY.withColor(1155126))));
+    private static final Holder<TrimPattern> SENTRY_TRIM_PATTERN = new KeyedHolder<>(TrimPatterns.SENTRY, new TrimPattern(ResourceLocation.withDefaultNamespace("sentry"), Component.translatable("trim_pattern.minecraft.sentry"), false));
+    private static final ArmorTrim EMERALD_SENTRY_TRIM = new ArmorTrim(EMERALD_TRIM_MATERIAL, SENTRY_TRIM_PATTERN);
     private static final Container emptyFakeContainer = new SimpleContainer();
 
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
@@ -316,6 +325,12 @@ public class LegacyUIElementTypes {
         return stack;
     }
 
+    private static void setFakeTrim(ItemStack stack, Dynamic<?> dynamic) {
+        if (!stack.is(Items.DIAMOND_CHESTPLATE) || dynamic.get("components").result().isEmpty()) return;
+        stack.set(DataComponents.EQUIPPABLE, DIAMOND_CHESTPLATE_EQUIPPABLE);
+        stack.set(DataComponents.TRIM, EMERALD_SENTRY_TRIM);
+    }
+
     private static ItemStack createBundleStack(Container items) {
         ItemStack stack = new ItemStack(Items.BUNDLE);
         List<ItemStack> contents = new ArrayList<>();
@@ -374,10 +389,18 @@ public class LegacyUIElementTypes {
         return armor;
     }
 
-    private static void setFakeTrim(ItemStack stack, Dynamic<?> dynamic) {
-        if (!stack.is(Items.DIAMOND_CHESTPLATE) || dynamic.get("components").result().isEmpty()) return;
-        stack.set(DataComponents.EQUIPPABLE, DIAMOND_CHESTPLATE_EQUIPPABLE);
-        stack.set(DataComponents.TRIM, EMERALD_SENTRY_TRIM);
+    private record KeyedHolder<T>(ResourceKey<T> key, T value) implements Holder<T> {
+        @Override public boolean isBound() { return true; }
+        @Override public boolean is(ResourceLocation location) { return key.location().equals(location); }
+        @Override public boolean is(ResourceKey<T> key) { return this.key.equals(key); }
+        @Override public boolean is(Predicate<ResourceKey<T>> predicate) { return predicate.test(key); }
+        @Override public boolean is(TagKey<T> tagKey) { return false; }
+        @Override public boolean is(Holder<T> holder) { return holder.is(key); }
+        @Override public Stream<TagKey<T>> tags() { return Stream.empty(); }
+        @Override public Either<ResourceKey<T>, T> unwrap() { return Either.left(key); }
+        @Override public Optional<ResourceKey<T>> unwrapKey() { return Optional.of(key); }
+        @Override public Kind kind() { return Kind.REFERENCE; }
+        @Override public boolean canSerializeIn(HolderOwner<T> owner) { return true; }
     }
 
     private static void setFakeMaxDamage(ItemStack stack) {
