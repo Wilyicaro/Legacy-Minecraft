@@ -21,6 +21,7 @@ import wily.legacy.client.LegacyVillagerRenderState;
 import wily.legacy.client.LegacyLivingEntityRenderState;
 //?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -42,6 +43,8 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     @Final
     protected ItemModelResolver itemModelResolver;
     @Unique
+    private static final float DROWNED_SCALE = 1.0625F;
+    @Unique
     private ItemStack legacy$emerald;
 
     protected LivingEntityRendererMixin(EntityRendererProvider.Context context) {
@@ -60,6 +63,11 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     @Redirect(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
     public boolean render(LivingEntity instance) {
         return true;
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
+    private void extractRenderState(LivingEntity entity, LivingEntityRenderState renderState, float f, CallbackInfo ci) {
+        if (entity.getType() == EntityType.DROWNED) renderState.scale *= DROWNED_SCALE;
     }
 
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
