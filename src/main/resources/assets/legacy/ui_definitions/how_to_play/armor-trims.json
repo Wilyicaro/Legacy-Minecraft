@@ -135,33 +135,69 @@
           "range": "[0,26]",
           "isFake": true,
           "fakeContainer": [
-            "netherite_upgrade_smithing_template",
-            "dune_armor_trim_smithing_template",
-            "coast_armor_trim_smithing_template",
-            "wild_armor_trim_smithing_template",
-            "ward_armor_trim_smithing_template",
-            "eye_armor_trim_smithing_template",
-            "vex_armor_trim_smithing_template",
-            "tide_armor_trim_smithing_template",
-            "snout_armor_trim_smithing_template",
-            "rib_armor_trim_smithing_template",
-            "spire_armor_trim_smithing_template",
-            "wayfinder_armor_trim_smithing_template",
-            "shaper_armor_trim_smithing_template",
-            "silence_armor_trim_smithing_template",
-            "raiser_armor_trim_smithing_template",
-            "host_armor_trim_smithing_template",
-            "flow_armor_trim_smithing_template",
-            "bolt_armor_trim_smithing_template",
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
             "air",
             "air",
+            "oak_fence_gate",
             "air",
             "air",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
             "air",
+            "dark_oak_door",
             "air",
+            "emerald",
             "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
             "air",
-            "air"
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
           ],
           "x": "${panel.x}+10+(${inventory.index}%9)*21",
           "y": "${panel.y}+116+(${inventory.index}/9)*21"
@@ -171,15 +207,34 @@
           "range": "[0,8]",
           "isFake": true,
           "fakeContainer": [
-            "diamond_helmet",
-            "diamond_chestplate",
-            "diamond_leggings",
-            "diamond_boots",
-            "emerald",
-            "amethyst_shard",
-            "gold_ingot",
-            "lapis_lazuli",
-            "redstone"
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
           ],
           "x": "${panel.x}+10+${quick_select.index}*21",
           "y": "${panel.y}+185"
@@ -336,33 +391,69 @@
           "isFake": true,
           "width": 13,
           "fakeContainer": [
-            "netherite_upgrade_smithing_template",
-            "dune_armor_trim_smithing_template",
-            "coast_armor_trim_smithing_template",
-            "wild_armor_trim_smithing_template",
-            "ward_armor_trim_smithing_template",
-            "eye_armor_trim_smithing_template",
-            "vex_armor_trim_smithing_template",
-            "tide_armor_trim_smithing_template",
-            "snout_armor_trim_smithing_template",
-            "rib_armor_trim_smithing_template",
-            "spire_armor_trim_smithing_template",
-            "wayfinder_armor_trim_smithing_template",
-            "shaper_armor_trim_smithing_template",
-            "silence_armor_trim_smithing_template",
-            "raiser_armor_trim_smithing_template",
-            "host_armor_trim_smithing_template",
-            "flow_armor_trim_smithing_template",
-            "bolt_armor_trim_smithing_template",
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
             "air",
             "air",
+            "oak_fence_gate",
             "air",
             "air",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
             "air",
+            "dark_oak_door",
             "air",
+            "emerald",
             "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
             "air",
-            "air"
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
           ],
           "x": "${panel.x}+7+(${inventory.index}%9)*13",
           "y": "${panel.y}+77+(${inventory.index}/9)*13"
@@ -373,15 +464,34 @@
           "isFake": true,
           "width": 13,
           "fakeContainer": [
-            "diamond_helmet",
-            "diamond_chestplate",
-            "diamond_leggings",
-            "diamond_boots",
-            "emerald",
-            "amethyst_shard",
-            "gold_ingot",
-            "lapis_lazuli",
-            "redstone"
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
           ],
           "x": "${panel.x}+7+(${quick_select.index}%9)*13",
           "y": "${panel.y}+122"
