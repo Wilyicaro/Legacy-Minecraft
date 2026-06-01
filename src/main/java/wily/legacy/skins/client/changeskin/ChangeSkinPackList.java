@@ -17,11 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 public final class ChangeSkinPackList {
+    private static final String SKIN_MEGA_BUNDLE_PACK_ID = "legacy:skinpack_megabundle";
     private static final String FESTIVE_MASHUP_PACK_ID = "festivemashup";
     private static final String FESTIVE_PACK_ID = "festive";
     private final ChangeSkinScreenSource source;
     private final Runnable focusSound;
     private final Runnable pressSound;
+    private final Runnable skinMegaBundleAction;
+    private final boolean showSkinMegaBundlePack;
     private final List<String> basePackIds = new ArrayList<>();
     private final List<String> packIds = new ArrayList<>();
     private int buttonHeight = 20;
@@ -29,10 +32,12 @@ public final class ChangeSkinPackList {
     private boolean queuedChangePack;
     private boolean reorderMode;
 
-    public ChangeSkinPackList(ChangeSkinScreenSource source, Runnable focusSound, Runnable pressSound) {
+    public ChangeSkinPackList(ChangeSkinScreenSource source, Runnable focusSound, Runnable pressSound, Runnable skinMegaBundleAction, boolean showSkinMegaBundlePack) {
         this.source = source;
         this.focusSound = focusSound;
         this.pressSound = pressSound;
+        this.skinMegaBundleAction = skinMegaBundleAction;
+        this.showSkinMegaBundlePack = showSkinMegaBundlePack;
     }
 
     private static SkinPack pack(Map<String, SkinPack> packs, String packId) {
@@ -96,6 +101,16 @@ public final class ChangeSkinPackList {
         return pack(source.packs(), getFocusedPackId());
     }
 
+    public SkinPack getFocusedDisplayPack() {
+        SkinPack focused = getFocusedPack();
+        if (focused != null || !focusedPackOpensStore()) return focused;
+        return pack(source.packs(), resolvePreferredDefaultPackId(packIds));
+    }
+
+    public boolean focusedPackOpensStore() {
+        return isSkinMegaBundlePack(getFocusedPackId());
+    }
+
     public void setFocusedPackIndex(int index, boolean playSound) {
         if (packIds.isEmpty()) {
             focusedPackIndex = 0;
@@ -104,7 +119,7 @@ public final class ChangeSkinPackList {
         int wrapped = wrapIndex(index);
         if (wrapped == focusedPackIndex) return;
         focusedPackIndex = wrapped;
-        if (!reorderMode) queuedChangePack = true;
+        if (!reorderMode && !focusedPackOpensStore()) queuedChangePack = true;
         if (playSound) focusSound.run();
     }
 
@@ -114,6 +129,10 @@ public final class ChangeSkinPackList {
             return;
         }
         focusedPackIndex = wrapIndex(index);
+        if (focusedPackOpensStore()) {
+            skinMegaBundleAction.run();
+            return;
+        }
         if (!reorderMode) queuedChangePack = true;
         pressSound.run();
     }
@@ -143,7 +162,7 @@ public final class ChangeSkinPackList {
     public List<String> orderedPackIds() {
         ArrayList<String> ids = new ArrayList<>(packIds.size());
         for (String packId : packIds) {
-            if (SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.PACK_FAVOURITES.equals(packId)) continue;
+            if (isSpecialPack(packId)) continue;
             ids.add(packId);
         }
         return List.copyOf(ids);
@@ -188,6 +207,7 @@ public final class ChangeSkinPackList {
     }
 
     private Component labelForPackId(String packId) {
+        if (isSkinMegaBundlePack(packId)) return Component.translatable("legacy.menu.download_skinpacks");
         SkinPack pack = pack(source.packs(), packId);
         return pack == null ? Component.literal(String.valueOf(packId)) : Component.literal(source.packName(pack));
     }
@@ -205,23 +225,27 @@ public final class ChangeSkinPackList {
 
     private void normalizeSpecialPackOrder(List<String> ids) {
         if (ids == null) return;
+        boolean hasInstalledPack = hasInstalledPack(ids);
         String preferredDefaultPackId = resolvePreferredDefaultPackId(ids);
         ids.removeIf(SkinIdUtil.PACK_FAVOURITES::equals);
         ids.removeIf(SkinIdUtil.PACK_DEFAULT::equals);
+        ids.removeIf(ChangeSkinPackList::isSkinMegaBundlePack);
         if (preferredDefaultPackId != null && !SkinIdUtil.PACK_DEFAULT.equals(preferredDefaultPackId))
             ids.removeIf(preferredDefaultPackId::equals);
         int insertAt = 0;
         if (preferredDefaultPackId != null && source.packs().containsKey(preferredDefaultPackId))
             ids.add(insertAt++, preferredDefaultPackId);
-        if (source.packs().containsKey(SkinIdUtil.PACK_FAVOURITES)) ids.add(insertAt, SkinIdUtil.PACK_FAVOURITES);
+        if (source.packs().containsKey(SkinIdUtil.PACK_FAVOURITES)) ids.add(insertAt++, SkinIdUtil.PACK_FAVOURITES);
+        if (showSkinMegaBundlePack && !hasInstalledPack) ids.add(Math.min(insertAt, ids.size()), SKIN_MEGA_BUNDLE_PACK_ID);
     }
 
     private boolean movePackAfterFavourites(String packId) {
         if (packId == null || packId.isBlank() || packIds.isEmpty()) return false;
-        if (SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.PACK_FAVOURITES.equals(packId)) return false;
+        if (isSpecialPack(packId)) return false;
         String preferredDefaultPackId = resolvePreferredDefaultPackId(packIds);
         if (packId.equals(preferredDefaultPackId) || !packIds.remove(packId)) return false;
         int insertAt = Math.max(1, packIds.indexOf(SkinIdUtil.PACK_FAVOURITES) + 1);
+        if (packIds.size() > insertAt && isSkinMegaBundlePack(packIds.get(insertAt))) insertAt++;
         packIds.add(Math.min(insertAt, packIds.size()), packId);
         return true;
     }
@@ -231,7 +255,7 @@ public final class ChangeSkinPackList {
         if (preferred != null && ids != null && ids.contains(preferred)) return preferred;
         if (ids == null) return null;
         for (String packId : ids) {
-            if (packId == null || packId.isBlank() || SkinIdUtil.PACK_FAVOURITES.equals(packId)) continue;
+            if (packId == null || packId.isBlank() || SkinIdUtil.PACK_FAVOURITES.equals(packId) || isSkinMegaBundlePack(packId)) continue;
             return packId;
         }
         return null;
@@ -247,10 +271,26 @@ public final class ChangeSkinPackList {
         int index = 0;
         while (index < packIds.size()) {
             String packId = packIds.get(index);
-            if (!SkinIdUtil.PACK_DEFAULT.equals(packId) && !SkinIdUtil.PACK_FAVOURITES.equals(packId)) break;
+            if (!isSpecialPack(packId)) break;
             index++;
         }
         return index;
+    }
+
+    private static boolean isSkinMegaBundlePack(String packId) {
+        return SKIN_MEGA_BUNDLE_PACK_ID.equals(packId);
+    }
+
+    private static boolean isSpecialPack(String packId) {
+        return SkinIdUtil.PACK_DEFAULT.equals(packId) || SkinIdUtil.PACK_FAVOURITES.equals(packId) || isSkinMegaBundlePack(packId);
+    }
+
+    private static boolean hasInstalledPack(List<String> ids) {
+        for (String packId : ids) {
+            if (packId == null || packId.isBlank() || isSpecialPack(packId)) continue;
+            return true;
+        }
+        return false;
     }
 
     public static final class PackButton extends Button {

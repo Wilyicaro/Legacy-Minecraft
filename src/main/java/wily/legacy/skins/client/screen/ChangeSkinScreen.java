@@ -266,7 +266,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         addRenderableOnly((g, i, j, f) ->
                 blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, packIconX, packIconY, packIconSize, packIconSize));
         addRenderableOnly((g, i, j, f) -> {
-            SkinPack pack = packList.getFocusedPack();
+            SkinPack pack = packList.getFocusedDisplayPack();
             ResourceLocation icon = pack == null ? null : pack.icon();
             if (icon == null) return;
             int innerInset = 2;
@@ -436,7 +436,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, true);
         int packNameX = tooltipBox.x - sc(normalLayout.packNameInsetX());
         int packNameY = panel.y + sc(normalLayout.packNameTop());
         int packNameW = Math.max(1, tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim()));
@@ -471,8 +471,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 if (isImport || locked)
                     drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
                 else if (selected != null)
-                    drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
-                if (!isImport && !locked && selected != null)
+                    drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                if (customPacks.isRemovableSkinSelection(selected))
                     drawActionSprite(g, LegacySprites.ERROR_CROSS, iconX, iconBaseY + sc(normalLayout.actionHolderGap()), holder);
             } else if (isImport) drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             else if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
@@ -523,7 +523,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 drawScaledCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             }
         }
-        SkinPack pack = packList.getFocusedPack();
+        SkinPack pack = packList.getFocusedDisplayPack();
         int packMid = centerTextX();
         int packTitleY = panel.y + sc(normalLayout.packTitleTop());
         float mainTextScale = mainTextScale();

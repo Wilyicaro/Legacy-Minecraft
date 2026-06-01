@@ -41,11 +41,11 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private Tu3NavZone tu3NavZone = Tu3NavZone.CAROUSEL;
 
     public TU3ChangeSkinScreen(Screen parent) {
-        super(parent);
+        this(parent, ChangeSkinScreenSource.Default.INSTANCE);
     }
 
     public TU3ChangeSkinScreen(Screen parent, ChangeSkinScreenSource source) {
-        super(parent, source);
+        super(parent, source, false);
     }
 
     private void refreshTu3Layout() {
@@ -407,7 +407,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, true);
         renderTu3TabsBehindStrip(g);
         if (tu3StripH > 0)
             tintBlitSprite(g, TU3_TOP_STRIP, 0, tu3StripY, width, tu3StripH, carouselNavActive() ? TU3_GREY_TINT : 1.0f);

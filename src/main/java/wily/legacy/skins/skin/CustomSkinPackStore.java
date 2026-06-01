@@ -132,7 +132,7 @@ public final class CustomSkinPackStore {
 
     public static void deleteSkin(Minecraft minecraft, String packId, String skinId) throws IOException {
         Path dir = requirePackDir(minecraft, packId);
-        requireEditableSkin(minecraft, packId, skinId, "removed");
+        if (skinId == null || skinId.isBlank()) throw new IOException("Custom skin was not found");
         Path packJson = dir.resolve("pack.json");
         ArrayList<JsonObject> skins = SkinPackJson.readOrderedSkins(packJson);
         int index = SkinPackJson.indexOfSkin(skins, skinId);
