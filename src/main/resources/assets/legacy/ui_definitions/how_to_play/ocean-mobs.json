@@ -44,6 +44,20 @@
           },
           "width": 433
         },
+        "nautilus": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus"
+          },
+          "width": 433
+        },
+        "zombie-nautilus": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus"
+          },
+          "width": 433
+        },
         "drowned": {
           "type": "draw_multiline_string",
           "component": {
@@ -114,6 +128,24 @@
           "type": "draw_multiline_string",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "nautilus": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "zombie-nautilus": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus",
             "font": "legacy:default_11"
           },
           "width": 268,
