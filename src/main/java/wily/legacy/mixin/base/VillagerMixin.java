@@ -30,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
-import wily.legacy.entity.LegacyVillager;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.mobcaps.ConsoleMobCaps;
@@ -39,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Mixin(Villager.class)
-public abstract class VillagerMixin extends AbstractVillager implements LegacyVillager {
+public abstract class VillagerMixin extends AbstractVillager {
     @Unique
     private boolean legacy$trackedPoiMemories;
     @Unique
@@ -79,22 +78,9 @@ public abstract class VillagerMixin extends AbstractVillager implements LegacyVi
         if (this.offers == null) {
             this.offers = new MerchantOffers();
             this.updateTrades();
-            legacy$updateLockedTradePreviews();
+            updateTrades(getLevel() + 1);
         }
         return this.offers;
-    }
-
-    @Override
-    public void legacy$updateLockedTradePreviews(ServerLevel level) {
-        legacy$updateLockedTradePreviews();
-    }
-
-    @Unique
-    private void legacy$updateLockedTradePreviews() {
-        int nextLevel = getLevel() + 1;
-        if (getLevel() < 5 && !legacy$hasOffersForLevel(self().getOffers(), nextLevel)) {
-            updateTrades(nextLevel);
-        }
     }
 
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
@@ -126,16 +112,6 @@ public abstract class VillagerMixin extends AbstractVillager implements LegacyVi
             ++j;
         }
 
-    }
-
-    @Unique
-    private static boolean legacy$hasOffersForLevel(MerchantOffers offers, int level) {
-        for (MerchantOffer offer : offers) {
-            if (((LegacyMerchantOffer) offer).getRequiredLevel() == level) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Unique
