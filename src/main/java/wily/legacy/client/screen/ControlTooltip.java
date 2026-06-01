@@ -317,18 +317,6 @@ public interface ControlTooltip {
         return null;
     }
 
-    static Component getUseAction(Minecraft minecraft) {
-        if (minecraft.player == null) return null;
-        Component action = getActualUse(minecraft);
-        if (isSpear(minecraft.player.getMainHandItem()) && action != LegacyComponents.EQUIP)
-            return LegacyComponents.CHARGE;
-        return action;
-    }
-
-    static Component getAttackAction(Minecraft minecraft) {
-        return minecraft.player != null && isSpear(minecraft.player.getMainHandItem()) ? LegacyComponents.JAB : getMainAction(minecraft);
-    }
-
     static Component getMainAction(Minecraft minecraft) {
         if (minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !minecraft.level.getWorldBorder().isWithinBounds(minecraft.hitResult.getLocation().x(), minecraft.hitResult.getLocation().z()))
             return null;
@@ -1385,7 +1373,7 @@ public interface ControlTooltip {
         public static final List<ControlTooltip> controlTooltips = new ArrayList<>();
 
         public static void applyGUIControlTooltips(Renderer renderer, Minecraft minecraft) {
-            renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyUse, () -> getUseAction(minecraft)).add(minecraft.options.keyAttack, () -> getAttackAction(minecraft));
+            renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyUse, () -> getActualUse(minecraft)).add(minecraft.options.keyAttack, () -> getMainAction(minecraft));
             renderer.tooltips.addAll(controlTooltips);
             renderer.add(minecraft.options.keyShift, () -> {
                 if (minecraft.player.isPassenger()) {
