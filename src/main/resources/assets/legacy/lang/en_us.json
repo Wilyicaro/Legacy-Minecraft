@@ -1554,6 +1554,7 @@
   "legacy.menu.download_natives_message": "Would you like to download these natives and be able to use this Controller Handler?",
   "legacy.menu.downloading_natives": "Downloading Natives",
   "legacy.menu.downloading_world_template": "Downloading World Template",
+  "legacy.menu.download_skinpacks": "Download Skinpacks",
   "legacy.menu.edit_album": "Edit Album",
   "legacy.menu.edit_custom_skin": "Edit Skin",
   "legacy.menu.edit_custom_skin_pack": "Edit Custom Skin Pack",
