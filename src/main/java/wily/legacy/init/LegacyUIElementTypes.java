@@ -5,7 +5,9 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
@@ -157,43 +159,26 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeBundleItems", LegacyUIElementTypes::parseFakeContainer);
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "scale");
-        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             ItemStack stack = a.getElements().containsKey(elementName + ".fakeBundleItems") ? createBundleStack(a.getElementValue(elementName + ".fakeBundleItems", emptyFakeContainer, Container.class)) : a.getElementValue(elementName + ".fakeItem", ItemStack.EMPTY, ItemStack.class);
             if (stack.isEmpty()) return;
-            Minecraft minecraft = Minecraft.getInstance();
-            Font font = minecraft.font;
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
-            ClientTooltipPositioner positioner;
-            if (a.getElements().containsKey(elementName + ".scale")) {
-                positioner = new LegacyRenderUtil.ScaledTooltipPositioner() {
-                    @Override
-                    public float scale() {
-                        return a.getFloat(elementName + ".scale", 1.0f);
-                    }
-
-                    @Override
-                    public Vector2i positionTooltip(int screenWidth, int screenHeight, int mouseX, int mouseY, int tooltipWidth, int tooltipHeight) {
-                        return new Vector2i(x, y);
-                    }
-                };
-            } else {
-                positioner = (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> new Vector2i(x, y);
-            }
-            GuiGraphicsExtractor.setTooltipForNextFrame(font, Screen.getTooltipFromItem(minecraft, stack).stream().map(Component::getVisualOrderText).toList(), stack.getTooltipImage(), positioner, 0, 0, true, stack.get(DataComponents.TOOLTIP_STYLE));
+            float scale = a.getElements().containsKey(elementName + ".scale") ? a.getFloat(elementName + ".scale", 1.0f) : 0.0f;
+            renderTooltip(guiGraphics, Minecraft.getInstance().font, stack, x, y, scale);
         }))));
     }));
     public static final UIDefinitionManager.ElementType RENDER_ARMOR_STAND = UIDefinitionManager.ElementType.registerConditional("render_armor_stand", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", LegacyUIElementTypes::parseFakeItem);
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "scale");
-        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             ArmorStandRenderState state = createArmorStandState(a.getElementValue(elementName + ".fakeItem", ItemStack.EMPTY, ItemStack.class));
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
             int width = a.getInteger(elementName + ".width", 0);
             int height = a.getInteger(elementName + ".height", 0);
-            GuiGraphicsExtractor.entity(state, a.getFloat(elementName + ".scale", 35.0f), new Vector3f(0.0F, 1.0F, 0.0F), new Quaternionf().rotationXYZ(0.43633232F, 0.0F, (float) Math.PI), null, x, y, x + width, y + height);
+            guiGraphics.submitEntityRenderState(state, a.getFloat(elementName + ".scale", 35.0f), new Vector3f(0.0F, 1.0F, 0.0F), new Quaternionf().rotationXYZ(0.43633232F, 0.0F, (float) Math.PI), null, x, y, x + width, y + height);
         }))));
     }));
     public static final UIDefinitionManager.ElementType RENDER_ENCHANTED_BOOK = UIDefinitionManager.ElementType.registerConditional("render_enchanted_book", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
@@ -356,6 +341,27 @@ public class LegacyUIElementTypes {
         return stack;
     }
 
+    private static void renderTooltip(GuiGraphics guiGraphics, Font font, ItemStack stack, int x, int y, float scale) {
+        List<ClientTooltipComponent> components = new ArrayList<>();
+        Screen.getTooltipFromItem(Minecraft.getInstance(), stack).stream()
+                .map(Component::getVisualOrderText)
+                .map(ClientTooltipComponent::create)
+                .forEach(components::add);
+        stack.getTooltipImage().ifPresent(image -> components.add(Math.min(1, components.size()), ClientTooltipComponent.create(image)));
+        ClientTooltipPositioner positioner = scale > 0.0f ? new LegacyRenderUtil.ScaledTooltipPositioner() {
+            @Override
+            public float scale() {
+                return scale;
+            }
+
+            @Override
+            public Vector2i positionTooltip(int screenWidth, int screenHeight, int mouseX, int mouseY, int tooltipWidth, int tooltipHeight) {
+                return new Vector2i(x, y);
+            }
+        } : (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> new Vector2i(x, y);
+        guiGraphics.renderTooltip(font, components, 0, 0, positioner, stack.get(DataComponents.TOOLTIP_STYLE));
+    }
+
     private static ArmorStandRenderState createArmorStandState(ItemStack armor) {
         ArmorStandRenderState state = new ArmorStandRenderState();
         state.entityType = EntityType.ARMOR_STAND;
@@ -367,6 +373,8 @@ public class LegacyUIElementTypes {
         state.showArms = true;
         state.xRot = 25.0F;
         state.bodyRot = 210.0F;
+        state.scale = 1.0F;
+        state.ageScale = 1.0F;
         state.chestEquipment = createArmorPreviewStack(armor);
         return state;
     }
