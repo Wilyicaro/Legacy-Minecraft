@@ -1,0 +1,29 @@
+{
+  "targetUI": "wily.legacy.client.screen.Legacy4JStoreScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 207,
+    "panel.height": 155,
+    "panel.y": "(${height}-${panel.height})/2+17",
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    },
+    "panelRecess.width": 192,
+    "panelRecess.height": 128,
+    "panelRecess.x": "${panel.x}+7",
+    "panelRecess.y": "${panel.y}+21",
+    "renderableVList.x": "${panelRecess.x}+7",
+    "renderableVList.y": "${panelRecess.y}+21",
+    "renderableVList.width": "${panelRecess.width}-14",
+    "renderableVList.height": 100,
+    "buttonsHeight": 20
+  }
+}

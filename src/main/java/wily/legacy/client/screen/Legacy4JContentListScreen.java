@@ -21,8 +21,10 @@ import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
@@ -47,7 +49,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     protected final ContentManager.Category category;
     protected final List<ContentManager.Pack> packs;
     protected ContentManager.Pack hoveredPack;
-    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, TOOLTIP_WIDTH);
+    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, () -> accessor.getInteger("tooltipBox.width", TOOLTIP_WIDTH));
     private final Panel panelRecess;
     
     // Legacy Scrolling System
@@ -94,7 +96,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
-        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, pack.descriptionComponent(), width));
+        return descriptionLabels.computeIfAbsent(pack.id(), id -> {
+            if (LegacyOptions.getUIMode().isSD()) {
+                return Panel.sdLabelsCache.apply(pack.descriptionComponent(), width);
+            }
+            return MultiLineLabel.create(font, pack.descriptionComponent(), width);
+        });
     }
 
     private boolean isDownloading(ContentManager.Pack pack) {
@@ -275,7 +282,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         tooltipBox.init();
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false))));
     }
 
     @Override
@@ -317,7 +324,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 }
             }
 
-            int lineHeight = 12;
+            int lineHeight = LegacyOptions.getUIMode().isSD() ? 8 : 12;
             int descriptionY = y + imageAreaHeight;
             int descriptionWidth = width;
             MultiLineLabel label = getDescriptionLabel(displayPack, descriptionWidth);
@@ -326,8 +333,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
 
-            scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF)
+            scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () ->
+                LegacyFontUtil.applySDFont(sd -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF))
             );
         }
     }
@@ -396,10 +403,13 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         public void renderString(GuiGraphics guiGraphics, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             int textX = this.getX() + 8;
-            int maxWidth = this.width - 44;
-            String text = this.getMessage().getString();
-            String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";
-            guiGraphics.drawString(font, clipped, textX, textY, color, true);
+            boolean hasStatusIcon = downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category) || installedPacks.getOrDefault(pack.id(), false);
+            int maxWidth = this.width - (hasStatusIcon ? 44 : 16);
+            LegacyFontUtil.applySDFont(sd -> {
+                String text = getMessage() == null ? "" : getMessage().getString();
+                String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";
+                guiGraphics.drawString(font, clipped, textX, textY, color, true);
+            });
         }
     }
 }
