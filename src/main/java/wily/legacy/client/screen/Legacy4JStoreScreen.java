@@ -14,6 +14,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.HashMap;
@@ -108,10 +109,13 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
     public void renderableVListInit() {
         addRenderableOnly((GuiGraphicsExtractor, i, j, f) -> {
             int y = panelRecess.y + 8;
-            for (FormattedCharSequence formattedCharSequence : font.split(getTitle(), getRenderableVList().listWidth - 10)) {
-                GuiGraphicsExtractor.text(font, formattedCharSequence, panel.getX() + (panel.getWidth() - font.width(formattedCharSequence)) / 2, y, CommonColor.GRAY_TEXT.get(), false);
-                y += 12;
-            }
+            LegacyFontUtil.applySDFont(sd -> {
+                int lineY = y;
+                for (FormattedCharSequence formattedCharSequence : font.split(getTitle(), getRenderableVList().listWidth - 10)) {
+                    GuiGraphicsExtractor.text(font, formattedCharSequence, panel.getX() + (panel.getWidth() - font.width(formattedCharSequence)) / 2, lineY, CommonColor.GRAY_TEXT.get(), false);
+                    lineY += sd ? 8 : 12;
+                }
+            });
         });
         getRenderableVList().init("renderableVList", panelRecess.getX() + 10, panelRecess.getY() + 21, panelRecess.getWidth() - 20, LIST_HEIGHT);
     }
@@ -139,9 +143,11 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
             extractDefaultSprite(GuiGraphicsExtractor);
             Font font = Minecraft.getInstance().font;
-            int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
-            String text = PlayerSkinWidget.clipText(font, getMessage().getString(), Math.max(0, getWidth() - 24));
-            GuiGraphicsExtractor.text(font, text, getX() + 12, textY, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            LegacyFontUtil.applySDFont(sd -> {
+                int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
+                String text = PlayerSkinWidget.clipText(font, getMessage().getString(), Math.max(0, getWidth() - 24));
+                GuiGraphicsExtractor.text(font, text, getX() + 12, textY, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            });
         }
     }
 }

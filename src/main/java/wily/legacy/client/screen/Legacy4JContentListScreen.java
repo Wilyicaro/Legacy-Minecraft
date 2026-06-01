@@ -22,9 +22,11 @@ import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
@@ -49,7 +51,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     protected final ContentManager.Category category;
     protected final List<ContentManager.Pack> packs;
     protected ContentManager.Pack hoveredPack;
-    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, TOOLTIP_WIDTH);
+    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, () -> accessor.getInteger("tooltipBox.width", TOOLTIP_WIDTH));
     private final Panel panelRecess;
     
     // Legacy Scrolling System
@@ -96,7 +98,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
-        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, pack.descriptionComponent(), width));
+        return descriptionLabels.computeIfAbsent(pack.id(), id -> {
+            if (LegacyOptions.getUIMode().isSD()) {
+                return Panel.sdLabelsCache.apply(pack.descriptionComponent(), width);
+            }
+            return MultiLineLabel.create(font, pack.descriptionComponent(), width);
+        });
     }
 
     private boolean isDownloading(ContentManager.Pack pack) {
@@ -278,7 +285,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         tooltipBox.init();
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> GuiGraphicsExtractor.text(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false)));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false))));
     }
 
     @Override
@@ -320,7 +327,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 }
             }
 
-            int lineHeight = 12;
+            int lineHeight = LegacyOptions.getUIMode().isSD() ? 8 : 12;
             int descriptionY = y + imageAreaHeight;
             int descriptionWidth = width;
             MultiLineLabel label = getDescriptionLabel(displayPack, descriptionWidth);
@@ -329,8 +336,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
 
-            scrollableRenderer.extractRenderState(GuiGraphicsExtractor, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, GuiGraphicsExtractor.textRenderer())
+            scrollableRenderer.extractRenderState(GuiGraphicsExtractor, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () ->
+                LegacyFontUtil.applySDFont(sd -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, GuiGraphicsExtractor.textRenderer()))
             );
         }
     }
@@ -401,8 +408,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             int textX = this.getX() + 8;
             boolean hasStatusIcon = downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category) || installedPacks.getOrDefault(pack.id(), false);
             int maxWidth = this.width - (hasStatusIcon ? 44 : 16);
-            String clipped = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, maxWidth));
-            GuiGraphicsExtractor.text(font, clipped, textX, textY, color, true);
+            LegacyFontUtil.applySDFont(sd -> {
+                String clipped = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, maxWidth));
+                GuiGraphicsExtractor.text(font, clipped, textX, textY, color, true);
+            });
         }
     }
 }
