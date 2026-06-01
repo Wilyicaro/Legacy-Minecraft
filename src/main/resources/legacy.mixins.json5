@@ -249,7 +249,6 @@
     "ProjectileInvoker",
     "AbstractHorseMixin",
     "AbstractMinecartMixin",
-    "AbstractVillagerAccessor",
     "AbstractVillagerMixin",
     "AnimalMixin",
     "ArmorStandMixin",
