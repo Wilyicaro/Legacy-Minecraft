@@ -34,7 +34,7 @@ public abstract class WanderingTraderMixin extends AbstractVillager {
     }
 
     @Inject(method = "updateTrades", at = @At("RETURN"))
-    private void legacy$removeLegacyTrades(ServerLevel level, CallbackInfo ci) {
+    private void legacy$removeLegacyTrades(CallbackInfo ci) {
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyLootTables)) {
             return;
         }
