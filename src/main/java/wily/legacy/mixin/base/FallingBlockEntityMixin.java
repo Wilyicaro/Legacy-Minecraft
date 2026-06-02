@@ -27,7 +27,7 @@ import wily.legacy.init.LegacyGameRules;
 
 @Mixin(FallingBlockEntity.class)
 public abstract class FallingBlockEntityMixin {
-    private static final AABB fallingBlockDetectBounding = new AABB(-50, -50, -50, 50, 50, 50);
+    private static final AABB fallingBlockDetectBounding = new AABB(-128, -128, -128, 128, 128, 128);
     @Shadow public int time;
 
     @Shadow
