@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -9,11 +10,13 @@ import wily.legacy.client.ContentManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.FormattedCharSequence;
 
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -99,10 +102,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
         return descriptionLabels.computeIfAbsent(pack.id(), id -> {
+            Component description = pack.descriptionComponent().copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
             if (LegacyOptions.getUIMode().isSD()) {
-                return Panel.sdLabelsCache.apply(pack.descriptionComponent(), width);
+                return Panel.sdLabelsCache.apply(description, width);
             }
-            return MultiLineLabel.create(font, pack.descriptionComponent(), width);
+            return MultiLineLabel.create(font, description, width);
         });
     }
 
@@ -337,7 +341,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.lineHeight = lineHeight;
 
             scrollableRenderer.extractRenderState(GuiGraphicsExtractor, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () ->
-                LegacyFontUtil.applySDFont(sd -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, GuiGraphicsExtractor.textRenderer()))
+                LegacyFontUtil.applySDFont(sd -> label.visitLines(TextAlignment.LEFT, x, descriptionY, lineHeight, bodyText(GuiGraphicsExtractor.textRenderer())))
             );
         }
     }
@@ -347,6 +351,34 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         if ((tooltipBox.isHovered(d, e) || !ControlType.getActiveType().isKbm()) && scrollableRenderer.mouseScrolled(g))
             return true;
         return super.mouseScrolled(d, e, f, g);
+    }
+
+    private static ActiveTextCollector bodyText(ActiveTextCollector collector) {
+        return new ActiveTextCollector() {
+            @Override
+            public Parameters defaultParameters() {
+                return collector.defaultParameters();
+            }
+
+            @Override
+            public void defaultParameters(Parameters parameters) {
+                collector.defaultParameters(parameters);
+            }
+
+            @Override
+            public void accept(TextAlignment alignment, int x, int y, Parameters parameters, FormattedCharSequence text) {
+                collector.accept(alignment, x, y, parameters, bodyText(text));
+            }
+
+            @Override
+            public void acceptScrolling(Component component, int x, int y, int width, int height, int color, Parameters parameters) {
+                collector.acceptScrolling(component, x, y, width, height, color, parameters);
+            }
+        };
+    }
+
+    private static FormattedCharSequence bodyText(FormattedCharSequence text) {
+        return sink -> text.accept((index, style, codePoint) -> sink.accept(index, style.withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF), codePoint));
     }
 
     private class PackActionScreen extends ConfirmationScreen {
