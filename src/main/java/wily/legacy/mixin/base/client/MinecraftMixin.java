@@ -481,7 +481,7 @@ public abstract class MinecraftMixin {
     private void resizeDisplay(CallbackInfo ci) {
         LegacyTipManager.rebuildActual();
         LegacyTipManager.rebuildActualLoading();
-        gui.getChat().rescaleChat();
+        if (gui != null) gui.getChat().rescaleChat();
     }
 
     @ModifyArg(method = "disconnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
