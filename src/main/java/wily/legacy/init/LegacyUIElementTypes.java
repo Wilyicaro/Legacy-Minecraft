@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.component.DataComponents;
@@ -25,6 +26,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -49,10 +51,12 @@ import org.joml.Vector3f;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.client.UIDefinitionManager;
 import wily.factoryapi.util.DynamicUtil;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.*;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
@@ -106,6 +110,27 @@ public class LegacyUIElementTypes {
                 s.scrolled.max = Math.max(0, Mth.ceil((yOffset - (height - 2 * yd - 6.0f)) / lineHeight));
             }));
         }))));
+    }));
+    public static final UIDefinitionManager.ElementType DRAW_MULTILINE_STRING = replaceElementType("draw_multiline_string", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseTextElements(uiDefinition, elementName, element);
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "lineSpacing", "width");
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "centered", UIDefinitionManager.ElementType::parseBoolean);
+        uiDefinition.addStatic(UIDefinition.createAfterInit(a -> a.getElement(elementName + ".component", Component.class).ifPresent(c -> {
+            UIAccessor accessor = accessorFunction.apply(a);
+            int width = a.getInteger(elementName + ".width", 0);
+            boolean howToPlay = accessor.getScreen() instanceof HowToPlayScreen;
+            List<FormattedCharSequence> lines = Minecraft.getInstance().font.split(c, width);
+            if (howToPlay) lines = lines.stream().map(LegacyUIElementTypes::howToPlayLine).toList();
+            AdvancedTextWidget widget = new AdvancedTextWidget(a)
+                    .lineSpacing(a.getInteger(elementName + ".lineSpacing", 12))
+                    .withWidth(width)
+                    .withLines(lines)
+                    .withColor(a.getInteger(elementName + ".color", howToPlay ? CommonColor.TIP_TEXT.get() : 0xFFFFFFFF))
+                    .withShadow(a.getBoolean(elementName + ".shadow", true))
+                    .centered(a.getBoolean(elementName + ".centered", false));
+            a.putLayoutElement(elementName, accessor.addChild(elementName, widget), i -> {}, i -> {});
+            a.putStaticElement(elementName + ".linesCount", widget.getLines().size());
+        })));
     }));
     public static final UIDefinitionManager.ElementType PUT_RENDERABLE_VLIST = UIDefinitionManager.ElementType.registerConditional("put_renderable_vertical_list", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseBoolean, "forceWidth", "cyclic");
@@ -304,6 +329,30 @@ public class LegacyUIElementTypes {
             });
         }));
     }));
+
+    private static FormattedCharSequence howToPlayLine(FormattedCharSequence line) {
+        return sink -> line.accept((i, style, codePoint) -> sink.accept(i, howToPlayStyle(style), codePoint));
+    }
+
+    private static Style howToPlayStyle(Style style) {
+        TextColor color = style.getColor();
+        if (color == null) return style;
+        int value = color.getValue() & 0x00FFFFFF;
+        return style.withColor(matchesColor(value, CommonColor.WHITE, 0xFFFFFF) ? colorValue(CommonColor.TIP_TEXT) : colorValue(CommonColor.TIP_TITLE_TEXT));
+    }
+
+    private static int colorValue(CommonColor color) {
+        return color.get() & 0x00FFFFFF;
+    }
+
+    private static boolean matchesColor(int value, CommonColor color, int fallback) {
+        return value == (color.get() & 0x00FFFFFF) || value == fallback;
+    }
+
+    private static UIDefinitionManager.ElementType replaceElementType(String path, UIDefinitionManager.ElementType type) {
+        UIDefinitionManager.ElementType.map.remove(FactoryAPI.createVanillaLocation(path));
+        return UIDefinitionManager.ElementType.registerConditional(path, type);
+    }
 
     private static UIDefinition parseFakeContainer(String field, Dynamic<?> dynamic) {
         return dynamic.asListOpt(d -> d).result().map(items -> UIDefinition.createBeforeInit(a -> {
