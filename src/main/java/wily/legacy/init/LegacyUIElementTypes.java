@@ -3,6 +3,7 @@ package wily.legacy.init;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -13,10 +14,15 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderOwner;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
@@ -30,7 +36,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
@@ -340,7 +345,6 @@ public class LegacyUIElementTypes {
         bindItemComponents();
         ItemStack stack = DynamicUtil.getItemFromDynamic(dynamic, true).get();
         setFakeTrim(stack, dynamic);
-        setFakeMaxDamage(stack);
         return stack;
     }
 
@@ -388,8 +392,64 @@ public class LegacyUIElementTypes {
 
     private static void bindItemComponents() {
         if (itemComponentsBound) return;
-        BuiltInRegistries.ITEM.stream().filter(item -> !item.builtInRegistryHolder().areComponentsBound()).forEach(item -> item.builtInRegistryHolder().bindComponents(createItemComponents(item)));
+        BuiltInRegistries.DATA_COMPONENT_INITIALIZERS
+                .build(new PreviewRegistryAccess(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY)))
+                .stream()
+                .filter(pending -> pending.key().equals(Registries.ITEM))
+                .forEach(pending -> pending.apply());
         itemComponentsBound = true;
+    }
+
+    private record PreviewRegistryAccess(HolderLookup.Provider registries) implements HolderLookup.Provider {
+        @Override
+        public Stream<ResourceKey<? extends Registry<?>>> listRegistryKeys() {
+            return registries.listRegistryKeys();
+        }
+
+        @Override
+        public <T> Optional<? extends HolderLookup.RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+            return Optional.of(new PreviewRegistryLookup<>(key, registries.lookup(key)));
+        }
+    }
+
+    private record PreviewRegistryLookup<T>(ResourceKey<? extends Registry<? extends T>> key, Optional<? extends HolderLookup.RegistryLookup<T>> registry) implements HolderLookup.RegistryLookup<T> {
+        @Override
+        public Lifecycle registryLifecycle() {
+            return registry.map(HolderLookup.RegistryLookup::registryLifecycle).orElse(Lifecycle.stable());
+        }
+
+        @Override
+        public Optional<Holder.Reference<T>> get(ResourceKey<T> key) {
+            return registry.flatMap(lookup -> lookup.get(key)).or(() -> Optional.of(emptyPreviewHolder(key)));
+        }
+
+        @Override
+        public Optional<HolderSet.Named<T>> get(TagKey<T> key) {
+            return Optional.of(registry.flatMap(lookup -> lookup.get(key)).orElseGet(() -> emptyPreviewTag(key)));
+        }
+
+        @Override
+        public Stream<Holder.Reference<T>> listElements() {
+            return registry.map(HolderLookup.RegistryLookup::listElements).orElseGet(Stream::empty);
+        }
+
+        @Override
+        public Stream<HolderSet.Named<T>> listTags() {
+            return registry.map(HolderLookup.RegistryLookup::listTags).orElseGet(Stream::empty);
+        }
+    }
+
+    private static <T> HolderSet.Named<T> emptyPreviewTag(TagKey<T> key) {
+        return HolderSet.emptyNamed(new PreviewHolderOwner<>(), key);
+    }
+
+    private static <T> Holder.Reference<T> emptyPreviewHolder(ResourceKey<T> key) {
+        Holder.Reference<T> holder = Holder.Reference.createStandAlone(new PreviewHolderOwner<>(), key);
+        holder.bindComponents(DataComponentMap.EMPTY);
+        return holder;
+    }
+
+    private record PreviewHolderOwner<T>() implements HolderOwner<T> {
     }
 
     private record KeyedHolder<T>(ResourceKey<T> key, T value) implements Holder<T> {
@@ -406,36 +466,6 @@ public class LegacyUIElementTypes {
         @Override public Optional<ResourceKey<T>> unwrapKey() { return Optional.of(key); }
         @Override public Kind kind() { return Kind.REFERENCE; }
         @Override public boolean canSerializeIn(HolderOwner<T> owner) { return true; }
-    }
-
-    private static DataComponentMap createItemComponents(Item item) {
-        return DataComponentMap.builder()
-                .addAll(DataComponents.COMMON_ITEM_COMPONENTS)
-                .set(DataComponents.ITEM_NAME, Component.translatable(item.getDescriptionId()))
-                .set(DataComponents.ITEM_MODEL, BuiltInRegistries.ITEM.getKey(item))
-                .build();
-    }
-
-    private static void setFakeMaxDamage(ItemStack stack) {
-        if (!stack.has(DataComponents.DAMAGE) || stack.has(DataComponents.MAX_DAMAGE)) return;
-        int maxDamage = getFakeMaxDamage(stack.getItem());
-        if (maxDamage > 0) stack.set(DataComponents.MAX_DAMAGE, maxDamage);
-    }
-
-    private static int getFakeMaxDamage(Item item) {
-        if (item == Items.FLINT_AND_STEEL) return 64;
-        Identifier key = BuiltInRegistries.ITEM.getKey(item);
-        if (!key.getNamespace().equals("minecraft")) return 0;
-        String id = key.getPath();
-        if (id.endsWith("_sword") || id.endsWith("_shovel") || id.endsWith("_pickaxe") || id.endsWith("_axe") || id.endsWith("_hoe") || id.endsWith("_spear")) {
-            if (id.startsWith("wooden_")) return 59;
-            if (id.startsWith("stone_")) return 131;
-            if (id.startsWith("iron_")) return 250;
-            if (id.startsWith("golden_")) return 32;
-            if (id.startsWith("diamond_")) return 1561;
-            if (id.startsWith("netherite_")) return 2031;
-        }
-        return 0;
     }
 
     public static void init() {
