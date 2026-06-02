@@ -98,12 +98,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
-        return descriptionLabels.computeIfAbsent(pack.id(), id -> {
-            if (LegacyOptions.getUIMode().isSD()) {
-                return Panel.sdLabelsCache.apply(pack.descriptionComponent(), width);
-            }
-            return MultiLineLabel.create(font, pack.descriptionComponent(), width);
-        });
+        if (LegacyOptions.getUIMode().isSD()) {
+            return Panel.sdLabelsCache.apply(pack.descriptionComponent(), width);
+        }
+        return Panel.labelsCache.apply(pack.descriptionComponent(), width);
     }
 
     private boolean isDownloading(ContentManager.Pack pack) {
