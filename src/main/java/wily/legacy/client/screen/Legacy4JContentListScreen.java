@@ -12,7 +12,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -97,10 +100,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
         return descriptionLabels.computeIfAbsent(pack.id(), id -> {
+            Component description = pack.descriptionComponent().copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
             if (LegacyOptions.getUIMode().isSD()) {
-                return Panel.sdLabelsCache.apply(pack.descriptionComponent(), width);
+                description = description.copy().withStyle(description.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT));
             }
-            return MultiLineLabel.create(font, pack.descriptionComponent(), width);
+            return bodyLabel(font, description, width);
         });
     }
 
@@ -334,7 +338,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.lineHeight = lineHeight;
 
             scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () ->
-                LegacyFontUtil.applySDFont(sd -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, 0xFFFFFFFF))
+                LegacyFontUtil.applySDFont(sd -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, x, descriptionY, lineHeight, true, CommonColor.TIP_TEXT.get()))
             );
         }
     }
@@ -344,6 +348,54 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         if ((tooltipBox.isHovered(d, e) || !ControlType.getActiveType().isKbm()) && scrollableRenderer.mouseScrolled(g))
             return true;
         return super.mouseScrolled(d, e, f, g);
+    }
+
+    private static MultiLineLabel bodyLabel(Font font, Component component, int width) {
+        List<FormattedCharSequence> lines = font.split(component, width).stream().map(Legacy4JContentListScreen::bodyText).toList();
+        int labelWidth = lines.stream().mapToInt(font::width).max().orElse(0);
+        return new MultiLineLabel() {
+            @Override
+            public int render(GuiGraphics graphics, Align align, int x, int y, int lineHeight, boolean shadow, int color) {
+                int lineY = y;
+                for (FormattedCharSequence line : lines) {
+                    graphics.drawString(font, line, alignedLeft(align, x, font.width(line)), lineY, CommonColor.TIP_TEXT.get());
+                    lineY += lineHeight;
+                }
+                return lineY;
+            }
+
+            @Override
+            public Style getStyle(Align align, int x, int y, int lineHeight, double mouseX, double mouseY) {
+                int index = Mth.floor((mouseY - y) / lineHeight);
+                if (index < 0 || index >= lines.size()) return null;
+                FormattedCharSequence line = lines.get(index);
+                int left = alignedLeft(align, x, font.width(line));
+                if (mouseX < left) return null;
+                return font.getSplitter().componentStyleAtWidth(line, Mth.floor(mouseX - left));
+            }
+
+            @Override
+            public int getLineCount() {
+                return lines.size();
+            }
+
+            @Override
+            public int getWidth() {
+                return Math.min(width, labelWidth);
+            }
+        };
+    }
+
+    private static int alignedLeft(MultiLineLabel.Align align, int x, int width) {
+        return switch (align) {
+            case CENTER -> x - width / 2;
+            case RIGHT -> x - width;
+            default -> x;
+        };
+    }
+
+    private static FormattedCharSequence bodyText(FormattedCharSequence text) {
+        return sink -> text.accept((index, style, codePoint) -> sink.accept(index, style.withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF), codePoint));
     }
 
     private class PackActionScreen extends ConfirmationScreen {
