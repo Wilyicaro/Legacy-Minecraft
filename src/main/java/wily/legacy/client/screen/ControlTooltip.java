@@ -482,6 +482,8 @@ public interface ControlTooltip {
                 if (item.getItem() instanceof AxeItem && (HoneycombItem.WAX_OFF_BY_BLOCK.get().containsKey(blockState.getBlock()) || WeatheringCopper.getPrevious(blockState).isPresent()))
                     return LegacyComponents.SCRAPE;
             }
+            if (blockState.is(BlockTags.COPPER_GOLEM_STATUES) && !mainHand.is(ItemTags.AXES))
+                return LegacyComponents.CHANGE_POSE;
         }
         if (blockHit != null && blockState != null && (blockState.getBlock() instanceof SignBlock || blockState.getBlock() instanceof CeilingHangingSignBlock || blockState.getBlock() instanceof WallHangingSignBlock)) {
             if (minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof SignBlockEntity sign) {
