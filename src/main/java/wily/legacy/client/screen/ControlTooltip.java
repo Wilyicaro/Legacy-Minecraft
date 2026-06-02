@@ -679,6 +679,8 @@ public interface ControlTooltip {
                     return LegacyComponents.SHEAR;
                 else if (blockState != null && blockState.getBlock() instanceof PumpkinBlock)
                     return LegacyComponents.CARVE;
+                else if (canShearPlant(blockState))
+                    return LegacyComponents.SHEAR;
             }
             if (blockState != null && actualItem.getItem() instanceof BrushItem && blockState.getBlock() instanceof BrushableBlock)
                 return LegacyComponents.BRUSH;
@@ -800,6 +802,10 @@ public interface ControlTooltip {
         if (!(usedItem.getItem() instanceof HoeItem && minecraft.hitResult instanceof BlockHitResult r)) return false;
         Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> use = HoeItem.TILLABLES.get(minecraft.level.getBlockState(r.getBlockPos()).getBlock());
         return use != null && use.getFirst().test(new UseOnContext(minecraft.player, hand, r));
+    }
+
+    static boolean canShearPlant(BlockState state) {
+        return state != null && state.getBlock() instanceof GrowingPlantHeadBlock plant && !plant.isMaxAge(state);
     }
 
     static boolean canTame(Minecraft minecraft, InteractionHand hand, ItemStack usedItem) {
