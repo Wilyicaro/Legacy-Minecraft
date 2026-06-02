@@ -230,7 +230,19 @@
           "y": "${selected_bundle.y}+1",
           "translateZ": 600,
           "width": 16,
-          "height": 16
+          "height": 16,
+          "applyCondition": {
+            "reference": "uiMode.fhd"
+          }
+        },
+        "small_pointer": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/small_pointer",
+          "x": "${selected_bundle.x}+1",
+          "y": "${selected_bundle.y}+1",
+          "width": 16,
+          "height": 16,
+          "applyCondition": "${uiMode.sd} || ${uiMode.hd}"
         },
         "quick_select": {
           "type": "put_legacy_slot",
@@ -549,12 +561,12 @@
         },
         "pointer": {
           "type": "blit_sprite",
-          "sprite": "legacy:container/pointer",
-          "x": "${selected_bundle.x}+1",
-          "y": "${selected_bundle.y}+1",
+          "sprite": "legacy:container/small_pointer",
+          "x": "${selected_bundle.x}-2",
+          "y": "${selected_bundle.y}-2",
           "translateZ": 600,
-          "width": 11,
-          "height": 11
+          "width": 16,
+          "height": 16
         },
         "quick_select": {
           "type": "put_legacy_slot",
