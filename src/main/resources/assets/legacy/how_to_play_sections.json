@@ -143,6 +143,10 @@
     "ui_definition": "legacy:how_to_play/piglins"
   },
   {
+    "title": {"translate": "legacy.menu.how_to_play.netherite"},
+    "ui_definition": "legacy:how_to_play/netherite"
+  },
+  {
     "title": {"translate": "legacy.menu.how_to_play.sculk-sensor"},
     "ui_definition": "legacy:how_to_play/sculk-sensor"
   },
