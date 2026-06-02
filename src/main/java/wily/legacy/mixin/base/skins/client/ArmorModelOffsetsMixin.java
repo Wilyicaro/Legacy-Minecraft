@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,9 +29,10 @@ public abstract class ArmorModelOffsetsMixin {
     @Unique
     private static void consoleskins$resetScale(ModelPart part) {
         if (part == null) return;
-        part.xScale = 1.0F;
-        part.yScale = 1.0F;
-        part.zScale = 1.0F;
+        PartPose pose = part.getInitialPose();
+        part.xScale = pose.xScale();
+        part.yScale = pose.yScale();
+        part.zScale = pose.zScale();
     }
 
     @Unique
