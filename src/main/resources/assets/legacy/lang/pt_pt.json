@@ -1972,6 +1972,7 @@
   "legacy.message.mobcap.max_villagers_spawned": "Não é possível usar o Ovo Gerador no momento. O número máximo de aldeões em um mundo foi atingido.",
   "legacy.message.mobcap.max_wolves_bred": "Este animal não pode entrar no Modo de Amor. O número máximo de Lobos para procriação foi atingido.",
   "legacy.message.mobcap.max_wolves_spawned": "Não é possível usar o Ovo Gerador no momento. O número máximo de Lobos em um mundo foi atingido.",
+  "legacy.options.alwaysClearSaveCache": "Always Clear Save Cache",
   "legacy.options.advancedHeldItemTooltip": "Dicas Avançadas de Item Segurado",
   "legacy.options.advancedOptionsMode": "Modo de Opções Avançadas",
   "legacy.options.advancedOptionsMode.default": "Padrão",
