@@ -1972,6 +1972,7 @@
   "legacy.message.mobcap.max_villagers_spawned": "Наразі неможливо використати яйце спавну. Досягнуто максимальну кількість селян у світі.",
   "legacy.message.mobcap.max_wolves_bred": "Ця тварина не може увійти в режим розмноження. Досягнуто максимальну кількість вовків, що розмножуються.",
   "legacy.message.mobcap.max_wolves_spawned": "Наразі неможливо використати яйце спавну. Досягнуто максимальну кількість вовків у світі.",
+  "legacy.options.alwaysClearSaveCache": "Always Clear Save Cache",
   "legacy.options.advancedHeldItemTooltip": "Розширена підказка для предмета в руці",
   "legacy.options.advancedOptionsMode": "Режим додаткових параметрів",
   "legacy.options.advancedOptionsMode.default": "Типово",
