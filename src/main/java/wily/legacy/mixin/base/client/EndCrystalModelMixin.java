@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.client.CommonValue;
 
 @Mixin(EndCrystalModel.class)
 public class EndCrystalModelMixin {
@@ -27,9 +27,9 @@ public class EndCrystalModelMixin {
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/EndCrystalRenderState;)V", at = @At("TAIL"))
     private void setupAnim(EndCrystalRenderState renderState, CallbackInfo ci) {
-        boolean consoleAspects = LegacyRenderUtil.hasConsoleAspects();
-        innerGlass.skipDraw = consoleAspects;
-        if (consoleAspects) {
+        boolean ps4Model = CommonValue.PS4_END_CRYSTAL_MODEL.get();
+        innerGlass.skipDraw = ps4Model;
+        if (ps4Model) {
             cube.xScale = 1.0F;
             cube.yScale = 1.0F;
             cube.zScale = 1.0F;
