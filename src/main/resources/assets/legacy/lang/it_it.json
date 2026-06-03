@@ -1972,6 +1972,7 @@
   "legacy.message.mobcap.max_villagers_spawned": "Impossibile usare l'uovo Generatore al momento. È stato raggiunto il numero massimo di Villici nel mondo.",
   "legacy.message.mobcap.max_wolves_bred": "Questo animale non può entrare in modalità Amore. È stato raggiunto il numero massimo di Lupi in riproduzione.",
   "legacy.message.mobcap.max_wolves_spawned": "Impossibile usare l'uovo Generatore al momento. È stato raggiunto il numero massimo di Lupi nel mondo.",
+  "legacy.options.alwaysClearSaveCache": "Always Clear Save Cache",
   "legacy.options.advancedHeldItemTooltip": "Descrizioni Avanzate Oggetti in Mano",
   "legacy.options.advancedOptionsMode": "Modalità Opzioni Avanzate",
   "legacy.options.advancedOptionsMode.default": "Predefinito",
