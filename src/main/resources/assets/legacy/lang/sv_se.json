@@ -1232,6 +1232,7 @@
   "legacy.action.remove": "Remove",
   "legacy.action.remove_favorite": "Remove Favorite",
   "legacy.action.remove_glow": "Remove Glow",
+  "legacy.action.remove_armor": "Remove Armor",
   "legacy.action.remove_harness": "Remove Harness",
   "legacy.action.remove_pattern": "Remove Pattern",
   "legacy.action.remove_saddle": "Remove Saddle",
