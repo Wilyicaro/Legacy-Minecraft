@@ -697,8 +697,8 @@ public interface ControlTooltip {
                 return LegacyComponents.PEEL_BARK;
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && minecraft.level.getBlockState(blockHit.getBlockPos().above()).isAir() && ShovelItem.FLATTENABLES.get(blockState.getBlock()) != null)
                 return LegacyComponents.DIG_PATH;
-            if (actualItem.is(Items.LILY_PAD))
-                return (minecraft.hitResult instanceof BlockHitResult hit && minecraft.level.getFluidState(hit.getBlockPos()).is(FluidTags.WATER)) ? LegacyComponents.PLACE : null;
+            if (actualItem.is(Items.LILY_PAD) || actualItem.is(Items.FROGSPAWN))
+                return canPlaceOnWater(minecraft, actualItem) ? LegacyComponents.PLACE : null;
             // 5-Feeding/healing interactions (canFeed, canSetLoveMode, heal, tame)
             if (canTame(minecraft, hand, actualItem)) return LegacyComponents.TAME;
             if (canDyeCollar(minecraft, actualItem)) return LegacyComponents.DYE_COLLAR;
@@ -825,6 +825,11 @@ public interface ControlTooltip {
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;
         return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && ((BlockItemAccessor) b).getPlacementBlockState(c) != null));
+    }
+
+    static boolean canPlaceOnWater(Minecraft minecraft, ItemStack usedItem) {
+        BlockHitResult hitResult = mayInteractItemAt(minecraft, usedItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ClipContext.Fluid.SOURCE_ONLY));
+        return hitResult != null && minecraft.level.getFluidState(hitResult.getBlockPos()).is(FluidTags.WATER);
     }
 
     static boolean isHangingLanternPlacement(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
