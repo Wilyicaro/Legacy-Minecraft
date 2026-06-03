@@ -53,6 +53,9 @@ import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.animal.happyghast.HappyGhast;
+//? if >=1.21.11 {
+import net.minecraft.world.entity.animal.nautilus.AbstractNautilus;
+//?}
 import net.minecraft.world.entity.animal.panda.Panda;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.animal.pig.Pig;
@@ -417,9 +420,19 @@ public interface ControlTooltip {
             for (InteractionHand hand : InteractionHand.values())
                 if (minecraft.player.getItemInHand(hand).is(Items.FLINT_AND_STEEL))
                     return LegacyComponents.IGNITE;
+        //? if >=1.21.11 {
+        if (entity instanceof AbstractNautilus nautilus && canOpenNautilusInventory(minecraft, nautilus))
+            return LegacyComponents.OPEN;
+        if (entity instanceof AbstractNautilus nautilus) {
+            if (canEquipNautilus(nautilus, mainHand, EquipmentSlot.SADDLE))
+                return LegacyComponents.SADDLE;
+            if (canEquipNautilus(nautilus, mainHand, EquipmentSlot.BODY))
+                return LegacyComponents.EQUIP;
+        }
+        //?}
         if (entity instanceof Wolf wolf && wolf.isTame() && mainHand.has(DataComponents.EQUIPPABLE) && mainHand.get(DataComponents.EQUIPPABLE).slot() == EquipmentSlot.BODY && wolf.getItemBySlot(EquipmentSlot.BODY).isEmpty()) 
             return LegacyComponents.EQUIP;
-        if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player) && (!canDyeEntity(minecraft, minecraft.player.getMainHandItem()) && !canDyeEntity(minecraft, minecraft.player.getOffhandItem())) && (!(a instanceof Parrot p) || (p.onGround() && !minecraft.player.isPassenger())))
+        if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player)/*? if >=1.21.11 {*/ && !(a instanceof AbstractNautilus)/*?}*/ && (!canDyeEntity(minecraft, minecraft.player.getMainHandItem()) && !canDyeEntity(minecraft, minecraft.player.getOffhandItem())) && (!(a instanceof Parrot p) || (p.onGround() && !minecraft.player.isPassenger())))
             return a.isInSittingPose() ? LegacyComponents.FOLLOW_ME : LegacyComponents.SIT;
         if (entity instanceof Allay allay) {
             ItemStack allayItem = allay.getItemInHand(InteractionHand.MAIN_HAND);
@@ -449,6 +462,10 @@ public interface ControlTooltip {
         if (entity instanceof LivingEntity living && mainHand.getItem() instanceof ShearsItem) {
             if (canShearEquipment(living, EquipmentSlot.BODY) && living.getItemBySlot(EquipmentSlot.BODY).is(ItemTags.HARNESSES))
                 return LegacyComponents.REMOVE_HARNESS;
+            //? if >=1.21.11 {
+            if (living instanceof AbstractNautilus && canShearEquipment(living, EquipmentSlot.BODY))
+                return LegacyComponents.REMOVE_ARMOR;
+            //?}
             if (canShearEquipment(living, EquipmentSlot.SADDLE))
                 return LegacyComponents.REMOVE_SADDLE;
         }
@@ -828,6 +845,16 @@ public interface ControlTooltip {
         ItemStack item = entity.getItemBySlot(slot);
         return item.has(DataComponents.EQUIPPABLE) && item.get(DataComponents.EQUIPPABLE).canBeSheared();
     }
+
+    //? if >=1.21.11 {
+    static boolean canOpenNautilusInventory(Minecraft minecraft, AbstractNautilus nautilus) {
+        return !nautilus.isBaby() && nautilus.isTame() && minecraft.player.isSecondaryUseActive() && (!nautilus.isVehicle() || nautilus.hasPassenger(minecraft.player));
+    }
+
+    static boolean canEquipNautilus(AbstractNautilus nautilus, ItemStack item, EquipmentSlot slot) {
+        return nautilus.canUseSlot(slot) && nautilus.isEquippableInSlot(item, slot) && nautilus.getItemBySlot(slot).isEmpty();
+    }
+    //?}
 
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;

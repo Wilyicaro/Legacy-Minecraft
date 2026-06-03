@@ -111,6 +111,7 @@ public class LegacyComponents {
     public static final Component QUICK_MOVE = Component.translatable("legacy.action.quick_move");
     public static final Component RELEASE = Component.translatable("legacy.action.release");
     public static final Component REMOVE = Component.translatable("legacy.action.remove");
+    public static final Component REMOVE_ARMOR = Component.translatable("legacy.action.remove_armor");
     public static final Component REMOVE_HARNESS = Component.translatable("legacy.action.remove_harness");
     public static final Component REMOVE_PATTERN = Component.translatable("legacy.action.remove_pattern");
     public static final Component REMOVE_SADDLE = Component.translatable("legacy.action.remove_saddle");
