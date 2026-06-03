@@ -1232,6 +1232,7 @@
   "legacy.action.remove": "削除",
   "legacy.action.remove_favorite": "お気に入りから削除",
   "legacy.action.remove_glow": "Remove Glow",
+  "legacy.action.remove_armor": "Remove Armor",
   "legacy.action.remove_harness": "Remove Harness",
   "legacy.action.remove_pattern": "Remove Pattern",
   "legacy.action.remove_saddle": "Remove Saddle",
