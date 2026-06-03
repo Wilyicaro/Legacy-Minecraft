@@ -271,7 +271,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> customSkinAnimation = CLIENT_STORAGE.register(createBoolean("customSkinAnimation", true));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedHeight = CLIENT_STORAGE.register(createBoolean("legacyDrownedHeight",true));
-    public static final FactoryConfig<Boolean> legacyZombiePigmanHeight = CLIENT_STORAGE.register(createBoolean("legacyZombiePigmanHeight",true));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
     public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyZombieAggressionAnimation", false));
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));
