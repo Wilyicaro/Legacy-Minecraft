@@ -2106,6 +2106,7 @@
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "旧版溺尸",
   "legacy.options.legacyDrownedHeight": "Legacy Drowned Height",
+  "legacy.options.legacyZombiePigmanHeight": "Legacy Zombie Pigman Height",
   "legacy.options.legacyDrownedAnimation": "旧版溺尸动画",
   "legacy.options.legacyEnchantmentScreen": "旧版附魔界面",
   "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
