@@ -20,8 +20,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +43,7 @@ import wily.legacy.util.client.LegacySoundUtil;
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
     private static final float ITEM_PADDING = 1.0f;
     private static final float ITEM_SCALE = 14.0f / 16.0f;
+    private static final float TRAPDOOR_Y_OFFSET = -2.0f;
     public Vec2 offset = Vec2.ZERO;
     public Identifier iconSprite = null;
     public ArbitrarySupplier<Identifier> iconHolderOverride = null;
@@ -301,10 +304,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             return;
         }
         graphics.pose().pushMatrix();
-        graphics.pose().translate(x + ITEM_PADDING, y + ITEM_PADDING);
+        graphics.pose().translate(x + ITEM_PADDING, y + ITEM_PADDING + getSlotYOffset(item));
         graphics.pose().scale(ITEM_SCALE, ITEM_SCALE);
         render.run();
         graphics.pose().popMatrix();
+    }
+
+    private static float getSlotYOffset(ItemStack item) {
+        return item.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof TrapDoorBlock ? TRAPDOOR_Y_OFFSET : 0;
     }
 
     public static boolean usesSlotPadding(ItemStack item) {
