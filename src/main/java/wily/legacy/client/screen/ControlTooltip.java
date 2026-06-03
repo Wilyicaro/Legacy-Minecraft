@@ -42,6 +42,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.Allay;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
@@ -717,8 +718,12 @@ public interface ControlTooltip {
                 else if (canShearPlant(blockState))
                     return LegacyComponents.SHEAR;
             }
-            if (blockState != null && actualItem.getItem() instanceof BrushItem && blockState.getBlock() instanceof BrushableBlock)
-                return LegacyComponents.BRUSH;
+            if (actualItem.getItem() instanceof BrushItem) {
+                if (entity instanceof Armadillo armadillo && !armadillo.isBaby())
+                    return LegacyComponents.BRUSH;
+                if (blockState != null && blockState.getBlock() instanceof BrushableBlock)
+                    return LegacyComponents.BRUSH;
+            }
             if (blockHit != null && actualItem.getItem() instanceof BoneMealItem && blockState.getBlock() instanceof BonemealableBlock b && b.isValidBonemealTarget(minecraft.level, blockHit.getBlockPos(), blockState/*? if <=1.20.2 {*//*,true*//*?}*/))
                 return LegacyComponents.GROW;
             // 7-Equipable items (armor, saddle, lead)
