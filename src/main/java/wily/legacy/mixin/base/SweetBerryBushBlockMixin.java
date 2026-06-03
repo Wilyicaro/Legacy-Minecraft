@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SweetBerryBushBlock;
@@ -29,7 +30,12 @@ public abstract class SweetBerryBushBlockMixin extends VegetationBlock {
 
     @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
     private void useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
-        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyWorldInteractions) || state.getValue(SweetBerryBushBlock.AGE) <= 1) {
+        int age = state.getValue(SweetBerryBushBlock.AGE);
+        if (age >= 3 && (player.getMainHandItem().is(Items.BONE_MEAL) || player.getOffhandItem().is(Items.BONE_MEAL))) {
+            cir.setReturnValue(InteractionResult.PASS);
+            return;
+        }
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyWorldInteractions) || age <= 1) {
             return;
         }
 

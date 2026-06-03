@@ -543,7 +543,7 @@ public interface ControlTooltip {
         }
         if (blockHit != null && blockState != null && blockState.getBlock() instanceof CakeBlock && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
             return LegacyComponents.EAT;
-        if (blockState != null && blockState.getBlock() instanceof SweetBerryBushBlock && blockState.getValue(SweetBerryBushBlock.AGE) > 1)
+        if (blockState != null && canHarvestSweetBerries(blockState, minecraft.player))
             return LegacyComponents.HARVEST;
         if (blockHit != null && blockState != null && minecraft.player.canUseGameMasterBlocks()) {
             if (blockState.getBlock() instanceof CommandBlock)
@@ -688,8 +688,11 @@ public interface ControlTooltip {
                 return LegacyComponents.MILK;
             if (entity instanceof MinecartFurnace && actualItem.is(ItemTags.COALS)) return LegacyComponents.FUEL;
             // 4-Placement/Terrain modification (canPlace, canHang, canTill, strip bark, dig path)
-            if (canPlace(minecraft, actualItem, hand))
+            if (canPlace(minecraft, actualItem, hand)) {
+                if (actualItem.getItem() instanceof BlockItem b && b.getBlock() instanceof LanternBlock && isHangingLanternPlacement(minecraft, actualItem, hand))
+                    return LegacyComponents.HANG;
                 return actualItem.getItem() instanceof BlockItem b && isPlant(b.getBlock()) ? LegacyComponents.PLANT : LegacyComponents.PLACE;
+            }
             if (canHang(minecraft, blockHit, blockState, actualItem)) return LegacyComponents.HANG;
             if (canTill(minecraft, hand, actualItem)) return LegacyComponents.TILL;
             if (actualItem.getItem() instanceof AxeItem && blockState != null && AxeItem.STRIPPABLES.get(blockState.getBlock()) != null && !(hand.equals(InteractionHand.MAIN_HAND) && minecraft.player.getOffhandItem().is(Items.SHIELD) && !minecraft.player.isSecondaryUseActive()))
@@ -784,6 +787,16 @@ public interface ControlTooltip {
         return null;
     }
 
+    static boolean isHoldingBoneMeal(Player player) {
+        return player.getMainHandItem().is(Items.BONE_MEAL) || player.getOffhandItem().is(Items.BONE_MEAL);
+    }
+
+    static boolean canHarvestSweetBerries(BlockState state, Player player) {
+        if (!(state.getBlock() instanceof SweetBerryBushBlock)) return false;
+        int age = state.getValue(SweetBerryBushBlock.AGE);
+        return age > 1 && (age < 3 || !isHoldingBoneMeal(player));
+    }
+
     static boolean canSetLoveMode(Entity entity, ItemStack usedItem) {
         return (entity instanceof Animal a && !a.isBaby() && a.isFood(usedItem) && a.canFallInLove() && !a.isInLove() && (!(a instanceof AbstractHorse) || isLoveFood(a, usedItem)));
     }
@@ -814,6 +827,16 @@ public interface ControlTooltip {
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;
         return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && ((BlockItemAccessor) b).getPlacementBlockState(c) != null));
+    }
+
+    static boolean isHangingLanternPlacement(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
+        if (!(minecraft.hitResult instanceof BlockHitResult hitResult) || !(usedItem.getItem() instanceof BlockItem blockItem))
+            return false;
+        BlockPlaceContext context = new BlockPlaceContext(minecraft.player, hand, usedItem, hitResult);
+        if (!context.canPlace())
+            return false;
+        BlockState state = ((BlockItemAccessor) blockItem).getPlacementBlockState(context);
+        return state != null && state.hasProperty(BlockStateProperties.HANGING) && state.getValue(BlockStateProperties.HANGING);
     }
 
     static Component getDecoratedPotAction(Minecraft minecraft, BlockHitResult hitResult, BlockState blockState) {
