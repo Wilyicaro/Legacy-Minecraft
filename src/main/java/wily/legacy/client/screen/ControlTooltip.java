@@ -408,7 +408,7 @@ public interface ControlTooltip {
             return LegacyComponents.OPEN;
         if (entity instanceof MinecartChest || entity instanceof MinecartHopper)
             return LegacyComponents.OPEN;
-        if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
+        if (entity instanceof ChestBoat && minecraft.player.isSecondaryUseActive())
             return LegacyComponents.OPEN;
         if (entity instanceof HappyGhast ghast && mainHand.is(ItemTags.HARNESSES) && ghast.canUseSlot(EquipmentSlot.BODY) && ghast.getItemBySlot(EquipmentSlot.BODY).isEmpty())
             return LegacyComponents.HARNESS;
