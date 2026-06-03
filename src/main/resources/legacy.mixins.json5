@@ -74,6 +74,7 @@
     "client.EditBoxMixin",
     "client.ElytraOnPlayerSoundInstanceMixin",
     "client.enchantment.EnchantmentScreenMixin",
+    "client.EndCrystalModelMixin",
     "client.EndCrystalRendererMixin",
     "client.NameTagFeatureMixin",
     "client.FireworkEntityRendererMixin",

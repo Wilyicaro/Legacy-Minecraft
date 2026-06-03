@@ -293,6 +293,10 @@ public class LegacyRenderUtil {
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p -> p.getId().equals("programmer_art"));
     }
 
+    public static boolean hasConsoleAspects() {
+        return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p -> p.getId().equals("legacy:console_aspects") || p.getId().equals("console_aspects"));
+    }
+
     public static void drawGenericLoading(GuiGraphics graphics, int x, int y) {
         drawGenericLoading(graphics, x, y, 21, 6);
     }
