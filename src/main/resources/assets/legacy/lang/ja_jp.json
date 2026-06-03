@@ -1972,6 +1972,7 @@
   "legacy.message.mobcap.max_villagers_spawned": "現在、スポーン エッグを使用できません。 世界の村人の数が最大数に達しました",
   "legacy.message.mobcap.max_wolves_bred": "この動物は求愛モードにできません。オオカミの繁殖数が最大数に達しました",
   "legacy.message.mobcap.max_wolves_spawned": "現在、スポーン エッグを使用できません。 世界のオオカミの数が最大数に達しました",
+  "legacy.options.alwaysClearSaveCache": "Always Clear Save Cache",
   "legacy.options.advancedHeldItemTooltip": "Advanced Held Item Tooltip",
   "legacy.options.advancedOptionsMode": "Advanced Options Mode",
   "legacy.options.advancedOptionsMode.default": "Default",
