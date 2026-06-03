@@ -625,6 +625,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyFireworks,
                                 LegacyOptions.legacyEvokerFangs,
                                 LegacyOptions.legacyDrownedHeight,
+                                LegacyOptions.legacyZombiePigmanHeight,
                                 LegacyOptions.legacyDrownedAnimation,
                                 LegacyOptions.legacyZombieAggressionAnimation,
                                 LegacyOptions.legacyEntityFireTint,
