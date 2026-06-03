@@ -1972,6 +1972,7 @@
   "legacy.message.mobcap.max_villagers_spawned": "Can't use Spawn Egg at the moment. The maximum number of villagers in a world has been reached.",
   "legacy.message.mobcap.max_wolves_bred": "This animal can't enter Love Mode. The maximum number of breeding Wolves has been reached.",
   "legacy.message.mobcap.max_wolves_spawned": "Can't use Spawn Egg at the moment. The maximum number of Wolves in a world has been reached.",
+  "legacy.options.alwaysClearSaveCache": "Always Clear Save Cache",
   "legacy.options.advancedHeldItemTooltip": "Advanced Held Item Tooltip",
   "legacy.options.advancedOptionsMode": "Advanced Options Mode",
   "legacy.options.advancedOptionsMode.default": "預設",
