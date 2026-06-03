@@ -43,7 +43,7 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     @Final
     protected ItemModelResolver itemModelResolver;
     @Unique
-    private static final float HUSK_SCALE = 1.0625F;
+    private static final float DROWNED_SCALE = 1.0625F;
     @Unique
     private ItemStack legacy$emerald;
 
@@ -67,9 +67,7 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
     private void extractRenderState(LivingEntity entity, LivingEntityRenderState renderState, float f, CallbackInfo ci) {
-        EntityType<?> type = entity.getType();
-        if (LegacyOptions.legacyDrownedHeight.get() && type == EntityType.DROWNED) renderState.scale *= HUSK_SCALE;
-        if (LegacyOptions.legacyZombiePigmanHeight.get() && type == EntityType.ZOMBIFIED_PIGLIN) renderState.scale *= HUSK_SCALE;
+        if (LegacyOptions.legacyDrownedHeight.get() && entity.getType() == EntityType.DROWNED) renderState.scale *= DROWNED_SCALE;
     }
 
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
