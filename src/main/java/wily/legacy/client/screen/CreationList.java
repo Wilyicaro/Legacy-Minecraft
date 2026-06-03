@@ -138,7 +138,7 @@ public class CreationList extends RenderableVList {
             } else minecraft.setScreen(new LoadSaveScreen(parent, summary, access, (album.isPresent() || template.albumId().isEmpty()) && template.isLocked()) {
                 @Override
                 public void onClose() {
-                    if (!LegacyOptions.saveCache.get())
+                    if (!LegacyOptions.saveCache.get() || LegacyOptions.alwaysClearSaveCache.get())
                         FileUtils.deleteQuietly(LegacySaveCache.getLevelDirectory(access).toFile());
                     super.onClose();
                 }

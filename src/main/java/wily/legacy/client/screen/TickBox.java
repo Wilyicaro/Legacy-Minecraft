@@ -9,6 +9,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
@@ -85,7 +86,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
         FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 1.0F);
         GuiGraphicsExtractor.pose().pushMatrix();
         if (!isHoveredOrFocused()) GuiGraphicsExtractor.pose().translate(0.4f, 0.4f);
-        this.renderString(GuiGraphicsExtractor, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get());
+        this.renderString(GuiGraphicsExtractor, minecraft.font, ColorUtil.withAlpha(isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get(), alpha));
         GuiGraphicsExtractor.pose().popMatrix();
     }
 

@@ -96,7 +96,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
+        renderer.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
         renderer.add(() -> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_CONNECTION);
     }
 

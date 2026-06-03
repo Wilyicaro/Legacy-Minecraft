@@ -265,10 +265,15 @@ public class SaveRenderableList extends RenderableVList {
         String string = summary.getLevelId();
         try (LevelStorageSource.LevelStorageAccess levelStorageAccess = levelStorageSource.createAccess(string)) {
             levelStorageAccess.deleteLevel();
+            try (LevelStorageSource.LevelStorageAccess currentAccess = LegacySaveCache.currentWorldSource.createAccess(string)) {
+                currentAccess.deleteLevel();
+            } catch (IOException _) {
+            }
         } catch (IOException iOException) {
             SystemToast.onWorldDeleteFailure(this.minecraft, string);
             LOGGER.error("Failed to delete world {}", string, iOException);
         }
+
         reloadSaveList();
         minecraft.setScreen(getScreen());
     }

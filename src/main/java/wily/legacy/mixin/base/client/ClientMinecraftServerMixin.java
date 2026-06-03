@@ -21,12 +21,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.network.TopMessage;
 
+import java.io.IOException;
 import java.net.Proxy;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -130,18 +132,22 @@ public abstract class ClientMinecraftServerMixin {
         }
     }
 
+    @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;close()V"))
+    private void stopServerBeforeClosingStorageSource(CallbackInfo ci) {
+        if (LegacySaveCache.isCurrentWorldSource(storageSource)) {
+            try {
+                storageSource.deleteLevel();
+            } catch (IOException e) {
+                Legacy4J.LOGGER.error("Failed to delete save cache {}", storageSource.getLevelId(), e);
+            }
+        }
+    }
+
     @Inject(method = "saveEverything", at = @At("RETURN"))
     public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
         if (!LegacySaveCache.isCurrentWorldSource(storageSource)) return;
         boolean requested = LegacySaveCache.consumeSaveCopyRequest();
         if (!requested && LegacyOptions.autoSaveInterval.get() == 0) return;
         LegacySaveCache.saveLevel(storageSource);
-    }
-
-    @Inject(method = "stopServer", at = @At("HEAD"))
-    private void stopServerHead(CallbackInfo ci) {
-        while (isSaving) {
-            Thread.onSpinWait();
-        }
     }
 }
