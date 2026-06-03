@@ -61,6 +61,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "changeFocus", at = @At("HEAD"))
     private void changeFocus(ComponentPath componentPath, CallbackInfo ci) {
+        LegacyRenderUtil.autoFocusedWidget = false;
         if (componentPath instanceof ComponentPath.Path path)
             NavigationElement.of(path.childPath().component()).playFocusSound(path);
     }

@@ -1,7 +1,8 @@
 package wily.legacy.mixin.base.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.CommonValue;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractButton.class)
@@ -55,6 +57,21 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
     @Redirect(method = "extractDefaultSprite", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
     protected boolean extractDefaultSprite(AbstractButton instance) {
         return true;
+    }
+
+    @Inject(method = "extractDefaultSprite", at = @At("HEAD"))
+    protected void extractDefaultSpriteHead(GuiGraphicsExtractor graphics, CallbackInfo ci) {
+        if (LegacyRenderUtil.hasAutoFocusButtonAnimation()) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BUTTON, this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
+            float timer = (Util.getMillis() % 1200) / 1200.0f;
+            alpha *= 0.5f + (timer >= 0.5f ? 1 - timer : timer);
+        }
+    }
+
+    @Inject(method = "extractDefaultSprite", at = @At("RETURN"))
+    protected void extractDefaultSpriteReturn(GuiGraphicsExtractor graphics, CallbackInfo ci) {
+        if (LegacyRenderUtil.hasAutoFocusButtonAnimation())
+            alpha = active ? 1 : 0.8f;
     }
 
 }

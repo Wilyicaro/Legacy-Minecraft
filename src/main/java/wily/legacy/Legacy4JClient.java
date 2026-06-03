@@ -120,6 +120,7 @@ import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
+import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
 
@@ -405,7 +406,10 @@ public class Legacy4JClient {
                 controllerManager.enableCursorAndScheduleReset();
             if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
-                if (path != null) path.applyFocus(true);
+                if (path != null) {
+                    path.applyFocus(true);
+                    LegacyRenderUtil.autoFocusedWidget = true;
+                }
             }
         }
         controllerManager.resetCursor();
