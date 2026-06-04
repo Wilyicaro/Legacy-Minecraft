@@ -167,5 +167,7 @@
   "selectServer.delete": "Delete Server",
   "selectWorld.delete": "Delete Save",
   "selectWorld.mapFeatures.info": "When enabled, structures such as Villages and Strongholds will generate in the world.",
-  "soundCategory.master": "Sound"
+  "soundCategory.master": "Sound",
+  "block.minecraft.jack_o_lantern": "Jack-O-Lantern",
+  "block.minecraft.jungle_sapling": "Jungle Tree Sapling"
 }
