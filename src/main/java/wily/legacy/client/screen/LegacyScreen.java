@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
@@ -21,13 +21,13 @@ public class LegacyScreen extends Screen implements Controller.Event, ControlToo
         this.parent = parent;
     }
 
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, true);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, true);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderDefaultBackground(guiGraphics, i, j, f);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        renderDefaultBackground(GuiGraphicsExtractor, i, j, f);
     }
 
     @Override

@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.recipebook.GhostSlots;
 import net.minecraft.client.gui.screens.recipebook.SlotSelectTime;
 import net.minecraft.world.inventory.Slot;
@@ -27,22 +27,22 @@ public class GhostSlotsMixin {
     @Final
     private SlotSelectTime slotSelectTime;
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, Minecraft minecraft, boolean bl, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, Minecraft minecraft, boolean bl, CallbackInfo ci) {
         ci.cancel();
         ingredients.forEach((slot, ghostSlot) -> {
             LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
-            guiGraphics.pose().pushMatrix();
-            holder.applyOffset(guiGraphics);
-            guiGraphics.pose().translate(slot.x, slot.y);
-            guiGraphics.pose().scale(holder.getScaleX(), holder.getScaleY());
-            guiGraphics.fill(0, 0, 16, 16, 0x30FF0000);
+            GuiGraphicsExtractor.pose().pushMatrix();
+            holder.applyOffset(GuiGraphicsExtractor);
+            GuiGraphicsExtractor.pose().translate(slot.x, slot.y);
+            GuiGraphicsExtractor.pose().scale(holder.getScaleX(), holder.getScaleY());
+            GuiGraphicsExtractor.fill(0, 0, 16, 16, 0x30FF0000);
             ItemStack itemStack = ghostSlot.getItem(this.slotSelectTime.currentIndex());
-            guiGraphics.renderFakeItem(itemStack, 0, 0);
-            guiGraphics.fill(0, 0, 16, 16, 0x30FFFFFF);
+            GuiGraphicsExtractor.fakeItem(itemStack, 0, 0);
+            GuiGraphicsExtractor.fill(0, 0, 16, 16, 0x30FFFFFF);
             if (ghostSlot.isResultSlot())
-                guiGraphics.renderItemDecorations(minecraft.font, itemStack, 0, 0);
-            guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.itemDecorations(minecraft.font, itemStack, 0, 0);
+            GuiGraphicsExtractor.pose().popMatrix();
         });
     }
 }

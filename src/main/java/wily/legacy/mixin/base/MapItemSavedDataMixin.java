@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -114,7 +115,7 @@ public abstract class MapItemSavedDataMixin {
     }
 
     @Inject(method = "tickCarriedBy", at = @At("RETURN"), cancellable = true)
-    private void tickCarriedBy(Player player, ItemStack itemStack, CallbackInfo ci) {
+    private void tickCarriedBy(Player player, ItemStack itemStack, ItemFrame itemFrame, CallbackInfo ci) {
         var iterator = LegacyWorldOptions.usedEndPortalPositions.get().iterator();
         boolean modified = false;
         while (iterator.hasNext()) {

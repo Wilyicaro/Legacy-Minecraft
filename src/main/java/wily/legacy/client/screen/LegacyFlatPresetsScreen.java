@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.core.Holder;
@@ -34,14 +34,14 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen {
                 FlatLevelGeneratorPreset preset = holder.value();
                 renderableVList.addRenderable(new LegacyFlatWorldScreen.ItemIconButton(0, 0, 263, 30, Component.translatable(holder.key().identifier().toLanguageKey("flat_world_preset"))) {
                     @Override
-                    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderContents(guiGraphics, i, j, f);
-                        renderItem(guiGraphics, preset.displayItem().value().getDefaultInstance(), "presetIcon", 5);
+                    protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+                        super.extractContents(GuiGraphicsExtractor, i, j, f);
+                        renderItem(GuiGraphicsExtractor, preset.displayItem().value().getDefaultInstance(), "presetIcon", 5);
                     }
 
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        renderScrollingString(guiGraphics, font, "presetMessage", 33, i, j);
+                    protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
+                        renderScrollingString(GuiGraphicsExtractor, font, "presetMessage", 33, i, j);
                     }
 
                     @Override
@@ -58,15 +58,15 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, false);
     }
 
     @Override
     protected void panelInit() {
         super.panelInit();
         panelRecess.init("panelRecess");
-        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panel.y + (sd ? 5 : 9), CommonColor.GRAY_TEXT.get(), false))));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panel.y + (sd ? 5 : 9), CommonColor.GRAY_TEXT.get(), false))));
         addRenderableOnly(panelRecess);
     }
 

@@ -1,11 +1,13 @@
 package wily.legacy.skins.client.screen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.api.ui.LegacySkinUi;
 import wily.legacy.skins.client.gui.GuiDollRender;
 import wily.legacy.skins.client.gui.GuiSessionSkin;
@@ -38,6 +40,27 @@ public interface ChangeSkinScreenSource {
         return skin == null ? "" : skin.name();
     }
 
+    default String skinName(@Nullable String skinId) {
+        if (skinId == null || skinId.isBlank()) return "";
+        SkinEntry entry = skin(skinId);
+        return entry == null ? skinId : skinName(entry);
+    }
+
+    default @Nullable String skinTheme(SkinEntry skin) {
+        if (skin == null) return null;
+        Identifier modelId = skin.modelId();
+        if (modelId == null && skin.texture() != null)
+            modelId = ClientSkinAssets.getModelIdFromTexture(skin.texture());
+        if (modelId == null) return null;
+        String theme = BoxModelManager.getThemeText(modelId);
+        return theme == null || theme.isBlank() ? null : theme;
+    }
+
+    default @Nullable String skinTheme(@Nullable String skinId) {
+        if (skinId == null || skinId.isBlank()) return null;
+        return skinTheme(skin(skinId));
+    }
+
     @Nullable String currentAppliedSkinId();
 
     boolean supportsFavorites();
@@ -50,7 +73,7 @@ public interface ChangeSkinScreenSource {
 
     void prewarmPreview(String skinId);
 
-    boolean renderPreview(GuiGraphics graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom);
+    boolean renderPreview(GuiGraphicsExtractor graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom);
 
     @Nullable Component packSubtitle(SkinPack pack);
 
@@ -120,6 +143,23 @@ public interface ChangeSkinScreenSource {
         }
 
         @Override
+        public String skinName(@Nullable String skinId) {
+            if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return "";
+            SkinEntry entry = skin(skinId);
+            return entry == null ? skinId : skinName(entry);
+        }
+
+        @Override
+        public @Nullable String skinTheme(@Nullable String skinId) {
+            if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
+            SkinEntry entry = skin(skinId);
+            if (entry != null) return skinTheme(entry);
+            Identifier modelId = ClientSkinAssets.getModelIdFromTexture(Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, skinId));
+            String theme = BoxModelManager.getThemeText(modelId);
+            return theme == null || theme.isBlank() ? null : theme;
+        }
+
+        @Override
         public String currentAppliedSkinId() {
             Minecraft minecraft = Minecraft.getInstance();
             UUID self = selfId(minecraft);
@@ -167,7 +207,7 @@ public interface ChangeSkinScreenSource {
         }
 
         @Override
-        public boolean renderPreview(GuiGraphics graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
+        public boolean renderPreview(GuiGraphicsExtractor graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
             if (skinId == null || skinId.isBlank()) return false;
             if (SkinIdUtil.isAutoSelect(skinId)) {
                 var playerSkin = GuiSessionSkin.getSessionPlayerSkin();

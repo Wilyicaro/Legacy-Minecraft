@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -40,42 +40,42 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             }
 
             @Override
-            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderContents(guiGraphics, i, j, f);
+            protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+                super.extractContents(GuiGraphicsExtractor, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()) {
-                    guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(getX() + 26, getY() + 5);
-                    guiGraphics.pose().scale(1.25f, 1.25f);
-                    guiGraphics.renderItem(s, 0, 0);
-                    guiGraphics.pose().popMatrix();
+                    GuiGraphicsExtractor.pose().pushMatrix();
+                    GuiGraphicsExtractor.pose().translate(getX() + 26, getY() + 5);
+                    GuiGraphicsExtractor.pose().scale(1.25f, 1.25f);
+                    GuiGraphicsExtractor.item(s, 0, 0);
+                    GuiGraphicsExtractor.pose().popMatrix();
                 }
                 FactoryScreenUtil.enableBlend();
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
                 if (selectedBiome == biome)
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX() + 6, this.getY() + (height - 12) / 2, 14, 12);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TICK, this.getX() + 6, this.getY() + (height - 12) / 2, 14, 12);
                 FactoryScreenUtil.disableBlend();
             }
 
             @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
                 int k = this.getX() + 54;
                 int l = this.getX() + this.getWidth();
-                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
+                LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
             }
 
         });
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, false);
     }
 
     @Override
     protected void panelInit() {
         super.panelInit();
-        addRenderableOnly(((guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
     }
 
     @Override

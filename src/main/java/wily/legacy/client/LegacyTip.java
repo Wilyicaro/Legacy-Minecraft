@@ -3,7 +3,7 @@ package wily.legacy.client;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 //? if <1.21.2 {
 /*import net.minecraft.client.gui.components.toasts.ToastComponent;
@@ -113,8 +113,8 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     @Override
-    public /*? if <1.21.2 {*//*Visibility*//*?} else {*/void/*?}*/ render(GuiGraphics guiGraphics, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l) {
-        renderTip(guiGraphics, 0, 0, 0, l);
+    public /*? if <1.21.2 {*//*Visibility*//*?} else {*/void/*?}*/ extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l) {
+        renderTip(GuiGraphicsExtractor, 0, 0, 0, l);
         //? if <1.21.2 {
         /*return visibility;
          *///?}
@@ -137,19 +137,19 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderTip(guiGraphics, i, j, f, Util.getMillis() - createdTime);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        renderTip(GuiGraphicsExtractor, i, j, f, Util.getMillis() - createdTime);
     }
 
-    public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
+    public void renderTip(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, float l) {
         if (canRemove.get() || l >= disappearTime) visibility = Visibility.HIDE;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(getX(), getY());
-        LegacyRenderUtil.renderPointerPanel(guiGraphics, 0, 0, getWidth(), getHeight());
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(getX(), getY());
+        LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, 0, 0, getWidth(), getHeight());
         if (title != null)
-            LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> guiGraphics.drawString(minecraft.font, title, (centered ? (width() - minecraft.font.width(title)) / 2 : b ? 5 : 13), b ? 5 : 13, CommonColor.TIP_TITLE_TEXT.get()));
-        LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> tipLabel.centered(centered).withColor(CommonColor.TIP_TEXT.get()).withShadow(centered).withPos(b ? 5 : 13, title == null ? b ? 5 : 13 : b ? 13 : 25).render(guiGraphics, i, j, f));
-        if (holder != null) holder.render(guiGraphics, i, j, f);
-        guiGraphics.pose().popMatrix();
+            LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> GuiGraphicsExtractor.text(minecraft.font, title, (centered ? (width() - minecraft.font.width(title)) / 2 : b ? 5 : 13), b ? 5 : 13, CommonColor.TIP_TITLE_TEXT.get()));
+        LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> tipLabel.centered(centered).withColor(CommonColor.TIP_TEXT.get()).withShadow(centered).withPos(b ? 5 : 13, title == null ? b ? 5 : 13 : b ? 13 : 25).extractRenderState(GuiGraphicsExtractor, i, j, f));
+        if (holder != null) holder.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 }

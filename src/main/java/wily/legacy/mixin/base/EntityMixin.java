@@ -3,6 +3,7 @@ package wily.legacy.mixin.base;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -10,11 +11,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mobcaps.LegacyMobCaps;
+import wily.legacy.util.LegacyTags;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -42,7 +48,27 @@ public abstract class EntityMixin {
         }
     }
 
-    //? if neoforge {
+    @ModifyExpressionValue(method = "doWaterSplashEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getSwimSplashSound()Lnet/minecraft/sounds/SoundEvent;"))
+    private SoundEvent getSwimSplashSound(SoundEvent original) {
+        return legacy$getSplashSound(original);
+    }
+
+    @ModifyExpressionValue(method = "doWaterSplashEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getSwimHighSpeedSplashSound()Lnet/minecraft/sounds/SoundEvent;"))
+    private SoundEvent getSwimHighSpeedSplashSound(SoundEvent original) {
+        return legacy$getSplashSound(original);
+    }
+
+    @ModifyArg(method = "doWaterSplashEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"), index = 1)
+    private float increaseWaterSplashVolume(float volume) {
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) ? volume * 3.0f : volume;
+    }
+
+    @Unique
+    private SoundEvent legacy$getSplashSound(SoundEvent original) {
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && self().getType().builtInRegistryHolder().is(LegacyTags.OLD_SPLASH_SOUND) ? LegacyRegistries.ENTITY_GENERIC_OLD_SPLASH.get() : original;
+    }
+
+    //? if neoforge && <26.1 {
     /*@ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;canStartSwimming()Z", remap = false))
     protected boolean updateSwimming(boolean original) {
         return (LegacyGameRules.getSidedBooleanGamerule(self(), LegacyGameRules.LEGACY_SWIMMING) && (self().isInWater() && self().getXRot() > 0) || original) && !(self() instanceof Player p && p.getAbilities().flying);

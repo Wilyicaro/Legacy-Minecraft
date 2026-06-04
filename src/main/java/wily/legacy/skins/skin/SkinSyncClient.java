@@ -2,9 +2,9 @@ package wily.legacy.skins.skin;
 
 import net.minecraft.client.Minecraft;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.skins.client.util.ViewBobbingSkinOverride;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,9 +26,8 @@ public final class SkinSyncClient {
         if (connected && STATE.tickUploadRetry()) {
             onRequestSkinUpload();
         }
-        if (connected && tickSnapshotRequest()) {
-            requestSnapshot(client, true);
-        }
+        Boolean snapshotForce = connected ? STATE.tickSnapshotRequest() : null;
+        if (snapshotForce != null) requestSnapshot(client, snapshotForce);
         if (connected && !STATE.sessionAnnounced) onRequestSkinUpload();
         if (!connected) return;
         PendingSelection pendingSelection = takePendingSelection();
@@ -39,7 +38,7 @@ public final class SkinSyncClient {
         Minecraft client = Minecraft.getInstance();
         if (client == null) return;
         STATE.sentAssets.clear();
-        STATE.snapshotDelay = 1;
+        STATE.requestSnapshot(1, true);
         PendingSelection pendingSelection = takePendingSelection();
         if (pendingSelection != null) {
             requestSetSkin(client, pendingSelection.packId(), pendingSelection.skinId());
@@ -88,10 +87,6 @@ public final class SkinSyncClient {
             STATE.requestUpload();
             return;
         }
-        if (SkinCloudSyncClient.isActive(client)) {
-            sendSelection(client, resolveSelectedSkinId(client), true);
-            return;
-        }
         sendSelection(client, resolveSelectedSkinId(client), true);
     }
 
@@ -119,16 +114,12 @@ public final class SkinSyncClient {
         else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, bytes);
         else if (assetType == SkinSync.ASSET_METADATA) ClientSkinAssets.putMetadata(skinId, bytes);
         else if (assetType == SkinSync.ASSET_CAPE) ClientSkinAssets.putCape(assetKey, bytes);
+        else if (assetType == SkinSync.ASSET_BOX_TEXTURE) ClientSkinAssets.putBoxTexture(assetKey, bytes);
         ClientSkinCache.set(uuid, skinId);
     }
 
     public static void onSyncSkin(UUID uuid, String skinId) {
         ClientSkinCache.set(uuid, skinId);
-    }
-
-    static void onCloudSnapshot(Map<UUID, String> skins) {
-        if (skins == null || skins.isEmpty()) return;
-        skins.forEach(ClientSkinCache::set);
     }
 
     private static UUID getUserId(Minecraft client) {
@@ -192,10 +183,7 @@ public final class SkinSyncClient {
     }
 
     private static void requestSnapshot(Minecraft client, boolean force) {
-        if (SkinCloudSyncClient.isActive(client)) {
-            SkinCloudSyncClient.requestSnapshot(client, force);
-            return;
-        }
+        if (!Legacy4JClient.hasModOnServer()) return;
         CommonNetwork.sendToServer(new SkinSync.RequestSnapshotC2S());
     }
 
@@ -206,10 +194,7 @@ public final class SkinSyncClient {
     private static void sendSelection(Minecraft client, String skinId, boolean forceAssets) {
         String id = SkinFairness.effectiveSkinId(client, skinId);
         STATE.sessionAnnounced = true;
-        if (SkinCloudSyncClient.isActive(client)) {
-            SkinCloudSyncClient.submitSelection(client, id);
-            return;
-        }
+        if (!Legacy4JClient.hasModOnServer()) return;
         CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));
         sendAssets(client, id, forceAssets);
     }
@@ -228,6 +213,7 @@ public final class SkinSyncClient {
         sendAssetChunks(skinId, SkinSync.ASSET_MODEL, assets.model());
         sendAssetChunks(skinId, SkinSync.ASSET_METADATA, assets.metadata());
         sendAssetChunks(skinId, SkinSync.ASSET_CAPE, assets.cape());
+        sendAssetChunks(skinId, SkinSync.ASSET_BOX_TEXTURE, assets.boxTexture());
     }
 
     private static void sendAssetChunks(String skinId, int assetType, byte[] bytes) {
@@ -245,13 +231,6 @@ public final class SkinSyncClient {
         return skinId == null ? null : new PendingSelection(packId, skinId);
     }
 
-    private static boolean tickSnapshotRequest() {
-        if (STATE.snapshotDelay < 0) return false;
-        if (--STATE.snapshotDelay > 0) return false;
-        STATE.snapshotDelay = -1;
-        return true;
-    }
-
     private static final class State {
         private static final int SCAN_INTERVAL = 20;
         private static final int UPLOAD_RETRY_INTERVAL = 20;
@@ -262,6 +241,7 @@ public final class SkinSyncClient {
         private String pendingPackId;
         private boolean pendingUpload;
         private boolean sessionAnnounced;
+        private boolean snapshotForce;
         private int snapshotDelay = -1;
         private int uploadRetryDelay;
         private int scanTick;
@@ -277,7 +257,13 @@ public final class SkinSyncClient {
         }
 
         private void requestSnapshotRetry() {
-            if (snapshotDelay < 0) snapshotDelay = SCAN_INTERVAL;
+            requestSnapshot(SCAN_INTERVAL, false);
+        }
+
+        private void requestSnapshot(int delay, boolean force) {
+            if (!force && snapshotDelay >= 0) return;
+            snapshotDelay = delay;
+            snapshotForce = force;
         }
 
         private boolean tickUploadRetry() {
@@ -288,11 +274,21 @@ public final class SkinSyncClient {
             return true;
         }
 
+        private Boolean tickSnapshotRequest() {
+            if (snapshotDelay < 0) return null;
+            if (--snapshotDelay > 0) return null;
+            boolean force = snapshotForce;
+            snapshotDelay = -1;
+            snapshotForce = false;
+            return force;
+        }
+
         private void reset() {
             pendingSkinId = null;
             pendingPackId = null;
             pendingUpload = false;
             sessionAnnounced = false;
+            snapshotForce = false;
             snapshotDelay = -1;
             uploadRetryDelay = 0;
             scanTick = 0;

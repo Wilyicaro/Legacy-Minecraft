@@ -1,0 +1,56 @@
+{
+    "parent": "block/block",
+    "display": {
+        "gui": {
+            "rotation": [ 30, 135, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.55, 0.55, 0.55 ]
+        },
+        "fixed": {
+            "rotation": [ 0, 90, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        }
+    },
+    "textures": {
+        "particle": "#wall"
+    },
+    "elements": [
+        {
+            "from": [ 4, 0, -1 ],
+            "to": [ 12, 16, 6 ],
+            "faces": {
+                "down": { "uv": [ 4, 0, 12, 6 ], "texture": "#wall" },
+                "up": { "uv": [ 4, 0, 12, 6 ], "texture": "#wall" },
+                "north": { "uv": [ 4, 0, 12, 16 ], "texture": "#wall" },
+                "south": { "uv": [ 4, 0, 12, 16 ], "texture": "#wall" },
+                "west": { "uv": [ 0, 0, 6, 16 ], "texture": "#wall" },
+                "east": { "uv": [ 0, 0, 6, 16 ], "texture": "#wall" }
+            }
+        },
+        {
+            "from": [ 4, 0, 10 ],
+            "to": [ 12, 16, 17 ],
+            "faces": {
+                "down": { "uv": [ 4, 10, 12, 16 ], "texture": "#wall" },
+                "up": { "uv": [ 4, 10, 12, 16 ], "texture": "#wall" },
+                "north": { "uv": [ 4, 0, 12, 16 ], "texture": "#wall" },
+                "south": { "uv": [ 4, 0, 12, 16 ], "texture": "#wall" },
+                "west": { "uv": [ 10, 0, 16, 16 ], "texture": "#wall" },
+                "east": { "uv": [ 10, 0, 16, 16 ], "texture": "#wall" }
+            }
+        },
+        {
+            "from": [ 5, 0, 5 ],
+            "to": [ 11, 13, 11 ],
+            "faces": {
+                "down": { "uv": [ 5, 5, 11, 11 ], "texture": "#wall" },
+                "up": { "uv": [ 5, 5, 11, 11 ], "texture": "#wall" },
+                "north": { "uv": [ 5, 3, 11, 16 ], "texture": "#wall" },
+                "south": { "uv": [ 5, 3, 11, 16 ], "texture": "#wall" },
+                "west": { "uv": [ 5, 3, 11, 16 ], "texture": "#wall" },
+                "east": { "uv": [ 5, 3, 11, 16 ], "texture": "#wall" }
+            }
+        }
+    ]
+}

@@ -38,24 +38,24 @@ import static wily.legacy.init.LegacyRegistries.isInvalidCauldron;
 
 @Mixin(LayeredCauldronBlock.class)
 public abstract class LayeredCauldronBlockMixin extends AbstractCauldronBlock implements EntityBlock {
-    public LayeredCauldronBlockMixin(Properties properties, /*? if >1.20.1 {*/CauldronInteraction.InteractionMap/*?} else {*//*Map<Item, CauldronInteraction>*//*?}*/ interactionMap) {
+    public LayeredCauldronBlockMixin(Properties properties, /*? if >1.20.1 {*/CauldronInteraction.Dispatcher/*?} else {*//*Map<Item, CauldronInteraction>*//*?}*/ interactionMap) {
         super(properties, interactionMap);
     }
 
     public void animateTick(BlockState blockState, Level level, BlockPos blockPos, RandomSource randomSource) {
         if (!blockState.is(LegacyTags.WATER_CAULDRONS)) return;
         level.getBlockEntity(blockPos, LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get()).ifPresent(be -> {
-            if (be.potion == null || be.hasWater()) return;
+            if (be.hasWater() || !be.getPotionContents().hasEffects()) return;
             //? if <1.20.5 {
             /*int i = PotionUtils.getColor(be.potion.value());
             double d = (double)(i >> 16 & 0xFF) / 255.0;
             double e = (double)(i >> 8 & 0xFF) / 255.0;
             double f = (double)(i & 0xFF) / 255.0;
-            level.addParticle(ParticleTypes.ENTITY_EFFECT, (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getX(), level.random.nextDouble() + blockPos.getY(), (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getZ(), d, e, f);
+                level.addParticle(ParticleTypes.ENTITY_EFFECT, (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getX(), randomSource.nextDouble() + blockPos.getY(), (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getZ(), d, e, f);
             *///?} else {
-            be.potion.value().getEffects().forEach(m -> {
-                if (level.random.nextInt(4) == 0) {
-                    level.addParticle(m.getParticleOptions(), (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getX(), level.random.nextDouble() + blockPos.getY(), (2.0 * level.random.nextDouble() - 1.0) / 4 + blockPos.getZ(), 1.0f, 1.0f, 1.0f);
+            be.getPotionContents().getAllEffects().forEach(m -> {
+                if (randomSource.nextInt(4) == 0) {
+                    level.addParticle(m.getParticleOptions(), (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getX(), randomSource.nextDouble() + blockPos.getY(), (2.0 * randomSource.nextDouble() - 1.0) / 4 + blockPos.getZ(), 1.0f, 1.0f, 1.0f);
                 }
             });
             //?}

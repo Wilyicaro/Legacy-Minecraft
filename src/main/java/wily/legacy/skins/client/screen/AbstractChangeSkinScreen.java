@@ -3,16 +3,18 @@ package wily.legacy.skins.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.client.ContentManager;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
@@ -59,12 +61,17 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected boolean lastWindowActive;
     protected int seenPackReloadVersion;
     protected String pendingInitialPackId;
+    private boolean openingSkinMegaBundle;
 
     protected AbstractChangeSkinScreen(Screen parent) {
         this(parent, ChangeSkinScreenSource.Default.INSTANCE);
     }
 
     protected AbstractChangeSkinScreen(Screen parent, ChangeSkinScreenSource source) {
+        this(parent, source, true);
+    }
+
+    protected AbstractChangeSkinScreen(Screen parent, ChangeSkinScreenSource source, boolean showSkinMegaBundlePack) {
         super(parent, s -> {
             ChangeSkinScreenLayout layout = LegacyOptions.getUIMode().isSD()
                     ? ChangeSkinScreenLayout.SD_480
@@ -81,7 +88,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         lastWindowActive = minecraft == null || minecraft.isWindowActive();
         tooltipBox = createTooltipBox();
         renderableVList.layoutSpacing(l -> 2);
-        packList = new ChangeSkinPackList(source, this::playFocusSound, this::playPackSelectionSound);
+        packList = new ChangeSkinPackList(source, this::playFocusSound, this::playPackSelectionSound, this::openSkinMegaBundleStore, showSkinMegaBundlePack);
         packList.init();
         seenPackReloadVersion = source.version();
         customPacks = new CustomSkinPackFlow(this);
@@ -133,7 +140,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
 
-    protected static void blitSprite(GuiGraphics g, Identifier id, int x, int y, int w, int h) {
+    protected static void blitSprite(GuiGraphicsExtractor g, Identifier id, int x, int y, int w, int h) {
         FactoryGuiGraphics.of(g).blitSprite(id, x, y, w, h);
     }
 
@@ -196,7 +203,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             };
         }
         minecraft.setScreen(built);
-        playPressSound();
     }
 
     boolean isEditingCustomPack(String packId) {
@@ -240,11 +246,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void playPackSelectionSound() {
-        LegacySoundUtil.playSimpleUISound(LegacyRegistries.PACK_SELECTION.get(), 1.0f);
+        playClickSound();
     }
 
     protected void playClickSound() {
-        LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
     }
 
     protected void openImportSkinScreen(String packId, Consumer<String> importedAction) {
@@ -273,6 +279,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void selectSkin() {
+        if (packList.focusedPackOpensStore()) {
+            openSkinMegaBundleStore();
+            return;
+        }
         if (isReorderingCustomPack()) {
             customPacks.finishReorderingPack();
             return;
@@ -299,10 +309,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected void favoriteSkin() {
         if (isReorderingCustomPack()) return;
+        if (packList.focusedPackOpensStore()) return;
         String skinId = centerSkinId();
         if (skinId == null) return;
         if (isEditingCustomPack()) {
-            if (!customPacks.isEditableSkinSelection(skinId)) return;
+            if (!customPacks.isRemovableSkinSelection(skinId)) return;
             customPacks.openDeleteSelectedSkin();
             return;
         }
@@ -536,6 +547,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void skinPack(int i) {
+        if (packList.focusedPackOpensStore()) return;
         ensurePreviewWidgets();
         syncCenterPreviewState();
         SkinPack pack = packList.getFocusedPack();
@@ -598,9 +610,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected Component favoriteActionLabel() {
         if (isReorderingCustomPack()) return null;
+        if (packList.focusedPackOpensStore()) return null;
         String skinId = centerSkinId();
         if (isEditingCustomPack()) {
-            if (skinId == null || !customPacks.isEditableSkinSelection(skinId)) return null;
+            if (!customPacks.isRemovableSkinSelection(skinId)) return null;
             return LegacyComponents.REMOVE_CUSTOM_SKIN;
         }
         if (skinId != null && customPacks.isImportSkinSelection(skinId))
@@ -612,6 +625,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected Component selectActionLabel() {
+        if (packList.focusedPackOpensStore()) return Component.translatable("legacy.menu.download_skinpacks");
         if (isReorderingCustomPack()) return CommonComponents.GUI_DONE;
         String skinId = centerSkinId();
         if (skinId != null && customPacks.isImportSkinSelection(skinId))
@@ -696,6 +710,35 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         cancelQueuedCarousel();
         skinPack(resolveFocusedPackSkinIndex(currentAppliedSkinId()));
         return true;
+    }
+
+    private void openSkinMegaBundleStore() {
+        if (minecraft == null || openingSkinMegaBundle) return;
+        ContentManager.Category category = ContentManager.CATEGORIES.stream()
+                .filter(c -> "bundle_packs".equals(c.id()))
+                .findFirst()
+                .orElse(null);
+        if (category == null) return;
+        openingSkinMegaBundle = true;
+        playClickSound();
+        ContentManager.fetchIndex(category).whenComplete((packs, err) -> minecraft.execute(() -> {
+            openingSkinMegaBundle = false;
+            if (err != null || packs == null) {
+                minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(err == null ? "" : err.getMessage())));
+                return;
+            }
+            restoreDefaultSkinPackFocus();
+            minecraft.setScreen(new Legacy4JContentListScreen(this, category, packs));
+        }));
+    }
+
+    private void restoreDefaultSkinPackFocus() {
+        String packId = source.preferredDefaultPackId();
+        if (packId == null || packId.isBlank()) return;
+        packList.focusPackId(packId, false);
+        packList.consumeQueuedChangePack();
+        skinPack(resolveFocusedPackSkinIndex(currentAppliedSkinId()));
+        restorePackButtonFocus();
     }
 
     private void sortCarouselBy(int offset) {
@@ -1186,19 +1229,19 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         super.removed();
     }
 
-    protected void drawBigCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
+    protected void drawBigCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color) {
         drawScaledCentered(g, text, centerX, y, color, bigTextScale());
     }
 
-    protected void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
+    protected void drawSmallCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color) {
         drawScaledCentered(g, text, centerX, y, color, smallTextScale());
     }
 
-    protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale) {
+    protected void drawScaledCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color, float scale) {
         drawScaledCentered(g, text, centerX, y, color, scale, false);
     }
 
-    protected void drawScaledCentered(GuiGraphics g, Component text, int centerX, int y, int color, float scale, boolean shadow) {
+    protected void drawScaledCentered(GuiGraphicsExtractor g, Component text, int centerX, int y, int color, float scale, boolean shadow) {
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         int textWidth = minecraft.font.width(text);
         int textX = -textWidth / 2;
@@ -1206,7 +1249,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         pose.pushMatrix();
         pose.translate((float) centerX, (float) yAdj);
         pose.scale(scale, scale);
-        g.drawString(minecraft.font, text, textX, 0, color, shadow);
+        g.text(minecraft.font, text, textX, 0, color, shadow);
         pose.popMatrix();
     }
 

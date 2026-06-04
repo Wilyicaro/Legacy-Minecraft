@@ -5,7 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -18,7 +18,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -42,6 +41,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class CreationList extends RenderableVList {
     protected final Minecraft minecraft;
@@ -58,6 +59,21 @@ public class CreationList extends RenderableVList {
             }
         }
     });
+    private static final LoadingCache<String, Identifier> worldIcons = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+        @Override
+        public Identifier load(String key) throws Exception {
+            try (ZipFile zip = new ZipFile(Path.of(key).toFile())) {
+                ZipEntry entry = zip.getEntry("icon.png");
+                if (entry == null) return PackAlbum.Selector.DEFAULT_ICON;
+                try (InputStream inputStream = zip.getInputStream(entry)) {
+                    NativeImage image = NativeImage.read(inputStream);
+                    Identifier location = Identifier.fromNamespaceAndPath("legacy", "template_world_icon/" + Integer.toHexString(key.hashCode()));
+                    Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(location::toString, image));
+                    return location;
+                }
+            }
+        }
+    });
 
     public CreationList(UIAccessor accessor) {
         super(accessor);
@@ -67,7 +83,7 @@ public class CreationList extends RenderableVList {
         LegacyWorldTemplate.list.forEach(t -> addTemplateButton(this, t, c -> {
             if (t.isGamePath() && !Files.exists(t.getPath())) {
                 Path path = t.getDownloadPath();
-                if (path == null || t.preDownload()) {
+                if (path == null) {
                     minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", t.buttonMessage())));
                 } else {
                     File file = path.toFile();
@@ -113,7 +129,7 @@ public class CreationList extends RenderableVList {
     public static void loadTemplate(Screen parent, Minecraft minecraft, LegacyWorldTemplate template) {
         try (LevelStorageSource.LevelStorageAccess access = LegacySaveCache.getLevelStorageSource().createAccess(LegacySaveCache.importSaveFile(template.open(), minecraft.getLevelSource()::levelExists, LegacySaveCache.getLevelStorageSource(), template.folderName()))) {
             template.albumId().ifPresent(id -> updateSelectedResourceAlbum(access, id));
-            LevelSummary summary = access.getSummary(/*? if >1.20.2 {*/access.getDataTag()/*?}*/);
+            LevelSummary summary = access.fixAndGetSummary();
             Optional<PackAlbum> album = template.albumId().map(PackAlbum::resourceById);
             album.ifPresent(LegacyClientWorldSettings.of(summary.getSettings())::setSelectedResourceAlbum);
             access.close();
@@ -122,8 +138,8 @@ public class CreationList extends RenderableVList {
             } else minecraft.setScreen(new LoadSaveScreen(parent, summary, access, (album.isPresent() || template.albumId().isEmpty()) && template.isLocked()) {
                 @Override
                 public void onClose() {
-                    if (!LegacyOptions.saveCache.get())
-                        FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
+                    if (!LegacyOptions.saveCache.get() || LegacyOptions.alwaysClearSaveCache.get())
+                        FileUtils.deleteQuietly(LegacySaveCache.getLevelDirectory(access).toFile());
                     super.onClose();
                 }
             });
@@ -152,8 +168,8 @@ public class CreationList extends RenderableVList {
         AbstractButton button;
         list.addRenderable(button = new IconButton(list, 0, 0, 270, 30, message) {
             @Override
-            public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + x, getY() + y, width, height);
+            public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(iconSprite, getX() + x, getY() + y, width, height);
             }
 
             @Override
@@ -168,13 +184,14 @@ public class CreationList extends RenderableVList {
         AbstractButton button;
         list.addRenderable(button = new IconButton(list, 0, 0, 270, 30, template.buttonMessage()) {
             @Override
-            public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-                Identifier icon = getTemplatePackIcon(template);
+            public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
+                Identifier icon = getTemplateWorldIcon(template);
+                if (icon == null) icon = getTemplatePackIcon(template);
                 if (icon != null) {
-                    FactoryGuiGraphics.of(guiGraphics).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
                     return;
                 }
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(template.icon(), getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(template.icon(), getX() + x, getY() + y, width, height);
             }
 
             @Override
@@ -184,15 +201,29 @@ public class CreationList extends RenderableVList {
         });
     }
 
+    private static Identifier getTemplateWorldIcon(LegacyWorldTemplate template) {
+        if (template.albumId().isEmpty() || !template.isGamePath()) return null;
+        Path path = template.getPath().toAbsolutePath().normalize();
+        if (!Files.isRegularFile(path)) return null;
+        try {
+            Identifier icon = worldIcons.getUnchecked(path.toString());
+            return PackAlbum.Selector.DEFAULT_ICON.equals(icon) ? null : icon;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private static Identifier getTemplatePackIcon(LegacyWorldTemplate template) {
-        String packId = template.albumId()
-            .map(PackAlbum::resourceById)
-            .map(PackAlbum::getDisplayPackId)
-            .orElse(null);
+        Optional<String> albumId = template.albumId();
+        if (albumId.isEmpty()) return null;
+        PackAlbum album = PackAlbum.resourceAlbums.get(albumId.get());
+        if (album == null) return null;
+        String packId = album.getDisplayPackId();
         if (packId == null || packId.isBlank()) return null;
         if (packId.startsWith("file/")) packId = packId.substring(5);
         try {
-            return packIcons.getUnchecked(packId);
+            Identifier icon = packIcons.getUnchecked(packId);
+            return PackAlbum.Selector.DEFAULT_ICON.equals(icon) ? null : icon;
         } catch (Exception e) {
             return null;
         }

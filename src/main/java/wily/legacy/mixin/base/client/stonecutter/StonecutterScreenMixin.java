@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client.stonecutter;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
@@ -22,6 +22,8 @@ import net.minecraft.world.item.crafting.display.SlotDisplayContext;
  *///?}
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -47,7 +49,7 @@ import static wily.legacy.util.LegacySprites.*;
 @Mixin(StonecutterScreen.class)
 public abstract class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterMenu> {
 
-    private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
     @Shadow
     private int startIndex;
@@ -68,12 +70,12 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
     //?} else {
     /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor) {
     }
     *///?}
 
@@ -105,8 +107,8 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     @Override
     public void init() {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 215;
-        imageHeight = sd ? 135 : 208;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 215);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 135 : 208);
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 63 : 95;
         titleLabelX = sd ? 7 : 14;
@@ -141,32 +143,32 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         }
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         int stonecuttingPanelSize = sd ? 51 : 75;
         int stonecuttingPanelX = leftPos + (sd ? 32 : 70);
         int stonecuttingPanelY = topPos + (sd ? 12 : 18);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, stonecuttingPanelX, stonecuttingPanelY, stonecuttingPanelSize, stonecuttingPanelSize);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(stonecuttingPanelX + stonecuttingPanelSize + 2.5f, stonecuttingPanelY);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, stonecuttingPanelX, stonecuttingPanelY, stonecuttingPanelSize, stonecuttingPanelSize);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(stonecuttingPanelX + stonecuttingPanelSize + 2.5f, stonecuttingPanelY);
         if (isScrollBarActive() && getOffscreenRows() > 0) {
             if (getOffscreenRows() != startIndex)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, stonecuttingPanelSize + 4);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.DOWN, 0, stonecuttingPanelSize + 4);
             if (startIndex > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, 0, -11);
-        } else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.UP, 0, -11);
+        } else FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 13, stonecuttingPanelSize);
-        guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() ? (stonecuttingPanelSize - LegacyScroller.SCROLLER_HEIGHT_OFFSET) * startIndex / getOffscreenRows() : 0));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 13, stonecuttingPanelSize);
+        GuiGraphicsExtractor.pose().translate(-2f, -1f + (this.isScrollBarActive() ? (stonecuttingPanelSize - LegacyScroller.SCROLLER_HEIGHT_OFFSET) * startIndex / getOffscreenRows() : 0));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
         FactoryScreenUtil.disableBlend();
-        guiGraphics.pose().popMatrix();
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(stonecuttingPanelX + 1.5f, stonecuttingPanelY + 1.5f);
+        GuiGraphicsExtractor.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(stonecuttingPanelX + 1.5f, stonecuttingPanelY + 1.5f);
         if (this.displayRecipes) {
             int buttonSize = sd ? 12 : 18;
             int size = getRecipes().size();
@@ -178,21 +180,21 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     if (s >= size) break block0;
                     int t = q * buttonSize;
                     int u = p * buttonSize;
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i, j, stonecuttingPanelX + 1.5f + t, stonecuttingPanelY + 1.5f + u, buttonSize, buttonSize) ? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, buttonSize, buttonSize);
-                    guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(t, u);
-                    guiGraphics.pose().scale(buttonSize / 18f);
-                    guiGraphics.renderItem(getResultItem(getRecipes().get(s)), 1, 1);
-                    guiGraphics.pose().popMatrix();
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i, j, stonecuttingPanelX + 1.5f + t, stonecuttingPanelY + 1.5f + u, buttonSize, buttonSize) ? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, buttonSize, buttonSize);
+                    GuiGraphicsExtractor.pose().pushMatrix();
+                    GuiGraphicsExtractor.pose().translate(t, u);
+                    GuiGraphicsExtractor.pose().scale(buttonSize / 18f);
+                    GuiGraphicsExtractor.item(getResultItem(getRecipes().get(s)), 1, 1);
+                    GuiGraphicsExtractor.pose().popMatrix();
                 }
             }
         }
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
@@ -223,10 +225,10 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         cir.setReturnValue(super.mouseClicked(event, bl));
     }
 
-    @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
-    public void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractTooltip", at = @At("HEAD"), cancellable = true)
+    public void renderTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        super.renderTooltip(guiGraphics, i, j);
+        super.extractTooltip(GuiGraphicsExtractor, i, j);
         if (this.displayRecipes) {
             int size = getRecipes().size();
             boolean sd = LegacyOptions.getUIMode().isSD();
@@ -240,7 +242,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     int s = r * 4 + q;
                     if (s >= size) break block0;
                     if (LegacyRenderUtil.isMouseOver(i, j, stonecuttingPanelX + 1.5 + q * buttonSize, stonecuttingPanelY + 1.5 + p * buttonSize, buttonSize, buttonSize))
-                        guiGraphics.setTooltipForNextFrame(this.font, getResultItem(getRecipes().get(s)), i, j);
+                        GuiGraphicsExtractor.setTooltipForNextFrame(this.font, getResultItem(getRecipes().get(s)), i, j);
                 }
             }
         }

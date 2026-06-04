@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -25,8 +25,8 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
         return this;
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyLoadingAndConnecting.get()) {
             ci.cancel();
             Component lastLoadingHeader = null;
@@ -51,7 +51,7 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
                 progress = -1.0F;
             }
             getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), lastLoadingHeader, lastLoadingStage, progress, genericLoading);
-            getLoadingRenderer().render(guiGraphics, i, j, f);
+            getLoadingRenderer().extractRenderState(GuiGraphicsExtractor, i, j, f);
         }
     }
 }

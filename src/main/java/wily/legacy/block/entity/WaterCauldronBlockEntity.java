@@ -17,6 +17,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -29,6 +30,7 @@ import wily.legacy.init.LegacyRegistries;
 
 public class WaterCauldronBlockEntity extends BlockEntity {
     public Holder<Potion> potion = getDefaultPotion();
+    public PotionContents potionContents = new PotionContents(getDefaultPotion());
     public Holder<Item> lastPotionItemUsed = Items.POTION.builtInRegistryHolder();
     public Integer waterColor;
 
@@ -72,16 +74,42 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         if (waterColor == null) {
             convertTo((LayeredCauldronBlock) Blocks.WATER_CAULDRON);
         } else convertToColored();
-        this.waterColor = waterColor;
+        this.waterColor = waterColor == null ? null : getOpaqueColor(waterColor);
         setChanged();
+    }
+
+    public static int getOpaqueColor(int color) {
+        return 0xFF000000 | color & 0xFFFFFF;
     }
 
     public Holder<Potion> getDefaultPotion() {
         return Potions.WATER;
     }
 
+    public void setPotion(Holder<Potion> potion) {
+        this.potion = potion;
+        potionContents = new PotionContents(potion);
+    }
+
+    public void setPotion(PotionContents potionContents) {
+        this.potionContents = potionContents;
+        potion = potionContents.potion().orElse(null);
+    }
+
+    public PotionContents getPotionContents() {
+        return potionContents;
+    }
+
+    public boolean hasPotion(PotionContents contents) {
+        return potionContents.equals(contents);
+    }
+
+    public int getPotionColor() {
+        return potionContents.getColorOr(-13083194);
+    }
+
     public boolean hasWater() {
-        return potion.value().equals(Potions.WATER.value());
+        return potionContents.is(Potions.WATER);
     }
 
     public Packet<ClientGamePacketListener> getUpdatePacket() {
@@ -92,8 +120,9 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     public void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         waterColor = null;
-        input.getInt("dyeColor").ifPresent(i -> waterColor = i);
-        input.getString("potion").flatMap(id -> BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, Identifier.tryParse(id)))).ifPresent(p -> potion = p);
+        setPotion(getDefaultPotion());
+        input.getInt("dyeColor").ifPresent(i -> waterColor = getOpaqueColor(i));
+        input.read("potionContents", PotionContents.CODEC).ifPresentOrElse(this::setPotion, () -> input.getString("potion").flatMap(id -> BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, Identifier.tryParse(id)))).ifPresent(this::setPotion));
         input.getString("lastPotionItemUsed").flatMap(id -> BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, Identifier.tryParse(id)))).ifPresent(p -> lastPotionItemUsed = p);
     }
 
@@ -103,7 +132,10 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         if (waterColor != null) {
             output.putInt("dyeColor", waterColor);
         }
-        potion.unwrapKey().ifPresent(r -> output.putString("potion", r.identifier().toString()));
+        output.store("potionContents", PotionContents.CODEC, potionContents);
+        if (potion != null) {
+            potion.unwrapKey().ifPresent(r -> output.putString("potion", r.identifier().toString()));
+        }
         lastPotionItemUsed.unwrapKey().ifPresent(r -> output.putString("lastPotionItemUsed", r.identifier().toString()));
     }
 }

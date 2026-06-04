@@ -5,10 +5,11 @@ package wily.legacy.mixin.base.client.cartography;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.component.DataComponents;
         //?}
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.resources.Identifier;
@@ -22,12 +23,16 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryItemUtil;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
@@ -39,7 +44,7 @@ import wily.legacy.util.client.LegacyFontUtil;
 @Mixin(CartographyTableScreen.class)
 public abstract class CartographyTableScreenMixin extends AbstractContainerScreen<CartographyTableMenu> {
 
-    private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
+private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
         public int getWidth() {
             return 23;
         }
@@ -51,11 +56,17 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     };
 
     private EditBox name;
+    private boolean updatingName;
+    private ItemStack lastInput = ItemStack.EMPTY;
     private final ContainerListener listener = new ContainerListener() {
         @Override
         public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
             if (i == 0) {
-                name.setValue(itemStack.isEmpty() ? "" : RenameItemMenu.getItemName(itemStack));
+                ItemStack input = itemStack.isEmpty() ? ItemStack.EMPTY : itemStack.copyWithCount(1);
+                if (!ItemStack.matches(input, lastInput) && !name.isFocused()) {
+                    setNameValue(itemStack.isEmpty() ? "" : RenameItemMenu.getItemName(itemStack));
+                }
+                lastInput = input;
                 name.setEditable(!itemStack.isEmpty());
             }
         }
@@ -73,8 +84,8 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     @Override
     public void init() {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 207;
-        imageHeight = sd ? 165 : 254;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 207);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 165 : 254);
         inventoryLabelX = sd ? 7 : 10;
         inventoryLabelY = sd ? 96 : 144;
         LegacyFontUtil.applySDFont(b -> titleLabelX = (imageWidth - font.width(getTitle())) / 2);
@@ -106,12 +117,14 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
                 LegacySlotDisplay.override(s, inventoryLabelX + s.getContainerSlot() * slotsSize, sd ? 148 : 225, defaultDisplay);
             }
         }
-        menu.addSlotListener(listener);
         this.name = new EditBox(this.font, leftPos + inventoryLabelX, topPos + (sd ? 25 : 38), sd ? 70 : 120, sd ? 13 : 18, Component.empty());
         this.name.setTextColor(-1);
         this.name.setTextColorUneditable(-1);
         this.name.setMaxLength(50);
         this.name.setResponder(s -> {
+            if (updatingName) {
+                return;
+            }
             Slot slot = menu.getSlot(0);
             if (!slot.hasItem())
                 return;
@@ -122,14 +135,25 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
             ((RenameItemMenu) menu).setResultItemName(s);
             minecraft.player.connection.send(new ServerboundRenameItemPacket(s));
         });
-        this.name.setValue("");
+        setNameValue("");
         this.addWidget(this.name);
         this.name.setEditable(this.menu.getSlot(0).hasItem());
+        menu.addSlotListener(listener);
+    }
+
+    @Override
+    protected void setInitialFocus() {
+        super.setInitialFocus();
+        setFocused(null);
+        name.setFocused(false);
     }
 
     public Component getCartographyAction() {
         ItemStack input = menu.getSlot(0).getItem();
         ItemStack input2 = menu.getSlot(1).getItem();
+        if (canUsePaperConversion(input, input2)) {
+            return LegacyComponents.BASIC_MAP;
+        }
         if (input.is(Items.FILLED_MAP)) {
             if (input2.is(Items.PAPER)) return LegacyComponents.ZOOM_MAP;
             else if (input2.is(Items.MAP)) return LegacyComponents.COPY_MAP;
@@ -137,6 +161,10 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
             return LegacyComponents.RENAME_MAP;
         }
         return null;
+    }
+
+    private boolean canUsePaperConversion(ItemStack input, ItemStack input2) {
+        return Legacy4JClient.hasModOnServer() && input.is(Items.PAPER) && input2.isEmpty();
     }
 
     @Override
@@ -147,25 +175,34 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         return super.keyPressed(keyEvent);
     }
 
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        boolean result = super.mouseClicked(event, bl);
+        if (name.isFocused() && !name.isMouseOver(event.x(), event.y())) {
+            setFocused(null);
+            name.setFocused(false);
+        }
+        return result;
+    }
 
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    public void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
-            super.renderLabels(guiGraphics, i, j);
-            guiGraphics.drawString(font, LegacyComponents.MAP_NAME, inventoryLabelX, b ? 18 : 27, CommonColor.GRAY_TEXT.get(), false);
+            super.extractLabels(GuiGraphicsExtractor, i, j);
+            GuiGraphicsExtractor.text(font, LegacyComponents.MAP_NAME, inventoryLabelX, b ? 18 : 27, CommonColor.GRAY_TEXT.get(), false);
             Component cartographyAction = getCartographyAction();
             if (cartographyAction != null)
-                guiGraphics.drawString(font, cartographyAction, (imageWidth - font.width(cartographyAction)) / 2, b ? 86 : 130, CommonColor.GRAY_TEXT.get(), false);
+                GuiGraphicsExtractor.text(font, cartographyAction, (imageWidth - font.width(cartographyAction)) / 2, b ? 86 : 130, CommonColor.GRAY_TEXT.get(), false);
         });
     }
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
     //?} else {
     /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor) {
     }
     *///?}
 
@@ -173,16 +210,22 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     public void repositionElements() {
         String string = this.name.getValue();
         super.repositionElements();
-        this.name.setValue(string);
+        setNameValue(string);
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    private void setNameValue(String value) {
+        updatingName = true;
+        name.setValue(value);
+        updatingName = false;
+    }
+
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        name.render(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.COMBINER_PLUS, leftPos + (sd ? 7 : 14), topPos + (sd ? 56 : 88), 13, 13);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        name.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.COMBINER_PLUS, leftPos + (sd ? 7 : 14), topPos + (sd ? 56 : 88), 13, 13);
         ItemStack input2 = menu.getSlot(1).getItem();
         boolean copy = input2.is(Items.MAP);
         boolean zoom = input2.is(Items.PAPER);
@@ -191,18 +234,20 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         int arrowWidth = sd ? 16 : 22;
         int arrowHeight = sd ? 14 : 15;
         int arrowY = topPos + (sd ? 55 : 87);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW, leftPos + (sd ? 24 : 36), arrowY, arrowWidth, arrowHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ARROW, leftPos + (sd ? 24 : 36), arrowY, arrowWidth, arrowHeight);
         Identifier cartographySprite;
         if (input.is(Items.FILLED_MAP)) {
             MapItemSavedData mapItemSavedData = MapItem.getSavedData(/*? if <1.20.5 {*//*MapItem.getMapId(input)*//*?} else {*/input.get(DataComponents.MAP_ID)/*?}*/, this.minecraft.level);
             if (mapItemSavedData != null && (mapItemSavedData.locked && (zoom || lock) || zoom && mapItemSavedData.scale >= 4))
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, leftPos + (sd ? 26 : 40), arrowY, 15, 15);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ERROR_CROSS, leftPos + (sd ? 26 : 40), arrowY, 15, 15);
             cartographySprite = copy ? LegacySprites.CARTOGRAPHY_TABLE_COPY : zoom ? LegacySprites.CARTOGRAPHY_TABLE_ZOOM : lock ? LegacySprites.CARTOGRAPHY_TABLE_LOCKED : LegacySprites.CARTOGRAPHY_TABLE_MAP;
-        } else
+        } else if (canUsePaperConversion(input, input2))
+            cartographySprite = LegacySprites.CARTOGRAPHY_TABLE_MAP;
+        else
             cartographySprite = LegacySprites.CARTOGRAPHY_TABLE;
 
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(cartographySprite, leftPos + (sd ? 43 : 70), topPos + (sd ? 40 : 61), sd ? 44 : 66, sd ? 44 : 66);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(cartographySprite, leftPos + (sd ? 43 : 70), topPos + (sd ? 40 : 61), sd ? 44 : 66, sd ? 44 : 66);
 
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW, leftPos + (sd ? 91 : 139), arrowY, arrowWidth, arrowHeight);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ARROW, leftPos + (sd ? 91 : 139), arrowY, arrowWidth, arrowHeight);
     }
 }

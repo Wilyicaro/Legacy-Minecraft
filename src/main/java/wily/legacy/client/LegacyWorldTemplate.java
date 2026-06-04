@@ -60,12 +60,11 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
 
         if (checkSum().isEmpty()) return path;
 
-        boolean exists = Files.exists(path);
-        String checksum;
-        if (exists && checkSum().get().equals(readFileCheckSum(path)) || (checksum = readCheckSum(path)) == null || !checkSum().get().equals(checksum))
-            return null;
+        if (Files.exists(path) && checkSum().get().equals(readFileCheckSum(path))) return null;
 
-        return path;
+        String checksum = readCheckSum(path);
+        if (checksum == null) return path;
+        return checkSum().get().equals(checksum) ? path : null;
     }
 
     public void downloadToPathIfPossible() {
@@ -105,7 +104,7 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
         if (!pack.hasWorldTemplate()) return true;
         Path path = downloadedPackPath(pack.id());
         if (!Files.isRegularFile(path)) return false;
-        return pack.worldTemplateCheckSum().map(s -> s.equals(ContentManager.readFileCheckSum(path))).orElse(true);
+        return pack.activeWorldTemplateCheckSum().map(s -> s.equals(ContentManager.readFileCheckSum(path))).orElse(true);
     }
 
     public static void downloadDownloadedPack(ContentManager.Pack pack) throws IOException {
@@ -113,12 +112,12 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
         Path path = downloadedPackPath(pack.id());
         Path temp = Files.createTempFile("legacy_world_", ".mcsave");
         try {
-            try (InputStream stream = pack.worldTemplateDownloadURI().orElseThrow().toURL().openStream()) {
+            try (InputStream stream = pack.activeWorldTemplateDownloadURI().orElseThrow().toURL().openStream()) {
                 Files.copy(stream, temp, StandardCopyOption.REPLACE_EXISTING);
             }
-            if (pack.worldTemplateCheckSum().isPresent()) {
+            if (pack.activeWorldTemplateCheckSum().isPresent()) {
                 String fileHash = ContentManager.readFileCheckSum(temp);
-                if (!pack.worldTemplateCheckSum().get().equals(fileHash)) {
+                if (!pack.activeWorldTemplateCheckSum().get().equals(fileHash)) {
                     throw new IOException("Checksum mismatch for world template " + pack.id());
                 }
             }

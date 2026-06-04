@@ -11,6 +11,12 @@ public class LegacyCommonOptions {
     public static final FactoryConfig.StorageHandler COMMON_STORAGE = new FactoryConfig.StorageHandler(true).withFile("legacy/common.json");
     public static final FactoryConfig<Boolean> legacyCombat = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyCombat", FactoryConfigDisplay.createToggle(optionName("legacyCombat")), true, b -> {}, COMMON_STORAGE));
     public static final FactoryConfig<Boolean> legacySwordBlocking = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacySwordBlocking", FactoryConfigDisplay.createToggle(optionName("legacySwordBlocking")), false, b -> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyBlockProtection = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyBlockProtection", FactoryConfigDisplay.createToggle(optionName("legacyBlockProtection")), true, b -> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyAudio = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyAudio", FactoryConfigDisplay.createToggle(optionName("legacyAudio")), true, b -> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyLootTables = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyLootTables", FactoryConfigDisplay.createToggle(optionName("legacyLootTables")), true, b -> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyMapBehavior = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyMapBehavior", FactoryConfigDisplay.createToggle(optionName("legacyMapBehavior")), true, b -> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyMobInteractions = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyMobInteractions", FactoryConfigDisplay.createToggle(optionName("legacyMobInteractions")), true, b -> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyWorldInteractions = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyWorldInteractions", FactoryConfigDisplay.createToggle(optionName("legacyWorldInteractions")), true, b -> {}, COMMON_STORAGE));
     public static final FactoryConfig<Boolean> squaredViewDistance = COMMON_STORAGE.register(FactoryConfig.createBoolean("squaredViewDistance", FactoryConfigDisplay.createToggle(optionName("squaredViewDistance")), false, b -> {
         if (FactoryAPI.isClient()) Legacy4JClient.updateChunks();
     }, COMMON_STORAGE));

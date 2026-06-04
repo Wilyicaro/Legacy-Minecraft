@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -18,11 +19,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyDragonEggTeleportParticles;
 import wily.legacy.client.ConduitRotationCache;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyInteractionAnimations;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
@@ -60,6 +64,16 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         if (minecraft.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
     }
 
+    @ModifyArg(method = "handleTakeItemEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 1), index = 6)
+    public float handleTakeItemEntityPitch(float pitch) {
+        return Math.max(2.0f, Math.min(4.0f, 3.0f + (pitch - 2.0f) / 1.4f));
+    }
+
+    @ModifyArg(method = "handleTakeItemEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 1), index = 5)
+    public float handleTakeItemEntityVolume(float volume) {
+        return volume * 2.0f;
+    }
+
     @Inject(method = "handlePlayerInfoUpdate", at = @At("RETURN"))
     public void handlePlayerInfoUpdate(ClientboundPlayerInfoUpdatePacket clientboundPlayerInfoUpdatePacket, CallbackInfo ci) {
         Legacy4JClient.onClientPlayerInfoChange();
@@ -73,6 +87,17 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;setServerVerifiedBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V"))
     public void handleDragonEggTeleportBlockUpdate(ClientboundBlockUpdatePacket clientboundBlockUpdatePacket, CallbackInfo ci) {
         LegacyDragonEggTeleportParticles.handleBlockUpdate(level, clientboundBlockUpdatePacket.getPos(), level.getBlockState(clientboundBlockUpdatePacket.getPos()), clientboundBlockUpdatePacket.getBlockState());
+    }
+
+    @Inject(method = "handleAnimate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getEntity(I)Lnet/minecraft/world/entity/Entity;"), cancellable = true)
+    public void handleAnimate(ClientboundAnimatePacket packet, CallbackInfo ci) {
+        if (minecraft.player != null && packet.getId() == minecraft.player.getId() && LegacyInteractionAnimations.consumeServerSwing(legacy$animationHand(packet.getAction()))) ci.cancel();
+    }
+
+    private InteractionHand legacy$animationHand(int action) {
+        if (action == ClientboundAnimatePacket.SWING_MAIN_HAND) return InteractionHand.MAIN_HAND;
+        if (action == ClientboundAnimatePacket.SWING_OFF_HAND) return InteractionHand.OFF_HAND;
+        return null;
     }
 
     @WrapWithCondition(method = /*? if <1.21.2 {*//*"handleContainerSetSlot"*//*?} else {*/"handleSetCursorItem"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
@@ -115,7 +140,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
     @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/network/PacketProcessor;)V", shift = At.Shift.AFTER), cancellable = true)
     public void handleSystemChat(ClientboundSystemChatPacket clientboundSystemChatPacket, CallbackInfo ci) {
-        if (!LegacyOptions.deathMessages.get() && clientboundSystemChatPacket.content().getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.")) {
+        boolean deathMessage = isDeathMessage(clientboundSystemChatPacket.content());
+        if (!LegacyOptions.deathMessages.get() && deathMessage) {
             ci.cancel();
             return;
         }
@@ -127,10 +153,30 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             ci.cancel();
             return;
         }
+        Component content = clientboundSystemChatPacket.content();
+        if (deathMessage && CommonColor.DEATH_MESSAGE_TEXT.isOverridden()) {
+            content = Component.empty().withStyle(s -> s.withColor(CommonColor.DEATH_MESSAGE_TEXT.get() & 0x00FFFFFF)).append(content);
+        }
         if (!LegacyOptions.systemMessagesAsOverlay.get()) {
-            minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);
+            minecraft.getChatListener().handleSystemMessage(content, false);
+            ci.cancel();
+        } else if (content != clientboundSystemChatPacket.content()) {
+            minecraft.getChatListener().handleSystemMessage(content, clientboundSystemChatPacket.overlay());
             ci.cancel();
         }
+    }
+
+    private static boolean isDeathMessage(Component component) {
+        if (component.getContents() instanceof TranslatableContents contents) {
+            if (contents.getKey().startsWith("death.")) return true;
+            for (Object arg : contents.getArgs()) {
+                if (arg instanceof Component child && isDeathMessage(child)) return true;
+            }
+        }
+        for (Component sibling : component.getSiblings()) {
+            if (isDeathMessage(sibling)) return true;
+        }
+        return false;
     }
 
     private static boolean isAdvancementAnnouncement(Component component) {

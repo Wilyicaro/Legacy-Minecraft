@@ -1,8 +1,10 @@
 package wily.legacy.init;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.flag.FeatureFlags;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.RegisterListing;
 import wily.legacy.Legacy4J;
@@ -23,6 +26,8 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacyMerchantMenu;
+import wily.legacy.util.LegacyLootTablesCondition;
+import wily.legacy.util.RandomDifficultyChanceCondition;
 import wily.legacy.util.LegacyTags;
 
 public class LegacyRegistries {
@@ -32,6 +37,10 @@ public class LegacyRegistries {
     private static final RegisterListing<Item> ITEM_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.ITEM);
     private static final RegisterListing<MenuType<?>> MENU_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.MENU);
     private static final RegisterListing<SoundEvent> SOUND_EVENT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.SOUND_EVENT);
+    private static final RegisterListing<MapCodec<? extends LootItemCondition>> LOOT_CONDITION_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.LOOT_CONDITION_TYPE);
+    private static final RegisterListing<Identifier> CUSTOM_STAT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.CUSTOM_STAT);
+    public static final Identifier SKELETON_JOCKEY_STAT = Legacy4J.createModLocation("skeleton_jockey");
+    public static final Identifier DAYS_PLAYED_STAT = Legacy4J.createModLocation("days_played");
 
     public static final RegisterListing.Holder<MenuType<LegacyMerchantMenu>> MERCHANT_MENU = MENU_REGISTER.add("merchant_menu", ()->new MenuType<>(LegacyMerchantMenu::new, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> STONECUTTER_PANEL_MENU = MENU_REGISTER.add("stonecutter_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::stoneCutterMenu, FeatureFlags.VANILLA_SET));
@@ -59,6 +68,11 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.space")));
     public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.backspace")));
     public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.screenshot")));
+    public static final RegisterListing.Holder<SoundEvent> ENTITY_GENERIC_OLD_SPLASH = SOUND_EVENT_REGISTER.add("entity.generic.old_splash", ()-> SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("entity.generic.old_splash")));
+    public static final RegisterListing.Holder<MapCodec<? extends LootItemCondition>> RANDOM_DIFFICULTY_CHANCE = LOOT_CONDITION_REGISTER.add("random_difficulty_chance", () -> RandomDifficultyChanceCondition.CODEC);
+    public static final RegisterListing.Holder<MapCodec<? extends LootItemCondition>> LEGACY_LOOT_TABLES = LOOT_CONDITION_REGISTER.add("legacy_loot_tables", () -> LegacyLootTablesCondition.CODEC);
+    private static final RegisterListing.Holder<Identifier> SKELETON_JOCKEY_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("skeleton_jockey", () -> SKELETON_JOCKEY_STAT);
+    private static final RegisterListing.Holder<Identifier> DAYS_PLAYED_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("days_played", () -> DAYS_PLAYED_STAT);
 
 
     public static boolean isInvalidCauldron(BlockState blockState, Level level, BlockPos blockPos){
@@ -73,5 +87,7 @@ public class LegacyRegistries {
         ITEM_REGISTER.register();
         MENU_REGISTER.register();
         SOUND_EVENT_REGISTER.register();
+        LOOT_CONDITION_REGISTER.register();
+        CUSTOM_STAT_REGISTER.register();
     }
 }

@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -34,12 +34,12 @@ public class SaveInfoScreen extends ConfirmationScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor);
     }
 
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        LegacyRenderUtil.drawAutoSavingIcon(guiGraphics, panel.x + (panel.width - 24) / 2, panel.y + (LegacyOptions.getUIMode().isSD() ? 28 : 36));
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        LegacyRenderUtil.drawAutoSavingIcon(GuiGraphicsExtractor, panel.x + (panel.width - 24) / 2, panel.y + (LegacyOptions.getUIMode().isSD() ? 28 : 36));
     }
 }

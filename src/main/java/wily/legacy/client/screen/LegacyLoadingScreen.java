@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.util.Util;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -171,16 +171,16 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         renderer.prepareRender(minecraft, UIAccessor.of(this));
-        renderer.renderBackground(guiGraphics, i, j, f);
+        renderer.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
     //?}
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        renderer.renderForeground(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        renderer.renderForeground(GuiGraphicsExtractor, i, j, f);
     }
 
     @Override

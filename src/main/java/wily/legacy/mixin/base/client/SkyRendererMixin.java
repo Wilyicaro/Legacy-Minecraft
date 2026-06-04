@@ -14,7 +14,7 @@ import com.mojang.blaze3d.systems.RenderPass;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SkyRenderer;
-import net.minecraft.client.renderer.state.SkyRenderState;
+import net.minecraft.client.renderer.state.level.SkyRenderState;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -60,7 +60,6 @@ public class SkyRendererMixin {
     private void useLegacySunriseColor(ClientLevel level, float partialTick, Camera camera, SkyRenderState state, CallbackInfo ci) {
         if (LegacyCloudAtmosphere.shouldUseConsoleAtmosphere(level)) {
             state.sunriseAndSunsetColor = LegacyCloudAtmosphere.getSunriseAndSunsetColor(level, partialTick);
-            state.skyColor = LegacyCloudAtmosphere.getSkyColor(level, camera, partialTick);
         }
     }
 

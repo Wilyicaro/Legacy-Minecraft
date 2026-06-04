@@ -109,7 +109,7 @@ public final class SkinPackLang {
             JsonObject obj = readObj(resource);
             if (obj == null) continue;
             for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
-                String key = entry.getKey();
+            String key = entry.getKey();
                 if (key == null || key.isBlank()) continue;
                 String value = stringValue(entry.getValue());
                 if (value != null && !value.isEmpty()) {

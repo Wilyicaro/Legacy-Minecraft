@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
@@ -121,16 +121,16 @@ public class TabList implements Renderable, GuiEventListener, NarratableEntry, N
     }
 
     @Override
-    public void render(GuiGraphics graphics, int i, int j, float f) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
         for (LegacyTabButton tabButton : tabButtons) {
             tabButton.selected = tabButton == selected;
             if (tabButton == selected) continue;
-            tabButton.render(graphics, i, j, f);
+            tabButton.extractRenderState(graphics, i, j, f);
         }
     }
 
-    public void renderSelected(GuiGraphics graphics, int i, int j, float f) {
-        if (selected != null) selected.render(graphics, i, j, f);
+    public void renderSelected(GuiGraphicsExtractor graphics, int i, int j, float f) {
+        if (selected != null) selected.extractRenderState(graphics, i, j, f);
     }
 
     public void resetSelectedTab() {

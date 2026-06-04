@@ -26,7 +26,7 @@ public class ChunkTrackingViewMixin {
     @Inject(method = "contains", at = @At("HEAD"), cancellable = true)
     private void isWithinDistance(int i, int j, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         if (LegacyCommonOptions.squaredViewDistance.get())
-            cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(center.x, center.z, viewDistance, i, j, false));
+            cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(center.x(), center.z(), viewDistance, i, j, false));
     }
 }
 //?}

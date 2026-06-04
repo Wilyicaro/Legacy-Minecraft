@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -19,18 +19,18 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         if (parent != null) {
-            guiGraphics.nextStratum();
-            parent.renderBackground(guiGraphics, 0, 0, f);
-            guiGraphics.nextStratum();
-            parent.render(guiGraphics, 0, 0, f);
-            guiGraphics.deferredTooltip = null;
+            GuiGraphicsExtractor.nextStratum();
+            parent.extractBackground(GuiGraphicsExtractor, 0, 0, f);
+            GuiGraphicsExtractor.nextStratum();
+            parent.extractRenderState(GuiGraphicsExtractor, 0, 0, f);
+            GuiGraphicsExtractor.deferredTooltip = null;
         }
 
         if (darkBackground) {
-            renderTransparentBackground(guiGraphics);
-            LegacyRenderUtil.renderUsername(guiGraphics);
+            extractTransparentBackground(GuiGraphicsExtractor);
+            LegacyRenderUtil.renderUsername(GuiGraphicsExtractor);
         }
     }
 

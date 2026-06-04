@@ -14,7 +14,7 @@ public interface PlayerYBobbing {
     }
 
     static float getAngle(Minecraft minecraft, float partialTicks) {
-        return minecraft.getCameraEntity() instanceof ClientAvatarEntity player && !minecraft.player.getAbilities().flying ? of(player.avatarState()).getAngle(partialTicks) : 0;
+        return minecraft.gameRenderer != null && minecraft.player != null && minecraft.getCameraEntity() instanceof ClientAvatarEntity player && !minecraft.player.getAbilities().flying ? of(player.avatarState()).getAngle(partialTicks) : 0;
     }
 
     float yBob();

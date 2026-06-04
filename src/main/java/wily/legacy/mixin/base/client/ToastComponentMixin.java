@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
@@ -27,13 +27,13 @@ public abstract class ToastComponentMixin {
 
     //? if <=1.20.1 {
     /*@Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void render(int i, GuiGraphics guiGraphics, CallbackInfoReturnable<Boolean> cir){
+    private void render(int i, GuiGraphicsExtractor GuiGraphicsExtractor, CallbackInfoReturnable<Boolean> cir){
         if (!MinecraftAccessor.getInstance().hasGameLoaded()) cir.setReturnValue(false);
     }
     *///?}
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", remap = false))
-    private Matrix3x2f render(Matrix3x2fStack instance, float f, float g, /*? if >=1.21.2 {*/GuiGraphics guiGraphics, /*?}*/int i) {
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    private Matrix3x2f render(Matrix3x2fStack instance, float f, float g, /*? if >=1.21.2 {*/GuiGraphicsExtractor GuiGraphicsExtractor, /*?}*/int i) {
         return instance.translate((i - this.toast.width()) / 2f, -toast.height() + ((LegacyOptions.getUIMode().isSD() ? 20 : 50) + toast.height() + this./*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/ * 32f) * /*? if <1.21.2 {*//*this.getVisibility(Util.getMillis())*//*?} else {*/visiblePortion/*?}*/);
     }
 }

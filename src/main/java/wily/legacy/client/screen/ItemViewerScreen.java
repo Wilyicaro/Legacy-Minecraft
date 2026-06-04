@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -151,18 +151,18 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
         setHoveredSlot(null);
         for (LegacySlotWidget slotWidget : slotWidgets) {
             slotWidget.isHovered = LegacyRenderUtil.isHovering(slotWidget.slot, panel.x, panel.y, i, j);
             if (slotWidget.isHovered)
                 setHoveredSlot(slotWidget.slot);
             slotWidget.slotBoundsWithItem(panel.x, panel.y, slotWidget.slot);
-            slotWidget.render(guiGraphics, i, j, f);
+            slotWidget.extractRenderState(GuiGraphicsExtractor, i, j, f);
         }
         if (hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
-            guiGraphics.setTooltipForNextFrame(font, hoveredSlot.getItem(), i, j);
+            GuiGraphicsExtractor.setTooltipForNextFrame(font, hoveredSlot.getItem(), i, j);
     }
 
     @Override
@@ -171,14 +171,14 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        panel.render(guiGraphics, i, j, f);
-        renderScroll(guiGraphics, i, j, f);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, false);
+        panel.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        renderScroll(GuiGraphicsExtractor, i, j, f);
     }
 
-    protected void renderScroll(GuiGraphics guiGraphics, int i, int j, float f) {
-        scroller.render(guiGraphics, i, j, f);
+    protected void renderScroll(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        scroller.extractRenderState(GuiGraphicsExtractor, i, j, f);
     }
 
     @Override

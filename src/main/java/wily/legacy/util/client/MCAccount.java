@@ -33,8 +33,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
@@ -803,10 +803,10 @@ public interface MCAccount {
             Component success = Component.translatable("legacy.menu.choose_user.success", user.getName());
             FactoryAPIClient.getToasts().addToast(new LegacyTip(success, Minecraft.getInstance().font.width(success) + 110, 46) {
                 @Override
-                public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
-                    super.renderTip(guiGraphics, i, j, f, l);
+                public void renderTip(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, float l) {
+                    super.renderTip(GuiGraphicsExtractor, i, j, f, l);
                     GameProfile profile = /*? if >1.20.2 {*/Minecraft.getInstance().getGameProfile()/*?} else {*//*user.getGameProfile()*//*?}*/;
-                    PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().getSkinManager().createLookup(profile, true).get(), 7, (height() - 32) / 2, 32);
+                    PlayerFaceExtractor.extractRenderState(GuiGraphicsExtractor, Minecraft.getInstance().getSkinManager().createLookup(profile, true).get(), 7, (height() - 32) / 2, 32);
                 }
             }.centered().disappearTime(2400).canRemove(() -> user != Minecraft.getInstance().getUser()));
             lastSessionCheck.set(null);

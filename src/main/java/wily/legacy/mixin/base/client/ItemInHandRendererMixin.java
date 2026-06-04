@@ -9,29 +9,32 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.FirstPersonDropAnimation;
+import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
-    private static final int LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS = 4;
-    private static final float LEGACY_TRIDENT_FIRST_PERSON_EXTRA_RAISE_TICKS = 0.75F;
-    private static final float LEGACY_TRIDENT_FIRST_PERSON_POSE_Y_OFFSET = 0.125F;
-
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -48,6 +51,12 @@ public abstract class ItemInHandRendererMixin {
     @Shadow
     public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3, PoseStack arg4, SubmitNodeCollector arg5, int i);
 
+    @Unique
+    private boolean legacy$mainHandWasEmptyMap;
+
+    @Unique
+    private boolean legacy$offHandWasEmptyMap;
+
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
@@ -62,12 +71,51 @@ public abstract class ItemInHandRendererMixin {
     public void renderItemLight(float f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, LocalPlayer localPlayer, int i, CallbackInfo ci, @Local(ordinal = 0, argsOnly = true) LocalIntRef original) {
         int light = getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
         if (LegacyOptions.itemLightingInHand.get() && light > 0)
-            original.set(LightTexture.pack(light, LightTexture.sky(i)));
+            original.set(LightCoordsUtil.pack(light, LightCoordsUtil.sky(i)));
+        updateMapFillAnimation(localPlayer.getMainHandItem(), true);
+        updateMapFillAnimation(localPlayer.getOffhandItem(), false);
     }
 
     @Unique
     private int getLight(ItemStack mainHand, ItemStack offHand) {
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
+    }
+
+    @Unique
+    private void updateMapFillAnimation(ItemStack itemStack, boolean mainHand) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            legacy$setWasEmptyMap(itemStack, mainHand);
+            return;
+        }
+        boolean wasEmptyMap = mainHand ? legacy$mainHandWasEmptyMap : legacy$offHandWasEmptyMap;
+        if (wasEmptyMap && itemStack.is(Items.FILLED_MAP)) {
+            MapId mapId = itemStack.get(DataComponents.MAP_ID);
+            if (mapId != null) LegacyMapFillAnimation.start(mapId, legacy$isStackedMap(itemStack, mapId));
+        }
+        legacy$setWasEmptyMap(itemStack, mainHand);
+    }
+
+    @Unique
+    private void legacy$setWasEmptyMap(ItemStack itemStack, boolean mainHand) {
+        if (mainHand) {
+            legacy$mainHandWasEmptyMap = itemStack.is(Items.MAP);
+        } else {
+            legacy$offHandWasEmptyMap = itemStack.is(Items.MAP);
+        }
+    }
+
+    @Unique
+    private boolean legacy$isStackedMap(ItemStack itemStack, MapId mapId) {
+        if (minecraft.player == null) return false;
+        int count = 0;
+        Inventory inventory = minecraft.player.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            if (stack.is(Items.FILLED_MAP) && mapId.equals(stack.get(DataComponents.MAP_ID))) {
+                count += stack.getCount();
+            }
+        }
+        return count > itemStack.getCount();
     }
 
     @ModifyExpressionValue(method = "renderOneHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
@@ -98,6 +146,12 @@ public abstract class ItemInHandRendererMixin {
     private void renderArmWithItem(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int j, CallbackInfo ci) {
         HumanoidArm humanoidArm = interactionHand == InteractionHand.MAIN_HAND ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
+        if (interactionHand == InteractionHand.MAIN_HAND && FirstPersonDropAnimation.isActive(f) && !abstractClientPlayer.isUsingItem()) {
+            renderDropAnimation(abstractClientPlayer, itemStack, humanoidArm, h, i, f, poseStack, submitNodeCollector, j);
+            ci.cancel();
+            poseStack.popPose();
+            return;
+        }
         if (abstractClientPlayer.getUseItem().is(Items.CROSSBOW)) {
             if (abstractClientPlayer.isUsingItem() && abstractClientPlayer.getUseItemRemainingTicks() > 0 && abstractClientPlayer.getUsedItemHand() == interactionHand) {
                 if (!abstractClientPlayer.isInvisible() || Legacy4JClient.isHostInvisible(abstractClientPlayer)) {
@@ -139,14 +193,20 @@ public abstract class ItemInHandRendererMixin {
             poseStack.popPose();
             return;
         }
-        if (!abstractClientPlayer.isUsingItem() || abstractClientPlayer.getUseItemRemainingTicks() <= 0 || abstractClientPlayer.getUsedItemHand() != interactionHand || itemStack.getUseAnimation() != /*? if <1.21.11 {*//*ItemUseAnimation.SPEAR*//*?} else {*/ItemUseAnimation.TRIDENT/*?}*/) {
+    }
+
+    @Unique
+    private void renderDropAnimation(AbstractClientPlayer player, ItemStack itemStack, HumanoidArm arm, float swingProgress, float equipProgress, float partialTick, PoseStack poseStack, SubmitNodeCollector collector, int light) {
+        float progress = FirstPersonDropAnimation.progress(partialTick);
+        float offset = Mth.sin(progress * (float) Math.PI);
+        if (itemStack.isEmpty()) {
+            poseStack.translate(0.0F, -0.5F * offset, 0.0F);
+            if (!player.isInvisible() || Legacy4JClient.isHostInvisible(player)) renderPlayerArm(poseStack, collector, light, equipProgress, swingProgress, arm);
             return;
         }
-        applyLegacyTridentFirstPersonTransform(abstractClientPlayer, itemStack, humanoidArm, i, k, f, poseStack);
-        this.renderItem(abstractClientPlayer, itemStack, humanoidArm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, submitNodeCollector, j);
-        ci.cancel();
-        poseStack.popPose();
-
+        applyItemArmTransform(poseStack, arm, equipProgress);
+        poseStack.translate(0.0F, -0.5F * offset, 0.0F);
+        renderItem(player, itemStack, arm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, collector, light);
     }
 
     @Unique
@@ -157,47 +217,6 @@ public abstract class ItemInHandRendererMixin {
         poseStack.translate((float) k * lx, mx, n);
         this.applyItemArmTransform(poseStack, humanoidArm, i);
         this.applyItemArmAttackTransform(poseStack, humanoidArm, h);
-    }
-
-    @Unique
-    private void applyLegacyTridentFirstPersonTransform(AbstractClientPlayer abstractClientPlayer, ItemStack itemStack, HumanoidArm humanoidArm, float equipProgress, int armDirection, float partialTick, PoseStack poseStack) {
-        this.applyItemArmTransform(poseStack, humanoidArm, equipProgress);
-        float useTicks = (float) itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float) abstractClientPlayer.getUseItemRemainingTicks() - partialTick + 1.0F);
-        float progress = getLegacyTridentFirstPersonProgress(useTicks);
-        poseStack.translate(0.0F, LEGACY_TRIDENT_FIRST_PERSON_POSE_Y_OFFSET, 0.0F);
-        poseStack.translate(armDirection * -0.5F * progress, 0.7F * progress, 0.1F * progress);
-        poseStack.mulPose(Axis.XP.rotationDegrees(-55.0F * progress));
-        poseStack.mulPose(Axis.YP.rotationDegrees(armDirection * 35.3F * progress));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(armDirection * -9.785F * progress));
-        if (progress > 0.1F) {
-            float bob = Mth.sin((useTicks - 0.1F) * 1.3F);
-            float bobStrength = bob * (progress - 0.1F) * progress;
-            poseStack.translate(0.0F, bobStrength * 0.004F, 0.0F);
-        }
-        poseStack.translate(0.0F, 0.0F, progress * 0.2F);
-        poseStack.scale(1.0F, 1.0F, 1.0F + progress * 0.2F);
-        poseStack.mulPose(Axis.YN.rotationDegrees(armDirection * 45.0F * progress));
-    }
-
-    @Unique
-    private float getLegacyTridentFirstPersonProgress(float useTicks) {
-        float adjustedTicks = Mth.clamp(useTicks * LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS / (LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS + LEGACY_TRIDENT_FIRST_PERSON_EXTRA_RAISE_TICKS), 0.0F, (float) LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS);
-        int lowerTick = Mth.floor(adjustedTicks);
-        int upperTick = Math.min(lowerTick + 1, LEGACY_TRIDENT_FIRST_PERSON_RAISE_TICKS);
-        return Mth.lerp(adjustedTicks - lowerTick, getLegacyTridentFirstPersonRaiseSample(lowerTick), getLegacyTridentFirstPersonRaiseSample(upperTick));
-    }
-
-    @Unique
-    private float getLegacyTridentFirstPersonRaiseSample(int ticksUsingItem) {
-        return switch (ticksUsingItem) {
-            case 0 -> 0.0F;
-            case 1 -> 0.70F;
-            case 2 -> 0.76F;
-            case 3 -> 0.82F;
-            case 4 -> 0.88F;
-            case 5 -> 0.94F;
-            default -> 1.0F;
-        };
     }
 
     //? if <1.21.4 {

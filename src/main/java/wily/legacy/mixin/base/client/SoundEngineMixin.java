@@ -3,20 +3,24 @@ package wily.legacy.mixin.base.client;
 import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.Options;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.SoundEngineAccessor;
+import wily.legacy.config.LegacyCommonOptions;
 
 import java.util.List;
 import java.util.Map;
@@ -54,6 +58,11 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @Shadow
     protected abstract float calculateVolume(SoundInstance arg);
+
+    @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
+    private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && sound.getIdentifier().equals(SoundEvents.ITEM_PICKUP.location()) ? 4.0f : max;
+    }
 
     @Override
     public void stopAllSound() {

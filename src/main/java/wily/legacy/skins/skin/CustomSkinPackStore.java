@@ -3,6 +3,7 @@ package wily.legacy.skins.skin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.repository.PackRepository;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 
 import java.io.IOException;
@@ -75,6 +76,18 @@ public final class CustomSkinPackStore {
         return SkinPackFiles.managesTargetDirectory(folderName, TARGET_DIRECTORY_NAME);
     }
 
+    public static boolean isManagedResourcePackId(String packId) {
+        return RESOURCE_PACK_ID.equals(packId) || RESOURCE_PACK_DIR.equals(packId);
+    }
+
+    public static List<String> preserveSelection(PackRepository repository, List<String> selectedIds) {
+        ArrayList<String> selected = new ArrayList<>(selectedIds);
+        if (repository == null) return selected;
+        String resolvedId = repository.getPack(RESOURCE_PACK_ID) != null ? RESOURCE_PACK_ID : repository.getPack(RESOURCE_PACK_DIR) != null ? RESOURCE_PACK_DIR : null;
+        if (resolvedId != null && !selected.contains(resolvedId)) selected.add(resolvedId);
+        return selected;
+    }
+
     public static void normalizeDownloadedPack(Path packDir) throws IOException {
         DownloadedSkinPackStore.normalizePack(packDir, "community");
     }
@@ -132,7 +145,7 @@ public final class CustomSkinPackStore {
 
     public static void deleteSkin(Minecraft minecraft, String packId, String skinId) throws IOException {
         Path dir = requirePackDir(minecraft, packId);
-        requireEditableSkin(minecraft, packId, skinId, "removed");
+        if (skinId == null || skinId.isBlank()) throw new IOException("Custom skin was not found");
         Path packJson = dir.resolve("pack.json");
         ArrayList<JsonObject> skins = SkinPackJson.readOrderedSkins(packJson);
         int index = SkinPackJson.indexOfSkin(skins, skinId);

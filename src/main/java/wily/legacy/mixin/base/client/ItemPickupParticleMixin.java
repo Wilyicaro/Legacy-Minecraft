@@ -36,7 +36,7 @@ public abstract class ItemPickupParticleMixin extends Particle implements Legacy
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void init(CallbackInfo info) {
-        if (LegacyOptions.legacyItemPickup.get()) lifetime += level.random.nextInt(8);
+        if (LegacyOptions.legacyItemPickup.get()) lifetime += level.getRandom().nextInt(8);
     }
 
     @Override

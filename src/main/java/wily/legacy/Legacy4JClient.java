@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.*;
 //? if <1.21.5 {
 /*import net.minecraft.client.resources.model.BakedModel;
  *///?} else {
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 //?}
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -49,6 +49,15 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+//? if neoforge && >=26.1 {
+/*import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.repository.KnownPack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.resource.JarContentsPackResources;
+*///?}
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.entity.Entity;
@@ -96,10 +105,11 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
-//? if fabric || >=1.21 && neoforge {
-/*import wily.legacy.client.screen.compat.IrisCompat;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
+//? if fabric || (>=1.21 && neoforge) {
+import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
-*///?}
+//?}
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -110,6 +120,7 @@ import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
+import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
 
@@ -300,7 +311,6 @@ public class Legacy4JClient {
 
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
-        if (LegacyOptions.unfocusedInputs.get()) minecraft.setWindowActive(true);
         while (keyCrafting.consumeClick()) {
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
                 if (minecraft.player.isSpectator()) minecraft.gui.getSpectatorGui().onHotbarActionKeyPressed();
@@ -396,7 +406,10 @@ public class Legacy4JClient {
                 controllerManager.enableCursorAndScheduleReset();
             if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
-                if (path != null) path.applyFocus(true);
+                if (path != null) {
+                    path.applyFocus(true);
+                    LegacyRenderUtil.autoFocusedWidget = true;
+                }
             }
         }
         controllerManager.resetCursor();
@@ -416,6 +429,7 @@ public class Legacy4JClient {
 
     public static void init() {
         SkinsClientBootstrap.init();
+        GlobalLeaderboardsFeature.init();
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT.get() && LegacyOptions.forceLegacyFlight.get()) return true;
             if (key == LegacyGameRules.LEGACY_SWIMMING.get() && LegacyOptions.forceLegacySwimming.get()) return true;
@@ -471,13 +485,13 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
-            FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
+            LegacyRenderDistance.initDefault();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
-            //? if fabric || >=1.21 && neoforge {
-            /*if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+            //? if fabric || (>=1.21 && neoforge) {
+            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            *///?}
+            //?}
             LegacyGuiElements.setup(m);
 
             HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
@@ -494,24 +508,42 @@ public class Legacy4JClient {
         });
 
         FactoryAPIClient.registerBlockColor(registry -> {
-            registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos), SHRUB.get());
-            BlockColor blockColor = (blockState, blockAndTintGetter, blockPos, i) -> {
-                if (blockAndTintGetter != null && blockPos != null) {
-                    BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
-                    if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOptions.enhancedPistonMovingRenderer.get()) {
-                        blockEntity = e.getRenderingBlockEntity();
-                    }
-                    if (blockEntity instanceof WaterCauldronBlockEntity be) {
-                        if (!be.hasWater())
-                            return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*//*PotionContents.getColor*//*?} else {*/PotionContents.getColorOptional/*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*/.orElse(-13083194)/*?}*/;
-                        else if (be.waterColor != null) return be.waterColor;
-                    }
-                    return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
+            registry.accept(List.of(new BlockTintSource() {
+                @Override
+                public int color(BlockState blockState) {
+                    return GrassColor.getDefaultColor();
                 }
-                return -1;
+
+                @Override
+                public int colorInWorld(BlockState blockState, net.minecraft.client.renderer.block.BlockAndTintGetter blockAndTintGetter, BlockPos blockPos) {
+                    return blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos);
+                }
+            }), SHRUB.get());
+            BlockTintSource blockColor = new BlockTintSource() {
+                @Override
+                public int color(BlockState blockState) {
+                    return -1;
+                }
+
+                @Override
+                public int colorInWorld(BlockState blockState, net.minecraft.client.renderer.block.BlockAndTintGetter blockAndTintGetter, BlockPos blockPos) {
+                    if (blockAndTintGetter != null && blockPos != null) {
+                        BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
+                        if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOptions.enhancedPistonMovingRenderer.get()) {
+                            blockEntity = e.getRenderingBlockEntity();
+                        }
+                        if (blockEntity instanceof WaterCauldronBlockEntity be) {
+                            if (!be.hasWater())
+                                return be.getPotionColor();
+                            else if (be.waterColor != null) return WaterCauldronBlockEntity.getOpaqueColor(be.waterColor);
+                        }
+                        return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
+                    }
+                    return -1;
+                }
             };
-            registry.accept(blockColor, Blocks.WATER_CAULDRON);
-            registry.accept(blockColor, LegacyRegistries.COLORED_WATER_CAULDRON.get());
+            registry.accept(List.of(blockColor), Blocks.WATER_CAULDRON);
+            registry.accept(List.of(blockColor), LegacyRegistries.COLORED_WATER_CAULDRON.get());
         });
         fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_oak_leaves"));
         fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPI.createVanillaLocation("fast_spruce_leaves"));
@@ -549,16 +581,7 @@ public class Legacy4JClient {
             knownBlocks.save();
             knownEntities.save();
         });
-        FactoryEvent.registerBuiltInPacks(registry -> {
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
-            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
-            if (FactoryAPI.getLoader().isForgeLike()) {
-                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
-                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
-            }
-        });
+        registerBuiltInPacks();
         LegacyUIElementTypes.init();
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(ThrownTridentRenderState.class, LoyaltyLinesRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(FireworkRocketRenderState.class, LegacyFireworkRenderState::new));
@@ -601,7 +624,20 @@ public class Legacy4JClient {
             TopMessage.setMedium(null);
         });
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID), Legacy4JSettingsScreen::new);
-        FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options));
+        FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options, false));
+    }
+
+    private static void registerBuiltInPacks() {
+        FactoryEvent.registerBuiltInPacks(registry -> {
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
+            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
+            if (FactoryAPI.getLoader().isForgeLike()) {
+                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+            }
+        });
     }
 
     public static void updateChunks() {
@@ -625,7 +661,13 @@ public class Legacy4JClient {
         }
     }
 
-    public static BlockStateModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
+    public static BlockStateModel getBlockModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*//*BakedModel*//*?} else {*/BlockStateModel/*?}*/ model) {
+        BlockStateModel featureModel = LegacyChunkLoading.getFeatureModel(pos, blockState, model);
+        if (featureModel != model) return featureModel;
+
+        BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
+        if (torchModel != model) return torchModel;
+
         boolean fastGraphics = !Minecraft.getInstance().options.cutoutLeaves().get();
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())) {
             if (!fastGraphics && blockGetter != null) {
@@ -668,8 +710,8 @@ public class Legacy4JClient {
         }
         LegacyOptions.CLIENT_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyOptions.CLIENT_STORAGE.save();
-        LegacyCommonOptions.COMMON_STORAGE.save();
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(FactoryConfig::reset);
+        LegacyCommonOptions.COMMON_STORAGE.save();
         minecraft.options.save();
     }
 

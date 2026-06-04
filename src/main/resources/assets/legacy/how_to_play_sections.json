@@ -127,6 +127,66 @@
     "ui_definition": "legacy:how_to_play/conduit"
   },
   {
+    "title": {"translate": "legacy.menu.how_to_play.scaffolding"},
+    "ui_definition": "legacy:how_to_play/scaffolding"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.raids"},
+    "ui_definition": "legacy:how_to_play/raids"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.bees"},
+    "ui_definition": "legacy:how_to_play/bees"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.piglins"},
+    "ui_definition": "legacy:how_to_play/piglins"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.netherite"},
+    "ui_definition": "legacy:how_to_play/netherite"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.sculk-sensor"},
+    "ui_definition": "legacy:how_to_play/sculk-sensor"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.deep-dark"},
+    "ui_definition": "legacy:how_to_play/deep-dark"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.archaeology"},
+    "ui_definition": "legacy:how_to_play/archaeology"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.armor-trims"},
+    "ui_definition": "legacy:how_to_play/armor-trims"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.trial-chamber"},
+    "ui_definition": "legacy:how_to_play/trial-chamber"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.autocrafter"},
+    "ui_definition": "legacy:how_to_play/autocrafter"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.bundle"},
+    "ui_definition": "legacy:how_to_play/bundle"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.pale-garden"},
+    "ui_definition": "legacy:how_to_play/pale-garden"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.happy-ghast"},
+    "ui_definition": "legacy:how_to_play/happy-ghast"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.copper-golem"},
+    "ui_definition": "legacy:how_to_play/copper-golem"
+  },
+  {
     "title": {"translate": "legacy.menu.how_to_play.host-and-player-options"},
     "ui_definition": "legacy:how_to_play/host-and-player-options"
   }

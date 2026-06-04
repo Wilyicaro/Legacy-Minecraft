@@ -1,9 +1,10 @@
 package wily.legacy.skins.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.skins.api.ui.LegacySkinUi;
+import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.SkinEntry;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
@@ -14,6 +15,8 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     private final LegacySkinUi.Adapter adapter;
     private final LinkedHashMap<String, SkinPack> packs = new LinkedHashMap<>();
     private final LinkedHashMap<String, SkinEntry> skins = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> skinThemes = new LinkedHashMap<>();
+    private final LinkedHashMap<String, EnumSet<SkinPoseRegistry.PoseTag>> skinPoses = new LinkedHashMap<>();
     private final LinkedHashMap<String, String> packSubtitles = new LinkedHashMap<>();
     private final Set<String> favoriteSkinIds = new LinkedHashSet<>();
     private int stateHash = Integer.MIN_VALUE;
@@ -31,6 +34,23 @@ final class SkinUiSource implements ChangeSkinScreenSource {
         return new SkinEntry(skin.id(), skin.sourceId(), skin.name(), skin.texture(), skin.modelId(), skin.cape(), skin.slimArms(), order, skin.fair());
     }
 
+    private static EnumSet<SkinPoseRegistry.PoseTag> poseTags(List<String> poses) {
+        EnumSet<SkinPoseRegistry.PoseTag> out = EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
+        if (poses == null || poses.isEmpty()) return out;
+        for (String pose : poses) {
+            SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(pose);
+            if (tag != null) out.add(tag);
+        }
+        return out;
+    }
+
+    private static void addPoseTags(Map<String, EnumSet<SkinPoseRegistry.PoseTag>> poses, String skinId, EnumSet<SkinPoseRegistry.PoseTag> tags) {
+        if (skinId == null || tags == null || tags.isEmpty()) return;
+        EnumSet<SkinPoseRegistry.PoseTag> existing = poses.get(skinId);
+        if (existing == null) poses.put(skinId, EnumSet.copyOf(tags));
+        else existing.addAll(tags);
+    }
+
     @Override
     public Map<String, SkinPack> packs() {
         refresh();
@@ -41,6 +61,21 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     public @Nullable SkinEntry skin(String id) {
         refresh();
         return id == null ? null : skins.get(id);
+    }
+
+    @Override
+    public String skinName(@Nullable String skinId) {
+        refresh();
+        SkinEntry entry = skinId == null ? null : skins.get(skinId);
+        return entry == null ? (skinId == null ? "" : skinId) : entry.name();
+    }
+
+    @Override
+    public @Nullable String skinTheme(@Nullable String skinId) {
+        refresh();
+        if (skinId == null) return null;
+        String theme = skinThemes.get(skinId);
+        return theme == null ? ChangeSkinScreenSource.super.skinTheme(skins.get(skinId)) : theme;
     }
 
     @Override
@@ -88,7 +123,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     }
 
     @Override
-    public boolean renderPreview(GuiGraphics graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
+    public boolean renderPreview(GuiGraphicsExtractor graphics, String skinId, float yawOffset, boolean crouchPose, float attackTime, float partialTick, int left, int top, int right, int bottom) {
         if (!skins.containsKey(skinId)) return false;
         adapter.renderPreview(new LegacySkinUi.PreviewContext(
                 graphics,
@@ -190,7 +225,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     }
                     String skinId = SkinIdUtil.trimToNull(apiSkin.id());
                     boolean favorite = favorites && skinId != null && adapter.isFavorite(skinId);
-                    nextStateHash = 31 * nextStateHash + Objects.hash(skinId, apiSkin.title(), favorite);
+                    nextStateHash = 31 * nextStateHash + Objects.hash(skinId, apiSkin.title(), apiSkin.theme(), apiSkin.poses(), favorite);
                 }
             }
         }
@@ -198,11 +233,16 @@ final class SkinUiSource implements ChangeSkinScreenSource {
         stateHash = nextStateHash;
         packs.clear();
         skins.clear();
+        skinThemes.clear();
+        skinPoses.clear();
         packSubtitles.clear();
         favoriteSkinIds.clear();
         appliedSkinId = selectedSkinId == null ? null : SkinIdUtil.isAutoSelect(selectedSkinId) ? "" : selectedSkinId;
         int packOrder = 0;
-        if (adapterPacks == null) return;
+        if (adapterPacks == null) {
+            SkinPoseRegistry.setApiPoseTags(skinPoses);
+            return;
+        }
         for (LegacySkinUi.Pack apiPack : adapterPacks) {
             String packId = SkinIdUtil.trimToNull(apiPack == null ? null : apiPack.id());
             if (packId == null || packs.containsKey(packId)) continue;
@@ -218,6 +258,9 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     skin = new SkinEntry(skinId, skinId, apiSkin.title(), null, null, null, false, order, false);
                     skins.put(skinId, skin);
                 }
+                String theme = SkinIdUtil.trimToNull(apiSkin.theme());
+                if (theme != null) skinThemes.putIfAbsent(skinId, theme);
+                addPoseTags(skinPoses, skinId, poseTags(apiSkin.poses()));
                 if (favorites && adapter.isFavorite(skinId)) favoriteSkinIds.add(skinId);
                 packSkins.put(skinId, skin.order() == order ? skin : orderedSkin(skin, order));
             }
@@ -234,6 +277,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                     0
             ));
         }
+        SkinPoseRegistry.setApiPoseTags(skinPoses);
     }
 
     private @Nullable String findPackId(String skinId) {
@@ -244,7 +288,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
 
     private @Nullable String findPackId(String skinId, boolean favoritesOnly) {
         for (Map.Entry<String, SkinPack> entry : packs.entrySet()) {
-            String packId = entry.getKey();
+        String packId = entry.getKey();
             if (favoritesOnly != SkinIdUtil.isFavouritesPack(packId)) continue;
             for (SkinEntry skin : entry.getValue().skins()) {
                 if (skin != null && skinId.equals(skin.id())) return packId;

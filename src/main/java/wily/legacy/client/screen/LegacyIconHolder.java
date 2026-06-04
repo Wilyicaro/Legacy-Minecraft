@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -12,6 +12,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
@@ -19,8 +20,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,11 +35,15 @@ import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.LegacyTags;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
+    private static final float ITEM_PADDING = 1.0f;
+    private static final float ITEM_SCALE = 14.0f / 16.0f;
+    private static final float TRAPDOOR_Y_OFFSET = -2.0f;
     public Vec2 offset = Vec2.ZERO;
     public Identifier iconSprite = null;
     public ArbitrarySupplier<Identifier> iconHolderOverride = null;
@@ -69,9 +76,9 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public static LegacyIconHolder fromSlot(Slot slot) {
         return new LegacyIconHolder() {
             @Override
-            public void render(GuiGraphics graphics, int i, int j, float f) {
+            public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
                 slotBoundsWithItem(0, 0, slot);
-                super.render(graphics, i, j, f);
+                super.extractRenderState(graphics, i, j, f);
             }
         };
     }
@@ -81,8 +88,8 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             Entity entity;
 
             @Override
-            public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-                super.render(graphics, mouseX, mouseY, delta);
+            public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+                super.extractRenderState(graphics, mouseX, mouseY, delta);
                 if (entity == null && Minecraft.getInstance().level != null) {
                     entity = entityType.create(Minecraft.getInstance().level, EntitySpawnReason.EVENT);
                 }
@@ -181,7 +188,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return getMinSize() < 18 || getMinSize() > 21;
     }
 
-    public void applyOffset(GuiGraphics graphics) {
+    public void applyOffset(GuiGraphicsExtractor graphics) {
         if (!offset.equals(Vec2.ZERO)) graphics.pose().translate(offset.x, offset.y);
     }
 
@@ -198,7 +205,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     @Override
-    public void render(GuiGraphics graphics, int i, int j, float f) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
         isHovered = isHovered(i, j);
         Identifier sprite = getIconHolderSprite();
         if (sprite != null)
@@ -209,7 +216,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderItem(graphics, i, j, f);
     }
 
-    public void renderIcon(Identifier location, GuiGraphics graphics, boolean scaled, int width, int height) {
+    public void renderIcon(Identifier location, GuiGraphicsExtractor graphics, boolean scaled, int width, int height) {
         renderChild(graphics, getX(), getY(), () -> {
             if (scaled) {
                 graphics.pose().scale(getSelectableWidth() / width, getSelectableHeight() / height);
@@ -218,28 +225,28 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         });
     }
 
-    public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+    public void renderItem(GuiGraphicsExtractor graphics, int i, int j, float f) {
         renderItem(graphics, itemIcon, getX(), getY(), isWarning());
     }
 
-    public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning) {
+    public void renderItem(GuiGraphicsExtractor graphics, ItemStack item, int x, int y, boolean isWarning) {
         if (!item.isEmpty()) renderItem(graphics, () -> {
-            graphics.renderFakeItem(item, 0, 0);
+            renderPaddedItem(graphics, item, () -> graphics.fakeItem(item, 0, 0));
             if (allowItemDecorations)
-                graphics.renderItemDecorations(Minecraft.getInstance().font, item, 0, 0);
+                graphics.itemDecorations(Minecraft.getInstance().font, item, 0, 0);
         }, x, y, isWarning);
     }
 
-    public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning) {
+    public void renderItem(GuiGraphicsExtractor graphics, Runnable itemRender, int x, int y, boolean isWarning) {
         renderScaled(graphics, x, y, itemRender);
         if (isWarning) renderWarning(graphics);
     }
 
-    public void renderWarning(GuiGraphics graphics) {
+    public void renderWarning(GuiGraphicsExtractor graphics) {
         renderChild(graphics, x, y, () -> FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.WARNING_ICON, 0, 0, 8, 8));
     }
 
-    public void renderEntity(GuiGraphics graphics, Entity entity, int mouseX, int mouseY, float deltaTime) {
+    public void renderEntity(GuiGraphicsExtractor graphics, Entity entity, int mouseX, int mouseY, float deltaTime) {
         entity.setYRot(180);
         entity.yRotO = entity.getYRot();
         entity.setXRot(entity.xRotO = 0);
@@ -251,14 +258,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         LegacyRenderUtil.renderEntity(graphics, getX(), getY(), getX() + Math.round(getSelectableWidth()), getY() + Math.round(getSelectableHeight() * 2), (int) Math.min(getSelectableWidth(), getSelectableHeight()), new Vector3f(), new Quaternionf().rotationXYZ(0.0f, (float) Math.PI / 4, (float) Math.PI), null, entity, true);
     }
 
-    public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+    public void renderSelection(GuiGraphicsExtractor graphics, int i, int j, float f) {
         if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20)
             renderChild(graphics, getXCorner() - (21f - getWidth()) / 2, getYCorner() - (21f - getHeight()) / 2, () -> FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SELECT_ICON_HIGHLIGHT_SMALL, 0, 0, 21, 21));
         else
             renderChild(graphics, getXCorner() + (getWidth() - 36f) / 2, getYCorner() + (getHeight() - 36f) / 2, () -> FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SELECT_ICON_HIGHLIGHT, 0, 0, 36, 36));
     }
 
-    public void renderScroll(GuiGraphics graphics, LegacyScrollRenderer scrollRenderer) {
+    public void renderScroll(GuiGraphicsExtractor graphics, LegacyScrollRenderer scrollRenderer) {
         if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20) {
             renderChild(graphics, getXCorner() + (getWidth() - 7) / 2.0f, getYCorner() - 0.5f, () -> {
                 scrollRenderer.renderSmallScroll(graphics, true, 0, -5);
@@ -272,14 +279,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         }
     }
 
-    public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render) {
+    public void renderScaled(GuiGraphicsExtractor graphics, float x, float y, Runnable render) {
         renderChild(graphics, x, y, () -> {
             graphics.pose().scale(getWidth() / 18f, getHeight() / 18f);
             render.run();
         });
     }
 
-    public void renderChild(GuiGraphics graphics, float x, float y, Runnable render) {
+    public void renderChild(GuiGraphicsExtractor graphics, float x, float y, Runnable render) {
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
         applyOffset(graphics);
@@ -287,19 +294,43 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.pose().popMatrix();
     }
 
-    public void renderHighlight(GuiGraphics graphics) {
+    public static void renderPaddedItem(GuiGraphicsExtractor graphics, ItemStack item, Runnable render) {
+        renderPaddedItem(graphics, item, 0, 0, render);
+    }
+
+    public static void renderPaddedItem(GuiGraphicsExtractor graphics, ItemStack item, float x, float y, Runnable render) {
+        if (!usesSlotPadding(item)) {
+            render.run();
+            return;
+        }
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x + ITEM_PADDING, y + ITEM_PADDING + getSlotYOffset(item));
+        graphics.pose().scale(ITEM_SCALE, ITEM_SCALE);
+        render.run();
+        graphics.pose().popMatrix();
+    }
+
+    private static float getSlotYOffset(ItemStack item) {
+        return item.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof TrapDoorBlock ? TRAPDOOR_Y_OFFSET : 0;
+    }
+
+    public static boolean usesSlotPadding(ItemStack item) {
+        return item.is(LegacyTags.PADDED_SLOT_ITEMS) || (!item.has(DataComponents.TOOL) && !item.is(LegacyTags.FULL_SIZE_SLOT_ITEMS));
+    }
+
+    public void renderHighlight(GuiGraphicsExtractor graphics) {
         renderChild(graphics, x, y, () -> {
             graphics.pose().scale(getSelectableWidth() / 16f, getSelectableHeight() / 16f);
             FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SLOT_HIGHLIGHT, 0, 0, 16, 16);
         });
     }
 
-    public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
+    public void renderTooltip(Minecraft minecraft, GuiGraphicsExtractor graphics, int i, int j) {
         if (isHovered || (allowFocusedItemTooltip && isFocused()))
             renderTooltip(minecraft, graphics, itemIcon, !isHovered ? (int) getMiddleX() : i, !isHovered ? (int) getMiddleY() : j);
     }
 
-    public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, ItemStack stack, int i, int j) {
+    public void renderTooltip(Minecraft minecraft, GuiGraphicsExtractor graphics, ItemStack stack, int i, int j) {
         if (!stack.isEmpty())
             LegacyFontUtil.applySmallerFont(LegacyFontUtil.MOJANGLES_11_FONT, b -> graphics.setTooltipForNextFrame(minecraft.font, stack, i, j));
     }

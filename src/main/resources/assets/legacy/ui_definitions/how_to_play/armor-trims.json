@@ -1,0 +1,502 @@
+{
+  "elements": [
+    {
+      "name": "armor_trims_hd",
+      "type": "children",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "applyPrefix": false,
+      "elements": {
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-228",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+          "width": 200,
+          "height": 222,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.armor-trims_message"
+              },
+              "width": 176
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.armor-trims_message_1"
+              },
+              "width": 176
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/small_panel",
+          "width": 207,
+          "height": 215,
+          "x": "${width}/2",
+          "y": "${scrollable_renderer.y}"
+        },
+        "title": {
+          "type": "draw_string",
+          "component": {
+            "translate": "block.minecraft.smithing_table"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+56",
+          "y": "${panel.y}+25"
+        },
+        "hammer": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/smithing_hammer",
+          "x": "${panel.x}+14",
+          "y": "${panel.y}+10",
+          "width": 38,
+          "height": 38
+        },
+        "arrow": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/arrow",
+          "x": "${panel.x}+82",
+          "y": "${panel.y}+59",
+          "width": 33,
+          "height": 23
+        },
+        "stand": {
+          "type": "render_armor_stand",
+          "x": "${panel.x}",
+          "y": "${panel.y}",
+          "width": 364,
+          "height": 150,
+          "scale": 35
+        },
+        "template": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "sentry_armor_trim_smithing_template",
+          "x": "${panel.x}+10",
+          "y": "${panel.y}+60"
+        },
+        "armor": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "diamond_chestplate",
+          "x": "${panel.x}+31",
+          "y": "${panel.y}+60"
+        },
+        "material": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "emerald",
+          "x": "${panel.x}+52",
+          "y": "${panel.y}+60"
+        },
+        "result": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "diamond_chestplate",
+            "components": {
+              "minecraft:trim": {
+                "material": {
+                  "asset_name": "emerald",
+                  "description": {
+                    "translate": "trim_material.minecraft.emerald"
+                  }
+                },
+                "pattern": {
+                  "asset_id": "minecraft:sentry",
+                  "description": {
+                    "translate": "trim_pattern.minecraft.sentry"
+                  },
+                  "decal": false
+                }
+              }
+            }
+          },
+          "width": 30,
+          "height": 30,
+          "x": "${panel.x}+127",
+          "y": "${panel.y}+56"
+        },
+        "inventory_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "container.inventory"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+10",
+          "y": "${panel.y}+105"
+        },
+        "inventory": {
+          "type": "put_legacy_slot",
+          "range": "[0,26]",
+          "isFake": true,
+          "fakeContainer": [
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
+            "air",
+            "air",
+            "oak_fence_gate",
+            "air",
+            "air",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
+            "air",
+            "dark_oak_door",
+            "air",
+            "emerald",
+            "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
+            "air",
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
+          ],
+          "x": "${panel.x}+10+(${inventory.index}%9)*21",
+          "y": "${panel.y}+116+(${inventory.index}/9)*21"
+        },
+        "quick_select": {
+          "type": "put_legacy_slot",
+          "range": "[0,8]",
+          "isFake": true,
+          "fakeContainer": [
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
+          ],
+          "x": "${panel.x}+10+${quick_select.index}*21",
+          "y": "${panel.y}+185"
+        }
+      }
+    },
+    {
+      "name": "armor_trims_sd",
+      "type": "children",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "applyPrefix": false,
+      "elements": {
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-144",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+          "contentX": 10,
+          "contentY": 8,
+          "width": 140,
+          "height": 137,
+          "lineHeight": 8,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.armor-trims_message",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.armor-trims_message_1",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/panel",
+          "width": 130,
+          "height": 140,
+          "x": "${width}/2",
+          "y": "${scrollable_renderer.y}"
+        },
+        "title": {
+          "type": "draw_string",
+          "component": {
+            "translate": "block.minecraft.smithing_table",
+            "font": "legacy:default_11"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+54",
+          "y": "${panel.y}+6"
+        },
+        "hammer": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/smithing_hammer",
+          "x": "${panel.x}+7",
+          "y": "${panel.y}+4",
+          "width": 30,
+          "height": 30
+        },
+        "arrow": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/small_arrow",
+          "x": "${panel.x}+54",
+          "y": "${panel.y}+38",
+          "width": 16,
+          "height": 14
+        },
+        "stand": {
+          "type": "render_armor_stand",
+          "x": "${panel.x}",
+          "y": "${panel.y}",
+          "width": 228,
+          "height": 100,
+          "scale": 20
+        },
+        "template": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "sentry_armor_trim_smithing_template",
+          "width": 13,
+          "x": "${panel.x}+7",
+          "y": "${panel.y}+40"
+        },
+        "armor": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "diamond_chestplate",
+          "width": 13,
+          "x": "${panel.x}+20",
+          "y": "${panel.y}+40"
+        },
+        "material": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "emerald",
+          "width": 13,
+          "x": "${panel.x}+33",
+          "y": "${panel.y}+40"
+        },
+        "result": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "diamond_chestplate",
+            "components": {
+              "minecraft:trim": {
+                "material": {
+                  "asset_name": "emerald",
+                  "description": {
+                    "translate": "trim_material.minecraft.emerald"
+                  }
+                },
+                "pattern": {
+                  "asset_id": "minecraft:sentry",
+                  "description": {
+                    "translate": "trim_pattern.minecraft.sentry"
+                  },
+                  "decal": false
+                }
+              }
+            }
+          },
+          "width": 20,
+          "height": 20,
+          "x": "${panel.x}+80",
+          "y": "${panel.y}+36"
+        },
+        "inventory_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "container.inventory",
+            "font": "legacy:default_11"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+7",
+          "y": "${panel.y}+67"
+        },
+        "inventory": {
+          "type": "put_legacy_slot",
+          "range": "[0,26]",
+          "isFake": true,
+          "width": 13,
+          "fakeContainer": [
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
+            "air",
+            "air",
+            "oak_fence_gate",
+            "air",
+            "air",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
+            "air",
+            "dark_oak_door",
+            "air",
+            "emerald",
+            "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
+            "air",
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
+          ],
+          "x": "${panel.x}+7+(${inventory.index}%9)*13",
+          "y": "${panel.y}+77+(${inventory.index}/9)*13"
+        },
+        "quick_select": {
+          "type": "put_legacy_slot",
+          "range": "[0,8]",
+          "isFake": true,
+          "width": 13,
+          "fakeContainer": [
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
+          ],
+          "x": "${panel.x}+7+(${quick_select.index}%9)*13",
+          "y": "${panel.y}+122"
+        }
+      }
+    }
+  ]
+}

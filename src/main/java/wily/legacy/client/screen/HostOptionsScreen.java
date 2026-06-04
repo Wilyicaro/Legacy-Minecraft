@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -52,17 +52,17 @@ public class HostOptionsScreen extends PanelVListScreen {
         this(PLAYERS_INVITE);
     }
 
-    public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphics guiGraphics, int x, int y) {
-        drawPlayerIcon(info, guiGraphics, x, y, 20, 20);
+    public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y) {
+        drawPlayerIcon(info, GuiGraphicsExtractor, x, y, 20, 20);
     }
 
-    public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphics guiGraphics, int x, int y, int width, int height) {
+    public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y, int width, int height) {
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(color[0], color[1], color[2], 1.0f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(color[0], color[1], color[2], 1.0f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(), x, y, width, height);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(), x, y, width, height);
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
     }
 
     public static List<PlayerInfo> getActualPlayerInfos() {
@@ -80,7 +80,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.getPublishComponent() : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.FRIENDS : null : null);
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> minecraft.getChatStatus().isChatAllowed(minecraft.isLocalServer()) ? LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName() : null);
+        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> minecraft.computeChatAbilities().canSendMessages() ? LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName() : null);
     }
 
     public void reloadPlayerButtons() {
@@ -168,16 +168,16 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         oldAlpha = alpha;
         alpha = Mth.lerp(f * 0.1f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
         shouldFade = false;
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, alpha);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, alpha);
         FactoryScreenUtil.enableBlend();
-        panel.render(guiGraphics, i, j, f);
+        panel.extractRenderState(GuiGraphicsExtractor, i, j, f);
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
-        LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font, title, panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
+        LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, title, panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false));
     }
 
     protected abstract class PlayerButton extends ListButton implements RenderableVListEntry {
@@ -189,10 +189,10 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
             if (isHoveredOrFocused()) shouldFade = true;
-            super.renderContents(guiGraphics, i, j, f);
-            drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics,
+            super.extractContents(GuiGraphicsExtractor, i, j, f);
+            drawPlayerIcon((LegacyPlayerInfo) playerInfo, GuiGraphicsExtractor,
                     getX() + list.accessor.getInteger(list.name + ".playerIcon.x", 6),
                     getY() + list.accessor.getInteger(list.name + ".playerIcon.y", 5),
                     list.accessor.getInteger(list.name + ".playerIcon.width", 20),
@@ -200,8 +200,8 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
 
         @Override
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            LegacyFontUtil.applySDFont(sd -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + list.accessor.getInteger(list.name + ".buttonMessage.x", 68), this.getY(), getX() + getWidth() - i, this.getY() + this.getHeight(), j, true));
+        protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
+            LegacyFontUtil.applySDFont(sd -> LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, this.getMessage(), getX() + list.accessor.getInteger(list.name + ".buttonMessage.x", 68), this.getY(), getX() + getWidth() - i, this.getY() + this.getHeight(), j, true));
         }
 
         @Override

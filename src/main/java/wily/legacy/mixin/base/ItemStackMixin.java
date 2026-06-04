@@ -6,11 +6,18 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -32,6 +39,7 @@ import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyItemAttributeDisplay;
 import wily.legacy.util.LegacyItemUtil;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
@@ -40,6 +48,21 @@ public abstract class ItemStackMixin implements DataComponentHolder {
 
     private ItemStack self() {
         return (ItemStack) (Object) this;
+    }
+
+    @Inject(method = "interactLivingEntity", at = @At("HEAD"), cancellable = true)
+    private void interactLivingEntity(Player player, LivingEntity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions)) {
+            return;
+        }
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(self().getItem());
+        if (color == null || !(entity instanceof Shulker shulker) || shulker.getColor() == color) return;
+        shulker.level().playSound(player, shulker, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
+        if (!player.level().isClientSide()) {
+            ((ShulkerAccessor) shulker).callSetVariant(Optional.of(color));
+            if (!player.getAbilities().instabuild) self().shrink(1);
+        }
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
     @Inject(method = "getHoverName", at = @At("RETURN"), cancellable = true)

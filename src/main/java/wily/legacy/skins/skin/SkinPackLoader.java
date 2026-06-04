@@ -345,7 +345,7 @@ public final class SkinPackLoader {
         if (def != null) out.put(SkinIdUtil.PACK_DEFAULT, def);
         out.put(SkinIdUtil.PACK_FAVOURITES, favPack);
         for (Map.Entry<String, SkinPack> e : base.entrySet()) {
-            String k = e.getKey();
+                String k = e.getKey();
             if (SkinIdUtil.PACK_DEFAULT.equals(k)) continue;
             if (SkinIdUtil.PACK_FAVOURITES.equals(k)) continue;
             out.put(k, e.getValue());
@@ -489,7 +489,7 @@ public final class SkinPackLoader {
         JsonObject poses = poseObject(packObj);
         if (poses == null) return;
         for (Map.Entry<String, JsonElement> e : poses.entrySet()) {
-            SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(e.getKey());
+                SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(e.getKey());
             if (tag == null) continue;
             collectPoseSelectors(e.getValue(), selector -> addPackPoseSelector(tag, selector, namespace, skinIdsBySourceId));
         }
@@ -576,7 +576,7 @@ public final class SkinPackLoader {
             LoadedPack pack = entry.getValue();
             if (!pack.hasSort()) {
                 flushSortedBucket(ordered, bucket);
-                ordered.put(entry.getKey(), pack.pack());
+            ordered.put(entry.getKey(), pack.pack());
                 continue;
             }
             if (!bucket.isEmpty() && bucket.getFirst().getValue().sortIndex() != pack.sortIndex()) {

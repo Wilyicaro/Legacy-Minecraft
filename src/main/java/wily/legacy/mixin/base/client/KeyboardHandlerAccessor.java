@@ -9,4 +9,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface KeyboardHandlerAccessor {
     @Invoker("keyPress")
     void invokeKeyPress(long l, int i, KeyEvent keyEvent);
+
+    @Invoker("handleDebugKeys")
+    boolean invokeHandleDebugKeys(KeyEvent keyEvent);
 }

@@ -124,7 +124,7 @@
             "translate": "legacy.menu.how_to_play.anvil_sword_name"
           },
           "x": "${text_box.x}+4",
-          "y": "${text_box.y}+(${text_box.height}-8)/2}"
+          "y": "${text_box.y}+(${text_box.height}-8)/2"
         },
         "enchant_cost": {
           "type": "draw_string",
@@ -392,7 +392,7 @@
             "font": "legacy:default_11"
           },
           "x": "${text_box.x}+2",
-          "y": "${text_box.y}+(${text_box.height}-5)/2}"
+          "y": "${text_box.y}+(${text_box.height}-5)/2"
         },
         "enchant_cost": {
           "type": "draw_string",

@@ -1,6 +1,6 @@
 package wily.legacy.skins.api.ui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -67,14 +67,27 @@ public final class LegacySkinUi {
         }
     }
 
-    public record Skin(String id, String title) {
+    public record Skin(String id, String title, @Nullable String theme, List<String> poses) {
+        public Skin(String id, String title) {
+            this(id, title, null, List.of());
+        }
+
+        public Skin(String id, String title, @Nullable String theme) {
+            this(id, title, theme, List.of());
+        }
+
+        public Skin(String id, String title, List<String> poses) {
+            this(id, title, null, poses);
+        }
+
         public Skin {
             Objects.requireNonNull(id, "id");
             Objects.requireNonNull(title, "title");
+            poses = poses == null ? List.of() : List.copyOf(poses);
         }
     }
 
-    public record PreviewContext(GuiGraphics graphics,
+    public record PreviewContext(GuiGraphicsExtractor graphics,
                                  String skinId,
                                  int left,
                                  int top,

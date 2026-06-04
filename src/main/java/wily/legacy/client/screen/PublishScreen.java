@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -117,7 +117,7 @@ public class PublishScreen extends ConfirmationScreen {
         Minecraft minecraft = Minecraft.getInstance();
         FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> {
             if (!server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port)) {
-                minecraft.gui.getChat().addMessage(Component.translatable("commands.publish.failed"));
+                minecraft.gui.getChat().addClientSystemMessage(Component.translatable("commands.publish.failed"));
             }
         }, () -> minecraft.player != null);
     }
@@ -128,8 +128,8 @@ public class PublishScreen extends ConfirmationScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) GuiGraphicsExtractor.deferredTooltip = null;
     }
 }

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -185,6 +185,36 @@ public class RenderableVList {
         }
     }
 
+    private boolean focusEdgeRenderable(boolean last) {
+        int start = last ? renderables.size() - 1 : 0;
+        int step = last ? -1 : 1;
+        for (int i = start; i >= 0 && i < renderables.size(); i += step) {
+            Renderable renderable = renderables.get(i);
+            if (renderable instanceof GuiEventListener) {
+                revealRenderable(renderable);
+                if (renderable instanceof GuiEventListener listener && getScreen().children().contains(listener)) {
+                    getScreen().changeFocus(ComponentPath.path(listener, getScreen()));
+                } else {
+                    focusRenderable(renderable);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEdgeFocused(boolean last) {
+        GuiEventListener focused = getScreen().getFocused();
+        if (focused == null) return false;
+        int start = last ? renderables.size() - 1 : 0;
+        int step = last ? -1 : 1;
+        for (int i = start; i >= 0 && i < renderables.size(); i += step) {
+            Renderable renderable = renderables.get(i);
+            if (renderable instanceof GuiEventListener) return renderable == focused;
+        }
+        return false;
+    }
+
 
     public void init(int leftPos, int topPos, int listWidth, int listHeight) {
         init("renderableVList", leftPos, topPos, listWidth, listHeight);
@@ -197,11 +227,11 @@ public class RenderableVList {
         this.listWidth = accessor.getInteger(name + ".width", listWidth);
         this.listHeight = accessor.getInteger(name + ".height", listHeight);
         boolean allowScroll = this.listHeight > 0;
-        if (allowScroll) accessor.getChildrenRenderables().add(((guiGraphics, i, j, f) -> {
+        if (allowScroll) accessor.getChildrenRenderables().add(((GuiGraphicsExtractor, i, j, f) -> {
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.UP.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.UP, this.leftPos + this.listWidth - 29 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.UP.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
             if (canScrollDown)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.DOWN.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
+                scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13 + verticalScrollArrowOffsetX, this.topPos + this.listHeight + scrollArrowYOffset + verticalScrollArrowOffsetY, LegacyScrollRenderer.SCROLLS[ScreenDirection.DOWN.ordinal()], verticalScrollArrowWidth, verticalScrollArrowHeight);
         }));
         canScrollDown = false;
         int yDiff = 0;
@@ -277,9 +307,19 @@ public class RenderableVList {
 
     private void revealRenderable(int index) {
         if (listHeight <= 0) return;
-        if (index < 0) return;
-        while (index < scrolledList.get() && scrolledList.get() > 0) mouseScrolled(false);
-        while (index >= scrolledList.get() + renderablesCount && canScrollDown) mouseScrolled(true);
+        if (index < 0 || index >= renderables.size()) return;
+        int visibleCount = Math.max(1, renderablesCount);
+        int scroll = scrolledList.get();
+        if (index < scroll) {
+            scroll = index;
+        } else if (index >= scroll + visibleCount) {
+            scroll = index - visibleCount + 1;
+        }
+        scroll = Math.max(0, Math.min(scroll, renderables.size() - 1));
+        if (scroll != scrolledList.get()) {
+            scrolledList.set(scroll);
+            accessor.reloadUI();
+        }
     }
 
     public void resetScroll() {
@@ -323,30 +363,25 @@ public class RenderableVList {
     public boolean keyPressed(int i, boolean cyclic) {
         if (renderables.contains(getScreen().getFocused()) && renderablesCount > 1) {
             if (i == InputConstants.KEY_DOWN) {
+                if (!canScrollDown && cyclic && isEdgeFocused(true)) return focusEdgeRenderable(false);
                 ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.DOWN);
                 if (isInvalidFocus(path, true)) {
                     if (canScrollDown) {
                         while (canScrollDown && isDirectionFocused(ScreenDirection.DOWN, true)) mouseScrolled(true);
                     } else if (cyclic) {
-                        if (path == null && scrolledList.get() > 0) {
-                            scrolledList.set(0);
-                            accessor.reloadUI();
-                            setLastFocusInDirection(ScreenDirection.DOWN);
-                        }
+                        if (path == null && focusEdgeRenderable(false)) return true;
                     } else if (path == null) return true;
                 }
             }
             if (i == InputConstants.KEY_UP) {
+                if (scrolledList.get() == 0 && cyclic && isEdgeFocused(false)) return focusEdgeRenderable(true);
                 ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.UP);
                 if (isInvalidFocus(path, true)) {
                     if (scrolledList.get() > 0) {
                         while (scrolledList.get() > 0 && isDirectionFocused(ScreenDirection.UP, true))
                             mouseScrolled(false);
                     } else if (cyclic) {
-                        if (path == null) {
-                            while (canScrollDown)
-                                mouseScrolled(true);
-                        }
+                        if (path == null && focusEdgeRenderable(true)) return true;
                     } else if (path == null) return true;
                 }
             }
@@ -443,8 +478,8 @@ public class RenderableVList {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(Minecraft.getInstance().font, text, this.getX() + 1, this.getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
+        public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+            LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(Minecraft.getInstance().font, text, this.getX() + 1, this.getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
         }
 
         @Override

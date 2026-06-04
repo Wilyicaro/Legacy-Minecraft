@@ -1,0 +1,19 @@
+{
+  "values": [
+    "minecraft:bow",
+    "minecraft:fishing_rod",
+    "minecraft:carrot_on_a_stick",
+    "minecraft:warped_fungus_on_a_stick",
+    "minecraft:crossbow",
+    "minecraft:wooden_spear",
+    "minecraft:stone_spear",
+    "minecraft:copper_spear",
+    "minecraft:iron_spear",
+    "minecraft:golden_spear",
+    "minecraft:diamond_spear",
+    "minecraft:netherite_spear",
+    "#minecraft:banners",
+    "#minecraft:fence_gates",
+    "minecraft:bell"
+  ]
+}

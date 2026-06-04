@@ -17,13 +17,13 @@ import java.util.Map;
 
 public final class DownloadedPackMetadata {
     private static final String FILE_NAME = ".legacy4j_content.json";
-    private static final Entry EMPTY = new Entry(null, null, null);
+    private static final Entry EMPTY = new Entry(null, null, null, false);
     private static final Map<String, Entry> CACHE = new HashMap<>();
 
     private DownloadedPackMetadata() {
     }
 
-    public record Entry(String name, String description, String worldTemplateFolderName) {
+    public record Entry(String name, String description, String worldTemplateFolderName, boolean useResourceAlbum) {
         public Component title(Component fallback) {
             return name == null || name.isBlank() ? fallback : Component.literal(name);
         }
@@ -37,13 +37,14 @@ public final class DownloadedPackMetadata {
         }
     }
 
-    public static void write(Path packDir, ContentManager.Pack pack) throws IOException {
+    public static void write(Path packDir, ContentManager.Pack pack, ContentManager.Category category) throws IOException {
         JsonObject root = new JsonObject();
         root.addProperty("name", pack.name());
+        root.addProperty("useResourceAlbum", category.useResourceAlbum());
         if (!pack.description().isBlank()) root.addProperty("description", pack.description());
         pack.worldTemplateFolderName().filter(s -> !s.isBlank()).ifPresent(s -> root.addProperty("worldTemplateFolderName", s));
         Files.writeString(packDir.resolve(FILE_NAME), root.toString(), StandardCharsets.UTF_8);
-        CACHE.put(normalize(pack.id()), new Entry(pack.name(), pack.description(), pack.worldTemplateFolderName().orElse(null)));
+        CACHE.put(normalize(pack.id()), new Entry(pack.name(), pack.description(), pack.worldTemplateFolderName().orElse(null), category.useResourceAlbum()));
     }
 
     public static void clear(String packId) {
@@ -92,7 +93,8 @@ public final class DownloadedPackMetadata {
             String name = root.has("name") ? root.get("name").getAsString() : null;
             String description = root.has("description") ? root.get("description").getAsString() : null;
             String worldTemplateFolderName = root.has("worldTemplateFolderName") ? root.get("worldTemplateFolderName").getAsString() : null;
-            return new Entry(name, description, worldTemplateFolderName);
+            boolean useResourceAlbum = !root.has("useResourceAlbum") || root.get("useResourceAlbum").getAsBoolean();
+            return new Entry(name, description, worldTemplateFolderName, useResourceAlbum);
         } catch (Exception e) {
             Legacy4J.LOGGER.warn("Failed to read downloaded pack metadata for {}", packId, e);
             return EMPTY;

@@ -6,10 +6,9 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import wily.legacy.client.ContentManager;
-import wily.legacy.client.StorePreviewAtlas;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -23,9 +22,11 @@ import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     protected final ContentManager.Category category;
     protected final List<ContentManager.Pack> packs;
     protected ContentManager.Pack hoveredPack;
-    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, TOOLTIP_WIDTH);
+    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, () -> accessor.getInteger("tooltipBox.width", TOOLTIP_WIDTH));
     private final Panel panelRecess;
     
     // Legacy Scrolling System
@@ -83,7 +84,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category)));
         if (!packs.isEmpty()) {
             hoveredPack = packs.get(0);
-            if (getLocalPreview(category, hoveredPack) == null) requestImage(hoveredPack.imageUrl());
+            requestImage(hoveredPack.imageUrl());
         }
         
         renderableVList.layoutSpacing(l -> 0);
@@ -97,7 +98,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
-        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, pack.descriptionComponent(), width));
+        Component description = pack.descriptionComponent().copy().withColor(CommonColor.TIP_TEXT.get() & 0x00FFFFFF);
+        if (LegacyOptions.getUIMode().isSD()) {
+            return Panel.sdLabelsCache.apply(description, width);
+        }
+        return Panel.labelsCache.apply(description, width);
     }
 
     private boolean isDownloading(ContentManager.Pack pack) {
@@ -106,12 +111,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
     private void selectPack(ContentManager.Pack pack) {
         if (hoveredPack == pack) {
-            if (getLocalPreview(category, pack) == null) requestImage(pack.imageUrl());
+            requestImage(pack.imageUrl());
             return;
         }
         hoveredPack = pack;
         scrollableRenderer.resetScrolled();
-        if (getLocalPreview(category, pack) == null) requestImage(pack.imageUrl());
+        requestImage(pack.imageUrl());
     }
 
     private void addMenuButton(ContentManager.Pack pack) {
@@ -170,7 +175,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private void finishDownload(ContentManager.Pack pack, boolean installedAnything, boolean reloadResources) {
         downloadingPacks.remove(pack.id());
         refreshInstalledPacks();
-        if (installedAnything && reloadResources) {
+        boolean appliedResourcePacks = installedAnything && ContentManager.applyAutoResourcePacks(pack, category);
+        if (installedAnything && (reloadResources || appliedResourcePacks)) {
             if (minecraft.screen == this) needsReload = true;
             else minecraft.reloadResourcePacks();
         }
@@ -201,14 +207,6 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         if (image != null) return image;
         requestImage(url);
         return null;
-    }
-
-    private static StorePreviewAtlas.Entry getLocalPreview(ContentManager.Category category, ContentManager.Pack pack) {
-        if ("skinpacks".equals(category.id())) {
-            StorePreviewAtlas.Entry skinpackPreview = StorePreviewAtlas.getSkinpack(pack.id());
-            if (skinpackPreview != null) return skinpackPreview;
-        }
-        return StorePreviewAtlas.get(pack.id());
     }
 
     private static CompletableFuture<RemoteImage> requestImage(Optional<URI> url) {
@@ -286,56 +284,49 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         tooltipBox.init();
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false)));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panelRecess.getY() + 8, CommonColor.GRAY_TEXT.get(), false))));
     }
 
     @Override
     public void renderableVListInit() {
         for (int i = 0; i < Math.min(4, packs.size()); i++) {
-            if (getLocalPreview(category, packs.get(i)) == null) requestImage(packs.get(i).imageUrl());
+            requestImage(packs.get(i).imageUrl());
         }
 
         getRenderableVList().init("renderableVList", panel.getX() + LIST_X, panel.getY() + LIST_Y, LIST_WIDTH, LIST_HEIGHT);
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
-        LegacyRenderUtil.renderLogo(guiGraphics);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor, false);
+        LegacyRenderUtil.renderLogo(GuiGraphicsExtractor);
 
-        tooltipBox.render(guiGraphics, mouseX, mouseY, partialTick);
+        tooltipBox.extractRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
         
         if (hoveredPack != null) {
             ContentManager.Pack displayPack = hoveredPack;
             int x = tooltipBox.getX() + 8;
             int y = tooltipBox.getY() + 8;
             int width = tooltipBox.getWidth() - 16;
-            StorePreviewAtlas.Entry localPreview = getLocalPreview(category, displayPack);
-            RemoteImage remoteImage = localPreview == null ? getOrDownloadImage(displayPack.imageUrl()) : null;
+            RemoteImage remoteImage = getOrDownloadImage(displayPack.imageUrl());
             int imageAreaHeight = 0;
             int maxImgHeight = (tooltipBox.getHeight() * 4) / 10;
 
-            if (localPreview != null) {
-                float scale = Math.min((float) width / localPreview.width(), (float) maxImgHeight / localPreview.height());
-                int imgWidth = (int) (localPreview.width() * scale);
-                int imgHeight = (int) (localPreview.height() * scale);
-                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, localPreview.resource(), x + (width - imgWidth) / 2, y, (float) localPreview.u(), localPreview.v(), imgWidth, imgHeight, localPreview.width(), localPreview.height(), localPreview.atlasWidth(), localPreview.atlasHeight());
-                imageAreaHeight = imgHeight + 10;
-            } else if (displayPack.imageUrl().isPresent()) {
+            if (displayPack.imageUrl().isPresent()) {
                 if (remoteImage != null && remoteImage.width > 0) {
                     float scale = Math.min((float) width / remoteImage.width, (float) maxImgHeight / remoteImage.height);
                     int imgWidth = (int) (remoteImage.width * scale);
                     int imgHeight = (int) (remoteImage.height * scale);
                     
-                    FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
                     imageAreaHeight = imgHeight + 10;
                 } else if (remoteImage == null) {
-                    LegacyRenderUtil.drawGenericLoading(guiGraphics, x + (width - 30) / 2, y + Math.max(0, (maxImgHeight - 30) / 2), 6, 3);
+                    LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, x + (width - 30) / 2, y + Math.max(0, (maxImgHeight - 30) / 2), 6, 3);
                     imageAreaHeight = maxImgHeight + 10;
                 }
             }
 
-            int lineHeight = 12;
+            int lineHeight = LegacyOptions.getUIMode().isSD() ? 8 : 12;
             int descriptionY = y + imageAreaHeight;
             int descriptionWidth = width;
             MultiLineLabel label = getDescriptionLabel(displayPack, descriptionWidth);
@@ -344,8 +335,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
             scrollableRenderer.lineHeight = lineHeight;
 
-            scrollableRenderer.render(guiGraphics, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () -> 
-                label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, guiGraphics.textRenderer())
+            scrollableRenderer.extractRenderState(GuiGraphicsExtractor, x, descriptionY, descriptionWidth, visibleLines * lineHeight, () ->
+                LegacyFontUtil.applySDFont(sd -> label.visitLines(net.minecraft.client.gui.TextAlignment.LEFT, x, descriptionY, lineHeight, GuiGraphicsExtractor.textRenderer()))
             );
         }
     }
@@ -395,29 +386,31 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
 
         @Override
-        protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, isHoveredOrFocused() ? LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON_HIGHLIGHTED, LegacySprites.BUTTON_HIGHLIGHTED) : LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON, LegacySprites.BUTTON), getX(), getY(), getWidth(), getHeight(), ARGB.white(alpha));
-            renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+        protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+            GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, isHoveredOrFocused() ? LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON_HIGHLIGHTED, LegacySprites.BUTTON_HIGHLIGHTED) : LegacyRenderUtil.getSpriteOrFallback(LegacySprites.LIST_BUTTON, LegacySprites.BUTTON), getX(), getY(), getWidth(), getHeight(), ARGB.white(alpha));
+            renderString(GuiGraphicsExtractor, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             if (downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category)) {
                 int size = 16;
                 int x = this.getX() + this.width - size - 11;
                 int y = this.getY() + (this.height - size) / 2;
-                LegacyRenderUtil.drawGenericLoading(guiGraphics, x, y, 4, 2);
+                LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, x, y, 4, 2);
             } else if (installedPacks.getOrDefault(pack.id(), false)) {
                 int spriteSize = 18;
                 int sx = this.getX() + this.width - spriteSize - 7;
                 int sy = this.getY() + (this.height - spriteSize) / 2;
-                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
+                GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
             }
         }
 
-        public void renderString(GuiGraphics guiGraphics, Font font, int color) {
+        public void renderString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int color) {
             int textY = this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1;
             int textX = this.getX() + 8;
             boolean hasStatusIcon = downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category) || installedPacks.getOrDefault(pack.id(), false);
             int maxWidth = this.width - (hasStatusIcon ? 44 : 16);
-            String clipped = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, maxWidth));
-            guiGraphics.drawString(font, clipped, textX, textY, color, true);
+            LegacyFontUtil.applySDFont(sd -> {
+                String clipped = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, maxWidth));
+                GuiGraphicsExtractor.text(font, clipped, textX, textY, color, true);
+            });
         }
     }
 }

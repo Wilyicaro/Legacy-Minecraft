@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.render.state.GuiItemRenderState;
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import org.joml.Matrix3x2f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ public abstract class GuiItemRenderStateMixin implements LegacyGuiItemRenderStat
     private float opacity = 1;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(String string, Matrix3x2f matrix3x2f, TrackingItemStackRenderState trackingItemStackRenderState, int i, int j, ScreenRectangle screenRectangle, CallbackInfo ci) {
+    private void init(Matrix3x2f matrix3x2f, TrackingItemStackRenderState trackingItemStackRenderState, int i, int j, ScreenRectangle screenRectangle, CallbackInfo ci) {
         size = LegacyGuiItemRenderer.getScale(matrix3x2f);
         opacity = LegacyGuiItemRenderer.OPACITY;
     }

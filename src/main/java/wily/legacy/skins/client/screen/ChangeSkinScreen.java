@@ -1,14 +1,13 @@
 package wily.legacy.skins.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
@@ -18,7 +17,6 @@ import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.skins.client.changeskin.ChangeSkinPackList;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
-import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.skin.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -140,11 +138,11 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private float mainTextScale() {
-        return bigTextScale();
+        return bigTextScale() * 1.05f;
     }
 
     private float packTypeTextScale() {
-        return Math.min(1.0f, smallTextScale());
+        return smallTextScale() * 1.05f;
     }
 
     private Component packLabel(SkinPack pack) {
@@ -199,7 +197,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             }
 
             @Override
-            public void render(GuiGraphics g, int i, int j, float f) {
+            public void extractRenderState(GuiGraphicsExtractor g, int i, int j, float f) {
                 LegacyRenderUtil.renderPointerPanel(g, getX(), getY(), getWidth(), getHeight());
             }
         };
@@ -266,7 +264,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         addRenderableOnly((g, i, j, f) ->
                 blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, packIconX, packIconY, packIconSize, packIconSize));
         addRenderableOnly((g, i, j, f) -> {
-            SkinPack pack = packList.getFocusedPack();
+            SkinPack pack = packList.getFocusedDisplayPack();
             Identifier icon = pack == null ? null : pack.icon();
             if (icon == null) return;
             int innerInset = 2;
@@ -435,8 +433,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
+    public void renderDefaultBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float pt) {
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, true);
         int packNameX = tooltipBox.x - sc(normalLayout.packNameInsetX());
         int packNameY = panel.y + sc(normalLayout.packNameTop());
         int packNameW = Math.max(1, tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim()));
@@ -466,13 +464,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             boolean locked = customPacks.isLockedSkinSelection(selected);
 
             if (reordering) {
-                drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             } else if (editing) {
                 if (isImport || locked)
                     drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
                 else if (selected != null)
-                    drawActionSprite(g, LegacySprites.BEACON_CONFIRM, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
-                if (!isImport && !locked && selected != null)
+                    drawTick(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
+                if (customPacks.isRemovableSkinSelection(selected))
                     drawActionSprite(g, LegacySprites.ERROR_CROSS, iconX, iconBaseY + sc(normalLayout.actionHolderGap()), holder);
             } else if (isImport) drawPadlock(g, iconX, iconBaseY + sc(normalLayout.actionHolderTopOffset()), holder);
             else if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
@@ -503,19 +501,14 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         center = getCenterWidget();
         if (center != null) {
             String skinId = center.skinId.get();
-            SkinEntry entry = skinId == null ? null : source.skin(skinId);
-            String name = entry == null ? String.valueOf(skinId) : source.skinName(entry);
+            String name = source.skinName(skinId);
             int mid = centerTextX();
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(normalLayout.skinNameBottomTrim());
             float mainTextScale = mainTextScale();
             int maxNameWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
             drawScaledCentered(g, Component.literal(PlayerSkinWidget.clipText(minecraft.font, name, maxNameWidth)), mid, skinNameY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
 
-            Identifier modelId = entry == null ? null : entry.modelId();
-            if (modelId == null && entry != null && entry.texture() != null)
-                modelId = ClientSkinAssets.getModelIdFromTexture(entry.texture());
-
-            String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
+            String theme = source.skinTheme(skinId);
             if (theme != null && !theme.isBlank() && !theme.equals(name)) {
                 int maxThemeWidth = Math.max(1, (int) ((tooltipBox.getWidth() - sc(normalLayout.themeTextWidthTrim())) / mainTextScale));
                 String show = PlayerSkinWidget.clipText(minecraft.font, theme, maxThemeWidth);
@@ -523,7 +516,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 drawScaledCentered(g, Component.literal(show), mid, Math.min(themeY, panel.y + tooltipBox.getHeight() - sc(normalLayout.themeBottomInset())), LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             }
         }
-        SkinPack pack = packList.getFocusedPack();
+        SkinPack pack = packList.getFocusedDisplayPack();
         int packMid = centerTextX();
         int packTitleY = panel.y + sc(normalLayout.packTitleTop());
         float mainTextScale = mainTextScale();
@@ -534,7 +527,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             drawScaledCentered(g, Component.literal(packName), packMid, packTitleY, LegacyRenderUtil.getDefaultTextColor(true), mainTextScale, true);
             Component label = packLabel(pack);
             if (label != null)
-                drawScaledCentered(g, label, packMid, packMetaY, ColorUtil.withAlpha(LegacyRenderUtil.getDefaultTextColor(true), 0.8f), packTypeTextScale(), true);
+                drawScaledCentered(g, label, packMid, packMetaY, LegacyRenderUtil.getDefaultTextColor(true), packTypeTextScale(), true);
         }
     }
 
@@ -553,7 +546,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         super.removed();
     }
 
-    private void drawTick(GuiGraphics guiGraphics, int iconX, int iconY, int holder) {
+    private void drawTick(GuiGraphicsExtractor GuiGraphicsExtractor, int iconX, int iconY, int holder) {
         float targetSize = Math.max(1f, sc(SELECTION_ICON_SIZE) * 0.8f + 2.0f);
         float scale = Math.min(targetSize / BEACON_CHECK_VISIBLE_W, targetSize / BEACON_CHECK_VISIBLE_H);
         float centerX = iconX + holder / 2.0f + holder * TICK_HOLDER_OFFSET_X;
@@ -562,30 +555,30 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         float visibleCenterY = centerY + (BEACON_CHECK_VISIBLE_Y + BEACON_CHECK_VISIBLE_H / 2.0f - BEACON_CHECK_CENTER_Y) * scale;
         int left = Math.round(visibleCenterX - SKIN_TICK_W / 2.0f);
         int top = Math.round(visibleCenterY - SKIN_TICK_H / 2.0f);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, left, top,
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, left, top,
                 (float) BEACON_CHECK_VISIBLE_X, (float) BEACON_CHECK_VISIBLE_Y,
                 SKIN_TICK_W, SKIN_TICK_H,
                 BEACON_CHECK_VISIBLE_W, BEACON_CHECK_VISIBLE_H,
                 BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
     }
 
-    private void drawPadlock(GuiGraphics guiGraphics, int iconX, int iconY, int holder) {
+    private void drawPadlock(GuiGraphicsExtractor GuiGraphicsExtractor, int iconX, int iconY, int holder) {
         float size = Math.max(1f, holder - 8f);
         float scale = size / PADLOCK_TEXTURE_SIZE;
         float left = iconX + (holder - PADLOCK_TEXTURE_SIZE * scale) / 2.0f;
         float top = iconY + (holder - PADLOCK_TEXTURE_SIZE * scale) / 2.0f;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(left, top);
-        guiGraphics.pose().scale(scale, scale);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, PADLOCK, 0, 0, 0, 0, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE);
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(left, top);
+        GuiGraphicsExtractor.pose().scale(scale, scale);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, PADLOCK, 0, 0, 0, 0, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
-    private void drawActionSprite(GuiGraphics guiGraphics, Identifier sprite, int iconX, int iconY, int holder) {
+    private void drawActionSprite(GuiGraphicsExtractor GuiGraphicsExtractor, Identifier sprite, int iconX, int iconY, int holder) {
         int size = Math.max(1, holder - 8);
         int left = iconX + (holder - size) / 2;
         int top = iconY + (holder - size) / 2;
-        blitSprite(guiGraphics, sprite, left, top, size, size);
+        blitSprite(GuiGraphicsExtractor, sprite, left, top, size, size);
     }
 
     private record NormalLayoutMetrics(

@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -12,11 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.PackAlbum;
 
+import java.util.UUID;
+
 @Mixin(PrimaryLevelData.class)
 public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSettings {
-
-    @Shadow
-    private boolean difficultyLocked;
 
     @Shadow
     private LevelSettings settings;
@@ -32,12 +30,12 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
 
     @Override
     public boolean isDifficultyLocked() {
-        return difficultyLocked;
+        return settings.difficultySettings().locked();
     }
 
     @Override
     public void setDifficultyLocked(boolean locked) {
-        difficultyLocked = locked;
+        settings = settings.withDifficultyLock(locked);
         LegacyClientWorldSettings.of(settings).setDifficultyLocked(locked);
     }
 
@@ -47,7 +45,7 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     }
 
     @Inject(method = "setTagData", at = @At("TAIL"))
-    private void setTagData(RegistryAccess registryAccess, CompoundTag compoundTag, CompoundTag compoundTag2, CallbackInfo ci) {
+    private void setTagData(CompoundTag compoundTag, UUID uuid, CallbackInfo ci) {
         compoundTag.putBoolean("TrustPlayers", trustPlayers());
         compoundTag.putString("SelectedResourceAssort", getSelectedResourceAlbum().id());
     }

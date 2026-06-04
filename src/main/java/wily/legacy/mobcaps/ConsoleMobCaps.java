@@ -57,6 +57,9 @@ public final class ConsoleMobCaps {
         if (type == EntityType.VILLAGER) {
             return TrackedMobCap.VILLAGERS;
         }
+        if (type == EntityType.PHANTOM) {
+            return TrackedMobCap.PHANTOMS;
+        }
         if (type == EntityType.ARMOR_STAND) {
             return TrackedMobCap.ARMOR_STANDS;
         }
@@ -162,6 +165,9 @@ public final class ConsoleMobCaps {
         if (type == EntityType.GHAST) {
             return tracker.count(type) < 4;
         }
+        if (bucket == TrackedMobCap.PHANTOMS) {
+            return tracker.count(bucket) < bucket.naturalLimit();
+        }
         if (type == EntityType.ENDERMAN && Level.END.equals(level.dimension())) {
             int endermanCap = TrackedMobCap.MONSTERS.naturalLimit();
             if (level.getDifficulty() == Difficulty.NORMAL) {
@@ -181,6 +187,9 @@ public final class ConsoleMobCaps {
     }
 
     public static String spawnEggFailure(ServerLevel level, EntityType<?> type) {
+        if (isHostile(type) && level.getDifficulty() == Difficulty.PEACEFUL) {
+            return CANT_SPAWN_IN_PEACEFUL;
+        }
         if (!LegacyMobCaps.isEnabled(level)) {
             return null;
         }
@@ -188,9 +197,6 @@ public final class ConsoleMobCaps {
         WorldMobCapTracker tracker = LegacyMobCaps.tracker(level);
         TrackedMobCap bucket = bucketForType(type);
 
-        if (isHostile(type) && level.getDifficulty() == Difficulty.PEACEFUL) {
-            return CANT_SPAWN_IN_PEACEFUL;
-        }
         if (bucket == TrackedMobCap.CHICKENS && tracker.count(TrackedMobCap.CHICKENS) >= TrackedMobCap.CHICKENS.manualLimit()) {
             return MAX_CHICKENS_SPAWNED;
         }
@@ -208,6 +214,9 @@ public final class ConsoleMobCaps {
         }
         if (bucket == TrackedMobCap.VILLAGERS && tracker.count(TrackedMobCap.VILLAGERS) >= TrackedMobCap.VILLAGERS.manualLimit()) {
             return MAX_VILLAGERS_SPAWNED;
+        }
+        if (bucket == TrackedMobCap.PHANTOMS && tracker.count(bucket) >= bucket.manualLimit()) {
+            return MAX_ENEMIES_SPAWNED;
         }
         if (bucket == TrackedMobCap.MONSTERS && tracker.count(TrackedMobCap.MONSTERS) >= TrackedMobCap.MONSTERS.manualLimit()) {
             return MAX_ENEMIES_SPAWNED;
@@ -280,7 +289,7 @@ public final class ConsoleMobCaps {
     }
 
     public static void sendFailure(Player player, String translationKey) {
-        player.displayClientMessage(Component.translatable(translationKey), false);
+        player.sendSystemMessage(Component.translatable(translationKey));
         syncInventory(player);
     }
 
@@ -303,6 +312,10 @@ public final class ConsoleMobCaps {
 
     public static String maxArmorStandsMessage() {
         return MAX_ARMOR_STANDS;
+    }
+
+    public static String peacefulSpawnMessage() {
+        return CANT_SPAWN_IN_PEACEFUL;
     }
 
     private static boolean isHostile(EntityType<?> type) {

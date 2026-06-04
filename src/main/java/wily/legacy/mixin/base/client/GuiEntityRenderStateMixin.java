@@ -1,10 +1,10 @@
 package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.client.gui.render.state.pip.GuiBannerResultRenderState;
-import net.minecraft.client.gui.render.state.pip.GuiBookModelRenderState;
-import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiBannerResultRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiBookModelRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import org.joml.Matrix3x2f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

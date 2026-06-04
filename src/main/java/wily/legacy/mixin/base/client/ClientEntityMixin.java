@@ -22,6 +22,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ClientEntityAccessor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyRenderDistance;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.keyFlyLeft;
@@ -60,6 +61,11 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Shadow
     public abstract boolean isInWater();
+
+    @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
+    private void shouldRender(double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
+        if (LegacyRenderDistance.usingLegacyEntityDistance()) cir.setReturnValue(LegacyRenderDistance.shouldRender((Entity) (Object) this, x, y, z));
+    }
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, CallbackInfoReturnable<Boolean> cir) {

@@ -27,7 +27,7 @@
                 "allowVariables": true,
                 "args": [
                   "controlIcon.key.jump",
-                  "controlIcon.player_movement",
+                  "controlIcon.key.forward",
                   "controlIcon.key.jump",
                   "controlIcon.key.jump",
                   "controlIcon.key.sneak",
@@ -312,7 +312,7 @@
                 "allowVariables": true,
                 "args": [
                   "controlIcon.key.jump",
-                  "controlIcon.player_movement",
+                  "controlIcon.key.forward",
                   "controlIcon.key.jump",
                   "controlIcon.key.jump",
                   "controlIcon.key.sneak",

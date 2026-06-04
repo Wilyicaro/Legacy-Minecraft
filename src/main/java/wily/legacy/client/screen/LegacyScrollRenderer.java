@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.resources.Identifier;
@@ -20,11 +20,11 @@ public class LegacyScrollRenderer {
         lastScroll = (lastScrolled[direction.ordinal()] = Util.getMillis());
     }
 
-    public void renderSmallScroll(GuiGraphics graphics, boolean up, int x, int y) {
+    public void renderSmallScroll(GuiGraphicsExtractor graphics, boolean up, int x, int y) {
         renderScroll(graphics, up ? ScreenDirection.UP : ScreenDirection.DOWN, x, y, up ? LegacySprites.SCROLL_UP_SMALL : LegacySprites.SCROLL_DOWN_SMALL, 7, 4);
     }
 
-    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y) {
+    public void renderScroll(GuiGraphicsExtractor graphics, ScreenDirection direction, int x, int y) {
         if (direction.getAxis() == ScreenAxis.HORIZONTAL)
             renderScroll(graphics, direction, x, y, SCROLLS[direction.ordinal()], 6, 11);
         else
@@ -36,7 +36,7 @@ public class LegacyScrollRenderer {
         return Math.min(1.0f, f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
     }
 
-    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y, Identifier sprite, int width, int height) {
+    public void renderScroll(GuiGraphicsExtractor graphics, ScreenDirection direction, int x, int y, Identifier sprite, int width, int height) {
         long l = lastScrolled[direction.ordinal()];
         if (l > 0)
             FactoryGuiGraphics.of(graphics).setBlitColor(1.0f, 1.0f, 1.0f, getAlpha(l));

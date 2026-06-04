@@ -14,9 +14,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
-import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
-import wily.factoryapi.base.client.UIDefinitionManager;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
@@ -130,12 +128,7 @@ public class HowToPlayScreen extends LegacyScreen {
         }
 
         public boolean isValid() {
-            if (!hasButton()) return false;
-            UIDefinition uiDefinition = getUIDefinition();
-            if (uiDefinition == null) return false;
-            UIAccessor accessor = UIAccessor.of(build(null));
-            accessor.beforeInit();
-            return uiDefinition.test(accessor);
+            return hasButton() && getUIDefinition() != null;
         }
 
         @Override

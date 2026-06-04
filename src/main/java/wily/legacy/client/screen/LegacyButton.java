@@ -27,8 +27,8 @@ public class LegacyButton extends Button.Plain implements RenderableVListEntry {
     }
 
     @Override
-    protected void renderDefaultLabel(ActiveTextCollector activeTextCollector) {
-        LegacyFontUtil.applySDFont(b -> super.renderDefaultLabel(activeTextCollector));
+    protected void extractDefaultLabel(ActiveTextCollector activeTextCollector) {
+        LegacyFontUtil.applySDFont(b -> super.extractDefaultLabel(activeTextCollector));
     }
 
     public static int getDefaultHeight() {

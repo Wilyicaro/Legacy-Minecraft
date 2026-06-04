@@ -30,7 +30,11 @@
   "mixins": [
     "${mod_id}.mixins.json"
   ],
+  "sodium:options": {
+    "mixin.features.render.world.clouds": false
+  },
   "depends": {
+    "fabricloader": ">=0.19.2",
     "fabric-api": "*",
     "factory_api": ">=${factory_api_version}",
     "minecraft": ["${mc_version_range}"]

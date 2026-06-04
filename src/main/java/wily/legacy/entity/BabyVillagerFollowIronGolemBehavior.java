@@ -47,7 +47,7 @@ public class BabyVillagerFollowIronGolemBehavior extends Behavior<Villager> {
 
     @Override
     protected void start(ServerLevel serverLevel, Villager livingEntity, long l) {
-        this.takeGolemRoseTick = serverLevel.random.nextInt(320);
+        this.takeGolemRoseTick = serverLevel.getRandom().nextInt(320);
         this.tookGolemRose = false;
         livingEntity.getNavigation().stop();
     }

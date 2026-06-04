@@ -1,0 +1,20 @@
+[
+  {
+    "buttonMessage": {"translate": "legacy.menu.play_tutorial"},
+    "icon": "legacy:creation_list/tutorial",
+    //? if >=26.1 {
+    "templateLocation": "world_templates/tutorial26.mcsave",
+    //?} else {
+    /*"templateLocation": "world_templates/tutorial.mcsave",
+    *///?}
+    "folderName": "Tutorial",
+    "isGamePath": true,
+    //? if >=26.1 {
+    "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial26.mcsave?checksum=b802b32e731b4c34faabebdae81dd504",
+    //?} else {
+    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial.mcsave?checksum=f7ac417c99ec18675bafceff68baf0e1",
+    *///?}
+    "directJoin": true,
+    "preDownload": true
+  }
+]

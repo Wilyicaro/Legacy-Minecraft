@@ -11,6 +11,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.IOUtil;
@@ -51,7 +52,8 @@ public record MapIdValueManager<T extends IdValueInfo<T>, M extends Map<Identifi
         map.clear();
         IOUtil.getOrderedNamespaces(manager).forEach(name -> manager.getResource(FactoryAPI.createLocation(name, name().getPath() + ".json")).ifPresent(r -> {
             try (BufferedReader bufferedReader = r.openAsReader()) {
-                codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(bufferedReader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", getName(), error)).ifPresent(listings -> {
+                var ops = DynamicUtil.getActualRegistryOps(JsonOps.INSTANCE);
+                codec.parse(ops, JsonParser.parseReader(bufferedReader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", getName(), error)).ifPresent(listings -> {
                     for (T listing : listings) {
                         map.put(listing.id(), map.containsKey(listing.id()) ? map.get(listing.id()).copyFrom(listing) : listing);
                     }
@@ -65,7 +67,7 @@ public record MapIdValueManager<T extends IdValueInfo<T>, M extends Map<Identifi
                 try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Minecraft.getInstance().gameDirectory.toPath().resolve("debug_map_id_values/" + name().getPath() + ".json"), Charsets.UTF_8))) {
                     w.setSerializeNulls(false);
                     w.setIndent("  ");
-                    GsonHelper.writeValue(w, codec.encodeStart(JsonOps.INSTANCE, List.copyOf(map.values())).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to write {}: {}", getName(), error)).orElseThrow(), null);
+                    GsonHelper.writeValue(w, codec.encodeStart(DynamicUtil.getActualRegistryOps(JsonOps.INSTANCE), List.copyOf(map.values())).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to write {}: {}", getName(), error)).orElseThrow(), null);
                 } catch (IOException exception) {
                     Legacy4J.LOGGER.warn(exception.getMessage());
                 }

@@ -25,9 +25,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -77,6 +80,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @Shadow
     public abstract boolean isMovingSlowly();
+
+    @Inject(method = "drop", at = @At("RETURN"))
+    private void drop(boolean all, CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue()) FirstPersonDropAnimation.start();
+    }
 
     public boolean canSprintController() {
         return !this.isSprinting() && /*? if <1.21.5 {*//*this.hasEnoughFoodToStartSprinting()*//*?} else {*/this.hasEnoughFoodToDoExhaustiveManoeuvres()/*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft.screen == null;
@@ -265,6 +273,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isAllowedInPortal()Z"))
     public boolean handleConfusionTransitionEffect(boolean original) {
         return original || Legacy4JClient.hasModOnServer();
+    }
+
+    @ModifyArg(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 1)
+    private float legacyPortalTriggerPitch(float pitch) {
+        return 1.0f;
+    }
+
+    @ModifyArg(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 2)
+    private float legacyPortalTriggerVolume(float volume) {
+        return 1.0f;
     }
 
     @Inject(method = /*? if <1.21.5 {*//*"serverAiStep"*//*?} else {*/"applyInput"/*?}*/, at = @At("RETURN"))

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -35,12 +35,12 @@ public class BookPanel extends WidgetPanel {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(getX(), getY());
-        guiGraphics.pose().scale(getWidth() / 146f, getHeight() / 180f);
-        FactoryGuiGraphics.of(guiGraphics).blit(BookViewScreen.BOOK_LOCATION, 0, 0, 20, 1, 146, 180);
-        guiGraphics.pose().popMatrix();
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(getX(), getY());
+        GuiGraphicsExtractor.pose().scale(getWidth() / 146f, getHeight() / 180f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(BookViewScreen.BOOK_LOCATION, 0, 0, 20, 1, 146, 180);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
     @Override
@@ -62,14 +62,14 @@ public class BookPanel extends WidgetPanel {
             private long lastPressTime;
 
             @Override
-            public void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            public void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || isMouseOver(i, j);
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(getX(), getY());
-                guiGraphics.pose().scale(1.5f, 1.5f);
-                guiGraphics.pose().translate(-getX(), -getY());
-                super.renderContents(guiGraphics, i, j, f);
-                guiGraphics.pose().popMatrix();
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(getX(), getY());
+                GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+                GuiGraphicsExtractor.pose().translate(-getX(), -getY());
+                super.extractContents(GuiGraphicsExtractor, i, j, f);
+                GuiGraphicsExtractor.pose().popMatrix();
             }
 
             @Override

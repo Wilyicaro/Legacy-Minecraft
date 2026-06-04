@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.grindstone;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.GrindstoneScreen;
 import net.minecraft.network.chat.Component;
@@ -9,6 +9,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,7 +24,8 @@ import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(GrindstoneScreen.class)
 public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {
-    private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
+
+private static final LegacySlotDisplay SLOTS_DISPLAY = new LegacySlotDisplay() {
         public int getWidth() {
             return 30;
         }
@@ -39,8 +43,8 @@ public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<Grin
     @Override
     protected void init() {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 207;
-        imageHeight = sd ? 145 : 215;
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageWidth(sd ? 130 : 207);
+        ((wily.legacy.mixin.base.client.AbstractContainerScreenAccessor) this).legacy$setImageHeight(sd ? 145 : 215);
         inventoryLabelX = sd ? 7 : 10;
         inventoryLabelY = sd ? 71 : 105;
         titleLabelX = sd ? 7 : 10;
@@ -71,31 +75,31 @@ public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<Grin
 
     //? if >1.20.1 {
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
     //?} else {
     /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor) {
     }
     *///?}
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
+        LegacyFontUtil.applySDFont(b -> super.extractLabels(GuiGraphicsExtractor, i, j));
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + (sd ? 61 : 85), topPos + (sd ? 33 : 50));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, sd ? 16 : 33, sd ? 14 : 24);
-        if (!sd) guiGraphics.pose().scale(1.5f, 1.5f);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(leftPos + (sd ? 61 : 85), topPos + (sd ? 33 : 50));
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, 0, 0, sd ? 16 : 33, sd ? 14 : 24);
+        if (!sd) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(2).hasItem())
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, sd ? 0 : 2, 0, 15, 15);
-        guiGraphics.pose().popMatrix();
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.ERROR_CROSS, sd ? 0 : 2, 0, 15, 15);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 }

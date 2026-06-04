@@ -18,6 +18,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
+import wily.legacy.skins.skin.CustomSkinPackStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,13 +103,17 @@ public abstract class OptionsMixin {
         List<String> savedResourcePacks = List.copyOf(resourcePacks);
         List<String> savedIncompatibleResourcePacks = List.copyOf(incompatibleResourcePacks);
         GlobalPacks.globalResources.get().applyPacks(packRepository, PackAlbum.getDefaultResourceAlbum().packs());
-        enableDownloadedSkinPack();
+        enableManagedSkinPacks();
         restoreManagedSkinPacks(packRepository, savedResourcePacks, savedIncompatibleResourcePacks);
         PackAlbum.updateSavedResourcePacks();
         ci.cancel();
     }
 
-    private void enableDownloadedSkinPack() {
+    private void enableManagedSkinPacks() {
+        try {
+            CustomSkinPackStore.enableResourcePack(minecraft);
+        } catch (IOException ignored) {
+        }
         try {
             DownloadedSkinPackStore.enableResourcePack(minecraft);
         } catch (IOException ignored) {

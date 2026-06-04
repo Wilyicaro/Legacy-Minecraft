@@ -1,6 +1,6 @@
 package wily.legacy.skins.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -85,12 +85,12 @@ public class CreateCustomSkinPackScreen extends ConfirmationScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
         if (nameBox == null) return;
         int textX = panel.x + (panel.width - renderableVList.listWidth) / 2;
         int textY = nameBox.getY() - (LegacyOptions.getUIMode().isSD() ? 11 : 14);
-        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font, MESSAGE, textX, textY, CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(ignored -> GuiGraphicsExtractor.text(font, MESSAGE, textX, textY, CommonColor.GRAY_TEXT.get(), false));
     }
 
     private void browseForIcon() {

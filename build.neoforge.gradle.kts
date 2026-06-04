@@ -12,6 +12,10 @@ platform {
 		required("neoforge") {
 			forgeVersionRange = "[1,)"
 		}
+		required("factory_api") {
+			slug("factory-api")
+			versionRange = ">=${prop("factory_api_version")}"
+		}
 	}
 }
 
@@ -53,6 +57,7 @@ repositories {
 	strictMaven("https://api.modrinth.com/maven", "maven.modrinth") { name = "Modrinth" }
 	maven("https://raw.githubusercontent.com/Kyubion-Studios/Mod-Resources/main/maven/") { name = "Kyubion Mod Resources" }
 	maven("https://maven.isxander.dev/releases")
+	maven("https://maven.caffeinemc.net/releases") { name = "CaffeineMC" }
 }
 
 dependencies {
@@ -62,12 +67,18 @@ dependencies {
 	api(jarJar(prop("sdl_dependency")) as Any)
 	api("wily.factory_api:factory_api-neoforge:${stonecutter.current.version}-${prop("factory_api_version")}")
 
-	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
+//	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
 	compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
-	compileOnly("maven.modrinth:sodium:${prop("sodium_version")}")
+	compileOnly("net.caffeinemc:sodium-neoforge:${prop("sodium_version")}")
+	compileOnly("net.caffeinemc:sodium-neoforge-mod:${prop("sodium_version")}")
 	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
-	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") as Any)
+	compileOnly("maven.modrinth:bisect-mod:lhJ7xU8k")
+	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") {
+		exclude(group = "commons-codec", module = "commons-codec")
+	} as Any)
+	api(jarJar("org.apache.httpcomponents:httpcore:4.4.16") as Any)
+	api(jarJar("commons-logging:commons-logging:1.2") as Any)
 }
 
 tasks.withType<Javadoc> {

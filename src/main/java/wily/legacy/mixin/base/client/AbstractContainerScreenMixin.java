@@ -8,7 +8,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -101,13 +101,27 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         }
         UIAccessor.of(this).addStatic(UIDefinition.createAfterInit(accessor -> {
             for (LegacySlotWidget slotWidget : slotWidgets) {
-                addWidget(slotWidget);
+                if (slotWidget != null) addWidget(slotWidget);
             }
         }));
     }
 
-    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
-    private int renderLabels(int i) {
+    @Unique
+    private LegacySlotWidget getSlotWidget(Slot slot) {
+        while (slotWidgets.size() <= slot.index) {
+            slotWidgets.add(null);
+        }
+        LegacySlotWidget widget = slotWidgets.get(slot.index);
+        if (widget == null || widget.slot != slot) {
+            widget = new LegacySlotWidget(slot);
+            slotWidgets.set(slot.index, widget);
+            addWidget(widget);
+        }
+        return widget;
+    }
+
+    @ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
+    private int extractLabels(int i) {
         return CommonColor.GRAY_TEXT.get();
     }
 
@@ -151,14 +165,14 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             this.doubleclick = false;
     }
 
-    @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
-    private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((float) Legacy4JClient.controllerManager.getPointerX() - 10, (float) Legacy4JClient.controllerManager.getPointerY() - 10);
-        if (!LegacyOptions.getUIMode().isSD()) guiGraphics.pose().scale(1.5f, 1.5f);
-        guiGraphics.renderItem(itemStack, 0, 0);
-        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
-        guiGraphics.pose().popMatrix();
+    @Inject(method = "extractFloatingItem", at = @At(value = "HEAD"), cancellable = true)
+    private void renderFloatingItem(GuiGraphicsExtractor GuiGraphicsExtractor, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate((float) Legacy4JClient.controllerManager.getPointerX() - 10, (float) Legacy4JClient.controllerManager.getPointerY() - 10);
+        if (!LegacyOptions.getUIMode().isSD()) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
+        GuiGraphicsExtractor.item(itemStack, 0, 0);
+        GuiGraphicsExtractor.itemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
+        GuiGraphicsExtractor.pose().popMatrix();
         ci.cancel();
     }
 
@@ -168,7 +182,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     }
 
     //? if <1.21.2 {
-    /*@ModifyExpressionValue(method = /^? if neoforge {^//^"renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;IIF)V"^//^?} else {^/"render"/^?}^/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
+    /*@ModifyExpressionValue(method = /^? if neoforge {^//^"renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/inventory/Slot;IIF)V"^//^?} else {^/"render"/^?}^/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
     private boolean renderSlotHighlight(boolean original) {
         return false;
     }
@@ -177,26 +191,26 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         return original && LegacySlotDisplay.of(slot).isVisible();
     }
     *///?} else {
-    @Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
-    private void renderSlotHighlightFront(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractSlotHighlightFront", at = @At("HEAD"), cancellable = true)
+    private void renderSlotHighlightFront(GuiGraphicsExtractor GuiGraphicsExtractor, CallbackInfo ci) {
         ci.cancel();
     }
 
-    @Inject(method = "renderSlotHighlightBack", at = @At("HEAD"), cancellable = true)
-    private void renderSlotHighlightBack(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractSlotHighlightBack", at = @At("HEAD"), cancellable = true)
+    private void renderSlotHighlightBack(GuiGraphicsExtractor GuiGraphicsExtractor, CallbackInfo ci) {
         ci.cancel();
     }
 
-    @ModifyExpressionValue(method = "renderSlots", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z"))
+    @ModifyExpressionValue(method = "extractSlots", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z"))
     private boolean renderSlots(boolean original, @Local Slot slot) {
-        return slotWidgets.get(slot.index).isVisible = original && LegacySlotDisplay.of(slot).isVisible();
+        return getSlotWidget(slot).isVisible = original && LegacySlotDisplay.of(slot).isVisible();
     }
 
     //?}
-    @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    private void renderSlot(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+    @Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
+    private void renderSlot(GuiGraphicsExtractor GuiGraphicsExtractor, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         ci.cancel();
-        LegacySlotWidget widget = slotWidgets.get(slot.index);
+        LegacySlotWidget widget = getSlotWidget(slot);
         ItemStack itemStack = slot.getItem();
         boolean bl = false;
         boolean bl2 = slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
@@ -212,7 +226,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
                 bl = true;
                 int k = Math.min(itemStack2.getMaxStackSize(), slot.getMaxStackSize(itemStack2));
                 int l = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
-                int m = AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots, this.quickCraftingType, itemStack2) + l;
+                int m = AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots.size(), this.quickCraftingType, itemStack2) + l;
                 if (m > k) {
                     m = k;
                     string = ChatFormatting.YELLOW.toString() + k;
@@ -230,14 +244,14 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         widget.itemSeed = slot.x + slot.y * this.imageWidth;
         if (widget.iconSprite == null && widget.itemIcon.isEmpty())
             widget.iconSprite = slot.getNoItemIcon();
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(-leftPos, -topPos);
-        widget.render(guiGraphics, 0, 0, 0);
-        guiGraphics.pose().popMatrix();
+        GuiGraphicsExtractor.pose().pushMatrix();
+        GuiGraphicsExtractor.pose().translate(-leftPos, -topPos);
+        widget.extractRenderState(GuiGraphicsExtractor, 0, 0, 0);
+        GuiGraphicsExtractor.pose().popMatrix();
     }
 
-    @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
-    protected void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractTooltip", at = @At("HEAD"), cancellable = true)
+    protected void renderTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, CallbackInfo ci) {
         if (hoveredSlot == null || !LegacySlotDisplay.isVisibleAndActive(hoveredSlot)) ci.cancel();
     }
 
@@ -284,7 +298,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         return LegacyMenuAccess.createMenuRectangleLimit(this, leftPos, topPos, imageWidth, imageHeight);
     }
 
-    @Redirect(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
+    @Redirect(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
     public boolean renderTooltip(ItemStack instance) {
         return true;
     }

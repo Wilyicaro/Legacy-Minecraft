@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.util.IOUtil;
@@ -15,13 +16,13 @@ import wily.legacy.util.IOUtil;
 import java.util.List;
 import java.util.Optional;
 
-public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optional<ItemStack> item,
+public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optional<ArbitrarySupplier<ItemStack>> item,
                                   Optional<Integer> waterColor, Optional<Integer> waterFogColor,
                                   Optional<Integer> fogColor, Optional<Integer> skyColor,
                                   Optional<Float> waterTransparency,
                                   Optional<Float> waterFogDistance) implements IdValueInfo<LegacyBiomeOverride> {
     public static final Identifier DEFAULT_LOCATION = FactoryAPI.createVanillaLocation("default");
-    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), DynamicUtil.ITEM_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
+    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), IOUtil.LAZY_ITEM_SUPPLIER_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
     public static final Codec<List<LegacyBiomeOverride>> LIST_MAP_CODEC = IOUtil.createListIdMapCodec(CODEC, "id").fieldOf("overrides").codec();
 
     public LegacyBiomeOverride(Identifier id) {
@@ -41,7 +42,7 @@ public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optio
     }
 
     public ItemStack icon() {
-        return item.orElse(ItemStack.EMPTY);
+        return item.map(ArbitrarySupplier::get).orElse(ItemStack.EMPTY);
     }
 
     @Override

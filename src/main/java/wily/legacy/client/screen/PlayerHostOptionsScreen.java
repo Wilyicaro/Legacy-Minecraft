@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -87,15 +87,15 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        panel.render(guiGraphics, i, j, f);
-        HostOptionsScreen.drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, panel.x + 7, panel.y + 5);
-        guiGraphics.drawString(font, playerInfo.getProfile().name(), panel.x + 31, panel.y + 12, CommonColor.GRAY_TEXT.get(), false);
+    public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        panel.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        HostOptionsScreen.drawPlayerIcon((LegacyPlayerInfo) playerInfo, GuiGraphicsExtractor, panel.x + 7, panel.y + 5);
+        GuiGraphicsExtractor.text(font, playerInfo.getProfile().name(), panel.x + 31, panel.y + 12, CommonColor.GRAY_TEXT.get(), false);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
+        if (LegacyOptions.legacySettingsMenus.get()) GuiGraphicsExtractor.deferredTooltip = null;
     }
 }

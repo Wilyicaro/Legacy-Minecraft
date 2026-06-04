@@ -2,7 +2,7 @@ package wily.legacy.mixin.base.client;
 
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.server.packs.resources.ReloadInstance;
@@ -52,8 +52,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
     private long initTime;
 
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyIntroAndReloading.get()) {
             ci.cancel();
             if (!loadIntroLocation) {
@@ -69,7 +69,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
             }
 
             if (!finishedIntro) {
-                LegacyIntro.render(guiGraphics, LegacyResourceManager.intro, timer);
+                LegacyIntro.render(GuiGraphicsExtractor, LegacyResourceManager.intro, timer);
             }
 
             float h;
@@ -82,12 +82,12 @@ public abstract class LoadingOverlayMixin extends Overlay {
 
             if (finishedIntro) {
                 if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null) {
-                    this.minecraft.screen.renderWithTooltipAndSubtitles(guiGraphics, 0, 0, f);
+                    this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(GuiGraphicsExtractor, 0, 0, f);
                 } else {
-                    FactoryGuiGraphics.of(guiGraphics).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
                 }
                 if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())
-                    LegacyRenderUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);
+                    LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, (GuiGraphicsExtractor.guiWidth() - 75) / 2, (GuiGraphicsExtractor.guiHeight() - 75) / 2);
 
                 if (g >= 2.0f)
                     this.minecraft.setOverlay(null);
@@ -102,7 +102,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 }
                 this.fadeOutStart = Util.getMillis();
                 if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    this.minecraft.screen.init(GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
                 }
             }
         }

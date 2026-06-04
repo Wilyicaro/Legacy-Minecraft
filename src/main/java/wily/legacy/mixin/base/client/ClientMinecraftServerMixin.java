@@ -10,6 +10,7 @@ import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.LevelLoadListener;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -20,13 +21,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.network.TopMessage;
 
+import java.io.IOException;
 import java.net.Proxy;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
@@ -51,7 +55,7 @@ public abstract class ClientMinecraftServerMixin {
     public abstract Iterable<ServerLevel> getAllLevels();
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, CallbackInfo ci) {
+    private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Optional<GameRules> gameRules, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, boolean bl, CallbackInfo ci) {
         ticksUntilAutosave *= Math.max(1, LegacyOptions.autoSaveInterval.get());
     }
 
@@ -128,23 +132,22 @@ public abstract class ClientMinecraftServerMixin {
         }
     }
 
+    @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;close()V"))
+    private void stopServerBeforeClosingStorageSource(CallbackInfo ci) {
+        if (LegacySaveCache.isCurrentWorldSource(storageSource)) {
+            try {
+                storageSource.deleteLevel();
+            } catch (IOException e) {
+                Legacy4J.LOGGER.error("Failed to delete save cache {}", storageSource.getLevelId(), e);
+            }
+        }
+    }
+
     @Inject(method = "saveEverything", at = @At("RETURN"))
     public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
         if (!LegacySaveCache.isCurrentWorldSource(storageSource)) return;
-        CompletableFuture.runAsync(() -> {
-            isSaving = true;
-            Iterable<ServerLevel> levels = getAllLevels();
-            levels.forEach(l -> l.noSave = true);
-            LegacySaveCache.saveLevel(storageSource);
-            levels.forEach(l -> l.noSave = false);
-            isSaving = false;
-        }, executor);
-    }
-
-    @Inject(method = "stopServer", at = @At("HEAD"))
-    private void stopServerHead(CallbackInfo ci) {
-        while (isSaving) {
-            Thread.onSpinWait();
-        }
+        boolean requested = LegacySaveCache.consumeSaveCopyRequest();
+        if (!requested && LegacyOptions.autoSaveInterval.get() == 0) return;
+        LegacySaveCache.saveLevel(storageSource);
     }
 }

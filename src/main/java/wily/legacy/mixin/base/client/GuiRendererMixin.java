@@ -8,10 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.GuiItemRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
@@ -45,8 +45,6 @@ public class GuiRendererMixin {
     @Final
     private MultiBufferSource.BufferSource bufferSource;
     @Shadow
-    private int frameNumber;
-    @Shadow
     @Final
     private SubmitNodeCollector submitNodeCollector;
     @Shadow
@@ -56,6 +54,8 @@ public class GuiRendererMixin {
     private Long2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Long2ObjectArrayMap<>();
     @Unique
     private List<GuiEntityRenderer> guiEntityRenderers;
+    @Unique
+    private int legacyFrameNumber;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
@@ -64,6 +64,7 @@ public class GuiRendererMixin {
 
     @Inject(method = "prepareItemElements", at = @At("HEAD"))
     private void prepareItemElementsHead(CallbackInfo ci) {
+        legacyFrameNumber++;
         if (guiItemRenderers == null) {
             Legacy4J.LOGGER.error("that can't be!");
             guiItemRenderers = new Long2ObjectArrayMap<>();
@@ -71,7 +72,7 @@ public class GuiRendererMixin {
         guiItemRenderers.forEach((i, renderer) -> renderer.markInvalid());
     }
 
-    @ModifyArg(method = "prepareItemElements", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;forEachItem(Ljava/util/function/Consumer;)V"))
+    @ModifyArg(method = "prepareItemElements", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;forEachItem(Ljava/util/function/Consumer;)V"))
     private Consumer<GuiItemRenderState> prepareItemElements(Consumer<GuiItemRenderState> consumer) {
         return renderState -> {
             LegacyGuiItemRenderState legacyRenderState = LegacyGuiItemRenderState.of(renderState);
@@ -86,7 +87,7 @@ public class GuiRendererMixin {
         for (ObjectIterator<LegacyGuiItemRenderer> iter = guiItemRenderers.values().iterator(); iter.hasNext(); ) {
             var renderer = iter.next();
             if (renderer.isValid())
-                renderer.prepareItemElements(featureRenderDispatcher, submitNodeCollector, bufferSource, renderState, frameNumber);
+                renderer.prepareItemElements(featureRenderDispatcher, submitNodeCollector, bufferSource, renderState, legacyFrameNumber);
             else {
                 renderer.close();
                 iter.remove();

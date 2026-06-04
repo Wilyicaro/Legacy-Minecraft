@@ -3,6 +3,7 @@ package wily.legacy.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.*;
+import net.minecraft.util.LightCoordsUtil;
 import org.joml.Matrix4f;
 
 public class LoyaltyLinesRenderer {
@@ -46,7 +47,7 @@ public class LoyaltyLinesRenderer {
 
         @Override
         public void render(PoseStack.Pose pose, VertexConsumer vertexConsumer) {
-            renderLoyaltyLines(renderState, vertexConsumer, pose, LightTexture.FULL_BLOCK);
+            renderLoyaltyLines(renderState, vertexConsumer, pose, LightCoordsUtil.pack(15, 0));
         }
     }
 }

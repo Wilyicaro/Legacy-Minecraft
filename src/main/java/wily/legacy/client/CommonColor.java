@@ -1,11 +1,11 @@
 package wily.legacy.client;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.util.IOUtil;
 
 import java.util.Locale;
 
@@ -22,11 +22,12 @@ public class CommonColor extends CommonValue<Integer> {
             }
         }
     }, i -> String.format(Locale.ROOT, "#%08X", i));
-    public static final Codec<Integer> INT_COLOR_CODEC = IOUtil.createFallbackCodec(RGBA_INT_COLOR_CODEC, Codec.INT);
+    public static final Codec<Integer> INT_COLOR_CODEC = Codec.either(RGBA_INT_COLOR_CODEC, Codec.INT).xmap(e -> e.map(i -> i, i -> i), Either::left);
 
     public static final ListMap<Identifier, CommonColor> COMMON_COLORS = new ListMap<>();
 
     public static final CommonColor CHAT_BACKGROUND = registerCommonColor("chat_background", 0xFF323232);
+    public static final CommonColor CHAT_TEXT = registerCommonColor("chat_text", 0xFFFFFFFF);
     public static final CommonColor GRAY_TEXT = registerCommonColor("inventory_gray_text", 0xFF323232);
     public static final CommonColor WIDGET_TEXT = registerCommonColor("widget_text", 0xFFFFFFFF);
     public static final CommonColor HIGHLIGHTED_WIDGET_TEXT = registerCommonColor("highlighted_widget_text", 0xFFFFFF00);
@@ -36,12 +37,18 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor TIP_TITLE_TEXT = registerCommonColor("tip_title_text", 0xFFFFFFFF);
     public static final CommonColor TIP_TEXT = registerCommonColor("tip_text", 0xFFFFFFFF);
     public static final CommonColor ACTION_TEXT = registerCommonColor("action_text", 0xFFFFFFFF);
+    public static final CommonColor ITEM_NAME_TEXT = registerCommonColor("item_name_text", 0xFFFFFFFF);
+    public static final CommonColor ITEM_TOOLTIP_TEXT = registerCommonColor("item_tooltip_text", 0xFFFFFFFF);
+    public static final CommonColor MAP_COORDINATE_TEXT = registerCommonColor("map_coordinate_text", 0xFF000000);
+    public static final CommonColor DEATH_MESSAGE_TEXT = registerCommonColor("death_message_text", 0xFFFFFFFF);
+    public static final CommonColor BOSS_TEXT = registerCommonColor("boss_text", 0xFFFFFFFF);
     public static final CommonColor SELECTED_STORAGE_SAVE = registerCommonColor("selected_storage_save", 0xFFFFFF00);
     public static final CommonColor STORAGE_SAVE = registerCommonColor("storage_save", 0xFF8C9DE2);
     public static final CommonColor EXPERIENCE_TEXT = registerCommonColor("experience_text", 0xFF80FF20);
     public static final CommonColor INSUFFICIENT_EXPERIENCE_TEXT = registerCommonColor("insufficient_experience_text", 0xFFCF1F1D);
     public static final CommonColor ANVIL_ERROR_TEXT = registerCommonColor("anvil_error_text", 0xFFFF6060);
     public static final CommonColor ENCHANTMENT_TEXT = registerCommonColor("enchantment_text", 0xFF685E4A);
+    public static final CommonColor ENCHANTMENT_LANGUAGE_TEXT = registerCommonColor("enchantment_language_text", 0xFF685E4A);
     public static final CommonColor INVALID_ENCHANTMENT_TEXT = registerCommonColor("invalid_enchantment_text", 0xFF383222);
     public static final CommonColor HIGHLIGHTED_ENCHANTMENT_TEXT = registerCommonColor("highlighted_enchantment_text", 0xFFFFFF80);
     public static final CommonColor BLACK = registerCommonColor("black", 0xFF000000);

@@ -1,4 +1,4 @@
-//? if >=1.21 && (fabric || neoforge) {
+//? fabric || neoforge {
 package wily.legacy.mixin.base.compat.sodium;
 
 import net.caffeinemc.mods.sodium.client.model.quad.blender.BlendedColorProvider;

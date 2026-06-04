@@ -1,6 +1,5 @@
 package wily.legacy;
 
-import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,6 +7,7 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.level.block.ComposterBlock;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import net.minecraft.world.item.*;
 import net.minecraft.world.phys.Vec3;
@@ -30,6 +30,7 @@ import wily.legacy.skins.SkinsBootstrap;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
+import wily.legacy.world.LegacyGeneratedChunks;
 
 //? if fabric {
 //?} else if forge {
@@ -110,6 +111,7 @@ public class Legacy4J {
             r.register(false, ClientAdvancementsPayload.ID);
             r.register(false, ClientAnimalInLoveSyncPayload.ID);
             r.register(false, ClientEffectActivationPayload.ID);
+            r.register(false, LegacyGeneratedChunks.Payload.ID);
             r.register(true, ClientMerchantTradingPayload.ID_C2S);
             r.register(false, ClientMerchantTradingPayload.ID_S2C);
             r.register(true, PlayerInfoSync.ID);
@@ -136,7 +138,6 @@ public class Legacy4J {
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
         FactoryEvent.registerCommands(TipCommand::register);
         FactoryEvent.setup(Legacy4J::setup);
-        FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
@@ -152,6 +153,7 @@ public class Legacy4J {
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
 
         LegacyBlockBehaviors.setup();
+        ComposterBlock.COMPOSTABLES.put(Items.GRASS_BLOCK, 0.3f);
     }
 
     public static boolean isChunkPosVisibleInSquare(int centerX, int centerZ, int viewDistance, int x, int z, boolean offset) {
@@ -160,10 +162,6 @@ public class Legacy4J {
         long p = Math.max(0, Math.max(n, o) - (offset ? 1 : 0));
         long q = Math.min(n, o);
         return Math.max(p, q) < viewDistance;
-    }
-
-    public static void tagsLoaded() {
-        LegacyBlockBehaviors.registerDyedWaterCauldronInteraction(CauldronInteraction.WATER.map());
     }
 
     public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot) {

@@ -68,9 +68,9 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 		val awPath = "src/main/resources/${extension.commonAccessWidener.get()}"
 
 		extension.awFile.convention("${awPath}.accesswidener")
-		extension.atFile.convention("${awPath}.cfg")
+		extension.atFile.convention("src/main/resources/META-INF/accesstransformer.cfg")
 
-		if (!inferredLoaderIsFabric && inferredLoader != "fabricMC") {
+		if (!inferredLoaderIsFabric && inferredLoader != "fabricmc") {
 			val task = project.tasks.register("convertAccessWidener", ConvertAccessWidenerToTransformerTask::class.java) {
 				group = "build setup"
 				description = "Converts a Fabric .accesswidener file to a Forge access transformer .cfg"
@@ -398,7 +398,7 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 			additionalFiles.from(srcJarTask.flatMap(Jar::getArchiveFile))
 			type = releaseType
 			version = fullVersion
-			changelog.set(rootProject.file("src/main/resources/assets/legacy/changelog/en_us.txt").readText())
+			changelog.set(rootProject.file("CHANGELOG.md").readText())
 			modLoaders.add(loader)
 
 			displayName = "${prop("mod_name")} $modVersion ${loader.replaceFirstChar(Char::titlecase)} $currentVersion"

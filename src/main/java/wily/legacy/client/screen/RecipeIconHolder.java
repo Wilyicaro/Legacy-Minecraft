@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
@@ -52,16 +52,16 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     }
 
     @Override
-    public void render(GuiGraphics graphics, int i, int j, float f) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
         compactMode = LegacyOptions.getUIMode().isSD();
         isHoveredTop = isFocused() && !compactMode && getFocusedRecipes().size() > 2 && isMouseOver(i, j, -1);
         isHoveredBottom = isFocused() && !compactMode && getFocusedRecipes().size() >= 2 && isMouseOver(i, j, 1);
         itemIcon = isValidIndex() ? getFocusedRecipes().get(0).getResultItem() : ItemStack.EMPTY;
-        super.render(graphics, i, j, f);
+        super.extractRenderState(graphics, i, j, f);
     }
 
     @Override
-    public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+    public void renderItem(GuiGraphicsExtractor graphics, int i, int j, float f) {
         if (!isValidIndex()) return;
         LegacyGuiItemRenderer.secureTranslucentRender(!canCraft(getFocusedRecipes().get(0)), 0.5f, (u) -> super.renderItem(graphics, i, j, f));
     }
@@ -96,7 +96,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     }
 
     @Override
-    public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
+    public void renderTooltip(Minecraft minecraft, GuiGraphicsExtractor graphics, int i, int j) {
         super.renderTooltip(minecraft, graphics, i, j);
         if (!isFocused()) return;
         if (getFocusedRecipes().size() <= 1) return;
@@ -169,7 +169,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     protected abstract void updateRecipeDisplay(RecipeInfo<R> rcp);
 
     @Override
-    public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+    public void renderSelection(GuiGraphicsExtractor graphics, int i, int j, float f) {
         if (isValidIndex()) {
             if (compactMode) {
                 if (canScroll()) {

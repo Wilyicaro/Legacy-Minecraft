@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -69,10 +69,10 @@ public class ServerEditScreen extends ConfirmationScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
+        super.extractRenderState(GuiGraphicsExtractor, i, j, f);
         int textX = panel.x + (panel.width - messageLabel.width) / 2;
-        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, LegacyComponents.ENTER_IP, textX, panel.y + (b ? 53 : 73), CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, LegacyComponents.ENTER_IP, textX, panel.y + (b ? 53 : 73), CommonColor.GRAY_TEXT.get(), false));
     }
 
     private void updateAddButtonStatus() {

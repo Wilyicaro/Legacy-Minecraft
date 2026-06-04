@@ -3,10 +3,11 @@ package wily.legacy.mixin.base.client;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
+import net.minecraft.client.gui.components.TextCursorUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -54,13 +55,13 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
     }
 
 
-    @ModifyVariable(method = "renderContents", at = @At(value = "STORE"), ordinal = 0)
+    @ModifyVariable(method = "extractContents", at = @At(value = "STORE"), ordinal = 0)
     public boolean renderWidget(boolean bl) {
         return this.isFocused() && (Util.getMillis()/*? if >1.20.1 {*/ - this.focusedTime/*?}*/) / 180L % 2 == 0L;
     }
 
-    @Redirect(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 3))
-    public void renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl) {
+    @Redirect(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/TextCursorUtils;extractAppendCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZ)V"))
+    public void extractWidgetRenderState(GuiGraphicsExtractor instance, Font arg, int i, int j, int k, boolean bl) {
         instance.pose().pushMatrix();
         instance.pose().translate(i - (textField.cursor() == 0 ? 3 : 4), j + 8.5f);
         instance.pose().scale(6, 1.5f);

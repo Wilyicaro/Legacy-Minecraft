@@ -2,11 +2,11 @@ package wily.legacy.client;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 public interface LegacyNameTag {
     LegacyNameTag NEXT_SUBMIT = new Instance();
@@ -31,14 +31,14 @@ public interface LegacyNameTag {
         renderOutline(bufferSource.getBuffer(seeThrough ? RenderTypes.textBackgroundSeeThrough() : RenderTypes.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
     }
 
-    static void renderOutline(VertexConsumer consumer, Matrix4f matrix4f, float x, float y, float width, float height, float thickness, float r, float g, float b, float a) {
+    static void renderOutline(VertexConsumer consumer, Matrix4fc matrix4f, float x, float y, float width, float height, float thickness, float r, float g, float b, float a) {
         fill(consumer, matrix4f, x, y, x + width, y + thickness, r, g, b, a);
         fill(consumer, matrix4f, x, y + height - thickness, x + width, y + height, r, g, b, a);
         fill(consumer, matrix4f, x, y + thickness, x + thickness, y + height - thickness, r, g, b, a);
         fill(consumer, matrix4f, x + width - thickness, y + thickness, x + width, y + height - thickness, r, g, b, a);
     }
 
-    static void fill(VertexConsumer vertexConsumer, Matrix4f matrix4f, float i, float j, float k, float l, float r, float g, float b, float a) {
+    static void fill(VertexConsumer vertexConsumer, Matrix4fc matrix4f, float i, float j, float k, float l, float r, float g, float b, float a) {
         float o;
         if (i < k) {
             o = i;
@@ -50,10 +50,10 @@ public interface LegacyNameTag {
             j = l;
             l = o;
         }
-        vertexConsumer.addVertex(matrix4f, i, j, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, i, l, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, k, l, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, k, j, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, i, j, 0).setColor(r, g, b, a).setLight(LightCoordsUtil.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, i, l, 0).setColor(r, g, b, a).setLight(LightCoordsUtil.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, k, l, 0).setColor(r, g, b, a).setLight(LightCoordsUtil.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, k, j, 0).setColor(r, g, b, a).setLight(LightCoordsUtil.FULL_BRIGHT);
     }
 
     float[] getNameTagColor();

@@ -114,7 +114,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                         LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
                         if (info.isExhaustionDisabled() != disableExhaustion) {
                             info.setDisableExhaustion(disableExhaustion);
-                            affectPlayer.displayClientMessage(Component.translatable(disableExhaustion ? "legacy.menu.host_options.player.disableExhaustion.enabled" : "legacy.menu.host_options.player.disableExhaustion.disabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(disableExhaustion ? "legacy.menu.host_options.player.disableExhaustion.enabled" : "legacy.menu.host_options.player.disableExhaustion.disabled"), false);
                             shouldSyncPlayerInfo = true;
                         }
                     }
@@ -123,7 +123,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                         LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
                         if (info.mayFlySurvival() != mayFlySurvival) {
                             LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, mayFlySurvival, true);
-                            affectPlayer.displayClientMessage(Component.translatable(mayFlySurvival ? "legacy.menu.host_options.player.mayFly.enabled" : "legacy.menu.host_options.player.mayFly.disabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(mayFlySurvival ? "legacy.menu.host_options.player.mayFly.enabled" : "legacy.menu.host_options.player.mayFly.disabled"), false);
                             shouldSyncPlayerInfo = true;
                         }
                     }
@@ -132,8 +132,8 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                         LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
                         if (info.isVisible() != visible) {
                             info.setVisibility(visible);
-                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
-                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
+                            affectPlayer.sendSystemMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);
                             shouldSyncPlayerInfo = true;
                         }
                     }
@@ -225,7 +225,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
 
         public static All fromPlayerList(MinecraftServer server) {
-            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getWorldData().getGameRules()), server.getDefaultGameType(), All.ID_S2C);
+            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
         }
 
         @Override
@@ -246,13 +246,15 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                 return false;
             });
             context.executor().execute(() -> {
+                MinecraftServer server = context.player() instanceof ServerPlayer sp ? FactoryAPIPlatform.getEntityServer(sp) : null;
                 GameRules displayRules = context.player() instanceof ServerPlayer sp ? sp.level().getGameRules() : Legacy4JClient.gameRules;
+                boolean[] changed = {false};
                 displayRules.visitGameRuleTypes(new GameRuleTypeVisitor() {
                     @Override
                     public void visitBoolean(GameRule<Boolean> gameRule) {
                         Identifier id = gameRule.getIdentifier();
                         if (gameRules.containsKey(id) && (context.player().level().isClientSide() || NON_OP_GAMERULES.contains(gameRule.getIdentifier()) || context.player().permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))) {
-                            displayRules.set(gameRule, gameRules.get(id) == 1, null);
+                            changed[0] |= setGameRule(displayRules, gameRule, gameRules.get(id) == 1, server);
                         }
                     }
 
@@ -260,11 +262,20 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                     public void visitInteger(GameRule<Integer> gameRule) {
                         Identifier id = gameRule.getIdentifier();
                         if (gameRules.containsKey(id) && (context.player().level().isClientSide() || NON_OP_GAMERULES.contains(gameRule.getIdentifier()) || context.player().permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))) {
-                            displayRules.set(gameRule, gameRules.get(id), null);
+                            changed[0] |= setGameRule(displayRules, gameRule, gameRules.get(id), server);
                         }
                     }
                 });
+                if (changed[0] && server != null && identifier == ID_C2S) {
+                    CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), All.fromPlayerList(server));
+                }
             });
+        }
+
+        private static <T> boolean setGameRule(GameRules gameRules, GameRule<T> gameRule, T value, MinecraftServer server) {
+            if (Objects.equals(gameRules.get(gameRule), value)) return false;
+            gameRules.set(gameRule, value, server);
+            return true;
         }
     }
 }
