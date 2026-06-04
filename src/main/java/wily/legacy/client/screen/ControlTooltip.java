@@ -42,6 +42,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.Allay;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.animal.cow.AbstractCow;
 import net.minecraft.world.entity.animal.cow.MushroomCow;
 import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
@@ -52,6 +53,9 @@ import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.animal.happyghast.HappyGhast;
+//? if >=1.21.11 {
+import net.minecraft.world.entity.animal.nautilus.AbstractNautilus;
+//?}
 import net.minecraft.world.entity.animal.panda.Panda;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.animal.pig.Pig;
@@ -416,9 +420,19 @@ public interface ControlTooltip {
             for (InteractionHand hand : InteractionHand.values())
                 if (minecraft.player.getItemInHand(hand).is(Items.FLINT_AND_STEEL))
                     return LegacyComponents.IGNITE;
+        //? if >=1.21.11 {
+        if (entity instanceof AbstractNautilus nautilus && canOpenNautilusInventory(minecraft, nautilus))
+            return LegacyComponents.OPEN;
+        if (entity instanceof AbstractNautilus nautilus) {
+            if (canEquipNautilus(nautilus, mainHand, EquipmentSlot.SADDLE))
+                return LegacyComponents.SADDLE;
+            if (canEquipNautilus(nautilus, mainHand, EquipmentSlot.BODY))
+                return LegacyComponents.EQUIP;
+        }
+        //?}
         if (entity instanceof Wolf wolf && wolf.isTame() && mainHand.has(DataComponents.EQUIPPABLE) && mainHand.get(DataComponents.EQUIPPABLE).slot() == EquipmentSlot.BODY && wolf.getItemBySlot(EquipmentSlot.BODY).isEmpty()) 
             return LegacyComponents.EQUIP;
-        if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player) && (!canDyeEntity(minecraft, minecraft.player.getMainHandItem()) && !canDyeEntity(minecraft, minecraft.player.getOffhandItem())) && (!(a instanceof Parrot p) || (p.onGround() && !minecraft.player.isPassenger())))
+        if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player)/*? if >=1.21.11 {*/ && !(a instanceof AbstractNautilus)/*?}*/ && (!canDyeEntity(minecraft, minecraft.player.getMainHandItem()) && !canDyeEntity(minecraft, minecraft.player.getOffhandItem())) && (!(a instanceof Parrot p) || (p.onGround() && !minecraft.player.isPassenger())))
             return a.isInSittingPose() ? LegacyComponents.FOLLOW_ME : LegacyComponents.SIT;
         if (entity instanceof Allay allay) {
             ItemStack allayItem = allay.getItemInHand(InteractionHand.MAIN_HAND);
@@ -438,7 +452,7 @@ public interface ControlTooltip {
             return LegacyComponents.OPEN;
         if (entity instanceof MinecartChest || entity instanceof MinecartHopper)
             return LegacyComponents.OPEN;
-        if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
+        if (entity instanceof ChestBoat && minecraft.player.isSecondaryUseActive())
             return LegacyComponents.OPEN;
         if (entity instanceof HappyGhast ghast && mainHand.is(ItemTags.HARNESSES) && ghast.canUseSlot(EquipmentSlot.BODY) && ghast.getItemBySlot(EquipmentSlot.BODY).isEmpty())
             return LegacyComponents.HARNESS;
@@ -448,6 +462,10 @@ public interface ControlTooltip {
         if (entity instanceof LivingEntity living && mainHand.getItem() instanceof ShearsItem) {
             if (canShearEquipment(living, EquipmentSlot.BODY) && living.getItemBySlot(EquipmentSlot.BODY).is(ItemTags.HARNESSES))
                 return LegacyComponents.REMOVE_HARNESS;
+            //? if >=1.21.11 {
+            if (living instanceof AbstractNautilus && canShearEquipment(living, EquipmentSlot.BODY))
+                return LegacyComponents.REMOVE_ARMOR;
+            //?}
             if (canShearEquipment(living, EquipmentSlot.SADDLE))
                 return LegacyComponents.REMOVE_SADDLE;
         }
@@ -699,8 +717,8 @@ public interface ControlTooltip {
                 return LegacyComponents.PEEL_BARK;
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && minecraft.level.getBlockState(blockHit.getBlockPos().above()).isAir() && ShovelItem.FLATTENABLES.get(blockState.getBlock()) != null)
                 return LegacyComponents.DIG_PATH;
-            if (actualItem.is(Items.LILY_PAD))
-                return (minecraft.hitResult instanceof BlockHitResult hit && minecraft.level.getFluidState(hit.getBlockPos()).is(FluidTags.WATER)) ? LegacyComponents.PLACE : null;
+            if (actualItem.is(Items.LILY_PAD) || actualItem.is(Items.FROGSPAWN))
+                return canPlaceOnWater(minecraft, actualItem) ? LegacyComponents.PLACE : null;
             // 5-Feeding/healing interactions (canFeed, canSetLoveMode, heal, tame)
             if (canTame(minecraft, hand, actualItem)) return LegacyComponents.TAME;
             if (canDyeCollar(minecraft, actualItem)) return LegacyComponents.DYE_COLLAR;
@@ -720,8 +738,12 @@ public interface ControlTooltip {
                 else if (canShearPlant(blockState))
                     return LegacyComponents.SHEAR;
             }
-            if (blockState != null && actualItem.getItem() instanceof BrushItem && blockState.getBlock() instanceof BrushableBlock)
-                return LegacyComponents.BRUSH;
+            if (actualItem.getItem() instanceof BrushItem) {
+                if (entity instanceof Armadillo armadillo && !armadillo.isBaby())
+                    return LegacyComponents.BRUSH;
+                if (blockState != null && blockState.getBlock() instanceof BrushableBlock)
+                    return LegacyComponents.BRUSH;
+            }
             if (blockHit != null && actualItem.getItem() instanceof BoneMealItem && blockState.getBlock() instanceof BonemealableBlock b && b.isValidBonemealTarget(minecraft.level, blockHit.getBlockPos(), blockState/*? if <=1.20.2 {*//*,true*//*?}*/))
                 return LegacyComponents.GROW;
             // 7-Equipable items (armor, saddle, lead)
@@ -824,9 +846,24 @@ public interface ControlTooltip {
         return item.has(DataComponents.EQUIPPABLE) && item.get(DataComponents.EQUIPPABLE).canBeSheared();
     }
 
+    //? if >=1.21.11 {
+    static boolean canOpenNautilusInventory(Minecraft minecraft, AbstractNautilus nautilus) {
+        return !nautilus.isBaby() && nautilus.isTame() && minecraft.player.isSecondaryUseActive() && (!nautilus.isVehicle() || nautilus.hasPassenger(minecraft.player));
+    }
+
+    static boolean canEquipNautilus(AbstractNautilus nautilus, ItemStack item, EquipmentSlot slot) {
+        return nautilus.canUseSlot(slot) && nautilus.isEquippableInSlot(item, slot) && nautilus.getItemBySlot(slot).isEmpty();
+    }
+    //?}
+
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;
         return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c = new BlockPlaceContext(minecraft.player, hand, usedItem, r)).canPlace() && ((BlockItemAccessor) b).getPlacementBlockState(c) != null));
+    }
+
+    static boolean canPlaceOnWater(Minecraft minecraft, ItemStack usedItem) {
+        BlockHitResult hitResult = mayInteractItemAt(minecraft, usedItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ClipContext.Fluid.SOURCE_ONLY));
+        return hitResult != null && minecraft.level.getFluidState(hitResult.getBlockPos()).is(FluidTags.WATER);
     }
 
     static boolean isHangingLanternPlacement(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
