@@ -1,5 +1,4 @@
 {
-  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "Un biome aride et chaud.",
   "biome.minecraft.bamboo_jungle.description": "Une variante rare de jungle avec des bambous denses.",
   "biome.minecraft.basalt_deltas.description": "Un biome chaud, composé de basalte et de pierre noire. Il est plein de cendres qui passent.",
@@ -64,8 +63,6 @@
   "biome.minecraft.windswept_hills.description": "Un biome de hautes terres avec quelques sommets escarpés. La neige tombe dans la montagne, contient des couches de neige au sommet des collines.",
   "biome.minecraft.windswept_savanna.description": "Une variante peu commune de savane. A un terrain chaotique avec des montagnes gigantesques couvertes de terre grossière et de zones de pierre.",
   "biome.minecraft.wooded_badlands.description": "Une variante des terres arides. Des couches de terre grossière et des forêts de chênes y sont trouvées.",
-  "block.minecraft.jack_o_lantern": "Jack-O-Lantern",
-  "block.minecraft.jungle_sapling": "Jungle Tree Sapling",
   "block.biomesoplenty.dead_pressure_plate.tip": "Une plaque de pression morte sensible qui peut être activée en appliquant presque n'importe quelle quantité de pression.",
   "block.biomesoplenty.empyreal_pressure_plate.tip": "Une plaque de pression empyrée sensible qui peut être activée en appliquant presque n'importe quelle quantité de pression.",
   "block.biomesoplenty.fir_pressure_plate.tip": "Une plaque de pression de sapin sensible qui peut être activée en appliquant presque n'importe quelle quantité de pression.",
@@ -2263,5 +2260,5 @@
   "structure.minecraft.villages": "Villages",
   "structure.minecraft.villages.description": "Établissements situés dans les biomes de plaines, savane, désert, taïga ou plaines enneigées. Gardés par des golems de fer et domicile de fermiers, bibliothécaires, clercs, forgerons et bouchers.",
   "structure.minecraft.woodland_mansions": "Manoirs des bois",
-  "structure.minecraft.woodland_mansions.description": "Manoirs trouvés dans les forêts de chêne noir. Domicile des vex et des illageois."
+  "structure.minecraft.woodland_mansions.description": "Mansions found in Dark Oak Forests. Home to Vexes and Illagers."
 }
