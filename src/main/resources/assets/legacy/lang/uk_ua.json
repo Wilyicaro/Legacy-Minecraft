@@ -1,5 +1,4 @@
 {
-  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "Спекотний посушливий біом.",
   "biome.minecraft.bamboo_jungle.description": "Рідкісний варіант біому джунглів з густими бамбуками.",
   "biome.minecraft.basalt_deltas.description": "Гарячий біом, що складається з базальту та чорного каменю. Він сповнений попелу, що пролітає повз.",
@@ -64,8 +63,6 @@
   "biome.minecraft.windswept_hills.description": "Високогірний біом з деякими крутими вершинами пагорбів. Снігопади випадають високо в горах, містять снігові шари на вершинах пагорбів.",
   "biome.minecraft.windswept_savanna.description": "Незвичайний варіант савани. Має хаотичний рельєф з гігантськими горами, вкритими грубим брудом і шматками каменю.",
   "biome.minecraft.wooded_badlands.description": "Варіант Безплідних земель. Тут зустрічаються шари грубого бруду та ліси з дубів.",
-  "block.minecraft.jack_o_lantern": "Jack-O-Lantern",
-  "block.minecraft.jungle_sapling": "Jungle Tree Sapling",
   "block.biomesoplenty.dead_pressure_plate.tip": "Чутлива мертва натискна плита, яку можна активувати, приклавши майже будь-яку кількість тиску.",
   "block.biomesoplenty.empyreal_pressure_plate.tip": "Чутлива емпірійна натискна плита, яка активується від майже будь‑якого тиску.",
   "block.biomesoplenty.fir_pressure_plate.tip": "Чутлива ялинова натискна плита, яка активується від майже будь‑якого тиску.",
@@ -2263,5 +2260,5 @@
   "structure.minecraft.villages": "Села",
   "structure.minecraft.villages.description": "Поселення, розташовані в біомах Рівнини, Савани, Пустелі, Тайги або Снігових рівнин. Охороняються залізними ґолемами і є домом для фермерів, бібліотекарів, священників, ковалів та м'ясників.",
   "structure.minecraft.woodland_mansions": "Лісові маєтки",
-  "structure.minecraft.woodland_mansions.description": "Маєтки, знайдені в Темнодубових лісах. Домівка для Бісиків та Розбійників."
+  "structure.minecraft.woodland_mansions.description": "Mansions found in Dark Oak Forests. Home to Vexes and Illagers."
 }
