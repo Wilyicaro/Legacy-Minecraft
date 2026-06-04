@@ -1,5 +1,4 @@
 {
-  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "炎热干燥的生态环境。",
   "biome.minecraft.bamboo_jungle.description": "一种罕见的丛林变体，竹子茂密。",
   "biome.minecraft.basalt_deltas.description": "炎热的生态环境，主要由玄武岩和黑石构成，空气中漂浮着火山灰。",
@@ -64,8 +63,6 @@
   "biome.minecraft.windswept_hills.description": "一个多山的生态系统，有一些陡峭的山丘。山上有积雪，山丘顶部有雪层。",
   "biome.minecraft.windswept_savanna.description": "一种不常见的稀树草原变体。有一种混乱的地形，有巨大的山脉覆盖着粗糙的泥土和石头。",
   "biome.minecraft.wooded_badlands.description": "一种有BADLANDS和森林生态系统的变体。那里有粗糙的泥土层和橡树森林。",
-  "block.minecraft.jack_o_lantern": "Jack-O-Lantern",
-  "block.minecraft.jungle_sapling": "Jungle Tree Sapling",
   "block.biomesoplenty.dead_pressure_plate.tip": "A sensitive Dead pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.empyreal_pressure_plate.tip": "A sensitive Empyreal pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.fir_pressure_plate.tip": "A sensitive Fir pressure plate that can be activated by applying almost any amount of pressure.",
@@ -2263,5 +2260,5 @@
   "structure.minecraft.villages": "村庄",
   "structure.minecraft.villages.description": "位于平原、稀树草原、沙漠、针叶林或雪原生物群系的定居点。由铁傀儡守护，居住着农民、图书管理员、牧师、铁匠和屠夫。",
   "structure.minecraft.woodland_mansions": "林地府邸",
-  "structure.minecraft.woodland_mansions.description": "位于深色橡树林的府邸，居住着恼鬼和恶魂。"
+  "structure.minecraft.woodland_mansions.description": "Mansions found in Dark Oak Forests. Home to Vexes and Illagers."
 }
