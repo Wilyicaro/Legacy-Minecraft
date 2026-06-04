@@ -1,5 +1,4 @@
 {
-  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "Бесплодные земли",
   "biome.minecraft.bamboo_jungle.description": "Редкий биом Джунглей с повышенной плотностью бамбука",
   "biome.minecraft.basalt_deltas.description": "Горячий биом, состоящий из базальта и чернита. Он полон летающим пеплом.",
@@ -64,8 +63,6 @@
   "biome.minecraft.windswept_hills.description": "Возвышенный биом с крутыми вершинами. На вершинах холмов выпадает снег, который образует снежные слои.",
   "biome.minecraft.windswept_savanna.description": "Необычный вариант Саванны. Характеризуется хаотичным рельефом с гигантскими горами, покрытыми каменистой землёй и участками камня.",
   "biome.minecraft.wooded_badlands.description": "Вариант Бесплодных земель. Здесь встречаются слои каменистой земли и леса из дубов.",
-  "block.minecraft.jack_o_lantern": "Jack-O-Lantern",
-  "block.minecraft.jungle_sapling": "Jungle Tree Sapling",
   "block.biomesoplenty.dead_pressure_plate.tip": "A sensitive Dead pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.empyreal_pressure_plate.tip": "A sensitive Empyreal pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.fir_pressure_plate.tip": "A sensitive Fir pressure plate that can be activated by applying almost any amount of pressure.",
@@ -2263,5 +2260,5 @@
   "structure.minecraft.villages": "Деревни",
   "structure.minecraft.villages.description": "Поселения, расположенные на равнинах, в саваннах, в пустынях, в тайге или в ледяных пустошах. Их охраняют железные големы. В них живут фермеры, библиотекари, священники, кузнецы и мясники.",
   "structure.minecraft.woodland_mansions": "Лесные особняки",
-  "structure.minecraft.woodland_mansions.description": "Особняки можно найти в Тёмных лесах. В них живут вредины, заклинатели, иллюзоры и поборники."
+  "structure.minecraft.woodland_mansions.description": "Mansions found in Dark Oak Forests. Home to Vexes and Illagers."
 }
