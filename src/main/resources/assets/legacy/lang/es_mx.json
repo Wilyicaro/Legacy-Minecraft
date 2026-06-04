@@ -1,5 +1,4 @@
 {
-  "disconnect.quitting": "Exiting the game",
   "biome.minecraft.badlands.description": "Un bioma cálido y árido.",
   "biome.minecraft.bamboo_jungle.description": "Una variante rara del bioma de la Jungla con densos bambúes.",
   "biome.minecraft.basalt_deltas.description": "Un bioma caliente, compuesto de basalto y piedra negra. Está lleno de cenizas que pasan volando.",
@@ -64,8 +63,6 @@
   "biome.minecraft.windswept_hills.description": "Un bioma de tierras altas con algunas cumbres empinadas. La nevada ocurre en la montaña, contiene capas de nieve en la cima de las colinas.",
   "biome.minecraft.windswept_savanna.description": "Una variante poco común de la Sabana. Tiene un terreno caótico con montañas gigantes cubiertas de tierra gruesa y parche de piedra.",
   "biome.minecraft.wooded_badlands.description": "Una variante de las Tierras Baldías. Se encuentran capas de tierra gruesa y bosques de árboles de roble.",
-  "block.minecraft.jack_o_lantern": "Jack-O-Lantern",
-  "block.minecraft.jungle_sapling": "Jungle Tree Sapling",
   "block.biomesoplenty.dead_pressure_plate.tip": "A sensitive Dead pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.empyreal_pressure_plate.tip": "A sensitive Empyreal pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.fir_pressure_plate.tip": "A sensitive Fir pressure plate that can be activated by applying almost any amount of pressure.",
@@ -2263,5 +2260,5 @@
   "structure.minecraft.villages": "Aldeas",
   "structure.minecraft.villages.description": "Asentamientos situados en biomas de Llanuras, Sabana, Desierto, Taiga o Llanuras Nevadas. Custodiados por Gólems de Hierro y hogar de Agricultores, Bibliotecarios, Clérigos, Herreros y Carniceros.",
   "structure.minecraft.woodland_mansions": "Mansiones del Bosque",
-  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers."
+  "structure.minecraft.woodland_mansions.description": "Mansions found in Dark Oak Forests. Home to Vexes and Illagers."
 }
