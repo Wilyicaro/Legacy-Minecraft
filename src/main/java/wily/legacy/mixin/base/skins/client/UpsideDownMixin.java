@@ -2,7 +2,6 @@ package wily.legacy.mixin.base.skins.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Avatar;
@@ -17,7 +16,6 @@ import wily.legacy.skins.client.gui.GuiDollRender;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.ClientSkinCache;
-import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
 
 @Mixin(AvatarRenderer.class)
@@ -26,7 +24,7 @@ public abstract class UpsideDownMixin {
     private void consoleskins$isEntityUpsideDown(Avatar avatar, CallbackInfoReturnable<Boolean> cir) {
         if (!LegacyOptions.customSkinAnimation.get()) return;
         if (!(avatar instanceof Player player)) return;
-        String skinId = SkinFairness.effectiveSkinId(Minecraft.getInstance(), ClientSkinCache.get(player.getUUID(), player.getScoreboardName()));
+        String skinId = ClientSkinCache.get(player.getUUID(), player.getScoreboardName());
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         if (SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.UPSIDE_DOWN, skinId)) cir.setReturnValue(true);
     }

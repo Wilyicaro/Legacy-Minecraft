@@ -192,7 +192,7 @@ public final class SkinSyncClient {
     }
 
     private static void sendSelection(Minecraft client, String skinId, boolean forceAssets) {
-        String id = SkinFairness.effectiveSkinId(client, skinId);
+        String id = SkinIdUtil.normalize(skinId);
         STATE.sessionAnnounced = true;
         if (!Legacy4JClient.hasModOnServer()) return;
         CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));

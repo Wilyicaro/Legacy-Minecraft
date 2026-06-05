@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.skins.client;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.PlayerSkin;
@@ -11,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
-import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
 
 @Mixin(AbstractClientPlayer.class)
@@ -20,7 +18,7 @@ public abstract class PlayerSkinMixin {
     private void consoleskins$overrideSkin(CallbackInfoReturnable<PlayerSkin> cir) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
         if (ClientSkinCache.isSkinOverrideBypassed()) return;
-        String skinId = SkinFairness.effectiveSkinId(Minecraft.getInstance(), ClientSkinCache.get(player.getUUID()));
+        String skinId = ClientSkinCache.get(player.getUUID());
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         if (cir.getReturnValue() == null) return;
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId, player.getUUID());
