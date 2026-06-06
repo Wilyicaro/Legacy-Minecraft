@@ -55,7 +55,7 @@ public class LegacyGuiElements {
             a.getElements().put("hud.translateY", () -> minecraft.getWindow().getGuiScaledHeight() + LegacyRenderUtil.getHUDDistance());
             a.getElements().put("hud.scaledTranslateY", () -> -minecraft.getWindow().getGuiScaledHeight());
             a.getElements().put("hud.renderColor", () -> ColorUtil.colorFromFloat(1.0f, 1.0f, 1.0f, LegacyRenderUtil.getHUDOpacity()));
-            a.getElements().put(FactoryGuiElement.BOSSHEALTH.name() + ".renderColor", () -> ColorUtil.colorFromFloat(1.0f, 1.0f, 1.0f, LegacyRenderUtil.getInterfaceOpacity()));
+            a.getElements().put(FactoryGuiElement.BOSSHEALTH.name() + ".renderColor", () -> ColorUtil.colorFromFloat(1.0f, 1.0f, 1.0f, LegacyRenderUtil.getHUDOpacity()));
             a.putStaticElement(FactoryGuiElement.CROSSHAIR.name() + ".hud.translateY", false);
             a.putStaticElement(FactoryGuiElement.CROSSHAIR.name() + ".hud.scaledTranslateY", false);
             a.getElements().put(FactoryGuiElement.SPECTATOR_HOTBAR.name() + ".translateY", () -> (22 - LegacyRenderUtil.getHUDDistance()) * (1 - SpectatorGuiAccessor.getInstance().getVisibility()));
