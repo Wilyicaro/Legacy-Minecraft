@@ -92,6 +92,9 @@
     "client.GuiGameRendererMixin",
     "client.GuiGraphicsExtractorMixin",
     "client.gui.GuiMixin",
+    //? if >=26.1 {
+    "client.gui.LocatorBarRendererMixin",
+    //?}
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
     "client.HugeExplosionParticleMixin",
