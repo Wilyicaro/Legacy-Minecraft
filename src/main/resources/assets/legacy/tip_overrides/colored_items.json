@@ -47,6 +47,10 @@
 	{
       "item": "#harnesses",
       "tip": {"translate": "item.minecraft.harness.tip"}
+    },
+	{
+      "item": "#bundles",
+      "tip": {"translate": "item.minecraft.bundle.tip"}
     }
   ]
 }
