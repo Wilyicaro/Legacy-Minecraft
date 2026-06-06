@@ -29,7 +29,7 @@
       "tip": {"translate": "block.minecraft.concrete_powder.tip"}
     },
     {
-      "block": "#concrete",
+      "item": "#concrete",
       "tip": {"translate": "block.minecraft.concrete.tip"}
     },
     {
