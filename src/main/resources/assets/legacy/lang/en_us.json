@@ -414,6 +414,7 @@
   "block.minecraft.oxidized_lightning_rod.tip": "Attracts lightning bolts in thunderstorms.",
   "block.minecraft.packed_ice.tip": "A solid unmeltable block of ice that can have objects placed on it.",
   "block.minecraft.packed_mud.tip": "Crafted from Mud and Wheat. Can be used to craft Mud Bricks or be used for construction.",
+  "block.minecraft.pale_hanging_moss.tip": "Generates in Pale Gardens. Grows downwards when Bone Meal is used on it.",
   "block.minecraft.pale_moss_block.tip": "Generates in Pale Gardens and can be spread with Bone Meal.",
   "block.minecraft.pale_moss_carpet.tip": "Generates in Pale Gardens. Can be used as decoration.",
   "block.minecraft.pale_oak_pressure_plate.tip": "A sensitive Pale Oak pressure plate that can be activated by applying almost any amount of pressure.",
