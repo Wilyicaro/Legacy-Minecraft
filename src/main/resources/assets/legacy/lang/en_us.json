@@ -848,7 +848,7 @@
   "item.minecraft.fishing_rod.tip": "Used to catch fish.",
   "item.minecraft.flint.tip": "Collected by digging gravel. Can be used to craft a flint and steel.",
   "item.minecraft.flint_and_steel.tip": "Used to create fire, ignite TNT and creepers, and open a Nether portal once it has been built.",
-  "item.minecraft.flower_pot.tip": "Used as a decoration. Flowers, Saplings, Cacti and Mushrooms can be planted in it.",
+  "block.minecraft.flower_pot.tip": "Used as a decoration. Flowers, Saplings, Cacti and Mushrooms can be planted in it.",
   "item.minecraft.furnace_minecart.tip": "Will move along rails and can push other minecarts when coal is put in it.",
   "item.minecraft.ghast_tear.tip": "Used in potion brewing. Dropped by Ghasts when they die.",
   "item.minecraft.glass_bottle.tip": "Can be filled with water, and used as the starting ingredient for a potion in the Brewing Stand.",
