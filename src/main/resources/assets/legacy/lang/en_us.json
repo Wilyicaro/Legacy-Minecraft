@@ -2200,6 +2200,7 @@
   "legacy.options.uiMode.fhd": "Full HD (1080p)",
   "legacy.options.uiMode.hd": "HD (720p)",
   "legacy.options.uiMode.sd": "SD (480p)",
+  "legacy.options.unlinkMusicFromMasterVolume": "Unlink Music From Master Volume",
   "legacy.options.unbindConflictingButtons": "Unbind Conflicting Buttons",
   "legacy.options.unbindConflictingKeys": "Unbind Conflicting Keys",
   "legacy.options.unfocusedInputs": "Allow Unfocused Input",

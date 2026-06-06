@@ -228,6 +228,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> minecartSounds = CLIENT_STORAGE.register(createBoolean("minecartSounds", true));
     public static final FactoryConfig<Boolean> backSound = CLIENT_STORAGE.register(createBoolean("backSound", true));
     public static final FactoryConfig<Boolean> hoverFocusSound = CLIENT_STORAGE.register(createBoolean("hoverFocusSound", false));
+    public static final FactoryConfig<Boolean> unlinkMusicFromMasterVolume = CLIENT_STORAGE.register(createBoolean("unlinkMusicFromMasterVolume", true));
     public static final FactoryConfig<Boolean> caveSounds = CLIENT_STORAGE.register(createBoolean("caveSounds", true));
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
