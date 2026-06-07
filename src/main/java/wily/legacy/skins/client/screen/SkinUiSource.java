@@ -31,7 +31,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
     }
 
     private static SkinEntry orderedSkin(SkinEntry skin, int order) {
-        return new SkinEntry(skin.id(), skin.sourceId(), skin.name(), skin.texture(), skin.modelId(), skin.cape(), skin.slimArms(), order);
+        return new SkinEntry(skin.id(), skin.sourceId(), skin.name(), skin.texture(), skin.modelId(), skin.cape(), skin.slimArms(), order, skin.fair());
     }
 
     private static EnumSet<SkinPoseRegistry.PoseTag> poseTags(List<String> poses) {
@@ -255,7 +255,7 @@ final class SkinUiSource implements ChangeSkinScreenSource {
                 int order = ++skinOrder;
                 SkinEntry skin = skins.get(skinId);
                 if (skin == null) {
-                    skin = new SkinEntry(skinId, skinId, apiSkin.title(), null, null, null, false, order);
+                    skin = new SkinEntry(skinId, skinId, apiSkin.title(), null, null, null, false, order, false);
                     skins.put(skinId, skin);
                 }
                 String theme = SkinIdUtil.trimToNull(apiSkin.theme());

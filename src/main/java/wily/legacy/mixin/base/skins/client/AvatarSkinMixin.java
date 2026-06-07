@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.skins.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.world.entity.Avatar;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
 
 @Mixin(AvatarRenderer.class)
@@ -24,7 +26,7 @@ public abstract class AvatarSkinMixin {
         if (!(state instanceof RenderStateSkinIdAccess access)) return;
         consoleskins$clearSkinState(access);
         access.consoleskins$setEntityUuid(avatar.getUUID());
-        String skinId = consoleskins$resolveSkinId(avatar);
+        String skinId = SkinFairness.effectiveSkinId(Minecraft.getInstance(), consoleskins$resolveSkinId(avatar));
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
         access.consoleskins$setSkinId(skinId);
         var movement = avatar.getDeltaMovement();
