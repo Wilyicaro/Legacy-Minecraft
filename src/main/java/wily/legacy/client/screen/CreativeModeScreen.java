@@ -199,6 +199,8 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 296), accessor.getInteger("scroller.y", panel.y + 27));
         scroller.height = accessor.getInteger("scroller.height", 135);
         scroller.width = accessor.getInteger("scroller.width", 13);
+        scroller.trackSprite = accessor.getResourceLocation("scroller.trackSprite", scroller.trackSprite);
+        scroller.thumbSprite = accessor.getResourceLocation("scroller.thumbSprite", scroller.thumbSprite);
         scroller.offset(new Vec2(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f));
         boolean sd = LegacyOptions.getUIMode().isSD();
         if (arrangement.get() == 2) {
