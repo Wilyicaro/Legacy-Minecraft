@@ -135,10 +135,16 @@ public abstract class ClientMinecraftServerMixin {
     @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;close()V"))
     private void stopServerBeforeClosingStorageSource(CallbackInfo ci) {
         if (LegacySaveCache.isCurrentWorldSource(storageSource)) {
-            try {
-                storageSource.deleteLevel();
-            } catch (IOException e) {
-                Legacy4J.LOGGER.error("Failed to delete save cache {}", storageSource.getLevelId(), e);
+            if (LegacySaveCache.saveExit) {
+                LegacySaveCache.saveExit = false;
+                LegacySaveCache.saveLevel(storageSource);
+            }
+            if (LegacyOptions.alwaysClearSaveCache.get()) {
+                try {
+                    storageSource.deleteLevel();
+                } catch (IOException e) {
+                    Legacy4J.LOGGER.error("Failed to delete save cache {}", storageSource.getLevelId(), e);
+                }
             }
         }
     }
