@@ -116,23 +116,23 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
         panel.init();
         addRenderableOnly(panel);
 
-        this.page = MultiLineEditBox.builder().setShowDecorations(false).setTextColor(-16777216).setCursorColor(-16777216).setShowBackground(false).setTextShadow(false).setX(panel.x + 20).setY(panel.y + 37).build(this.font, panel.getWidth() - 40, panel.getHeight() - 74, CommonComponents.EMPTY);
+        this.page = MultiLineEditBox.builder().setShowDecorations(false).setTextColor(-16777216).setCursorColor(-16777216).setShowBackground(false).setTextShadow(false).setX(panel.textX()).setY(panel.textY()).build(this.font, panel.editWidth(), panel.editHeight(), CommonComponents.EMPTY);
         this.page.setCharacterLimit(1024);
         MultiLineEditBox var10000 = this.page;
         Objects.requireNonNull(this.font);
-        var10000.setLineLimit(126 / 9);
+        var10000.setLineLimit(panel.editLineLimit(this.font.lineHeight));
         this.page.setValueListener((string) -> this.pages.set(this.currentPage, string));
         this.addRenderableWidget(this.page);
         this.updatePageContent();
         this.numberOfPages = this.getPageNumberMessage();
-        this.addRenderableWidget(Button.builder(Component.translatable("book.signButton"), button -> this.minecraft.setScreen(this.signScreen)).bounds(this.width / 2 - 108, panel.y + panel.height + 5, 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("book.signButton"), button -> this.minecraft.setScreen(this.signScreen)).bounds(this.width / 2 - 108, panel.screenButtonY(), 100, 20).build());
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> {
             this.minecraft.setScreen(null);
             this.saveChanges();
-        }).bounds(this.width / 2 + 8, panel.y + panel.height + 5, 100, 20).build());
+        }).bounds(this.width / 2 + 8, panel.screenButtonY(), 100, 20).build());
 
-        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + panel.width - 62, panel.y + panel.height - 34, true, (button) -> this.pageForward(), true));
-        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + 26, panel.y + panel.height - 34, false, (button) -> this.pageBack(), true));
+        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.nextPageButtonX(), panel.pageButtonY(), true, (button) -> this.pageForward(), true));
+        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.previousPageButtonX(), panel.pageButtonY(), false, (button) -> this.pageBack(), true));
     }
 
     @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
@@ -159,12 +159,12 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
     @ModifyArg(method = "visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
     public int pageX(int anchorX) {
-        return panel.x + panel.width - 24;
+        return panel.pageNumberX();
     }
 
     @ModifyArg(method = "visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
     public int pageY(int y) {
-        return panel.y + 22;
+        return panel.pageNumberY();
     }
 
     @Override

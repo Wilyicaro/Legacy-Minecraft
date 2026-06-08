@@ -67,8 +67,8 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         ci.cancel();
         panel.init();
         addRenderableWidget(panel);
-        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + panel.width - 62, panel.y + panel.height - 34, true, (button) -> this.pageForward(), true));
-        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + 26, panel.y + panel.height - 34, false, (button) -> this.pageBack(), true));
+        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.nextPageButtonX(), panel.pageButtonY(), true, (button) -> this.pageForward(), true));
+        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.previousPageButtonX(), panel.pageButtonY(), false, (button) -> this.pageBack(), true));
         setFocused(panel);
         this.updateButtonVisibility();
     }
@@ -99,32 +99,32 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
 
     @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 1)
     public int changeSplitWidth(int i) {
-        return 159;
+        return panel.splitWidth();
     }
 
     @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
     public int changePageX(int i) {
-        return panel.x + panel.width - 24;
+        return panel.pageNumberX();
     }
 
     @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
     public int changePageY(int i) {
-        return panel.y + 22;
+        return panel.pageNumberY();
     }
 
     @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 0)
     public int changeTextX(int i) {
-        return panel.x + 20;
+        return panel.textX();
     }
 
     @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 1)
     public int changeTextY(int i, @Local(ordinal = 3) int o) {
-        return panel.y + 37 + o * this.font.lineHeight;
+        return panel.textY() + o * this.font.lineHeight;
     }
 
     @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"), index = 0)
     public int changeMaxLines(int i) {
-        return 176 / this.font.lineHeight;
+        return panel.maxPageLines(this.font.lineHeight);
     }
 
     @Override
