@@ -1,0 +1,20 @@
+{
+  "targetUI": "net.minecraft.client.gui.screens.inventory.BookSignScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.width": 146,
+    "panel.height": 180,
+    "panel.x": "(${width}-146)/2",
+    "panel.y": "(${height}-180)/2",
+    "panel.text.x": 15,
+    "panel.text.y": 27,
+    "panel.text.width": 115,
+    "panel.titleEdit.y": 36,
+    "panel.owner.y": 44,
+    "panel.finalizeText.y": 62,
+    "panel.screenButton.y": 185
+  }
+}

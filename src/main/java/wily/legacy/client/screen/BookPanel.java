@@ -30,9 +30,30 @@ public class BookPanel extends WidgetPanel {
     @Override
     public void init(String name) {
         super.init(name);
-        size(201, 248);
-        pos(centeredLeftPos(accessor.getScreen()), centeredTopPos(accessor.getScreen()) - 30);
+        appearance(201, 248);
+        pos(value("x", centeredLeftPos(accessor.getScreen())), value("y", centeredTopPos(accessor.getScreen()) - 30));
     }
+
+    public int textX() { return x("text.x", 20); }
+    public int textY() { return y("text.y", 37); }
+    public int editWidth() { return value("edit.width", getWidth() - 40); }
+    public int editHeight() { return value("edit.height", getHeight() - 74); }
+    public int splitWidth() { return value("text.width", 159); }
+    public int pageNumberX() { return x("pageNumber.x", getWidth() - 24); }
+    public int pageNumberY() { return y("pageNumber.y", 22); }
+    public int pageButtonY() { return y("pageButton.y", getHeight() - 34); }
+    public int previousPageButtonX() { return x("previousPageButton.x", 26); }
+    public int nextPageButtonX() { return x("nextPageButton.x", getWidth() - 62); }
+    public int screenButtonY() { return y("screenButton.y", getHeight() + 5); }
+    public int titleEditY() { return y("titleEdit.y", 50); }
+    public int ownerY() { return y("owner.y", 61); }
+    public int finalizeTextY() { return y("finalizeText.y", 85); }
+    public int editLineLimit(int lineHeight) { return Math.max(1, value("edit.lineLimit", 126 / 9)); }
+    public int maxPageLines(int lineHeight) { return Math.max(1, value("text.maxLines", 176 / lineHeight)); }
+    public float pageButtonScale() { return accessor.getFloat(name + ".pageButton.scale", 1.5f); }
+    private int value(String key, int fallback) { return accessor.getInteger(name + "." + key, fallback); }
+    private int x(String key, int fallback) { return getX() + value(key, fallback); }
+    private int y(String key, int fallback) { return getY() + value(key, fallback); }
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -66,7 +87,7 @@ public class BookPanel extends WidgetPanel {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || isMouseOver(i, j);
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(getX(), getY());
-                guiGraphics.pose().scale(1.5f, 1.5f);
+                guiGraphics.pose().scale(pageButtonScale(), pageButtonScale());
                 guiGraphics.pose().translate(-getX(), -getY());
                 super.renderWidget(guiGraphics, i, j, f);
                 guiGraphics.pose().popMatrix();
@@ -86,7 +107,8 @@ public class BookPanel extends WidgetPanel {
 
             @Override
             public boolean isMouseOver(double d, double e) {
-                return this.active && this.visible && d >= (double) this.getX() && e >= (double) this.getY() && d < (double) (this.getX() + this.getWidth() * 3 / 2) && e < (double) (this.getY() + this.getHeight() * 3 / 2);
+                float scale = pageButtonScale();
+                return this.active && this.visible && d >= (double) this.getX() && e >= (double) this.getY() && d < (double) (this.getX() + this.getWidth() * scale) && e < (double) (this.getY() + this.getHeight() * scale);
             }
         };
     }

@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client.book;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.ControlType;
@@ -79,8 +81,8 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         ci.cancel();
         panel.init();
         addRenderableWidget(panel);
-        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + panel.width - 62, panel.y + panel.height - 34, true, (button) -> this.pageForward(), true));
-        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + 26, panel.y + panel.height - 34, false, (button) -> this.pageBack(), true));
+        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.nextPageButtonX(), panel.pageButtonY(), true, (button) -> this.pageForward(), true));
+        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.previousPageButtonX(), panel.pageButtonY(), false, (button) -> this.pageBack(), true));
         setFocused(panel);
         this.updateButtonVisibility();
     }
@@ -133,28 +135,34 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
-    @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
-    public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
-        if (this.cachedPageComponents.isEmpty()) {
-            cir.setReturnValue(null);
-            return;
-        }
-        int i = (int) Math.floor(d - panel.x - 20);
-        int j = (int) Math.floor(e - panel.y - 37);
-        if (i < 0 || j < 0) {
-            cir.setReturnValue(null);
-            return;
-        }
-        int k = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
-        if (i <= 159 && j < this.minecraft.font.lineHeight * k + k) {
-            int l = j / this.minecraft.font.lineHeight;
-            if (l < this.cachedPageComponents.size()) {
-                FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(l);
-                cir.setReturnValue(this.minecraft.font.getSplitter().componentStyleAtWidth(formattedCharSequence, i));
-                return;
-            }
-        }
-        cir.setReturnValue(null);
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 1)
+    public int changeSplitWidth(int i) {
+        return panel.splitWidth();
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
+    public int changePageX(int i) {
+        return panel.pageNumberX();
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
+    public int changePageY(int i) {
+        return panel.pageNumberY();
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 0)
+    public int changeTextX(int i) {
+        return panel.textX();
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(IILnet/minecraft/util/FormattedCharSequence;)V"), index = 1)
+    public int changeTextY(int i, @Local(ordinal = 3) int o) {
+        return panel.textY() + o * this.font.lineHeight;
+    }
+
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I"), index = 0)
+    public int changeMaxLines(int i) {
+        return panel.maxPageLines(this.font.lineHeight);
     }
 
     @Override
