@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -16,6 +17,8 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
     public static final float SCROLLER_HEIGHT_OFFSET = 13.5f;
     public final LegacyScrollRenderer scrollRenderer;
     public Vec2 offset = Vec2.ZERO;
+    public Identifier trackSprite = LegacySprites.SQUARE_RECESSED_PANEL;
+    public Identifier thumbSprite = LegacySprites.PANEL;
     public boolean dragged = false;
 
     public LegacyScroller(LegacyScrollRenderer scrollRenderer) {
@@ -61,9 +64,9 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
                 scrollRenderer.renderScroll(GuiGraphicsExtractor, ScreenDirection.UP, 0, -11);
             GuiGraphicsExtractor.pose().popMatrix();
         } else FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
-        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, width, height);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(trackSprite, 0, 0, width, height);
         GuiGraphicsExtractor.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0));
-        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(thumbSprite, 0, 0, 16, 16);
         FactoryGuiGraphics.of(GuiGraphicsExtractor).clearBlitColor();
         GuiGraphicsExtractor.pose().popMatrix();
     }
