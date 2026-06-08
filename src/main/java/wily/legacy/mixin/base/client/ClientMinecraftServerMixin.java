@@ -20,12 +20,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.network.TopMessage;
 
+import java.io.IOException;
 import java.net.Proxy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -125,6 +127,23 @@ public abstract class ClientMinecraftServerMixin {
         if (LegacySaveCache.saveExit) {
             LegacySaveCache.saveExit = false;
             LegacySaveCache.saveLevel(storageSource);
+        }
+    }
+
+    @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;close()V"))
+    private void stopServerBeforeClosingStorageSource(CallbackInfo ci) {
+        if (LegacySaveCache.isCurrentWorldSource(storageSource)) {
+            if (LegacySaveCache.saveExit) {
+                LegacySaveCache.saveExit = false;
+                LegacySaveCache.saveLevel(storageSource);
+            }
+            if (LegacyOptions.alwaysClearSaveCache.get()) {
+                try {
+                    storageSource.deleteLevel();
+                } catch (IOException e) {
+                    Legacy4J.LOGGER.error("Failed to delete save cache {}", storageSource.getLevelId(), e);
+                }
+            }
         }
     }
 
