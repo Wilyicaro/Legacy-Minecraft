@@ -18,14 +18,15 @@ import java.util.Optional;
 public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optional<ItemStack> item,
                                   Optional<Integer> waterColor, Optional<Integer> waterFogColor,
                                   Optional<Integer> fogColor, Optional<Integer> skyColor,
+                                  Optional<Integer> grassColor, Optional<Integer> foliageColor,
                                   Optional<Float> waterTransparency,
                                   Optional<Float> waterFogDistance) implements IdValueInfo<LegacyBiomeOverride> {
     public static final Identifier DEFAULT_LOCATION = FactoryAPI.createVanillaLocation("default");
-    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), DynamicUtil.ITEM_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
+    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), DynamicUtil.ITEM_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("grass_color").forGetter(LegacyBiomeOverride::grassColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("foliage_color").forGetter(LegacyBiomeOverride::foliageColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
     public static final Codec<List<LegacyBiomeOverride>> LIST_MAP_CODEC = IOUtil.createListIdMapCodec(CODEC, "id").fieldOf("overrides").codec();
 
     public LegacyBiomeOverride(Identifier id) {
-        this(id, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        this(id, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     public static LegacyBiomeOverride getDefault() {
@@ -73,13 +74,21 @@ public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optio
         return skyColor.or(() -> getDefault().skyColor);
     }
 
+    public Optional<Integer> grassColor() {
+        return grassColor.or(() -> getDefault().grassColor);
+    }
+
+    public Optional<Integer> foliageColor() {
+        return foliageColor.or(() -> getDefault().foliageColor);
+    }
+
     public Optional<Float> waterFogDistance() {
         return waterFogDistance.or(() -> getDefault().waterFogDistance);
     }
 
     @Override
     public LegacyBiomeOverride copyFrom(LegacyBiomeOverride other) {
-        return new LegacyBiomeOverride(id, other.name.or(this::name), other.item.or(this::item), other.waterColor.or(this::waterColor), other.waterFogColor.or(this::waterFogColor), other.fogColor.or(this::fogColor), other.skyColor.or(this::skyColor), other.waterTransparency.or(this::waterTransparency), other.waterFogDistance.or(this::waterFogDistance));
+        return new LegacyBiomeOverride(id, other.name.or(this::name), other.item.or(this::item), other.waterColor.or(this::waterColor), other.waterFogColor.or(this::waterFogColor), other.fogColor.or(this::fogColor), other.skyColor.or(this::skyColor), other.grassColor.or(this::grassColor), other.foliageColor.or(this::foliageColor), other.waterTransparency.or(this::waterTransparency), other.waterFogDistance.or(this::waterFogDistance));
     }
 
     @Override
