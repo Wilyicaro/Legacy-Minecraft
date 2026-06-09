@@ -502,6 +502,7 @@ public class Legacy4JClient {
             };
             registry.accept(blockColor, Blocks.WATER_CAULDRON);
             registry.accept(blockColor, LegacyRegistries.COLORED_WATER_CAULDRON.get());
+            registry.accept((blockState, blockAndTintGetter, blockPos, i) -> LegacyBiomeOverride.getOrDefault(FactoryAPI.createVanillaLocation("birch_forest")).foliageColor().orElse(FoliageColor.FOLIAGE_BIRCH), Blocks.BIRCH_LEAVES);
         });
         fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_oak_leaves"));
         fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPI.createVanillaLocation("fast_spruce_leaves"));
