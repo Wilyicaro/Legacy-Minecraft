@@ -65,6 +65,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Shadow
     private float scrollSpeed;
     @Shadow
+    private int totalScrollLength;
+    @Shadow
     private List<FormattedCharSequence> lines;
     @Shadow
     private boolean speedupActive;
@@ -95,6 +97,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
             int k = this.width / 2 - 161;
             for (int n = 0; n < this.lines.size(); ++n) {
+                int lineAdvance = getPoemLineAdvance(n);
                 if (n == this.lines.size() - 1) {
                     float h = (float) m + g - (float) (this.height / 2 - 6);
                     if (h < 0.0F) {
@@ -105,28 +108,21 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                 if ((float) m + g + 12.0F + 8.0F > 0.0F && (float) m + g < (float) this.height) {
                     FormattedCharSequence formattedCharSequence = this.lines.get(n);
 
-                    if (formattedCharSequence == FormattedCharSequence.EMPTY) {
-                        continue;
-                    }
-
-                    boolean centered = this.centeredLines.contains(n);
-                    guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(k, centered ? width / 2 : m);
-                    guiGraphics.pose().scale(2, 2);
-                    if (centered) {
-                        guiGraphics.drawCenteredString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
-                    } else {
-                        guiGraphics.drawString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
-                    }
-                    guiGraphics.pose().popMatrix();
-
-                    if (n + 1 < lines.size() && lines.get(n + 1) == FormattedCharSequence.EMPTY) {
-                        m += 100;
-                        continue;
+                    if (formattedCharSequence != FormattedCharSequence.EMPTY) {
+                        boolean centered = this.centeredLines.contains(n);
+                        guiGraphics.pose().pushMatrix();
+                        guiGraphics.pose().translate(k, centered ? width / 2 : m);
+                        guiGraphics.pose().scale(2, 2);
+                        if (centered) {
+                            guiGraphics.drawCenteredString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
+                        } else {
+                            guiGraphics.drawString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
+                        }
+                        guiGraphics.pose().popMatrix();
                     }
                 }
 
-                m += 16;
+                m += lineAdvance;
             }
             guiGraphics.pose().popMatrix();
             LegacyFontUtil.defaultFontOverride = null;
@@ -170,6 +166,11 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
         ci.cancel();
     }
 
+    @Unique
+    private int getPoemLineAdvance(int index) {
+        return 24;
+    }
+
     @Inject(method = "keyPressed", at = @At("HEAD"))
     public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (keyEvent.isUp() || keyEvent.isDown()) {
@@ -185,9 +186,21 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     }
 
     @Inject(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/WinScreen;lines:Ljava/util/List;", opcode = Opcodes.PUTFIELD))
-    private void init(CallbackInfo ci) {
+    private void initLineSets(CallbackInfo ci) {
         this.titleLines = new IntOpenHashSet();
         this.nameLines = new IntOpenHashSet();
+    }
+
+    @Inject(method = "init", at = @At("TAIL"))
+    private void updateTotalScrollLength(CallbackInfo ci) {
+        if (poem) {
+            totalScrollLength = 0;
+            for (int i = 0; i < lines.size(); i++) {
+                totalScrollLength += getPoemLineAdvance(i);
+            }
+        } else {
+            totalScrollLength = lines.size() * 18;
+        }
     }
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Ljava/lang/String;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"*//*?} else {*/"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"/*?}*/, ordinal = 0))
