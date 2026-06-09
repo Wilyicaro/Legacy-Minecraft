@@ -48,4 +48,14 @@ public class ClientBiomeMixin {
     private void getSkyColor(CallbackInfoReturnable<Integer> cir) {
         biomeOverride().skyColor().ifPresent(cir::setReturnValue);
     }
+
+    @Inject(method = "getGrassColor", at = @At("HEAD"), cancellable = true)
+    private void getGrassColor(double x, double z, CallbackInfoReturnable<Integer> cir) {
+        biomeOverride().grassColor().ifPresent(cir::setReturnValue);
+    }
+
+    @Inject(method = "getFoliageColor", at = @At("HEAD"), cancellable = true)
+    private void getFoliageColor(CallbackInfoReturnable<Integer> cir) {
+        biomeOverride().foliageColor().ifPresent(cir::setReturnValue);
+    }
 }
