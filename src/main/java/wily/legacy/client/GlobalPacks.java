@@ -211,7 +211,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public boolean hasChanged() {
-            return !getSelectedIds().equals(globalPacks.get());
+            return !getSelectedIds().equals(globalPacks.get().list());
         }
 
         public void applyChanges() {
