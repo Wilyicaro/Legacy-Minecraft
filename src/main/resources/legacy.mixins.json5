@@ -75,6 +75,7 @@
     "client.zombie.ZombifiedPiglinRendererMixin",
     "client.EditBoxMixin",
     "client.ElytraOnPlayerSoundInstanceMixin",
+    "client.EquipmentLayerRendererMixin",
     "client.enchantment.EnchantmentScreenMixin",
     "client.EndCrystalModelMixin",
     "client.EndCrystalRendererMixin",
