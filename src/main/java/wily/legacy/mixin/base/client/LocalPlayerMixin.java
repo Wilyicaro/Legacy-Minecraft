@@ -87,7 +87,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     }
 
     public boolean canSprintController() {
-        return !this.isSprinting() && /*? if <1.21.5 {*//*this.hasEnoughFoodToStartSprinting()*//*?} else {*/this.hasEnoughFoodToDoExhaustiveManoeuvres()/*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft.screen == null;
+        return !this.isSprinting() && !this.isFallFlying() && /*? if <1.21.5 {*//*this.hasEnoughFoodToStartSprinting()*//*?} else {*/this.hasEnoughFoodToDoExhaustiveManoeuvres()/*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft.screen == null;
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else if <1.21.5 {*//*3*//*?} else {*/1/*?}*/))
