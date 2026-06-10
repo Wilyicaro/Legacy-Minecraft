@@ -1,7 +1,6 @@
 package wily.legacy.skins.client.render.boxloader;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
@@ -10,6 +9,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -41,22 +41,22 @@ public class BoxAddonLayer extends RenderLayer {
         return p != null && p.isInvisible();
     }
 
-    private static void renderSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
+    private static void submitSlot(ModelPart limb, List<ModelPart> parts, PoseStack ps, SubmitNodeCollector collector, RenderType renderType, int light, float partScale, int outlineColor) {
         if (parts == null || parts.isEmpty()) return;
         ps.pushPose();
         limb.translateAndRotate(ps);
         if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
-        for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
+        for (ModelPart p : parts) collector.submitModelPart(p, ps, renderType, light, OverlayTexture.NO_OVERLAY, null, false, false, -1, null, outlineColor);
         ps.popPose();
     }
 
-    private static void renderHat(ModelPart head, ModelPart hat, boolean hatChildLike, List<ModelPart> parts, PoseStack ps, VertexConsumer vc, int light, float partScale) {
+    private static void submitHat(ModelPart head, ModelPart hat, boolean hatChildLike, List<ModelPart> parts, PoseStack ps, SubmitNodeCollector collector, RenderType renderType, int light, float partScale, int outlineColor) {
         if (parts == null || parts.isEmpty()) return;
         ps.pushPose();
         if (hatChildLike) head.translateAndRotate(ps);
         hat.translateAndRotate(ps);
         if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
-        for (ModelPart p : parts) p.render(ps, vc, light, OverlayTexture.NO_OVERLAY);
+        for (ModelPart p : parts) collector.submitModelPart(p, ps, renderType, light, OverlayTexture.NO_OVERLAY, null, false, false, -1, null, outlineColor);
         ps.popPose();
     }
 
@@ -137,29 +137,22 @@ public class BoxAddonLayer extends RenderLayer {
         final boolean hatChildLike = isHatChildLike(head, hat);
         final int armorMask = getArmorMask(ars);
         final boolean hideHead = hasHeadItem(ars);
-        collector.submitCustomGeometry(
-                poseStack,
-                RenderTypes.entityCutoutNoCull(texFinal),
-                (pose, vc) -> {
-                    PoseStack ps = new PoseStack();
-                    ps.last().set(pose);
-
-                    float partScale = baked.partScale();
-                    if (!hideHead) {
-                        renderSlot(head, baked.get(AttachSlot.HEAD, armorMask), ps, vc, packedLight, partScale);
-                        renderHat(head, hat, hatChildLike, baked.get(AttachSlot.HAT, armorMask), ps, vc, packedLight, partScale);
-                    }
-                    renderSlot(body, baked.get(AttachSlot.BODY, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(jacket, baked.get(AttachSlot.JACKET, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(rightArm, baked.get(AttachSlot.RIGHT_ARM, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(leftArm, baked.get(AttachSlot.LEFT_ARM, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(rightSleeve, baked.get(AttachSlot.RIGHT_SLEEVE, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(leftSleeve, baked.get(AttachSlot.LEFT_SLEEVE, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(rightLeg, baked.get(AttachSlot.RIGHT_LEG, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(leftLeg, baked.get(AttachSlot.LEFT_LEG, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(rightPants, baked.get(AttachSlot.RIGHT_PANTS, armorMask), ps, vc, packedLight, partScale);
-                    renderSlot(leftPants, baked.get(AttachSlot.LEFT_PANTS, armorMask), ps, vc, packedLight, partScale);
-                }
-        );
+        RenderType renderType = RenderTypes.entityCutout(texFinal);
+        float partScale = baked.partScale();
+        int outlineColor = ars.outlineColor;
+        if (!hideHead) {
+            submitSlot(head, baked.get(AttachSlot.HEAD, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+            submitHat(head, hat, hatChildLike, baked.get(AttachSlot.HAT, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        }
+        submitSlot(body, baked.get(AttachSlot.BODY, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(jacket, baked.get(AttachSlot.JACKET, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(rightArm, baked.get(AttachSlot.RIGHT_ARM, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(leftArm, baked.get(AttachSlot.LEFT_ARM, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(rightSleeve, baked.get(AttachSlot.RIGHT_SLEEVE, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(leftSleeve, baked.get(AttachSlot.LEFT_SLEEVE, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(rightLeg, baked.get(AttachSlot.RIGHT_LEG, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(leftLeg, baked.get(AttachSlot.LEFT_LEG, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(rightPants, baked.get(AttachSlot.RIGHT_PANTS, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
+        submitSlot(leftPants, baked.get(AttachSlot.LEFT_PANTS, armorMask), poseStack, collector, renderType, packedLight, partScale, outlineColor);
     }
 }
