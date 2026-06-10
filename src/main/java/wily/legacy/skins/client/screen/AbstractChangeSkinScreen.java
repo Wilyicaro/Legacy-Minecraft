@@ -806,10 +806,10 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? LegacyComponents.MOVE_LEFT : null);
             r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> movableCustomSkinSelected() ? LegacyComponents.MOVE_RIGHT : null);
         }
+        r.add(navigateIcon, navigateLabel);
         if (source.supportsCustomPackOptions() && LegacyOptions.showCustomPackOptionsTooltip.get()) {
             r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : ControllerBinding.BACK.getIcon(), () -> LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS);
         }
-        r.add(navigateIcon, navigateLabel);
         if (!source.supportsAdvancedOptions() || LegacyOptions.hideAdvancedOptionsTooltip.get() || LegacyOptions.legacySettingsMenus.get())
             return;
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), () -> LegacyComponents.SHOW_ADVANCED_OPTIONS);
