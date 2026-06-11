@@ -71,6 +71,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private double legacyElytraBoostYBobMovement;
     private boolean legacyElytraBoostBobbing;
     private boolean legacyWasJumpHeld;
+    private boolean legacyWasLookingDownForElytraBoost;
+    private boolean legacyReleasedElytraBoostByLook;
     private boolean legacyAutoShielding;
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
@@ -251,6 +253,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
             legacy$clearElytraBoostYBobMovement();
             legacy$cancelActiveElytraReleaseBoost();
             legacyWasJumpHeld = false;
+            legacyWasLookingDownForElytraBoost = false;
+            legacyReleasedElytraBoostByLook = false;
             return;
         }
         legacyStoredElytraBoost *= LEGACY_ELYTRA_IDLE_DECAY;
@@ -293,26 +297,37 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         }
         if (!legacy$canUseStoredElytraBoost()) {
             setDeltaMovement(legacy$clearActiveElytraReleaseBoost(deltaMovement));
+            legacyWasLookingDownForElytraBoost = false;
+            legacyReleasedElytraBoostByLook = false;
             legacy$decayStoredElytraBoost(!isFallFlying());
             return;
         }
         boolean jumpHeld = legacy$isJumpHeld();
-        boolean canBobBoost = legacy$canUseElytraBoostYBobbing();
+        boolean lookingDownForBoost = legacy$isLookingDownForElytraBoost();
+        boolean canBobBoost = lookingDownForBoost;
         boolean startedBoosting = !legacyWasJumpHeld && jumpHeld;
         boolean releasedJumpThisTick = legacyWasJumpHeld && !jumpHeld;
+        boolean releasedLookThisTick = legacyWasJumpHeld && jumpHeld && legacyWasLookingDownForElytraBoost && !lookingDownForBoost;
+        if (!jumpHeld || lookingDownForBoost) legacyReleasedElytraBoostByLook = false;
+        if (releasedLookThisTick) legacyReleasedElytraBoostByLook = true;
         legacyWasJumpHeld = jumpHeld;
-        if (jumpHeld) {
+        legacyWasLookingDownForElytraBoost = jumpHeld && lookingDownForBoost;
+        if (releasedLookThisTick) {
+            legacy$exitElytraBoostYBobMovement(deltaMovement);
+        } else if (jumpHeld && !legacyReleasedElytraBoostByLook) {
             deltaMovement = legacy$clearActiveElytraReleaseBoost(deltaMovement);
             if (canBobBoost) legacy$updateElytraBoostYBobMovement(deltaMovement, startedBoosting);
             else legacy$exitElytraBoostYBobMovement(deltaMovement);
             deltaMovement = deltaMovement.with(Direction.Axis.Y, this.getAbilities().getFlyingSpeed() * 12);
             legacy$chargeStoredElytraBoost(deltaMovement);
+        } else if (jumpHeld) {
+            legacy$exitElytraBoostYBobMovement(deltaMovement);
         } else if (!releasedJumpThisTick) {
             if (canBobBoost) legacy$handoffElytraBoostYBobMovement(deltaMovement);
             else legacy$exitElytraBoostYBobMovement(deltaMovement);
             legacy$decayStoredElytraBoost(false);
         }
-        if (releasedJumpThisTick) {
+        if (releasedJumpThisTick || releasedLookThisTick) {
             legacy$releaseStoredElytraBoost();
         }
         setDeltaMovement(legacy$updateActiveElytraReleaseBoost(deltaMovement));
