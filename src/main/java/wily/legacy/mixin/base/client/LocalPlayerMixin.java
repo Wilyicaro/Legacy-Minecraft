@@ -265,6 +265,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         return deltaMovement;
     }
 
+    private Vec3 legacy$clearElytraClimbVelocity(Vec3 deltaMovement) {
+        return deltaMovement.y > 0.0 ? deltaMovement.with(Direction.Axis.Y, 0.0) : deltaMovement;
+    }
+
     //
     private Vec3 legacy$updateActiveElytraReleaseBoost(Vec3 deltaMovement) {
         if (legacyActiveElytraReleaseBoost <= LEGACY_ELYTRA_RELEASE_END) {
@@ -311,14 +315,20 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         legacyWasJumpHeld = jumpHeld;
         legacyWasLookingDownForElytraBoost = jumpHeld && lookingDownForBoost;
         if (releasedLookThisTick) {
+            deltaMovement = legacy$clearElytraClimbVelocity(deltaMovement);
             legacy$exitElytraBoostYBobMovement(deltaMovement);
         } else if (jumpHeld && !legacyReleasedElytraBoostByLook) {
             deltaMovement = legacy$clearActiveElytraReleaseBoost(deltaMovement);
-            if (canBobBoost) legacy$updateElytraBoostYBobMovement(deltaMovement, startedBoosting);
-            else legacy$exitElytraBoostYBobMovement(deltaMovement);
-            deltaMovement = deltaMovement.with(Direction.Axis.Y, this.getAbilities().getFlyingSpeed() * 12);
-            legacy$chargeStoredElytraBoost(deltaMovement);
+            if (canBobBoost) {
+                legacy$updateElytraBoostYBobMovement(deltaMovement, startedBoosting);
+                deltaMovement = deltaMovement.with(Direction.Axis.Y, this.getAbilities().getFlyingSpeed() * 12);
+                legacy$chargeStoredElytraBoost(deltaMovement);
+            } else {
+                legacy$exitElytraBoostYBobMovement(deltaMovement);
+                move(MoverType.SELF, new Vec3(0, this.getAbilities().getFlyingSpeed() * 12, 0));
+            }
         } else if (jumpHeld) {
+            deltaMovement = legacy$clearElytraClimbVelocity(deltaMovement);
             legacy$exitElytraBoostYBobMovement(deltaMovement);
         } else if (!releasedJumpThisTick) {
             if (canBobBoost) legacy$handoffElytraBoostYBobMovement(deltaMovement);
@@ -326,6 +336,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
             legacy$decayStoredElytraBoost(false);
         }
         if (releasedJumpThisTick || releasedLookThisTick) {
+            deltaMovement = legacy$clearElytraClimbVelocity(deltaMovement);
             legacy$releaseStoredElytraBoost();
         }
         setDeltaMovement(legacy$updateActiveElytraReleaseBoost(deltaMovement));
