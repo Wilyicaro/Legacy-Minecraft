@@ -74,6 +74,7 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
 
     @Inject(method = "tick", at = @At("RETURN"))
     protected void tickShieldControls(CallbackInfo ci) {
+        legacy$stopFallFlyingInWater();
         legacy$updateShieldControls();
     }
 
@@ -137,6 +138,13 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
     @ModifyArg(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"), index = 1)
     protected double travel(double original) {
         return LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) ? original + 0.1f : original;
+    }
+
+    @Unique
+    private void legacy$stopFallFlyingInWater() {
+        if (isFallFlying() && isInWater()) {
+            stopFallFlying();
+        }
     }
 
     @Unique
