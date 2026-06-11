@@ -259,6 +259,8 @@
     "AnimalMixin",
     "ArmorStandMixin",
     "BonusChestFeatureMixin",
+    "BambooSaplingBlockMixin",
+    "BambooStalkBlockMixin",
     "CampfireBlockMixin",
     "CartographyTableMenuMixin",
     "CartographyTableMapSlotMixin",
