@@ -62,6 +62,7 @@
     "client.ClientPrimaryLevelDataMixin",
     "client.ClientTextTooltipMixin",
     "client.ConduitBlockEntityRendererMixin",
+    "client.ConduitBlockMixin",
     "client.ContainerEventHandlerMixin",
     "client.container.ContainerScreenMixin",
     "client.crafting.CraftingScreenMixin",
