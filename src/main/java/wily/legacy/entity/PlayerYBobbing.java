@@ -14,7 +14,16 @@ public interface PlayerYBobbing {
     }
 
     static float getAngle(Minecraft minecraft, float partialTicks) {
-        return minecraft.getCameraEntity() instanceof ClientAvatarEntity player && !minecraft.player.getAbilities().flying ? of(player.avatarState()).getAngle(partialTicks) : 0;
+        return minecraft.gameRenderer != null && minecraft.player != null && minecraft.getCameraEntity() instanceof ClientAvatarEntity player && (!minecraft.player.getAbilities().flying || isLegacyElytraBoostBobbing(minecraft.player)) ? of(player.avatarState()).getAngle(partialTicks) : 0;
+    }
+
+    static boolean isLegacyElytraBoostBobbing(Player player) {
+        return player instanceof LegacyLocalPlayer legacyPlayer && legacyPlayer.isLegacyElytraBoostBobbing();
+    }
+
+    static double getYBobMovement(Player player, boolean elytraBoostBobbing) {
+        if (!elytraBoostBobbing) return player.getDeltaMovement().y;
+        return player instanceof LegacyLocalPlayer legacyPlayer ? legacyPlayer.getLegacyElytraBoostYBobMovement() : player.getDeltaMovement().y;
     }
 
     float yBob();
@@ -31,6 +40,9 @@ public interface PlayerYBobbing {
 
     default void handleYBobbing(Player p) {
         setOYBob(yBob());
-        setYBob(yBob() + ((!p.onGround() && !p.isDeadOrDying() ? (float) Math.atan(-p.getDeltaMovement().y * 0.2D) * 15.0F : 0) - yBob()) * 0.8F);
+        boolean elytraBoostBobbing = isLegacyElytraBoostBobbing(p);
+        boolean shouldBob = (!p.onGround() || elytraBoostBobbing) && !p.isDeadOrDying();
+        double yMovement = getYBobMovement(p, elytraBoostBobbing);
+        setYBob(yBob() + ((shouldBob ? (float) Math.atan(-yMovement * 0.2D) * 15.0F : 0) - yBob()) * 0.8F);
     }
 }

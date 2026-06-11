@@ -40,6 +40,10 @@ import static wily.legacy.Legacy4JClient.*;
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin extends AbstractClientPlayer implements LegacyLocalPlayer {
     private static final float LEGACY_ELYTRA_STORAGE_PITCH = 25.0f;
+    private static final double LEGACY_ELYTRA_BOOST_BOB_GRAVITY = 0.08;
+    private static final double LEGACY_ELYTRA_BOOST_BOB_DRAG = 0.98;
+    private static final double LEGACY_ELYTRA_BOOST_BOB_HANDOFF_END = 0.02;
+    private static final double LEGACY_ELYTRA_BOOST_BOB_EXIT_HANDOFF = 0.12;
     private static final double LEGACY_ELYTRA_STORAGE_BASE = 0.026;
     private static final double LEGACY_ELYTRA_STORAGE_SPEED_FACTOR = 0.02;
     private static final double LEGACY_ELYTRA_MAX_STORAGE = 3.0;
@@ -64,6 +68,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     private double legacyStoredElytraBoost;
     private double legacyActiveElytraReleaseBoost;
+    private double legacyElytraBoostYBobMovement;
+    private boolean legacyElytraBoostBobbing;
     private boolean legacyWasJumpHeld;
     private boolean legacyAutoShielding;
 
@@ -88,6 +94,21 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     public boolean canSprintController() {
         return !this.isSprinting() && !this.isFallFlying() && /*? if <1.21.5 {*//*this.hasEnoughFoodToStartSprinting()*//*?} else {*/this.hasEnoughFoodToDoExhaustiveManoeuvres()/*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft.screen == null;
+    }
+
+    @Override
+    public boolean isLegacyElytraBoosting() {
+        return legacy$canUseElytraBoostYBobbing() && legacy$isJumpHeld();
+    }
+
+    @Override
+    public boolean isLegacyElytraBoostBobbing() {
+        return legacyElytraBoostBobbing;
+    }
+
+    @Override
+    public double getLegacyElytraBoostYBobMovement() {
+        return legacyElytraBoostYBobMovement;
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else if <1.21.5 {*//*3*//*?} else {*/1/*?}*/))
@@ -171,12 +192,46 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         return isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && gameRules.get(LegacyGameRules.LEGACY_FLIGHT.get());
     }
 
+    private boolean legacy$isLookingDownForElytraBoost() {
+        return getXRot() > LEGACY_ELYTRA_STORAGE_PITCH;
+    }
+
+    private boolean legacy$canUseElytraBoostYBobbing() {
+        return legacy$canUseStoredElytraBoost() && legacy$isLookingDownForElytraBoost();
+    }
+
     // Charges extra  speed while the player is climbing and looking downward 
     private void legacy$chargeStoredElytraBoost(Vec3 deltaMovement) {
-        if (getXRot() <= LEGACY_ELYTRA_STORAGE_PITCH) return;
+        if (!legacy$isLookingDownForElytraBoost()) return;
         double pitchScale = Math.min(1.0, (getXRot() - LEGACY_ELYTRA_STORAGE_PITCH) / (90.0 - LEGACY_ELYTRA_STORAGE_PITCH));
         double storedThisTick = (LEGACY_ELYTRA_STORAGE_BASE + deltaMovement.horizontalDistance() * LEGACY_ELYTRA_STORAGE_SPEED_FACTOR) * pitchScale;
         legacyStoredElytraBoost = Math.min(LEGACY_ELYTRA_MAX_STORAGE, legacyStoredElytraBoost + storedThisTick);
+    }
+
+    private void legacy$updateElytraBoostYBobMovement(Vec3 deltaMovement, boolean startedBoosting) {
+        if (startedBoosting) legacyElytraBoostYBobMovement = Math.min(0.0, deltaMovement.y);
+        legacyElytraBoostYBobMovement = (legacyElytraBoostYBobMovement - LEGACY_ELYTRA_BOOST_BOB_GRAVITY) * LEGACY_ELYTRA_BOOST_BOB_DRAG;
+        legacyElytraBoostBobbing = true;
+    }
+
+    private void legacy$clearElytraBoostYBobMovement() {
+        legacyElytraBoostYBobMovement = 0.0;
+        legacyElytraBoostBobbing = false;
+    }
+
+    private void legacy$handoffElytraBoostYBobMovement(Vec3 deltaMovement) {
+        if (!legacyElytraBoostBobbing) return;
+        if (deltaMovement.y <= legacyElytraBoostYBobMovement || Math.abs(deltaMovement.y - legacyElytraBoostYBobMovement) <= LEGACY_ELYTRA_BOOST_BOB_HANDOFF_END) {
+            legacy$clearElytraBoostYBobMovement();
+            return;
+        }
+        legacy$updateElytraBoostYBobMovement(deltaMovement, false);
+    }
+
+    private void legacy$exitElytraBoostYBobMovement(Vec3 deltaMovement) {
+        if (!legacyElytraBoostBobbing) return;
+        legacyElytraBoostYBobMovement += (deltaMovement.y - legacyElytraBoostYBobMovement) * LEGACY_ELYTRA_BOOST_BOB_EXIT_HANDOFF;
+        if (Math.abs(deltaMovement.y - legacyElytraBoostYBobMovement) <= LEGACY_ELYTRA_BOOST_BOB_HANDOFF_END) legacy$clearElytraBoostYBobMovement();
     }
 
     // fires the stored climb speed along the player's current look vector upon climb release
@@ -191,6 +246,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private void legacy$decayStoredElytraBoost(boolean hardReset) {
         if (hardReset) {
             legacyStoredElytraBoost = 0.0;
+            legacy$clearElytraBoostYBobMovement();
             legacy$cancelActiveElytraReleaseBoost();
             legacyWasJumpHeld = false;
             return;
@@ -239,13 +295,19 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
             return;
         }
         boolean jumpHeld = legacy$isJumpHeld();
+        boolean canBobBoost = legacy$canUseElytraBoostYBobbing();
+        boolean startedBoosting = !legacyWasJumpHeld && jumpHeld;
         boolean releasedJumpThisTick = legacyWasJumpHeld && !jumpHeld;
         legacyWasJumpHeld = jumpHeld;
         if (jumpHeld) {
             deltaMovement = legacy$clearActiveElytraReleaseBoost(deltaMovement);
+            if (canBobBoost) legacy$updateElytraBoostYBobMovement(deltaMovement, startedBoosting);
+            else legacy$exitElytraBoostYBobMovement(deltaMovement);
             deltaMovement = deltaMovement.with(Direction.Axis.Y, this.getAbilities().getFlyingSpeed() * 12);
             legacy$chargeStoredElytraBoost(deltaMovement);
         } else if (!releasedJumpThisTick) {
+            if (canBobBoost) legacy$handoffElytraBoostYBobMovement(deltaMovement);
+            else legacy$exitElytraBoostYBobMovement(deltaMovement);
             legacy$decayStoredElytraBoost(false);
         }
         if (releasedJumpThisTick) {
