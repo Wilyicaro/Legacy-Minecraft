@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.*;
 //? if <1.21.5 {
@@ -123,6 +124,7 @@ import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
+import org.lwjgl.glfw.GLFW;
 
 
 import java.io.File;
@@ -180,6 +182,8 @@ public class Legacy4JClient {
     public static boolean isNewerVersion = false;
     public static boolean isNewerMinecraftVersion = false;
     private static boolean hideNextExperimentalWorldWarning;
+    private static int consumedKeyboardActions;
+    private static final int KEYBOARD_CRAFTING = 1, KEYBOARD_INVENTORY = 2, KEYBOARD_ESCAPE = 4, KEYBOARD_WHATS_THIS = 8;
     public static ControlType lastControlType;
     public static boolean canSprint = false;
     public static int sprintTicksLeft = -1;
@@ -299,6 +303,32 @@ public class Legacy4JClient {
         }
     }
 
+    public static void updateKeyboardToggleKeyPress(KeyEvent keyEvent, int action) {
+        if (action != GLFW.GLFW_RELEASE) return;
+        if (keyCrafting.matches(keyEvent)) consumedKeyboardActions &= ~KEYBOARD_CRAFTING;
+        if (Minecraft.getInstance().options.keyInventory.matches(keyEvent)) consumedKeyboardActions &= ~KEYBOARD_INVENTORY;
+        consumedKeyboardActions &= ~keyboardActionForKey(keyEvent.key());
+    }
+
+    public static boolean consumeKeyboardToggleKeyPress(KeyMapping keyMapping) {
+        return consumeKeyboardPress(keyMapping == keyCrafting ? KEYBOARD_CRAFTING : keyMapping == Minecraft.getInstance().options.keyInventory ? KEYBOARD_INVENTORY : 0);
+    }
+
+    public static boolean consumeKeyboardActionKeyPress(int key) {
+        return consumeKeyboardPress(keyboardActionForKey(key));
+    }
+
+    private static int keyboardActionForKey(int key) {
+        return key == InputConstants.KEY_ESCAPE ? KEYBOARD_ESCAPE : key == InputConstants.KEY_W ? KEYBOARD_WHATS_THIS : 0;
+    }
+
+    private static boolean consumeKeyboardPress(int action) {
+        if (controllerManager.isControllerTheLastInput() || action == 0) return true;
+        if ((consumedKeyboardActions & action) != 0) return false;
+        consumedKeyboardActions |= action;
+        return true;
+    }
+
     public static void preTick(Minecraft minecraft) {
         if (minecraft.isGameLoadFinished()) {
             ControlType activeControlType = ControlType.getActiveType();
@@ -312,6 +342,7 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
         while (keyCrafting.consumeClick()) {
+            if (!consumeKeyboardToggleKeyPress(keyCrafting)) continue;
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
                 if (minecraft.player.isSpectator()) minecraft.gui.getSpectatorGui().onHotbarActionKeyPressed();
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));

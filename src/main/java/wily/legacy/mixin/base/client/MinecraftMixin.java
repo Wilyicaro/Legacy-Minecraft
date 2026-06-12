@@ -465,6 +465,7 @@ public abstract class MinecraftMixin {
     @Redirect(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyInventory:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyAdvancements:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"))
     private boolean handleKeybindsInventoryKey(KeyMapping instance) {
         boolean clicked = instance.consumeClick();
+        if (clicked && !Legacy4JClient.consumeKeyboardToggleKeyPress(instance)) clicked = false;
         AdvancementToast toast = FactoryAPIClient.getToasts().getToast(AdvancementToast.class, Toast.NO_TOKEN);
         if (toast == null) {
             if (inventoryKeyLastPressed && !instance.isDown()) {

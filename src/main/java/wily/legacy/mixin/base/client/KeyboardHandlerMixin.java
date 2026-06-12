@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,10 +20,15 @@ import wily.legacy.Legacy4JClient;
 public class KeyboardHandlerMixin {
     @Shadow @Final private Minecraft minecraft;
 
-    @Inject(method = "keyPress", at = @At("HEAD"))
+    @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     public void keyPress(long l, int i, KeyEvent keyEvent, CallbackInfo ci) {
-        if (l == minecraft.getWindow().handle() && !Legacy4JClient.controllerManager.isControllerSimulatingInput)
+        if (l == minecraft.getWindow().handle() && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
             Legacy4JClient.controllerManager.setControllerTheLastInput(false);
+            Legacy4JClient.updateKeyboardToggleKeyPress(keyEvent, i);
+            if (i != GLFW.GLFW_RELEASE && keyEvent.isEscape() && !Legacy4JClient.consumeKeyboardActionKeyPress(keyEvent.key())) {
+                ci.cancel();
+            }
+        }
     }
 
     //? if forge {
