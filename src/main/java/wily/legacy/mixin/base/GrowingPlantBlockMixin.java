@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 
 @Mixin(GrowingPlantBlock.class)
 public abstract class GrowingPlantBlockMixin {
@@ -22,7 +21,6 @@ public abstract class GrowingPlantBlockMixin {
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!Legacy4J.canApplyServerAuthoritativeChanges()) return;
         if (state.is(Blocks.KELP) || state.is(Blocks.KELP_PLANT)) {
             cir.setReturnValue(LEGACY_KELP_SHAPE);
         }

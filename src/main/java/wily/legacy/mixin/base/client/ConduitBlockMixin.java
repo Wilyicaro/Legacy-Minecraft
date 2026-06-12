@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 
 @Mixin(ConduitBlock.class)
 public abstract class ConduitBlockMixin {
@@ -24,7 +23,6 @@ public abstract class ConduitBlockMixin {
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!Legacy4J.canApplyServerAuthoritativeChanges()) return;
         boolean active = level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit && conduit.isActive();
         cir.setReturnValue(active ? LEGACY_CONDUIT_ACTIVE_SHAPE : LEGACY_CONDUIT_INACTIVE_SHAPE);
     }

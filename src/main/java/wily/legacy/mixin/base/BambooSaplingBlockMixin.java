@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 
 @Mixin(BambooSaplingBlock.class)
 public abstract class BambooSaplingBlockMixin {
@@ -21,7 +20,6 @@ public abstract class BambooSaplingBlockMixin {
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!Legacy4J.canApplyServerAuthoritativeChanges()) return;
         cir.setReturnValue(LEGACY_BAMBOO_SAPLING_SHAPE);
     }
 }

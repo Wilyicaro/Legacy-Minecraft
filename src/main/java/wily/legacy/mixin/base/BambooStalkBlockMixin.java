@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 
 @Mixin(BambooStalkBlock.class)
 public abstract class BambooStalkBlockMixin {
@@ -25,7 +24,6 @@ public abstract class BambooStalkBlockMixin {
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (!Legacy4J.canApplyServerAuthoritativeChanges()) return;
         Vec3 offset = state.getOffset(pos);
         VoxelShape shape = state.getValue(BambooStalkBlock.AGE) == 0 ? LEGACY_THIN_BAMBOO_STALK_SHAPE : LEGACY_THICK_BAMBOO_STALK_SHAPE;
         cir.setReturnValue(shape.move(offset.x, offset.y, offset.z));
