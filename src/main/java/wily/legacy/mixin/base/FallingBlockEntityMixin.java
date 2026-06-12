@@ -13,7 +13,9 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ConcretePowderBlock;
+import net.minecraft.world.level.block.Fallable;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
@@ -49,6 +51,12 @@ public abstract class FallingBlockEntityMixin {
         BlockPos blockPos = entity.blockPosition().below();
         Level level = entity.level();
         if (fallingBlock.getBlockState().getBlock() instanceof ConcretePowderBlock && (level.getFluidState(entity.blockPosition()).is(FluidTags.WATER) || level.getFluidState(blockPos).is(FluidTags.WATER))) return;
+        if (fallingBlock.getBlockState().is(Blocks.SNOW) && level.getBlockState(entity.blockPosition()).is(Blocks.SNOW)) {
+            entity.discard();
+            ((Fallable) fallingBlock.getBlockState().getBlock()).onBrokenAfterFall(level, entity.blockPosition(), fallingBlock);
+            ci.cancel();
+            return;
+        }
         BlockState blockState = level.getBlockState(blockPos);
         if (blockState.isAir() || Block.isFaceFull(blockState.getCollisionShape(level, blockPos), Direction.UP)) return;
         time = 0;
