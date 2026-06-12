@@ -730,6 +730,10 @@ public class Legacy4JClient {
         return FactoryAPIClient.hasModOnServer(MOD_ID);
     }
 
+    public static boolean hasModOnServerOrSingleplayer() {
+        return Minecraft.getInstance().hasSingleplayerServer() || hasModOnServer();
+    }
+
     public static int getEffectiveRenderDistance() {
         return Minecraft.getInstance().options.getEffectiveRenderDistance();
     }

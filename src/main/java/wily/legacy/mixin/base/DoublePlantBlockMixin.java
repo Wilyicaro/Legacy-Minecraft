@@ -13,6 +13,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import wily.legacy.Legacy4J;
 
 @Mixin(DoublePlantBlock.class)
 public abstract class DoublePlantBlockMixin extends VegetationBlock {
@@ -25,6 +26,7 @@ public abstract class DoublePlantBlockMixin extends VegetationBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (!Legacy4J.canApplyServerAuthoritativeChanges()) return super.getShape(state, level, pos, context);
         if ((Object) this instanceof TallFlowerBlock) {
             return LEGACY_TALL_FLOWER_SHAPE;
         }

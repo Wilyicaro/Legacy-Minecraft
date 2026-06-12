@@ -142,7 +142,7 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
 
     @Unique
     private void legacy$stopFallFlyingInWater() {
-        if (isFallFlying() && isInWater()) {
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT) && isFallFlying() && isInWater()) {
             stopFallFlying();
         }
     }

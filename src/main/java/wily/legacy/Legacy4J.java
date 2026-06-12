@@ -147,6 +147,10 @@ public class Legacy4J {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 
+    public static boolean canApplyServerAuthoritativeChanges() {
+        return !FactoryAPI.isClient() || Legacy4JClient.hasModOnServerOrSingleplayer();
+    }
+
     public static void setup() {
         LegacyCommonOptions.COMMON_STORAGE.load();
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.CRAFTING);
