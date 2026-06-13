@@ -12,10 +12,6 @@
   "menu.returnToGame": "Continuar Jogo",
   "menu.savingLevel": "Preparando para Salvar Nível",
   "options.autosaveIndicator": "Exibir Ícone de Salvamento",
-  "options.key.toggleSneak": "Alternar Agachar",
-  "options.key.toggleSprint": "Alternar Correr",
-  "options.key.toggleUse": "Alternar Uso",
-  "options.key.toggleAttack": "Alternar Ataque",
   "options.language": "Linguagens",
   "soundCategory.master": "Som"
 }
