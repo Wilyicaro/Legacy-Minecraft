@@ -1,0 +1,50 @@
+[
+  {
+    "id": "starterpacks",
+    "title": {
+      "translate": "legacy.menu.store.starterpacks"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/STARTERPACKS/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true,
+    "useResourceAlbum": false
+  },
+  {
+    "id": "texture_packs",
+    "title": {
+      "translate": "legacy.menu.albums.texture_packs"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/texture_packs/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true
+  },
+  {
+    "id": "mashup_packs",
+    "title": {
+      "translate": "legacy.menu.store.mashup_packs"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/mashup_packs/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true
+  },
+  {
+    "id": "bundle_packs",
+    "title": {
+      "translate": "legacy.menu.store.bundle_packs"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/Bundle%20Packs/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true,
+    "useResourceAlbum": false
+  },
+  {
+    "id": "legacy4j",
+    "title": {
+      "translate": "legacy.menu.store.legacy4j"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/Legacy4J/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true,
+    "useResourceAlbum": false
+  }
+]

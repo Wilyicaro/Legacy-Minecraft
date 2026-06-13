@@ -1,0 +1,318 @@
+package wily.legacy.client.screen;
+
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ContentManager;
+import wily.legacy.client.ControlType;
+import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.util.ScreenUtil;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class Legacy4JContentListScreen extends PanelVListScreen {
+    private static final int PANEL_WIDTH = 257;
+    private static final int PANEL_HEIGHT = 226;
+    private static final int TOOLTIP_WIDTH = 240;
+    private static final int LIST_X = 20;
+    private static final int LIST_Y = 48;
+    private static final int LIST_WIDTH = 218;
+    private static final int LIST_HEIGHT = 162;
+    private static final int BUTTON_HEIGHT = 30;
+
+    private final ContentManager.Category category;
+    private final List<ContentManager.Pack> packs;
+    private final Panel tooltipBox = Panel.tooltipBoxOf(panel, TOOLTIP_WIDTH);
+    private final Panel panelRecess;
+    private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    private final ScrollableRenderer scrollableRenderer = new ScrollableRenderer(scrollRenderer);
+    private static final Map<String, RemoteImage> downloadedImages = new ConcurrentHashMap<>();
+    private static final Map<String, CompletableFuture<RemoteImage>> pendingImageLoads = new ConcurrentHashMap<>();
+    private static final java.util.Set<String> downloadingImages = ConcurrentHashMap.newKeySet();
+    private final java.util.Set<String> downloadingPacks = ConcurrentHashMap.newKeySet();
+    private final Map<String, Boolean> installedPacks = new ConcurrentHashMap<>();
+    private final Map<String, MultiLineLabel> descriptionLabels = new ConcurrentHashMap<>();
+    private ContentManager.Pack hoveredPack;
+    private boolean needsReload;
+
+    private record RemoteImage(ResourceLocation id, int width, int height) {
+    }
+
+    public Legacy4JContentListScreen(Screen parent, ContentManager.Category category, List<ContentManager.Pack> packs) {
+        super(parent, s -> Panel.createPanel(s,
+            p -> p.appearance(PANEL_WIDTH, PANEL_HEIGHT),
+            p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 17)
+        ), Component.translatable("legacy.menu.store_title"));
+        panelRecess = Panel.createPanel(this,
+            p -> p.appearance(LegacySprites.PANEL_RECESS, panel.getWidth() - 20, panel.getHeight() - 40),
+            p -> p.pos(panel.getX() + 10, panel.getY() + 30)
+        );
+        this.category = category;
+        this.packs = packs;
+        renderableVList.layoutSpacing(l -> 0);
+        packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category)));
+        if (!packs.isEmpty()) {
+            hoveredPack = packs.get(0);
+            requestImage(hoveredPack.imageUrl());
+        }
+        packs.forEach(this::addMenuButton);
+    }
+
+    private void addMenuButton(ContentManager.Pack pack) {
+        renderableVList.addRenderable(new PackButton(0, 0, LIST_WIDTH, BUTTON_HEIGHT, pack) {
+            @Override
+            public void onPress() {
+                if (isDownloading(pack)) return;
+                selectPack(pack);
+                if (isInstalled(pack)) minecraft.setScreen(createDeleteScreen(pack));
+                else startDownload(pack);
+            }
+
+            @Override
+            public void setFocused(boolean focused) {
+                super.setFocused(focused);
+                if (focused) selectPack(pack);
+            }
+        });
+    }
+
+    private Screen createDeleteScreen(ContentManager.Pack pack) {
+        return new ConfirmationScreen(this, Component.translatable("legacy.menu.delete"), Component.translatable("legacy.menu.delete_message")) {
+            @Override
+            protected void addButtons() {
+                renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent)).build());
+                renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.delete"), b -> {
+                    deletePack(pack);
+                    minecraft.setScreen(parent);
+                }).build());
+            }
+        };
+    }
+
+    private void selectPack(ContentManager.Pack pack) {
+        if (hoveredPack == pack) {
+            requestImage(pack.imageUrl());
+            return;
+        }
+        hoveredPack = pack;
+        scrollableRenderer.scrolled.set(0);
+        requestImage(pack.imageUrl());
+    }
+
+    private boolean isInstalled(ContentManager.Pack pack) {
+        return installedPacks.computeIfAbsent(pack.id(), id -> ContentManager.isPackInstalled(pack, category));
+    }
+
+    private boolean isDownloading(ContentManager.Pack pack) {
+        return downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category);
+    }
+
+    private void startDownload(ContentManager.Pack pack) {
+        downloadingPacks.add(pack.id());
+        ContentManager.downloadPack(pack, category, installedAnything -> finishDownload(pack, installedAnything));
+    }
+
+    private void finishDownload(ContentManager.Pack pack, boolean installedAnything) {
+        downloadingPacks.remove(pack.id());
+        refreshInstalledPacks();
+        boolean appliedResourcePacks = installedAnything && ContentManager.applyAutoResourcePacks(pack, category);
+        if (!installedAnything || (!category.requiresResourceReload() && !appliedResourcePacks)) return;
+        if (minecraft.screen == this) needsReload = true;
+        else minecraft.reloadResourcePacks();
+    }
+
+    private void refreshInstalledPacks() {
+        packs.forEach(pack -> installedPacks.put(pack.id(), ContentManager.isPackInstalled(pack, category)));
+    }
+
+    private void deletePack(ContentManager.Pack pack) {
+        ContentManager.deletePack(pack, category);
+        installedPacks.put(pack.id(), false);
+        needsReload = true;
+    }
+
+    private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
+        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, pack.descriptionComponent(), width));
+    }
+
+    private static RemoteImage getOrDownloadImage(Optional<URI> url) {
+        if (url.isEmpty()) return null;
+        String key = url.get().toString();
+        RemoteImage image = downloadedImages.get(key);
+        if (image != null) return image;
+        requestImage(url);
+        return null;
+    }
+
+    private static CompletableFuture<RemoteImage> requestImage(Optional<URI> url) {
+        if (url.isEmpty()) return CompletableFuture.completedFuture(null);
+        String key = url.get().toString();
+        RemoteImage image = downloadedImages.get(key);
+        if (image != null) return CompletableFuture.completedFuture(image);
+        CompletableFuture<RemoteImage> pending = pendingImageLoads.get(key);
+        if (pending != null) return pending;
+        CompletableFuture<RemoteImage> future = new CompletableFuture<>();
+        CompletableFuture<RemoteImage> existing = pendingImageLoads.putIfAbsent(key, future);
+        if (existing != null) return existing;
+        if (downloadingImages.contains(key)) return future;
+        downloadingImages.add(key);
+        CompletableFuture.runAsync(() -> {
+            Minecraft client = Minecraft.getInstance();
+            try (InputStream in = ContentManager.openRemoteStream(url.get().toURL(), 5000, 10000)) {
+                NativeImage nativeImage = NativeImage.read(in);
+                int width = nativeImage.getWidth();
+                int height = nativeImage.getHeight();
+                client.execute(() -> {
+                    ResourceLocation id = Legacy4J.createModLocation("pack_image/" + Integer.toHexString(key.hashCode()));
+                    client.getTextureManager().register(id, new DynamicTexture(/*? if >=1.21.5 {*//*id::toString, *//*?}*/nativeImage));
+                    RemoteImage remoteImage = new RemoteImage(id, width, height);
+                    downloadedImages.put(key, remoteImage);
+                    future.complete(remoteImage);
+                });
+            } catch (Exception e) {
+                RemoteImage remoteImage = new RemoteImage(null, 0, 0);
+                downloadedImages.put(key, remoteImage);
+                Legacy4J.LOGGER.warn("Failed to load content image {}", key, e);
+                client.execute(() -> future.complete(remoteImage));
+            } finally {
+                client.execute(() -> {
+                    downloadingImages.remove(key);
+                    pendingImageLoads.remove(key);
+                });
+            }
+        });
+        return future;
+    }
+
+    @Override
+    public void onClose() {
+        if (needsReload) minecraft.reloadResourcePacks();
+        super.onClose();
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.getIcon(), () -> hoveredPack != null && isInstalled(hoveredPack) ? Component.translatable("legacy.menu.delete") : Component.translatable("legacy.menu.install"));
+    }
+
+    @Override
+    protected void panelInit() {
+        super.panelInit();
+        tooltipBox.init();
+        panelRecess.init("panelRecess");
+        addRenderableOnly(panelRecess);
+        addRenderableOnly((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panelRecess.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+    }
+
+    @Override
+    public Component getTitle() {
+        return packs.isEmpty() ? Component.translatable("legacy.menu.store_no_content") : super.getTitle();
+    }
+
+    @Override
+    public void renderableVListInit() {
+        for (int i = 0; i < Math.min(4, packs.size()); i++) {
+            requestImage(packs.get(i).imageUrl());
+        }
+        getRenderableVList().init("renderableVList", panel.x + LIST_X, panel.y + LIST_Y, LIST_WIDTH, LIST_HEIGHT);
+    }
+
+    @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        ScreenUtil.renderLogo(guiGraphics);
+        tooltipBox.render(guiGraphics, i, j, f);
+        renderTooltip(guiGraphics);
+    }
+
+    private void renderTooltip(GuiGraphics guiGraphics) {
+        if (hoveredPack == null) return;
+        int x = tooltipBox.x + 8;
+        int y = tooltipBox.y + 10;
+        int width = tooltipBox.width - 16;
+        int imageHeight = renderPreviewImage(guiGraphics, hoveredPack, x, y, width);
+        int titleY = y + imageHeight;
+        ScreenUtil.renderScrollingString(guiGraphics, font, hoveredPack.nameComponent(), x, titleY, x + width, titleY + 12, CommonColor.TIP_TITLE_TEXT.get(), true);
+        MultiLineLabel label = getDescriptionLabel(hoveredPack, width);
+        int descriptionY = titleY + 18;
+        int visibleHeight = tooltipBox.y + tooltipBox.height - 12 - descriptionY;
+        scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleHeight / 12);
+        scrollableRenderer.lineHeight = 12;
+        scrollableRenderer.render(guiGraphics, x, descriptionY, width, visibleHeight, () -> label.renderLeftAligned(guiGraphics, x, descriptionY, 12, CommonColor.TIP_TEXT.get()));
+    }
+
+    private int renderPreviewImage(GuiGraphics guiGraphics, ContentManager.Pack pack, int x, int y, int width) {
+        int maxHeight = (tooltipBox.height * 4) / 10;
+        if (pack.imageUrl().isEmpty()) return 0;
+        RemoteImage remoteImage = getOrDownloadImage(pack.imageUrl());
+        if (remoteImage != null && remoteImage.id() != null && remoteImage.width() > 0 && remoteImage.height() > 0) {
+            float scale = Math.min((float) width / remoteImage.width(), (float) maxHeight / remoteImage.height());
+            int imageWidth = Math.max(1, (int) (remoteImage.width() * scale));
+            int imageHeight = Math.max(1, (int) (remoteImage.height() * scale));
+            FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id(), x + (width - imageWidth) / 2, y, 0.0f, 0.0f, imageWidth, imageHeight, imageWidth, imageHeight);
+            return imageHeight + 8;
+        }
+        if (remoteImage == null) {
+            ScreenUtil.drawGenericLoading(guiGraphics, x + (width - 30) / 2, y + Math.max(0, (maxHeight - 30) / 2), 6, 3);
+            return maxHeight + 8;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+        if ((tooltipBox.isHovered(d, e) || !ControlType.getActiveType().isKbm()) && scrollableRenderer.mouseScrolled(g)) return true;
+        return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+    }
+
+    private abstract class PackButton extends AbstractButton {
+        private final ContentManager.Pack pack;
+
+        PackButton(int x, int y, int width, int height, ContentManager.Pack pack) {
+            super(x, y, width, height, pack.nameComponent());
+            this.pack = pack;
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderWidget(guiGraphics, i, j, f);
+            if (isDownloading(pack)) {
+                ScreenUtil.drawGenericLoading(guiGraphics, getX() + getWidth() - 24, getY() + 7, 4, 2);
+            } else if (isInstalled(pack)) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, getX() + getWidth() - 24, getY() + 6, 18, 18);
+            }
+        }
+
+        @Override
+        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int color) {
+            int right = getX() + getWidth() - (isDownloading(pack) || isInstalled(pack) ? 34 : 8);
+            ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 8, getY(), right, getY() + getHeight(), color, true);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+            defaultButtonNarrationText(narrationElementOutput);
+        }
+    }
+}

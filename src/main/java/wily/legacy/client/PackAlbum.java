@@ -112,6 +112,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         albums.forEach(PackAlbum::registerResource);
         if (!Files.exists(RESOURCE_ALBUMS_PATH) || !albums.isEmpty()) save(RESOURCE_ALBUMS_PATH, DEFAULT_RESOURCE_ALBUMS, defaultResourceAlbum);
         if (albums.isEmpty()) load();
+        DownloadedResourceAlbums.syncAll();
     }
 
     public static PackAlbum resourceById(String s){
@@ -604,6 +605,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
         public static ResourceLocation getPackBackground(Pack pack) {
             return packBackgrounds.computeIfAbsent(pack.getId(), string -> loadPackIcon(Minecraft.getInstance().getTextureManager(), pack, "background.png",null));
+        }
+
+        public static void invalidatePackAssets(String packId) {
+            packIcons.remove(packId);
+            packBackgrounds.remove(packId);
         }
 
         @Override

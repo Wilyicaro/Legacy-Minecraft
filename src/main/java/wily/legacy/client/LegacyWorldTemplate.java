@@ -25,19 +25,21 @@ import wily.legacy.util.JsonUtil;
 
 import java.io.*;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, Optional<URI> downloadURI, Optional<String> checkSum) {
-    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName),Codec.BOOL.fieldOf("directJoin").orElse(false).forGetter(LegacyWorldTemplate::directJoin),Codec.BOOL.fieldOf("isLocked").orElse(true).forGetter(LegacyWorldTemplate::isLocked),Codec.BOOL.fieldOf("isGamePath").orElse(false).forGetter(LegacyWorldTemplate::isGamePath),Codec.STRING.xmap(URI::create,URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI)).apply(i, LegacyWorldTemplate::create));
+public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, Optional<String> albumId, Optional<URI> downloadURI, Optional<String> checkSum) {
+    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName),Codec.BOOL.fieldOf("directJoin").orElse(false).forGetter(LegacyWorldTemplate::directJoin),Codec.BOOL.fieldOf("isLocked").orElse(true).forGetter(LegacyWorldTemplate::isLocked),Codec.BOOL.fieldOf("isGamePath").orElse(false).forGetter(LegacyWorldTemplate::isGamePath), Codec.STRING.optionalFieldOf("resourceAlbum").forGetter(LegacyWorldTemplate::albumId),Codec.STRING.xmap(URI::create,URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI)).apply(i, LegacyWorldTemplate::create));
 
-    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, Optional<URI> compoundDownloadURI) {
+    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, Optional<String> albumId, Optional<URI> compoundDownloadURI) {
         Optional<String[]> splitURI = compoundDownloadURI.map(u->u.toString().split("\\?checksum="));
-        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, splitURI.map(s->URI.create(s[0])),splitURI.map(s->s.length < 2 ? null : s[1]));
+        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, albumId, splitURI.map(s->URI.create(s[0])),splitURI.map(s->s.length < 2 ? null : s[1]));
     }
 
     public Path getPath(){
@@ -84,6 +86,90 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
         }
     }
 
+    public static boolean isDownloadedPackInstalled(ContentManager.Pack pack) {
+        if (!pack.hasWorldTemplate()) return true;
+        Path path = downloadedPackPath(pack.id());
+        if (!Files.isRegularFile(path)) return false;
+        return pack.activeWorldTemplateCheckSum().map(s -> s.equals(ContentManager.readFileCheckSum(path))).orElse(true);
+    }
+
+    public static void downloadDownloadedPack(ContentManager.Pack pack) throws IOException {
+        if (!pack.hasWorldTemplate()) return;
+        Path path = downloadedPackPath(pack.id());
+        Path temp = Files.createTempFile("legacy_world_", ".mcsave");
+        try {
+            try (InputStream stream = ContentManager.openRemoteStream(pack.activeWorldTemplateDownloadURI().orElseThrow().toURL(), 5000, 10000)) {
+                Files.copy(stream, temp, StandardCopyOption.REPLACE_EXISTING);
+            }
+            if (pack.activeWorldTemplateCheckSum().isPresent()) {
+                String fileHash = ContentManager.readFileCheckSum(temp);
+                if (!pack.activeWorldTemplateCheckSum().get().equals(fileHash)) {
+                    throw new IOException("Checksum mismatch for world template " + pack.id());
+                }
+            }
+            Files.createDirectories(path.getParent());
+            Files.copy(temp, path, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(temp);
+        }
+    }
+
+    public static void removeDownloadedPack(String packId) {
+        try {
+            Files.deleteIfExists(downloadedPackPath(packId));
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Failed to remove downloaded world template {}", packId, e);
+        }
+    }
+
+    public static void refreshDownloadedPacks() {
+        list.removeIf(LegacyWorldTemplate::isManagedDownloadedPack);
+        loadDownloadedPacks(list);
+    }
+
+    private static void loadDownloadedPacks(List<LegacyWorldTemplate> list) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft == null) return;
+        Path dir = minecraft.getResourcePackDirectory();
+        if (dir == null || !Files.isDirectory(dir)) return;
+        try (Stream<Path> paths = Files.list(dir)) {
+            paths.filter(Files::isDirectory)
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .map(LegacyWorldTemplate::downloadedPackTemplate)
+                .flatMap(Optional::stream)
+                .sorted(Comparator.comparing(template -> template.buttonMessage().getString(), String.CASE_INSENSITIVE_ORDER))
+                .forEach(list::add);
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Failed to load downloaded world templates", e);
+        }
+    }
+
+    private static Optional<LegacyWorldTemplate> downloadedPackTemplate(String packId) {
+        DownloadedPackMetadata.Entry entry = DownloadedPackMetadata.entry(packId);
+        if (!entry.hasWorldTemplate() || !Files.isRegularFile(downloadedPackPath(packId))) return Optional.empty();
+        String name = entry.name() == null || entry.name().isBlank() ? packId : entry.name();
+        String folderName = entry.worldTemplateFolderName();
+        if (folderName == null || folderName.isBlank()) folderName = name;
+        return Optional.of(new LegacyWorldTemplate(Component.literal(name), Legacy4J.createModLocation("creation_list/create_world"), downloadedPackLocation(packId), folderName, false, true, true, Optional.of(DownloadedResourceAlbums.albumId(packId)), Optional.empty(), Optional.empty()));
+    }
+
+    private static Path downloadedPackPath(String packId) {
+        return Minecraft.getInstance().gameDirectory.toPath().resolve(downloadedPackLocation(packId));
+    }
+
+    private static String downloadedPackLocation(String packId) {
+        return "legacy_world_templates/files/" + normalizeDownloadedPackId(packId) + ".mcsave";
+    }
+
+    private static String normalizeDownloadedPackId(String packId) {
+        return packId.startsWith("file/") ? packId.substring(5) : packId;
+    }
+
+    private static boolean isManagedDownloadedPack(LegacyWorldTemplate template) {
+        return template.albumId().filter(DownloadedResourceAlbums::isManagedAlbum).isPresent() || template.isGamePath() && template.worldTemplate().startsWith("legacy_world_templates/files/");
+    }
+
     public static final List<LegacyWorldTemplate> list = new ArrayList<>();
     private static final String TEMPLATES = "world_templates.json";
     public static class Manager implements ResourceManagerReloadListener {
@@ -97,7 +183,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
                         Legacy4J.LOGGER.warn("The World Template {} is using a deprecated syntax, please contact this resource creator or try updating it.", name+":"+TEMPLATES);
                         obj.asMap().forEach((s, e) -> {
                             if (e instanceof JsonObject tabObj) {
-                                list.add(create(Component.translatable(s), FactoryAPI.createLocation(GsonHelper.getAsString(tabObj, "icon")), GsonHelper.getAsString(tabObj, "templateLocation"), GsonHelper.getAsString(tabObj, "folderName"), GsonHelper.getAsBoolean(tabObj, "directJoin", false), true, false, Optional.empty()));
+                                list.add(create(Component.translatable(s), FactoryAPI.createLocation(GsonHelper.getAsString(tabObj, "icon")), GsonHelper.getAsString(tabObj, "templateLocation"), GsonHelper.getAsString(tabObj, "folderName"), GsonHelper.getAsBoolean(tabObj, "directJoin", false), true, false, Optional.empty(), Optional.empty()));
                             }
                         });
                     } else if (element instanceof JsonArray a) a.forEach(e->CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(w->{
@@ -108,6 +194,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
                     Legacy4J.LOGGER.warn(var8.getMessage());
                 }
             }));
+            loadDownloadedPacks(list);
         }
         @Override
         public String getName() {
