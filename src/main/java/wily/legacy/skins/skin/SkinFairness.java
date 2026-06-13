@@ -4,8 +4,6 @@ import net.minecraft.client.Minecraft;
 import wily.factoryapi.FactoryAPIClient;
 
 public final class SkinFairness {
-    private static final String MINIMEGA_MOD_ID = "minimega";
-
     private SkinFairness() {
     }
 
@@ -26,11 +24,7 @@ public final class SkinFairness {
     }
 
     public static boolean isRestrictedServer(Minecraft client) {
-        return client != null
-                && client.player != null
-                && client.getConnection() != null
-                && !client.hasSingleplayerServer()
-                && FactoryAPIClient.hasModOnServer(MINIMEGA_MOD_ID);
+        return false; // Mods can change this via Mixin
     }
 
 }

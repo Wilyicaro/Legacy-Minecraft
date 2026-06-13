@@ -83,6 +83,7 @@ public abstract class OptionsMixin {
 
     @ModifyReturnValue(method = "getFinalSoundSourceVolume", at = @At("RETURN"))
     private float getFinalSoundSourceVolume(float original, SoundSource soundSource) {
+        if (!LegacyOptions.unlinkMusicFromMasterVolume.get()) return original;
         if (soundSource == SoundSource.MUSIC) return ((Options) (Object) this).getSoundSourceVolume(soundSource);
         if (soundSource == SoundSource.RECORDS) return ((Options) (Object) this).getSoundSourceVolume(soundSource) * ((Options) (Object) this).getSoundSourceVolume(SoundSource.MUSIC);
         return original;

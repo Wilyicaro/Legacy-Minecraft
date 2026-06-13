@@ -19,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerBinding;
@@ -134,8 +135,10 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.key() == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
-            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+        if (keyEvent.key() == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
+            if (!Legacy4JClient.consumeKeyboardActionKeyPress(InputConstants.KEY_W)) return true;
+            if (LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy())))
+                LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
             return true;
         }
         return super.keyPressed(keyEvent);

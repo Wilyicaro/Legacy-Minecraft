@@ -10,7 +10,6 @@ import net.minecraft.server.permissions.Permissions;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.Level;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
@@ -108,10 +107,6 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
                 }
             }
             case WORLD_SPAWN -> {
-                if (sp.level().dimension() != Level.OVERWORLD) {
-                    sp.sendSystemMessage(Component.translatable("commands.setworldspawn.failure.not_overworld"), false);
-                    return;
-                }
                 server.getCommands().performPrefixedCommand(source, "setworldspawn");
                 sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.world_spawn", pos.getX(), pos.getY(), pos.getZ()), false);
             }
