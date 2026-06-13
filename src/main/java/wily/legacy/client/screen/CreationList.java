@@ -41,8 +41,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class CreationList extends RenderableVList {
     protected final Minecraft minecraft;
@@ -56,21 +54,6 @@ public class CreationList extends RenderableVList {
                 Identifier location = Identifier.fromNamespaceAndPath("legacy", "template_pack_icon/" + Integer.toHexString(key.hashCode()));
                 Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(location::toString, image));
                 return location;
-            }
-        }
-    });
-    private static final LoadingCache<String, Identifier> worldIcons = CacheBuilder.newBuilder().build(new CacheLoader<>() {
-        @Override
-        public Identifier load(String key) throws Exception {
-            try (ZipFile zip = new ZipFile(Path.of(key).toFile())) {
-                ZipEntry entry = zip.getEntry("icon.png");
-                if (entry == null) return PackAlbum.Selector.DEFAULT_ICON;
-                try (InputStream inputStream = zip.getInputStream(entry)) {
-                    NativeImage image = NativeImage.read(inputStream);
-                    Identifier location = Identifier.fromNamespaceAndPath("legacy", "template_world_icon/" + Integer.toHexString(key.hashCode()));
-                    Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(location::toString, image));
-                    return location;
-                }
             }
         }
     });
@@ -185,8 +168,7 @@ public class CreationList extends RenderableVList {
         list.addRenderable(button = new IconButton(list, 0, 0, 270, 30, template.buttonMessage()) {
             @Override
             public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
-                Identifier icon = getTemplateWorldIcon(template);
-                if (icon == null) icon = getTemplatePackIcon(template);
+                Identifier icon = getTemplatePackIcon(template);
                 if (icon != null) {
                     FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
                     return;
@@ -199,18 +181,6 @@ public class CreationList extends RenderableVList {
                 onPress.accept(this);
             }
         });
-    }
-
-    private static Identifier getTemplateWorldIcon(LegacyWorldTemplate template) {
-        if (template.albumId().isEmpty() || !template.isGamePath()) return null;
-        Path path = template.getPath().toAbsolutePath().normalize();
-        if (!Files.isRegularFile(path)) return null;
-        try {
-            Identifier icon = worldIcons.getUnchecked(path.toString());
-            return PackAlbum.Selector.DEFAULT_ICON.equals(icon) ? null : icon;
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     private static Identifier getTemplatePackIcon(LegacyWorldTemplate template) {

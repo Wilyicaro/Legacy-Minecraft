@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
@@ -40,13 +41,17 @@ public abstract class BossHealthOverlayMixin {
             if (!b) graphics.pose().scale(2 / 3f, 2 / 3f);
             graphics.pose().translate(-font.width(component) / 2f, 0);
             if (CommonColor.BOSS_TEXT.isOverridden()) {
-                graphics.text(font, bossNameText(component), 0, 0, CommonColor.BOSS_TEXT.get(), false);
+                graphics.text(font, bossNameText(component), 0, 0, bossTextColor(CommonColor.BOSS_TEXT.get()), false);
             } else {
-                graphics.text(font, component, 0, 0, k);
+                graphics.text(font, component, 0, 0, bossTextColor(k));
             }
             graphics.pose().popMatrix();
             LegacyFontUtil.forceVanillaFontShadowColor = false;
         });
+    }
+
+    private static int bossTextColor(int color) {
+        return ColorUtil.withAlpha(color, LegacyRenderUtil.getHUDOpacity());
     }
 
     private static FormattedCharSequence bossNameText(Component component) {

@@ -465,6 +465,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.backSound,
                                 LegacyOptions.hoverFocusSound,
                                 LegacyOptions.inventoryHoverFocusSound,
+                                LegacyOptions.unlinkMusicFromMasterVolume,
                                 LegacyOptions.of(mc.options.showSubtitles()),
                                 LegacyOptions.of(mc.options.directionalAudio()),
                                 LegacyOptions.of(mc.options.musicFrequency()),

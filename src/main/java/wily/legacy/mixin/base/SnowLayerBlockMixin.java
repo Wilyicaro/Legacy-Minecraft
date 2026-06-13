@@ -57,17 +57,27 @@ public class SnowLayerBlockMixin extends Block implements Fallable, LegacyBlockE
         BlockState fallenState = level.getBlockState(blockPos);
         if (fallenState.is(Blocks.SNOW)) {
             ((FallingBlockAccessor)fallingBlockEntity).setCancelDrop(true);
-            if (fallenState.getValue(SnowLayerBlock.LAYERS) >= SnowLayerBlock.MAX_HEIGHT) {
-                BlockPos above = blockPos.above();
-                BlockState aboveState = level.getBlockState(above);
-                if (aboveState.is(Blocks.SNOW)) level.setBlock(above, fallingBlockEntity.getBlockState().setValue(SnowLayerBlock.LAYERS, Math.min(SnowLayerBlock.MAX_HEIGHT, aboveState.getValue(SnowLayerBlock.LAYERS) + fallingBlockEntity.getBlockState().getValue(SnowLayerBlock.LAYERS))), Block.UPDATE_ALL);
-                else level.setBlock(above, fallingBlockEntity.getBlockState(), Block.UPDATE_ALL);
+            mergeSnowLayers(level, blockPos, fallingBlockEntity.getBlockState(), fallingBlockEntity.getBlockState().getValue(SnowLayerBlock.LAYERS));
+        }
+    }
+
+    private void mergeSnowLayers(Level level, BlockPos blockPos, BlockState fallingState, int layers) {
+        BlockPos targetPos = blockPos;
+        int remainingLayers = layers;
+        while (remainingLayers > 0) {
+            BlockState targetState = level.getBlockState(targetPos);
+            if (targetState.is(Blocks.SNOW)) {
+                int total = targetState.getValue(SnowLayerBlock.LAYERS) + remainingLayers;
+                level.setBlock(targetPos, targetState.setValue(SnowLayerBlock.LAYERS, Math.min(SnowLayerBlock.MAX_HEIGHT, total)), Block.UPDATE_ALL);
+                remainingLayers = Math.max(0, total - SnowLayerBlock.MAX_HEIGHT);
+            } else if (targetState.isAir() || targetState.canBeReplaced()) {
+                int placedLayers = Math.min(SnowLayerBlock.MAX_HEIGHT, remainingLayers);
+                level.setBlock(targetPos, fallingState.setValue(SnowLayerBlock.LAYERS, placedLayers), Block.UPDATE_ALL);
+                remainingLayers -= placedLayers;
             } else {
-                int total = fallenState.getValue(SnowLayerBlock.LAYERS) + fallingBlockEntity.getBlockState().getValue(SnowLayerBlock.LAYERS);
-                level.setBlock(blockPos, fallenState.setValue(SnowLayerBlock.LAYERS, Math.min(SnowLayerBlock.MAX_HEIGHT, total)), Block.UPDATE_ALL);
-                if (total > SnowLayerBlock.MAX_HEIGHT)
-                    level.setBlock(blockPos.above(), fallingBlockEntity.getBlockState().setValue(SnowLayerBlock.LAYERS, total - SnowLayerBlock.MAX_HEIGHT), Block.UPDATE_ALL);
+                return;
             }
+            targetPos = targetPos.above();
         }
     }
 

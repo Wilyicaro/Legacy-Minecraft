@@ -9,6 +9,10 @@
     "tip": {"translate": "block.minecraft.deepslate_bricks.tip"}
     },
     {
+    "blocks": ["deepslate_tiles","cracked_deepslate_tiles"],
+    "tip": {"translate": "block.minecraft.deepslate_tiles.tip"}
+    },
+    {
     "blocks": ["red_sandstone","smooth_red_sandstone","chiseled_red_sandstone","cut_red_sandstone"],
     "tip": {"translate": "block.minecraft.red_sandstone.tip"}
     },
