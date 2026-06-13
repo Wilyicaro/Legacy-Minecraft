@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "block": "#wooden_shelves",
+    "tip": {"translate": "block.minecraft.shelf.tip"}
+  }
+}

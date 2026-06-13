@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "block": "#copper_chests",
+    "tip": {"translate": "block.minecraft.copper_chest.tip"}
+  }
+}
