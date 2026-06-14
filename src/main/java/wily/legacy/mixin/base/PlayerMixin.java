@@ -58,7 +58,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
-        if (level().isClientSide && !Legacy4JClient.hasModOnServer()) return;
+        if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
         cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
     }
 

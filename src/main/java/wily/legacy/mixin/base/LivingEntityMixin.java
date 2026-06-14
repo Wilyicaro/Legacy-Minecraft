@@ -41,7 +41,7 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     private boolean isLegacyFlying(){
-        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || Legacy4JClient.hasModOnServer()));
+        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT));
     }
     @Redirect(method = /*? if <1.21.2 {*/"travel"/*?} else {*//*"travelInAir"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V", ordinal = /*? if <1.21.2 {*/3/*?} else {*//*1*//*?}*/))
     public void travelFlight(LivingEntity instance, double x, double y, double z) {

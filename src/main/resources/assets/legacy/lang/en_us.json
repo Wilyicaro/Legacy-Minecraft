@@ -594,6 +594,8 @@
   "gamerule.legacyMapGrid.description": "When enabled, the maps will be centered on X:0 and Y:0.",
   "gamerule.legacySwimming": "Legacy Swimming",
   "gamerule.legacySwimming.description": "When enabled, players will be able to swim at any time they are in the water.",
+  "gamerule.legacyFlight": "Legacy Flight",
+  "gamerule.legacyFlight.description": "When enabled, players will be able to fly in any direction and go up and down while fall flying in a Elytra.",
   "gamerule.playerStartingBundle": "Starter Bundle",
   "gamerule.playerStartingBundle.description": "When enabled, the players will start with an empty bundle.",
   "gamerule.playerStartingMap": "Starter Map",

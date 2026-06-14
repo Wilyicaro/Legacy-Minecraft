@@ -121,7 +121,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             this(Collections.emptyMap(),gameRules,GameType.SURVIVAL,identifier);
         }
 
-        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING,LegacyGameRules.LEGACY_FLIGHT,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
 
         public static <T extends GameRules.Value<T>> void syncGamerule(GameRules.Key<T> key, T value, MinecraftServer server){
             Object objectValue = value instanceof GameRules.IntegerValue integer ? integer.get() : value instanceof GameRules.BooleanValue bool ? bool.get() : null;
