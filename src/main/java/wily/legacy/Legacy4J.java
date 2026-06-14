@@ -43,6 +43,10 @@ import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.DyedItemColor;
+//? if <1.21.4 {
+import net.minecraft.world.item.component.BlockItemStateProperties;
+import net.minecraft.world.item.component.CustomModelData;
+//?}
 //?} else {
 /*import net.minecraft.world.item.alchemy.PotionUtils;
 import wily.factoryapi.util.ColorUtil;
@@ -117,6 +121,8 @@ public class Legacy4J {
     public static final String DECAY_POTION_NAME = "decay";
     public static final int DECAY_EFFECT_DURATION = 800;
     public static final int DECAY_EFFECT_AMPLIFIER = 1;
+    public static final String MUSHROOM_PORE_NAME = "block.legacy.mushroom_pore";
+    public static final int MUSHROOM_PORE_MODEL_DATA = 421001;
 
     private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
 
@@ -525,6 +531,41 @@ public class Legacy4J {
         if (stack.is(Items.POTION)) return "item.minecraft.potion.effect." + DECAY_POTION_NAME;
         return null;
     }
+
+    //? if <1.21.4 {
+    public static ItemStack createMushroomPore() {
+        ItemStack stack = new ItemStack(Items.BROWN_MUSHROOM_BLOCK);
+        //? if >=1.20.5 {
+        stack.set(DataComponents.ITEM_NAME, Component.translatable(MUSHROOM_PORE_NAME));
+        stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(MUSHROOM_PORE_MODEL_DATA));
+        stack.set(DataComponents.BLOCK_STATE, new BlockItemStateProperties(Map.of("north", "false", "east", "false", "south", "false", "west", "false", "up", "false", "down", "false")));
+        //?}
+        //? if <1.20.5 {
+        /*
+        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag blockState = new CompoundTag();
+        blockState.putString("north", "false");
+        blockState.putString("east", "false");
+        blockState.putString("south", "false");
+        blockState.putString("west", "false");
+        blockState.putString("up", "false");
+        blockState.putString("down", "false");
+        tag.putInt("CustomModelData", MUSHROOM_PORE_MODEL_DATA);
+        tag.put("BlockStateTag", blockState);
+        *///?}
+        return stack;
+    }
+
+    public static boolean isMushroomPore(ItemStack stack) {
+        //? if <1.20.5 {
+        /*
+        CompoundTag tag = stack.getTag();
+        return stack.is(Items.BROWN_MUSHROOM_BLOCK) && tag != null && tag.getInt("CustomModelData") == MUSHROOM_PORE_MODEL_DATA;
+        *///?} else {
+        return stack.is(Items.BROWN_MUSHROOM_BLOCK) && stack.get(DataComponents.CUSTOM_MODEL_DATA) instanceof CustomModelData modelData && modelData.value() == MUSHROOM_PORE_MODEL_DATA;
+        //?}
+    }
+    //?}
 
     private static boolean isDecayEffectList(List<MobEffectInstance> effects) {
         return effects.size() == 1 && isDecayEffect(effects.get(0));

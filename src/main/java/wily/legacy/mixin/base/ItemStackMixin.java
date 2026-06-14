@@ -54,6 +54,13 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
 
+    //? if <1.20.5 {
+    /*@Inject(method = "getHoverName", at = @At("HEAD"), cancellable = true)
+    private void getHoverName(CallbackInfoReturnable<Component> cir) {
+        if (Legacy4J.isMushroomPore((ItemStack)(Object)this)) cir.setReturnValue(Component.translatable(Legacy4J.MUSHROOM_PORE_NAME));
+    }
+    *///?}
+
     //? if <1.21.2 {
     @ModifyArg(method = "getTooltipLines",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge || (forge && <1.20.5) {*/ /*0*//*?} else {*/ 1/*?}*/))
     public ChatFormatting getTooltipLines(ChatFormatting arg) {

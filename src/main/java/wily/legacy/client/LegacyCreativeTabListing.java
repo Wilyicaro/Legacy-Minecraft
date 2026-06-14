@@ -92,6 +92,9 @@ public class LegacyCreativeTabListing implements LegacyTabInfo {
             DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_splash_potion"), ()-> Legacy4J.createDecayPotion(Items.SPLASH_POTION));
             DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_lingering_potion"), ()-> Legacy4J.createDecayPotion(Items.LINGERING_POTION));
             DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_tipped_arrow"), Legacy4J::createDecayTippedArrow);
+            //? if <1.21.4 {
+            DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("mushroom_pore"), Legacy4J::createMushroomPore);
+            //?}
         }
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {

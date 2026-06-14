@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:block/brown_mushroom_block_inventory"
+  //? if <1.21.4 {
+  ,
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 421001
+      },
+      "model": "legacy:item/mushroom_pore"
+    }
+  ]
+  //?}
+}
