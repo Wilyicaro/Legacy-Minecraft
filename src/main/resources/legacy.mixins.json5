@@ -223,6 +223,10 @@
     "FlowerBlockMixin",
     "FoodDataMixin",
     "ItemStackMixin",
+    //? if <=1.21.1 {
+    "PotionItemMixin",
+    "TippedArrowItemMixin",
+    //?}
     "cauldron.LayeredCauldronBlockMixin",
     "LevelMixin",
     "LivingEntityMixin",

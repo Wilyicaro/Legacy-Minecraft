@@ -15,6 +15,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.util.DynamicUtil;
@@ -87,6 +88,10 @@ public class LegacyCreativeTabListing implements LegacyTabInfo {
                 if (Minecraft.getInstance().getConnection() == null) return ItemStack.EMPTY;
                 return Raid./*? >=1.21.2 {*/ /*getOminousBannerInstance*//*?} else {*/getLeaderBannerInstance/*?}*/(/*? if >=1.20.5 {*/Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN)/*?}*/);
             });
+            DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_potion"), ()-> Legacy4J.createDecayPotion(Items.POTION));
+            DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_splash_potion"), ()-> Legacy4J.createDecayPotion(Items.SPLASH_POTION));
+            DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_lingering_potion"), ()-> Legacy4J.createDecayPotion(Items.LINGERING_POTION));
+            DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_tipped_arrow"), Legacy4J::createDecayTippedArrow);
         }
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {

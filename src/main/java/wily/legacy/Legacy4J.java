@@ -30,6 +30,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.ItemInteractionResult;
 //?}
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.alchemy.Potion;
@@ -112,6 +114,9 @@ public class Legacy4J {
     public static final Supplier<String> VERSION = ()-> FactoryAPIPlatform.getModInfo(MOD_ID).getVersion();
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinToggles.COMMON_STORAGE, true);
+    public static final String DECAY_POTION_NAME = "decay";
+    public static final int DECAY_EFFECT_DURATION = 800;
+    public static final int DECAY_EFFECT_AMPLIFIER = 1;
 
     private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
 
@@ -465,11 +470,83 @@ public class Legacy4J {
         //?}
     }
 
+    public static List<MobEffectInstance> createDecayEffects() {
+        return List.of(new MobEffectInstance(MobEffects.WITHER, DECAY_EFFECT_DURATION, DECAY_EFFECT_AMPLIFIER));
+    }
+
+    //? if >=1.20.5 {
+    public static PotionContents createDecayPotionContents() {
+        return new PotionContents(Optional.empty(), Optional.empty(), createDecayEffects()/*? if >=1.21.3 {*//*, Optional.of(DECAY_POTION_NAME)*//*?}*/);
+    }
+    //?}
+
+    public static ItemStack createDecayPotion(Item item) {
+        return createDecayPotion(new ItemStack(item));
+    }
+
+    public static ItemStack createDecayPotion(ItemStack stack) {
+        //? if <1.20.5 {
+        /*List<MobEffectInstance> effects = createDecayEffects();
+        PotionUtils.setCustomEffects(stack, effects);
+        stack.getOrCreateTag().putInt("CustomPotionColor", PotionUtils.getColor(effects));
+        return stack;
+        *///?} else {
+        stack.set(DataComponents.POTION_CONTENTS, createDecayPotionContents());
+        return stack;
+        //?}
+    }
+
+    public static ItemStack createDecayTippedArrow() {
+        return createDecayTippedArrow(1);
+    }
+
+    public static ItemStack createDecayTippedArrow(int count) {
+        return createDecayPotion(new ItemStack(Items.TIPPED_ARROW, count));
+    }
+
+    public static boolean isDecayPotionItem(ItemStack stack) {
+        //? if <1.20.5 {
+        /*return PotionUtils.getPotion(stack) == Potions.EMPTY && isDecayEffectList(PotionUtils.getCustomEffects(stack));
+        *///?} else {
+        PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        if (contents.potion().isPresent()) return false;
+        //? if >=1.21.3 {
+        /*if (contents.customName().filter(DECAY_POTION_NAME::equals).isPresent()) return true;
+        *///?}
+        return isDecayEffectList(contents.customEffects());
+        //?}
+    }
+
+    public static String getDecayPotionDescriptionId(ItemStack stack) {
+        if (!isDecayPotionItem(stack)) return null;
+        if (stack.is(Items.TIPPED_ARROW)) return "item.minecraft.tipped_arrow.effect." + DECAY_POTION_NAME;
+        if (stack.is(Items.SPLASH_POTION)) return "item.minecraft.splash_potion.effect." + DECAY_POTION_NAME;
+        if (stack.is(Items.LINGERING_POTION)) return "item.minecraft.lingering_potion.effect." + DECAY_POTION_NAME;
+        if (stack.is(Items.POTION)) return "item.minecraft.potion.effect." + DECAY_POTION_NAME;
+        return null;
+    }
+
+    private static boolean isDecayEffectList(List<MobEffectInstance> effects) {
+        return effects.size() == 1 && isDecayEffect(effects.get(0));
+    }
+
+    private static boolean isDecayEffect(MobEffectInstance effect) {
+        return effect.getEffect().equals(MobEffects.WITHER) && effect.getDuration() == DECAY_EFFECT_DURATION && effect.getAmplifier() == DECAY_EFFECT_AMPLIFIER;
+    }
+
     public static void addPotionTooltip(Holder<Potion> potion, List<Component> tooltipList, float f/*? if >=1.20.3 {*/, float tickRate/*?}*/){
         //? if <1.20.5 {
         /*PotionUtils.addPotionTooltip(potion.value().getEffects(), tooltipList, f/^? if >=1.20.3 {^/, tickRate/^?}^/);
         *///?} else {
         PotionContents.addPotionTooltip(potion.value().getEffects(), tooltipList::add, f, tickRate);
+        //?}
+    }
+
+    public static void addPotionTooltip(List<MobEffectInstance> effects, List<Component> tooltipList, float f/*? if >=1.20.3 {*/, float tickRate/*?}*/){
+        //? if <1.20.5 {
+        /*PotionUtils.addPotionTooltip(effects, tooltipList, f/^? if >=1.20.3 {^/, tickRate/^?}^/);
+        *///?} else {
+        PotionContents.addPotionTooltip(effects, tooltipList::add, f, tickRate);
         //?}
     }
 
