@@ -10,8 +10,10 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.network.PlayerInfoSync;
 
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public class LegacyGameRules {
+    private static Predicate<GameRules.Key<GameRules.BooleanValue>> clientRuleResolver = key -> Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules != null && Legacy4JClient.gameRules.getBoolean(key);
 
     public static final GameRules.Key<GameRules.BooleanValue> GLOBAL_MAP_PLAYER_ICON = GameRules.register("globalMapPlayerIcon", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
     public static final GameRules.Key<GameRules.BooleanValue> DEFAULT_SHOW_ARMOR_STANDS_ARMS = GameRules.register("defaultShowArmorStandArms", GameRules.Category.MISC, GameRules.BooleanValue.create(true, (server, booleanValue) ->  PlayerInfoSync.All.syncGamerule(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS, booleanValue, server)));
@@ -33,7 +35,11 @@ public class LegacyGameRules {
 
 
     public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
-        return entity.level().isClientSide && Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules.getBoolean(key) || !entity.level().isClientSide && entity.getServer().getGameRules().getBoolean(key);
+        return entity.level().isClientSide && clientRuleResolver.test(key) || !entity.level().isClientSide && entity.getServer().getGameRules().getBoolean(key);
+    }
+
+    public static void setClientRuleResolver(Predicate<GameRules.Key<GameRules.BooleanValue>> resolver) {
+        clientRuleResolver = resolver == null ? key -> false : resolver;
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){

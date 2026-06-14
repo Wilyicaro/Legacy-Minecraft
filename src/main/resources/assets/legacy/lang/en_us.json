@@ -1620,6 +1620,7 @@
   "legacy.options.fastLeavesCustomModels": "Fast Leaves Custom Models",
   "legacy.options.fastLeavesWhenBlocked": "Fast Leaves When Blocked",
   "legacy.options.flyingViewRolling": "Flying View Rolling",
+  "legacy.options.forceLegacyFlight": "Force Legacy Flight",
   "legacy.options.forceMixedCrafting": "Force Mixed Crafting",
   "legacy.options.forceSmoothMovement": "Force Smooth Movement",
   "legacy.options.gameTooltips": "In-Game Tooltips",
