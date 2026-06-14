@@ -34,12 +34,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, Optional<String> albumId, Optional<URI> downloadURI, Optional<String> checkSum) {
-    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName),Codec.BOOL.fieldOf("directJoin").orElse(false).forGetter(LegacyWorldTemplate::directJoin),Codec.BOOL.fieldOf("isLocked").orElse(true).forGetter(LegacyWorldTemplate::isLocked),Codec.BOOL.fieldOf("isGamePath").orElse(false).forGetter(LegacyWorldTemplate::isGamePath), Codec.STRING.optionalFieldOf("resourceAlbum").forGetter(LegacyWorldTemplate::albumId),Codec.STRING.xmap(URI::create,URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI)).apply(i, LegacyWorldTemplate::create));
+public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean preDownload, Optional<String> albumId, Optional<URI> downloadURI, Optional<URI> checksumURI, Optional<String> checkSum) {
+    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName),Codec.BOOL.fieldOf("directJoin").orElse(false).forGetter(LegacyWorldTemplate::directJoin),Codec.BOOL.fieldOf("isLocked").orElse(true).forGetter(LegacyWorldTemplate::isLocked),Codec.BOOL.fieldOf("isGamePath").orElse(false).forGetter(LegacyWorldTemplate::isGamePath),Codec.BOOL.fieldOf("preDownload").orElse(false).forGetter(LegacyWorldTemplate::preDownload), Codec.STRING.optionalFieldOf("resourceAlbum").forGetter(LegacyWorldTemplate::albumId),Codec.STRING.xmap(URI::create,URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI),Codec.STRING.xmap(URI::create,URI::toString).optionalFieldOf("checksumURI").forGetter(LegacyWorldTemplate::checksumURI),Codec.STRING.optionalFieldOf("checksum").forGetter(LegacyWorldTemplate::checkSum)).apply(i, LegacyWorldTemplate::create));
 
-    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, Optional<String> albumId, Optional<URI> compoundDownloadURI) {
+    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean preDownload, Optional<String> albumId, Optional<URI> compoundDownloadURI, Optional<URI> checksumURI, Optional<String> checkSum) {
         Optional<String[]> splitURI = compoundDownloadURI.map(u->u.toString().split("\\?checksum="));
-        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, albumId, splitURI.map(s->URI.create(s[0])),splitURI.map(s->s.length < 2 ? null : s[1]));
+        Optional<URI> downloadURI = splitURI.map(s->URI.create(s[0]));
+        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, preDownload, albumId, downloadURI, checksumURI.or(()->downloadURI.map(u->URI.create(u + ".md5"))), checkSum.or(()->splitURI.map(s->s.length < 2 ? null : s[1])));
     }
 
     public Path getPath(){
@@ -53,14 +54,20 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
             throw new RuntimeException(e);
         }
     }
-    public void downloadToPathIfPossible(){
-        if (!isGamePath || downloadURI.isEmpty()) return;
+    public Path getDownloadPath(){
+        if (!isGamePath || downloadURI.isEmpty()) return null;
         Path path = getPath();
-        boolean exists = Files.exists(path);
-        String checksum;
-        if (exists && checkSum().isEmpty() || (exists && checkSum().get().equals(readFileCheckSum(path))) || (checksum = readCheckSum(path)) == null || !checkSum().get().equals(checksum)) return;
+        if (checkSum().isEmpty()) return path;
+        if (Files.exists(path) && checkSum().get().equals(readFileCheckSum(path))) return null;
+        String checksum = readCheckSum(path);
+        if (checksum == null) return path;
+        return checkSum().get().equals(checksum) ? path : null;
+    }
+    public void downloadToPathIfPossible(){
+        Path path = getDownloadPath();
+        if (path == null) return;
         try (InputStream stream = downloadURI.get().toURL().openStream()) {
-            if (exists) Files.delete(path);
+            Files.deleteIfExists(path);
             Files.createDirectories(path.getParent());
             Files.copy(stream,path);
         } catch (IOException e) {
@@ -69,7 +76,8 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
     }
 
     public String readCheckSum(Path path){
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(URI.create(downloadURI.get()+".md5").toURL().openStream()))) {
+        if (checksumURI.isEmpty()) return null;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(checksumURI.get().toURL().openStream()))) {
             return reader.readLine().trim();
         } catch (IOException e) {
             Legacy4J.LOGGER.warn("Error when reading checksum from world template {}: {}",path,e.getMessage());
@@ -151,7 +159,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
         String name = entry.name() == null || entry.name().isBlank() ? packId : entry.name();
         String folderName = entry.worldTemplateFolderName();
         if (folderName == null || folderName.isBlank()) folderName = name;
-        return Optional.of(new LegacyWorldTemplate(Component.literal(name), Legacy4J.createModLocation("creation_list/create_world"), downloadedPackLocation(packId), folderName, false, true, true, Optional.of(DownloadedResourceAlbums.albumId(packId)), Optional.empty(), Optional.empty()));
+        return Optional.of(new LegacyWorldTemplate(Component.literal(name), Legacy4J.createModLocation("creation_list/create_world"), downloadedPackLocation(packId), folderName, false, true, true, false, Optional.of(DownloadedResourceAlbums.albumId(packId)), Optional.empty(), Optional.empty(), Optional.empty()));
     }
 
     private static Path downloadedPackPath(String packId) {
@@ -183,12 +191,12 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
                         Legacy4J.LOGGER.warn("The World Template {} is using a deprecated syntax, please contact this resource creator or try updating it.", name+":"+TEMPLATES);
                         obj.asMap().forEach((s, e) -> {
                             if (e instanceof JsonObject tabObj) {
-                                list.add(create(Component.translatable(s), FactoryAPI.createLocation(GsonHelper.getAsString(tabObj, "icon")), GsonHelper.getAsString(tabObj, "templateLocation"), GsonHelper.getAsString(tabObj, "folderName"), GsonHelper.getAsBoolean(tabObj, "directJoin", false), true, false, Optional.empty(), Optional.empty()));
+                                list.add(create(Component.translatable(s), FactoryAPI.createLocation(GsonHelper.getAsString(tabObj, "icon")), GsonHelper.getAsString(tabObj, "templateLocation"), GsonHelper.getAsString(tabObj, "folderName"), GsonHelper.getAsBoolean(tabObj, "directJoin", false), true, false, false, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
                             }
                         });
                     } else if (element instanceof JsonArray a) a.forEach(e->CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(w->{
-                        w.downloadToPathIfPossible();
                         list.add(w);
+                        if (w.preDownload()) w.downloadToPathIfPossible();
                     }));
                 } catch (IOException var8) {
                     Legacy4J.LOGGER.warn(var8.getMessage());

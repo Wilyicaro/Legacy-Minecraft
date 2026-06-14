@@ -33,6 +33,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -52,8 +53,9 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         super(component);
     }
 
-    @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
-    public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
+    @Unique
+    private void rebuildMenuButtons() {
+        renderableVList.renderables.clear();
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
             if (minecraft.isDemo()){
                 try {
@@ -64,7 +66,9 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
             }else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         Button modButton;
-        renderableVList.addRenderable(modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
+        renderableVList.addRenderable(modButton = GlobalLeaderboardsFeature.isOptedOut()
+                ? Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build()
+                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(GlobalLeaderboardsFeature.isOptedOut() ? new ModsScreen(this) : LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, ContentManager.supportedCategories()))).build());
@@ -74,10 +78,16 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         *///?}
     }
 
+    @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
+    public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
+        rebuildMenuButtons();
+    }
+
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
         ci.cancel();
+        rebuildMenuButtons();
         super.init();
         renderableVListInit();
     }

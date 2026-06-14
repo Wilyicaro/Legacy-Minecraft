@@ -41,6 +41,12 @@ public class LegacyRegistries {
     private static final RegisterListing<Item> ITEM_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.ITEM);
     private static final RegisterListing<MenuType<?>> MENU_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.MENU);
     private static final RegisterListing<SoundEvent> SOUND_EVENT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.SOUND_EVENT);
+    private static final RegisterListing<ResourceLocation> CUSTOM_STAT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.CUSTOM_STAT);
+
+    public static final ResourceLocation SKELETON_JOCKEY_STAT = Legacy4J.createModLocation("skeleton_jockey");
+    public static final ResourceLocation DAYS_PLAYED_STAT = Legacy4J.createModLocation("days_played");
+    public static final RegisterListing.Holder<ResourceLocation> SKELETON_JOCKEY_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("skeleton_jockey", () -> SKELETON_JOCKEY_STAT);
+    public static final RegisterListing.Holder<ResourceLocation> DAYS_PLAYED_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("days_played", () -> DAYS_PLAYED_STAT);
 
     public static final RegisterListing.Holder<MenuType<LegacyMerchantMenu>> MERCHANT_MENU = MENU_REGISTER.add("merchant_menu", ()->new MenuType<>(LegacyMerchantMenu::new, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> STONECUTTER_PANEL_MENU = MENU_REGISTER.add("stonecutter_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::stoneCutterMenu, FeatureFlags.VANILLA_SET));
@@ -80,5 +86,6 @@ public class LegacyRegistries {
         ITEM_REGISTER.register();
         MENU_REGISTER.register();
         SOUND_EVENT_REGISTER.register();
+        CUSTOM_STAT_REGISTER.register();
     }
 }

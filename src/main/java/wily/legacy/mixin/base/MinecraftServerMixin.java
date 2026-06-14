@@ -7,7 +7,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.globalleaderboards.GlobalDifficultyStatsStore;
 import wily.legacy.init.LegacyGameRules;
 
 @Mixin(MinecraftServer.class)
@@ -19,5 +21,10 @@ public abstract class MinecraftServerMixin {
     @Inject(method = "isPvpAllowed", at = @At("HEAD"), cancellable = true)
     public void isPvpAllowed(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(getGameRules().getBoolean(LegacyGameRules.PLAYER_VS_PLAYER));
+    }
+
+    @Inject(method = "stopServer", at = @At("HEAD"))
+    private void legacy$stopServer(CallbackInfo ci) {
+        GlobalDifficultyStatsStore.saveAll();
     }
 }

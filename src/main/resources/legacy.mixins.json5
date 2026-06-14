@@ -241,6 +241,7 @@
     "ServerGamePacketListenerImplMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
+    "StatsCounterMixin",
     "SnowLayerBlockMixin",
     "SquidMixin",
     "StonecutterBlockMixin",

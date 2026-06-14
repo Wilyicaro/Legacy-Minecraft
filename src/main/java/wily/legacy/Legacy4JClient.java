@@ -103,6 +103,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 //? if fabric || >=1.21 && neoforge {
 import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
@@ -428,6 +429,7 @@ public class Legacy4JClient {
     }
 
     public static void init() {
+        GlobalLeaderboardsFeature.init();
         ControlType.UpdateEvent.EVENT.register((last, actual)->{
             UIAccessor uiAccessor = Minecraft.getInstance().screen == null ? FactoryScreenUtil.getGuiAccessor() : FactoryScreenUtil.getScreenAccessor();
             uiAccessor.reloadUI();
@@ -468,6 +470,7 @@ public class Legacy4JClient {
             currentWorldSource = LevelStorageSource.createDefault(m.gameDirectory.toPath().resolve("current-world"));
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            GlobalLeaderboardsFeature.onClientStarted(m);
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
             //? if fabric

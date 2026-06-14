@@ -9,6 +9,7 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -19,6 +20,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyComponents;
 
@@ -87,6 +89,14 @@ public class OptionsScreen extends PanelVListScreen {
         renderer.add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)}) : null, ()-> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT,screen));
         renderer.add(ControlTooltip.EXTRA::get, ()-> ControlTooltip.getKeyMessage(InputConstants.KEY_X,screen));
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> ControlTooltip.getKeyMessage(InputConstants.KEY_O,screen));
+    }
+
+    private static TickBox createGlobalLeaderboardsTickBox() {
+        return new TickBox(0, 0, 200,
+                !GlobalLeaderboardsFeature.isOptedOut(),
+                b -> Component.translatable("legacy.options.globalLeaderboards"),
+                b -> Tooltip.create(Component.translatable("legacy.options.globalLeaderboards.tooltip")),
+                t -> GlobalLeaderboardsFeature.setEnabled(t.selected));
     }
 
     @Override
@@ -181,7 +191,8 @@ public class OptionsScreen extends PanelVListScreen {
                         o-> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.misc"),
                                 LegacyOptions.of(mc.options.realmsNotifications()),
-                                LegacyOptions.of(mc.options.allowServerListing())),
+                                LegacyOptions.of(mc.options.allowServerListing()))
+                                .addRenderable(createGlobalLeaderboardsTickBox()),
                         o-> o.renderableVList.addRenderables(
                                 RenderableVListScreen.openScreenButton(LegacyComponents.RESET_KNOWN_BLOCKS_TITLE,()-> ConfirmationScreen.createResetKnownListingScreen(o, LegacyComponents.RESET_KNOWN_BLOCKS_TITLE,LegacyComponents.RESET_KNOWN_BLOCKS_MESSAGE, Legacy4JClient.knownBlocks)).build(),
                                 RenderableVListScreen.openScreenButton(LegacyComponents.RESET_KNOWN_ENTITIES_TITLE,()-> ConfirmationScreen.createResetKnownListingScreen(o, LegacyComponents.RESET_KNOWN_ENTITIES_TITLE,LegacyComponents.RESET_KNOWN_ENTITIES_MESSAGE, Legacy4JClient.knownEntities)).build()))));
@@ -365,6 +376,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("legacy.menu.in_game_settings"),
                                 LegacyOptions.invertedCrosshair,
                                 LegacyOptions.legacyCreativeTab,
+                                LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
                                 LegacyOptions.legacyHearts),
                         o-> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),

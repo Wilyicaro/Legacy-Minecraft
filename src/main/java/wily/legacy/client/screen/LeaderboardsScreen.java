@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -42,7 +43,9 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
@@ -73,6 +76,18 @@ public class LeaderboardsScreen extends PanelVListScreen {
         super(parent,568,275, CommonComponents.EMPTY);
         rebuildRenderableVList(Minecraft.getInstance());
         renderableVList.layoutSpacing(l-> 1);
+    }
+
+    public static Screen getActualLeaderboardsScreenInstance(Screen parent) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!LegacyOptions.legacyLeaderboards.get() && minecraft.player != null) {
+            return new StatsScreen(parent, minecraft.player.getStats());
+        }
+        return GlobalLeaderboardsFeature.isOptedOut() ? new LeaderboardsScreen(parent) : GlobalLeaderboardsFeature.createScreen(parent, () -> new LeaderboardsScreen(parent));
+    }
+
+    public static Screen getOverallLeaderboardsScreenInstance(Screen parent) {
+        return GlobalLeaderboardsFeature.isOptedOut() ? new LeaderboardsScreen(parent) : GlobalLeaderboardsFeature.createScreen(parent, () -> new LeaderboardsScreen(parent));
     }
 
     @Override
@@ -187,6 +202,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     @Override
     public void tick() {
         super.tick();
+        if (minecraft.getConnection() == null || minecraft.player == null) return;
         if (updateTimer <= 0){
             updateTimer = 20;
             if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
@@ -306,6 +322,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 h.itemIcon = i.asItem().getDefaultInstance();
                 return h;
             }else if (stat.getValue() instanceof EntityType<?> e){
+                ResourceLocation entityId = BuiltInRegistries.ENTITY_TYPE.getKey(e);
+                ResourceLocation entityIcon = entityId == null ? null : Legacy4J.createModLocation("icon/leaderboards/entity/" + entityId.getPath());
+                if (entityIcon != null && FactoryGuiGraphics.getSprites().textureAtlas.texturesByName.containsKey(entityIcon)) {
+                    LegacyIconHolder h = new LegacyIconHolder(24, 24);
+                    h.iconSprite = entityIcon;
+                    return h;
+                }
                 return LegacyIconHolder.entityHolder(0,0,24,24, e);
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
