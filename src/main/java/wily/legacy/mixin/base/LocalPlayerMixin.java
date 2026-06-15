@@ -13,8 +13,10 @@ import net.minecraft.client.player.Input;
 *///?}
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.entity.LegacyLocalPlayer;
+import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.*;
@@ -87,6 +90,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private boolean legacyWasLookingDownForElytraBoost;
     @Unique
     private boolean legacyReleasedElytraBoostByLook;
+    @Unique
+    private boolean legacyAutoShielding;
 
     //? if <1.21.5 {
     @Shadow protected abstract boolean hasEnoughFoodToStartSprinting();
@@ -367,6 +372,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         }
     }
 
+    @Inject(method = "aiStep", at = @At("RETURN"))
+    private void aiStepShieldControls(CallbackInfo ci) {
+        legacy$updateShieldControls();
+    }
+
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*/"handleConfusionTransitionEffect"/*?} else {*//*"handlePortalTransitionEffect"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
     public boolean handleConfusionTransitionEffect(boolean original) {
         return original || Legacy4JClient.hasModOnServer();
@@ -381,5 +391,45 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         if (wantsToStopRiding() && this.isPassenger()) {
             minecraft.options.keyShift.setDown(false);
         }
+    }
+
+    @Inject(method = "rideTick", at = @At("RETURN"))
+    private void rideTickShieldControls(CallbackInfo ci) {
+        legacy$updateShieldControls();
+    }
+
+    @WrapWithCondition(method = "onSyncedDataUpdated", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;startUsingItem(Lnet/minecraft/world/InteractionHand;)V"))
+    private boolean onSyncedDataUpdatedStartUsingItem(LocalPlayer instance, InteractionHand hand) {
+        return !((LegacyShieldPlayer)this).isShieldPaused() || !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) || !(getItemInHand(hand).getItem() instanceof ShieldItem);
+    }
+
+    @Unique
+    private void legacy$updateShieldControls() {
+        InteractionHand hand = legacy$getShieldHand();
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*//*keyPresses.shift()*//*?} else {*/shiftKeyDown/*?}*/)) {
+            if (LegacyShieldPlayer.hasConflictingUse((LocalPlayer)(Object)this, hand)) {
+                legacyAutoShielding = false;
+                return;
+            }
+            if (((LegacyShieldPlayer)this).isShieldPaused()) {
+                if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+                legacyAutoShielding = false;
+                return;
+            }
+            if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
+                if (isUsingItem()) stopUsingItem();
+                startUsingItem(hand);
+            }
+            legacyAutoShielding = true;
+        } else {
+            if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+            legacyAutoShielding = false;
+        }
+    }
+
+    @Unique
+    private InteractionHand legacy$getShieldHand() {
+        if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
+        return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
     }
 }

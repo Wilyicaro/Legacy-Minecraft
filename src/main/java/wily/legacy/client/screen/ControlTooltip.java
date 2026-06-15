@@ -100,6 +100,7 @@ import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.inventory.LegacySlot;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.RenameItemMenu;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.FlowerPotBlockAccessor;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.util.JsonUtil;
@@ -707,7 +708,7 @@ public interface ControlTooltip {
             if (blockState != null && blockState.getBlock() instanceof ComposterBlock && blockState.getValue(ComposterBlock.LEVEL) < 7 && ComposterBlock.COMPOSTABLES.containsKey(actualItem.getItem())) return LegacyComponents.FILL;
             if (blockHit != null && !actualItem.isEmpty() && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof CampfireBlockEntity e && /*? if <1.21.2 {*/e.getCookableRecipe(actualItem).isPresent()/*?} else {*//*minecraft.level.recipeAccess().propertySet(RecipePropertySet.FURNACE_INPUT).test(actualItem)*//*?}*/) return LegacyComponents.COOK;
             if (blockState != null && actualItem.getItem() instanceof BrushItem && blockState.getBlock() instanceof BrushableBlock) return LegacyComponents.BRUSH;
-            if (actualItem.getUseAnimation().equals(/*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK)) return LegacyComponents.BLOCK;
+            if (actualItem.getUseAnimation().equals(/*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK)) return actualItem.getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(minecraft.player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) ? null : LegacyComponents.BLOCK;
             if (/*? if <1.21.2 {*/actualItem.getItem() instanceof Equipable e/*?} else {*//*actualItem.has(DataComponents.EQUIPPABLE)*//*?}*/ && (!/*? if <1.20.5 {*//*(actualItem.getItem() instanceof HorseArmorItem)*//*?} else if <1.21.2 {*/e.getEquipmentSlot().equals(EquipmentSlot.BODY)/*?} else {*//*actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) *//*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*/m.isBodyArmorItem(actualItem)/*?} else {*/ /*m.isEquippableInSlot(actualItem,EquipmentSlot.BODY)*//*?}*/)) return LegacyComponents.EQUIP;
             if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem) return LegacyComponents.USE;
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS)) return LegacyComponents.LAUNCH;

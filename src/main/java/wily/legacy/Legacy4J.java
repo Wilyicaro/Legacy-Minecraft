@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.registries.Registries;
 //? if >1.20.1 {
 import net.minecraft.core.dispenser.BlockSource;
 //?} else {
@@ -26,6 +27,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 //? if >=1.20.5 && <1.21.2 {
 import net.minecraft.world.ItemInteractionResult;
 //?}
@@ -123,6 +125,7 @@ public class Legacy4J {
     public static final int DECAY_EFFECT_AMPLIFIER = 1;
     public static final String MUSHROOM_PORE_NAME = "block.legacy.mushroom_pore";
     public static final int MUSHROOM_PORE_MODEL_DATA = 421001;
+    public static final TagKey<Item> LCE_OFFHAND = TagKey.create(Registries.ITEM, createModLocation("lce_offhand"));
 
     private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
 
@@ -180,6 +183,7 @@ public class Legacy4J {
             r.register(true, ServerMenuCraftPayload.ID);
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
+            r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
@@ -759,6 +763,19 @@ public class Legacy4J {
         //?} else {
         /*return Inventory.EQUIPMENT_SLOT_MAPPING.int2ObjectEntrySet().stream().anyMatch(e-> e.getValue() != EquipmentSlot.OFFHAND && predicate.test(inventory.getItem(e.getIntKey())));
         *///?}
+    }
+
+    public static boolean canGoInLceOffhand(ItemStack stack) {
+        return stack.isEmpty() || stack.is(LCE_OFFHAND) || canGoInLocalOffhand(stack);
+    }
+
+    private static boolean canGoInLocalOffhand(ItemStack stack) {
+        return stack.is(ItemTags.ARROWS)
+                || stack.is(Items.FIREWORK_ROCKET)
+                || stack.is(Items.FILLED_MAP)
+                || stack.is(Items.NAUTILUS_SHELL)
+                || stack.is(Items.SHIELD)
+                || stack.is(Items.TOTEM_OF_UNDYING);
     }
 
     public static void onServerPlayerJoin(ServerPlayer p){

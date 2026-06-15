@@ -1,9 +1,11 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -12,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
+import wily.legacy.init.LegacyGameRules;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.LegacySlot;
@@ -30,6 +34,10 @@ public abstract class SlotMixin implements LegacySlot {
     @Shadow public abstract ItemStack getItem();
 
     @Shadow public abstract void setChanged();
+
+    @Shadow @Final public Container container;
+
+    @Shadow public abstract int getContainerSlot();
 
     private LegacySlotDisplay display = LegacySlotDisplay.VANILLA;
     private ItemStack lastItemStack = ItemStack.EMPTY;
@@ -56,6 +64,11 @@ public abstract class SlotMixin implements LegacySlot {
         }
         ItemStack override = LegacySlotDisplay.of((Slot) (Object) this).getItemOverride();
         if (override != null) cir.setReturnValue(override);
+    }
+
+    @ModifyReturnValue(method = "mayPlace", at = @At("RETURN"))
+    private boolean mayPlace(boolean original, ItemStack stack) {
+        return original && (!(container instanceof Inventory inventory) || getContainerSlot() != 40 || !LegacyGameRules.getSidedBooleanGamerule(inventory.player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) || Legacy4J.canGoInLceOffhand(stack));
     }
 
     @Override

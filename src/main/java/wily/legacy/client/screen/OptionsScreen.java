@@ -159,7 +159,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyCreativeBlockPlacing,
                                 LegacyOptions.mapsWithCoords,
                                 LegacyOptions.vanillaTutorial,
-                                LegacyOptions.forceLegacyFlight),
+                                LegacyOptions.forceLegacyFlight,
+                                LegacyOptions.forceLegacyShieldControls,
+                                LegacyOptions.forceLegacyOffhandLimits),
                         o-> {if (mc.level == null) LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(c, b -> c.sync())));},
                         o-> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.user_interface_settings"),

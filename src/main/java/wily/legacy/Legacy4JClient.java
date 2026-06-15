@@ -433,6 +433,8 @@ public class Legacy4JClient {
         GlobalLeaderboardsFeature.init();
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
+            if (key == LegacyGameRules.LEGACY_SHIELD_CONTROLS && LegacyOptions.forceLegacyShieldControls.get()) return true;
+            if (key == LegacyGameRules.LEGACY_OFFHAND_LIMITS && LegacyOptions.forceLegacyOffhandLimits.get()) return true;
             return hasModOnServer() && gameRules != null && gameRules.getBoolean(key);
         });
         ControlType.UpdateEvent.EVENT.register((last, actual)->{

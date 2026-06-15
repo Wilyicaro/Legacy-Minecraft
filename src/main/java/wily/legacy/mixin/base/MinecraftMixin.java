@@ -30,6 +30,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -47,11 +48,15 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.screen.*;
+import wily.legacy.entity.LegacyShieldPlayer;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerPlayerMissHitPayload;
+import wily.legacy.network.ServerPlayerShieldPausePayload;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -85,6 +90,7 @@ public abstract class MinecraftMixin {
     @Shadow @Nullable public MultiPlayerGameMode gameMode;
     private boolean inventoryKeyLastPressed = false;
     private int inventoryKeyHold = 0;
+    private int legacy$shieldPauseSyncCooldown = 0;
 
     @Shadow private int rightClickDelay;
 
@@ -105,6 +111,19 @@ public abstract class MinecraftMixin {
 
     private Minecraft self(){
         return (Minecraft)(Object)this;
+    }
+
+    @Unique
+    private void legacy$pauseShield() {
+        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS)) {
+            boolean usingShield = player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem;
+            if (usingShield && Legacy4JClient.hasModOnServer() && legacy$shieldPauseSyncCooldown == 0) {
+                CommonNetwork.sendToServer(new ServerPlayerShieldPausePayload());
+                legacy$shieldPauseSyncCooldown = 1;
+            }
+            ((LegacyShieldPlayer)player).pauseShield(LegacyShieldPlayer.SHIELD_PAUSE_TICKS);
+            if (usingShield && gameMode != null) gameMode.releaseUsingItem(player);
+        }
     }
 
     //? if forge {
@@ -143,14 +162,34 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
+        if (legacy$shieldPauseSyncCooldown > 0) legacy$shieldPauseSyncCooldown--;
+        if (player != null && screen == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
+            legacy$pauseShield();
+        }
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
+        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !Legacy4J.canGoInLceOffhand(player.getMainHandItem())) {
+            while (options.keySwapOffhand.consumeClick()) {
+            }
+        }
     }
+
+    @Inject(method = "continueAttack", at = @At("HEAD"))
+    private void continueAttack(boolean bl, CallbackInfo ci) {
+        if (bl) legacy$pauseShield();
+    }
+
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void startAttack(CallbackInfoReturnable<Boolean> cir) {
         CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
     }
+    @Inject(method = "startAttack", at = @At("HEAD"))
+    private void startAttackHead(CallbackInfoReturnable<Boolean> cir) {
+        legacy$pauseShield();
+    }
+
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
     private void startUseItem(CallbackInfo ci){
+        legacy$pauseShield();
         if (player != null && player.isSleeping()){
             ClientPacketListener clientPacketListener = player.connection;
             clientPacketListener.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.STOP_SLEEPING));

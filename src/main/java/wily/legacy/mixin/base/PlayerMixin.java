@@ -1,10 +1,16 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+//? if >=1.21.5 {
+/*import net.minecraft.server.level.ServerLevel;
+*///?}
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
@@ -20,15 +26,20 @@ import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.init.LegacyGameRules;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing {
+public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing, LegacyShieldPlayer {
     @Unique
     float oYBob;
     @Unique
     float yBob;
+    @Unique
+    private boolean legacy$autoShielding;
+    @Unique
+    private int legacy$shieldPauseUntilTick;
 
     @Shadow public abstract Abilities getAbilities();
 
@@ -72,6 +83,17 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) ci.cancel();
     }
 
+    @Inject(method = "tick", at = @At("RETURN"))
+    protected void tickShieldControls(CallbackInfo ci) {
+        legacy$updateShieldControls();
+    }
+
+    @Inject(method = /*? if <1.21.5 {*/"blockUsingShield"/*?} else {*//*"blockUsingItem"*//*?}*/, at = @At("RETURN"))
+    protected void blockUsingShield(/*? if >=1.21.5 {*//*ServerLevel level, *//*?}*/LivingEntity attacker, CallbackInfo ci) {
+        if (!(getUseItem().getItem() instanceof ShieldItem) || !(attacker instanceof Mob)) return;
+        attacker.knockback(0.5D, getX() - attacker.getX(), getZ() - attacker.getZ());
+    }
+
     @Inject(method = "getCurrentItemAttackStrengthDelay", at = @At(value = "HEAD"), cancellable = true)
     protected void getCurrentItemAttackStrengthDelay(CallbackInfoReturnable<Float> cir) {
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) cir.setReturnValue(1.0f);
@@ -108,5 +130,47 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
     @ModifyArg(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"), index = 1)
     protected double travel(double original) {
         return LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) ? original + 0.1f : original;
+    }
+
+    @Unique
+    private void legacy$updateShieldControls() {
+        InteractionHand hand = legacy$getShieldHand();
+        if (level().isClientSide()) return;
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || isShiftKeyDown())) {
+            if (!isShieldPaused() && LegacyShieldPlayer.hasConflictingUse((Player)(Object)this, hand)) {
+                legacy$autoShielding = false;
+                return;
+            }
+            if (isShieldPaused()) {
+                if (legacy$autoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+                legacy$autoShielding = false;
+                return;
+            }
+            if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
+                if (isUsingItem()) stopUsingItem();
+                startUsingItem(hand);
+            }
+            legacy$autoShielding = true;
+        } else {
+            if (legacy$autoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+            legacy$autoShielding = false;
+        }
+    }
+
+    @Unique
+    private InteractionHand legacy$getShieldHand() {
+        if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
+        return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
+    }
+
+    @Override
+    public void pauseShield(int ticks) {
+        legacy$shieldPauseUntilTick = Math.max(legacy$shieldPauseUntilTick, tickCount + ticks);
+        if (isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+    }
+
+    @Override
+    public boolean isShieldPaused() {
+        return tickCount < legacy$shieldPauseUntilTick;
     }
 }

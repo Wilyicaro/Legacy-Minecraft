@@ -28,6 +28,8 @@ public class LegacyGameRules {
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_MAP_GRID = GameRules.register("legacyMapGrid", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_SWIMMING = GameRules.register("legacySwimming", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_SWIMMING, booleanValue, server)));
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_FLIGHT = GameRules.register("legacyFlight", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_FLIGHT, booleanValue, server)));
+    public static final GameRules.Key<GameRules.BooleanValue> LEGACY_SHIELD_CONTROLS = GameRules.register("legacyShieldControls", GameRules.Category.PLAYER, GameRules.BooleanValue.create(false, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_SHIELD_CONTROLS, booleanValue, server)));
+    public static final GameRules.Key<GameRules.BooleanValue> LEGACY_OFFHAND_LIMITS = GameRules.register("legacyOffhandLimits", GameRules.Category.PLAYER, GameRules.BooleanValue.create(false, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_OFFHAND_LIMITS, booleanValue, server)));
 
     public static GameRules.Key<GameRules.BooleanValue> getTntExplodes(){
         return /*? if <1.21.5 {*/TNT_EXPLODES/*?} else {*//*GameRules.RULE_TNT_EXPLODES*//*?}*/;
