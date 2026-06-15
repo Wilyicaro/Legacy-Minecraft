@@ -223,6 +223,19 @@
     "EntityTypeMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
+    "mobcaps.ArmorStandItemMixin",
+    "mobcaps.BoatItemMixin",
+    "mobcaps.CarvedPumpkinBlockMixin",
+    "mobcaps.HangingEntityItemMixin",
+    "mobcaps.ItemFrameItemMixin",
+    "mobcaps.NaturalSpawnerMixin",
+    "mobcaps.PhantomSpawnerMixin",
+    //? if >=1.21.5 {
+    "mobcaps.ServerChunkCacheMixin",
+    //?}
+    "mobcaps.ServerLevelMixin",
+    "mobcaps.SpawnEggItemMixin",
+    "mobcaps.ThrownEggMixin",
     "ItemStackMixin",
     //? if <=1.21.1 {
     "PotionItemMixin",

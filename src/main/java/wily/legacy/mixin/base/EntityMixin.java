@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.mobcaps.LegacyMobCaps;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -21,6 +23,11 @@ public abstract class EntityMixin {
     @Inject(method = "setCustomName", at = @At("RETURN"))
     public void setCustomName(Component component, CallbackInfo ci) {
         if (self() instanceof Mob m) m.setPersistenceRequired();
+    }
+
+    @Inject(method = "setRemoved", at = @At("HEAD"))
+    public void setRemoved(Entity.RemovalReason removalReason, CallbackInfo ci) {
+        if (self().level() instanceof ServerLevel && !self().isRemoved()) LegacyMobCaps.handleEntityRemoved(self());
     }
 
     @ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
