@@ -61,5 +61,12 @@
         "name": "legacy:backspace"
       }
     ]
+  },
+  "random.screenshot": {
+    "sounds": [
+      {
+        "name": "legacy:screenshot"
+      }
+    ]
   }
 }

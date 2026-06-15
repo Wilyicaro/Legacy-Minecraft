@@ -185,6 +185,7 @@
     "RenderSystemMixin",
     "CompositeRenderTypeAccessor",
     "ClientLivingEntityMixin",
+    "ScreenshotMixin",
     "VillagerModelMixin",
     "BubbleParticleMixin",
     "client.gui.SubtitleOverlayMixin",
