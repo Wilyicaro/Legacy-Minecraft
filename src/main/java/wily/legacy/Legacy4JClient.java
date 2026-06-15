@@ -663,6 +663,7 @@ public class Legacy4JClient {
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"legacy_resources"),true);
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"legacy_waters"),true);
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"console_aspects"),false);
+            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"rosenfeld_patch"),false);
             if (FactoryAPI.getLoader().isForgeLike()) {
                 registry.register("programmer_art", FactoryAPI.createLocation(MOD_ID, "programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
                 registry.register("high_contrast", FactoryAPI.createLocation(MOD_ID,"high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
