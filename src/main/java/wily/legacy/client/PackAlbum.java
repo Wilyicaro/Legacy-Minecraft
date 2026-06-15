@@ -308,7 +308,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
-            return new Selector(i,j,k,l, LegacyComponents.RESOURCE_ALBUMS, LegacyComponents.SHOW_RESOURCE_PACKS, resourceAlbums, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAlbum() : resourceById(defaultResourceAlbum.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip){
+            return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAlbum() : resourceById(defaultResourceAlbum.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip){
 
                 @Override
                 public void applyChanges(boolean reloadAndSave) {
@@ -322,7 +322,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip, PackAlbum selectedAlbum) {
-            return new Selector(i,j,k,l, LegacyComponents.RESOURCE_ALBUMS, LegacyComponents.SHOW_RESOURCE_PACKS, resourceAlbums, selectedAlbum, Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip);
+            return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, selectedAlbum, Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip);
         }
 
         public Selector(int i, int j, int k, int l, Component component, Component screenComponent, ListMap<String, PackAlbum> albums, PackAlbum savedAlbum, PackRepository packRepository, Path packPath, Consumer<Selector> reloadChanges, FactoryConfig<GlobalPacks> globalPacks, boolean hasTooltip) {
@@ -408,7 +408,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                 while (!resourceById(TEMPLATE_ALBUM +(repeat > 0 ? "_" + repeat : "")).equals(MINECRAFT))
                                     repeat++;
                                 String id = TEMPLATE_ALBUM +(repeat > 0 ? "_" + repeat : "");
-                                minecraft.setScreen(createAlbumEditScreen(parent, b.getMessage(), Component.translatable("legacy.menu.albums.resource.template",repeat), Component.translatable("legacy.menu.albums.resource.template.description"), (name,description)-> {
+                                minecraft.setScreen(createAlbumEditScreen(parent, b.getMessage(), LegacyComponents.getResourceAlbumTemplate(repeat), LegacyComponents.getResourceAlbumTemplateDescription(), (name,description)-> {
                                     minecraft.setScreen(new PackSelectionScreen(packRepository, r -> {
                                         PackAlbum.resourceAlbums.put(id,new PackAlbum(id, 0, name, description,Optional.empty(),Optional.empty(), getSelectableIds(packRepository), Optional.empty()));
                                         save();

@@ -86,7 +86,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
-            return new Selector(i,j,k,l, LegacyComponents.GLOBAL_RESOURCE_PACKS, LegacyComponents.SHOW_RESOURCE_PACKS, Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
+            return new Selector(i,j,k,l, LegacyComponents.getGlobalResourcePacks(), LegacyComponents.getShowResourcePacks(), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
         }
 
         public Selector(int i, int j, int k, int l, Component component, Component screenComponent, PackRepository packRepository, Path packPath, FactoryConfig<GlobalPacks> globalPacks, boolean hasTooltip) {

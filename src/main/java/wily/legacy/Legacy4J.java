@@ -182,6 +182,7 @@ public class Legacy4J {
             r.register(false, PlayerInfoSync.All.ID_S2C);
             r.register(true, ServerMenuCraftPayload.ID);
             r.register(true, ServerOpenClientMenuPayload.ID);
+            r.register(true, ServerHostOptionsPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
             r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);

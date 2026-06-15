@@ -6,8 +6,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.LogoRenderer;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -34,6 +36,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -48,6 +51,10 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     *///?}
     @Unique
     private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l->5);
+    @Unique
+    private int legacy$lastFocusedButtonIndex = -1;
+    @Unique
+    private String legacy$lastFocusedButtonMessage;
 
     protected TitleScreenMixin(Component component) {
         super(component);
@@ -66,16 +73,42 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
             }else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         Button modButton;
-        renderableVList.addRenderable(modButton = GlobalLeaderboardsFeature.isOptedOut()
+        modButton = GlobalLeaderboardsFeature.isOptedOut()
                 ? Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build()
-                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(GlobalLeaderboardsFeature.isOptedOut() ? new ModsScreen(this) : LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
+                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
+        } else {
+            renderableVList.addRenderable(modButton);
+            renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
+        }
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, ContentManager.supportedCategories()))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
         //? if forge || neoforge && <=1.20.4 {
         /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
         *///?}
+    }
+
+    @Unique
+    private void legacy$rememberFocusedButton() {
+        if (getFocused() instanceof AbstractWidget widget) {
+            legacy$lastFocusedButtonIndex = renderableVList.renderables.indexOf(widget);
+            legacy$lastFocusedButtonMessage = widget.getMessage().getString();
+        }
+    }
+
+    @Unique
+    private void legacy$restoreFocusedButton() {
+        if (legacy$lastFocusedButtonMessage != null) {
+            for (Renderable renderable : renderableVList.renderables) {
+                if (renderable instanceof AbstractWidget widget && legacy$lastFocusedButtonMessage.equals(widget.getMessage().getString())) {
+                    renderableVList.focusRenderable(renderable);
+                    return;
+                }
+            }
+        }
+        if (legacy$lastFocusedButtonIndex >= 0 && legacy$lastFocusedButtonIndex < renderableVList.renderables.size()) renderableVList.focusRenderable(renderableVList.renderables.get(legacy$lastFocusedButtonIndex));
     }
 
     @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
@@ -87,9 +120,11 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
         ci.cancel();
+        legacy$rememberFocusedButton();
         rebuildMenuButtons();
         super.init();
         renderableVListInit();
+        legacy$restoreFocusedButton();
     }
 
     @Override
@@ -104,13 +139,17 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> ChooseUserScreen.CHOOSE_USER);
+        if (LegacyOptions.legacySettingsMenus.get())
+            ControlTooltip.Renderer.of(this).add(ControlTooltip.PRESS::get, ()-> LegacyComponents.SELECT);
+        else
+            ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> ChooseUserScreen.CHOOSE_USER);
         if (PublishScreen.hasWorldHost()) ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
     }
 
     @Inject(method = "removed", at = @At("RETURN"))
     public void removed(CallbackInfo ci) {
+        legacy$rememberFocusedButton();
         splash = null;
     }
 

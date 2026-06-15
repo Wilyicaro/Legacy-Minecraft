@@ -46,6 +46,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,6 +56,7 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 //? if >=1.20.5 {
@@ -217,6 +219,15 @@ public class Legacy4JClient {
         }
     }
 
+    public static boolean isHostInvisible(Player player) {
+        return player != null && isHostInvisible(player.getUUID());
+    }
+
+    public static boolean isHostInvisible(UUID playerId) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(playerId) instanceof LegacyPlayerInfo info && !info.isVisible();
+    }
+
     public static void displayActivationAnimation(Renderable renderable){
         itemActivationRenderReplacement = renderable;
         Minecraft.getInstance().gameRenderer.displayItemActivation(ItemStack.EMPTY);
@@ -288,6 +299,11 @@ public class Legacy4JClient {
                 }
             };
         }else if (screen instanceof BackupConfirmScreen s) {
+            if (LegacyOptions.hideExperimentalWorldWarning.get() && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+                Minecraft minecraft = Minecraft.getInstance();
+                minecraft.execute(() -> BackupConfirmScreenAccessor.of(s).proceed(false, false));
+                return minecraft.screen;
+            }
             return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 141 + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? 14 : 0), s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription(), LegacyScreen::onClose) {
                 boolean eraseCache = false;
                 protected void addButtons() {
@@ -305,6 +321,19 @@ public class Legacy4JClient {
             };
         }
         return screen;
+    }
+
+    private static boolean isExperimentalWorldWarning(Component... components) {
+        for (Component component : components) {
+            if (component == null) continue;
+            if (component.getContents() instanceof TranslatableContents contents) {
+                String key = contents.getKey().toLowerCase(Locale.ROOT);
+                if (key.contains("experimental") || key.contains("datapack") || key.contains("data_pack") || key.contains("dataPack")) return true;
+            }
+            String text = component.getString().toLowerCase(Locale.ROOT);
+            if (text.contains("experimental") || text.contains("data pack")) return true;
+        }
+        return false;
     }
 
     public static void preTick(Minecraft minecraft){

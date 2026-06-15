@@ -68,7 +68,12 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider = new LegacySliderButton<>(0,0, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().getShortDisplayName()),b->Tooltip.create(Component.translatable("selectWorld.gameMode."+b.getObjectValue().getName()+ ".info")),summary.getSettings().gameType(),()->GAME_TYPES, b-> {});
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
-        onlineTickBox = new TickBox(0,0,220,publishScreen.publish, b-> PublishScreen.PUBLISH, b->null, button -> {
+        onlineTickBox = new TickBox(0,0,220,publishScreen.publish, b-> PublishScreen.getPublishComponent(), b->PublishScreen.getPublishTooltip(), button -> {
+            if (wily.legacy.client.LegacyOptions.legacySettingsMenus.get()) {
+                if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
+                publishScreen.publish = button.selected;
+                return;
+            }
             if (button.selected) minecraft.setScreen(publishScreen);
             button.selected = publishScreen.publish = false;
         });

@@ -29,6 +29,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PlayerIdentifier;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.LegacyKeyMapping;
@@ -38,7 +39,9 @@ import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
+import wily.legacy.network.ServerHostOptionsPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
@@ -58,6 +61,8 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING,LegacyGameRules.LEGACY_FLIGHT,LegacyGameRules.LEGACY_SHIELD_CONTROLS,LegacyGameRules.LEGACY_OFFHAND_LIMITS));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+    public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_WORLD_RULES = List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING);
+    public static final List<GameRules.Key<GameRules.BooleanValue>> LEGACY_OTHER_RULES = List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION);
 
     public HostOptionsScreen(Component title) {
         super(s-> Panel.centered(s, LegacySprites.PANEL,250,190, 0, 20),HOST_OPTIONS);
@@ -69,7 +74,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.PUBLISH : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.FRIENDS : null : null);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.getPublishComponent() : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.FRIENDS : null : null);
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()-> minecraft.getChatStatus().isChatAllowed(minecraft.isLocalServer()) ? LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName() : null);
     }
 
@@ -198,22 +203,15 @@ public class HostOptionsScreen extends PanelVListScreen {
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
             screen.renderableVList.addRenderable(new TickBox(0,0,initialVisibility,b1-> Component.translatable("legacy.menu.host_options.player.invisible"),b1-> null, b1->{
                 if (initialVisibility != b1.selected){
-                    COMMAND_MAP.put(b1,()->{
-                    if (b1.selected) {
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:invisibility infinite 255 true".formatted(playerInfo.getProfile().getName()));
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:resistance infinite 255 true".formatted(playerInfo.getProfile().getName()));
-                    }else {
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:invisibility".formatted(playerInfo.getProfile().getName()));
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:resistance".formatted(playerInfo.getProfile().getName()));
-                    }});
-                }
+                    COMMAND_MAP.put(b1,()-> CommonNetwork.sendToServer(PlayerInfoSync.invisibility(b1.selected, playerInfo.getProfile())));
+                } else COMMAND_MAP.remove(b1);
             }));
             if (playerInfo.getGameMode().isSurvival()){
                 screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()))));
                 screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, playerInfo.getProfile()))));
             }
-            screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(),playerInfo.getProfile().getName())))));
-            screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().getName())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
+            screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> runHostAction(ServerHostOptionsPayload.gameMode(b1.getObjectValue(), playerInfo.getProfile().getId()), "gamemode %s %s".formatted(b1.getObjectValue().getName(),playerInfo.getProfile().getName())))));
+            screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> runHostAction(ServerHostOptionsPayload.playerSpawn(playerInfo.getProfile().getId()), "spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().getName())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
         });
     }
 
@@ -257,9 +255,29 @@ public class HostOptionsScreen extends PanelVListScreen {
         if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
         addRenderableWidget(Button.builder(HOST_OPTIONS,this::pressHostOptionsButton).bounds(panel.x, panel.y - 36,250,20).build());
     }
+
+    protected void runHostAction(ServerHostOptionsPayload payload, String fallbackCommand) {
+        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(payload);
+        else minecraft.player.connection.sendCommand(fallbackCommand);
+    }
+
+    protected void runHostCommand(String command) {
+        runHostAction(ServerHostOptionsPayload.command(command), command);
+    }
+
+    protected void queueHostAction(Map<Object, Runnable> actions, Object key, Runnable action) {
+        actions.remove(key);
+        actions.put(key, action);
+    }
+
+    protected void queueHostCommand(Map<Object, Runnable> actions, Object key, String command) {
+        queueHostAction(actions, key, () -> runHostCommand(command));
+    }
+
     protected void pressHostOptionsButton(Button b){
         Map<String,Object> nonOpGamerules = new HashMap<>();
-        Map<AbstractWidget,Runnable> COMMAND_MAP = new HashMap<>();
+        Map<Object,Runnable> COMMAND_MAP = new LinkedHashMap<>();
+        boolean legacyMenus = LegacyOptions.legacySettingsMenus.get();
 
         PanelVListScreen screen = new PanelVListScreen(this,s-> Panel.centered(s, LegacySprites.PANEL, 265,minecraft.player.hasPermissions(2) ? 200 : 130), HOST_OPTIONS){
             @Override
@@ -287,10 +305,13 @@ public class HostOptionsScreen extends PanelVListScreen {
             }
         };
         if (!minecraft.player.hasPermissions(2)){
-            for (GameRules.Key<GameRules.BooleanValue> key : PlayerInfoSync.All.NON_OP_GAMERULES)
-                screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> Component.translatable(key.getDescriptionId()),b1-> null, b1-> nonOpGamerules.put(key.getId(),b1.selected)));
-            LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
-            Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
+            List<GameRules.Key<GameRules.BooleanValue>> nonOpRules = legacyMenus ? LEGACY_OTHER_RULES : PlayerInfoSync.All.NON_OP_GAMERULES;
+            for (GameRules.Key<GameRules.BooleanValue> key : nonOpRules)
+                screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> LegacyComponents.getMenuGameRuleName(key),b1-> null, b1-> nonOpGamerules.put(key.getId(),b1.selected)));
+            if (!legacyMenus) {
+                LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
+                Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
+            }
             minecraft.setScreen(screen);
             return;
         }
@@ -298,25 +319,33 @@ public class HostOptionsScreen extends PanelVListScreen {
         int initialWeather = minecraft.level.isThundering() ? 2 : minecraft.level.isRaining() ? 1 : 0;
         screen.renderableVList.layoutSpacing(l-> 2);
 
-        for (GameRules.Key<GameRules.BooleanValue> key : WORLD_RULES)
-            screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> Component.translatable(key.getDescriptionId()),b1-> null, b1-> COMMAND_MAP.put(b1,()->minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
-        screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_day"),b1-> minecraft.player.connection.sendCommand("time set day")).bounds(0,0,215,20).build());
-        screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_night"),b1-> minecraft.player.connection.sendCommand("time set 14000")).bounds(0,0,215,20).build());
-        screen.renderableVList.addRenderable(new LegacySliderButton<>(0,0, 230,16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"),b1.getObjectValue().getDisplayName()),b1-> Tooltip.create(minecraft.level.getDifficulty().getInfo()),minecraft.level.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b1->COMMAND_MAP.put(b1,()->minecraft.getConnection().sendCommand("difficulty " + b1.getObjectValue().getKey()))));
+        List<GameRules.Key<GameRules.BooleanValue>> worldRules = legacyMenus ? LEGACY_WORLD_RULES : WORLD_RULES;
+        for (GameRules.Key<GameRules.BooleanValue> key : worldRules)
+            screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> LegacyComponents.getMenuGameRuleName(key),b1-> null, b1-> queueHostCommand(COMMAND_MAP, key.getId(), "gamerule %s %s".formatted(key.getId(), b1.selected))));
+        screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_day"),b1-> queueHostAction(COMMAND_MAP, "time", () -> runHostAction(ServerHostOptionsPayload.time("day"), "time set day"))).bounds(0,0,215,20).build());
+        screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_night"),b1-> queueHostAction(COMMAND_MAP, "time", () -> runHostAction(ServerHostOptionsPayload.time("night"), "time set 14000"))).bounds(0,0,215,20).build());
+        screen.renderableVList.addRenderable(new LegacySliderButton<>(0,0, 230,16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"),b1.getObjectValue().getDisplayName()),b1-> Tooltip.create(minecraft.level.getDifficulty().getInfo()),minecraft.level.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b1->queueHostAction(COMMAND_MAP, "difficulty", () -> runHostAction(ServerHostOptionsPayload.difficulty(b1.getObjectValue()), "difficulty " + b1.getObjectValue().getKey()))));
         Supplier<GameType> gameType = ()->Legacy4JClient.defaultServerGameType == null ? minecraft.gameMode.getPlayerMode() : Legacy4JClient.defaultServerGameType;
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
-        screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),b1->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.get().getName()+ ".info")),gameType.get(),()->gameTypes, b1->COMMAND_MAP.put(b1,()->minecraft.getConnection().sendCommand("defaultgamemode " + b1.getObjectValue().getName()))));
-        screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_world_spawn"),b1-> COMMAND_MAP.put(b1,()->minecraft.player.connection.sendCommand("setworldspawn"))).bounds(0,0,215,20).build());
+        screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),b1->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.get().getName()+ ".info")),gameType.get(),()->gameTypes, b1->queueHostAction(COMMAND_MAP, "defaultGameMode", () -> runHostAction(ServerHostOptionsPayload.defaultGameMode(b1.getObjectValue()), "defaultgamemode " + b1.getObjectValue().getName()))));
+        screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_world_spawn"),b1-> queueHostAction(COMMAND_MAP, "worldSpawn", () -> runHostAction(ServerHostOptionsPayload.worldSpawn(), "setworldspawn"))).bounds(0,0,215,20).build());
         screen.renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {}))),SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable("soundCategory.weather"), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(),false)))));
         screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> Component.translatable( "legacy.weather_state." + b1.getObjectValue()),b1->null,weathers.get(initialWeather),()->weathers, b1->{
-            if (!Objects.equals(b1.getObjectValue(), weathers.get(initialWeather))) COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("weather " + b1.getObjectValue()));
+            if (!Objects.equals(b1.getObjectValue(), weathers.get(initialWeather))) queueHostAction(COMMAND_MAP, "weather", () -> runHostAction(ServerHostOptionsPayload.weather(b1.getObjectValue()), "weather " + b1.getObjectValue()));
         }));
-        for (GameRules.Key<GameRules.BooleanValue> key : OTHER_RULES)
-            screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> Component.translatable(key.getDescriptionId()),b1-> null, b1->COMMAND_MAP.put(b1,()->minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
+        List<GameRules.Key<GameRules.BooleanValue>> otherRules = legacyMenus ? LEGACY_OTHER_RULES : OTHER_RULES;
+        for (GameRules.Key<GameRules.BooleanValue> key : otherRules)
+            screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> LegacyComponents.getMenuGameRuleName(key),b1-> null, b1->queueHostCommand(COMMAND_MAP, key.getId(), "gamerule %s %s".formatted(key.getId(), b1.selected))));
+        if (legacyMenus) {
+            minecraft.setScreen(screen);
+            return;
+        }
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
         Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
-        minecraft.setScreen(screen);
-        if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
+        if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) {
+            minecraft.setScreen(screen);
+            return;
+        }
         BiFunction<Boolean,Component,AbstractButton> teleportButton = (bol,title)-> Button.builder(title, b1-> minecraft.setScreen(new HostOptionsScreen(title) {
             @Override
             protected void addHostOptionsButton() {
@@ -336,6 +365,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         })).bounds(0,0,215,20).build();
         screen.renderableVList.addRenderable(teleportButton.apply(true,Component.translatable("legacy.menu.host_options.teleport_player")));
         screen.renderableVList.addRenderable(teleportButton.apply(false,Component.translatable("legacy.menu.host_options.teleport_me")));
+        minecraft.setScreen(screen);
     }
     public boolean isPauseScreen() {
         return false;

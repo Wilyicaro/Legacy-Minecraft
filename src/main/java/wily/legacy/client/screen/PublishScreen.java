@@ -14,6 +14,7 @@ import net.minecraft.world.level.GameType;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyClientWorldSettings;
+import wily.legacy.client.LegacyOptions;
 
 import java.util.function.Consumer;
 
@@ -23,7 +24,6 @@ import static wily.legacy.client.screen.LoadSaveScreen.GAME_TYPES;
 public class PublishScreen extends ConfirmationScreen{
     public static final Component PORT_INFO_TEXT = Component.translatable("lanServer.port");
     public static final Component LAN_SERVER = Component.translatable("lanServer.title");
-    public static final Component PUBLISH = Component.translatable(hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
     public boolean publish = false;
     protected EditBox portEdit;
     protected final LegacySliderButton<GameType> gameTypeSlider;
@@ -31,6 +31,14 @@ public class PublishScreen extends ConfirmationScreen{
 
     public static boolean hasWorldHost(){
         return FactoryAPI.isModLoaded(FactoryAPI.getLoader().isForgeLike() ? "world_host" : "world-host");
+    }
+
+    public static Component getPublishComponent() {
+        return Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
+    }
+
+    public static Tooltip getPublishTooltip() {
+        return Tooltip.create(Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online.description" : "menu.shareToLan.description"));
     }
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {
@@ -78,6 +86,11 @@ public class PublishScreen extends ConfirmationScreen{
     public void publish(IntegratedServer server){
         if (!publish) return;
         FactoryAPI.SECURE_EXECUTOR.executeNowIfPossible(()->this.minecraft.gui.getChat().addMessage(server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed")),()-> Minecraft.getInstance().player != null);
+    }
+
+    public void setGameType(GameType gameType) {
+        gameTypeSlider.setObjectValue(gameType);
+        gameTypeSlider.updateMessage();
     }
 
 

@@ -11,6 +11,7 @@ import net.minecraft.client.multiplayer.*;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -129,6 +130,14 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
 
     @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
     public void handleSystemChat(ClientboundSystemChatPacket clientboundSystemChatPacket, CallbackInfo ci) {
+        if (!LegacyOptions.deathMessages.get() && clientboundSystemChatPacket.content().getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.")) {
+            ci.cancel();
+            return;
+        }
+        if (!LegacyOptions.displayGameMessages.get()) {
+            ci.cancel();
+            return;
+        }
         if (!LegacyOptions.systemMessagesAsOverlay.get()) {
             minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);
             ci.cancel();

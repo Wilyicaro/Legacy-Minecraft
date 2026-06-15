@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client.chat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.OverlayPanelScreen;
 import wily.legacy.util.ScreenUtil;
 
@@ -52,10 +54,18 @@ public abstract class ChatComponentMixin {
     private int changeMessageTagXD(int i) {
         return i-Math.round(ScreenUtil.getChatSafeZone());
     }
+    @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 1), index = 4)
+    private int hideMessageTagColor(int i) {
+        return LegacyOptions.displayChatIndicators.get() ? i : 0;
+    }
 
     @Redirect(method = "getMessageTagAt",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
     private double changeMessageTagXPos(ChatComponent instance, double d) {
         return screenToChatX(d) + Math.round(ScreenUtil.getChatSafeZone());
+    }
+    @Inject(method = "getMessageTagAt", at = @At("HEAD"), cancellable = true)
+    private void getMessageTagAt(double d, double e, CallbackInfoReturnable<GuiMessageTag> cir) {
+        if (!LegacyOptions.displayChatIndicators.get()) cir.setReturnValue(null);
     }
 
     @Inject(method = "render",at = @At(value = "HEAD"), cancellable = true)
