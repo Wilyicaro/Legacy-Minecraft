@@ -95,6 +95,18 @@ public class LegacyOptions {
         return tooltip == null ? null : tooltip.message;
     }
 
+    private static void reloadCloudRendering() {
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            if (minecraft.levelRenderer == null) return;
+            minecraft.levelRenderer.allChanged();
+            ((LevelRendererAccessor) minecraft.levelRenderer).updateSkyBuffers();
+            //? if >=1.21.2 {
+            /*minecraft.levelRenderer.getCloudRenderer().markForRebuild();
+            *///?}
+        });
+    }
+
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue) {
         return createBoolean(key, defaultValue, b-> {});
     }
@@ -303,6 +315,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> headFollowsTheCamera = CLIENT_STORAGE.register(createBoolean("headFollowsTheCamera", true));
     public static final FactoryConfig<Boolean> fastLeavesWhenBlocked = CLIENT_STORAGE.register(createBoolean("fastLeavesWhenBlocked", true, b-> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> invertedFrontCameraPitch = CLIENT_STORAGE.register(createBoolean("invertedFrontCameraPitch", true, b-> {}));
+    public static final FactoryConfig<Boolean> lceClouds = CLIENT_STORAGE.register(createBoolean("lceClouds", true, b-> reloadCloudRendering()));
+    public static final FactoryConfig<Boolean> legacyCloudHeightAndTexture = CLIENT_STORAGE.register(createBoolean("legacyCloudHeightAndTexture", b-> Component.translatable("legacy.options.legacyCloudHeightAndTexture.tooltip"), false, b-> reloadCloudRendering()));
     public static final FactoryConfig<Boolean> legacySkyShape = CLIENT_STORAGE.register(createBoolean("legacySkyShape", true, b-> Legacy4JClient.updateSkyShape()));
     public static final FactoryConfig<Boolean> fastLeavesCustomModels = CLIENT_STORAGE.register(createBoolean("fastLeavesCustomModels", true, b-> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> skipIntro = CLIENT_STORAGE.register(createBoolean("skipIntro", false));

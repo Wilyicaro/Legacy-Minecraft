@@ -73,12 +73,17 @@
     "client.chat.ChatComponentMixin",
     "client.chat.ChatScreenMixin",
     "ClientEntityMixin",
+    "ClientLevelMixin",
     "ClientLevelSettingsMixin",
     "ClientLevelStorageSourceMixin",
     "ClientMinecraftServerMixin",
     "ClientPacketListenerMixin",
     "ClientPrimaryLevelDataMixin",
     "ClientTextTooltipMixin",
+    "DimensionSpecialEffectsMixin",
+    //? if >=1.21.2 {
+    /*"OverworldDimensionSpecialEffectsMixin",
+    *///?}
     "ContainerEventHandlerMixin",
     "client.container.ContainerScreenMixin",
     "client.crafting.CraftingScreenMixin",
