@@ -92,6 +92,15 @@
     "DeathScreenMixin",
     "client.drowned.DrownedModelMixin",
     "client.drowned.DrownedRendererMixin",
+    //? if <1.21.2 {
+    "client.zombie.ZombieModelMixin",
+    "client.zombie.ZombieVillagerModelMixin",
+    "client.zombie.PiglinModelMixin",
+    //?} else {
+    /*"client.zombie.AbstractZombieRendererMixin",
+    "client.zombie.ZombieVillagerRendererMixin",
+    "client.zombie.ZombifiedPiglinRendererMixin",
+    *///?}
     "EditBoxMixin",
     "client.enchantment.EnchantmentScreenMixin",
     "EndCrystalRendererMixin",
