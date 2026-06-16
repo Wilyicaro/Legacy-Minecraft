@@ -164,6 +164,10 @@ public class LegacyComponents {
     public static final Component RESET_KNOWN_ENTITIES_MESSAGE = Component.translatable("legacy.menu.reset_known_entities_message");
     public static final Component RESET_KNOWN_BLOCKS_TITLE = Component.translatable("legacy.menu.reset_known_blocks");
     public static final Component RESET_KNOWN_BLOCKS_MESSAGE = Component.translatable("legacy.menu.reset_known_blocks_message");
+    public static final Component PREPARING_AUTOSAVE = Component.translatable("legacy.menu.savingLevel.preparing");
+    public static final Component PREPARING_MANUAL_SAVE = Component.translatable("legacy.menu.savingLevel.preparing_manual");
+    public static final Component PREPARING_CHUNKS = Component.translatable("legacy.menu.savingLevel.preparing_chunks");
+    public static final Component FINALIZING = Component.translatable("legacy.menu.savingLevel.finalizing");
     public static final Component SELECTION = Component.literal("...");
     public static final Component NONE = Component.translatable("legacy.options.none");
     public static final Component NEEDS_RESTART = Component.translatable("legacy.options.needs_restart");

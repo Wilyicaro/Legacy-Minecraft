@@ -20,9 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.network.TopMessage;
-import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -47,8 +46,17 @@ public abstract class ClientMinecraftServerMixin {
     }
     @Inject(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci){
+        if (LegacyOptions.autoSaveInterval.get() == 0 || Minecraft.getInstance().isDemo()) {
+            ticksUntilAutosave++;
+            return;
+        }
         if (LegacyOptions.autoSaveCountdown.get() && LegacyOptions.autoSaveInterval.get() > 0 && ticksUntilAutosave >= 0 && ticksUntilAutosave <= 100) {
             if (ticksUntilAutosave % 20 == 0) TopMessage.setMedium(new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", ticksUntilAutosave / 20), CommonColor.INVENTORY_GRAY_TEXT.get(), 21, false, false, false));
+        }
+        if (ticksUntilAutosave <= 0) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.screen == null) minecraft.execute(LegacyLoadingScreen::startFakeAutoSave);
+            else ticksUntilAutosave++;
         }
     }
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.GETFIELD, ordinal = 1))

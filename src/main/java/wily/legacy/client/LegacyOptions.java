@@ -291,6 +291,8 @@ public class LegacyOptions {
     public static final FactoryConfig<AdvancedOptionsMode> advancedOptionsMode = CLIENT_STORAGE.register(create("advancedOptionsMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> AdvancedOptionsMode.values()[i], AdvancedOptionsMode::ordinal, ()->AdvancedOptionsMode.values().length, AdvancedOptionsMode.DEFAULT, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> saveCache = CLIENT_STORAGE.register(createBoolean("saveCache", true));
     public static final FactoryConfig<Boolean> autoSaveCountdown = CLIENT_STORAGE.register(createBoolean("autoSaveCountdown", true));
+    public static final FactoryConfig<Boolean> fakeAutosaveScreen = CLIENT_STORAGE.register(createBoolean("fakeAutosaveScreen", false));
+    public static final FactoryConfig<Boolean> fakeManualSaveScreen = CLIENT_STORAGE.register(createBoolean("fakeManualSaveScreen", false));
     public static final FactoryConfig<Boolean> displayControlTooltips = CLIENT_STORAGE.register(createBoolean("displayControlTooltips", true));
     public static final FactoryConfig<Boolean> systemMessagesAsOverlay = CLIENT_STORAGE.register(createBoolean("systemMessagesAsOverlay", true));
     public static final FactoryConfig<Boolean> screenshotToasts = CLIENT_STORAGE.register(createBoolean("screenshotToasts", true));
