@@ -15,9 +15,11 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.client.resources.language.I18n;
@@ -110,6 +112,7 @@ public class ScreenUtil {
 
     public static final Bearer<Integer> actualPlayerTabWidth = Bearer.of(0);
     public static final Bearer<Integer> actualPlayerTabHeight = Bearer.of(0);
+    public static boolean suppressInventoryElytraPose;
 
     static {
         isNvidia = new SystemInfo().getHardware().getGraphicsCards().stream().anyMatch(s -> s.getVendor().contains("nvidia") || s.getVendor().contains("NVIDIA"));
@@ -421,11 +424,31 @@ public class ScreenUtil {
         }
 
         entityRenderDispatcher.setRenderShadow(false);
-        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*/0.0f,/*?}*/ partialTicks, guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0);
-        guiGraphics.flush();
-        entityRenderDispatcher.setRenderShadow(true);
-        guiGraphics.pose().popPose();
-        Lighting.setupFor3DItems();
+        boolean suppressElytraPose = entity == mc.player && mc.screen instanceof InventoryScreen;
+        AbstractClientPlayer player = suppressElytraPose && entity instanceof AbstractClientPlayer p ? p : null;
+        float elytraRotX = player == null ? 0 : player.elytraRotX;
+        float elytraRotY = player == null ? 0 : player.elytraRotY;
+        float elytraRotZ = player == null ? 0 : player.elytraRotZ;
+        suppressInventoryElytraPose = suppressElytraPose;
+        try {
+            if (player != null) {
+                player.elytraRotX = 0.2617994F;
+                player.elytraRotY = 0;
+                player.elytraRotZ = -0.2617994F;
+            }
+            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*/0.0f,/*?}*/ partialTicks, guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0);
+            guiGraphics.flush();
+        } finally {
+            suppressInventoryElytraPose = false;
+            if (player != null) {
+                player.elytraRotX = elytraRotX;
+                player.elytraRotY = elytraRotY;
+                player.elytraRotZ = elytraRotZ;
+            }
+            entityRenderDispatcher.setRenderShadow(true);
+            guiGraphics.pose().popPose();
+            Lighting.setupFor3DItems();
+        }
     }
 
     public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {

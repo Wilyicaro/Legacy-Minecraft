@@ -93,6 +93,7 @@
     "client.drowned.DrownedModelMixin",
     "client.drowned.DrownedRendererMixin",
     //? if <1.21.2 {
+    "client.elytra.ElytraModelMixin",
     "client.zombie.ZombieModelMixin",
     "client.zombie.ZombieVillagerModelMixin",
     "client.zombie.PiglinModelMixin",

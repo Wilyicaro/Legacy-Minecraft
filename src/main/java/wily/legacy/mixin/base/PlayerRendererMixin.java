@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.util.ScreenUtil;
 
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererMixin extends LivingEntityRenderer {
@@ -55,6 +56,17 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     @Redirect(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;isFallFlying:Z"))
     private boolean render(PlayerRenderState instance) {
         return instance.isFallFlying && instance.hasPose(Pose.FALL_FLYING);
+    }
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V", at = @At("TAIL"))
+    private void extractRenderState(AbstractClientPlayer abstractClientPlayer, PlayerRenderState state, float f, CallbackInfo ci) {
+        if (!ScreenUtil.suppressInventoryElytraPose) return;
+        state.isFallFlying = false;
+        state.fallFlyingTimeInTicks = 0;
+        state.shouldApplyFlyingYRot = false;
+        state.flyingYRot = 0;
+        state.elytraRotX = 0.2617994F;
+        state.elytraRotY = 0;
+        state.elytraRotZ = -0.2617994F;
     }
     *///?}
 }
