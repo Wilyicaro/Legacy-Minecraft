@@ -47,7 +47,6 @@ import wily.legacy.util.ScreenUtil;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.LoadSaveScreen.GAME_MODEL_LABEL;
 
@@ -325,9 +324,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_day"),b1-> queueHostAction(COMMAND_MAP, "time", () -> runHostAction(ServerHostOptionsPayload.time("day"), "time set day"))).bounds(0,0,215,20).build());
         screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_night"),b1-> queueHostAction(COMMAND_MAP, "time", () -> runHostAction(ServerHostOptionsPayload.time("night"), "time set 14000"))).bounds(0,0,215,20).build());
         screen.renderableVList.addRenderable(new LegacySliderButton<>(0,0, 230,16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"),b1.getObjectValue().getDisplayName()),b1-> Tooltip.create(minecraft.level.getDifficulty().getInfo()),minecraft.level.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b1->queueHostAction(COMMAND_MAP, "difficulty", () -> runHostAction(ServerHostOptionsPayload.difficulty(b1.getObjectValue()), "difficulty " + b1.getObjectValue().getKey()))));
-        Supplier<GameType> gameType = ()->Legacy4JClient.defaultServerGameType == null ? minecraft.gameMode.getPlayerMode() : Legacy4JClient.defaultServerGameType;
+        GameType gameType = Legacy4JClient.defaultServerGameType == null ? minecraft.gameMode.getPlayerMode() : Legacy4JClient.defaultServerGameType;
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
-        screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),b1->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.get().getName()+ ".info")),gameType.get(),()->gameTypes, b1->queueHostAction(COMMAND_MAP, "defaultGameMode", () -> runHostAction(ServerHostOptionsPayload.defaultGameMode(b1.getObjectValue()), "defaultgamemode " + b1.getObjectValue().getName()))));
+        screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),b1->Tooltip.create(Component.translatable("selectWorld.gameMode."+b1.getObjectValue().getName()+ ".info")),gameType,()->gameTypes, b1->queueHostAction(COMMAND_MAP, "gameMode", () -> runHostAction(ServerHostOptionsPayload.defaultGameMode(b1.getObjectValue()), "defaultgamemode " + b1.getObjectValue().getName()))));
         screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_world_spawn"),b1-> queueHostAction(COMMAND_MAP, "worldSpawn", () -> runHostAction(ServerHostOptionsPayload.worldSpawn(), "setworldspawn"))).bounds(0,0,215,20).build());
         screen.renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {}))),SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable("soundCategory.weather"), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(),false)))));
         screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> Component.translatable( "legacy.weather_state." + b1.getObjectValue()),b1->null,weathers.get(initialWeather),()->weathers, b1->{
