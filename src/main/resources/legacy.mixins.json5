@@ -63,6 +63,7 @@
     "BaseAshSmokeParticleMixin",
     "client.beacon.BeaconScreenMixin",
     "BiomeAmbientSoundsHandlerMixin",
+    "client.BannerRendererMixin",
     "ClientBiomeMixin",
     "BitmapProviderMixin",
     "client.book.BookEditScreenMixin",
@@ -87,11 +88,18 @@
     "ContainerEventHandlerMixin",
     "client.container.ContainerScreenMixin",
     "client.crafting.CraftingScreenMixin",
+    "client.CustomHeadLayerMixin",
     "client.create_world.CreateWorldScreenMixin",
     "CyclingSlotBackgroundMixin",
     "DeathScreenMixin",
     "client.drowned.DrownedModelMixin",
     "client.drowned.DrownedRendererMixin",
+    //? if <1.21.3 {
+    "client.ElytraLayerMixin",
+    //?} else {
+    /*"client.WingsLayerMixin",
+    "client.EquipmentLayerRendererMixin",
+    *///?}
     //? if <1.21.2 {
     "client.elytra.ElytraModelMixin",
     "client.zombie.ZombieModelMixin",
@@ -164,6 +172,7 @@
     "client.sign.SignEditScreenMixin",
     "SimpleSoundInstanceMixin",
     "SlotMixin",
+    "client.SkullBlockRendererMixin",
     "client.smithing.SmithingScreenMixin",
     "SoundEngineMixin",
     "SoundManagerMixin",

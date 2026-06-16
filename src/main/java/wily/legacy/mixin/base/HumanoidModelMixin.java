@@ -51,6 +51,11 @@ public abstract class HumanoidModelMixin {
     @Invoker("poseLeftArm")
     protected abstract void legacy$poseLeftArm(/*? if <1.21.2 {*/ LivingEntity livingEntity/*?} else if <1.21.11 {*/ /*HumanoidRenderState humanoidRenderState, HumanoidModel.ArmPose armPose*//*?} else {*/ /*HumanoidRenderState humanoidRenderState*//*?}*/);
 
+    //? if >=1.21.2 && <1.21.4 {
+    /*@Invoker("getArmPose")
+    protected abstract HumanoidModel.ArmPose legacy$getArmPose(HumanoidRenderState humanoidRenderState, HumanoidArm humanoidArm);
+    *///?}
+
     private float getLegacyTridentRaiseProgress(int ticksUsingItem) {
         return switch (Mth.clamp(ticksUsingItem, 0, LEGACY_TRIDENT_RAISE_TICKS)) {
             case 0 -> 0.0F;
@@ -72,7 +77,7 @@ public abstract class HumanoidModelMixin {
 
     private void applyLegacyTridentSupportArmPose(/*? if <1.21.2 {*/ LivingEntity livingEntity/*?} else {*/ /*HumanoidRenderState humanoidRenderState*//*?}*/, HumanoidArm useArm) {
         HumanoidArm supportArm = useArm.getOpposite();
-        HumanoidModel.ArmPose supportArmPose = supportArm == HumanoidArm.RIGHT ? /*? if <1.21.2 {*/rightArmPose/*?} else {*//*humanoidRenderState.rightArmPose*//*?}*/ : /*? if <1.21.2 {*/leftArmPose/*?} else {*//*humanoidRenderState.leftArmPose*//*?}*/;
+        HumanoidModel.ArmPose supportArmPose = /*? if <1.21.2 {*/supportArm == HumanoidArm.RIGHT ? rightArmPose : leftArmPose/*?} else if <1.21.4 {*//*legacy$getArmPose(humanoidRenderState, supportArm)*//*?} else {*//*supportArm == HumanoidArm.RIGHT ? humanoidRenderState.rightArmPose : humanoidRenderState.leftArmPose*//*?}*/;
         if (supportArmPose == null || supportArmPose.isTwoHanded()) {
             return;
         }
