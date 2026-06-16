@@ -72,49 +72,50 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER), cancellable = true)
     private void renderArmWithItem(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
-        if (!abstractClientPlayer.getUseItem().is(Items.CROSSBOW)) return;
         HumanoidArm humanoidArm = interactionHand == InteractionHand.MAIN_HAND ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
-        if (abstractClientPlayer.isUsingItem() && abstractClientPlayer.getUseItemRemainingTicks() > 0 && abstractClientPlayer.getUsedItemHand() == interactionHand) {
-            if (!abstractClientPlayer.isInvisible()) {
-                poseStack.pushPose();
-                float duration = (float) CrossbowItem.getChargeDuration(abstractClientPlayer.getUseItem()/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
-                float c = Mth.clamp((float) abstractClientPlayer.getTicksUsingItem() + f, 0.0F, duration);
-                poseStack.mulPose(Axis.YN.rotationDegrees(k * 20.0F));
-                poseStack.translate(k * Mth.lerp(c / duration, 0.2F, 0.85F), 0, 0.54);
-                this.renderPlayerArm(poseStack, multiBufferSource, j, -1.0f, 0.5f, humanoidArm.getOpposite());
-                poseStack.popPose();
-            }
-            applyItemTransforms(poseStack,h,humanoidArm,i,k);
-            float l = (float)itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float)abstractClientPlayer.getUseItemRemainingTicks() - f + 1.0F);
-            float m = l / (float)CrossbowItem.getChargeDuration(itemStack/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
-            if (m > 1.0F) {
-                m = 1.0F;
+        if (abstractClientPlayer.getUseItem().is(Items.CROSSBOW)) {
+            if (abstractClientPlayer.isUsingItem() && abstractClientPlayer.getUseItemRemainingTicks() > 0 && abstractClientPlayer.getUsedItemHand() == interactionHand) {
+                if (!abstractClientPlayer.isInvisible()) {
+                    poseStack.pushPose();
+                    float duration = (float) CrossbowItem.getChargeDuration(abstractClientPlayer.getUseItem()/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
+                    float c = Mth.clamp((float) abstractClientPlayer.getTicksUsingItem() + f, 0.0F, duration);
+                    poseStack.mulPose(Axis.YN.rotationDegrees(k * 20.0F));
+                    poseStack.translate(k * Mth.lerp(c / duration, 0.2F, 0.85F), 0, 0.54);
+                    this.renderPlayerArm(poseStack, multiBufferSource, j, -1.0f, 0.5f, humanoidArm.getOpposite());
+                    poseStack.popPose();
+                }
+                applyItemTransforms(poseStack,h,humanoidArm,i,k);
+                float l = (float)itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float)abstractClientPlayer.getUseItemRemainingTicks() - f + 1.0F);
+                float m = l / (float)CrossbowItem.getChargeDuration(itemStack/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
+                if (m > 1.0F) {
+                    m = 1.0F;
+                }
+
+                if (m > 0.1F) {
+                    float n = Mth.sin((l - 0.1F) * 1.3F);
+                    float o = m - 0.1F;
+                    float p = n * o;
+                    poseStack.translate(p * 0.0F, p * 0.004F, p * 0.0F);
+                }
+
+                poseStack.translate(k*0.2, -0.1F, m * 0.04F - 0.2);
+                poseStack.scale(1.0F, 1.0F, 1.0F + m * 0.2F);
+                poseStack.mulPose(Axis.ZP.rotationDegrees((float)k * 25.0F));
+                poseStack.mulPose(Axis.YP.rotationDegrees((float)k * 25.0F));
+            } else {
+                applyItemTransforms(poseStack,h,humanoidArm,i,k);
+                if (CrossbowItem.isCharged(itemStack) && h < 0.001F && interactionHand == InteractionHand.MAIN_HAND) {
+                    poseStack.translate((float) k * -0.641864F, 0.0F, 0.0F);
+                    poseStack.mulPose(Axis.YP.rotationDegrees((float) k * 10.0F));
+                }
             }
 
-            if (m > 0.1F) {
-                float n = Mth.sin((l - 0.1F) * 1.3F);
-                float o = m - 0.1F;
-                float p = n * o;
-                poseStack.translate(p * 0.0F, p * 0.004F, p * 0.0F);
-            }
-
-            poseStack.translate(k*0.2, -0.1F, m * 0.04F - 0.2);
-            poseStack.scale(1.0F, 1.0F, 1.0F + m * 0.2F);
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float)k * 25.0F));
-            poseStack.mulPose(Axis.YP.rotationDegrees((float)k * 25.0F));
-        } else {
-            applyItemTransforms(poseStack,h,humanoidArm,i,k);
-            if (CrossbowItem.isCharged(itemStack) && h < 0.001F && interactionHand == InteractionHand.MAIN_HAND) {
-                poseStack.translate((float) k * -0.641864F, 0.0F, 0.0F);
-                poseStack.mulPose(Axis.YP.rotationDegrees((float) k * 10.0F));
-            }
+            this.renderItem(abstractClientPlayer, itemStack, humanoidArm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, /*? if <1.21.5 {*/ humanoidArm == HumanoidArm.LEFT,/*?}*/ poseStack, multiBufferSource, j);
+            ci.cancel();
+            poseStack.popPose();
+            return;
         }
-
-        this.renderItem(abstractClientPlayer, itemStack, humanoidArm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, /*? if <1.21.5 {*/ humanoidArm == HumanoidArm.LEFT,/*?}*/ poseStack, multiBufferSource, j);
-        ci.cancel();
-        poseStack.popPose();
-
     }
 
     @Unique

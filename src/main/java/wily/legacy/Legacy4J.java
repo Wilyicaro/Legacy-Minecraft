@@ -4,6 +4,10 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+//? if <1.21.1 {
+/*import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+*///?}
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.registries.Registries;
 //? if >1.20.1 {
@@ -35,6 +39,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+//? if <1.21.1 {
+/*import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrownTrident;
+*///?}
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.alchemy.Potion;
 //? if >=1.20.5 {
@@ -223,12 +232,32 @@ public class Legacy4J {
         return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.CONSUME*//*?} else {*/ ItemInteractionResult.CONSUME/*?}*/;
     }
 
+    private static void registerTridentDispenseBehavior() {
+        //? if <1.21.1 {
+        /*DispenserBlock.registerBehavior(Items.TRIDENT, new AbstractProjectileDispenseBehavior() {
+            @Override
+            protected Projectile getProjectile(Level level, Position position, ItemStack itemStack) {
+                ThrownTrident trident = new ThrownTrident(EntityType.TRIDENT, level);
+                CompoundTag tag = new CompoundTag();
+                tag.put("Trident", itemStack.copyWithCount(1).save(new CompoundTag()));
+                trident.readAdditionalSaveData(tag);
+                trident.setPos(position.x(), position.y(), position.z());
+                trident.pickup = AbstractArrow.Pickup.ALLOWED;
+                return trident;
+            }
+        });
+        *///?} else {
+        DispenserBlock.registerProjectileBehavior(Items.TRIDENT);
+        //?}
+    }
+
     public static void setup(){
         LegacyCommonOptions.COMMON_STORAGE.load();
         //? if >=1.21.2 {
         /*CommonRecipeManager.addRecipeTypeToSync(RecipeType.CRAFTING);
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
         *///?}
+        registerTridentDispenseBehavior();
 
         //? if <1.21.5 {
         DispenserBlock.registerBehavior(Blocks.TNT, new OptionalDispenseItemBehavior() {
