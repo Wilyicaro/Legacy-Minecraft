@@ -247,6 +247,7 @@
     "EntityTypeMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
+    "AnvilMenuMixin",
     "mobcaps.ArmorStandItemMixin",
     "mobcaps.BoatItemMixin",
     "mobcaps.CarvedPumpkinBlockMixin",
@@ -255,8 +256,8 @@
     "mobcaps.NaturalSpawnerMixin",
     "mobcaps.PhantomSpawnerMixin",
     //? if >=1.21.5 {
-    "mobcaps.ServerChunkCacheMixin",
-    //?}
+    /*"mobcaps.ServerChunkCacheMixin",
+    *///?}
     "mobcaps.ServerLevelMixin",
     "mobcaps.SpawnEggItemMixin",
     "mobcaps.ThrownEggMixin",
@@ -270,6 +271,9 @@
     "LivingEntityMixin",
     "LoomBlockMixin",
     "MapItemMixin",
+    //? if >=1.21.5 {
+    /*"MapIdMixin",
+    *///?}
     "MapItemSavedDataMixin",
     "MerchantContainerMixin",
     "MerchantMixin",

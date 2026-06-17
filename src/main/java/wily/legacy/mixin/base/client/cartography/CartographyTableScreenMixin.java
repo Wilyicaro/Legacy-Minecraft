@@ -44,7 +44,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         @Override
         public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
             if (i == 0) {
-                name.setValue(itemStack.isEmpty() ? "" : itemStack.getHoverName().getString());
+                name.setValue(itemStack.isEmpty() ? "" : RenameItemMenu.getItemName(itemStack));
                 name.setEditable(!itemStack.isEmpty());
             }
         }
@@ -105,7 +105,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
             if (!slot.hasItem())
                 return;
 
-            if (!FactoryItemUtil.hasCustomName(slot.getItem()) && s.equals(slot.getItem().getHoverName().getString())) {
+            if (!FactoryItemUtil.hasCustomName(slot.getItem()) && s.equals(RenameItemMenu.getItemName(slot.getItem()))) {
                 s = "";
             }
             ((RenameItemMenu)menu).setResultItemName(s);

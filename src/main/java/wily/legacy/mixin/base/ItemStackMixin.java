@@ -9,6 +9,7 @@ import com.google.common.collect.Multimaps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 //? if >=1.20.5 {
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -26,10 +27,17 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.TooltipFlag;
 //? if >=1.21.5 {
 /*import net.minecraft.world.item.component.TooltipDisplay;
 *///?}
+//? if >=1.20.5 {
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.item.component.MapPostProcessing;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+//?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,6 +68,58 @@ public abstract class ItemStackMixin {
         if (Legacy4J.isMushroomPore((ItemStack)(Object)this)) cir.setReturnValue(Component.translatable(Legacy4J.MUSHROOM_PORE_NAME));
     }
     *///?}
+
+    @Inject(method = "getHoverName", at = @At("RETURN"), cancellable = true)
+    private void getMapHoverName(CallbackInfoReturnable<Component> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+        if (!stack.is(Items.FILLED_MAP) || /*? if <1.20.5 {*//*stack.hasCustomHoverName()*//*?} else {*/stack.has(DataComponents.CUSTOM_NAME) || stack.has(DataComponents.MAP_POST_PROCESSING)/*?}*/) return;
+        //? if <1.20.5 {
+        /*Integer mapId = MapItem.getMapId(stack);
+        if (mapId != null) cir.setReturnValue(stack.getItem().getName(stack).copy().append(Component.translatable("legacy.map.id", mapId)));
+        *///?} else {
+        MapId mapId = stack.get(DataComponents.MAP_ID);
+        if (mapId != null) cir.setReturnValue(stack.getItem().getName(stack).copy().append(Component.translatable("legacy.map.id", mapId.id())));
+        //?}
+    }
+
+    //? if <1.20.5 {
+    /*@Inject(method = "getTooltipLines", at = @At("RETURN"))
+    private void getLegacyMapTooltipLines(Player player, TooltipFlag tooltipFlag, CallbackInfoReturnable<List<Component>> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+        if (!stack.is(Items.FILLED_MAP)) return;
+        Integer mapId = MapItem.getMapId(stack);
+        cir.getReturnValue().removeIf(component -> {
+            String line = component.getString();
+            return line.equals("filled_map.id") || line.startsWith("Id #") || mapId != null && line.equals("#" + mapId);
+        });
+    }
+    *///?}
+
+    //? if >=1.20.5 && <1.21.5 {
+    @Inject(method = "getTooltipLines", at = @At("RETURN"))
+    private void getTooltipLines(Item.TooltipContext tooltipContext, Player player, TooltipFlag tooltipFlag, CallbackInfoReturnable<List<Component>> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+        if (!stack.is(Items.FILLED_MAP)) return;
+        MapId mapId = stack.get(DataComponents.MAP_ID);
+        if (mapId == null) return;
+        List<Component> lines = cir.getReturnValue();
+        String idLine = Component.translatable("filled_map.id", mapId.id()).getString();
+        lines.removeIf(component -> {
+            String line = component.getString();
+            return line.equals(idLine) || line.equals("filled_map.id") || line.startsWith("Id #") || line.equals("#" + mapId.id());
+        });
+        MapItemSavedData data = tooltipContext.mapData(mapId);
+        if (data == null) {
+            lines.add(Component.translatable("filled_map.unknown").withStyle(ChatFormatting.GRAY));
+            return;
+        }
+        MapPostProcessing postProcessing = stack.get(DataComponents.MAP_POST_PROCESSING);
+        if (data.locked || postProcessing == MapPostProcessing.LOCK) {
+            lines.add(Component.translatable("filled_map.locked").withStyle(ChatFormatting.GRAY));
+        }
+        lines.add(Component.translatable("legacy.map.level", Math.min(data.scale + (postProcessing == MapPostProcessing.SCALE ? 1 : 0), 4), 4).withStyle(ChatFormatting.GRAY));
+    }
+    //?}
 
     //? if <1.21.2 {
     @ModifyArg(method = "getTooltipLines",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge || (forge && <1.20.5) {*/ /*0*//*?} else {*/ 1/*?}*/))
