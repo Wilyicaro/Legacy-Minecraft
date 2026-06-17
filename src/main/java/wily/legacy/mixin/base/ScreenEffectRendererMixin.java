@@ -3,11 +3,13 @@ package wily.legacy.mixin.base;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -54,5 +56,10 @@ public abstract class ScreenEffectRendererMixin {
         }
         renderTex(f,f1/*? if >=1.21.4 {*//*, multiBufferSource*//*?}*/);
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, 1.0f);
+    }
+
+    @Redirect(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isOnFire()Z"))
+    private static boolean renderScreenEffect(LocalPlayer player) {
+        return player.isOnFire() && !player.hasEffect(MobEffects.FIRE_RESISTANCE);
     }
 }
