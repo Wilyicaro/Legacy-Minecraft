@@ -20,6 +20,8 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
@@ -75,6 +77,14 @@ public class LegacyOptions {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
     }
 
+    public static FactoryConfig<Double> ofSound(OptionInstance<Double> optionInstance, String captionKey) {
+        return FactoryConfig.create(OptionInstanceAccessor.of(optionInstance).getKey(), new FactoryConfigDisplay.Instance<>(
+                Component.translatable(captionKey),
+                v-> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v)),
+                (c,v)-> v <= 0.0 ? CommonComponents.optionNameValue(c, CommonComponents.OPTION_OFF) : Component.translatable("options.percent_value", c, Mth.floor(v * 100.0))
+        ), OptionInstanceAccessor.of(optionInstance).defaultValue(), Bearer.of(optionInstance::get, optionInstance::set), FactoryConfigControl.createDouble(), v->{}, VANILLA_STORAGE_ACCESS);
+    }
+
     public static <T> FactoryConfig<T> create(OptionInstance<T> optionInstance) {
         FactoryConfigControl<T> control;
         if (optionInstance.values().equals(OptionInstance.BOOLEAN_VALUES)){
@@ -105,6 +115,11 @@ public class LegacyOptions {
             /*minecraft.levelRenderer.getCloudRenderer().markForRebuild();
             *///?}
         });
+    }
+
+    private static void updateSoundVolume() {
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> minecraft.getSoundManager().updateSourceVolume(SoundSource.MASTER, minecraft.options.getSoundSourceVolume(SoundSource.MASTER)));
     }
 
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue) {
@@ -213,6 +228,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> minecartSounds = CLIENT_STORAGE.register(createBoolean("minecartSounds", true));
     public static final FactoryConfig<Boolean> backSound = CLIENT_STORAGE.register(createBoolean("backSound", true));
     public static final FactoryConfig<Boolean> hoverFocusSound = CLIENT_STORAGE.register(createBoolean("hoverFocusSound", false));
+    public static final FactoryConfig<Boolean> unlinkMusicFromMasterVolume = CLIENT_STORAGE.register(createBoolean("unlinkMusicFromMasterVolume", true, b-> updateSoundVolume()));
     public static final FactoryConfig<Boolean> caveSounds = CLIENT_STORAGE.register(createBoolean("caveSounds", true));
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));

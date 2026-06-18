@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.google.common.collect.Streams;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Monitor;
 import com.mojang.blaze3d.platform.VideoMode;
@@ -358,9 +357,11 @@ public class OptionsScreen extends PanelVListScreen {
                 Component.translatable("legacy.menu.audio"),
                 s->Panel.centered(s,250,88,0,-30),
                 new ArrayList<>(List.of(
-                        o->o.renderableVList.addOptions(Streams.concat(
-                                Arrays.stream(SoundSource.values()).filter(s->s.ordinal() <= 1).sorted(Comparator.comparingInt(s->s == SoundSource.MUSIC ? 0 : 1)).map(s->LegacyOptions.of(mc.options.getSoundSourceOptionInstance(s))),
-                                Stream.of(LegacyOptions.caveSounds,LegacyOptions.minecartSounds))))),
+                        o->o.renderableVList.addOptions(
+                                LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(SoundSource.MUSIC), "soundCategory.music"),
+                                LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(SoundSource.MASTER), "legacy.menu.sound"),
+                                LegacyOptions.caveSounds,
+                                LegacyOptions.minecartSounds))),
                 ()-> Section.ADVANCED_AUDIO));
         public static final Section ADVANCED_AUDIO = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",AUDIO.title()),
@@ -370,8 +371,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.soundDevice()),
                                 LegacyOptions.backSound,
                                 LegacyOptions.hoverFocusSound,
-                                LegacyOptions.inventoryHoverFocusSound),
-                        o->o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss->ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
+                                LegacyOptions.inventoryHoverFocusSound,
+                                LegacyOptions.unlinkMusicFromMasterVolume),
+                        o->o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss->ss.ordinal() > 1).map(ss -> (FactoryConfig<?>) LegacyOptions.ofSound(mc.options.getSoundSourceOptionInstance(ss), "soundCategory." + ss.getName()))))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
                 s -> LegacyOptions.legacySettingsMenus.get()
