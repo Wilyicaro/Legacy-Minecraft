@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;
@@ -9,6 +10,9 @@ import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ThrownTrident.class)
 public abstract class ThrownTridentMixin extends AbstractArrow {
@@ -25,5 +29,10 @@ public abstract class ThrownTridentMixin extends AbstractArrow {
             return;
         }
         setNoPhysics(true);
+    }
+
+    @Inject(method = "tickDespawn", at = @At("HEAD"), cancellable = true)
+    private void tickDespawn(CallbackInfo ci) {
+        if (getOwner() instanceof Player || pickup == AbstractArrow.Pickup.ALLOWED) ci.cancel();
     }
 }
