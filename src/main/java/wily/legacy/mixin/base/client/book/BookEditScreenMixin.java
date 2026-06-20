@@ -158,7 +158,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 2)
     public int pageX(int anchorX) {
-        return panel.pageNumberX();
+        return panel.pageNumberX() - this.font.width(this.numberOfPages);
     }
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 3)

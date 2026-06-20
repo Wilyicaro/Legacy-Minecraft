@@ -100,15 +100,15 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
 
         if (this.cachedPage != this.currentPage) {
             FormattedText formattedText = this.bookAccess.getPage(this.currentPage);
-            this.cachedPageComponents = this.font.split(formattedText, 159);
+            this.cachedPageComponents = this.font.split(formattedText, panel.splitWidth());
             this.pageMsg = Component.translatable("book.pageIndicator", this.currentPage + 1, Math.max(this.getNumPages(), 1));
         }
         this.cachedPage = this.currentPage;
-        guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0xFF000000, false);
-        int n = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
+        guiGraphics.drawString(this.font, this.pageMsg, panel.pageNumberX() - this.font.width(this.pageMsg), panel.pageNumberY(), 0xFF000000, false);
+        int n = Math.min(panel.maxPageLines(this.font.lineHeight), this.cachedPageComponents.size());
         for (int o = 0; o < n; ++o) {
             FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(o);
-            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0xFF000000, false);
+            guiGraphics.drawString(this.font, formattedCharSequence, panel.textX(), panel.textY() + o * this.font.lineHeight, 0xFF000000, false);
         }
         Style style = this.getClickedComponentStyleAt(i, j);
         if (style != null) {
