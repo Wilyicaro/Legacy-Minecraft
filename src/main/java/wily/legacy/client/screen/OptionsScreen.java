@@ -436,8 +436,8 @@ public class OptionsScreen extends PanelVListScreen {
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.save_settings"),
                                 LegacyOptions.autoSaveWhenPaused,
-                                LegacyOptions.directSaveLoad,
-                                LegacyOptions.saveCache),
+                                LegacyOptions.directSaveLoad),
+                        o -> o.renderableVList.addLinkedOptions(LegacyOptions.saveCache, FactoryConfig::get, LegacyOptions.alwaysClearSaveCache),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.misc"),
                                 LegacyOptions.of(mc.options.realmsNotifications()),

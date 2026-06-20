@@ -295,6 +295,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> advancedHeldItemTooltip = CLIENT_STORAGE.register(createBoolean("advancedHeldItemTooltip", false));
     public static final FactoryConfig<AdvancedOptionsMode> advancedOptionsMode = CLIENT_STORAGE.register(create("advancedOptionsMode", builder -> builder.valueToComponent(v -> v.displayName), i -> AdvancedOptionsMode.values()[i], AdvancedOptionsMode::ordinal, () -> AdvancedOptionsMode.values().length, AdvancedOptionsMode.CODEC, AdvancedOptionsMode.DEFAULT, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> saveCache = CLIENT_STORAGE.register(createBoolean("saveCache", true));
+    public static final FactoryConfig<Boolean> alwaysClearSaveCache = CLIENT_STORAGE.register(createBoolean("alwaysClearSaveCache", false));
     public static final FactoryConfig<Boolean> autoSaveCountdown = CLIENT_STORAGE.register(createBoolean("autoSaveCountdown", false));
     public static final FactoryConfig<Boolean> displayControlTooltips = CLIENT_STORAGE.register(createBoolean("displayControlTooltips", true));
     public static final FactoryConfig<Boolean> inGameOnlineIds = CLIENT_STORAGE.register(createBoolean("inGameOnlineIds", true));

@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -17,8 +17,8 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
     public static final float SCROLLER_HEIGHT_OFFSET = 13.5f;
     public final LegacyScrollRenderer scrollRenderer;
     public Vec2 offset = Vec2.ZERO;
-    public Identifier trackSprite = LegacySprites.SQUARE_RECESSED_PANEL;
-    public Identifier thumbSprite = LegacySprites.PANEL;
+    public ResourceLocation trackSprite = LegacySprites.SQUARE_RECESSED_PANEL;
+    public ResourceLocation thumbSprite = LegacySprites.PANEL;
     public boolean dragged = false;
 
     public LegacyScroller(LegacyScrollRenderer scrollRenderer) {

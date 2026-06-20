@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.book;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
@@ -157,12 +156,12 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
-    @ModifyArg(method = "visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 2)
     public int pageX(int anchorX) {
         return panel.pageNumberX();
     }
 
-    @ModifyArg(method = "visitText(Lnet/minecraft/client/gui/ActiveTextCollector;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 3)
     public int pageY(int y) {
         return panel.pageNumberY();
     }
