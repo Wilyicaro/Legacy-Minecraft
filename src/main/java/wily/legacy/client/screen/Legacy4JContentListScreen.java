@@ -1,6 +1,8 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.*;
@@ -50,6 +52,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private static final int LIST_WIDTH = 218;
     private static final int LIST_HEIGHT = 162;
     private static final int BUTTON_HEIGHT = 30;
+    private static final int HD_STORE_IMAGE_SIZE = 90;
+    private static final int SD_STORE_IMAGE_SIZE = 60;
+    private static final int STORE_IMAGE_SIZE_TOLERANCE = 4;
     
     protected final ContentManager.Category category;
     protected final List<ContentManager.Pack> packs;
@@ -70,6 +75,28 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private boolean needsReload = false;
 
     private record RemoteImage(Identifier id, int width, int height) {
+    }
+
+    private record ImageSize(int width, int height) {
+    }
+
+    private static class StorePreviewTexture extends DynamicTexture {
+        public StorePreviewTexture(java.util.function.Supplier<String> name, NativeImage image) {
+            super(name, image);
+            sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
+        }
+    }
+
+    private static ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
+        if (image.width == image.height) {
+            int size = LegacyOptions.getUIMode().isSD() ? SD_STORE_IMAGE_SIZE : HD_STORE_IMAGE_SIZE;
+            if (size <= maxWidth && size <= maxHeight + STORE_IMAGE_SIZE_TOLERANCE) {
+                return new ImageSize(size, size);
+            }
+        }
+
+        float scale = Math.min((float) maxWidth / image.width, (float) maxHeight / image.height);
+        return new ImageSize(Math.max(1, Math.round(image.width * scale)), Math.max(1, Math.round(image.height * scale)));
     }
 
     public Legacy4JContentListScreen(Screen parent, ContentManager.Category category, List<ContentManager.Pack> packs) {
@@ -237,7 +264,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     String cleanId = Integer.toHexString(key.hashCode());
                     Identifier textureId = Identifier.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
                     
-                    client.getTextureManager().register(textureId, new DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
+                    client.getTextureManager().register(textureId, new StorePreviewTexture(() -> "pack_image_" + cleanId, nativeImage));
                     
                     RemoteImage remoteImage = new RemoteImage(textureId, nativeWidth, nativeHeight);
                     downloadedImages.put(key, remoteImage);
@@ -319,9 +346,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
             if (displayPack.imageUrl().isPresent()) {
                 if (remoteImage != null && remoteImage.width > 0) {
-                    float scale = Math.min((float) width / remoteImage.width, (float) maxImgHeight / remoteImage.height);
-                    int imgWidth = (int) (remoteImage.width * scale);
-                    int imgHeight = (int) (remoteImage.height * scale);
+                    ImageSize imageSize = fitRemoteImage(remoteImage, width, maxImgHeight);
+                    int imgWidth = imageSize.width();
+                    int imgHeight = imageSize.height();
                     
                     FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id, x + (width - imgWidth) / 2, y, 0.0f, 0.0f, imgWidth, imgHeight, imgWidth, imgHeight);
                     imageAreaHeight = imgHeight + 10;
