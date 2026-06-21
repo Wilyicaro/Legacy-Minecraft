@@ -52,8 +52,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private static final int LIST_WIDTH = 218;
     private static final int LIST_HEIGHT = 162;
     private static final int BUTTON_HEIGHT = 30;
-    private static final int HD_STORE_IMAGE_SIZE = 90;
-    private static final int SD_STORE_IMAGE_SIZE = 60;
+    private static final int HD_STORE_IMAGE_SIZE = 120;
+    private static final int SD_STORE_IMAGE_SIZE = 90;
     private static final int STORE_IMAGE_SIZE_TOLERANCE = 4;
     
     protected final ContentManager.Category category;
@@ -342,7 +342,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             int width = tooltipBox.getWidth() - 16;
             RemoteImage remoteImage = getOrDownloadImage(displayPack.imageUrl());
             int imageAreaHeight = 0;
-            int maxImgHeight = (tooltipBox.getHeight() * 4) / 10;
+            int maxImgHeight = (tooltipBox.getHeight() * 2) / 3;
 
             if (displayPack.imageUrl().isPresent()) {
                 if (remoteImage != null && remoteImage.width > 0) {
