@@ -87,9 +87,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         }
     }
 
-    private static ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
+    private ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
         if (image.width == image.height) {
-            int size = LegacyOptions.getUIMode().isSD() ? SD_STORE_IMAGE_SIZE : HD_STORE_IMAGE_SIZE;
+            int defaultSize = LegacyOptions.getUIMode().isSD() ? SD_STORE_IMAGE_SIZE : HD_STORE_IMAGE_SIZE;
+            int size = accessor.getInteger("previewImage.size", defaultSize);
             if (size <= maxWidth && size <= maxHeight + STORE_IMAGE_SIZE_TOLERANCE) {
                 return new ImageSize(size, size);
             }

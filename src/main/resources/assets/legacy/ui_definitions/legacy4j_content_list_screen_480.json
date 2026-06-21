@@ -25,6 +25,7 @@
     "renderableVList.width": 145,
     "renderableVList.height": 98,
     "tooltipBox.width": 160,
+    "previewImage.size": 60,
     "buttonsHeight": 20
   }
 }
