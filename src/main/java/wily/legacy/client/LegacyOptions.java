@@ -378,7 +378,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
     public static final FactoryConfig<Boolean> unbindConflictingButtons = CLIENT_STORAGE.register(createBoolean("unbindConflictingButtons", true));
     public static final FactoryConfig<Integer> hudDelay = CLIENT_STORAGE.register(createInteger("hudDelay", builder -> builder.messageFunction((display, value) -> value == 0 ? CommonComponents.optionNameValue(display.name(), CommonComponents.OPTION_OFF) : Component.translatable("options.percent_value", display.name(), value)), 0, () -> 200, 100));
-    public static final FactoryConfig<Boolean> legacyBabyVillagerHead = CLIENT_STORAGE.register(createBoolean("legacyBabyVillagerHead", true));
     public static final FactoryConfig<Boolean> bubblesOutsideWater = CLIENT_STORAGE.register(createBoolean("bubblesOutsideWater", true));
     public static final FactoryConfig<Boolean> legacyItemPickup = CLIENT_STORAGE.register(createBoolean("legacyItemPickup", true));
     public static final FactoryConfig<Boolean> controllerToasts = CLIENT_STORAGE.register(createBoolean("controllerToasts", true));
