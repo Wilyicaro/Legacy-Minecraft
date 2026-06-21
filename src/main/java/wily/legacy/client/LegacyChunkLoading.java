@@ -140,7 +140,16 @@ public final class LegacyChunkLoading {
     }
 
     public static BlockState getFeatureState(BlockPos pos, BlockState state) {
-        if (!LegacyOptions.slowChunkLoading.get() || !isFeatureState(state)) {
+        ClientLevel currentLevel = Minecraft.getInstance().level;
+        if (!LegacyOptions.slowChunkLoading.get() || currentLevel == null) {
+            return state;
+        }
+
+        if (isHiddenFeatureSupport(pos, state, currentLevel)) {
+            return Blocks.GRASS_BLOCK.defaultBlockState();
+        }
+
+        if (!isFeatureState(state)) {
             return state;
         }
 
@@ -423,6 +432,17 @@ public final class LegacyChunkLoading {
 
     private static boolean isFeatureState(BlockState state) {
         return state.is(LegacyTags.SLOW_CHUNK_FEATURES);
+    }
+
+    private static boolean isHiddenFeatureSupport(BlockPos pos, BlockState state, ClientLevel currentLevel) {
+        if (!state.is(Blocks.DIRT) || featureReadyAt.isEmpty()) {
+            return false;
+        }
+
+        BlockPos above = pos.above();
+        long section = SectionPos.asLong(above);
+        long readyAt = readyAt(section);
+        return readyAt != 0 && Util.getMillis() < readyAt && isFeatureState(currentLevel.getBlockState(above));
     }
 
     private static boolean hasDelayedFeatures(long section) {
