@@ -435,14 +435,26 @@ public final class LegacyChunkLoading {
     }
 
     private static boolean isHiddenFeatureSupport(BlockPos pos, BlockState state, ClientLevel currentLevel) {
-        if (!state.is(Blocks.DIRT) || featureReadyAt.isEmpty()) {
+        if (!canRenderAsGrassUnderHiddenFeature(state) || featureReadyAt.isEmpty()) {
             return false;
+        }
+
+        if ((state.is(Blocks.DIRT_PATH) || state.is(Blocks.GRASS_BLOCK)) && hasPendingFeatureDelay(SectionPos.asLong(pos))) {
+            return true;
         }
 
         BlockPos above = pos.above();
         long section = SectionPos.asLong(above);
+        return hasPendingFeatureDelay(section) && isFeatureState(currentLevel.getBlockState(above));
+    }
+
+    private static boolean canRenderAsGrassUnderHiddenFeature(BlockState state) {
+        return state.is(Blocks.DIRT) || state.is(Blocks.DIRT_PATH) || state.is(Blocks.GRASS_BLOCK);
+    }
+
+    private static boolean hasPendingFeatureDelay(long section) {
         long readyAt = readyAt(section);
-        return readyAt != 0 && Util.getMillis() < readyAt && isFeatureState(currentLevel.getBlockState(above));
+        return readyAt != 0 && Util.getMillis() < readyAt;
     }
 
     private static boolean hasDelayedFeatures(long section) {
