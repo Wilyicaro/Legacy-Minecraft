@@ -39,6 +39,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     private static final int LIST_WIDTH = 218;
     private static final int LIST_HEIGHT = 162;
     private static final int BUTTON_HEIGHT = 30;
+    private static final int STORE_IMAGE_SIZE = 120;
+    private static final int STORE_IMAGE_SIZE_TOLERANCE = 4;
 
     private final ContentManager.Category category;
     private final List<ContentManager.Pack> packs;
@@ -56,6 +58,25 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     private boolean needsReload;
 
     private record RemoteImage(ResourceLocation id, int width, int height) {
+    }
+
+    private record ImageSize(int width, int height) {
+    }
+
+    private static class StorePreviewTexture extends DynamicTexture {
+        public StorePreviewTexture(/*? if >=1.21.5 {*//*java.util.function.Supplier<String> name, *//*?}*/NativeImage image) {
+            super(/*? if >=1.21.5 {*//*name, *//*?}*/image);
+            setFilter(true, false);
+            setClamp(true);
+        }
+    }
+
+    private static ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
+        if (image.width == image.height && STORE_IMAGE_SIZE <= maxWidth && STORE_IMAGE_SIZE <= maxHeight + STORE_IMAGE_SIZE_TOLERANCE) {
+            return new ImageSize(STORE_IMAGE_SIZE, STORE_IMAGE_SIZE);
+        }
+        float scale = Math.min((float) maxWidth / image.width, (float) maxHeight / image.height);
+        return new ImageSize(Math.max(1, Math.round(image.width * scale)), Math.max(1, Math.round(image.height * scale)));
     }
 
     public Legacy4JContentListScreen(Screen parent, ContentManager.Category category, List<ContentManager.Pack> packs) {
@@ -184,7 +205,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
                 int height = nativeImage.getHeight();
                 client.execute(() -> {
                     ResourceLocation id = Legacy4J.createModLocation("pack_image/" + Integer.toHexString(key.hashCode()));
-                    client.getTextureManager().register(id, new DynamicTexture(/*? if >=1.21.5 {*//*id::toString, *//*?}*/nativeImage));
+                    client.getTextureManager().register(id, new StorePreviewTexture(/*? if >=1.21.5 {*//*id::toString, *//*?}*/nativeImage));
                     RemoteImage remoteImage = new RemoteImage(id, width, height);
                     downloadedImages.put(key, remoteImage);
                     future.complete(remoteImage);
@@ -263,13 +284,13 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private int renderPreviewImage(GuiGraphics guiGraphics, ContentManager.Pack pack, int x, int y, int width) {
-        int maxHeight = (tooltipBox.height * 4) / 10;
+        int maxHeight = (tooltipBox.height * 2) / 3;
         if (pack.imageUrl().isEmpty()) return 0;
         RemoteImage remoteImage = getOrDownloadImage(pack.imageUrl());
         if (remoteImage != null && remoteImage.id() != null && remoteImage.width() > 0 && remoteImage.height() > 0) {
-            float scale = Math.min((float) width / remoteImage.width(), (float) maxHeight / remoteImage.height());
-            int imageWidth = Math.max(1, (int) (remoteImage.width() * scale));
-            int imageHeight = Math.max(1, (int) (remoteImage.height() * scale));
+            ImageSize imageSize = fitRemoteImage(remoteImage, width, maxHeight);
+            int imageWidth = imageSize.width();
+            int imageHeight = imageSize.height();
             FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id(), x + (width - imageWidth) / 2, y, 0.0f, 0.0f, imageWidth, imageHeight, imageWidth, imageHeight);
             return imageHeight + 8;
         }
