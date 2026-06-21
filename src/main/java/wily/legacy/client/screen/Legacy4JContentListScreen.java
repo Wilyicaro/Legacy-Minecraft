@@ -1,8 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.input.InputWithModifiers;
@@ -81,7 +79,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private static class StorePreviewTexture extends DynamicTexture {
         public StorePreviewTexture(java.util.function.Supplier<String> name, NativeImage image) {
             super(name, image);
-            sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
+            setFilter(true, false);
+            setClamp(true);
         }
     }
 
