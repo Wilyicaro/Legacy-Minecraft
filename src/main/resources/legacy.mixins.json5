@@ -242,6 +242,7 @@
     "AnimalMixin",
     "ArmorStandMixin",
     "BonusChestFeatureMixin",
+    "CarpetBlockMixin",
     "CartographyTableMenuMixin",
     "CraftingTableBlockMixin",
     "CriteriaTriggersMixin",
