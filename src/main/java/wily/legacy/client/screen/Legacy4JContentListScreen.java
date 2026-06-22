@@ -67,7 +67,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
         public StorePreviewTexture(/*? if >=1.21.5 {*//*java.util.function.Supplier<String> name, *//*?}*/NativeImage image) {
             super(/*? if >=1.21.5 {*//*name, *//*?}*/image);
             setFilter(true, false);
-            setClamp(true);
+            //? if >=1.21.5 {
+            /*setClamp(true);
+            *///?}
         }
     }
 
