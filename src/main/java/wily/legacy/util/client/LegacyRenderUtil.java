@@ -737,9 +737,33 @@ public class LegacyRenderUtil {
             double d = vec32.horizontalDistanceSqr();
             double e = vec3.horizontalDistanceSqr();
             if (d > 0.0 && e > 0.0) {
-                int dir = (int) -Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
-                float z = (float) (Math.min(Math.PI / 8, Math.acos((vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e)) / 2.5));
-                if (z > 0) return dir * z;
+                double dot = (vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e);
+                double angle = Math.acos(Mth.clamp(dot, -1.0, 1.0));
+                double z = Math.min(Math.PI / 8, angle / 2.5);
+                if (z > 0.0) {
+                    double dir = -Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
+                    return (float)(original + dir * z);
+                }
+            }
+        }
+        return original;
+    }
+
+    public static float getFlyingViewYRotation(float original) {
+        if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()) {
+            float f = FactoryAPIClient.getGamePartialTick(false);
+            Vec3 vec3 = mc.player.getViewVector(f);
+            Vec3 vec32 = mc.player.avatarState().deltaMovementOnPreviousTick().lerp(mc.player.getDeltaMovement(), f);
+            double d = vec32.horizontalDistanceSqr();
+            double e = vec3.horizontalDistanceSqr();
+            if (d > 0.01 && e > 0.01) {
+                double dot = (vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e);
+                double angle = Math.acos(Mth.clamp(dot, -1.0, 1.0));
+                double forwardAlignment = Mth.clamp(dot, 0.0, 1.0);
+                if (angle > 0.0 && forwardAlignment > 0.0) {
+                    double dir = -Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
+                    return (float)(original + dir * angle * forwardAlignment * 0.25);
+                }
             }
         }
         return original;
