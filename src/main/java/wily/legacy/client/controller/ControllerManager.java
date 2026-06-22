@@ -16,7 +16,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -50,20 +49,6 @@ public class ControllerManager {
     private static final float DIAGONAL_SPEED = 0.4F;
     private static final float ANGLE8 = 45F * Mth.DEG_TO_RAD;
     private static final float ANGLE16 = 22.5F * Mth.DEG_TO_RAD;
-    private static final long ELYTRA_LOOK_DRIFT_DURATION_MS = 1500L;
-    private static final long ELYTRA_LOOK_DRIFT_BUILD_MS = 450L;
-    private static final double ELYTRA_LOOK_DRIFT_TURN_TO_DEGREES = 0.15D;
-    private static final double ELYTRA_LOOK_DRIFT_DEFAULT_TURN = 0.9375D;
-    private static final double ELYTRA_LOOK_DRIFT_YAW_CAP = 18.0D / ELYTRA_LOOK_DRIFT_TURN_TO_DEGREES;
-    private static final double ELYTRA_LOOK_DRIFT_PITCH_CAP = 9.0D / ELYTRA_LOOK_DRIFT_TURN_TO_DEGREES;
-    private static final double ELYTRA_LOOK_DRIFT_YAW_GAIN = ELYTRA_LOOK_DRIFT_YAW_CAP / ELYTRA_LOOK_DRIFT_DEFAULT_TURN;
-    private static final double ELYTRA_LOOK_DRIFT_PITCH_GAIN = ELYTRA_LOOK_DRIFT_PITCH_CAP / ELYTRA_LOOK_DRIFT_DEFAULT_TURN;
-    private static final double ELYTRA_LOOK_DRIFT_MINIMUM = 0.01D;
-    private static double elytraLookDriftX, elytraLookDriftY;
-    private static double elytraLookDriftStartX, elytraLookDriftStartY;
-    private static double elytraLookDriftLastProgress;
-    private static long elytraLookDriftStartMs = -1L;
-    private static long elytraLookDriftLastUpdateMs;
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
@@ -82,76 +67,14 @@ public class ControllerManager {
 
     public static void updatePlayerCamera(BindingState.Axis stick, Controller controller) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || minecraft.screen != null || minecraft.player == null) {
-            resetElytraLookDrift();
-            return;
-        }
-        long now = Util.getMillis();
-        boolean fallFlying = minecraft.player.isFallFlying();
-        if (stick.pressed) {
-            if (elytraLookDriftStartMs >= 0L) resetElytraLookDrift();
-            double f = getControllerCameraSensitivity(minecraft);
-            double turnX = getCameraCurve(stick.getSmoothX()) * f;
-            double turnY = getCameraCurve(stick.getSmoothY()) * f * (LegacyOptions.invertYController.get() ? -1 : 1);
-            minecraft.player.turn(turnX, turnY);
-            if (fallFlying) updateElytraLookDriftBias(turnX, turnY, now);
-            else resetElytraLookDrift();
-            return;
-        }
-        if (!fallFlying) {
-            resetElytraLookDrift();
-            return;
-        }
-        if (stick.released) startElytraLookDrift(now);
-        updateElytraLookDrift(minecraft, now);
+        if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || minecraft.screen != null || !stick.pressed || minecraft.player == null) return;
+        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * (minecraft.player.isScoping() ? 0.125 : 1.0);
+        minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyOptions.invertYController.get() ? -1 : 1));
     }
 
     public static float getCameraCurve(float f) {
         if (LegacyOptions.linearCameraMovement.get()) return f;
         return f * f * Math.signum(f);
-    }
-
-    private static double getControllerCameraSensitivity(Minecraft minecraft) {
-        return Math.pow(LegacyOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * (minecraft.player.isScoping() ? 0.125 : 1.0);
-    }
-
-    private static void updateElytraLookDriftBias(double turnX, double turnY, long now) {
-        long elapsed = elytraLookDriftLastUpdateMs == 0L ? 0L : Math.min(100L, Math.max(0L, now - elytraLookDriftLastUpdateMs));
-        elytraLookDriftLastUpdateMs = now;
-        if (elapsed == 0L) return;
-        double blend = Mth.clamp(elapsed / (double) ELYTRA_LOOK_DRIFT_BUILD_MS, 0.0D, 1.0D);
-        double targetX = Mth.clamp(-turnX * ELYTRA_LOOK_DRIFT_YAW_GAIN, -ELYTRA_LOOK_DRIFT_YAW_CAP, ELYTRA_LOOK_DRIFT_YAW_CAP);
-        double targetY = Mth.clamp(-turnY * ELYTRA_LOOK_DRIFT_PITCH_GAIN, -ELYTRA_LOOK_DRIFT_PITCH_CAP, ELYTRA_LOOK_DRIFT_PITCH_CAP);
-        elytraLookDriftX = Mth.lerp(blend, elytraLookDriftX, targetX);
-        elytraLookDriftY = Mth.lerp(blend, elytraLookDriftY, targetY);
-    }
-
-    private static void startElytraLookDrift(long now) {
-        if (Math.abs(elytraLookDriftX) < ELYTRA_LOOK_DRIFT_MINIMUM && Math.abs(elytraLookDriftY) < ELYTRA_LOOK_DRIFT_MINIMUM) {
-            resetElytraLookDrift();
-            return;
-        }
-        elytraLookDriftStartX = elytraLookDriftX;
-        elytraLookDriftStartY = elytraLookDriftY;
-        elytraLookDriftX = elytraLookDriftY = elytraLookDriftLastProgress = 0.0D;
-        elytraLookDriftStartMs = now;
-        elytraLookDriftLastUpdateMs = now;
-    }
-
-    private static void updateElytraLookDrift(Minecraft minecraft, long now) {
-        if (elytraLookDriftStartMs < 0L) return;
-        double progress = Mth.clamp((now - elytraLookDriftStartMs) / (double) ELYTRA_LOOK_DRIFT_DURATION_MS, 0.0D, 1.0D);
-        double eased = 1.0D - (1.0D - progress) * (1.0D - progress);
-        double delta = Math.max(0.0D, eased - elytraLookDriftLastProgress);
-        if (delta > 0.0D) minecraft.player.turn(elytraLookDriftStartX * delta, elytraLookDriftStartY * delta);
-        elytraLookDriftLastProgress = eased;
-        if (progress >= 1.0D) resetElytraLookDrift();
-    }
-
-    private static void resetElytraLookDrift() {
-        elytraLookDriftX = elytraLookDriftY = elytraLookDriftStartX = elytraLookDriftStartY = elytraLookDriftLastProgress = 0.0D;
-        elytraLookDriftStartMs = -1L;
-        elytraLookDriftLastUpdateMs = 0L;
     }
 
     public void setup(Minecraft minecraft) {
@@ -606,7 +529,6 @@ public class ControllerManager {
     }
 
     public void setControllerTheLastInput(boolean controllerTheLastInput) {
-        if (!controllerTheLastInput) resetElytraLookDrift();
         if (isControllerTheLastInput != controllerTheLastInput) {
             isControllerTheLastInput = controllerTheLastInput;
             updateCursorInputMode();
