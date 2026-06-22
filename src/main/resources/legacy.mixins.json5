@@ -84,6 +84,7 @@
     "ClientTextTooltipMixin",
     "client.ConduitBlockEntityRendererMixin",
     "client.ConduitBlockMixin",
+    "client.DragonEggBlockMixin",
     "DimensionSpecialEffectsMixin",
     //? if >=1.21.2 {
     /*"OverworldDimensionSpecialEffectsMixin",

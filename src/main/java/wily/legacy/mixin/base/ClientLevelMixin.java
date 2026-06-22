@@ -2,13 +2,17 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.LegacyCloudAtmosphere;
+import wily.legacy.client.LegacyDragonEggTeleportParticles;
 
 @Mixin(ClientLevel.class)
 public abstract class ClientLevelMixin {
@@ -23,5 +27,11 @@ public abstract class ClientLevelMixin {
         //?} else {
         /*cir.setReturnValue(LegacyCloudAtmosphere.getWarmCloudColor(cir.getReturnValue(), LegacyCloudAtmosphere.getTimeOfDay((ClientLevel) (Object) this, partialTick)));
         *///?}
+    }
+
+    @Inject(method = "setServerVerifiedBlockState", at = @At("HEAD"))
+    private void handleDragonEggTeleportBlockUpdate(BlockPos pos, BlockState state, int flags, CallbackInfo ci) {
+        ClientLevel level = (ClientLevel) (Object) this;
+        LegacyDragonEggTeleportParticles.handleBlockUpdate(level, pos, level.getBlockState(pos), state);
     }
 }
