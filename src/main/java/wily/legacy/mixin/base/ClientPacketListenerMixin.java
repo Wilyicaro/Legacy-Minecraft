@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.ConduitRotationCache;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
@@ -77,6 +78,7 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
 
     @Inject(method = "handleLogin", at = @At("TAIL"))
     public void handleLoginMusic(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
+        ConduitRotationCache.clear();
         if (minecraft.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
     }
 

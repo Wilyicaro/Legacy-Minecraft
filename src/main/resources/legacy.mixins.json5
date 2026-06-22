@@ -82,6 +82,8 @@
     "ClientPacketListenerMixin",
     "ClientPrimaryLevelDataMixin",
     "ClientTextTooltipMixin",
+    "client.ConduitBlockEntityRendererMixin",
+    "client.ConduitBlockMixin",
     "DimensionSpecialEffectsMixin",
     //? if >=1.21.2 {
     /*"OverworldDimensionSpecialEffectsMixin",
