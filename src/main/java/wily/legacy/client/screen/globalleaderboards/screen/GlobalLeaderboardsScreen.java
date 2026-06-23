@@ -102,7 +102,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 if (!GlobalLeaderboardBoardRegistry.supportsDifficulty(boards.get(selectedStatBoard).id(), difficulty)) {
                     difficulty = GlobalLeaderboardDifficulty.EASY;
                 }
-                page = 0;
+                resetPageAndScroll();
                 rebuildRenderableVList(minecraft);
                 repositionElements();
                 return;
@@ -321,7 +321,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
 
     private void cycleView() {
         viewMode = viewMode == GlobalLeaderboardViewMode.AROUND_ME ? GlobalLeaderboardViewMode.TOP : GlobalLeaderboardViewMode.AROUND_ME;
-        page = 0;
+        resetPageAndScroll();
     }
 
     private void cycleDifficulty(boolean left) {
@@ -333,7 +333,12 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
             index = Stocker.cyclic(0, index + (left ? -1 : 1), values.length);
             difficulty = values[index];
         } while (board != null && !GlobalLeaderboardBoardRegistry.supportsDifficulty(board.id(), difficulty) && index != initial);
+        resetPageAndScroll();
+    }
+
+    private void resetPageAndScroll() {
         page = 0;
+        renderableVList.resetScroll();
     }
 
     private Component filterText() {

@@ -121,7 +121,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
         int initialSelectedStatBoard = selectedStatBoard;
         while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0,selectedStatBoard + (left ? -1 : 1), statsBoards.size())) && selectedStatBoard != initialSelectedStatBoard){
             if (!statsBoards.get(selectedStatBoard).statsList.isEmpty()) {
-                page = 0;
+                resetPageAndScroll();
                 rebuildRenderableVList(minecraft);
                 repositionElements();
                 return;
@@ -133,6 +133,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_X){
             filter.add(1,true);
+            resetPageAndScroll();
             rebuildRenderableVList(minecraft);
             repositionElements();
         }
@@ -152,6 +153,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
         if (renderableVList.keyPressed(i)) return true;
         return super.keyPressed(i, j, k);
+    }
+
+    protected void resetPageAndScroll() {
+        page = 0;
+        renderableVList.resetScroll();
     }
 
     @Override
