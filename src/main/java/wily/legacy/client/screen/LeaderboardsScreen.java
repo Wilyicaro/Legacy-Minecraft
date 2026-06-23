@@ -235,6 +235,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     protected void cycleFilter() {
         filter.add(1, true);
+        resetPageAndScroll();
     }
 
     public int changedPage(int count) {
@@ -248,12 +249,17 @@ public class LeaderboardsScreen extends PanelVListScreen {
         int initialSelectedStatBoard = selectedStatBoard;
         while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0, selectedStatBoard + (left ? -1 : 1), boards.size())) && selectedStatBoard != initialSelectedStatBoard) {
             if (!boards.get(selectedStatBoard).statsList.isEmpty()) {
-                page = 0;
+                resetPageAndScroll();
                 rebuildRenderableVList(minecraft);
                 repositionElements();
                 return;
             }
         }
+    }
+
+    protected void resetPageAndScroll() {
+        page = 0;
+        renderableVList.resetScroll();
     }
 
     @Override
