@@ -73,7 +73,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    @Override
    protected void cycleFilter() {
       this.viewMode = this.viewMode == GlobalLeaderboardViewMode.AROUND_ME ? GlobalLeaderboardViewMode.TOP : GlobalLeaderboardViewMode.AROUND_ME;
-      this.page = 0;
+      this.resetPageAndScroll();
    }
 
    private void cycleDifficulty(boolean left) {
@@ -84,7 +84,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          index = wily.factoryapi.base.Stocker.cyclic(0, index + (left ? -1 : 1), values.length);
          this.difficulty = values[index];
       } while (board != null && !GlobalLeaderboardBoardRegistry.supportsDifficulty(board.id(), this.difficulty));
-      this.page = 0;
+      this.resetPageAndScroll();
    }
 
    @Override
@@ -124,7 +124,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             if (!GlobalLeaderboardBoardRegistry.supportsDifficulty(boards.get(this.selectedStatBoard).id(), this.difficulty)) {
                this.difficulty = GlobalLeaderboardDifficulty.EASY;
             }
-            this.page = 0;
+            this.resetPageAndScroll();
             this.rebuildRenderableVList(this.minecraft);
             this.repositionElements();
             return;
