@@ -141,7 +141,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                         Component value = column.format(row.columnValue(column.id()));
                         SimpleLayoutRenderable renderable = renderables.get(index);
                         int w = font.width(value);
-                        guiGraphics.drawString(font, value, renderable.getX() + (renderable.getWidth() - w) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()), false);
+                        guiGraphics.drawString(font, value, renderable.getX() + (renderable.getWidth() - w) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
                         added++;
                     }
                 }
