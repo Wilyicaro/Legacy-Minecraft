@@ -28,6 +28,7 @@ public class CommonColor extends CommonValue<Integer> {
 
     public static final CommonColor CHAT_BACKGROUND = registerCommonColor("chat_background",0x323232);
     public static final CommonColor INVENTORY_GRAY_TEXT = registerCommonColor("inventory_gray_text", 0x323232);
+    public static final CommonColor GRAY_TEXT = INVENTORY_GRAY_TEXT;
     public static final CommonColor WIDGET_TEXT = registerCommonColor("widget_text", 0xFFFFFF);
     public static final CommonColor HIGHLIGHTED_WIDGET_TEXT = registerCommonColor("highlighted_widget_text", 0xFFFF00);
     public static final CommonColor TITLE_TEXT = registerCommonColor("title_text", 0xFFFFFF);

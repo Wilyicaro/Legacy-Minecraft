@@ -69,7 +69,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
                 }
             }
             //?}
-            ScreenUtil.renderLocalPlayerHead(guiGraphics,7, (height() - 32) / 2, 32);
+            ScreenUtil.renderLocalPlayerAdvancementFace(guiGraphics,7, (height() - 32) / 2, 32);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
             //? if <1.21.2 {

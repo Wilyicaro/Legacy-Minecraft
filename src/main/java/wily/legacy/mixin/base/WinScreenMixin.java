@@ -151,7 +151,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().translate(k - font.width(formattedCharSequence) * (title ? 1.5f : 1) / 2, m,0);
                     if (title) guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-                    font.drawInBatch8xOutline(formattedCharSequence,0, 0,0xFFFFFF,0, guiGraphics.pose().last().pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 15728880);
+                    font.drawInBatch8xOutline(formattedCharSequence,0, 0,0xFFFFFF,0, guiGraphics.pose().last().pose(), ScreenUtil.guiBufferSource(guiGraphics), 15728880);
                     guiGraphics.pose().popPose();
                     guiGraphics.flush();
                 }

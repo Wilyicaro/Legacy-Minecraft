@@ -13,6 +13,7 @@ import java.util.Set;
 public class LegacyMixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
+        if (FactoryAPI.getConfigDirectory() == null) return;
         LegacyMixinToggles.COMMON_STORAGE.load();
         if (FactoryAPI.isClient()) LegacyMixinOptions.CLIENT_MIXIN_STORAGE.load();
     }
@@ -24,8 +25,10 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (!LegacyMixinToggles.COMMON_STORAGE.getFormatted("wily.", mixinClassName)) return false;
-        if (FactoryAPI.isClient() && !LegacyMixinOptions.CLIENT_MIXIN_STORAGE.getFormatted("wily.", mixinClassName)) return false;
+        if (FactoryAPI.getConfigDirectory() != null) {
+            if (!LegacyMixinToggles.COMMON_STORAGE.getFormatted("wily.", mixinClassName)) return false;
+            if (FactoryAPI.isClient() && !LegacyMixinOptions.CLIENT_MIXIN_STORAGE.getFormatted("wily.", mixinClassName)) return false;
+        }
         if (FactoryAPI.isLoadingMod("nostalgic_tweaks")) {
             if (mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
         } else if (mixinClassName.contains("compat.nostalgic.")) return false;

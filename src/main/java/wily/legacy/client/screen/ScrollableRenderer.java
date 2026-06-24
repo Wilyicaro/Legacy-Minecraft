@@ -26,7 +26,7 @@ public class ScrollableRenderer {
     }
 
     public void render(GuiGraphics graphics, int x, int y, int width, int height, Runnable scrollable){
-        FactoryGuiGraphics.of(graphics).enableScissor(x,y, x + width, y + height);
+        graphics.enableScissor(x,y, x + width, y + height);
         oldSmoothScrolled = smoothScrolled;
         smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());
         graphics.pose().pushPose();

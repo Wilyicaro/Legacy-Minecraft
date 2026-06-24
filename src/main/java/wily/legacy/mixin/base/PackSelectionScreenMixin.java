@@ -27,7 +27,10 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.DownloadedPackMetadata;
+import wily.legacy.client.DownloadedResourceAlbums;
 import wily.legacy.init.LegacyRegistries;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
@@ -36,7 +39,9 @@ import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
@@ -69,15 +74,21 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
 
     @Unique
     private final List<RenderableVList> renderableVLists = List.of(unselectedPacksList,selectedPacksList);
+    @Unique
+    private final Map<AbstractButton, String> packIds = new IdentityHashMap<>();
+    @Unique
+    private String lastFocusedPackId;
 
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
+        rememberFocusedPack();
         super.init();
         panel.init();
         unselectedPacksList.init(panel.x + 15, panel.y + 30, 180, 192);
         selectedPacksList.init(panel.x + 215, panel.y + 30, 180, 192);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
+        restoreFocusedPack();
     }
     //? if >=1.20.5 {
     @Inject(method = "repositionElements",at = @At("HEAD"), cancellable = true)
@@ -107,9 +118,12 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     @Inject(method = "populateLists", at = @At("HEAD"), cancellable = true)
     private void populateLists(CallbackInfo ci) {
         ci.cancel();
+        rememberFocusedPack();
+        packIds.clear();
         addPacks(unselectedPacksList,model.getUnselected());
         addPacks(selectedPacksList,model.getSelected());
         repositionElements();
+        restoreFocusedPack();
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
@@ -118,13 +132,17 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();
         stream.forEach(e-> {
+            if (DownloadedResourceAlbums.isManagedPack(e.getId())) return;
+            if (DownloadedSkinPackStore.isManagedResourcePackId(e.getId())) return;
+            Component title = DownloadedPackMetadata.getTitle(e.getId(), e.getTitle());
+            Component descriptionText = DownloadedPackMetadata.getDescription(e.getId(), e.getExtendedDescription());
             List<Component> description = new ArrayList<>();
             if (!e.getCompatibility().isCompatible()){
                 description.add(INCOMPATIBLE_TITLE);
                 description.add(e.getCompatibility().getDescription());
             }
-            if (!e.getExtendedDescription().getString().isEmpty()) description.add(e.getExtendedDescription());
-            AbstractButton button = new AbstractButton(0,0,180,30,e.getTitle()) {
+            if (!descriptionText.getString().isEmpty()) description.add(descriptionText);
+            AbstractButton button = new AbstractButton(0,0,180,30,title) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
@@ -234,9 +252,31 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     defaultButtonNarrationText(narrationElementOutput);
                 }
             };
+            packIds.put(button, e.getId());
             if (!description.isEmpty()) button.setTooltip(new MultilineTooltip(description,161));
             list.addRenderable(button);
         });
+    }
+
+    @Unique
+    private void rememberFocusedPack() {
+        if (getFocused() instanceof AbstractButton button) {
+            String packId = packIds.get(button);
+            if (packId != null) lastFocusedPackId = packId;
+        }
+    }
+
+    @Unique
+    private void restoreFocusedPack() {
+        if (lastFocusedPackId == null) return;
+        for (RenderableVList list : renderableVLists) {
+            for (var renderable : list.renderables) {
+                if (renderable instanceof AbstractButton button && lastFocusedPackId.equals(packIds.get(button))) {
+                    list.focusRenderable(button);
+                    return;
+                }
+            }
+        }
     }
 
 

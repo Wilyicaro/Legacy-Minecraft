@@ -509,25 +509,26 @@ public interface ControlTooltip {
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f, Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
             guiGraphics.pose().pushPose();
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
-            double hudDiff = (1 - LegacyOptions.hudDistance.get()) * 60D;
-            double xDiff = -Math.min(hudDiff,30);
-            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, Math.min(hudDiff,16),1000);
-            int baseHeight = guiGraphics.guiHeight() - 29;
+            double hudDistance = Math.max(0.0D, LegacyOptions.hudDistance.get() - 0.5D) * 2.0D;
+            double hudDiff = 1.0D - hudDistance;
+            double xDiff = 32.0D - 30.0D * hudDiff;
+            double y = guiGraphics.guiHeight() - (29.0D - 16.0D * hudDiff);
+            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, y,1000);
 
             renderTooltips.forEach((action,icon)->{
                 if (left) {
-                    int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), false);
+                    int controlWidth = icon.render(guiGraphics, 0, 0, allowPressed(), false);
                     if (controlWidth > 0) {
-                        guiGraphics.drawString(minecraft.font, action, 34 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
-                        guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 12, 0, 0);
+                        guiGraphics.drawString(minecraft.font, action, controlWidth + 2, 0, CommonColor.ACTION_TEXT.get());
+                        guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 10, 0, 0);
                         guiGraphics.flush();
                     }
                 } else {
-                    int controlWidth = icon.render(guiGraphics, -32, baseHeight, allowPressed(), true);
+                    int controlWidth = icon.render(guiGraphics, 0, 0, allowPressed(), true);
                     if (controlWidth > 0) {
                         guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0, 0);
-                        icon.render(guiGraphics, -32, baseHeight, allowPressed(), false);
-                        guiGraphics.drawString(minecraft.font, action, -30 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
+                        icon.render(guiGraphics, 0, 0, allowPressed(), false);
+                        guiGraphics.drawString(minecraft.font, action, controlWidth + 2, 0, CommonColor.ACTION_TEXT.get());
                         guiGraphics.pose().translate(-12, 0, 0);
                         guiGraphics.flush();
                     }

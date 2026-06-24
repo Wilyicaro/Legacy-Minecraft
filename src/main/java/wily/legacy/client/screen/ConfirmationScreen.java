@@ -20,8 +20,17 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 
 public class ConfirmationScreen extends OverlayPanelScreen implements RenderableVList.Access {
+    public static int getPanelWidth() {
+        return 230;
+    }
+
+    public static int getBaseHeight() {
+        return 97;
+    }
+
     protected final AdvancedTextWidget messageLabel;
     protected Consumer<ConfirmationScreen> okAction;
     public Button okButton;
@@ -44,6 +53,14 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
 
     public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, int xOffset, int yOffset, Component title, Consumer<AdvancedTextWidget> textWidgetConsumer, Consumer<ConfirmationScreen> okAction) {
         this(parent,s-> Panel.createPanel(s, p-> p.appearance(imageWidth, baseHeight + s.messageLabel.height), p-> p.pos( p.centeredLeftPos(s) + xOffset, p.centeredTopPos(s) + yOffset)), title, textWidgetConsumer, okAction);
+    }
+
+    public ConfirmationScreen(Screen parent, IntSupplier imageWidth, IntSupplier baseHeight, Component title, Consumer<AdvancedTextWidget> textWidgetConsumer, Consumer<ConfirmationScreen> okAction) {
+        this(parent,s-> Panel.createPanel(s, p-> p.appearance(imageWidth.getAsInt(), baseHeight.getAsInt() + s.messageLabel.height), p-> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s))), title, textWidgetConsumer, okAction);
+    }
+
+    public ConfirmationScreen(Screen parent, IntSupplier imageWidth, IntSupplier baseHeight, Component title, Component message, Consumer<ConfirmationScreen> okAction) {
+        this(parent, imageWidth, baseHeight, title, w -> w.withLines(message, imageWidth.getAsInt() - 30), okAction);
     }
 
     public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, int xOffset, int yOffset, Component title, Component message, Consumer<ConfirmationScreen> okAction) {

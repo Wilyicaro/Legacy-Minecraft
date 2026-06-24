@@ -192,6 +192,23 @@
     "BufferSourceAccessor",
     "BackupConfirmScreenMixin",
     "PaintingRendererMixin",
+    "skins.client.LivingEntityRendererAccessor",
+    "skins.client.PlayerSkinMixin",
+    //? if >=1.21.2 {
+    /*"skins.client.SkinIdStateMixin",
+    "skins.client.PlayerRendererSkinStateMixin",
+    *///?}
+    "skins.client.BoxLayerSetupMixin",
+    "skins.client.ModelPartAccessor",
+    "skins.client.SkipRenderMixin",
+    "skins.client.PlayerPartsMixin",
+    "skins.client.ArmorOffsetsMixin",
+    "skins.client.MenuDollMixin",
+    "skins.client.SkinTickMixin",
+    "skins.client.UpsideDownRendererMixin",
+    //? if >=1.21.2 {
+    /*"skins.client.UpsideDownMixin",
+    *///?}
     "piston.PistonHeadRendererMixin",
     "WinScreenMixin",
     "client.gui.PlayerTabOverlayMixin",

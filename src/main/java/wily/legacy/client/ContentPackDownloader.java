@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ContentManager.Category;
 import wily.legacy.client.ContentManager.Pack;
+import wily.legacy.skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,6 +121,8 @@ final class ContentPackDownloader {
     private static boolean isStandalonePackInstalled(Pack pack, Category category) {
         Path path = ContentManager.getContentDir(category.targetDirectoryName()).resolve(pack.id());
         if (!Files.isDirectory(path)) return false;
+        String folderName = category.targetDirectoryName();
+        if ((DownloadedSkinPackStore.managesTargetDirectory(folderName) || CustomSkinPackStore.managesTargetDirectory(folderName)) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
         if (pack.hasWorldTemplate() && !LegacyWorldTemplate.isDownloadedPackInstalled(pack)) return false;
         if (!pack.downloadVariants().isEmpty() && !pack.activeDownloadKey().equals(readDownloadKey(path))) return false;
         if (pack.activeCheckSum().isPresent()) {
@@ -232,7 +236,12 @@ final class ContentPackDownloader {
                 if (rootResourcePack) {
                     DownloadedPackMetadata.write(targetFolder, pack, category);
                 }
-                if (rootResourcePack) {
+                String folderName = category.targetDirectoryName();
+                if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
+                    DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
+                } else if (CustomSkinPackStore.managesTargetDirectory(folderName)) {
+                    CustomSkinPackStore.normalizeDownloadedPack(targetFolder);
+                } else if (rootResourcePack) {
                     if (syncResourceAlbum && category.useResourceAlbum()) {
                         DownloadedResourceAlbums.sync(pack);
                     } else {

@@ -194,7 +194,7 @@ public class ContentManager {
     }
 
     public static boolean isSupportedCategory(Category category) {
-        return !category.targetDirectoryName().replace('\\', '/').contains("lce_skinpacks");
+        return true;
     }
 
     private static Optional<Pack.Variant> selectVariant(List<Pack.Variant> variants) {

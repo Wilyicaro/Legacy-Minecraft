@@ -76,13 +76,17 @@ repositories {
 configurations.configureEach {
     resolutionStrategy {
         force("net.fabricmc:fabric-loader:${fabric_loader_version}")
+        if (loader == "forge") force("net.sf.jopt-simple:jopt-simple:5.0.4")
     }
 }
 dependencies {
     minecraft "com.mojang:minecraft:${stonecutter.current.version}"
     mappings loom.officialMojangMappings()
     api(include(sdl_dependency))
-    modApi "wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}"
+    modApi("wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}") {
+        exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib"
+    }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.2.10"
     modCompileOnly("maven.modrinth:world-host:${world_host_version}")
     modCompileOnly("maven.modrinth:vivecraft:${vivecraft_version}")
     if (stonecutter.eval(stonecutter.current.version, "<=1.21.1")) {
@@ -111,6 +115,7 @@ dependencies {
             modCompileOnly("dev.architectury:architectury-forge:${architectury_version}")
         }
         compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
+        forgeRuntimeLibrary "io.github.llamalad7:mixinextras-common:0.5.0"
     } else if (loader == "neoforge") {
         neoForge "net.neoforged:neoforge:${neoforge_version}"
     }
@@ -147,10 +152,82 @@ loom {
 }
 
 def isJava21 = stonecutter.eval(stonecutter.current.version, ">=1.20.5")
+def javaLanguageVersion = isJava21 ? 21 : 17
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
-    options.release = isJava21 ? 21 : 17
+    options.release = javaLanguageVersion
+}
+
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(javaLanguageVersion)
+    }
+    if (loader == "forge" && stonecutter.eval(stonecutter.current.version, ">=1.21")) doFirst {
+        def clientExtra = classpath.files.find { it.name == "client-extra.jar" }
+        def mergedForge = classpath.files.find { it.name.startsWith("forge-${stonecutter.current.version}-${forge_version}-minecraft-merged-") && it.name.endsWith(".jar") }
+        if (clientExtra != null && mergedForge != null) {
+            def sanitized = new File(temporaryDir, "${mergedForge.name.substring(0, mergedForge.name.length() - 4)}-minecraftmodule.jar")
+            if (!sanitized.exists() || sanitized.lastModified() < mergedForge.lastModified()) {
+                sanitized.parentFile.mkdirs()
+                def manifest
+                mergedForge.withInputStream { input ->
+                    def jarInput = new java.util.jar.JarInputStream(input)
+                    try {
+                        manifest = jarInput.manifest ?: new java.util.jar.Manifest()
+                    } finally {
+                        jarInput.close()
+                    }
+                }
+                manifest.mainAttributes.putValue("Manifest-Version", manifest.mainAttributes.getValue("Manifest-Version") ?: "1.0")
+                manifest.mainAttributes.putValue("Automatic-Module-Name", "minecraft")
+                mergedForge.withInputStream { input ->
+                    sanitized.withOutputStream { output ->
+                        def jarInput = new java.util.jar.JarInputStream(input)
+                        def jarOutput = new java.util.jar.JarOutputStream(output, manifest)
+                        try {
+                            java.util.jar.JarEntry entry
+                            while ((entry = jarInput.nextJarEntry) != null) {
+                                if (entry.name.equalsIgnoreCase("META-INF/MANIFEST.MF") || entry.name ==~ /META-INF\/.*\.(SF|RSA|DSA|EC)/) continue
+                                def nextEntry = new java.util.jar.JarEntry(entry.name)
+                                nextEntry.time = entry.time
+                                jarOutput.putNextEntry(nextEntry)
+                                jarInput.transferTo(jarOutput)
+                                jarOutput.closeEntry()
+                            }
+                        } finally {
+                            jarOutput.close()
+                            jarInput.close()
+                        }
+                    }
+                }
+            }
+            systemProperty "legacyClassPath", clientExtra.absolutePath + File.pathSeparator + sanitized.absolutePath
+        }
+        if (stonecutter.eval(stonecutter.current.version, ">=1.21.5")) {
+            def dliConfigArg = jvmArgs.find { it.toString().startsWith("-Dfabric.dli.config=") }
+            if (dliConfigArg != null) {
+                def dliConfig = new File(dliConfigArg.toString().substring("-Dfabric.dli.config=".length()))
+                if (dliConfig.exists()) {
+                    def sanitizedConfig = new File(temporaryDir, "launch-dli.cfg")
+                    def skipClientDataArgs = false
+                    sanitizedConfig.parentFile.mkdirs()
+                    sanitizedConfig.withWriter("UTF-8") { writer ->
+                        dliConfig.eachLine { line ->
+                            if (!line.startsWith("\t") && line.trim() == "clientdataArgs") {
+                                skipClientDataArgs = true
+                            } else {
+                                if (skipClientDataArgs && !line.startsWith("\t")) skipClientDataArgs = false
+                                if (!skipClientDataArgs) writer.writeLine(line)
+                            }
+                        }
+                    }
+                    setJvmArgs(jvmArgs.findAll { !it.toString().startsWith("-Dfabric.dli.config=") })
+                    systemProperty "fabric.dli.config", sanitizedConfig.absolutePath
+                }
+            }
+        }
+    }
 }
 
 def buildJar = tasks.create("buildJar", Copy.class) {
@@ -167,6 +244,9 @@ java {
     withSourcesJar()
     sourceCompatibility = isJava21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
     targetCompatibility = isJava21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(javaLanguageVersion)
+    }
 }
 remapJar {
     if (loader == "neoforge") atAccessWideners.add aw

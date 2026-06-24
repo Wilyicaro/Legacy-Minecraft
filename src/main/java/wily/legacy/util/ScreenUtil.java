@@ -16,6 +16,7 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -81,6 +82,11 @@ import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
+import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.skins.skin.ClientSkinCache;
+import wily.legacy.skins.skin.SkinFairness;
+import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.skins.skin.SkinPackLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -371,12 +377,16 @@ public class ScreenUtil {
             double e = Math.max((double)r * 0.5, 3.0);
             double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
             double g = Mth.lerp(f, 0.0, r);
-            FactoryGuiGraphics.of(guiGraphics).enableScissor(j, k, l, m);
+            guiGraphics.enableScissor(j, k, l, m);
             guiGraphics.drawString(font, charSequence, j - (int)g, p, n,shadow && CommonValue.WIDGET_TEXT_SHADOW.get());
             guiGraphics.disableScissor();
         } else {
             guiGraphics.drawString(font, charSequence, j, p, n,shadow && CommonValue.WIDGET_TEXT_SHADOW.get());
         }
+    }
+
+    public static MultiBufferSource.BufferSource guiBufferSource(GuiGraphics graphics) {
+        return /*? if <1.21.3 {*/graphics.bufferSource()/*?} else {*//*FactoryGuiGraphics.of(graphics).getBufferSource()*//*?}*/;
     }
 
     public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render){
@@ -385,7 +395,6 @@ public class ScreenUtil {
             return;
         }
 
-        FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
         graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
         FactoryScreenUtil.enableBlend();
@@ -393,7 +402,6 @@ public class ScreenUtil {
         FactoryScreenUtil.disableBlend();
         graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        FactoryGuiGraphics.of(graphics).popBufferSource();
     }
 
     public static boolean isHovering(Slot slot,int leftPos, int topPos,  double d, double e) {
@@ -436,7 +444,7 @@ public class ScreenUtil {
                 player.elytraRotY = 0;
                 player.elytraRotZ = -0.2617994F;
             }
-            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*/0.0f,/*?}*/ partialTicks, guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0);
+            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*/0.0f,/*?}*/ partialTicks, guiGraphics.pose(), guiBufferSource(guiGraphics), 0xF000F0);
             guiGraphics.flush();
         } finally {
             suppressInventoryElytraPose = false;
@@ -454,7 +462,7 @@ public class ScreenUtil {
     public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
         float n = (float)(i + k) / 2.0f;
         float o = (float)(j + l) / 2.0f;
-        FactoryGuiGraphics.of(guiGraphics).enableScissor(i, j, k, l);
+        guiGraphics.enableScissor(i, j, k, l);
         float p = (float)Math.atan((n - g) / 40.0f);
         float q = (float)Math.atan((o - h) / 40.0f);
         Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);
@@ -482,7 +490,42 @@ public class ScreenUtil {
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
         if (mc.player == null) return;
+        String skinId = getLocalPlayerSkinId();
+        if (shouldRenderBoxHeadPreview(skinId)) {
+            int x0 = x;
+            int y0 = y;
+            int x1 = x + size;
+            int y1 = y + size;
+            float centerX = (x0 + x1) / 2.0F;
+            float centerY = (y0 + y1) / 2.0F;
+            renderEntityInInventoryFollowsMouse(guiGraphics, x0, y0, x1, y1, size, 0.75F, centerX, centerY, mc.player);
+            return;
+        }
         PlayerFaceRenderer.draw(guiGraphics, mc.player./*? if >1.20.1 {*/getSkin/*?} else {*//*getSkinTextureLocation*//*?}*/(), x, y, size);
+    }
+
+    public static void renderLocalPlayerAdvancementFace(GuiGraphics guiGraphics, int x, int y, int size) {
+        ResourceLocation face = SkinPackLoader.getAdvancementFace(getLocalPlayerSkinId());
+        if (face != null) {
+            FactoryScreenUtil.enableBlend();
+            FactoryGuiGraphics.of(guiGraphics).blit(face, x, y, 0.0f, 0.0f, size, size, size, size);
+            FactoryScreenUtil.disableBlend();
+            return;
+        }
+        renderLocalPlayerHead(guiGraphics, x, y, size);
+    }
+
+    private static boolean shouldRenderBoxHeadPreview(String skinId) {
+        return !SkinIdUtil.isBlankOrAutoSelect(skinId) && ClientSkinAssets.hasHeadBox(ClientSkinAssets.resolveSkin(skinId));
+    }
+
+    private static String getLocalPlayerSkinId() {
+        if (mc.player == null) return null;
+        try {
+            return SkinFairness.effectiveSkinId(mc, ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName()));
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     public static float getAutoGuiScale() {

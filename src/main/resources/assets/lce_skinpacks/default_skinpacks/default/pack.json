@@ -1,0 +1,129 @@
+{
+  "name": "key:legacy.default.pack",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "auto_select",
+      "name": "key:legacy.default.auto_select",
+      "texture": "skins/steve.png",
+      "order": 1
+    },
+    {
+      "id": "default_steve",
+      "name": "key:legacy.default.steve",
+      "texture": "skins/steve.png",
+      "order": 2
+    },
+    {
+      "id": "tennis_steve",
+      "name": "key:legacy.default.tennis_steve",
+      "texture": "skins/tennis_steve.png",
+      "order": 3
+    },
+    {
+      "id": "tux_steve",
+      "name": "key:legacy.default.tux_steve",
+      "texture": "skins/tux_steve.png",
+      "order": 4
+    },
+    {
+      "id": "athlete_steve",
+      "name": "key:legacy.default.athlete_steve",
+      "texture": "skins/athlete_steve.png",
+      "order": 5
+    },
+    {
+      "id": "scottish_steve",
+      "name": "key:legacy.default.scottish_steve",
+      "texture": "skins/scottish_steve.png",
+      "order": 6
+    },
+    {
+      "id": "jail_steve",
+      "name": "key:legacy.default.jail_steve",
+      "texture": "skins/jail_steve.png",
+      "order": 7
+    },
+    {
+      "id": "cyclist_steve",
+      "name": "key:legacy.default.cyclist_steve",
+      "texture": "skins/cyclist_steve.png",
+      "order": 8
+    },
+    {
+      "id": "boxer_steve",
+      "name": "key:legacy.default.boxer_steve",
+      "texture": "skins/boxer_steve.png",
+      "order": 9
+    },
+    {
+      "id": "default_alex",
+      "name": "key:legacy.default.alex",
+      "texture": "skins/alex.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "tennis_alex",
+      "name": "key:legacy.default.tennis_alex",
+      "texture": "skins/tennis_alex.png",
+      "order": 11,
+      "model": "slim"
+    },
+    {
+      "id": "tux_alex",
+      "name": "key:legacy.default.tux_alex",
+      "texture": "skins/tux_alex.png",
+      "order": 12,
+      "model": "slim"
+    },
+    {
+      "id": "athlete_alex",
+      "name": "key:legacy.default.athlete_alex",
+      "texture": "skins/athlete_alex.png",
+      "order": 13,
+      "model": "slim"
+    },
+    {
+      "id": "swedish_alex",
+      "name": "key:legacy.default.swedish_alex",
+      "texture": "skins/swedish_alex.png",
+      "order": 14,
+      "model": "slim"
+    },
+    {
+      "id": "prisoner_alex",
+      "name": "key:legacy.default.prisoner_alex",
+      "texture": "skins/prisoner_alex.png",
+      "order": 15,
+      "model": "slim"
+    },
+    {
+      "id": "cyclist_alex",
+      "name": "key:legacy.default.cyclist_alex",
+      "texture": "skins/cyclist_alex.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "boxer_alex",
+      "name": "key:legacy.default.boxer_alex",
+      "texture": "skins/boxer_alex.png",
+      "order": 17,
+      "model": "slim"
+    },
+    {
+      "id": "dev_steve",
+      "name": "key:legacy.default.dev_steve",
+      "texture": "skins/dev_steve.png",
+      "order": 19
+    },
+    {
+      "id": "dev_alex",
+      "name": "key:legacy.default.dev_alex",
+      "texture": "skins/dev_alex.png",
+      "order": 18,
+      "model": "slim"
+    }
+  ]
+}
