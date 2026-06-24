@@ -186,12 +186,6 @@ public class RenderableVList {
         }
     }
 
-    public void resetScroll() {
-        scrolledList.set(0);
-        canScrollDown = false;
-    }
-
-
     public void init(int leftPos, int topPos, int listWidth, int listHeight) {
         init("renderableVList", leftPos, topPos, listWidth, listHeight);
     }
