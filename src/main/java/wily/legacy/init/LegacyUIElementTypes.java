@@ -249,9 +249,9 @@ public class LegacyUIElementTypes {
             float f4 = Mth.clamp(Mth.frac(f1 + 0.25F) * 1.6F - 0.3F, 0.0F, 1.0F);
             float f5 = Mth.clamp(Mth.frac(f1 + 0.75F) * 1.6F - 0.3F, 0.0F, 1.0F);
             bookModel.get().setupAnim(0.0F, f4, f5, g);
-            VertexConsumer vertexconsumer = FactoryGuiGraphics.of(guiGraphics).getBufferSource().getBuffer(bookModel.get().renderType(ENCHANTING_TABLE_BOOK));
+            VertexConsumer vertexconsumer = ScreenUtil.guiBufferSource(guiGraphics).getBuffer(bookModel.get().renderType(ENCHANTING_TABLE_BOOK));
             bookModel.get().renderToBuffer(guiGraphics.pose(), vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY/*? <1.20.5 {*//*, 1.0F, 1.0F, 1.0F, 1.0F*//*?}*/);
-            FactoryGuiGraphics.of(guiGraphics).getBufferSource().endBatch();
+            ScreenUtil.guiBufferSource(guiGraphics).endBatch();
             guiGraphics.flush();
             guiGraphics.pose().popPose();
             Lighting.setupFor3DItems();

@@ -47,10 +47,27 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 
 public class LegacyOptions {
+    public enum UIMode {
+        HD(false),
+        SD(true);
+
+        private final boolean sd;
+
+        UIMode(boolean sd) {
+            this.sd = sd;
+        }
+
+        public boolean isSD() {
+            return sd;
+        }
+    }
+
     @Deprecated
     private static final File deprecatedLegacyOptionssFile = FactoryAPI.getConfigDirectory().resolve("legacy_options.txt").toFile();
     @Deprecated
     private static final Splitter OPTION_SPLITTER = Splitter.on(':').limit(2);
+    private static final String DEFAULT_SKIN_CLOUD_RELAY_URL = "https://legacy4j-skins-relay.creepereater201.workers.dev";
+    private static boolean suppressPlayerInfoSync = false;
 
     public static final Function<OptionInstance<?>,FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
 
@@ -103,6 +120,10 @@ public class LegacyOptions {
 
     public static Component componentFromTooltip(Tooltip tooltip){
         return tooltip == null ? null : tooltip.message;
+    }
+
+    public static UIMode getUIMode() {
+        return UIMode.HD;
     }
 
     private static void reloadCloudRendering() {
@@ -188,10 +209,21 @@ public class LegacyOptions {
 
     public static final FactoryConfig<String> lastLoadedVersion = CLIENT_STORAGE.register(FactoryConfig.create("lastLoadedVersion", null,()-> Codec.STRING,"", v-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = CLIENT_STORAGE.register(FactoryConfig.create("lastLoadedMinecraftVersion", null, ()-> Codec.STRING, "", v-> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> tu3ChangeSkinScreen = CLIENT_STORAGE.register(FactoryConfig.createBoolean("tu3ChangeSkinScreen", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.tu3_change_skin_screen")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> smoothPreviewScroll = CLIENT_STORAGE.register(FactoryConfig.createBoolean("smoothPreviewScroll", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.smooth_preview_scroll")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> hideArmorOnAllBoxSkins = CLIENT_STORAGE.register(FactoryConfig.createBoolean("hideArmorOnAllBoxSkins", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.hide_armor")), false, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> showCustomPackOptionsTooltip = CLIENT_STORAGE.register(FactoryConfig.createBoolean("showCustomPackOptionsTooltip", FactoryConfigDisplay.createToggle(Component.translatable("legacy.menu.change_skin.custom_pack_options")), true, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> skinSelectionInitialized = FactoryConfig.<Boolean>builder().key("skinSelectionInitialized").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> lastUsedCustomPackId = FactoryConfig.<String>builder().key("lastUsedCustomPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinUserId = FactoryConfig.<String>builder().key("selectedSkinUserId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinId = FactoryConfig.<String>builder().key("selectedSkinId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> selectedSkinPackId = FactoryConfig.<String>builder().key("selectedSkinPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<List<String>> favoriteSkinIds = FactoryConfig.<List<String>>builder().key("favoriteSkinIds").control(FactoryConfigControl.of(Codec.STRING.listOf())).defaultValue(List.of()).buildAndRegister(CLIENT_STORAGE);
+    public static final FactoryConfig<String> skinCloudRelayUrl = FactoryConfig.<String>builder().key("skinCloudRelayUrl").control(FactoryConfigControl.of(Codec.STRING)).defaultValue(DEFAULT_SKIN_CLOUD_RELAY_URL).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b-> {
         syncLegacyClassicWorkstations(b);
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
     public static final FactoryConfig<Boolean> modCraftingTabs = CLIENT_STORAGE.register(createBoolean("modCraftingTabs",false));
@@ -285,6 +317,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> forceLegacyOffhandLimits = CLIENT_STORAGE.register(createBoolean("forceLegacyOffhandLimits", b-> LegacyComponents.MAY_BE_A_CHEAT,false));
     public static final FactoryConfig<Boolean> legacyCreativeBlockPlacing = CLIENT_STORAGE.register(createBoolean("legacyCreativeBlockPlacing",true));
     public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
+    public static final FactoryConfig<Boolean> customSkinAnimation = CLIENT_STORAGE.register(createBoolean("customSkinAnimation", true));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
     public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBoolean("legacyZombieAggressionAnimation", b -> Component.translatable("legacy.options.legacyZombieAggressionAnimation.tooltip"), false));
@@ -314,16 +347,16 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> systemMessagesAsOverlay = CLIENT_STORAGE.register(createBoolean("systemMessagesAsOverlay", true));
     public static final FactoryConfig<Boolean> screenshotToasts = CLIENT_STORAGE.register(createBoolean("screenshotToasts", true));
     public static final FactoryConfig<Boolean> forceMixedCrafting = CLIENT_STORAGE.register(createBoolean("forceMixedCrafting", false, b-> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(classicCrafting.get() || b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicTrading = CLIENT_STORAGE.register(createBoolean("classicTrading",false, b-> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicTrading(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicStonecutting = CLIENT_STORAGE.register(createBoolean("classicStonecutting",false, b-> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicStonecutting(b, Minecraft.getInstance().player));
     }));
     public static final FactoryConfig<Boolean> classicLoom = CLIENT_STORAGE.register(createBoolean("classicLoom",false, b-> {
-        if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
+        if (canSendPlayerInfoSync()) CommonNetwork.sendToServer(PlayerInfoSync.classicLoom(b, Minecraft.getInstance().player));
     }));
     private static void syncLegacyClassicWorkstations(boolean enabled) {
         if (!legacySettingsMenus.get()) return;
@@ -331,6 +364,35 @@ public class LegacyOptions {
         FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
         FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
     }
+
+    public static String getLastUsedCustomPackIdOrNull() {
+        String packId = lastUsedCustomPackId.get();
+        return packId == null || packId.isBlank() ? null : packId;
+    }
+
+    public static String getSkinCloudRelayUrl() {
+        String value = skinCloudRelayUrl.get();
+        if (value == null) return DEFAULT_SKIN_CLOUD_RELAY_URL;
+        value = value.trim();
+        while (value.endsWith("/")) value = value.substring(0, value.length() - 1);
+        return value.isEmpty() ? DEFAULT_SKIN_CLOUD_RELAY_URL : value;
+    }
+
+    public static boolean canSendPlayerInfoSync() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return !suppressPlayerInfoSync && minecraft.player != null && Legacy4JClient.hasModOnServer();
+    }
+
+    public static void runWithoutPlayerInfoSync(Runnable runnable) {
+        boolean previous = suppressPlayerInfoSync;
+        suppressPlayerInfoSync = true;
+        try {
+            runnable.run();
+        } finally {
+            suppressPlayerInfoSync = previous;
+        }
+    }
+
     public static final FactoryConfig<Boolean> headFollowsTheCamera = CLIENT_STORAGE.register(createBoolean("headFollowsTheCamera", true));
     public static final FactoryConfig<Boolean> fastLeavesWhenBlocked = CLIENT_STORAGE.register(createBoolean("fastLeavesWhenBlocked", true, b-> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> invertedFrontCameraPitch = CLIENT_STORAGE.register(createBoolean("invertedFrontCameraPitch", true, b-> {}));

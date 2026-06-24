@@ -51,7 +51,7 @@ public class SpawnEggItemMixin {
     }
 
     @Inject(method = "spawnOffspringFromSpawnEgg", at = @At("HEAD"), cancellable = true)
-    private static void gateSpawnEggOffspring(Player player, Mob parent, EntityType<? extends Mob> type, ServerLevel level, Vec3 pos, ItemStack stack, CallbackInfoReturnable<Optional<Mob>> cir) {
+    private void gateSpawnEggOffspring(Player player, Mob parent, EntityType<? extends Mob> type, ServerLevel level, Vec3 pos, ItemStack stack, CallbackInfoReturnable<Optional<Mob>> cir) {
         String failure = ConsoleMobCaps.spawnEggFailure(level, type);
         if (failure == null) return;
         ConsoleMobCaps.sendFailure(player, failure);

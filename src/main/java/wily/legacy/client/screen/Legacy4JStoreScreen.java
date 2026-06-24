@@ -2,13 +2,18 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import wily.factoryapi.base.client.WidgetAccessor;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ContentManager;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -86,13 +91,27 @@ public class Legacy4JStoreScreen extends PanelVListScreen {
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor)widget).setHeight(accessor.getInteger("buttonsHeight", 30));
+            *///?} else {
+            widget.setHeight(accessor.getInteger("buttonsHeight", 30));
+            //?}
+        }
+    }
+
+    @Override
     public void renderableVListInit() {
         addRenderableOnly((guiGraphics, i, j, f) -> {
             int y = panelRecess.y + 8;
-            for (FormattedCharSequence line : font.split(getTitle(), panelRecess.width - 20)) {
-                guiGraphics.drawString(font, line, panel.x + (panel.width - font.width(line)) / 2, y, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-                y += 12;
-            }
+            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, sd -> {
+                int lineY = y;
+                for (FormattedCharSequence line : font.split(getTitle(), getRenderableVList().listWidth - 10)) {
+                    guiGraphics.drawString(font, line, panel.x + (panel.width - font.width(line)) / 2, lineY, CommonColor.GRAY_TEXT.get(), false);
+                    lineY += sd ? 8 : 12;
+                }
+            });
         });
         getRenderableVList().init("renderableVList", panelRecess.x + 10, panelRecess.y + 21, panelRecess.width - 20, LIST_HEIGHT);
     }
@@ -126,7 +145,13 @@ public class Legacy4JStoreScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int color) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 12, getY(), getX() + getWidth() - 8, getY() + getHeight(), color, true);
+            int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
+            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> {
+                int maxWidth = Math.max(0, getWidth() - 24);
+                String text = getMessage() == null ? "" : getMessage().getString();
+                String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";
+                guiGraphics.drawString(font, clipped, getX() + 12, textY, color, true);
+            });
         }
 
         @Override

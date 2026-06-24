@@ -120,6 +120,7 @@ import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
+import wily.legacy.skins.SkinsClientBootstrap;
 import wily.legacy.util.MCAccount;
 import wily.legacy.util.ScreenUtil;
 
@@ -424,6 +425,7 @@ public class Legacy4JClient {
                 if (!knownEntities.contains(e.getType()) && LegacyTipManager.setTip(LegacyTipManager.getTip(e))) knownEntities.add(r.getEntity().getType());
             }
         }
+        SkinsClientBootstrap.postTick(minecraft);
     }
 
     public static void postScreenInit(Screen screen){
@@ -459,6 +461,7 @@ public class Legacy4JClient {
     }
 
     public static void init() {
+        SkinsClientBootstrap.init();
         GlobalLeaderboardsFeature.init();
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
@@ -508,6 +511,17 @@ public class Legacy4JClient {
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
             GlobalLeaderboardsFeature.onClientStarted(m);
+            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+                @Override
+                public Component title() {
+                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+                }
+
+                @Override
+                public Screen build(Screen parent) {
+                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
+                }
+            };
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
             //? if fabric
@@ -529,12 +543,18 @@ public class Legacy4JClient {
                 int newSelection = Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getInventory()./*? if <1.21.5 {*/selected/*?} else {*//*getSelectedSlot()*//*?}*/ : -1;
                 if (ScreenUtil.lastHotbarSelection >= 0 && ScreenUtil.lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
                 ScreenUtil.lastHotbarSelection = newSelection;
-                if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0)
-                    FactoryGuiGraphics.of(guiGraphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(guiGraphics).getBufferSource()));
+                if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0) {
+                    //? if >=1.21.3 {
+                    /*FactoryGuiGraphics.of(guiGraphics).pushBufferSource(BufferSourceWrapper.translucent(ScreenUtil.guiBufferSource(guiGraphics)));
+                    *///?}
+                }
             });
             FactoryGuiElement.HOTBAR.post().register(guiGraphics -> {
-                if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0)
-                    FactoryGuiGraphics.of(guiGraphics).popBufferSource();
+                if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0) {
+                    //? if >=1.21.3 {
+                    /*FactoryGuiGraphics.of(guiGraphics).popBufferSource();
+                    *///?}
+                }
                 if (Minecraft.getInstance().player != null) ControlTooltip.Renderer.of(Minecraft.getInstance().gui).render(guiGraphics, 0,0, FactoryAPIClient.getPartialTick());
                 ScreenUtil.renderTopText(guiGraphics, TopMessage.small,21,1.0f, TopMessage.smallTicks);
                 ScreenUtil.renderTopText(guiGraphics, TopMessage.medium,37,1.5f, TopMessage.mediumTicks);

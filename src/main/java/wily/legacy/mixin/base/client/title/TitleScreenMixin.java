@@ -72,21 +72,20 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
                 }
             }else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
-        Button modButton;
-        modButton = GlobalLeaderboardsFeature.isOptedOut()
-                ? Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build()
-                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
+        Button modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build();
+        Button leaderboardsButton = Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
         if (LegacyOptions.legacySettingsMenus.get()) {
-            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
+            renderableVList.addRenderable(leaderboardsButton);
         } else {
-            renderableVList.addRenderable(modButton);
+            renderableVList.addRenderable(GlobalLeaderboardsFeature.isOptedOut() ? modButton : leaderboardsButton);
             renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
         }
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, ContentManager.supportedCategories()))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
         //? if forge || neoforge && <=1.20.4 {
-        /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
+        /*if (!LegacyOptions.legacySettingsMenus.get() && GlobalLeaderboardsFeature.isOptedOut())
+            this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
         *///?}
     }
 

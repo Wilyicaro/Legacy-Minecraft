@@ -80,8 +80,10 @@ public class SDLControllerHandler implements Controller.Handler{
                 return;
             } else try {
                 SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(nativesFile.getPath());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 Legacy4J.LOGGER.warn("Failed to load {} natives: {}", getName(), e.getMessage());
+                LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                LegacyOptions.selectedControllerHandler.save();
                 init = true;
                 return;
             }

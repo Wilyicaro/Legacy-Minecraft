@@ -48,6 +48,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -233,10 +234,15 @@ public record PackAlbum(String id, int version, Component displayName, Component
         return a;
     }
 
+    public static PackAlbum resolveWorldResourceAlbum(@Nullable PackAlbum album) {
+        if (album == null || MINECRAFT.id().equals(album.id())) return getDefaultResourceAlbum();
+        return album;
+    }
+
     public static void applyDefaultResourceAlbum(){
-        List<String> oldSelection = getSelectableIds(Minecraft.getInstance().getResourcePackRepository());
+        List<String> oldSelection = getSelectedIds(Minecraft.getInstance().getResourcePackRepository());
         GlobalPacks.globalResources.get().applyPacks(Minecraft.getInstance().getResourcePackRepository(), getDefaultResourceAlbum().packs());
-        if (!oldSelection.equals(getSelectableIds(Minecraft.getInstance().getResourcePackRepository()))) {
+        if (!oldSelection.equals(getSelectedIds(Minecraft.getInstance().getResourcePackRepository()))) {
             Minecraft.getInstance().reloadResourcePacks();
             updateSavedResourcePacks();
         }
@@ -256,17 +262,24 @@ public record PackAlbum(String id, int version, Component displayName, Component
     }
 
     public static List<String> getSelectableIds(PackRepository packRepository){
-        return packRepository.getSelectedPacks().stream().filter(pack -> !FactoryAPIPlatform.isPackHidden(pack)).map(Pack::getId).toList();
+        return packRepository.getSelectedPacks().stream().filter(pack -> !FactoryAPIPlatform.isPackHidden(pack) && !DownloadedResourceAlbums.isManagedPack(pack.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(pack.getId())).map(Pack::getId).toList();
     }
 
     public boolean isValidPackDisplay(PackRepository packRepository){
-        String id = getDisplayPackId();
-        if (id == null) return false;
-        return packRepository.getPack(id) != null;
+        return getDisplayPack(packRepository) != null;
     }
 
     public String getDisplayPackId(){
         return displayPack.orElse(packs.isEmpty() ? null : packs.get(packs.size() - 1));
+    }
+
+    public Pack getDisplayPack(PackRepository packRepository) {
+        String id = getDisplayPackId();
+        if (id == null) return null;
+        Pack pack = packRepository.getPack(id);
+        if (pack != null) return pack;
+        if (id.startsWith("file/")) return packRepository.getPack(id.substring(5));
+        return packRepository.getPack("file/" + id);
     }
 
     public static ConfirmationScreen createAlbumEditScreen(Screen parent, Component title, Component defaultName, Component defaultDescription, BiConsumer<Component,Component> editAlbum){
@@ -306,6 +319,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
+        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyIconHolder.MOJANGLES_11_FONT)),i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAlbum() : resourceById(defaultResourceAlbum.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip){
@@ -317,6 +331,18 @@ public record PackAlbum(String id, int version, Component displayName, Component
                         defaultResourceAlbum.set(savedAlbum.id());
                         save();
                     }
+                }
+            };
+        }
+
+        public static Selector globalResources(int i, int j, int k, int l, boolean hasTooltip) {
+            PackRepository repository = Minecraft.getInstance().getResourcePackRepository();
+            Path packPath = Minecraft.getInstance().getResourcePackDirectory();
+            FactoryConfig<GlobalPacks> globalConfig = GlobalPacks.globalResources;
+            return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, resourceById(defaultResourceAlbum.get()), repository, packPath, Selector::reloadResourcesChanges, globalConfig, hasTooltip){
+                @Override
+                public void applyChanges(boolean reloadAndSave) {
+                    globalConfig.get().applyPacks(repository, this.savedAlbum.packs());
                 }
             };
         }
@@ -338,8 +364,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             this.packRepository = packRepository;
             oldSelection = getSelectedIds(packRepository);
             scrolledList = new Stocker.Sizeable(0);
-            if (albums.size() > getMaxPacks())
-                scrolledList.max = albums.size() - getMaxPacks();
+            updateScrollBounds(albums.size());
             setSelectedIndex(savedAlbum == null ? 0 : ((List<PackAlbum>) albums.values()).indexOf(savedAlbum));
             while (selectedIndex >= scrolledList.get() + getMaxPacks()){
                 if (scrolledList.add(1) == 0) break;
@@ -347,8 +372,23 @@ public record PackAlbum(String id, int version, Component displayName, Component
             updateTooltip();
         }
 
+        @Override
+        public void setWidth(int i) {
+            super.setWidth(i);
+            if (scrolledList != null) updateScrollBounds(albums.size());
+        }
+
+        private void updateScrollBounds(int size) {
+            scrolledList.max = Math.max(0, size - getMaxPacks());
+            if (scrolledList.get() > scrolledList.max) scrolledList.set(scrolledList.max);
+        }
+
         public void updateTooltip(){
             if (hasTooltip) setTooltip(Tooltip.create(getSelectedAlbum().description(), getSelectedAlbum().displayName()));
+        }
+
+        public static int getDefaultWidth() {
+            return LegacyOptions.getUIMode().isSD() ? 105 : 161;
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel){
@@ -356,25 +396,35 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel, int xOffset){
-            renderTooltipBox(guiGraphics,panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, 161, panel.getHeight() - 10);
+            renderTooltipBox(guiGraphics,panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, getDefaultWidth(), panel.getHeight() - 10);
         }
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
             if (hasTooltip) return;
             ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
             if (getSelectedAlbum() != null){
-                boolean p = getSelectedAlbum().isValidPackDisplay(packRepository);
+                boolean sd = LegacyOptions.getUIMode().isSD();
+                BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? sdLabelsCache : labelsCache;
+                Pack displayPack = getSelectedAlbum().getDisplayPack(packRepository);
                 if (getSelectedAlbum().iconSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(),x + 7,y + 5,32,32);
-                else FactoryGuiGraphics.of(graphics).blit(p ? getPackIcon(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : DEFAULT_ICON, x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
-                FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
-                labelsCache.apply(getSelectedAlbum().displayName(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFF);
+                else FactoryGuiGraphics.of(graphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
+                int nameWidth = width - 53;
+                int lineHeight = sd ? 8 : 12;
+                graphics.enableScissor(x + 40, y + 4,x + 40 + nameWidth, y + 44);
+                labelCache.apply(getSelectedAlbum().displayName(),nameWidth).renderLeftAligned(graphics,x + (sd ? 40 : 43), y + 8,lineHeight,CommonColor.TIP_TITLE_TEXT.get());
                 graphics.disableScissor();
-                ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
-                MultiLineLabel label = labelsCache.apply(getSelectedAlbum().description(),145);
-                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFF));
+                ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(displayPack == null ? null : getPackBackground(displayPack));
+                int descriptionWidth = width - 16;
+                MultiLineLabel label = labelCache.apply(getSelectedAlbum().description(),descriptionWidth);
+                int descriptionFromBottom = sd ? 52 : 78;
+                int visibleLines = Math.max(0,(height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight);
+                scrollableRenderer.scrolled.max = Math.max(0,label.getLineCount() - visibleLines);
+                scrollableRenderer.lineHeight = lineHeight;
+                int left = x + (sd ? 5 : 8);
+                scrollableRenderer.render(graphics, left,y + 40, descriptionWidth, visibleLines * lineHeight, ()->label.renderLeftAligned(graphics,left, y + 40,lineHeight,CommonColor.TIP_TEXT.get()));
                 if (background != null) {
-                    if (getSelectedAlbum().backgroundSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(background, x + 8,y + height - 78,145, 72);
-                    else FactoryGuiGraphics.of(graphics).blit(background, x + 8,y + height - 78,0.0f, 0.0f, 145, 72, 145, 72);
+                    if (getSelectedAlbum().backgroundSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(background, left,y + height - descriptionFromBottom,sd ? 95 : 145, sd ? 47 : 72);
+                    else FactoryGuiGraphics.of(graphics).blit(background, left,y + height - descriptionFromBottom,0.0f, 0.0f, sd ? 95 : 145, sd ? 47 : 72, sd ? 95 : 145, sd ? 47 : 72);
                 }
             }
         }
@@ -419,7 +469,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                     }, packPath, title));
                                 }));
                             }).build());
-                            renderableVList.addRenderable(Button.builder(EDIT_ALBUM, b-> {
+                            AbstractButton editButton;
+                            renderableVList.addRenderable(editButton = Button.builder(EDIT_ALBUM, b-> {
                                 PackAlbum editAlbum = getSelectedAlbum();
                                 minecraft.setScreen(createAlbumEditScreen(parent, b.getMessage(), editAlbum.displayName, editAlbum.description, (name,description)-> {
                                     PackAlbum.resourceAlbums.put(editAlbum.id(),new PackAlbum(editAlbum.id(), editAlbum.version(), name, description, editAlbum.iconSprite(), editAlbum.backgroundSprite(), editAlbum.packs(), editAlbum.displayPack()));
@@ -437,7 +488,10 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                 setSelectedIndex(0);
                                 minecraft.setScreen(screen);
                             }).build());
-                            if (DEFAULT_RESOURCE_ALBUMS.stream().anyMatch(a->a.equals(getSelectedAlbum()))) removeButton.active = false;
+                            if (DownloadedResourceAlbums.isManagedAlbum(getSelectedAlbum().id())) {
+                                editButton.active = false;
+                                removeButton.active = false;
+                            } else if (DEFAULT_RESOURCE_ALBUMS.stream().anyMatch(a->a.equals(getSelectedAlbum()))) removeButton.active = false;
                         }
                     });
                     return true;
@@ -450,7 +504,6 @@ public record PackAlbum(String id, int version, Component displayName, Component
             if (selectedIndex == index) return;
             this.selectedIndex = Stocker.cyclic(0,index, albums.size());
             scrollableRenderer.scrolled.set(0);
-            scrollableRenderer.scrolled.max = Math.max(0,labelsCache.apply(getSelectedAlbum().description(),145).getLineCount() - (getSelectedAlbum().backgroundSprite.orElse(getSelectedAlbum().isValidPackDisplay(packRepository) ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null) == null ? 20 : 7));
             updateTooltip();
         }
 
@@ -460,26 +513,31 @@ public record PackAlbum(String id, int version, Component displayName, Component
             if (reloadAndSave) reloadChanges.accept(this);
         }
 
-        public static void applyResourceChanges(Minecraft minecraft, List<String> oldSelection, List<String> newSelection, Runnable runnable){
+        public static void applyResourceChanges(Minecraft minecraft, List<String> oldSelection, List<String> newSelection, boolean persistSelection, Runnable runnable){
             GlobalPacks.globalResources.get().applyPacks(minecraft.getResourcePackRepository(),newSelection);
             minecraft.setScreen(new LegacyLoadingScreen());
             if (!oldSelection.equals(getSelectedIds(minecraft.getResourcePackRepository()))) {
-                updateSavedResourcePacks();
+                if (persistSelection) updateSavedResourcePacks();
                 Minecraft.getInstance().reloadResourcePacks().thenRun(runnable);
             }else runnable.run();
         }
 
+        public static void applyResourceChanges(Minecraft minecraft, List<String> oldSelection, List<String> newSelection, Runnable runnable){
+            applyResourceChanges(minecraft, oldSelection, newSelection, true, runnable);
+        }
+
         public static void reloadResourcesChanges(Selector selector){
             if (!selector.oldSelection.equals(getSelectedIds(selector.packRepository))) {
-                updateSavedResourcePacks();
+                if (!Minecraft.getInstance().hasSingleplayerServer()) updateSavedResourcePacks();
                 Minecraft.getInstance().reloadResourcePacks();
             }
         }
 
         public void openPackSelectionScreen(){
+            if (DownloadedResourceAlbums.isManagedAlbum(getSelectedAlbum().id())) return;
             if (minecraft.screen != null) {
                 Screen screen = minecraft.screen;
-                packRepository.setSelected(getSelectedAlbum().packs());
+                packRepository.setSelected(DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedAlbum().packs()));
                 List<String> oldSelection = getSelectedIds(packRepository);
                 minecraft.setScreen(new PackSelectionScreen(packRepository, p-> {
                     if (!oldSelection.equals(getSelectedIds(p))) {
@@ -549,10 +607,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
             int visibleCount = 0;
             FactoryScreenUtil.enableBlend();
             for (int index = 0; index < albums.size(); index++) {
-                if (visibleCount>=getMaxPacks()) break;
-                PackAlbum album = albums.getByIndex(Math.min(albums.size() - 1, scrolledList.get() + index));
+                if (visibleCount>=getMaxPacks() || scrolledList.get() + index >= albums.size()) break;
+                PackAlbum album = albums.getByIndex(scrolledList.get() + index);
+                Pack displayPack = album.getDisplayPack(packRepository);
                 if (album.iconSprite().isPresent()) FactoryGuiGraphics.of(guiGraphics).blitSprite(album.iconSprite().get(),getX() + 21 + 30 * index,getY() + font.lineHeight + 4,28,28);
-                else FactoryGuiGraphics.of(guiGraphics).blit(album.isValidPackDisplay(packRepository) ? getPackIcon(packRepository.getPack(album.getDisplayPackId())) : DEFAULT_ICON, getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
+                else FactoryGuiGraphics.of(guiGraphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
                 if (scrolledList.get() + index == selectedIndex)
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
                 visibleCount++;
@@ -608,8 +667,12 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         public static void invalidatePackAssets(String packId) {
-            packIcons.remove(packId);
-            packBackgrounds.remove(packId);
+            if (packId == null) return;
+            String normalized = packId.startsWith("file/") ? packId.substring(5) : packId;
+            List<String> ids = List.of(packId, normalized, "file/" + normalized);
+            TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+            ids.stream().map(packIcons::remove).filter(Objects::nonNull).forEach(textureManager::release);
+            ids.stream().map(packBackgrounds::remove).filter(Objects::nonNull).forEach(textureManager::release);
         }
 
         @Override

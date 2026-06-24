@@ -188,7 +188,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
             this.flag.y = -32.0f;
             //? if >=1.20.5
             DyeColor dyeColor = ((BannerItem)menu.getResultSlot().getItem().getItem()).getColor();
-            BannerRenderer.renderPatterns(guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0, OverlayTexture.NO_OVERLAY, this.flag, ModelBakery.BANNER_BASE, true/*? if >=1.20.5 {*/, dyeColor/*?}*/, this.resultBannerPatterns);
+            BannerRenderer.renderPatterns(guiGraphics.pose(), ScreenUtil.guiBufferSource(guiGraphics), 0xF000F0, OverlayTexture.NO_OVERLAY, this.flag, ModelBakery.BANNER_BASE, true/*? if >=1.20.5 {*/, dyeColor/*?}*/, this.resultBannerPatterns);
             guiGraphics.pose().popPose();
             guiGraphics.flush();
         } else if (this.hasMaxPatterns) {

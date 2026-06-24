@@ -95,6 +95,8 @@ import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.init.*;
 import wily.legacy.mobcaps.LegacyMobCaps;
 import wily.legacy.network.*;
+import wily.legacy.skins.SkinsBootstrap;
+import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
 
@@ -198,7 +200,14 @@ public class Legacy4J {
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
+            r.register(true, SkinSync.SetSkinC2S.ID);
+            r.register(false, SkinSync.SyncSkinS2C.ID);
+            r.register(false, SkinSync.RequestSkinS2C.ID);
+            r.register(true, SkinSync.RequestSnapshotC2S.ID);
+            r.register(true, SkinSync.UploadAssetChunkC2S.ID);
+            r.register(false, SkinSync.SyncAssetChunkS2C.ID);
         });
+        SkinsBootstrap.initCommon();
         ArmorStandPose.init();
         LegacyMobCaps.init();
         //? if >=1.20.5 {

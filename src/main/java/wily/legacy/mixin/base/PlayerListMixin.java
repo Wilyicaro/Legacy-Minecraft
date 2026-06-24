@@ -22,6 +22,7 @@ import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.skins.skin.SkinSync;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,5 +56,10 @@ public abstract class PlayerListMixin {
         ((LegacyPlayerInfo)cir.getReturnValue()).copyFrom(((LegacyPlayerInfo)serverPlayer));
         ((LegacyPlayer)cir.getReturnValue()).copyFrom(((LegacyPlayer)serverPlayer));
         CriteriaTriggers.CHANGED_DIMENSION.trigger(cir.getReturnValue(), serverPlayer.level().dimension(), cir.getReturnValue().serverLevel().dimension());
+    }
+
+    @Inject(method = "remove", at = @At("HEAD"), require = 0)
+    public void legacy4j$clearSkinSyncState(ServerPlayer serverPlayer, CallbackInfo ci) {
+        if (serverPlayer != null) SkinSync.clearPlayer(serverPlayer.getUUID());
     }
 }

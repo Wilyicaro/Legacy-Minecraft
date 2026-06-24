@@ -389,7 +389,9 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.of(mc.options.graphicsMode()));
                         },
                         o -> {
-                            if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(LegacyOptions.legacyGamma);
+                            if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
+                                    LegacyOptions.customSkinAnimation,
+                                    LegacyOptions.legacyGamma);
                             else o.renderableVList.addLinkedOptions(
                                     LegacyOptions.displayLegacyGamma, FactoryConfig::get,
                                     LegacyOptions.legacyGamma);
@@ -402,7 +404,7 @@ public class OptionsScreen extends PanelVListScreen {
                 ()-> Section.ADVANCED_GRAPHICS,(p, s)-> {
                     if (LegacyOptions.legacySettingsMenus.get() && !isMergedLegacyGraphicsSection(s)) return new OptionsScreen(p, s);
                     GlobalPacks.Selector globalPackSelector = GlobalPacks.Selector.resources(0,0,230,45,false);
-                    PackAlbum.Selector selector = PackAlbum.Selector.resources(0,0,230,45,false);
+                    PackAlbum.Selector selector = mc.hasSingleplayerServer() ? PackAlbum.Selector.resources(0,0,230,45,false) : PackAlbum.Selector.globalResources(0,0,230,45,false);
                     OptionsScreen screen = new OptionsScreen(p, s){
                         int selectorTooltipVisibility = 0;
                         boolean finishedAnimation = false;

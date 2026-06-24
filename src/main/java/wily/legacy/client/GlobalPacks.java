@@ -30,10 +30,12 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.ScrollableRenderer;
 import wily.legacy.init.LegacyRegistries;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -54,7 +56,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         List<String> packs = new ArrayList<>(list());
         packs.removeIf(additional::contains);
         packs.addAll(applyOnTop ? 0 : packs.size(), additional);
-        repository.setSelected(packs);
+        repository.setSelected(DownloadedSkinPackStore.preserveSelection(repository, packs));
     }
 
     public GlobalPacks withPacks(List<String> packs){
@@ -84,6 +86,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
+        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyIconHolder.MOJANGLES_11_FONT)),i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i,j,k,l, LegacyComponents.getGlobalResourcePacks(), LegacyComponents.getShowResourcePacks(), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
@@ -102,20 +105,28 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             updateModel();
             packRepository.setSelected(packs);
             scrolledList = new Stocker.Sizeable(0);
-            List<Pack> displayPacks = getDisplayPacks();
-            int s = displayPacks.size();
-            if (s > getMaxPacks())
-                scrolledList.max = displayPacks.size() - getMaxPacks();
+            updateScrollBounds(getDisplayPacks().size());
             setSelectedPack(0);
             updateTooltip();
         }
 
+        @Override
+        public void setWidth(int i) {
+            super.setWidth(i);
+            if (scrolledList != null) updateScrollBounds(getDisplayPacks().size());
+        }
+
+        private void updateScrollBounds(int size) {
+            scrolledList.max = Math.max(0, size - getMaxPacks());
+            if (scrolledList.get() > scrolledList.max) scrolledList.set(scrolledList.max);
+        }
+
         public List<Pack> getDisplayPacks(){
-            return Stream.concat(model.selected.stream(),model.unselected.stream()).toList();
+            return Stream.concat(model.selected.stream(),model.unselected.stream()).filter(pack -> !DownloadedResourceAlbums.isManagedPack(pack.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(pack.getId())).toList();
         }
 
         public void updateTooltip(){
-            if (hasTooltip) setTooltip(Tooltip.create(selectedPack.getDescription(), selectedPack.getTitle()));
+            if (hasTooltip) setTooltip(Tooltip.create(DownloadedPackMetadata.getDescription(selectedPack), DownloadedPackMetadata.getTitle(selectedPack)));
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel){
@@ -123,7 +134,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel, int xOffset){
-            renderTooltipBox(guiGraphics,panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, 161, panel.getHeight() - 10);
+            renderTooltipBox(guiGraphics,panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, PackAlbum.Selector.getDefaultWidth(), panel.getHeight() - 10);
         }
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
@@ -131,13 +142,25 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
             if (selectedPack != null){
                 FactoryGuiGraphics.of(graphics).blit(PackAlbum.Selector.getPackIcon(selectedPack), x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
-                FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
-                labelsCache.apply(selectedPack.getTitle(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFF);
+                boolean sd = LegacyOptions.getUIMode().isSD();
+                BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? sdLabelsCache : labelsCache;
+                Component title = DownloadedPackMetadata.getTitle(selectedPack);
+                Component description = DownloadedPackMetadata.getDescription(selectedPack);
+                int nameWidth = width - 53;
+                int lineHeight = sd ? 8 : 12;
+                graphics.enableScissor(x + 40, y + 4,x + 40 + nameWidth, y + 44);
+                labelCache.apply(title,nameWidth).renderLeftAligned(graphics,x + (sd ? 40 : 43), y + 8,lineHeight,CommonColor.TIP_TITLE_TEXT.get());
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
-                MultiLineLabel label = labelsCache.apply(selectedPack.getDescription(), 145);
-                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFF));
-                if (background != null) FactoryGuiGraphics.of(graphics).blit(background, x + 8,y + height - 78,0.0f, 0.0f, 145, 72, 145, 72);
+                int descriptionWidth = width - 16;
+                MultiLineLabel label = labelCache.apply(description, descriptionWidth);
+                int descriptionFromBottom = sd ? 52 : 78;
+                int visibleLines = Math.max(0,(height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight);
+                scrollableRenderer.scrolled.max = Math.max(0,label.getLineCount() - visibleLines);
+                scrollableRenderer.lineHeight = lineHeight;
+                int left = x + (sd ? 5 : 8);
+                scrollableRenderer.render(graphics, left,y + 40, descriptionWidth, visibleLines * lineHeight, ()->label.renderLeftAligned(graphics,left, y + 40,lineHeight,CommonColor.TIP_TEXT.get()));
+                if (background != null) FactoryGuiGraphics.of(graphics).blit(background, left,y + height - descriptionFromBottom,0.0f, 0.0f, descriptionWidth, sd ? 47 : 72, descriptionWidth, sd ? 47 : 72);
             }
         }
 
@@ -172,8 +195,6 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             this.selectedIndex = Stocker.cyclic(0,index,displayPacks.size());
             selectedPack = displayPacks.get(selectedIndex);
             scrollableRenderer.scrolled.set(0);
-            ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
-            scrollableRenderer.scrolled.max = Math.max(0,labelsCache.apply(selectedPack.getDescription(), 145).getLineCount() - (background == null ? 20 : 7));
             updateTooltip();
         }
 
@@ -190,14 +211,14 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public List<String> getSelectedIds(){
-            return model.selected.stream().filter(p-> !FactoryAPIPlatform.isPackHidden(p) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+            return model.selected.stream().filter(p-> !FactoryAPIPlatform.isPackHidden(p) && !DownloadedResourceAlbums.isManagedPack(p.getId()) && !DownloadedSkinPackStore.isManagedResourcePackId(p.getId()) && !p.isRequired()).map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
                 Collections.reverse(l);
                 return l;
             }));
         }
 
         public boolean hasChanged(){
-            return !getSelectedIds().equals(globalPacks.get());
+            return !getSelectedIds().equals(globalPacks.get().list());
         }
 
         public void applyChanges(){
@@ -214,7 +235,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             if (minecraft.screen != null) {
                 Screen screen = minecraft.screen;
                 Collection<String> packs = packRepository.getSelectedIds();
-                packRepository.setSelected(getSelectedIds());
+                packRepository.setSelected(DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedIds()));
                 minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
                     updateModel();
                     packRepository.setSelected(packs);
@@ -268,7 +289,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             int visibleCount = 0;
             FactoryScreenUtil.enableBlend();
             for (int index = 0; index < displayPacks.size(); index++) {
-                if (visibleCount>=getMaxPacks()) break;
+                if (visibleCount>=getMaxPacks() || scrolledList.get() + index >= displayPacks.size()) break;
                 FactoryGuiGraphics.of(guiGraphics).blit(PackAlbum.Selector.getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
                 if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PACK_SELECTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
                 if (scrolledList.get() + index == selectedIndex)

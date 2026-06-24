@@ -33,6 +33,7 @@ public class LegacyComponents {
     public static final Component COLLECT = Component.translatable("legacy.action.collect");
     public static final Component COOK = Component.translatable("legacy.action.cook");
     public static final Component CREATE = Component.translatable("legacy.action.create");
+    public static final Component EDIT = Component.translatable("legacy.action.edit");
     public static final Component DIG_PATH = Component.translatable("legacy.action.dig_path");
     public static final Component DISMOUNT = Component.translatable("legacy.action.dismount");
     public static final Component DISTRIBUTE = Component.translatable("legacy.action.distribute");
@@ -70,6 +71,8 @@ public class LegacyComponents {
     public static final Component MOVE_INGREDIENT = Component.translatable("legacy.action.move_ingredient");
     public static final Component MOVE_KEYBOARD = Component.translatable("legacy.action.move_keyboard");
     public static final Component MOVE_LAYER = Component.translatable("legacy.action.move_layer");
+    public static final Component MOVE_LEFT = Component.translatable("legacy.action.move_left");
+    public static final Component MOVE_RIGHT = Component.translatable("legacy.action.move_right");
     public static final Component MOVE_UP_DOWN = Component.translatable("legacy.action.move_up_down");
     public static final Component NAME = Component.translatable("legacy.action.name");
     public static final Component NEXT_PAGE = Component.translatable("legacy.action.next_page");
@@ -98,6 +101,7 @@ public class LegacyComponents {
     public static final Component SAIL = Component.translatable("legacy.action.sail");
     public static final Component SEARCH_MODE = Component.translatable("legacy.action.search_mode");
     public static final Component SELECT_TAB = Component.translatable("legacy.action.select_tab");
+    public static final Component SELECT_SKIN = Component.translatable("legacy.action.select_skin");
     public static final Component SHEAR = Component.translatable("legacy.action.shear");
     public static final Component SEND_COMMAND = Component.translatable("legacy.action.send_command");
     public static final Component SEND_MESSAGE = Component.translatable("legacy.action.send_message");
@@ -124,6 +128,12 @@ public class LegacyComponents {
     public static final Component WAKE_UP = Component.translatable("legacy.action.wake_up");
     public static final Component WHATS_THIS = Component.translatable("legacy.action.whats_this");
     public static final Component ZOOM = Component.translatable("legacy.action.zoom");
+    public static final Component ADD_FAVORITE = Component.translatable("legacy.action.add_favorite");
+    public static final Component REMOVE_FAVORITE = Component.translatable("legacy.action.remove_favorite");
+    public static final Component IMPORT_SKIN = Component.translatable("legacy.menu.import_skin");
+    public static final Component EDIT_CUSTOM_SKIN = Component.translatable("legacy.menu.edit_custom_skin");
+    public static final Component REMOVE_CUSTOM_SKIN = Component.translatable("legacy.menu.remove_custom_skin");
+    public static final Component NAVIGATE = Component.translatable("legacy.action.navigate");
     public static final Component HOLD_TO_DESCEND = Component.translatable("legacy.action.hold_to_descend");
     public static final Component LAYER_OPTIONS = Component.translatable("legacy.menu.create_flat_world.layer_options");
     public static final Component LAYER_MESSAGE = Component.translatable("legacy.menu.create_flat_world.layer_message");
@@ -140,6 +150,7 @@ public class LegacyComponents {
     public static final Component SERVER_OPTIONS_MESSAGE = Component.translatable("legacy.menu.server_options_message");
     public static final Component MISSING_WORLD_TEMPLATE = Component.translatable("legacy.menu.missing_world_template");
     public static final Component GAME_OPTIONS = Component.translatable("legacy.menu.game_options");
+    public static final Component CUSTOM_SKIN_PACK_OPTIONS = Component.translatable("legacy.menu.custom_skin_pack_options");
     public static final Component WORLD_OPTIONS = Component.translatable("createWorld.tab.world.title");
     public static final Component INGREDIENTS = Component.translatable("legacy.container.ingredients");
     public static final Component COLOR_TAB = Component.translatable("legacy.container.tab.color");

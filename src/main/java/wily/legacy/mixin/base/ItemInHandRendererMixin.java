@@ -3,6 +3,7 @@ package wily.legacy.mixin.base;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -23,6 +24,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.client.LegacyHeadRenderState;
@@ -64,6 +66,21 @@ public abstract class ItemInHandRendererMixin {
         if (LegacyOptions.itemLightingInHand.get() && light > 0) original.set(LightTexture.pack(light,LightTexture.sky(i)));
     }
 
+    @ModifyExpressionValue(method = "renderOneHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
+    private boolean allowFirstPersonHostInvisibleMapHand(boolean invisible) {
+        return invisible && !Legacy4JClient.isHostInvisible(minecraft.player);
+    }
+
+    @ModifyExpressionValue(method = "renderTwoHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
+    private boolean allowFirstPersonHostInvisibleMapHands(boolean invisible) {
+        return invisible && !Legacy4JClient.isHostInvisible(minecraft.player);
+    }
+
+    @ModifyExpressionValue(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isInvisible()Z"))
+    private boolean allowFirstPersonHostInvisibleArm(boolean invisible) {
+        return invisible && !Legacy4JClient.isHostInvisible(minecraft.player);
+    }
+
     @Unique
     private int getLight(ItemStack mainHand, ItemStack offHand){
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
@@ -84,7 +101,7 @@ public abstract class ItemInHandRendererMixin {
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
         if (abstractClientPlayer.getUseItem().is(Items.CROSSBOW)) {
             if (abstractClientPlayer.isUsingItem() && abstractClientPlayer.getUseItemRemainingTicks() > 0 && abstractClientPlayer.getUsedItemHand() == interactionHand) {
-                if (!abstractClientPlayer.isInvisible()) {
+                if (!abstractClientPlayer.isInvisible() || Legacy4JClient.isHostInvisible(abstractClientPlayer)) {
                     poseStack.pushPose();
                     float duration = (float) CrossbowItem.getChargeDuration(abstractClientPlayer.getUseItem()/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
                     float c = Mth.clamp((float) abstractClientPlayer.getTicksUsingItem() + f, 0.0F, duration);

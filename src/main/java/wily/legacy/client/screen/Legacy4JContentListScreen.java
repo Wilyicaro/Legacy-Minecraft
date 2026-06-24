@@ -15,13 +15,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
@@ -39,7 +44,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     private static final int LIST_WIDTH = 218;
     private static final int LIST_HEIGHT = 162;
     private static final int BUTTON_HEIGHT = 30;
-    private static final int STORE_IMAGE_SIZE = 120;
+    private static final int HD_STORE_IMAGE_SIZE = 120;
+    private static final int SD_STORE_IMAGE_SIZE = 90;
     private static final int STORE_IMAGE_SIZE_TOLERANCE = 4;
 
     private final ContentManager.Category category;
@@ -74,8 +80,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private static ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
-        if (image.width == image.height && STORE_IMAGE_SIZE <= maxWidth && STORE_IMAGE_SIZE <= maxHeight + STORE_IMAGE_SIZE_TOLERANCE) {
-            return new ImageSize(STORE_IMAGE_SIZE, STORE_IMAGE_SIZE);
+        if (image.width == image.height) {
+            int size = LegacyOptions.getUIMode().isSD() ? SD_STORE_IMAGE_SIZE : HD_STORE_IMAGE_SIZE;
+            if (size <= maxWidth && size <= maxHeight + STORE_IMAGE_SIZE_TOLERANCE) {
+                return new ImageSize(size, size);
+            }
         }
         float scale = Math.min((float) maxWidth / image.width, (float) maxHeight / image.height);
         return new ImageSize(Math.max(1, Math.round(image.width * scale)), Math.max(1, Math.round(image.height * scale)));
@@ -107,8 +116,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
             public void onPress() {
                 if (isDownloading(pack)) return;
                 selectPack(pack);
+                if (!isFocused()) return;
                 if (isInstalled(pack)) minecraft.setScreen(createDeleteScreen(pack));
-                else startDownload(pack);
+                else if (prepareDownloadTarget(pack)) startDownload(pack);
             }
 
             @Override
@@ -120,14 +130,15 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private Screen createDeleteScreen(ContentManager.Pack pack) {
-        return new ConfirmationScreen(this, Component.translatable("legacy.menu.delete"), Component.translatable("legacy.menu.delete_message")) {
+        return new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> 95, pack.nameComponent(), Component.translatable("legacy.menu.delete_message"), b -> {}) {
             @Override
             protected void addButtons() {
-                renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent)).build());
+                renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent))
+                        .bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
                 renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.delete"), b -> {
                     deletePack(pack);
                     minecraft.setScreen(parent);
-                }).build());
+                }).bounds(panel.x + 15, panel.getRectangle().bottom() - 30, 200, 20).build());
             }
         };
     }
@@ -148,6 +159,29 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
 
     private boolean isDownloading(ContentManager.Pack pack) {
         return downloadingPacks.contains(pack.id()) || ContentManager.isPackDownloading(pack, category);
+    }
+
+    private boolean prepareDownloadTarget(ContentManager.Pack pack) {
+        if (!prepareManagedTarget(category)) return false;
+        if (!pack.hasBundlePacks()) return true;
+        for (ContentManager.Pack.BundlePack bundlePack : pack.bundlePacks()) {
+            Optional<ContentManager.Category> bundleCategory = ContentManager.CATEGORIES.stream().filter(c -> c.id().equals(bundlePack.categoryId())).findFirst();
+            if (bundleCategory.isPresent() && !bundleCategory.get().id().equals(category.id()) && !prepareManagedTarget(bundleCategory.get())) return false;
+        }
+        return true;
+    }
+
+    private boolean prepareManagedTarget(ContentManager.Category targetCategory) {
+        if (!DownloadedSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName()) && !CustomSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName())) return true;
+        try {
+            if (DownloadedSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName())) DownloadedSkinPackStore.enableResourcePack(minecraft);
+            else CustomSkinPackStore.enableResourcePack(minecraft);
+            return true;
+        } catch (IOException e) {
+            String message = e.getMessage();
+            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, targetCategory.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
+            return false;
+        }
     }
 
     private void startDownload(ContentManager.Pack pack) {
@@ -175,7 +209,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private MultiLineLabel getDescriptionLabel(ContentManager.Pack pack, int width) {
-        return descriptionLabels.computeIfAbsent(pack.id(), id -> MultiLineLabel.create(font, pack.descriptionComponent(), width));
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        return descriptionLabels.computeIfAbsent(pack.id() + ":" + width + ":" + sd, id -> {
+            MultiLineLabel[] label = new MultiLineLabel[1];
+            Legacy4JClient.applyFontOverrideIf(sd, LegacyIconHolder.MOJANGLES_11_FONT, ignored -> label[0] = MultiLineLabel.create(font, pack.descriptionComponent(), width));
+            return label[0];
+        });
     }
 
     private static RemoteImage getOrDownloadImage(Optional<URI> url) {
@@ -245,7 +284,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
         tooltipBox.init();
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panelRecess.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        addRenderableOnly((guiGraphics, i, j, f) -> Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored ->
+                guiGraphics.drawString(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panelRecess.y + 8, CommonColor.GRAY_TEXT.get(), false)));
     }
 
     @Override
@@ -272,17 +312,18 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     private void renderTooltip(GuiGraphics guiGraphics) {
         if (hoveredPack == null) return;
         int x = tooltipBox.x + 8;
-        int y = tooltipBox.y + 10;
+        int y = tooltipBox.y + 8;
         int width = tooltipBox.width - 16;
         int imageHeight = renderPreviewImage(guiGraphics, hoveredPack, x, y, width);
-        int titleY = y + imageHeight;
-        ScreenUtil.renderScrollingString(guiGraphics, font, hoveredPack.nameComponent(), x, titleY, x + width, titleY + 12, CommonColor.TIP_TITLE_TEXT.get(), true);
         MultiLineLabel label = getDescriptionLabel(hoveredPack, width);
-        int descriptionY = titleY + 18;
-        int visibleHeight = tooltipBox.y + tooltipBox.height - 12 - descriptionY;
-        scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleHeight / 12);
-        scrollableRenderer.lineHeight = 12;
-        scrollableRenderer.render(guiGraphics, x, descriptionY, width, visibleHeight, () -> label.renderLeftAligned(guiGraphics, x, descriptionY, 12, CommonColor.TIP_TEXT.get()));
+        int lineHeight = LegacyOptions.getUIMode().isSD() ? 8 : 12;
+        int descriptionY = y + imageHeight;
+        int visibleLines = Math.max(0, (tooltipBox.y + tooltipBox.height - 24 - descriptionY) / lineHeight);
+        scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
+        scrollableRenderer.lineHeight = lineHeight;
+        scrollableRenderer.render(guiGraphics, x, descriptionY, width, visibleLines * lineHeight, () ->
+                Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored ->
+                        label.renderLeftAligned(guiGraphics, x, descriptionY, lineHeight, CommonColor.TIP_TEXT.get())));
     }
 
     private int renderPreviewImage(GuiGraphics guiGraphics, ContentManager.Pack pack, int x, int y, int width) {
@@ -294,11 +335,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
             int imageWidth = imageSize.width();
             int imageHeight = imageSize.height();
             FactoryGuiGraphics.of(guiGraphics).blit(remoteImage.id(), x + (width - imageWidth) / 2, y, 0.0f, 0.0f, imageWidth, imageHeight, imageWidth, imageHeight);
-            return imageHeight + 8;
+            return imageHeight + 10;
         }
         if (remoteImage == null) {
             ScreenUtil.drawGenericLoading(guiGraphics, x + (width - 30) / 2, y + Math.max(0, (maxHeight - 30) / 2), 6, 3);
-            return maxHeight + 8;
+            return maxHeight + 10;
         }
         return 0;
     }
@@ -329,8 +370,15 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int color) {
-            int right = getX() + getWidth() - (isDownloading(pack) || isInstalled(pack) ? 34 : 8);
-            ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 8, getY(), right, getY() + getHeight(), color, true);
+            int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
+            int textX = getX() + 8;
+            boolean hasStatusIcon = isDownloading(pack) || isInstalled(pack);
+            int maxWidth = getWidth() - (hasStatusIcon ? 44 : 16);
+            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> {
+                String text = getMessage() == null ? "" : getMessage().getString();
+                String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";
+                guiGraphics.drawString(font, clipped, textX, textY, color, true);
+            });
         }
 
         @Override
