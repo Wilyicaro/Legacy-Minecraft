@@ -1,10 +1,10 @@
 package wily.legacy.skins.client.render.boxloader;
 
-public record CubeDef(
+public record PlaneDef(
         int[] uv,
         float[] origin,
         float[] size,
-        float inflate,
+        String face,
         boolean mirror,
         Boolean visible,
         int armorMask

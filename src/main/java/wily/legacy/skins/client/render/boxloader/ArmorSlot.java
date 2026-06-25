@@ -1,10 +1,20 @@
 package wily.legacy.skins.client.render.boxloader;
 
 public enum ArmorSlot {
-    HELMET,
-    CHESTPLATE,
-    LEGGINGS,
-    BOOTS;
+    HELMET(1),
+    CHESTPLATE(2),
+    LEGGINGS(4),
+    BOOTS(8);
+
+    private final int mask;
+
+    ArmorSlot(int mask) {
+        this.mask = mask;
+    }
+
+    public int mask() {
+        return mask;
+    }
 
     public static ArmorSlot fromString(String key) {
         if (key == null) return null;

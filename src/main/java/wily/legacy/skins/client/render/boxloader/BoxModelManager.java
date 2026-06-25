@@ -5,9 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -32,7 +29,7 @@ public final class BoxModelManager {
     private static final Map<String, ResourceLocation> KEY_INDEX = new ConcurrentHashMap<>();
     private static final Set<ResourceLocation> LOADED = ConcurrentHashMap.newKeySet();
     private static final Map<ResourceLocation, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
-    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null);
+    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static volatile boolean initialized;
 
     private BoxModelManager() {
@@ -67,12 +64,36 @@ public final class BoxModelManager {
         return getValue(id, BoxData::offsets);
     }
 
+    public static EnumMap<ToolSlot, float[]> getToolOffsets(ResourceLocation id) {
+        return getValue(id, BoxData::toolOffsets);
+    }
+
     public static EnumMap<AttachSlot, float[]> getScales(ResourceLocation id) {
         return getValue(id, BoxData::scales);
     }
 
+    public static EnumMap<AttachSlot, float[]> getAnimationScales(ResourceLocation id) {
+        return getValue(id, BoxData::animationScales);
+    }
+
+    public static EnumMap<AttachSlot, float[]> getAnimationOffsets(ResourceLocation id) {
+        return getValue(id, BoxData::animationOffsets);
+    }
+
+    public static EnumMap<AttachSlot, PivotAnimation> getPivotAnimations(ResourceLocation id) {
+        return getValue(id, BoxData::pivotAnimations);
+    }
+
     public static EnumMap<ArmorSlot, float[]> getArmorOffsets(ResourceLocation id) {
         return getValue(id, BoxData::armorOffsets);
+    }
+
+    public static EnumMap<AttachSlot, float[]> getArmorScales(ResourceLocation id) {
+        return getValue(id, BoxData::armorScales);
+    }
+
+    public static Boolean getArmorStretch(ResourceLocation id) {
+        return getValue(id, BoxData::armorStretch);
     }
 
     public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) {
@@ -300,13 +321,19 @@ public final class BoxModelManager {
                 : null;
         JsonObject meta = getObject(root, "meta");
         BoxData data = new BoxData(
-                bones == null ? null : bake(texW, texH, texelScale, BoxModelJsonSupport.expandMirrors(root, bones), BoxModelJsonSupport.parseHideSlots(root.get("hide"))),
+                bones == null ? null : BoxModelBaker.bake(texW, texH, texelScale, BoxModelJsonSupport.expandMirrors(root, bones), BoxModelJsonSupport.parseHideSlots(root.get("hide"))),
                 readTexture(texture),
                 readString(meta, "themeName"),
                 readString(meta, "themeNameId"),
                 nonEmpty(BoxModelJsonSupport.parseOffsets(root.get("offsets"))),
+                nonEmpty(BoxModelJsonSupport.parseToolOffsets(root.get("offsets"))),
                 nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "scales", "partScale", "part_scale"))),
+                nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "animationScales", "animation_scales", "rotationScales", "rotation_scales"))),
+                nonEmpty(BoxModelJsonSupport.parseOffsets(getAny(root, "animationOffsets", "animation_offsets", "rotationOffsets", "rotation_offsets"))),
+                nonEmpty(BoxModelJsonSupport.parsePivotAnimations(getAny(root, "pivotAnimations", "pivot_animations", "partAnimations", "part_animations"))),
                 nonEmpty(BoxModelJsonSupport.parseArmorOffsets(getAny(root, "armor_offsets", "armorOffsets"))),
+                nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "armor_scales", "armorScales"))),
+                readBoolean(root, "armor_stretch", "armorStretch", "auto_armor_scale", "autoArmorScale", "armor_auto_scale", "armorAutoScale"),
                 nonEmpty(BoxModelJsonSupport.parseArmorHideSlots(getAny(root, "hidearmour", "hideArmour", "hide_armor"))),
                 readSlimFlag(root, meta)
         );
@@ -379,6 +406,18 @@ public final class BoxModelManager {
         return root != null && key != null && root.has(key) ? root.get(key).getAsFloat() : defaultValue;
     }
 
+    private static Boolean readBoolean(JsonObject root, String... keys) {
+        if (root == null || keys == null) return null;
+        for (String key : keys) {
+            if (key == null || !root.has(key) || !root.get(key).isJsonPrimitive()) continue;
+            try {
+                return root.get(key).getAsBoolean();
+            } catch (RuntimeException ignored) {
+            }
+        }
+        return null;
+    }
+
     private static String trimToNull(String value) {
         return value == null || (value = value.trim()).isEmpty() ? null : value;
     }
@@ -420,88 +459,23 @@ public final class BoxModelManager {
         return set == null || set.isEmpty() ? null : set;
     }
 
-    private static BuiltBoxModel bake(int texW, int texH, float texelScale, List<BoneDef> bones, EnumSet<AttachSlot> hide) {
-        MeshDefinition mesh = new MeshDefinition();
-        PartDefinition root = mesh.getRoot();
-        float minX = Float.POSITIVE_INFINITY;
-        float minY = Float.POSITIVE_INFINITY;
-        float minZ = Float.POSITIVE_INFINITY;
-        float maxX = Float.NEGATIVE_INFINITY;
-        float maxY = Float.NEGATIVE_INFINITY;
-        float maxZ = Float.NEGATIVE_INFINITY;
-        EnumMap<AttachSlot, CubeListBuilder> builders = new EnumMap<>(AttachSlot.class);
-        EnumSet<AttachSlot> present = EnumSet.noneOf(AttachSlot.class);
-        for (BoneDef bone : bones) {
-            if (bone == null || bone.attach() == null || bone.cubes() == null || bone.cubes().isEmpty()) continue;
-            if (Boolean.FALSE.equals(bone.visible())) continue;
-            CubeListBuilder builder = builders.computeIfAbsent(bone.attach(), ignored -> CubeListBuilder.create());
-            for (CubeDef cube : bone.cubes()) {
-                if (cube == null || Boolean.FALSE.equals(cube.visible())) continue;
-                float[] origin = cube.origin();
-                float[] size = cube.size();
-                if (origin == null || size == null || origin.length < 3 || size.length < 3) continue;
-                int[] uv = cube.uv();
-                if (uv == null || uv.length < 2) uv = new int[]{0, 0};
-                builder = builder.texOffs(uv[0], uv[1]);
-                builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
-                builder = builder.addBox(
-                        origin[0] * texelScale,
-                        origin[1] * texelScale,
-                        origin[2] * texelScale,
-                        size[0] * texelScale,
-                        size[1] * texelScale,
-                        size[2] * texelScale,
-                        new CubeDeformation(cube.inflate() * texelScale)
-                );
-                present.add(bone.attach());
-                minX = Math.min(minX, origin[0]);
-                minY = Math.min(minY, origin[1]);
-                minZ = Math.min(minZ, origin[2]);
-                maxX = Math.max(maxX, origin[0] + size[0]);
-                maxY = Math.max(maxY, origin[1] + size[1]);
-                maxZ = Math.max(maxZ, origin[2] + size[2]);
-            }
-            builders.put(bone.attach(), builder);
-        }
-        EnumMap<AttachSlot, String> childNames = new EnumMap<>(AttachSlot.class);
-        for (AttachSlot slot : present) {
-            CubeListBuilder builder = builders.get(slot);
-            if (builder == null) continue;
-            String child = "consoleskins$slot_" + slot.name();
-            childNames.put(slot, child);
-            root.addOrReplaceChild(child, builder, PartPose.ZERO);
-        }
-        ModelPart bakedRoot = LayerDefinition.create(mesh, texW, texH).bakeRoot();
-        EnumMap<AttachSlot, List<ModelPart>> parts = new EnumMap<>(AttachSlot.class);
-        for (Map.Entry<AttachSlot, String> entry : childNames.entrySet()) {
-            ModelPart child = getChild(bakedRoot, entry.getValue());
-            if (child != null) parts.put(entry.getKey(), List.of(child));
-        }
-        float bboxH = 1.8F;
-        float bboxW = 0.6F;
-        if (minX != Float.POSITIVE_INFINITY && minY != Float.POSITIVE_INFINITY && minZ != Float.POSITIVE_INFINITY
-                && maxX != Float.NEGATIVE_INFINITY && maxY != Float.NEGATIVE_INFINITY && maxZ != Float.NEGATIVE_INFINITY) {
-            float h = Math.max(0.0F, maxY - minY) / 16.0F;
-            float w = Math.max(Math.max(0.0F, maxX - minX), Math.max(0.0F, maxZ - minZ)) / 16.0F;
-            if (h > 0.01F) bboxH = Math.max(bboxH, h);
-            if (w > 0.01F) bboxW = Math.max(bboxW, w);
-        }
-        return new BuiltBoxModel(texW, texH, 1.0F / texelScale, bboxH, bboxW, parts, hide == null ? EnumSet.noneOf(AttachSlot.class) : hide);
-    }
-
-    private static ModelPart getChild(ModelPart root, String name) {
-        try {
-            return root.getChild(name);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    public record PivotAnimation(float[] offset, float[] amplitude, float speed, float phase, boolean movingOnly) {
     }
 
     private record BoxData(BuiltBoxModel model, ResourceLocation texture, String themeName, String themeKey,
-                           EnumMap<AttachSlot, float[]> offsets, EnumMap<AttachSlot, float[]> scales,
-                           EnumMap<ArmorSlot, float[]> armorOffsets, EnumSet<ArmorSlot> armorHide, Boolean slim) {
+                           EnumMap<AttachSlot, float[]> offsets, EnumMap<ToolSlot, float[]> toolOffsets,
+                           EnumMap<AttachSlot, float[]> scales,
+                           EnumMap<AttachSlot, float[]> animationScales,
+                           EnumMap<AttachSlot, float[]> animationOffsets,
+                           EnumMap<AttachSlot, PivotAnimation> pivotAnimations,
+                           EnumMap<ArmorSlot, float[]> armorOffsets,
+                           EnumMap<AttachSlot, float[]> armorScales,
+                           Boolean armorStretch,
+                           EnumSet<ArmorSlot> armorHide,
+                           Boolean slim) {
         boolean isEmpty() {
-            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null;
+            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && toolOffsets == null && scales == null && animationScales == null && animationOffsets == null && pivotAnimations == null && armorOffsets == null && armorScales == null && armorStretch == null && armorHide == null && slim == null;
         }
     }
+
 }
