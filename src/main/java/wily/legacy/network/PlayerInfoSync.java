@@ -127,7 +127,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                     case ENABLE_INVISIBILITY,DISABLE_INVISIBILITY -> {
                         boolean visible = sync == Sync.DISABLE_INVISIBILITY;
                         LegacyPlayerInfo info = (LegacyPlayerInfo)affectPlayer;
-                        if (info.isVisible() != visible) {
+                        if (info.legacy$isVisible() != visible) {
                             info.setVisibility(visible);
                             affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
                             affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);

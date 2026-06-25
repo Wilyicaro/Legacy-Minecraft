@@ -9,12 +9,19 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.FactoryRenderStateExtension;
+import wily.legacy.client.LegacyLivingEntityRenderState;
 import wily.legacy.util.client.LegacyHeadRenderState;
 
 @Mixin(WingsLayer.class)
 public class WingsLayerMixin {
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V", at = @At("HEAD"))
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V", at = @At("HEAD"), cancellable = true)
     private void legacy$storeWingsRenderState(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, HumanoidRenderState renderState, float limbSwing, float limbSwingAmount, CallbackInfo ci) {
+        LegacyLivingEntityRenderState legacyState = FactoryRenderStateExtension.Accessor.of(renderState).getExtension(LegacyLivingEntityRenderState.class);
+        if (legacyState != null && legacyState.hostInvisible) {
+            ci.cancel();
+            return;
+        }
         LegacyHeadRenderState.setWings(renderState);
     }
 

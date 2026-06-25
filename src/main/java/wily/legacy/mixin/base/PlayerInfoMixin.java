@@ -36,6 +36,12 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
     public boolean isVisible() {
         return visible;
     }
+
+    @Override
+    public boolean legacy$isVisible() {
+        return visible;
+    }
+
     @Override
     public void setVisibility(boolean visible) {
         this.visible = visible;

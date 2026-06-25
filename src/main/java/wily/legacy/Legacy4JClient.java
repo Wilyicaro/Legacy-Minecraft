@@ -226,7 +226,7 @@ public class Legacy4JClient {
 
     public static boolean isHostInvisible(UUID playerId) {
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(playerId) instanceof LegacyPlayerInfo info && !info.isVisible();
+        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(playerId) instanceof LegacyPlayerInfo info && !info.legacy$isVisible();
     }
 
     public static void displayActivationAnimation(Renderable renderable){

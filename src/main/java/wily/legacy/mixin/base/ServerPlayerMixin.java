@@ -22,6 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -46,6 +47,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean classicLoom = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
+    @Unique boolean legacy$visible = true;
 
 
     public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
@@ -130,7 +132,12 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public boolean isVisible() {
-        return !super.isInvisible();
+        return legacy$isVisible();
+    }
+
+    @Override
+    public boolean legacy$isVisible() {
+        return legacy$visible;
     }
 
     @Override
@@ -144,6 +151,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public void setVisibility(boolean visible) {
+        legacy$visible = visible;
         super.setInvisible(!visible);
     }
 

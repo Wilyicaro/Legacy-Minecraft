@@ -170,7 +170,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         addPlayerButtons(true,(playerInfo, b)->{
             if (!minecraft.player.hasPermissions(2)) return;
             Map<AbstractWidget,Runnable> COMMAND_MAP = new HashMap<>();
-            boolean initialVisibility = !((LegacyPlayerInfo)playerInfo).isVisible();
+            boolean initialVisibility = !((LegacyPlayerInfo)playerInfo).legacy$isVisible();
             PanelVListScreen screen = new PanelVListScreen(this, s-> Panel.centered(s, LegacySprites.PANEL,280, playerInfo.getGameMode().isSurvival() ? 120 : 88), HOST_OPTIONS){
                 @Override
                 public void renderableVListInit() {

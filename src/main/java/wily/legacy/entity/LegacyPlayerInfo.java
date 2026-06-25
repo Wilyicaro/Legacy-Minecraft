@@ -25,6 +25,10 @@ public interface LegacyPlayerInfo {
 
     boolean isVisible();
 
+    default boolean legacy$isVisible() {
+        return isVisible();
+    }
+
     void setVisibility(boolean visible);
 
     boolean isExhaustionDisabled();
@@ -54,7 +58,7 @@ public interface LegacyPlayerInfo {
 
     static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info){
         buf.get().writeVarInt(info.getIdentifierIndex());
-        buf.get().writeBoolean(info.isVisible());
+        buf.get().writeBoolean(info.legacy$isVisible());
         buf.get().writeBoolean(info.isExhaustionDisabled());
         buf.get().writeBoolean(info.mayFlySurvival());
         //? if <1.20.5 {
@@ -66,7 +70,7 @@ public interface LegacyPlayerInfo {
 
     default void copyFrom(LegacyPlayerInfo info){
         this.setIdentifierIndex(info.getIdentifierIndex());
-        this.setVisibility(info.isVisible());
+        this.setVisibility(info.legacy$isVisible());
         this.setDisableExhaustion(info.isExhaustionDisabled());
         this.setMayFlySurvival(info.mayFlySurvival());
         this.setStatsMap(info.getStatsMap());
