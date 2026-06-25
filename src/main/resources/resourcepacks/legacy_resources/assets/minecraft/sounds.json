@@ -8,5 +8,14 @@
       "mob/horse/idle4"
     ],
     "subtitle": "subtitles.entity.horse.ambient"
+  },
+  "entity.experience_orb.pickup": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "random/orb",
+        "pitch": 2.0
+      }
+    ]
   }
 }
