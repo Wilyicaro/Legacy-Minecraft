@@ -41,6 +41,7 @@ public final class GlobalLeaderboardsFeature {
       thread.setDaemon(true);
       return thread;
    });
+   private static final int MISSING_CACHE_RETRY_SECONDS = 30;
    private static final GlobalLeaderboardProvider LEGACY_PROVIDER = new GlobalLeaderboardProvider() {
       @Override
       public String id() {
@@ -435,25 +436,30 @@ public final class GlobalLeaderboardsFeature {
       String requestKey = requestKey(board, viewMode);
       long now = System.currentTimeMillis();
       long cooldown = Math.max(0, GlobalLeaderboardsConfig.get().fetchCooldownSeconds()) * 1000L;
+      GlobalLeaderboardBoardCache cache = boardCaches.get(board.key());
+      long fetchedAt = fetchedAt(cache, viewMode);
+      long requestCooldown = fetchedAt <= 0 ? Math.min(cooldown, MISSING_CACHE_RETRY_SECONDS * 1000L) : cooldown;
       Long requestedAt = REQUEST_TIMES.get(requestKey);
-      if (requestedAt != null && now - requestedAt < cooldown) {
+      if (requestedAt != null && now - requestedAt < requestCooldown) {
          return false;
       }
 
-      GlobalLeaderboardBoardCache cache = boardCaches.get(board.key());
       if (cache == null) {
          return true;
       }
 
-      if (viewMode == GlobalLeaderboardViewMode.TOP && cache.topEntries().isEmpty()) {
-         return true;
-      }
-      if (viewMode == GlobalLeaderboardViewMode.AROUND_ME && cache.aroundEntries().isEmpty()) {
+      if (fetchedAt <= 0) {
          return true;
       }
 
-      long fetchedAt = viewMode == GlobalLeaderboardViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
-      return fetchedAt <= 0 || now - fetchedAt >= cooldown;
+      return now - fetchedAt >= cooldown;
+   }
+
+   private static long fetchedAt(GlobalLeaderboardBoardCache cache, GlobalLeaderboardViewMode viewMode) {
+      if (cache == null) {
+         return 0L;
+      }
+      return viewMode == GlobalLeaderboardViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
    }
 
    private static synchronized void mergeBoardCache(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, List<GlobalLeaderboardRow> entries) {

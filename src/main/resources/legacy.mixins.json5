@@ -315,7 +315,6 @@
     "WanderingTraderMixin",
     "WolfMixin",
     "ZombieMixin",
-    "WoodlandMansionPiecesSecondFloor",
     "FireworkStarRecipeAccessor",
     "FireworkRocketRecipeAccessor",
     "ThrownTridentMixin",
