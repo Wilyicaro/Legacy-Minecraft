@@ -436,7 +436,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, true);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
         int packNameX = tooltipBox.x - sc(normalLayout.packNameInsetX());
         int packNameY = panel.y + sc(normalLayout.packNameTop());
         int packNameW = Math.max(1, tooltipBox.getWidth() - sc(normalLayout.packNameWidthTrim()));
