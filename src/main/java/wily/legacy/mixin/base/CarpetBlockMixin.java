@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPI;
+import wily.legacy.Legacy4JClient;
 
 @Mixin(BlockBehaviour.class)
 public class CarpetBlockMixin {
@@ -24,7 +26,7 @@ public class CarpetBlockMixin {
 
     @Inject(method = "getCollisionShape", at = @At("HEAD"), cancellable = true)
     private void getCollisionShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext, CallbackInfoReturnable<VoxelShape> cir) {
-        if (blockState.getBlock() instanceof CarpetBlock && collisionContext instanceof EntityCollisionContext entityCollisionContext) {
+        if (legacy$hasModOnServer() && blockState.getBlock() instanceof CarpetBlock && collisionContext instanceof EntityCollisionContext entityCollisionContext) {
             if (entityCollisionContext.getEntity() instanceof AbstractMinecart minecart && isOnRails(minecart)) {
                 cir.setReturnValue(Shapes.empty());
             } else if (entityCollisionContext.getEntity() instanceof Player) {
@@ -37,5 +39,10 @@ public class CarpetBlockMixin {
     private static boolean isOnRails(AbstractMinecart minecart) {
         BlockPos blockPos = minecart.blockPosition();
         return minecart.level().getBlockState(blockPos).is(BlockTags.RAILS) || minecart.level().getBlockState(blockPos.below()).is(BlockTags.RAILS);
+    }
+
+    @Unique
+    private static boolean legacy$hasModOnServer() {
+        return !FactoryAPI.isClient() || Legacy4JClient.hasModOnServer();
     }
 }
