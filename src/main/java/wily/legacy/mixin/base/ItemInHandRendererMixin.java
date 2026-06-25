@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.client.LegacyHeadRenderState;
@@ -99,6 +100,12 @@ public abstract class ItemInHandRendererMixin {
     private void renderArmWithItem(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
         HumanoidArm humanoidArm = interactionHand == InteractionHand.MAIN_HAND ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
+        if (interactionHand == InteractionHand.MAIN_HAND && FirstPersonDropAnimation.isActive(f) && !abstractClientPlayer.isUsingItem()) {
+            renderDropAnimation(abstractClientPlayer, itemStack, humanoidArm, h, i, f, poseStack, multiBufferSource, j);
+            ci.cancel();
+            poseStack.popPose();
+            return;
+        }
         if (abstractClientPlayer.getUseItem().is(Items.CROSSBOW)) {
             if (abstractClientPlayer.isUsingItem() && abstractClientPlayer.getUseItemRemainingTicks() > 0 && abstractClientPlayer.getUsedItemHand() == interactionHand) {
                 if (!abstractClientPlayer.isInvisible() || Legacy4JClient.isHostInvisible(abstractClientPlayer)) {
@@ -141,6 +148,20 @@ public abstract class ItemInHandRendererMixin {
             poseStack.popPose();
             return;
         }
+    }
+
+    @Unique
+    private void renderDropAnimation(AbstractClientPlayer player, ItemStack itemStack, HumanoidArm arm, float swingProgress, float equipProgress, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
+        float progress = FirstPersonDropAnimation.progress(partialTick);
+        float offset = Mth.sin(progress * (float) Math.PI);
+        if (itemStack.isEmpty()) {
+            poseStack.translate(0.0F, -0.5F * offset, 0.0F);
+            if (!player.isInvisible() || Legacy4JClient.isHostInvisible(player)) renderPlayerArm(poseStack, bufferSource, light, equipProgress, swingProgress, arm);
+            return;
+        }
+        applyItemArmTransform(poseStack, arm, equipProgress);
+        poseStack.translate(0.0F, -0.5F * offset, 0.0F);
+        renderItem(player, itemStack, arm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, /*? if <1.21.5 {*/ arm == HumanoidArm.LEFT,/*?}*/ poseStack, bufferSource, light);
     }
 
     @Unique

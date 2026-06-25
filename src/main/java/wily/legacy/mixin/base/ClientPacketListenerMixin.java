@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
@@ -80,6 +81,16 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     public void handleLoginMusic(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
         ConduitRotationCache.clear();
         if (minecraft.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
+    }
+
+    @ModifyArg(method = "handleTakeItemEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 1), index = 6)
+    public float handleTakeItemEntityPitch(float pitch) {
+        return Math.max(2.0f, Math.min(4.0f, 3.0f + (pitch - 2.0f) / 1.4f));
+    }
+
+    @ModifyArg(method = "handleTakeItemEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V", ordinal = 1), index = 5)
+    public float handleTakeItemEntityVolume(float volume) {
+        return volume * 2.0f;
     }
 
     @Inject(method = "handlePlayerInfoUpdate", at = @At("RETURN"))

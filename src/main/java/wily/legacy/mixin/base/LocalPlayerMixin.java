@@ -28,9 +28,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -102,6 +104,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Shadow public abstract void move(MoverType arg, Vec3 arg2);
 
     @Shadow public abstract boolean isMovingSlowly();
+
+    @Inject(method = "drop", at = @At("RETURN"))
+    private void drop(boolean all, CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue()) FirstPersonDropAnimation.start();
+    }
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);

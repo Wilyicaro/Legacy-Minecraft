@@ -94,6 +94,7 @@ public abstract class MinecraftMixin {
     private boolean inventoryKeyLastPressed = false;
     private int inventoryKeyHold = 0;
     private int legacy$shieldPauseSyncCooldown = 0;
+    private boolean legacy$dropKeyDown = false;
 
     @Shadow private int rightClickDelay;
 
@@ -166,6 +167,7 @@ public abstract class MinecraftMixin {
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
         if (legacy$shieldPauseSyncCooldown > 0) legacy$shieldPauseSyncCooldown--;
+        legacy$handleDropKey();
         if (player != null && screen == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
             legacy$pauseShield();
         }
@@ -174,6 +176,29 @@ public abstract class MinecraftMixin {
             while (options.keySwapOffhand.consumeClick()) {
             }
         }
+    }
+
+    @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
+    private boolean handleDropSwing(LocalPlayer player, InteractionHand hand) {
+        return false;
+    }
+
+    @Unique
+    private void legacy$handleDropKey() {
+        if (player == null) {
+            legacy$dropKeyDown = false;
+            return;
+        }
+
+        boolean clicked = false;
+        boolean down = options.keyDrop.isDown();
+        while (options.keyDrop.consumeClick()) {
+            clicked = true;
+        }
+        if (screen == null && !player.isSpectator() && !down && (legacy$dropKeyDown || clicked)) {
+            player.drop(Screen.hasControlDown());
+        }
+        legacy$dropKeyDown = down;
     }
 
     @Inject(method = "continueAttack", at = @At("HEAD"))

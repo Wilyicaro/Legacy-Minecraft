@@ -11,6 +11,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
@@ -50,6 +51,11 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
     @Shadow @Final private List<TickableSoundInstance> queuedTickableSounds;
 
     @Shadow protected abstract float calculateVolume(SoundInstance arg);
+
+    @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
+    private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
+        return sound.getLocation().equals(SoundEvents.ITEM_PICKUP./*? if <1.21.2 {*/getLocation/*?} else {*//*location*//*?}*/()) ? 4.0f : max;
+    }
 
     @Override
     public void stopAllSound() {
