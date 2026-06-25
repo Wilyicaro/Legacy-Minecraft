@@ -65,6 +65,7 @@
     "client.beacon.BeamMixin",
     "BiomeAmbientSoundsHandlerMixin",
     "client.BannerRendererMixin",
+    "client.BlockEntityRenderDispatcherMixin",
     "ClientBiomeMixin",
     "BitmapProviderMixin",
     "client.book.BookEditScreenMixin",

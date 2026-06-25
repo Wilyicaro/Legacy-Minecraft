@@ -469,6 +469,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.prioritizeChunkUpdates()),
                                 LegacyOptions.of(mc.options.biomeBlendRadius()),
                                 LegacyOptions.of(mc.options.entityDistanceScaling()),
+                                LegacyOptions.legacyEntityDistance,
                                 LegacyOptions.of(mc.options.entityShadows())),
                         o->o.renderableVList.addCategory(Component.translatable("legacy.menu.legacy_settings")),
                         o->o.renderableVList.addLinkedOptions(

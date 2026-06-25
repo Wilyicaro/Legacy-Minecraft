@@ -1796,6 +1796,7 @@
   "legacy.options.legacyZombieAggressionAnimation.tooltip": "Keeps zombies, husks, drowned, zombie villagers, and zombified piglins from raising their arms when they become aggressive.",
   "legacy.options.legacyEnchantmentScreen": "Legacy Enchanting Screen",
   "legacy.options.legacyEntityFireTint": "Legacy Entity Fire Tint",
+  "legacy.options.legacyEntityDistance": "Legacy Entity Distance",
   "legacy.options.legacyEvokerFangs": "Legacy Evoker Fangs",
   "legacy.options.legacyFurnaceScreen": "Legacy Furnace Screen",
   "legacy.options.legacyGrindstoneScreen": "Legacy Grindstone Screen",
