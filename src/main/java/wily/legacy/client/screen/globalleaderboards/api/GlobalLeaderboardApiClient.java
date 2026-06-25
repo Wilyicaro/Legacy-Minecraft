@@ -99,6 +99,7 @@ public final class GlobalLeaderboardApiClient {
          }
          HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
          if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            Legacy4J.LOGGER.warn("Global leaderboard fetch for board {} failed with status {}", boardId, response.statusCode());
             return GlobalLeaderboardPage.failed();
          }
 
