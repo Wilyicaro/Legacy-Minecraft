@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyHaloRing;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(SkyRenderer.class)
@@ -50,6 +51,11 @@ public class SkyRendererMixin {
     @ModifyArg(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V", remap = false))
     private RenderPipeline changeSkyRenderPipeline(RenderPipeline renderPipeline) {
         return legacySkyShape ? LegacyRenderPipelines.LEGACY_SKY : renderPipeline;
+    }
+
+    @Inject(method = "renderSunMoonAndStars", at = @At("RETURN"))
+    private void renderHaloRing(PoseStack poseStack, float sunAngle, int moonPhase, float rainLevel, float starBrightness, CallbackInfo ci) {
+        LegacyHaloRing.render(poseStack);
     }
 
     @Inject(method = "buildSkyDisc", at = @At("HEAD"), cancellable = true)
