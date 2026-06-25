@@ -13,6 +13,7 @@ public class CommonValue<T> extends Stocker<T> {
     public static final CommonValue<Boolean> WIDGET_TEXT_SHADOW = registerCommonValue("widget_text_shadow", true, Codec.BOOL);
     public static final CommonValue<Float> LEGACY_FONT_DIM_FACTOR = registerCommonValue("legacy_font_dim_factor", 0.0f, Codec.FLOAT);
     public static final CommonValue<Boolean> PS4_END_CRYSTAL_MODEL = registerCommonValue("ps4_end_crystal_model", false, Codec.BOOL);
+    public static final CommonValue<Boolean> HALO_RING = registerCommonValue("halo_ring", false, Codec.BOOL);
     public static final CommonValue<Boolean> AUTOFOCUS_BUTTON_ANIMATION = registerCommonValue("autofocus_button_animation", false, Codec.BOOL);
     public final T defaultValue;
     public final Codec<T> codec;

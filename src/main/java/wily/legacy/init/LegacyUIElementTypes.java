@@ -440,7 +440,7 @@ public class LegacyUIElementTypes {
     }
 
     private static <T> HolderSet.Named<T> emptyPreviewTag(TagKey<T> key) {
-        return HolderSet.emptyNamed(new PreviewHolderOwner<>(), key);
+        return new LegacyPreviewHolderSet<>(new PreviewHolderOwner<>(), key);
     }
 
     private static <T> Holder.Reference<T> emptyPreviewHolder(ResourceKey<T> key) {

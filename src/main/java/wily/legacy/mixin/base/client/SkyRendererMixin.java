@@ -15,6 +15,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.SkyRenderer;
 import net.minecraft.client.renderer.state.level.SkyRenderState;
+import net.minecraft.world.level.MoonPhase;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyCloudAtmosphere;
+import wily.legacy.client.LegacyHaloRing;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(SkyRenderer.class)
@@ -61,6 +63,11 @@ public class SkyRendererMixin {
         if (LegacyCloudAtmosphere.shouldUseConsoleAtmosphere(level)) {
             state.sunriseAndSunsetColor = LegacyCloudAtmosphere.getSunriseAndSunsetColor(level, partialTick);
         }
+    }
+
+    @Inject(method = "renderSunMoonAndStars", at = @At("RETURN"))
+    private void renderHaloRing(PoseStack poseStack, float sunAngle, /*? if >=1.21.11 {*/float moonAngle, float starAngle, MoonPhase moonPhase, /*?} else {*//*int moonPhase, *//*?}*/float rainLevel, float starBrightness, CallbackInfo ci) {
+        LegacyHaloRing.render(poseStack);
     }
 
     @Inject(method = "buildSkyDisc", at = @At("HEAD"), cancellable = true)
