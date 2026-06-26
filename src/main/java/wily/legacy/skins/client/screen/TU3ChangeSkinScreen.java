@@ -405,7 +405,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, true);
+        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
         renderTu3TabsBehindStrip(g);
         if (tu3StripH > 0)
             tintBlitSprite(g, TU3_TOP_STRIP, 0, tu3StripY, width, tu3StripH, carouselNavActive() ? TU3_GREY_TINT : 1.0f);
