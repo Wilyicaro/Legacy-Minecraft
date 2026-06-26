@@ -259,6 +259,7 @@
     *///?}
     "ItemMixin",
     "AbstractContainerMenuMixin",
+    "IngredientMixin",
     "AbstractArrowMixin",
     "ProjectileInvoker",
     "AbstractMinecartMixin",
@@ -316,6 +317,7 @@
     "ServerGamePacketListenerImplMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
+    "ShulkerAccessor",
     "StatsCounterMixin",
     "SnowLayerBlockMixin",
     "SquidMixin",

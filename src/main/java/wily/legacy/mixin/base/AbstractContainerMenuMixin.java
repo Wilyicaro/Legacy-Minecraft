@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,12 +55,15 @@ public abstract class AbstractContainerMenuMixin {
                 if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
                     setCarried(ItemStack.EMPTY);
                 ci.cancel();
-            } else if (Legacy4J.isDyeableItem(slot.getItem().getItemHolder()) && getCarried().getItem() instanceof DyeItem d) {
-                Legacy4J.dyeItem(slot.getItem(), Legacy4J.getDyeColor(d.getDyeColor()));
-                slot.setChanged();
-                if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
-                    getCarried().shrink(1);
-                ci.cancel();
+            } else {
+                DyeColor color = Legacy4J.getDyeColorOrNull(getCarried().getItem());
+                if (Legacy4J.isDyeableItem(slot.getItem().getItemHolder()) && color != null) {
+                    Legacy4J.dyeItem(slot.getItem(), Legacy4J.getDyeColor(color));
+                    slot.setChanged();
+                    if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
+                        getCarried().shrink(1);
+                    ci.cancel();
+                }
             }
         }
     }

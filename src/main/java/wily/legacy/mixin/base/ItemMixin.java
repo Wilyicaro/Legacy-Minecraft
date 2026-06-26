@@ -3,7 +3,16 @@ package wily.legacy.mixin.base;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+//? if <1.21.5 {
+import net.minecraft.world.entity.animal.Sheep;
+//?} else {
+/*import net.minecraft.world.entity.animal.sheep.Sheep;
+*///?}
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
@@ -19,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.Legacy4J;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
 //? if <1.20.5 {
@@ -79,5 +89,19 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
     @Inject(method = "getUseAnimation", at = @At("HEAD"), cancellable = true)
     public void getUseAnimation(ItemStack itemStack, CallbackInfoReturnable</*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/> cir) {
         if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) cir.setReturnValue(/*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK);
+    }
+
+    @Inject(method = "interactLivingEntity", at = @At("HEAD"), cancellable = true)
+    public void interactLivingEntity(ItemStack itemStack, Player player, LivingEntity livingEntity, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
+        DyeColor color = Legacy4J.getDyeColorOrNull(itemStack.getItem());
+        if (color == null || itemStack.getItem() == Legacy4J.getDyeItem(color)) return;
+        if (livingEntity instanceof Sheep sheep && sheep.isAlive() && !sheep.isSheared() && sheep.getColor() != color) {
+            sheep.level().playSound(player, sheep, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
+            if (!player.level().isClientSide()) {
+                sheep.setColor(color);
+                itemStack.shrink(1);
+            }
+            cir.setReturnValue(InteractionResult.SUCCESS);
+        }
     }
 }

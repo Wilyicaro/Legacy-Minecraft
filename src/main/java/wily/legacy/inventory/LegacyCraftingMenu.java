@@ -31,6 +31,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.FactoryIngredient;
+import wily.legacy.Legacy4J;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
 
@@ -119,7 +120,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
                 List<Optional<Ingredient>> customIngredients = super.getIngredients(player, packet);
-                if (packet.craftId().isPresent() && customIngredients.size() == 2 && Arrays.stream(FactoryIngredient.of(customIngredients.get(0).get()).getStacks()).allMatch(i->i.getItem() instanceof BannerItem) && Arrays.stream(FactoryIngredient.of(customIngredients.get(1).get()).getStacks()).allMatch(i->i.getItem() instanceof DyeItem)){
+                if (packet.craftId().isPresent() && customIngredients.size() == 2 && Arrays.stream(FactoryIngredient.of(customIngredients.get(0).get()).getStacks()).allMatch(i->i.getItem() instanceof BannerItem) && Arrays.stream(FactoryIngredient.of(customIngredients.get(1).get()).getStacks()).allMatch(i-> Legacy4J.getDyeColorOrNull(i.getItem()) != null)){
                     return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b->
                             b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p-> {
                                         Optional<Ingredient> extraIng = getBannerPatternExtraIngredient(player.level().registryAccess(),p.key());
@@ -143,9 +144,9 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
                                     CompoundTag patternTag = new CompoundTag();
                                     patternsTag.add(patternTag);
                                     patternTag.putString("Pattern", p.value().getHashname());
-                                    patternTag.putInt("Color", ((DyeItem) container.getItem(1).getItem()).getDyeColor().getId());
+                                    patternTag.putInt("Color", Legacy4J.getDyeColor(container.getItem(1).getItem()).getId());
                                     *///?} else {
-                                    banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, ((DyeItem) container.getItem(1).getItem()).getDyeColor()).build());
+                                    banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, Legacy4J.getDyeColor(container.getItem(1).getItem())).build());
                                      //?}
                                     return banner;
                                 })).orElse(ItemStack.EMPTY);

@@ -456,23 +456,27 @@ public class Legacy4J {
             return consumeInteraction();
         });
 
+        CauldronInteraction dyeCauldronInteraction = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            DyeColor color = getDyeColorOrNull(itemStack.getItem());
+            if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || color == null || !be.hasWater()) {
+                return defaultPassInteraction();
+            }
+            int dyeColor = getDyeColor(color);
+            if (be.waterColor == null) be.setWaterColor(dyeColor);
+            else be.setWaterColor(be.waterColor = Legacy4J.mixColors(List.of(be.waterColor,dyeColor).iterator()));
+            be.setChanged();
+
+            if (!level.isClientSide) {
+                level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
+                sendCauldronBubblesParticles(level, blockPos);
+            }
+
+            return level.isClientSide ? successInteraction() : consumeInteraction();
+        };
         for (DyeColor color : DyeColor.values()) {
-            putInteractionOrFallback(waterCauldron, DyeItem.byColor(color),(blockState, level, blockPos, player, interactionHand, itemStack) -> {
-                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !(itemStack.getItem() instanceof DyeItem) || !be.hasWater()) {
-                    return defaultPassInteraction();
-                }
-                int dyeColor = getDyeColor(color);
-                if (be.waterColor == null) be.setWaterColor(dyeColor);
-                else be.setWaterColor(be.waterColor = Legacy4J.mixColors(List.of(be.waterColor,dyeColor).iterator()));
-                be.setChanged();
-
-                if (!level.isClientSide) {
-                    level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
-                    sendCauldronBubblesParticles(level, blockPos);
-                }
-
-                return level.isClientSide ? successInteraction() : consumeInteraction();
-            });
+            putInteractionOrFallback(waterCauldron, getDyeItem(color), dyeCauldronInteraction);
+            Item legacyDyeItem = getLegacyDyeItem(color);
+            if (legacyDyeItem != null) putInteractionOrFallback(waterCauldron, legacyDyeItem, dyeCauldronInteraction);
         }
 
 
@@ -640,6 +644,37 @@ public class Legacy4J {
         return /*? if <1.20.5 {*//*ColorUtil.colorFromFloat(dyeColor.getTextureDiffuseColors())*//*?} else {*/dyeColor.getTextureDiffuseColor()/*?}*/;
     }
 
+    public static int getDyeColor(DyeItem dye){
+        return getDyeColor(dye.getDyeColor());
+    }
+
+    public static DyeColor getDyeColor(Item item){
+        DyeColor color = getDyeColorOrNull(item);
+        return color == null ? DyeColor.BLACK : color;
+    }
+
+    public static DyeColor getDyeColorOrNull(Item item){
+        if (item == Items.BONE_MEAL) return DyeColor.WHITE;
+        if (item == Items.INK_SAC) return DyeColor.BLACK;
+        if (item == Items.LAPIS_LAZULI) return DyeColor.BLUE;
+        if (item == Items.COCOA_BEANS) return DyeColor.BROWN;
+        return item instanceof DyeItem dye ? dye.getDyeColor() : null;
+    }
+
+    public static Item getLegacyDyeItem(DyeColor color){
+        return switch (color) {
+            case WHITE -> Items.BONE_MEAL;
+            case BLACK -> Items.INK_SAC;
+            case BLUE -> Items.LAPIS_LAZULI;
+            case BROWN -> Items.COCOA_BEANS;
+            default -> null;
+        };
+    }
+
+    public static Item getDyeItem(DyeColor color){
+        return DyeItem.byColor(color);
+    }
+
     public static float getItemDamageModifier(ItemStack stack){
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)){
             if (stack.is(ItemTags.SWORDS)) return 1;
@@ -726,7 +761,7 @@ public class Legacy4J {
     }
 
     public static boolean isDyedItem(ItemStack itemStack){
-        return /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).hasCustomColor(itemStack) *//*?} else {*/itemStack.get(DataComponents.DYED_COLOR) == null/*?}*/;
+        return /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).hasCustomColor(itemStack) *//*?} else {*/itemStack.has(DataComponents.DYED_COLOR)/*?}*/;
     }
 
     public static boolean isDyeableItem(Holder<Item> item){

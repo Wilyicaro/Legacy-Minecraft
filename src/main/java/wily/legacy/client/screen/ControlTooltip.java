@@ -52,6 +52,7 @@ import net.minecraft.world.entity.decoration.GlowItemFrame;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.decoration.Painting;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -234,7 +235,7 @@ public interface ControlTooltip {
                 else if (a.getHoveredSlot().getItem().getCount() > 1) return LegacyComponents.TAKE_HALF;
             } else {
                 if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && Legacy4J.canRepair(a.getHoveredSlot().getItem(),a.getMenu().getCarried())) return LegacyComponents.REPAIR;
-                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && Legacy4J.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && a.getMenu().getCarried().getItem() instanceof DyeItem) return LegacyComponents.DYE;
+                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && Legacy4J.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && Legacy4J.getDyeColorOrNull(a.getMenu().getCarried().getItem()) != null) return LegacyComponents.DYE;
                 else if (isBundle(a.getMenu().getCarried()) && BundleItem.getFullnessDisplay(a.getMenu().getCarried()) > 0 && !a.getHoveredSlot().hasItem()) return LegacyComponents.RELEASE;
                 else if (a.getHoveredSlot().hasItem() && !a.getMenu().getCarried().isEmpty() && !FactoryItemUtil.equalItems(a.getMenu().getCarried(),a.getHoveredSlot().getItem()) && a.getHoveredSlot().mayPlace(a.getHoveredSlot().getItem())) return LegacyComponents.SWAP;
                 else if (!a.getHoveredSlot().hasItem() && a.getHoveredSlot().mayPlace(a.getHoveredSlot().getItem())) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.PLACE_ONE : LegacyComponents.PLACE;
@@ -688,7 +689,7 @@ public interface ControlTooltip {
                 else if (be.waterColor != null && !Legacy4J.isDyedItem(actualItem)) return LegacyComponents.DYE;
             }
 
-            if (blockHit != null && actualItem.getItem() instanceof DyeItem && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity) return LegacyComponents.MIX;
+            if (blockHit != null && Legacy4J.getDyeColorOrNull(actualItem.getItem()) != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity) return LegacyComponents.MIX;
 
 
 
@@ -811,7 +812,14 @@ public interface ControlTooltip {
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem){
-        return usedItem.getItem() instanceof DyeItem && minecraft.hitResult instanceof EntityHitResult result && (result.getEntity() instanceof Wolf w && w.isTame() || result.getEntity() instanceof Sheep || result.getEntity() instanceof Cat c && c.isTame());
+        DyeColor color = Legacy4J.getDyeColorOrNull(usedItem.getItem());
+        if (color == null || !(minecraft.hitResult instanceof EntityHitResult result) || minecraft.player == null) return false;
+        Entity entity = result.getEntity();
+        return entity instanceof Sheep sheep && sheep.getColor() != color || entity instanceof Shulker shulker && shulker.getColor() != color || canDyeCollar(entity, minecraft.player, color);
+    }
+
+    static boolean canDyeCollar(Entity entity, Player player, DyeColor color) {
+        return entity instanceof Wolf w && w.isTame() && w.isOwnedBy(player) && w.getCollarColor() != color || entity instanceof Cat c && c.isTame() && c.isOwnedBy(player) && c.getCollarColor() != color;
     }
 
     interface ActionHolder {

@@ -20,11 +20,18 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 *///?}
 //?}
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -61,6 +68,19 @@ import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
+
+    @Inject(method = "interactLivingEntity", at = @At("HEAD"), cancellable = true)
+    private void interactLivingEntity(Player player, LivingEntity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+        DyeColor color = Legacy4J.getDyeColorOrNull(stack.getItem());
+        if (color == null || !(entity instanceof Shulker shulker) || shulker.getColor() == color) return;
+        shulker.level().playSound(player, shulker, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
+        if (!player.level().isClientSide()) {
+            ((ShulkerAccessor) shulker).callSetVariant(Optional.of(color));
+            if (!player.getAbilities().instabuild) stack.shrink(1);
+        }
+        cir.setReturnValue(InteractionResult.SUCCESS);
+    }
 
     //? if <1.20.5 {
     /*@Inject(method = "getHoverName", at = @At("HEAD"), cancellable = true)
