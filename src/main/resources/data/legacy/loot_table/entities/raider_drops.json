@@ -1,0 +1,354 @@
+{
+    "type":  "minecraft:entity",
+    "pools":  [
+                  {
+                      "bonus_rolls":  0.0,
+                      "entries":  [
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "add":  false,
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "function":  "minecraft:set_count"
+                                                            },
+                                                            {
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "enchantment":  "minecraft:looting",
+                                                                "function":  "minecraft:enchanted_count_increase"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:emerald"
+                                      }
+                                  ],
+                      "rolls":  1.0
+                  },
+                  {
+                      "bonus_rolls":  0.0,
+                      "conditions":  [
+                                         {
+                                             "condition":  "legacy:random_difficulty_chance",
+                                             "easy":  0.65,
+                                             "hard":  0.8,
+                                             "normal":  0.65,
+                                             "peaceful":  0.0
+                                         }
+                                     ],
+                      "entries":  [
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "add":  false,
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "function":  "minecraft:set_count"
+                                                            },
+                                                            {
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "enchantment":  "minecraft:looting",
+                                                                "function":  "minecraft:enchanted_count_increase"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:emerald",
+                                          "weight":  40
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "add":  false,
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  3.0,
+                                                                              "min":  2.0
+                                                                          },
+                                                                "function":  "minecraft:set_count"
+                                                            },
+                                                            {
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "enchantment":  "minecraft:looting",
+                                                                "function":  "minecraft:enchanted_count_increase"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:emerald",
+                                          "weight":  20
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "add":  false,
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  5.0,
+                                                                              "min":  4.0
+                                                                          },
+                                                                "function":  "minecraft:set_count"
+                                                            },
+                                                            {
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "enchantment":  "minecraft:looting",
+                                                                "function":  "minecraft:enchanted_count_increase"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:emerald",
+                                          "weight":  8
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:book",
+                                          "weight":  8
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_pickaxe",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_axe",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_shovel",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_sword",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_helmet",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_chestplate",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_leggings",
+                                          "weight":  10
+                                      },
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "chance":  0.5,
+                                                                                       "condition":  "minecraft:random_chance"
+                                                                                   }
+                                                                               ],
+                                                                "function":  "minecraft:enchant_with_levels",
+                                                                "levels":  30.0,
+                                                                "options":  "#minecraft:on_random_loot"
+                                                            },
+                                                            {
+                                                                "add":  false,
+                                                                "damage":  {
+                                                                               "type":  "minecraft:uniform",
+                                                                               "max":  0.9,
+                                                                               "min":  0.3
+                                                                           },
+                                                                "function":  "minecraft:set_damage"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:iron_boots",
+                                          "weight":  10
+                                      }
+                                  ],
+                      "rolls":  1.0
+                  }
+              ],
+    "random_sequence":  "legacy:entities/raider_drops"
+}

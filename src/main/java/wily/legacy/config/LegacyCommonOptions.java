@@ -11,6 +11,7 @@ public class LegacyCommonOptions {
     public static final FactoryConfig.StorageHandler COMMON_STORAGE = new FactoryConfig.StorageHandler(true).withFile("legacy/common.json");
     public static final FactoryConfig<Boolean> legacyCombat = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyCombat", new FactoryConfigDisplay.Instance<>(optionName("legacyCombat")), true, b-> {}, COMMON_STORAGE));
     public static final FactoryConfig<Boolean> legacySwordBlocking = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacySwordBlocking", new FactoryConfigDisplay.Instance<>(optionName("legacySwordBlocking")), false, b-> {}, COMMON_STORAGE));
+    public static final FactoryConfig<Boolean> legacyLootTables = COMMON_STORAGE.register(FactoryConfig.createBoolean("legacyLootTables", new FactoryConfigDisplay.Instance<>(optionName("legacyLootTables")), true, b-> {}, COMMON_STORAGE));
     public static final FactoryConfig<Boolean> squaredViewDistance = COMMON_STORAGE.register(FactoryConfig.createBoolean("squaredViewDistance", new FactoryConfigDisplay.Instance<>(optionName("squaredViewDistance")), false, b-> {
         if (FactoryAPI.isClient()) Legacy4JClient.updateChunks();
     }, COMMON_STORAGE));

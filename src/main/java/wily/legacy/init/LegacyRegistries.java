@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.RegisterListing;
@@ -29,7 +30,9 @@ import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacyMerchantMenu;
+import wily.legacy.util.LegacyLootTablesCondition;
 import wily.legacy.util.LegacyTags;
+import wily.legacy.util.RandomDifficultyChanceCondition;
 
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +44,7 @@ public class LegacyRegistries {
     private static final RegisterListing<Item> ITEM_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.ITEM);
     private static final RegisterListing<MenuType<?>> MENU_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.MENU);
     private static final RegisterListing<SoundEvent> SOUND_EVENT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.SOUND_EVENT);
+    private static final RegisterListing<LootItemConditionType> LOOT_CONDITION_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.LOOT_CONDITION_TYPE);
     private static final RegisterListing<ResourceLocation> CUSTOM_STAT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.CUSTOM_STAT);
 
     public static final ResourceLocation SKELETON_JOCKEY_STAT = Legacy4J.createModLocation("skeleton_jockey");
@@ -73,6 +77,8 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.space")));
     public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.backspace")));
     public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.screenshot")));
+    public static final RegisterListing.Holder<LootItemConditionType> RANDOM_DIFFICULTY_CHANCE = LOOT_CONDITION_REGISTER.add("random_difficulty_chance", () -> new LootItemConditionType(/*? if <1.20.4 {*//*RandomDifficultyChanceCondition.SERIALIZER*//*?} else {*/RandomDifficultyChanceCondition.CODEC/*?}*/));
+    public static final RegisterListing.Holder<LootItemConditionType> LEGACY_LOOT_TABLES = LOOT_CONDITION_REGISTER.add("legacy_loot_tables", () -> new LootItemConditionType(/*? if <1.20.4 {*//*LegacyLootTablesCondition.SERIALIZER*//*?} else {*/LegacyLootTablesCondition.CODEC/*?}*/));
 
 
     public static boolean isInvalidCauldron(BlockState blockState, Level level, BlockPos blockPos){
@@ -87,6 +93,7 @@ public class LegacyRegistries {
         ITEM_REGISTER.register();
         MENU_REGISTER.register();
         SOUND_EVENT_REGISTER.register();
+        LOOT_CONDITION_REGISTER.register();
         CUSTOM_STAT_REGISTER.register();
     }
 }

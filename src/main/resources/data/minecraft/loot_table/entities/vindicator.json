@@ -1,0 +1,83 @@
+{
+    "type":  "minecraft:entity",
+    "pools":  [
+                  {
+                      "bonus_rolls":  0.0,
+                      "conditions":  [
+                                         {
+                                             "condition":  "minecraft:killed_by_player"
+                                         }
+                                     ],
+                      "entries":  [
+                                      {
+                                          "type":  "minecraft:item",
+                                          "functions":  [
+                                                            {
+                                                                "add":  false,
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "function":  "minecraft:set_count"
+                                                            },
+                                                            {
+                                                                "count":  {
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  1.0,
+                                                                              "min":  0.0
+                                                                          },
+                                                                "enchantment":  "minecraft:looting",
+                                                                "function":  "minecraft:enchanted_count_increase"
+                                                            }
+                                                        ],
+                                          "name":  "minecraft:emerald"
+                                      }
+                                  ],
+                      "rolls":  1.0
+                  },
+                  {
+                      "bonus_rolls":  0,
+                      "conditions":  [
+                                         {
+                                             "condition":  "legacy:legacy_loot_tables"
+                                         },
+                                         {
+                                             "condition":  "minecraft:any_of",
+                                             "terms":  [
+                                                           {
+                                                               "condition":  "minecraft:entity_properties",
+                                                               "entity":  "this",
+                                                               "predicate":  {
+                                                                                 "type_specific":  {
+                                                                                                       "has_raid":  true,
+                                                                                                       "is_captain":  false,
+                                                                                                       "type":  "minecraft:raider"
+                                                                                                   }
+                                                                             }
+                                                           },
+                                                           {
+                                                               "condition":  "minecraft:entity_properties",
+                                                               "entity":  "this",
+                                                               "predicate":  {
+                                                                                 "type_specific":  {
+                                                                                                       "has_raid":  true,
+                                                                                                       "is_captain":  true,
+                                                                                                       "type":  "minecraft:raider"
+                                                                                                   }
+                                                                             }
+                                                           }
+                                                       ]
+                                         }
+                                     ],
+                      "entries":  [
+                                      {
+                                          "type":  "minecraft:loot_table",
+                                          "value":  "legacy:entities/raider_drops"
+                                      }
+                                  ],
+                      "rolls":  1
+                  }
+              ],
+    "random_sequence":  "minecraft:entities/vindicator"
+}
