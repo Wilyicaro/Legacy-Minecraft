@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(ServerPlayerGameMode.class)
@@ -43,7 +45,7 @@ public abstract class ServerPlayerGameModeMixin {
     }
 
     private boolean decreaseCreativeTurtleEggs(BlockPos pos, BlockState state) {
-        if (!isCreative() || !state.is(Blocks.TURTLE_EGG)) return false;
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyWorldInteractions) || !isCreative() || !state.is(Blocks.TURTLE_EGG)) return false;
         int eggs = state.getValue(TurtleEggBlock.EGGS);
         if (eggs <= 1) return false;
         level.playSound(null, pos, SoundEvents.TURTLE_EGG_BREAK, SoundSource.BLOCKS, 0.7f, 0.9f + level.getRandom().nextFloat() * 0.2f);

@@ -322,6 +322,7 @@
     "ShulkerAccessor",
     "StatsCounterMixin",
     "SnowLayerBlockMixin",
+    "SweetBerryBushBlockMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
     "StyleMixin",
