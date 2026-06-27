@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyCreativeTabListing;
 import wily.legacy.client.LegacyTip;
@@ -120,8 +121,10 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
+            if (!Legacy4JClient.consumeKeyboardActionKeyPress(InputConstants.KEY_W)) return true;
+            if (LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy())))
+                ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return true;
         }
         return super.keyPressed(i, j, k);

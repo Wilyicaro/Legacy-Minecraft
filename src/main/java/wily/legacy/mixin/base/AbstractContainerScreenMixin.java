@@ -89,11 +89,18 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if (Legacy4JClient.keyCrafting.matches(i, j)) {
-            this.onClose();
+            if (Legacy4JClient.consumeKeyboardToggleKeyPress(Legacy4JClient.keyCrafting)) this.onClose();
             cir.setReturnValue(true);
+            return;
         }
-        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft.screen.isDragging() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (this.minecraft.options.keyInventory.matches(i, j) && !Legacy4JClient.consumeKeyboardToggleKeyPress(this.minecraft.options.keyInventory)) {
+            cir.setReturnValue(true);
+            return;
+        }
+        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft.screen.isDragging() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
+            if (!Legacy4JClient.consumeKeyboardActionKeyPress(InputConstants.KEY_W)) cir.setReturnValue(true);
+            else if (LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy())))
+                ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         }
     }
 
