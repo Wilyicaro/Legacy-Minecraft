@@ -99,6 +99,7 @@ import wily.legacy.skins.SkinsBootstrap;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
+import wily.legacy.world.LegacyGeneratedChunks;
 
 //? if fabric {
 //?} else if forge {
@@ -200,6 +201,7 @@ public class Legacy4J {
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
+            r.register(false, LegacyGeneratedChunks.Payload.ID);
             r.register(true, SkinSync.SetSkinC2S.ID);
             r.register(false, SkinSync.SyncSkinS2C.ID);
             r.register(false, SkinSync.RequestSkinS2C.ID);

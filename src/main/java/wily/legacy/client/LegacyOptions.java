@@ -401,6 +401,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> lceClouds = CLIENT_STORAGE.register(createBoolean("lceClouds", true, b-> reloadCloudRendering()));
     public static final FactoryConfig<Boolean> legacyCloudHeightAndTexture = CLIENT_STORAGE.register(createBoolean("legacyCloudHeightAndTexture", b-> Component.translatable("legacy.options.legacyCloudHeightAndTexture.tooltip"), false, b-> reloadCloudRendering()));
     public static final FactoryConfig<Boolean> legacySkyShape = CLIENT_STORAGE.register(createBoolean("legacySkyShape", true, b-> Legacy4JClient.updateSkyShape()));
+    public static final FactoryConfig<Boolean> slowChunkLoading = CLIENT_STORAGE.register(createBoolean("slowChunkLoading", false, b-> LegacyChunkLoading.reset()));
     public static final FactoryConfig<Boolean> fastLeavesCustomModels = CLIENT_STORAGE.register(createBoolean("fastLeavesCustomModels", true, b-> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> skipIntro = CLIENT_STORAGE.register(createBoolean("skipIntro", false));
     public static final FactoryConfig<Boolean> legacyIntroAndReloading = CLIENT_STORAGE.register(createBoolean("legacyIntroAndReloading", true));

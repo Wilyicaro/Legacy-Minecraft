@@ -1856,6 +1856,7 @@
   "legacy.options.showVanillaRecipeBook": "Display Vanilla Recipe Book",
   "legacy.options.skipInitialSaveWarning": "Skip Initial Save Warning",
   "legacy.options.skipIntro": "Skip Intro",
+  "legacy.options.slowChunkLoading": "Slow Chunk Loading",
   "legacy.options.smoothAnimatedCharacter": "Smooth Animated Character",
   "legacy.options.smoothMovement": "Smooth Movement",
   "legacy.options.squaredRenderDistance": "Squared Render Distance",
