@@ -1,0 +1,84 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:allay",
+    {
+      "id": "minecraft:armadillo",
+      "required": false
+    },
+    "minecraft:armor_stand",
+    "minecraft:arrow",
+    "minecraft:axolotl",
+    "minecraft:bee",
+    {
+      "id": "minecraft:breeze_wind_charge",
+      "required": false
+    },
+    "minecraft:camel",
+    {
+      "id": "minecraft:camel_husk",
+      "required": false
+    },
+    "minecraft:cat",
+    "minecraft:chicken",
+    "minecraft:cod",
+    "minecraft:cow",
+    "minecraft:dolphin",
+    "minecraft:donkey",
+    "minecraft:egg",
+    "minecraft:ender_pearl",
+    "minecraft:experience_bottle",
+    "minecraft:eye_of_ender",
+    "minecraft:firework_rocket",
+    "minecraft:fishing_bobber",
+    "minecraft:frog",
+    "minecraft:glow_squid",
+    "minecraft:goat",
+    "minecraft:horse",
+    "minecraft:iron_golem",
+    "minecraft:item",
+    {
+      "id": "minecraft:lingering_potion",
+      "required": false
+    },
+    "minecraft:llama",
+    "minecraft:magma_cube",
+    "minecraft:mooshroom",
+    "minecraft:mule",
+    "minecraft:ocelot",
+    "minecraft:panda",
+    "minecraft:parrot",
+    "minecraft:pig",
+    "minecraft:polar_bear",
+    "minecraft:pufferfish",
+    "minecraft:rabbit",
+    "minecraft:salmon",
+    "minecraft:sheep",
+    "minecraft:shulker_bullet",
+    "minecraft:skeleton_horse",
+    "minecraft:slime",
+    "minecraft:sniffer",
+    "minecraft:snow_golem",
+    "minecraft:snowball",
+    {
+      "id": "minecraft:splash_potion",
+      "required": false
+    },
+    "minecraft:squid",
+    "minecraft:strider",
+    "minecraft:tadpole",
+    "minecraft:trader_llama",
+    "minecraft:trident",
+    "minecraft:tropical_fish",
+    "minecraft:turtle",
+    "minecraft:villager",
+    "minecraft:wandering_trader",
+    {
+      "id": "minecraft:wind_charge",
+      "required": false
+    },
+    "minecraft:wither_skull",
+    "minecraft:wolf",
+    "minecraft:zombie_horse"
+  ]
+}

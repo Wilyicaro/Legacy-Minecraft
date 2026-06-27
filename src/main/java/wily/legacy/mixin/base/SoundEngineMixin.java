@@ -23,9 +23,11 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.SoundEngineAccessor;
+import wily.legacy.config.LegacyCommonOptions;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
     private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
-        return sound.getLocation().equals(SoundEvents.ITEM_PICKUP./*? if <1.21.2 {*/getLocation/*?} else {*//*location*//*?}*/()) ? 4.0f : max;
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && sound.getLocation().equals(SoundEvents.ITEM_PICKUP./*? if <1.21.2 {*/getLocation/*?} else {*//*location*//*?}*/()) ? 4.0f : max;
     }
 
     @Override

@@ -27,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
 
@@ -180,7 +182,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "RETURN"))
     public void drop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
-        if (cir.getReturnValue() != null && !level().isClientSide && bl2){
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && cir.getReturnValue() != null && !level().isClientSide && bl2){
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_PICKUP, this.getSoundSource(),1.0f,1.0f);
         }
     }

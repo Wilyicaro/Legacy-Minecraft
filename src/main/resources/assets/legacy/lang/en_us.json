@@ -1785,6 +1785,7 @@
   "legacy.options.legacyClassicMerchantScreen": "Legacy Classic Merchant Screen",
   "legacy.options.legacyClassicStonecutterScreen": "Legacy Classic Stonecutter Screen",
   "legacy.options.legacyCombat": "Legacy Combat",
+  "legacy.options.legacyAudio": "Legacy Sound Effects",
   "legacy.options.legacyContainerLikeScreen": "Legacy Container-like Screen",
   "legacy.options.legacyCrafterScreen": "Legacy Crafter Screen",
   "legacy.options.legacyCreateWorldScreen": "Legacy Create World Screen",

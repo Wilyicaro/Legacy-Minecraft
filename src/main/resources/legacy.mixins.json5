@@ -178,6 +178,7 @@
     "ScreenEffectRendererMixin",
     "ScreenMixin",
     "client.sign.SignEditScreenMixin",
+    "client.ElytraOnPlayerSoundInstanceMixin",
     "SimpleSoundInstanceMixin",
     "SlotMixin",
     "client.SkullBlockRendererMixin",
@@ -296,6 +297,7 @@
     "TippedArrowItemMixin",
     //?}
     "cauldron.LayeredCauldronBlockMixin",
+    "CampfireBlockMixin",
     "LevelMixin",
     "LivingEntityMixin",
     "LoomBlockMixin",
