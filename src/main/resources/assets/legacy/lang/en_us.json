@@ -1792,6 +1792,7 @@
   "legacy.options.legacyCreativeBlockPlacing": "Legacy Creative Block Placing",
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "Legacy Drowned",
+  "legacy.options.legacyDrownedHeight": "Legacy Drowned Height",
   "legacy.options.legacyDrownedAnimation": "Legacy Drowned Animation",
   "legacy.options.legacyZombieAggressionAnimation": "Legacy Zombie Aggression Animation",
   "legacy.options.legacyZombieAggressionAnimation.tooltip": "Keeps zombies, husks, drowned, zombie villagers, and zombified piglins from raising their arms when they become aggressive.",

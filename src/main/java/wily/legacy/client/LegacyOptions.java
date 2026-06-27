@@ -321,6 +321,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> smoothAnimatedCharacter = CLIENT_STORAGE.register(createBoolean("smoothAnimatedCharacter",false));
     public static final FactoryConfig<Boolean> customSkinAnimation = CLIENT_STORAGE.register(createBoolean("customSkinAnimation", true));
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
+    public static final FactoryConfig<Boolean> legacyDrownedHeight = CLIENT_STORAGE.register(createBoolean("legacyDrownedHeight",true));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
     public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBoolean("legacyZombieAggressionAnimation", b -> Component.translatable("legacy.options.legacyZombieAggressionAnimation.tooltip"), false));
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));

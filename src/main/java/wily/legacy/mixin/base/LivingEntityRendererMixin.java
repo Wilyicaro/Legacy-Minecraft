@@ -17,6 +17,7 @@ import wily.legacy.client.LegacyVillagerRenderState;
 import wily.legacy.client.LegacyLivingEntityRenderState;
 *///?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.Items;
@@ -37,6 +38,8 @@ import wily.legacy.client.LegacyOptions;
 public abstract class LivingEntityRendererMixin extends /*? if >=1.21.2 {*//*EntityRenderer<LivingEntity, LivingEntityRenderState>*//*?} else {*/EntityRenderer<LivingEntity>/*?}*/ {
     @Shadow public abstract EntityModel</*? if <1.21.2 {*/LivingEntity/*?} else {*//*LivingEntityRenderState*//*?}*/> getModel();
 
+    @Unique
+    private static final float DROWNED_SCALE = 1.0625F;
 
     protected LivingEntityRendererMixin(EntityRendererProvider.Context context) {
         super(context);
@@ -55,6 +58,22 @@ public abstract class LivingEntityRendererMixin extends /*? if >=1.21.2 {*//*Ent
     public boolean render(LivingEntity instance){
         return true;
     }
+
+    //? if <1.21.2 {
+    @Inject(method = "scale(Lnet/minecraft/world/entity/LivingEntity;Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("TAIL"))
+    private void legacy$scaleDrowned(LivingEntity livingEntity, PoseStack poseStack, float f, CallbackInfo ci) {
+        if (LegacyOptions.legacyDrownedHeight.get() && livingEntity.getType() == EntityType.DROWNED) {
+            poseStack.scale(DROWNED_SCALE, DROWNED_SCALE, DROWNED_SCALE);
+        }
+    }
+    //?} else {
+    /*@Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At("TAIL"))
+    private void legacy$scaleDrowned(LivingEntity livingEntity, LivingEntityRenderState renderState, float f, CallbackInfo ci) {
+        if (LegacyOptions.legacyDrownedHeight.get() && livingEntity.getType() == EntityType.DROWNED) {
+            renderState.scale *= DROWNED_SCALE;
+        }
+    }
+    *///?}
 
     @Inject(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*//*"render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/, at = @At("HEAD"))
     public void render(/*? if <1.21.2 {*/LivingEntity livingEntity, float f, float g/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
