@@ -7,12 +7,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -22,6 +32,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.ScreenshotToast;
 import wily.legacy.entity.PlayerYBobbing;
+import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Files;
@@ -54,6 +65,30 @@ public abstract class GameRendererMixin {
     private void tick(CallbackInfo ci){
         if (itemActivationItem == null && Legacy4JClient.itemActivationRenderReplacement != null) Legacy4JClient.itemActivationRenderReplacement = null;
     }
+
+    //? if <1.21.5 {
+    @Inject(method = "pick", at = @At("RETURN"))
+    private void pick(float tickDelta, CallbackInfo ci) {
+        if (minecraft.level == null || minecraft.player == null || !(minecraft.hitResult instanceof BlockHitResult blockHit)) return;
+        if (LegacyBlockProtection.blocksNetherPortalBreak(minecraft.level.getBlockState(blockHit.getBlockPos()))) {
+            minecraft.hitResult = legacy$pickThroughNetherPortal(tickDelta);
+        }
+    }
+
+    @Unique
+    private HitResult legacy$pickThroughNetherPortal(float tickDelta) {
+        Vec3 from = minecraft.player.getEyePosition(tickDelta);
+        double reach = /*? if <1.20.5 {*//*minecraft.gameMode == null ? 0.0 : minecraft.gameMode.getPickRange()*//*?} else {*/minecraft.player.blockInteractionRange()/*?}*/;
+        Vec3 to = from.add(minecraft.player.getViewVector(tickDelta).scale(reach));
+        return minecraft.level.clip(new ClipContext(from, to, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, minecraft.player) {
+            @Override
+            public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
+                if (LegacyBlockProtection.blocksNetherPortalBreak(state)) return Shapes.empty();
+                return super.getBlockShape(state, level, pos);
+            }
+        });
+    }
+    //?}
 
     //? if >=1.20.5 && <1.21.2 {
     @Redirect(method = "renderItemActivationAnimation", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))

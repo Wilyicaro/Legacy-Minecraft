@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.util.LegacyBlockProtection;
 
 @Mixin(MultiPlayerGameMode.class)
 public class MultiplayerGameModeMixin {
@@ -35,6 +37,13 @@ public class MultiplayerGameModeMixin {
     private void useItem(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         if (LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && player.getItemInHand(hand).getItem() instanceof ShieldItem) {
             cir.setReturnValue(InteractionResult.PASS);
+        }
+    }
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
+    private void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (minecraft.player != null && minecraft.level != null && LegacyBlockProtection.blocksBreak(minecraft.level, pos, minecraft.level.getBlockState(pos), minecraft.player.getAbilities().instabuild)) {
+            cir.setReturnValue(false);
         }
     }
 

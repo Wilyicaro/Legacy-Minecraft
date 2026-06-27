@@ -27,6 +27,7 @@ import net.minecraft.client.sounds.SoundManager;
 //? if >=1.21.2 {
 /*import net.minecraft.core.component.DataComponents;
 *///?}
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
@@ -64,6 +65,8 @@ import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ButtonBlock;
@@ -73,6 +76,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -94,6 +99,7 @@ import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.network.ServerPlayerShieldPausePayload;
+import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -241,6 +247,29 @@ public abstract class MinecraftMixin {
     private void continueAttack(boolean bl, CallbackInfo ci) {
         if (bl) legacy$pauseShield();
     }
+
+    //? if >=1.21.5 {
+    /*@Inject(method = "pick", at = @At("RETURN"))
+    private void pick(float tickDelta, CallbackInfo ci) {
+        if (level == null || player == null || !(hitResult instanceof BlockHitResult blockHit)) return;
+        if (LegacyBlockProtection.blocksNetherPortalBreak(level.getBlockState(blockHit.getBlockPos()))) {
+            hitResult = legacy$pickThroughNetherPortal(tickDelta);
+        }
+    }
+
+    @Unique
+    private HitResult legacy$pickThroughNetherPortal(float tickDelta) {
+        Vec3 from = player.getEyePosition(tickDelta);
+        Vec3 to = from.add(player.getViewVector(tickDelta).scale(player.blockInteractionRange()));
+        return level.clip(new ClipContext(from, to, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player) {
+            @Override
+            public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
+                if (LegacyBlockProtection.blocksNetherPortalBreak(state)) return Shapes.empty();
+                return super.getBlockShape(state, level, pos);
+            }
+        });
+    }
+    *///?}
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void startAttack(CallbackInfoReturnable<Boolean> cir) {

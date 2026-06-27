@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.util.LegacyBlockProtection;
 
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeMixin {
@@ -39,8 +40,11 @@ public abstract class ServerPlayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     protected void destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (decreaseCreativeTurtleEggs(pos, level.getBlockState(pos))) {
+        BlockState state = level.getBlockState(pos);
+        if (decreaseCreativeTurtleEggs(pos, state)) {
             cir.setReturnValue(true);
+        } else if (LegacyBlockProtection.blocksBreak(level, pos, state, isCreative())) {
+            cir.setReturnValue(false);
         }
     }
 
