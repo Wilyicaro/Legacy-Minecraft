@@ -21,20 +21,54 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
+//? if >=1.21.2 {
+/*import net.minecraft.core.component.DataComponents;
+*///?}
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+//? if >=1.20.5 {
+import net.minecraft.world.entity.EquipmentSlot;
+//?}
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.Parrot;
+//? if <1.21.5 {
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.Wolf;
+//?} else {
+/*import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.animal.wolf.Wolf;
+*///?}
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+//? if >=1.20.5 && <1.21.2 {
+import net.minecraft.world.item.Equipable;
+//?}
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.ShearsItem;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.RedStoneOreBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -95,6 +129,8 @@ public abstract class MinecraftMixin {
     private int inventoryKeyHold = 0;
     private int legacy$shieldPauseSyncCooldown = 0;
     private boolean legacy$dropKeyDown = false;
+    @Unique
+    private InteractionHand legacy$suppressedUseAnimationHand;
 
     @Shadow private int rightClickDelay;
 
@@ -215,8 +251,171 @@ public abstract class MinecraftMixin {
         legacy$pauseShield();
     }
 
+    @WrapWithCondition(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
+    private boolean startUseItemSwing(LocalPlayer player, InteractionHand hand) {
+        return !legacy$suppressedUseAnimation(hand);
+    }
+
+    @WrapWithCondition(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;itemUsed(Lnet/minecraft/world/InteractionHand;)V"))
+    private boolean startUseItemItemUsed(ItemInHandRenderer renderer, InteractionHand hand) {
+        return !legacy$suppressedUseAnimation(hand);
+    }
+
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult startUseItemInteractAt(MultiPlayerGameMode gameMode, Player player, Entity entity, EntityHitResult hit, InteractionHand hand, Operation<InteractionResult> original) {
+        boolean suppress = legacy$suppressesUseAnimation(hand);
+        if (suppress) legacy$suppressedUseAnimationHand = hand;
+        InteractionResult result = original.call(gameMode, player, entity, hit, hand);
+        legacy$rememberServerUseAnimation(hand, suppress, result);
+        return result;
+    }
+
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult startUseItemInteract(MultiPlayerGameMode gameMode, Player player, Entity entity, InteractionHand hand, Operation<InteractionResult> original) {
+        boolean suppress = legacy$suppressesUseAnimation(hand);
+        if (suppress) legacy$suppressedUseAnimationHand = hand;
+        InteractionResult result = original.call(gameMode, player, entity, hand);
+        legacy$rememberServerUseAnimation(hand, suppress, result);
+        return result;
+    }
+
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult startUseItemUseOn(MultiPlayerGameMode gameMode, LocalPlayer player, InteractionHand hand, BlockHitResult hit, Operation<InteractionResult> original) {
+        boolean suppress = legacy$suppressesUseAnimation(hand);
+        BlockState state = level == null ? null : level.getBlockState(hit.getBlockPos());
+        ItemStack item = player.getItemInHand(hand).copy();
+        if (suppress) legacy$suppressedUseAnimationHand = hand;
+        InteractionResult result = original.call(gameMode, player, hand, hit);
+        legacy$rememberServerUseAnimation(hand, suppress, result);
+        legacy$playMissingUseAnimation(player, hand, item, state, result, suppress);
+        return result;
+    }
+
+    @Unique
+    private void legacy$playMissingUseAnimation(LocalPlayer player, InteractionHand hand, ItemStack item, BlockState state, InteractionResult result, boolean suppress) {
+        if (suppress || state == null || legacy$resultSwingsClient(result)) return;
+        if (legacy$triesInvalidPainting(item, result) || legacy$triesActiveButton(state, result) || legacy$triesInvalidBell(state, result)) player.swing(hand);
+    }
+
+    @Unique
+    private boolean legacy$resultSwingsClient(InteractionResult result) {
+        //? if <1.21.2 {
+        return result.shouldSwing();
+        //?} else {
+        /*return result instanceof InteractionResult.Success success && success.swingSource() == InteractionResult.SwingSource.CLIENT;
+        *///?}
+    }
+
+    @Unique
+    private boolean legacy$resultIsSuccess(InteractionResult result) {
+        //? if <1.21.2 {
+        return result == InteractionResult.SUCCESS;
+        //?} else {
+        /*return result instanceof InteractionResult.Success;
+        *///?}
+    }
+
+    @Unique
+    private boolean legacy$resultIsFail(InteractionResult result) {
+        //? if <1.21.2 {
+        return result == InteractionResult.FAIL;
+        //?} else {
+        /*return result instanceof InteractionResult.Fail;
+        *///?}
+    }
+
+    @Unique
+    private boolean legacy$resultIsPass(InteractionResult result) {
+        //? if <1.21.2 {
+        return result == InteractionResult.PASS;
+        //?} else {
+        /*return result instanceof InteractionResult.Pass;
+        *///?}
+    }
+
+    @Unique
+    private boolean legacy$triesInvalidPainting(ItemStack item, InteractionResult result) {
+        return item.getItem() instanceof HangingEntityItemAccessor hanging && hanging.getType() == EntityType.PAINTING;
+    }
+
+    @Unique
+    private boolean legacy$triesActiveButton(BlockState state, InteractionResult result) {
+        return state.getBlock() instanceof ButtonBlock && state.getValue(ButtonBlock.POWERED) && !legacy$resultIsFail(result);
+    }
+
+    @Unique
+    private boolean legacy$triesInvalidBell(BlockState state, InteractionResult result) {
+        return state.getBlock() instanceof BellBlock && legacy$resultIsPass(result);
+    }
+
+    @Unique
+    private void legacy$rememberServerUseAnimation(InteractionHand hand, boolean suppress, InteractionResult result) {
+        if (suppress && !legacy$resultIsFail(result)) LegacyInteractionAnimations.suppressServerSwing(hand);
+    }
+
+    @Unique
+    private boolean legacy$suppressedUseAnimation(InteractionHand hand) {
+        return legacy$suppressedUseAnimationHand == hand || legacy$suppressesUseAnimation(hand);
+    }
+
+    @Unique
+    private boolean legacy$suppressesUseAnimation(InteractionHand hand) {
+        if (player == null || level == null || hitResult == null) return false;
+        ItemStack item = player.getItemInHand(hand);
+        if (hitResult.getType() == HitResult.Type.ENTITY && hitResult instanceof EntityHitResult entityHit) return legacy$suppressesEntityUseAnimation(entityHit.getEntity(), item);
+        return hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHit && level.getBlockState(blockHit.getBlockPos()).getBlock() instanceof RedStoneOreBlock;
+    }
+
+    @Unique
+    private boolean legacy$suppressesEntityUseAnimation(Entity entity, ItemStack item) {
+        DyeColor color = Legacy4J.getDyeColorOrNull(item.getItem());
+        if (item.getItem() instanceof SpawnEggItem && entity instanceof Mob && entity.getType() == legacy$getSpawnEggType(item)) return true;
+        if (entity instanceof Wolf wolf && !wolf.isTame() && item.is(Items.BONE)) return true;
+        if (entity instanceof Sheep sheep) {
+            if (item.getItem() instanceof ShearsItem && sheep.isAlive() && !sheep.isSheared()) return true;
+            if (color != null && sheep.getColor() != color) return true;
+        }
+        if (legacy$canToggleTamedSitting(entity, item)) return true;
+        return entity instanceof Animal animal && animal.isFood(item);
+    }
+
+    @Unique
+    private EntityType<?> legacy$getSpawnEggType(ItemStack item) {
+        return ((SpawnEggItem)item.getItem()).getType(/*? if >=1.21.4 {*//*level.registryAccess(), *//*?}*/item/*? if <1.20.5 {*//*.getTag()*//*?}*/);
+    }
+
+    @Unique
+    private boolean legacy$canToggleTamedSitting(Entity entity, ItemStack item) {
+        if (!(entity instanceof TamableAnimal animal) || !animal.isTame() || !animal.isOwnedBy(player)) return false;
+        if (!(entity instanceof Wolf || entity instanceof Cat || entity instanceof Parrot)) return false;
+        if (legacy$canDyeCollar(entity, player.getMainHandItem()) || legacy$canDyeCollar(entity, player.getOffhandItem())) return false;
+        if (legacy$canEquipWolfArmor(entity, item)) return false;
+        return !(entity instanceof Parrot parrot) || parrot.onGround() && !player.isPassenger();
+    }
+
+    @Unique
+    private boolean legacy$canDyeCollar(Entity entity, ItemStack item) {
+        DyeColor color = Legacy4J.getDyeColorOrNull(item.getItem());
+        if (color == null) return false;
+        if (entity instanceof Wolf wolf) return wolf.getCollarColor() != color;
+        return entity instanceof Cat cat && cat.getCollarColor() != color;
+    }
+
+    @Unique
+    private boolean legacy$canEquipWolfArmor(Entity entity, ItemStack item) {
+        if (!(entity instanceof Wolf wolf)) return false;
+        //? if <1.20.5 {
+        /*return false;
+        *///?} else if <1.21.2 {
+        return item.getItem() instanceof Equipable equipable && equipable.getEquipmentSlot() == EquipmentSlot.BODY && wolf.getItemBySlot(EquipmentSlot.BODY).isEmpty();
+        //?} else {
+        /*return item.has(DataComponents.EQUIPPABLE) && item.get(DataComponents.EQUIPPABLE).slot() == EquipmentSlot.BODY && wolf.getItemBySlot(EquipmentSlot.BODY).isEmpty();
+        *///?}
+    }
+
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
     private void startUseItem(CallbackInfo ci){
+        legacy$suppressedUseAnimationHand = null;
         legacy$pauseShield();
         if (player != null && player.isSleeping()){
             ClientPacketListener clientPacketListener = player.connection;
@@ -232,6 +431,7 @@ public abstract class MinecraftMixin {
     @Inject(method = "startUseItem", at = @At("RETURN"))
     private void startUseItemReturn(CallbackInfo ci){
         if (player.getAbilities().flying && player.isSprinting()) rightClickDelay = -1;
+        legacy$suppressedUseAnimationHand = null;
     }
 
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))

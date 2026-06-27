@@ -13,6 +13,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ConduitRotationCache;
+import wily.legacy.client.LegacyInteractionAnimations;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
@@ -101,6 +103,17 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     @Inject(method = "handlePlayerInfoRemove", at = @At("RETURN"))
     public void handlePlayerInfoUpdate(ClientboundPlayerInfoRemovePacket clientboundPlayerInfoRemovePacket, CallbackInfo ci) {
         Legacy4JClient.onClientPlayerInfoChange();
+    }
+
+    @Inject(method = "handleAnimate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getEntity(I)Lnet/minecraft/world/entity/Entity;"), cancellable = true)
+    public void handleAnimate(ClientboundAnimatePacket packet, CallbackInfo ci) {
+        if (minecraft.player != null && packet.getId() == minecraft.player.getId() && LegacyInteractionAnimations.consumeServerSwing(legacy$animationHand(packet.getAction()))) ci.cancel();
+    }
+
+    private InteractionHand legacy$animationHand(int action) {
+        if (action == ClientboundAnimatePacket.SWING_MAIN_HAND) return InteractionHand.MAIN_HAND;
+        if (action == ClientboundAnimatePacket.SWING_OFF_HAND) return InteractionHand.OFF_HAND;
+        return null;
     }
 
     @WrapWithCondition(method = /*? if <1.21.2 {*/"handleContainerSetSlot"/*?} else {*//*"handleSetCursorItem"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
