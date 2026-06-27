@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:wandering_trader/emerald_lilac",
+    "minecraft:wandering_trader/emerald_rose_bush",
+    "minecraft:wandering_trader/emerald_sunflower",
+    "minecraft:wandering_trader/emerald_peony",
+    "minecraft:wandering_trader/emerald_red_sandstone"
+  ]
+}
