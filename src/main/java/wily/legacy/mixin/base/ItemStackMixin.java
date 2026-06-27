@@ -71,6 +71,9 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "interactLivingEntity", at = @At("HEAD"), cancellable = true)
     private void interactLivingEntity(Player player, LivingEntity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions)) {
+            return;
+        }
         ItemStack stack = (ItemStack) (Object) this;
         DyeColor color = Legacy4J.getDyeColorOrNull(stack.getItem());
         if (color == null || !(entity instanceof Shulker shulker) || shulker.getColor() == color) return;

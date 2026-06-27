@@ -259,6 +259,7 @@
     "IAttributeExtensionMixin",
     *///?}
     "ItemMixin",
+    "AbstractHorseMixin",
     "AbstractContainerMenuMixin",
     "IngredientMixin",
     "AbstractArrowMixin",
@@ -345,6 +346,7 @@
     "EnchantmentMixin",
     "EntityMixin",
     "WitherSkullBlockMixin",
+    "ZombieMixin",
     "SdlGamepadMixin",
     "ClientBoundAwardStatsPacketAccessor",
     "EntityAccessor",

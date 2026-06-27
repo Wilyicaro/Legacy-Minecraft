@@ -1809,6 +1809,7 @@
   "legacy.options.legacyItemTooltips": "Legacy Item Tooltips",
   "legacy.options.legacyItemTooltipsScaling": "Legacy Item Tooltips Scaling",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
+  "legacy.options.legacyMobInteractions": "Legacy Mob Interactions",
   "legacy.options.legacyWorldInteractions": "Legacy World Interactions",
   "legacy.options.lceClouds": "Legacy Clouds",
   "legacy.options.legacyCloudHeight": "Legacy Cloud Height",
