@@ -97,6 +97,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Inject(method = "tick", at = @At("RETURN"))
     protected void tickShieldControls(CallbackInfo ci) {
+        legacy$stopFallFlyingInWater();
         legacy$updateShieldControls();
     }
 
@@ -142,6 +143,17 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
     @ModifyArg(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"), index = 1)
     protected double travel(double original) {
         return LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) ? original + 0.1f : original;
+    }
+
+    @Unique
+    private void legacy$stopFallFlyingInWater() {
+        if ((!FactoryAPI.isClient() || Legacy4JClient.hasModOnServer()) && isFallFlying() && isInWater()) {
+            //? if <1.21.2 {
+            setSharedFlag(7, false);
+            //?} else {
+            /*stopFallFlying();
+            *///?}
+        }
     }
 
     @Unique
