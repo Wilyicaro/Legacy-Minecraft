@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "category": "blocks",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": /*? if <1.21.2 {*/{
+    "tag": "minecraft:smelts_to_glass"
+  }/*?} else {*//*"#minecraft:smelts_to_glass"*//*?}*/,
+  "result": {
+    "id": "minecraft:glass"
+  }
+}
