@@ -15,11 +15,17 @@
  - `Force Legacy Shield Controls`
  - `Force Legacy Offhand Limits`
  - `Legacy block protection`
+ - `Legacy World Interactions`
+ - `Legacy Mob interactions`
+ - `Legacy Map Behavior`
+ - `Legacy Loot Tables`
+ - `Legacy Sound effects`
 - Added some options to Graphics section:
  - `Legacy Clouds` (with changes to the sky color)
  - `Legacy Clouds Height`
  - `Legacy Zombie Aggression Animation`
- - `Slow Chunk Loading`
+ - `Legacy Drowned Height`
+ - `Slow Chunk Loading`(off by default)
  - `Legacy Entity Distance`
 - Added some options to User Interface section:
   - `Display Realms Button`
@@ -40,25 +46,32 @@
 - Added `Advanced Options` for the controller section
 - Added Controller LED RGB sliders with a preview
 - Added Decay potions and tipped arrows
-- Added all the missing SD UIs, including How To Play, More World Options and Host Options interfaces
+- Added all the missing SD UIs, including How To Play, More World Options, Book & quill, and Host Options interfaces
 - Added Mushroom Pore
 - Added SD Control Icons for Keyboard & Mouse, Steam, and PlayStation 4/5
   - KBM by Cjnator38
   - PS4/PS5 and initial Steam designs by NicSonic-_-
 - Added descriptions for entries in More World Options (Nabouna32)
 - Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
-- The leaderboard now globally tracks stats of survival mode players
-	- Due to this the mods button can now only be accessed from advanced game options
+- The leaderboard now globally tracks stats of survival mode players across all difficulties
+  - Due to this the mods button can now only be accessed from advanced game options
+- Added new How to Plays from 1.14 to 1.21.11
 - Added a new Tiny Take-over credits background art, thanks to Cjnator38
 
 ## Parity Changes
 
+- You can now dye the Shulker mob
 - Player body no longer renders in first person when sleeping
 - The legacy sleep animation will now play in first person
+- Carpets no longer raise the player 1/16th
 - Legacy drop item animation
 - Beacon beam will be visible from the inside
 - Trident killers will be possible
+- Tridents thrown by the player will not despawn
 - Tweaked elytra momentum
+- Elytra will have understeer
+- Flying into water with elytra will cancel it
+- The elytra glide sound will fade out upon landing
 - Trident sits higher up in the hand and slightly more pointed
 - Dispensers can fire tridents
 - Tweaked trident third person wind up animation
@@ -76,11 +89,16 @@
 - Maps opened in the same area stack
 - Head layer items such as mob heads now receive damage tint
 - Host Options command outputs
+- Horses will show food particles and play the eating sound when fed
+- Campfires now have a sound when you place an food item onto them
 - Wandering traders can sell more trades
 - Wandering traders will preview trades like villagers
 - Wandering traders will have llamas when spawned with an egg
-- Adjusted hitbox of tall plants and kelp
-- Adjusted the model in the inventory of various things to match PS4 edition
+- Adjusted hitbox of tall plants, kelp, bamboo and conduits
+- Drowned will now have the same height as the Husk
+- When picking up berries they will go straight into the inventory
+- In console aspects , adjusted the inventory model of walls to match PS4 edition
+- In console aspects , adjusted the model of end crystals to match PS4 edition
 - The interact animation will be suppressed on various actions
 - Music and Sound sliders are no longer linked
 - Experience orb and item pick up sound has been pitched up, thanks to Cjnator38
@@ -93,9 +111,12 @@
 - Remastered Stadia Control Icons (NicSonic-_-)
 - Touched up PlayStation 5 Control Icons (NicSonic-_-)
 - Remastered Steam Control Icons (Cjnator38)
-- Reordered options and unified the size of advanced options panels, thanks to Cjnator38
 - A sizable amount of new Control Tooltip actions and fixes (Nabouna32)
-- Integration with Bisect Hosting Menu
+- Biome overrides can now define grass and foliage colors
+- Biome overrides can now define Birch leaves individual color
+- Added a new common value , `minecraft:ps4_end_crystal_model` , to enable the use of PS4 end crystal model in resource packs
+- Added a new common value, `minecraft:halo_ring`, to enable the use of the Halo Sky ring in resource packs
+- Added additional common colors for use in resource packs
 
 ## Fixed
 
@@ -113,8 +134,10 @@
 - Fixed crouch toggle resetting when opening a screen
 - Fixed default map size being 3 by default, instead of 0 like in PS4 Edition (only new worlds will be applied)
 - Fixed Dragon egg teleport particles being random
-- Fixed tnt not applying knockback through blocks (Halloween Mash-up TNT launcher) 
+- Fixed end poem scrolling jitter
+- Fixed TNT not applying knockback through blocks (Halloween Mash-up TNT launcher)
 - Fixed Minecarts having collision with carpets ( Halloween Mash-up Roller Coaster)
 - Fixed y view bobbing not working anymore
 - Fixed Death screen not having the reason
+- Fixed locator bar pips not following Hud Opacity
 - Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
