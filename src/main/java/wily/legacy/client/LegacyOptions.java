@@ -433,6 +433,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyItemPickup = CLIENT_STORAGE.register(createBoolean("legacyItemPickup", true));
     public static final FactoryConfig<Boolean> controllerToasts = CLIENT_STORAGE.register(createBoolean("controllerToasts", true));
     public static final FactoryConfig<Boolean> legacyHearts = CLIENT_STORAGE.register(createBoolean("legacyHearts", true));
+    public static final FactoryConfig<Boolean> legacyFont = CLIENT_STORAGE.register(createBoolean("legacyFont", b -> Component.translatable("legacy.options.legacyFont.tooltip"), true));
     public static final FactoryConfig<Boolean> controllerDoubleClick = CLIENT_STORAGE.register(createBoolean("controllerDoubleClick", false));
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));

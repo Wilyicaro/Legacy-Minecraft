@@ -1805,6 +1805,8 @@
   "legacy.options.legacyGrindstoneScreen": "Legacy Grindstone Screen",
   "legacy.options.legacyGui": "Legacy Gui",
   "legacy.options.legacyHearts": "Legacy Health Flash",
+  "legacy.options.legacyFont": "Legacy Font",
+  "legacy.options.legacyFont.tooltip": "When enabled, the shadow of texts will be black and smaller.",
   "legacy.options.legacyIntroAndReloading": "Legacy Intro & Reloading",
   "legacy.options.legacyInventoryScreen": "Legacy Inventory Screen",
   "legacy.options.legacyItemPickup": "Legacy Item Pickup",

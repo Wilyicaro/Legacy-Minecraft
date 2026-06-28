@@ -585,7 +585,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyCreativeTab,
                                 LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
-                                LegacyOptions.legacyHearts),
+                                LegacyOptions.legacyHearts,
+                                LegacyOptions.legacyFont),
                         o-> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),
                         o-> o.renderableVList.addOptions(
                                 LegacyOptions.screenshotToasts,
