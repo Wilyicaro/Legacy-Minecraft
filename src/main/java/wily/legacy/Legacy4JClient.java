@@ -786,7 +786,10 @@ public class Legacy4JClient {
         }
     }
 
-    public static /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ model){
+    public static /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ getBlockModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ model){
+        /*? if >=1.21.5 {*//*BlockStateModel*//*?} else {*/BakedModel/*?}*/ torchModel = LegacyTorchModel.get(blockState, model);
+        if (torchModel != model) return torchModel;
+
         boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())){
             if (!fastGraphics && blockGetter != null) {

@@ -22,7 +22,7 @@ import wily.legacy.Legacy4JClient;
 public abstract class BlockRendererMixin extends AbstractBlockRenderContext {
     @Inject(method = "renderModel", at = @At("HEAD"))
     public void renderModel(/*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ model, BlockState state, BlockPos pos, BlockPos origin, CallbackInfo ci, @Local(argsOnly = true) LocalRef</*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/> bakedModelLocalRef) {
-        bakedModelLocalRef.set(Legacy4JClient.getFastLeavesModelReplacement(slice, pos, state, model));
+        bakedModelLocalRef.set(Legacy4JClient.getBlockModelReplacement(slice, pos, state, model));
     }
 }
 //?}
