@@ -1,12 +1,9 @@
 package wily.legacy.util;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -22,12 +19,18 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 public record LegacyItemAttributeDisplay(ItemStack context) implements ItemAttributeModifiers.Display {
-    public static final Codec<LegacyItemAttributeDisplay> CODEC = ItemStack.CODEC.xmap(LegacyItemAttributeDisplay::new, LegacyItemAttributeDisplay::context);
     public static final DecimalFormat ATTRIBUTE_MODIFIER_FORMAT = Util.make(new DecimalFormat("#.##"), (decimalFormat) -> {
         decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ROOT));
         decimalFormat.setMinimumFractionDigits(1);
     });
-    static final StreamCodec<RegistryFriendlyByteBuf, LegacyItemAttributeDisplay> STREAM_CODEC = ItemStack.STREAM_CODEC.map(LegacyItemAttributeDisplay::new, LegacyItemAttributeDisplay::context);
+
+    public static LegacyItemAttributeDisplay of(ItemStack context) {
+        return new LegacyItemAttributeDisplay(context);
+    }
+
+    public static ItemAttributeModifiers.Display wrap(ItemStack context, ItemAttributeModifiers.Display display) {
+        return display.type() == ItemAttributeModifiers.Display.Type.DEFAULT ? of(context) : display;
+    }
 
     public Type type() {
         return ItemAttributeModifiers.Display.Type.DEFAULT;
