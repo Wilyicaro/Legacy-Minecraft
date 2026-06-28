@@ -148,7 +148,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
     @Unique
     private void legacy$stopFallFlyingInWater() {
         if ((!FactoryAPI.isClient() || Legacy4JClient.hasModOnServer()) && isFallFlying() && isInWater()) {
-            //? if <1.21.2 {
+            //? if <1.21.5 {
             setSharedFlag(7, false);
             //?} else {
             /*stopFallFlying();

@@ -32,6 +32,6 @@ public final class LegacyBlockProtection {
     }
 
     private static int minY(Level level) {
-        return level./*? if >=1.21.5 {*//*getMinY*//*?} else {*/getMinBuildHeight/*?}*/();
+        return level./*? if >=1.21.2 {*//*getMinY*//*?} else {*/getMinBuildHeight/*?}*/();
     }
 }

@@ -66,7 +66,6 @@ public abstract class GameRendererMixin {
         if (itemActivationItem == null && Legacy4JClient.itemActivationRenderReplacement != null) Legacy4JClient.itemActivationRenderReplacement = null;
     }
 
-    //? if <1.21.5 {
     @Inject(method = "pick", at = @At("RETURN"))
     private void pick(float tickDelta, CallbackInfo ci) {
         if (minecraft.level == null || minecraft.player == null || !(minecraft.hitResult instanceof BlockHitResult blockHit)) return;
@@ -88,7 +87,6 @@ public abstract class GameRendererMixin {
             }
         });
     }
-    //?}
 
     //? if >=1.20.5 && <1.21.2 {
     @Redirect(method = "renderItemActivationAnimation", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
