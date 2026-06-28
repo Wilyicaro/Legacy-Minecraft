@@ -5,12 +5,14 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.*;
 //? if >=1.21.2 {
-/*import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+/*import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import org.spongepowered.asm.mixin.Final;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
 import wily.legacy.client.LegacyVillagerRenderState;
@@ -19,6 +21,7 @@ import wily.legacy.client.LegacyLivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.Merchant;
@@ -75,8 +78,13 @@ public abstract class LivingEntityRendererMixin extends /*? if >=1.21.2 {*//*Ent
     }
     *///?}
 
-    @Inject(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*//*"render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/, at = @At("HEAD"))
+    @Inject(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*//*"render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/, at = @At("HEAD"), cancellable = true)
     public void render(/*? if <1.21.2 {*/LivingEntity livingEntity, float f, float g/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft != null && minecraft.player != null && minecraft.getCameraEntity() == minecraft.player && minecraft.options.getCameraType() == CameraType.FIRST_PERSON && minecraft.player.isSleeping() && /*? if <1.21.2 {*/livingEntity.getId() == minecraft.player.getId() && livingEntity.isSleeping()/*?} else {*//*livingEntityRenderState instanceof PlayerRenderState playerRenderState && playerRenderState.id == minecraft.player.getId() && playerRenderState.hasPose(Pose.SLEEPING)*//*?}*/) {
+            ci.cancel();
+            return;
+        }
         if (/*? if <1.21.2 {*/livingEntity instanceof Merchant m && m.getTradingPlayer() != null/*?} else {*//*FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class) != null && FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class).isTrading*//*?}*/ && LegacyOptions.merchantTradingIndicator.get()) {
             poseStack.pushPose();
             poseStack.translate(0,/*? if <1.21.2 {*/livingEntity.getBbHeight()/*?} else {*//*livingEntityRenderState.boundingBoxHeight*//*?}*/ + 0.5f,0);
