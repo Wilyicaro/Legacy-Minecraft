@@ -13,6 +13,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.client.gui.screens.inventory.BookSignScreen;
+import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
@@ -446,6 +449,9 @@ public class Legacy4JClient {
     public static void init() {
         SkinsClientBootstrap.init();
         GlobalLeaderboardsFeature.init();
+        UIDefinitionManager.registerNamedUITarget("book_edit_screen", BookEditScreen.class);
+        UIDefinitionManager.registerNamedUITarget("book_sign_screen", BookSignScreen.class);
+        UIDefinitionManager.registerNamedUITarget("book_view_screen", BookViewScreen.class);
         LegacyGameRules.setClientRuleResolver(key -> {
             if (key == LegacyGameRules.LEGACY_FLIGHT && LegacyOptions.forceLegacyFlight.get()) return true;
             if (key == LegacyGameRules.LEGACY_SWIMMING && LegacyOptions.forceLegacySwimming.get()) return true;
