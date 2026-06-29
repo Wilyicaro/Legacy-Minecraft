@@ -33,10 +33,6 @@ import static wily.legacy.util.LegacySprites.BREWING_FUEL_SLOT;
 @Mixin(BrewingStandScreen.class)
 public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
     private static final Vec2 BREWING_SLOT_OFFSET = new Vec2(0, 0.5f);
-    private static final LegacySlotDisplay FIRST_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(BREWING_SLOT_OFFSET);
-    private static final LegacySlotDisplay SECOND_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(new Vec2(0.5f, 0f));
-    private static final LegacySlotDisplay THIRD_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(BREWING_SLOT_OFFSET);
-    private static final LegacySlotDisplay FOURTH_BREWING_SLOT_DISPLAY = createBrewingSlotDisplay(new Vec2(0.5f, 0.5f));
     @Shadow
     @Final
     private static int[] BUBBLELENGTHS;
@@ -62,18 +58,30 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         return fallback;
     }
 
-    private static LegacySlotDisplay createBrewingSlotDisplay(Vec2 offset) {
+    private static Vec2 getOffset(UIAccessor accessor, String elementName, Vec2 fallback) {
+        return new Vec2(accessor.getFloat(elementName + ".offset.x", fallback.x), accessor.getFloat(elementName + ".offset.y", fallback.y));
+    }
+
+    private static LegacySlotDisplay createBrewingSlotDisplay(UIAccessor accessor, String elementName, String offsetElementName, Vec2 offset) {
         return new LegacySlotDisplay() {
             public Vec2 getOffset() {
-                return LegacyOptions.getUIMode().isSD() ? Vec2.ZERO : offset;
+                return LegacyOptions.getUIMode().isSD() ? Vec2.ZERO : BrewingStandScreenMixin.getOffset(accessor, offsetElementName, offset);
             }
 
             public int getWidth() {
-                return LegacyOptions.getUIMode().isSD() ? 18 : 27;
+                return accessor.getInteger(elementName + ".width", LegacyOptions.getUIMode().isSD() ? 18 : 27);
+            }
+
+            public int getHeight() {
+                return accessor.getInteger(elementName + ".height", getWidth());
+            }
+
+            public ResourceLocation getIconSprite() {
+                return accessor.getElement(elementName + ".iconSprite", ResourceLocation.class).orElse(null);
             }
 
             public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
-                return EMPTY_OVERRIDE;
+                return accessor.getBoolean(elementName + ".hideHolder", true) ? EMPTY_OVERRIDE : LegacySlotDisplay.super.getIconHolderOverride();
             }
         };
     }
@@ -82,13 +90,14 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     public void init(CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        imageWidth = sd ? 130 : 213;
-        imageHeight = sd ? 145 : 225;
-        inventoryLabelX = sd ? 7 : 13;
-        inventoryLabelY = sd ? 74 : 115;
+        UIAccessor accessor = UIAccessor.of(this);
+        imageWidth = accessor.getInteger("imageWidth", sd ? 130 : 213);
+        imageHeight = accessor.getInteger("imageHeight", sd ? 145 : 225);
+        inventoryLabelX = accessor.getInteger("inventoryLabel.x", sd ? 7 : 13);
+        inventoryLabelY = accessor.getInteger("inventoryLabel.y", sd ? 74 : 115);
         LegacyFontUtil.applySDFont(b -> this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2);
-        titleLabelY = sd ? 4 : 11;
-        int slotsSize = sd ? 13 : 21;
+        titleLabelY = accessor.getInteger("title.y", sd ? 4 : 11);
+        int slotsSize = accessor.getInteger("inventorySlots.size", sd ? 13 : 21);
         LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
             @Override
             public int getWidth() {
@@ -97,35 +106,42 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         };
         super.init();
         if (!sd)
-            topPos -= 20;
+            topPos += accessor.getInteger("screenOffset.y", -20);
+        LegacySlotDisplay outerBrewingSlotDisplay = createBrewingSlotDisplay(accessor, "brewingBottleSlot", "brewingBottleSlot.outer", BREWING_SLOT_OFFSET);
+        LegacySlotDisplay centerBrewingSlotDisplay = createBrewingSlotDisplay(accessor, "brewingBottleSlot", "brewingBottleSlot.center", new Vec2(0.5f, 0f));
+        LegacySlotDisplay ingredientBrewingSlotDisplay = createBrewingSlotDisplay(accessor, "brewingIngredientSlot", "brewingIngredientSlot", new Vec2(0.5f, 0.5f));
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0) {
-                LegacySlotDisplay.override(s, sd ? 34 : 60, sd ? 48 : 76, FIRST_BREWING_SLOT_DISPLAY);
+                LegacySlotDisplay.override(s, accessor.getInteger("brewingBottleSlot.left.x", sd ? 34 : 60), accessor.getInteger("brewingBottleSlot.left.y", sd ? 48 : 76), outerBrewingSlotDisplay);
             } else if (i == 1) {
-                LegacySlotDisplay.override(s, sd ? 57 : 94, sd ? 55 : 87, SECOND_BREWING_SLOT_DISPLAY);
+                LegacySlotDisplay.override(s, accessor.getInteger("brewingBottleSlot.center.x", sd ? 57 : 94), accessor.getInteger("brewingBottleSlot.center.y", sd ? 55 : 87), centerBrewingSlotDisplay);
             } else if (i == 2) {
-                LegacySlotDisplay.override(s, sd ? 80 : 129, sd ? 48 : 76, THIRD_BREWING_SLOT_DISPLAY);
+                LegacySlotDisplay.override(s, accessor.getInteger("brewingBottleSlot.right.x", sd ? 80 : 129), accessor.getInteger("brewingBottleSlot.right.y", sd ? 48 : 76), outerBrewingSlotDisplay);
             } else if (i == 3) {
-                LegacySlotDisplay.override(s, sd ? 57 : 94, sd ? 14 : 25, FOURTH_BREWING_SLOT_DISPLAY);
+                LegacySlotDisplay.override(s, accessor.getInteger("brewingIngredientSlot.x", sd ? 57 : 94), accessor.getInteger("brewingIngredientSlot.y", sd ? 14 : 25), ingredientBrewingSlotDisplay);
             } else if (i == 4) {
-                LegacySlotDisplay.override(s, sd ? 7 : 19, sd ? 16 : 25, new LegacySlotDisplay() {
+                LegacySlotDisplay.override(s, accessor.getInteger("brewingFuelSlot.x", sd ? 7 : 19), accessor.getInteger("brewingFuelSlot.y", sd ? 16 : 25), new LegacySlotDisplay() {
                     public Vec2 getOffset() {
-                        return sd ? Vec2.ZERO : BREWING_SLOT_OFFSET;
+                        return sd ? Vec2.ZERO : BrewingStandScreenMixin.getOffset(accessor, "brewingFuelSlot", BREWING_SLOT_OFFSET);
                     }
 
                     public int getWidth() {
-                        return sd ? 18 : 27;
+                        return accessor.getInteger("brewingFuelSlot.width", sd ? 18 : 27);
+                    }
+
+                    public int getHeight() {
+                        return accessor.getInteger("brewingFuelSlot.height", getWidth());
                     }
 
                     public ResourceLocation getIconSprite() {
-                        return s.getItem().isEmpty() ? BREWING_FUEL_SLOT : null;
+                        return s.getItem().isEmpty() ? accessor.getResourceLocation("brewingFuelSlot.iconSprite", BREWING_FUEL_SLOT) : null;
                     }
                 });
             } else if (i < menu.slots.size() - 9) {
-                LegacySlotDisplay.override(s, inventoryLabelX + (s.getContainerSlot() - 9) % 9 * slotsSize, (sd ? 84 : 126) + (s.getContainerSlot() - 9) / 9 * slotsSize, defaultDisplay);
+                LegacySlotDisplay.override(s, accessor.getInteger("inventorySlots.x", inventoryLabelX) + (s.getContainerSlot() - 9) % 9 * slotsSize, accessor.getInteger("inventorySlots.y", sd ? 84 : 126) + (s.getContainerSlot() - 9) / 9 * slotsSize, defaultDisplay);
             } else {
-                LegacySlotDisplay.override(s, inventoryLabelX + s.getContainerSlot() * slotsSize, sd ? 126 : 195, defaultDisplay);
+                LegacySlotDisplay.override(s, accessor.getInteger("inventorySlots.x", inventoryLabelX) + s.getContainerSlot() * slotsSize, accessor.getInteger("hotbarSlots.y", sd ? 126 : 195), defaultDisplay);
             }
         }
     }
@@ -145,14 +161,15 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         LegacyFontUtil.applySDFont(b -> super.renderLabels(guiGraphics, i, j));
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_COIL_FLAME, sd ? 23 : 43, sd ? 25 : 42, sd ? 34 : 51, sd ? 22 : 33);
+        UIAccessor accessor = UIAccessor.of(this);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_COIL_FLAME, accessor.getInteger("brewingCoil.x", sd ? 23 : 43), accessor.getInteger("brewingCoil.y", sd ? 25 : 42), accessor.getInteger("brewingCoil.width", sd ? 34 : 51), accessor.getInteger("brewingCoil.height", sd ? 22 : 33));
         int fuel = this.menu.getFuel();
-        int fuelWidth = sd ? 18 : 27;
-        int fuelHeight = sd ? 4 : 6;
+        int fuelWidth = accessor.getInteger("fuelLength.width", sd ? 18 : 27);
+        int fuelHeight = accessor.getInteger("fuelLength.height", sd ? 4 : 6);
         int n = Mth.clamp((fuelWidth * fuel + 20 - 1) / 20, 0, fuelWidth);
         if (n > 0) {
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(sd ? 38 : LegacyRenderUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f, sd ? 41 : 66);
+            guiGraphics.pose().translate(accessor.getFloat("fuelLength.x", sd ? 38 : LegacyRenderUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f), accessor.getFloat("fuelLength.y", sd ? 41 : 66));
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FUEL_LENGTH_SPRITE, fuelWidth, fuelHeight, 0, 0, 0, 0, 0, n, fuelHeight);
             guiGraphics.pose().popMatrix();
         }
@@ -162,10 +179,11 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        UIAccessor accessor = UIAccessor.of(this);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + (sd ? 33 : LegacyRenderUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f), topPos + (sd ? 12 : 22.4f));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0, sd ? 64 : 96, sd ? 64 : 96);
+        guiGraphics.pose().translate(leftPos + accessor.getFloat("brewingSlots.x", sd ? 33 : LegacyRenderUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f), topPos + accessor.getFloat("brewingSlots.y", sd ? 12 : 22.4f));
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0, accessor.getInteger("brewingSlots.width", sd ? 64 : 96), accessor.getInteger("brewingSlots.height", sd ? 64 : 96));
         guiGraphics.pose().popMatrix();
         int o;
         if ((o = this.menu.getBrewingTicks()) > 0) {
@@ -175,16 +193,16 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
             int p = (int) (brewHeight * (1.0f - (float) o / 400.0f));
             if (p > 0) {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(leftPos + (sd ? 75 : LegacyRenderUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f), topPos + (sd ? 12 : 22.4f));
-                if (!sd) guiGraphics.pose().scale(1.5f, 1.5f);
+                guiGraphics.pose().translate(leftPos + accessor.getFloat("brewProgress.x", sd ? 75 : LegacyRenderUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f), topPos + accessor.getFloat("brewProgress.y", sd ? 12 : 22.4f));
+                if (!sd) guiGraphics.pose().scale(accessor.getFloat("brewProgress.scale", 1.5f), accessor.getFloat("brewProgress.scale", 1.5f));
                 guiGraphics.pose().scale(1f / guiScale, 1f / guiScale);
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREW_PROGRESS_SPRITE, brewWidth, brewHeight, 0, 0, 0, 0, 0, brewWidth, p);
                 guiGraphics.pose().popMatrix();
             }
             if ((p = BUBBLELENGTHS[o / 2 % 7]) > 0) {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(leftPos + (sd ? 41 : 71), topPos + (sd ? 11 : 21));
-                if (!sd) guiGraphics.pose().scale(1.5f, 1.5f);
+                guiGraphics.pose().translate(leftPos + accessor.getFloat("brewingBubbles.x", sd ? 41 : 71), topPos + accessor.getFloat("brewingBubbles.y", sd ? 11 : 21));
+                if (!sd) guiGraphics.pose().scale(accessor.getFloat("brewingBubbles.scale", 1.5f), accessor.getFloat("brewingBubbles.scale", 1.5f));
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BUBBLES_SPRITE, 12, 29, 0, 29 - p, 0, 29 - p, 0, 12, p);
                 guiGraphics.pose().popMatrix();
             }

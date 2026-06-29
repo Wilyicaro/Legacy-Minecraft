@@ -142,6 +142,7 @@ public class LegacySprites {
     public static final ResourceLocation HIGH_VERT_TAB_UP = Legacy4J.createModLocation("tiles/high_vert_tab_up");
     public static final ResourceLocation LOW_VERT_TAB = Legacy4J.createModLocation("tiles/low_vert_tab");
     public static final ResourceLocation ICON_HOLDER = Legacy4J.createModLocation("container/icon_holder");
+    public static final ResourceLocation EMPTY_SLOT = Legacy4J.createModLocation("container/empty");
     public static final ResourceLocation SIZEABLE_ICON_HOLDER = Legacy4J.createModLocation("container/sizeable_icon_holder");
     public static final ResourceLocation SELECT_ICON_HIGHLIGHT = Legacy4J.createModLocation("container/select_icon_highlight");
     public static final ResourceLocation SELECT_ICON_HIGHLIGHT_SMALL = Legacy4J.createModLocation("container/select_icon_highlight_small");
