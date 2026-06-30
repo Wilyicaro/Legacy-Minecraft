@@ -33,6 +33,8 @@ public class LegacyBiomeOverride {
     Integer waterFogColor;
     Integer fogColor;
     Integer skyColor;
+    Integer grassColor;
+    Integer foliageColor;
     Float waterTransparency;
     Float waterFogDistance;
 
@@ -79,6 +81,19 @@ public class LegacyBiomeOverride {
         return skyColor == null ? getDefault().skyColor : skyColor;
     }
 
+    public Integer grassColor() {
+        return grassColor == null ? getDefault().grassColor : grassColor;
+    }
+
+    public Integer foliageColor() {
+        return foliageColor == null ? getDefault().foliageColor : foliageColor;
+    }
+
+    public int getFoliageColorOrDefault(int defaultColor) {
+        Integer color = foliageColor();
+        return color == null ? defaultColor : color;
+    }
+
     public Float waterFogDistance() {
         return waterFogDistance == null ? getDefault().waterFogDistance : waterFogDistance;
     }
@@ -107,6 +122,8 @@ public class LegacyBiomeOverride {
                                 if ((i = JsonUtil.optionalJsonColor(o, "water_fog_color", null)) != null) override.waterFogColor = i;
                                 if ((i = JsonUtil.optionalJsonColor(o, "fog_color", null)) != null) override.fogColor = i;
                                 if ((i = JsonUtil.optionalJsonColor(o, "sky_color", null)) != null) override.skyColor = i;
+                                if ((i = JsonUtil.optionalJsonColor(o, "grass_color", null)) != null) override.grassColor = i;
+                                if ((i = JsonUtil.optionalJsonColor(o, "foliage_color", null)) != null) override.foliageColor = i;
                                 if (o.get("water_fog_distance") instanceof JsonPrimitive p && p.isNumber()) override.waterFogDistance = p.getAsFloat();
                                 if (o.get("water_transparency") instanceof JsonPrimitive p && p.isNumber()) override.waterTransparency = p.getAsFloat();
                             }

@@ -50,4 +50,16 @@ public class ClientBiomeMixin {
         LegacyBiomeOverride o = biomeOverride();
         if (o.skyColor() != null) cir.setReturnValue(o.skyColor());
     }
+
+    @Inject(method = "getGrassColor", at = @At("HEAD"), cancellable = true)
+    private void getGrassColor(double x, double z, CallbackInfoReturnable<Integer> cir){
+        LegacyBiomeOverride o = biomeOverride();
+        if (o.grassColor() != null) cir.setReturnValue(o.grassColor());
+    }
+
+    @Inject(method = "getFoliageColor", at = @At("HEAD"), cancellable = true)
+    private void getFoliageColor(CallbackInfoReturnable<Integer> cir){
+        LegacyBiomeOverride o = biomeOverride();
+        if (o.foliageColor() != null) cir.setReturnValue(o.foliageColor());
+    }
 }
