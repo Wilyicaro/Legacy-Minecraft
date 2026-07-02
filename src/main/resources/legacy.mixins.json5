@@ -281,6 +281,7 @@
     "BonusChestFeatureMixin",
     "CarpetBlockMixin",
     "CartographyTableMenuMixin",
+    "CartographyTableMapSlotMixin",
     "CraftingTableBlockMixin",
     "CriteriaTriggersMixin",
     "EmptyMapItemMixin",

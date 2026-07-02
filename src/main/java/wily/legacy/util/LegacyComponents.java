@@ -179,6 +179,12 @@ public class LegacyComponents {
     public static final Component PREPARING_MANUAL_SAVE = Component.translatable("legacy.menu.savingLevel.preparing_manual");
     public static final Component PREPARING_CHUNKS = Component.translatable("legacy.menu.savingLevel.preparing_chunks");
     public static final Component FINALIZING = Component.translatable("legacy.menu.savingLevel.finalizing");
+    public static final Component MAP_NAME = Component.translatable("legacy.container.mapName");
+    public static final Component BASIC_MAP = Component.translatable("legacy.container.basicMap");
+    public static final Component RENAME_MAP = Component.translatable("legacy.container.renameMap");
+    public static final Component ZOOM_MAP = Component.translatable("legacy.container.zoomMap");
+    public static final Component COPY_MAP = Component.translatable("legacy.container.copyMap");
+    public static final Component LOCK_MAP = Component.translatable("legacy.container.lockMap");
     public static final Component SELECTION = Component.literal("...");
     public static final Component NONE = Component.translatable("legacy.options.none");
     public static final Component NEEDS_RESTART = Component.translatable("legacy.options.needs_restart");

@@ -12,10 +12,14 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+//? if >=1.20.5 {
+import net.minecraft.core.component.DataComponents;
+//?}
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
+import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.client.LegacyHeadRenderState;
@@ -44,6 +49,13 @@ public abstract class ItemInHandRendererMixin {
     @Shadow protected abstract void applyItemArmAttackTransform(PoseStack arg, HumanoidArm arg2, float g);
 
     @Shadow public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3/*? if <1.21.5 {*/, boolean bl/*?}*/, PoseStack arg4, MultiBufferSource arg5, int i);
+
+    @Unique
+    private boolean legacy$mainHandWasEmptyMap;
+
+    @Unique
+    private boolean legacy$offHandWasEmptyMap;
+
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
@@ -65,6 +77,8 @@ public abstract class ItemInHandRendererMixin {
     public void renderItemLight(float f, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, LocalPlayer localPlayer, int i, CallbackInfo ci, @Local(ordinal = 0, argsOnly = true) LocalIntRef original) {
         int light =getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
         if (LegacyOptions.itemLightingInHand.get() && light > 0) original.set(LightTexture.pack(light,LightTexture.sky(i)));
+        updateMapFillAnimation(localPlayer.getMainHandItem(), true);
+        updateMapFillAnimation(localPlayer.getOffhandItem(), false);
     }
 
     @ModifyExpressionValue(method = "renderOneHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
@@ -85,6 +99,52 @@ public abstract class ItemInHandRendererMixin {
     @Unique
     private int getLight(ItemStack mainHand, ItemStack offHand){
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
+    }
+
+    @Unique
+    private void updateMapFillAnimation(ItemStack itemStack, boolean mainHand) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            legacy$setWasEmptyMap(itemStack, mainHand);
+            return;
+        }
+        boolean wasEmptyMap = mainHand ? legacy$mainHandWasEmptyMap : legacy$offHandWasEmptyMap;
+        if (wasEmptyMap && itemStack.is(Items.FILLED_MAP)) {
+            Object mapId = legacy$getMapId(itemStack);
+            if (mapId != null) LegacyMapFillAnimation.start(mapId, legacy$isStackedMap(itemStack, mapId));
+        }
+        legacy$setWasEmptyMap(itemStack, mainHand);
+    }
+
+    @Unique
+    private void legacy$setWasEmptyMap(ItemStack itemStack, boolean mainHand) {
+        if (mainHand) {
+            legacy$mainHandWasEmptyMap = itemStack.is(Items.MAP);
+        } else {
+            legacy$offHandWasEmptyMap = itemStack.is(Items.MAP);
+        }
+    }
+
+    @Unique
+    private boolean legacy$isStackedMap(ItemStack itemStack, Object mapId) {
+        if (minecraft.player == null) return false;
+        int count = 0;
+        Inventory inventory = minecraft.player.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            if (stack.is(Items.FILLED_MAP) && mapId.equals(legacy$getMapId(stack))) {
+                count += stack.getCount();
+            }
+        }
+        return count > itemStack.getCount();
+    }
+
+    @Unique
+    private Object legacy$getMapId(ItemStack itemStack) {
+        //? if <1.20.5 {
+        /*return MapItem.getMapId(itemStack);
+        *///?} else {
+        return itemStack.get(DataComponents.MAP_ID);
+        //?}
     }
 
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))

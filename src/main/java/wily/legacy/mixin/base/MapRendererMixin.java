@@ -26,9 +26,13 @@ import org.spongepowered.asm.mixin.Unique;import org.spongepowered.asm.mixin.inj
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PlayerIdentifier;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 
 import java.util.Iterator;
@@ -37,14 +41,28 @@ import java.util.stream.StreamSupport;
 
 @Mixin(/*? if <1.21.2 {*/MapRenderer.MapInstance/*?} else {*/ /*MapRenderer*//*?}*/.class)
 public abstract class MapRendererMixin {
+    @Unique
+    private static final RenderType LEGACY_MAP_BACKGROUND = RenderType.text(FactoryAPI.createVanillaLocation("textures/map/map_background_checkerboard.png"));
+
     //? if <1.20.5
     /*@Unique private static final RenderType MAP_ICONS = RenderType.text(new ResourceLocation("textures/map/map_icons.png"));*/
     //? if <1.21.2 {
     @Shadow
     private MapItemSavedData data;
+
+    @Unique
+    private Object legacy$mapId;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(MapRenderer mapRenderer, int mapId, MapItemSavedData mapItemSavedData, CallbackInfo ci) {
+        legacy$mapId = /*? if <1.20.5 {*//*mapId*//*?} else {*/new MapId(mapId)/*?}*/;
+    }
     //?} else {
     /*@Inject(method = "extractRenderState", at = @At("RETURN"))
     private void extractRenderState(MapId mapId, MapItemSavedData mapItemSavedData, MapRenderState mapRenderState, CallbackInfo ci){
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            LegacyMapFillAnimation.track(mapRenderState, mapId, mapItemSavedData);
+        }
         int i = 0;
         for (MapDecoration decoration : mapItemSavedData.getDecorations()) {
             LegacyMapDecorationRenderState.of(mapRenderState.decorations.get(i)).extractRenderState(decoration);
@@ -64,8 +82,71 @@ public abstract class MapRendererMixin {
     //?}
     @Redirect(method = /*? if <1.21.2 {*/"draw"/*?} else {*/ /*"render"*//*?}*/,at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Ljava/lang/Iterable;iterator()Ljava/util/Iterator;"/*?} else {*/ /*"Ljava/util/List;iterator()Ljava/util/Iterator;"*//*?}*/))
     Iterator</*? if <1.21.2 {*/MapDecoration/*?} else {*/ /*MapRenderState.MapDecorationRenderState*//*?}*/> drawDecorations(/*? if <=1.21.2 {*/Iterable<MapDecoration>/*?} else {*/ /*List<MapRenderState.MapDecorationRenderState>*//*?}*/ iterable){
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return iterable.iterator();
+        }
         return /*? if <1.21.2 {*/StreamSupport.stream(iterable.spliterator(), false)/*?} else {*//*iterable.stream()*//*?}*/.filter(s-> !isPlayerDecoration(/*? if <1.20.2 {*//*s.getType() *//*?} else if <1.21.2 {*/s.type()/*?} else {*//*LegacyMapDecorationRenderState.of(s).getType()*//*?}*/)).iterator();
     }
+    @Inject(method = /*? if <1.21.2 {*/"draw"/*?} else {*/ /*"render"*//*?}*/, at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Ljava/lang/Iterable;iterator()Ljava/util/Iterator;"/*?} else {*/ /*"Ljava/util/List;iterator()Ljava/util/Iterator;"*//*?}*/))
+    private void drawFillAnimation(/*? if >=1.21.2 {*//*MapRenderState mapRenderState, *//*?}*/PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return;
+        }
+        Object state = /*? if <1.21.2 {*/this/*?} else {*//*mapRenderState*//*?}*/;
+        //? if <1.21.2 {
+        LegacyMapFillAnimation.track(state, legacy$mapId, data);
+        //?}
+        byte[] colors = LegacyMapFillAnimation.colors(state);
+        if (colors != null) drawHiddenMapPixels(state, poseStack, multiBufferSource, colors, i);
+    }
+
+    @Unique
+    private void drawHiddenMapPixels(Object state, PoseStack poseStack, MultiBufferSource multiBufferSource, byte[] colors, int light) {
+        if (!hasHiddenMapPixels(state, colors)) return;
+        Matrix4f matrix = poseStack.last().pose();
+        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(LEGACY_MAP_BACKGROUND);
+        for (int x = 0; x < 128; x++) {
+            if (LegacyMapFillAnimation.isColumnVisible(state, x)) continue;
+            int y = 0;
+            while (y < 128) {
+                while (y < 128 && colors[x + y * 128] == 0) y++;
+                int start = y;
+                while (y < 128 && colors[x + y * 128] != 0) y++;
+                if (start < y) drawHiddenMapRun(matrix, vertexConsumer, x, start, y, light);
+            }
+        }
+    }
+
+    @Unique
+    private boolean hasHiddenMapPixels(Object state, byte[] colors) {
+        for (int x = 0; x < 128; x++) {
+            if (LegacyMapFillAnimation.isColumnVisible(state, x)) continue;
+            for (int y = 0; y < 128; y++) {
+                if (colors[x + y * 128] != 0) return true;
+            }
+        }
+        return false;
+    }
+
+    @Unique
+    private void drawHiddenMapRun(Matrix4f matrix, VertexConsumer vertexConsumer, int x, int y0, int y1, int light) {
+        float u0 = x / 128.0f;
+        float u1 = (x + 1) / 128.0f;
+        float v0 = y0 / 128.0f;
+        float v1 = y1 / 128.0f;
+        //? if <1.20.5 {
+        /*vertexConsumer.vertex(matrix, x, y1, -0.015f).color(-1).uv(u0, v1).uv2(light).endVertex();
+        vertexConsumer.vertex(matrix, x + 1, y1, -0.015f).color(-1).uv(u1, v1).uv2(light).endVertex();
+        vertexConsumer.vertex(matrix, x + 1, y0, -0.015f).color(-1).uv(u1, v0).uv2(light).endVertex();
+        vertexConsumer.vertex(matrix, x, y0, -0.015f).color(-1).uv(u0, v0).uv2(light).endVertex();
+        *///?} else {
+        vertexConsumer.addVertex(matrix, x, y1, -0.015f).setColor(-1).setUv(u0, v1).setLight(light);
+        vertexConsumer.addVertex(matrix, x + 1, y1, -0.015f).setColor(-1).setUv(u1, v1).setLight(light);
+        vertexConsumer.addVertex(matrix, x + 1, y0, -0.015f).setColor(-1).setUv(u1, v0).setLight(light);
+        vertexConsumer.addVertex(matrix, x, y0, -0.015f).setColor(-1).setUv(u0, v0).setLight(light);
+        //?}
+    }
+
     @Inject(method = /*? if <1.21.2 {*/"draw"/*?} else {*/ /*"render"*//*?}*/, at = @At("HEAD"))
     void draw(/*? if >=1.21.2 {*//*MapRenderState mapRenderState, *//*?}*/PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -81,6 +162,9 @@ public abstract class MapRendererMixin {
 
     @Inject(method = /*? if <1.21.2 {*/"draw"/*?} else {*/ /*"render"*//*?}*/, at = @At("RETURN"))
     void drawReturn(/*? if >=1.21.2 {*//*MapRenderState mapRenderState, *//*?}*/PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
+        if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior)) {
+            return;
+        }
         int l = 0;
         for (/*? if <1.21.2 {*/MapDecoration/*?} else {*/ /*MapRenderState.MapDecorationRenderState*//*?}*/ mapDecoration : /*? if <1.21.2 {*/this.data.getDecorations()/*?} else {*/ /*mapRenderState.decorations*//*?}*/) {
             /*? if <1.20.5 {*//*MapDecoration.Type*//*?} else {*/Holder<MapDecorationType>/*?}*/ type = /*? if <1.20.2 {*//*mapDecoration.getType() *//*?} else if <1.21.2 {*/mapDecoration.type()/*?} else {*//*LegacyMapDecorationRenderState.of(mapDecoration).getType()*//*?}*/;
