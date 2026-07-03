@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["suspicious_sand", "suspicious_gravel"],
+    "tip": {"translate": "block.minecraft.suspicious_block.tip"}
+  }
+}

@@ -13,15 +13,15 @@
       "tip": {"translate": "block.minecraft.coral_block.tip"}
     },
     {
-      "block": "#dead_corals",
+      "item": "#dead_coral_plants",
       "tip": {"translate": "block.minecraft.dead_coral.tip"}
     },
     {
-      "block": "#dead_coral_plants",
+      "item": "#dead_corals",
       "tip": {"translate": "block.minecraft.dead_coral_fan.tip"}
     },
     {
-      "block": "#dead_coral_blocks",
+      "item": "#dead_coral_blocks",
       "tip": {"translate": "block.minecraft.dead_coral_block.tip"}
     }
   ]

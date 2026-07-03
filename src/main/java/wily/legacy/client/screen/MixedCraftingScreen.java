@@ -128,7 +128,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         setupDefaultButtons(renderer, this);
         Event.super.addControlTooltips(renderer);
         renderer.
-                add(EXTRA::get, () -> LegacyComponents.INFO).
+                add(EXTRA::get, () -> LegacyComponents.craftingInfoAction(infoType.get())).
                 add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
                 add(()-> searchMode ? VERTICAL_NAVIGATION.get() : ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(),PLUS_ICON,OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
                 addCompound(() -> new Icon[]{ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), SPACE_ICON, ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()}, () -> LegacyComponents.GROUP);

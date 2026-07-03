@@ -123,7 +123,8 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1/*? if >=1.21.4 {*//*, false*//*?}*/);
+                int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : CommonColor.INVALID_ENCHANTMENT_TEXT.get();
+                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/);
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + 80.5);
@@ -135,7 +136,8 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s/*? if >=1.21.4 {*//*, false*//*?}*/);
+                int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : s;
+                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/);
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
             guiGraphics.drawString(this.font, string, 120 - this.font.width(string), 12, s);
