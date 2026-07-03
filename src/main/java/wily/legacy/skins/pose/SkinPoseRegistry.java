@@ -9,6 +9,7 @@ public final class SkinPoseRegistry {
     private static final Object LOCK = new Object();
     private static volatile Map<PoseTag, List<Selector>> ACTIVE = empty();
     private static volatile Map<PoseTag, List<Selector>> RUNTIME = empty();
+    private static volatile Map<String, EnumSet<PoseTag>> API = Map.of();
     private static Map<PoseTag, List<Selector>> STAGING = empty();
 
     private SkinPoseRegistry() {
@@ -82,6 +83,23 @@ public final class SkinPoseRegistry {
         RUNTIME = empty();
     }
 
+    public static void setApiPoseTags(Map<String, ? extends Set<PoseTag>> poses) {
+        if (poses == null || poses.isEmpty()) {
+            API = Map.of();
+            return;
+        }
+        HashMap<String, EnumSet<PoseTag>> next = new HashMap<>();
+        for (Map.Entry<String, ? extends Set<PoseTag>> entry : poses.entrySet()) {
+            String id = entry.getKey();
+            Set<PoseTag> tags = entry.getValue();
+            if (id == null || id.isBlank() || tags == null || tags.isEmpty()) continue;
+            EnumSet<PoseTag> copy = EnumSet.noneOf(PoseTag.class);
+            copy.addAll(tags);
+            if (!copy.isEmpty()) next.put(id.trim(), copy);
+        }
+        API = next.isEmpty() ? Map.of() : Collections.unmodifiableMap(next);
+    }
+
     public static boolean hasPose(PoseTag tag, String skinId) {
         if (tag == null || skinId == null || skinId.isEmpty()) return false;
 
@@ -90,6 +108,9 @@ public final class SkinPoseRegistry {
 
         String id = skinId.indexOf(' ') >= 0 ? skinId.trim() : skinId;
         if (id.isEmpty()) return false;
+
+        EnumSet<PoseTag> apiTags = API.get(id);
+        if (apiTags != null && apiTags.contains(tag)) return true;
 
         if (sels != null && !sels.isEmpty()) {
             for (Selector s : sels) {
@@ -148,7 +169,9 @@ public final class SkinPoseRegistry {
         UPSIDE_DOWN("upside_down"),
         STATUE_OF_LIBERTY("statue_of_liberty"),
         DISABLE_VIEW_BOBBING("disable_view_bobbing"),
-        HIDE_HAND("hide_hand");
+        HIDE_HEAD_LAYER("hide_head_layer"),
+        HIDE_HAND("hide_hand"),
+        NO_IDLE_SWAY("no_idle_sway");
 
         private final String key;
 
@@ -164,6 +187,7 @@ public final class SkinPoseRegistry {
             if (key == null) return null;
             String k = key.trim().toLowerCase(Locale.ROOT);
             String nk = k.replace("_", "");
+            if (nk.equals("weepingstatue")) return STATUE_OF_LIBERTY;
             for (PoseTag t : values()) {
                 if (t.key.equals(k)) return t;
                 if (t.key.replace("_", "").equals(nk)) return t;

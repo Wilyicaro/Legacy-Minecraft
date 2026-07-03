@@ -29,7 +29,7 @@ public final class BoxModelManager {
     private static final Map<String, ResourceLocation> KEY_INDEX = new ConcurrentHashMap<>();
     private static final Set<ResourceLocation> LOADED = ConcurrentHashMap.newKeySet();
     private static final Map<ResourceLocation, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
-    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null);
+    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static volatile boolean initialized;
 
     private BoxModelManager() {
@@ -64,12 +64,36 @@ public final class BoxModelManager {
         return getValue(id, BoxData::offsets);
     }
 
+    public static EnumMap<ToolSlot, float[]> getToolOffsets(ResourceLocation id) {
+        return getValue(id, BoxData::toolOffsets);
+    }
+
     public static EnumMap<AttachSlot, float[]> getScales(ResourceLocation id) {
         return getValue(id, BoxData::scales);
     }
 
+    public static EnumMap<AttachSlot, float[]> getAnimationScales(ResourceLocation id) {
+        return getValue(id, BoxData::animationScales);
+    }
+
+    public static EnumMap<AttachSlot, float[]> getAnimationOffsets(ResourceLocation id) {
+        return getValue(id, BoxData::animationOffsets);
+    }
+
+    public static EnumMap<AttachSlot, PivotAnimation> getPivotAnimations(ResourceLocation id) {
+        return getValue(id, BoxData::pivotAnimations);
+    }
+
     public static EnumMap<ArmorSlot, float[]> getArmorOffsets(ResourceLocation id) {
         return getValue(id, BoxData::armorOffsets);
+    }
+
+    public static EnumMap<AttachSlot, float[]> getArmorScales(ResourceLocation id) {
+        return getValue(id, BoxData::armorScales);
+    }
+
+    public static Boolean getArmorStretch(ResourceLocation id) {
+        return getValue(id, BoxData::armorStretch);
     }
 
     public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) {
@@ -302,8 +326,14 @@ public final class BoxModelManager {
                 readString(meta, "themeName"),
                 readString(meta, "themeNameId"),
                 nonEmpty(BoxModelJsonSupport.parseOffsets(root.get("offsets"))),
+                nonEmpty(BoxModelJsonSupport.parseToolOffsets(root.get("offsets"))),
                 nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "scales", "partScale", "part_scale"))),
+                nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "animationScales", "animation_scales", "rotationScales", "rotation_scales"))),
+                nonEmpty(BoxModelJsonSupport.parseOffsets(getAny(root, "animationOffsets", "animation_offsets", "rotationOffsets", "rotation_offsets"))),
+                nonEmpty(BoxModelJsonSupport.parsePivotAnimations(getAny(root, "pivotAnimations", "pivot_animations", "partAnimations", "part_animations"))),
                 nonEmpty(BoxModelJsonSupport.parseArmorOffsets(getAny(root, "armor_offsets", "armorOffsets"))),
+                nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "armor_scales", "armorScales"))),
+                readBoolean(root, "armor_stretch", "armorStretch", "auto_armor_scale", "autoArmorScale", "armor_auto_scale", "armorAutoScale"),
                 nonEmpty(BoxModelJsonSupport.parseArmorHideSlots(getAny(root, "hidearmour", "hideArmour", "hide_armor"))),
                 readSlimFlag(root, meta)
         );
@@ -376,6 +406,18 @@ public final class BoxModelManager {
         return root != null && key != null && root.has(key) ? root.get(key).getAsFloat() : defaultValue;
     }
 
+    private static Boolean readBoolean(JsonObject root, String... keys) {
+        if (root == null || keys == null) return null;
+        for (String key : keys) {
+            if (key == null || !root.has(key) || !root.get(key).isJsonPrimitive()) continue;
+            try {
+                return root.get(key).getAsBoolean();
+            } catch (RuntimeException ignored) {
+            }
+        }
+        return null;
+    }
+
     private static String trimToNull(String value) {
         return value == null || (value = value.trim()).isEmpty() ? null : value;
     }
@@ -417,11 +459,22 @@ public final class BoxModelManager {
         return set == null || set.isEmpty() ? null : set;
     }
 
+    public record PivotAnimation(float[] offset, float[] amplitude, float speed, float phase, boolean movingOnly) {
+    }
+
     private record BoxData(BuiltBoxModel model, ResourceLocation texture, String themeName, String themeKey,
-                           EnumMap<AttachSlot, float[]> offsets, EnumMap<AttachSlot, float[]> scales,
-                           EnumMap<ArmorSlot, float[]> armorOffsets, EnumSet<ArmorSlot> armorHide, Boolean slim) {
+                           EnumMap<AttachSlot, float[]> offsets, EnumMap<ToolSlot, float[]> toolOffsets,
+                           EnumMap<AttachSlot, float[]> scales,
+                           EnumMap<AttachSlot, float[]> animationScales,
+                           EnumMap<AttachSlot, float[]> animationOffsets,
+                           EnumMap<AttachSlot, PivotAnimation> pivotAnimations,
+                           EnumMap<ArmorSlot, float[]> armorOffsets,
+                           EnumMap<AttachSlot, float[]> armorScales,
+                           Boolean armorStretch,
+                           EnumSet<ArmorSlot> armorHide,
+                           Boolean slim) {
         boolean isEmpty() {
-            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && scales == null && armorOffsets == null && armorHide == null && slim == null;
+            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && toolOffsets == null && scales == null && animationScales == null && animationOffsets == null && pivotAnimations == null && armorOffsets == null && armorScales == null && armorStretch == null && armorHide == null && slim == null;
         }
     }
 }

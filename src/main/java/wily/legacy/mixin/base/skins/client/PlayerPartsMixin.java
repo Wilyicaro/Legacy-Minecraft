@@ -188,7 +188,7 @@ public abstract class PlayerPartsMixin {
     private void consoleskins$applyBoxModel(PlayerModel self, ClientSkinAssets.ResolvedSkin resolved) {
         if (resolved == null) return;
         BuiltBoxModel model = resolved.boxModel();
-        consoleskins$applyVisualOffsets(self, resolved.modelId(), model);
+        consoleskins$applyVisualOffsets(self, resolved.modelId());
         if (model == null) return;
         consoleskins$hidePair(self, model, AttachSlot.HEAD, AttachSlot.HAT);
         consoleskins$hidePair(self, model, AttachSlot.BODY, AttachSlot.JACKET);
@@ -266,54 +266,17 @@ public abstract class PlayerPartsMixin {
     }
 
     @Unique
-    private void consoleskins$applyVisualOffsets(PlayerModel self, net.minecraft.resources.ResourceLocation modelId, BuiltBoxModel model) {
+    private void consoleskins$applyVisualOffsets(PlayerModel self, net.minecraft.resources.ResourceLocation modelId) {
         if (modelId == null) return;
         EnumMap<AttachSlot, float[]> offsets = BoxModelManager.getOffsets(modelId);
         EnumMap<AttachSlot, float[]> scales = BoxModelManager.getScales(modelId);
         if ((offsets == null || offsets.isEmpty()) && (scales == null || scales.isEmpty())) return;
         for (int i = 0; i < PlayerModelParts.ALL.length; i++) {
             AttachSlot slot = PlayerModelParts.ALL[i];
-            float[] offset = consoleskins$visualOffsetForSlot(offsets, model, slot);
+            float[] offset = offsets == null ? null : offsets.get(slot);
             consoleskins$applyOffset(self, slot, offset, 1.0F);
             consoleskins$prevOffsets[i] = offset == null ? null : Arrays.copyOf(offset, offset.length);
             consoleskins$applyScale(self, slot, scales == null ? null : scales.get(slot));
         }
-    }
-
-    @Unique
-    private static float[] consoleskins$visualOffsetForSlot(EnumMap<AttachSlot, float[]> offsets, BuiltBoxModel model, AttachSlot slot) {
-        if (offsets == null || slot == null) return null;
-        float[] offset = offsets.get(slot);
-        AttachSlot base = consoleskins$overlayBase(slot);
-        if (base == null) return offset;
-        float[] baseOffset = offsets.get(base);
-        if (baseOffset == null) return offset;
-        if (offset == null || (consoleskins$isZeroOffset(offset) && !consoleskins$hasBoxParts(model, slot))) return baseOffset;
-        return offset;
-    }
-
-    @Unique
-    private static AttachSlot consoleskins$overlayBase(AttachSlot slot) {
-        return switch (slot) {
-            case HAT -> AttachSlot.HEAD;
-            case JACKET -> AttachSlot.BODY;
-            case RIGHT_SLEEVE -> AttachSlot.RIGHT_ARM;
-            case LEFT_SLEEVE -> AttachSlot.LEFT_ARM;
-            case RIGHT_PANTS -> AttachSlot.RIGHT_LEG;
-            case LEFT_PANTS -> AttachSlot.LEFT_LEG;
-            default -> null;
-        };
-    }
-
-    @Unique
-    private static boolean consoleskins$hasBoxParts(BuiltBoxModel model, AttachSlot slot) {
-        List<ModelPart> parts = model == null || slot == null ? null : model.get(slot);
-        return parts != null && !parts.isEmpty();
-    }
-
-    @Unique
-    private static boolean consoleskins$isZeroOffset(float[] offset) {
-        if (offset == null || offset.length < 3) return false;
-        return Math.abs(offset[0]) < 1.0E-4F && Math.abs(offset[1]) < 1.0E-4F && Math.abs(offset[2]) < 1.0E-4F;
     }
 }

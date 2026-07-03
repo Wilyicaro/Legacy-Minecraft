@@ -2,10 +2,19 @@ package wily.legacy.skins.pose;
 
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.skins.client.render.PlayerModelParts;
+import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.client.render.boxloader.AttachSlot;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.skins.client.render.boxloader.BoxModelManager.PivotAnimation;
+import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.SkinIdUtil;
+
+import java.util.EnumMap;
 
 public final class MenuDollPose {
     private MenuDollPose() {
@@ -105,6 +114,81 @@ public final class MenuDollPose {
         model.leftPants.z = model.leftLeg.z;
     }
 
+    private static void applyBoxPivotAnimations(PlayerModel model, Object state, String skinId) {
+        if (model == null || state == null || SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        ResourceLocation modelId = modelId(state, skinId);
+        if (modelId == null) return;
+        EnumMap<AttachSlot, float[]> scales = BoxModelManager.getAnimationScales(modelId);
+        EnumMap<AttachSlot, float[]> offsets = BoxModelManager.getAnimationOffsets(modelId);
+        EnumMap<AttachSlot, PivotAnimation> animations = BoxModelManager.getPivotAnimations(modelId);
+        if ((scales == null || scales.isEmpty()) && (offsets == null || offsets.isEmpty()) && (animations == null || animations.isEmpty())) return;
+        float time = animationTime(state);
+        boolean moving = ArmPoseSupport.isMenuDoll(state) || ArmPoseSupport.isMoving(state) || ArmPoseSupport.getMoveSpeedSq(state) > 1.0E-4F;
+        for (AttachSlot slot : PlayerModelParts.ALL) {
+            ModelPart part = PlayerModelParts.get(model, slot);
+            if (part == null) continue;
+            applyBoxAnimation(part, scales == null ? null : scales.get(slot), offsets == null ? null : offsets.get(slot), animations == null ? null : animations.get(slot), time, moving);
+        }
+    }
+
+    private static ResourceLocation modelId(Object state, String skinId) {
+        if (state instanceof RenderStateSkinIdAccess access) return access.consoleskins$getCachedModelId();
+        ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(skinId, ArmPoseSupport.getEntityUuid(state));
+        return resolved == null ? null : resolved.modelId();
+    }
+
+    private static void applyBoxAnimation(ModelPart part, float[] scale, float[] offset, PivotAnimation animation, float time, boolean moving) {
+        if (scale != null) {
+            part.xRot *= axis(scale, 0, 1.0F);
+            part.yRot *= axis(scale, 1, 1.0F);
+            part.zRot *= axis(scale, 2, 1.0F);
+        }
+        if (offset != null) {
+            part.xRot += degrees(axis(offset, 0, 0.0F));
+            part.yRot += degrees(axis(offset, 1, 0.0F));
+            part.zRot += degrees(axis(offset, 2, 0.0F));
+        }
+        if (animation == null || animation.movingOnly() && !moving) return;
+        float wave = Mth.sin(time * animation.speed() + animation.phase());
+        float[] base = animation.offset();
+        float[] amplitude = animation.amplitude();
+        part.xRot += degrees(axis(base, 0, 0.0F) + axis(amplitude, 0, 0.0F) * wave);
+        part.yRot += degrees(axis(base, 1, 0.0F) + axis(amplitude, 1, 0.0F) * wave);
+        part.zRot += degrees(axis(base, 2, 0.0F) + axis(amplitude, 2, 0.0F) * wave);
+    }
+
+    private static float animationTime(Object state) {
+        if (ArmPoseSupport.isMenuDoll(state)) return (System.currentTimeMillis() % 1_000_000L) / 300.0F;
+        return ArmPoseSupport.getAgeInTicks(state);
+    }
+
+    private static float axis(float[] value, int index, float fallback) {
+        return value != null && value.length > index ? value[index] : fallback;
+    }
+
+    private static float degrees(float value) {
+        return value * ((float) Math.PI / 180.0F);
+    }
+
+    private static void removeIdleSway(PlayerModel model, Object state) {
+        if (model == null) return;
+        float ageInTicks = state == null ? 0.0F : ArmPoseSupport.getAgeInTicks(state);
+        float zRot = Mth.cos(ageInTicks * 0.09F) * 0.05F + 0.05F;
+        float xRot = Mth.sin(ageInTicks * 0.067F) * 0.05F;
+        model.rightArm.zRot -= zRot;
+        model.leftArm.zRot += zRot;
+        model.rightArm.xRot -= xRot;
+        model.leftArm.xRot += xRot;
+        model.rightSleeve.zRot = model.rightArm.zRot;
+        model.leftSleeve.zRot = model.leftArm.zRot;
+        model.rightSleeve.xRot = model.rightArm.xRot;
+        model.leftSleeve.xRot = model.leftArm.xRot;
+    }
+
+    private static boolean skipCustomAnimation(Object state) {
+        return state instanceof RenderStateSkinIdAccess access && access.consoleskins$skipCustomAnimation();
+    }
+
     private static void applyMenuDollAnimation(PlayerModel model, Object state, String skinId) {
         if (!ArmPoseSupport.isMenuDoll(state)) return;
         ModelPart head = model.head;
@@ -141,12 +225,16 @@ public final class MenuDollPose {
         if (model == null || state == null) return;
         String skinId = ArmPoseSupport.getSkinId(state);
         boolean stiffLegs = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
-        boolean customAnimation = LegacyOptions.customSkinAnimation.get();
+        boolean customAnimation = LegacyOptions.customSkinAnimation.get() && !skipCustomAnimation(state);
+        boolean noIdleSway = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.NO_IDLE_SWAY, skinId);
         applyMenuDollAnimation(model, state, skinId);
         if (!ArmPoseSupport.isMenuDoll(state) && customAnimation && stiffLegs) {
             applyStiffLegs(model, state);
         }
-        if (!customAnimation) return;
+        if (!customAnimation) {
+            if (noIdleSway && !ArmPoseSupport.isMenuDoll(state)) removeIdleSway(model, state);
+            return;
+        }
         boolean zombieArms = ZombieArmsPose.shouldApply(state);
         if (zombieArms) ZombieArmsPose.apply(model, state);
         if (IdleSitPose.shouldApply(state)) {
@@ -169,6 +257,10 @@ public final class MenuDollPose {
         if (SyncLegsPose.shouldApply(state)) {
             SyncLegsPose.apply(model);
         }
+        if (noIdleSway && !zombieArms && !ArmPoseSupport.isMenuDoll(state)) {
+            removeIdleSway(model, state);
+        }
+        applyBoxPivotAnimations(model, state, skinId);
     }
 
     private record State(String skinId, boolean crouching, float attackTime) {
