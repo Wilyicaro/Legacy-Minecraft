@@ -8,6 +8,8 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.util.ListMap;
 
+import java.util.Objects;
+
 public class CommonValue<T> extends Stocker<T> {
     public static final ListMap<ResourceLocation, CommonValue<?>> COMMON_VALUES = new ListMap<>();
 
@@ -22,8 +24,14 @@ public class CommonValue<T> extends Stocker<T> {
         set(defaultValue);
     }
 
+    public boolean isOverridden() {
+        return !Objects.equals(defaultValue, get());
+    }
+
     public static final CommonValue<Boolean> WIDGET_TEXT_SHADOW = registerCommonValue("widget_text_shadow",true, Codec.BOOL);
     public static final CommonValue<Float> LEGACY_FONT_DIM_FACTOR = registerCommonValue("legacy_font_dim_factor",0.0f, Codec.FLOAT);
+    public static final CommonValue<Boolean> PS4_END_CRYSTAL_MODEL = registerCommonValue("ps4_end_crystal_model",false, Codec.BOOL);
+    public static final CommonValue<Boolean> AUTOFOCUS_BUTTON_ANIMATION = registerCommonValue("autofocus_button_animation", false, Codec.BOOL);
     public static final CommonValue<Double> SCALE_MULTIPLIER = registerCommonValue(FactoryAPI.createVanillaLocation("scale_multiplier"),new CommonValue<>(1.0d, Codec.DOUBLE){
         @Override
         public void set(Double obj) {

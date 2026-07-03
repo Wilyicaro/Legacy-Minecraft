@@ -35,6 +35,7 @@ public class SkyLevelRendererMixin {
     private /*? if <1.20.5 {*//*double*//*?} else {*/float/*?}*/ drawStars(/*? if <1.20.5 {*//*double*//*?} else {*/float/*?}*/ original) {
         return original - 0.05f;
     }
+
     //? if >=1.21.4 {
     /*@Unique
     private boolean legacySkyShape = LegacyOptions.legacySkyShape.get();
