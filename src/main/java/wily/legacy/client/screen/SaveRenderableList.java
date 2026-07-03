@@ -425,6 +425,7 @@ public class SaveRenderableList extends RenderableVList {
         String string = summary.getLevelId();
         try (LevelStorageSource.LevelStorageAccess levelStorageAccess = levelStorageSource.createAccess(string)) {
             levelStorageAccess.deleteLevel();
+            FileUtils.deleteQuietly(Legacy4JClient.currentWorldSource.getBaseDir().resolve(string).toFile());
         } catch (IOException iOException) {
             SystemToast.onWorldDeleteFailure(this.minecraft, string);
             LOGGER.error("Failed to delete world {}", string, iOException);

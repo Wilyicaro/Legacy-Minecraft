@@ -29,7 +29,6 @@ import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LegacyCraftingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.TabList;
-import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
 import wily.legacy.util.ScreenUtil;
@@ -96,7 +95,10 @@ public class ControllerManager {
                         if (connectedController != null) connectedController.disconnect(ControllerManager.this);
                         return;
                     }
-                    if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null) connectedController.connect(ControllerManager.this);
+                    if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null) {
+                        connectedController.connect(ControllerManager.this);
+                        updateControllerLed();
+                    }
                     minecraft.execute(() -> {
                         if (connectedController != null) getHandler().setup(ControllerManager.this);
                     });
@@ -152,10 +154,7 @@ public class ControllerManager {
 
             if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) disableCursor();
 
-            if (minecraft.player != null && minecraft.getConnection() != null && controller.hasLED() && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i){
-                float[] color = Legacy4JClient.getVisualPlayerColor(i);
-                controller.setLED((byte) (color[0] * 255),(byte) (color[1] * 255),(byte) (color[2] * 255));
-            }
+            updateControllerLed(controller);
 
             if (state.is(ControllerBinding.START) && state.justPressed)
                 if (minecraft.screen == null) minecraft.pauseGame(false);
@@ -363,7 +362,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen){
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.onceClick(true))){
+        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.released || state.onceClick(true))){
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }
@@ -415,6 +414,19 @@ public class ControllerManager {
 
     public float getVisualPointerY() {
         return Math.round(minecraft.mouseHandler.ypos()) / ((float) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight());
+    }
+
+    public void updateControllerLed() {
+        updateControllerLed(connectedController);
+    }
+
+    private void updateControllerLed(Controller controller) {
+        if (controller == null || !controller.hasLED()) return;
+        controller.setLED(
+                LegacyOptions.controllerLedRed.get().byteValue(),
+                LegacyOptions.controllerLedGreen.get().byteValue(),
+                LegacyOptions.controllerLedBlue.get().byteValue()
+        );
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button){

@@ -411,7 +411,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 graphics.enableScissor(x + 40, y + 4,x + 40 + nameWidth, y + 44);
-                labelCache.apply(getSelectedAlbum().displayName(),nameWidth).renderLeftAligned(graphics,x + (sd ? 40 : 43), y + 8,lineHeight,CommonColor.TIP_TITLE_TEXT.get());
+                labelCache.apply(getSelectedAlbum().displayName(),nameWidth).renderLeftAligned(graphics,x + (sd ? 40 : 43), y + 8,lineHeight,CommonColor.ITEM_NAME_TEXT.get());
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(displayPack == null ? null : getPackBackground(displayPack));
                 int descriptionWidth = width - 16;
@@ -686,7 +686,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
         @Override
         public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class,k-> k.key() == InputConstants.KEY_O && isFocused() ? LegacyComponents.ALBUM_OPTIONS : k.key() == InputConstants.KEY_X && isFocused() || k.key() == InputConstants.MOUSE_BUTTON_LEFT && isHovered() ? screenComponent : ControlTooltip.getSelectAction(this,context));
+            return context.actionOfContext(KeyContext.class, k -> {
+                if (LegacyOptions.displayPackManagementTooltips.get() && k.key() == InputConstants.KEY_O && isFocused()) return LegacyComponents.ALBUM_OPTIONS;
+                if (LegacyOptions.displayPackManagementTooltips.get() && (k.key() == InputConstants.KEY_X && isFocused() || k.key() == InputConstants.MOUSE_BUTTON_LEFT && isHovered())) return screenComponent;
+                return ControlTooltip.getSelectAction(this, context);
+            });
         }
     }
 }

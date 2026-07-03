@@ -261,5 +261,6 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         SaveRenderableList.resetIconCache();
         PackAlbum album = getSelectedResourceAlbum(summary);
         PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()),album.packs(),false,()->new WorldOpenFlows(minecraft,source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, ()-> minecraft.setScreen(screen)/*?}*/));
+        Legacy4JClient.serverPlayerJoinConsumer = s-> LegacyClientWorldSettings.of(s.server.getWorldData()).setSelectedResourceAlbum(album);
     }
 }

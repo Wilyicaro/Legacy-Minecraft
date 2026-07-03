@@ -42,6 +42,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
     protected AdvancedTextWidget mappingTooltipLines = new AdvancedTextWidget(accessor).withShadow(false);
     protected LegacyKeyMapping selectedMapping = null;
     protected ArbitrarySupplier<Component> mappingTooltip = ArbitrarySupplier.empty();
+    protected Screen advancedOptionsScreen;
 
     public LegacyKeyMappingScreen(Screen parent) {
         this(parent, Component.translatable("controls.keybinds.title"));
@@ -167,7 +168,12 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             setSelectedMapping(null);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        if (super.keyPressed(i, j, k)) return true;
+        if (i == InputConstants.KEY_O && advancedOptionsScreen != null) {
+            minecraft.setScreen(advancedOptionsScreen);
+            return true;
+        }
+        return false;
     }
 
     public boolean allowsKey(){
@@ -255,10 +261,12 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
+        OptionsScreen.setupSelectorControlTooltips(renderer, this);
         renderer.replace(0, i-> i, c-> selectedMapping == null ? c : null);
         renderer.replace(1, i-> i, c-> selectedMapping == null ? c : null);
         renderer.replace(2, i-> i, c-> selectedMapping == null ? c : null);
         renderer.replace(3, i-> i, c-> selectedMapping == null ? c : null);
+        renderer.replace(6, i-> i, c-> c == null && selectedMapping == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
         renderer.add(ControlTooltip.CANCEL_BINDING::get, ()-> selectedMapping == null ? null : LegacyComponents.CANCEL);
     }
 

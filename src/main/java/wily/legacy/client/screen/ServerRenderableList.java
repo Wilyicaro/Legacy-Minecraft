@@ -86,6 +86,7 @@ public class ServerRenderableList extends RenderableVList {
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
     protected final Minecraft minecraft;
+    protected boolean lastDisplayRealmsButton = LegacyOptions.displayRealmsButton.get();
 
     public final ServerList servers;
     @Nullable
@@ -124,6 +125,14 @@ public class ServerRenderableList extends RenderableVList {
             lanServerDetector.interrupt();
             lanServerDetector = null;
         }
+    }
+
+    public boolean syncOptionDrivenButtons() {
+        boolean displayRealmsButton = LegacyOptions.displayRealmsButton.get();
+        if (lastDisplayRealmsButton == displayRealmsButton) return false;
+        lastDisplayRealmsButton = displayRealmsButton;
+        updateServers();
+        return true;
     }
 
     private Component getMultiplayerDisabledReason() {

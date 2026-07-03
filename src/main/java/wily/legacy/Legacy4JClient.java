@@ -141,6 +141,7 @@ public class Legacy4JClient {
 
     public static boolean isNewerVersion = false;
     public static boolean isNewerMinecraftVersion = false;
+    private static boolean hideNextExperimentalWorldWarning;
     private static int consumedKeyboardActions;
     private static final int KEYBOARD_CRAFTING = 1, KEYBOARD_INVENTORY = 2, KEYBOARD_ESCAPE = 4, KEYBOARD_WHATS_THIS = 8;
     public static final List<Runnable> whenResetOptions = new ArrayList<>();
@@ -302,7 +303,8 @@ public class Legacy4JClient {
                 }
             };
         }else if (screen instanceof BackupConfirmScreen s) {
-            if (LegacyOptions.hideExperimentalWorldWarning.get() && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+            if ((LegacyOptions.hideExperimentalWorldWarning.get() || hideNextExperimentalWorldWarning) && isExperimentalWorldWarning(s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription())) {
+                hideNextExperimentalWorldWarning = false;
                 Minecraft minecraft = Minecraft.getInstance();
                 minecraft.execute(() -> BackupConfirmScreenAccessor.of(s).proceed(false, false));
                 return minecraft.screen;
@@ -337,6 +339,16 @@ public class Legacy4JClient {
             if (text.contains("experimental") || text.contains("data pack")) return true;
         }
         return false;
+    }
+
+    public static void hideNextExperimentalWorldWarning(Runnable runnable) {
+        boolean previous = hideNextExperimentalWorldWarning;
+        hideNextExperimentalWorldWarning = true;
+        try {
+            runnable.run();
+        } finally {
+            hideNextExperimentalWorldWarning = previous;
+        }
     }
 
     public static void updateKeyboardToggleKeyPress(int key, int scanCode, int action) {
@@ -381,7 +393,7 @@ public class Legacy4JClient {
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                 continue;
             }
-            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock && controllerManager.isControllerTheLastInput()){
+            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock){
                 minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
             } else if (ScreenUtil.hasClassicCrafting()) {
                 minecraft.getTutorial().onOpenInventory();
@@ -471,7 +483,10 @@ public class Legacy4JClient {
             if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways())) controllerManager.enableCursorAndScheduleReset();
             if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
-                if (path != null) path.applyFocus(true);
+                if (path != null) {
+                    path.applyFocus(true);
+                    ScreenUtil.autoFocusedWidget = true;
+                }
             }
         }
         controllerManager.resetCursor();
@@ -606,7 +621,7 @@ public class Legacy4JClient {
                 a.getElements().put("hud.translateY", ()-> Minecraft.getInstance().getWindow().getGuiScaledHeight() + ScreenUtil.getHUDDistance());
                 a.getElements().put("hud.scaledTranslateY", ()-> -Minecraft.getInstance().getWindow().getGuiScaledHeight());
                 a.getElements().put("hud.renderColor", ()-> ColorUtil.colorFromFloat(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity()));
-                a.getElements().put(FactoryGuiElement.BOSSHEALTH.name()+".renderColor", ()-> ColorUtil.colorFromFloat(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity()));
+                a.getElements().put(FactoryGuiElement.BOSSHEALTH.name()+".renderColor", ()-> ColorUtil.colorFromFloat(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity()));
 
                 a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaleX", crosshairScale);
                 a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaleY", crosshairScale);

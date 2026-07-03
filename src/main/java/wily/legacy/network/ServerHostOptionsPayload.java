@@ -2,7 +2,11 @@ package wily.legacy.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -74,7 +78,7 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
                 sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.set_" + value), false);
             }
             case WEATHER -> {
-                server.getCommands().performPrefixedCommand(source, "weather " + value);
+                if (!setWeather(server, sp, value)) server.getCommands().performPrefixedCommand(source, "weather " + value);
                 sp.displayClientMessage(Component.translatable("legacy.menu.host_options.message.weather." + value), false);
             }
             case DIFFICULTY -> {
@@ -131,6 +135,44 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             case "spectator" -> GameType.SPECTATOR;
             default -> GameType.SURVIVAL;
         };
+    }
+
+    private static boolean setWeather(MinecraftServer server, ServerPlayer player, String value) {
+        switch (value) {
+            case "clear" -> setClearWeather(server, player);
+            case "rain" -> setWeather(server, duration(player, ServerLevel.RAIN_DURATION), true, false);
+            case "thunder" -> setWeather(server, duration(player, ServerLevel.THUNDER_DURATION), true, true);
+            default -> {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void setClearWeather(MinecraftServer server, ServerPlayer player) {
+        server.overworld().setWeatherParameters(duration(player, ServerLevel.RAIN_DELAY), 0, false, false);
+        applyWeather(server, 0.0f, 0.0f);
+    }
+
+    private static void setWeather(MinecraftServer server, int duration, boolean raining, boolean thundering) {
+        server.overworld().setWeatherParameters(0, duration, raining, thundering);
+        applyWeather(server, raining ? 1.0f : 0.0f, thundering ? 1.0f : 0.0f);
+    }
+
+    private static int duration(ServerPlayer player, IntProvider provider) {
+        return provider.sample(player.level().getRandom());
+    }
+
+    private static void applyWeather(MinecraftServer server, float rain, float thunder) {
+        boolean raining = rain > 0.0f;
+        server.getPlayerList().broadcastAll(new ClientboundGameEventPacket(raining ? ClientboundGameEventPacket.START_RAINING : ClientboundGameEventPacket.STOP_RAINING, 0.0f));
+        for (ServerLevel level : server.getAllLevels()) {
+            if (!level.dimensionType().hasSkyLight()) continue;
+            level.setRainLevel(rain);
+            level.setThunderLevel(thunder);
+            server.getPlayerList().broadcastAll(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, rain), level.dimension());
+            server.getPlayerList().broadcastAll(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, thunder), level.dimension());
+        }
     }
 
     public enum Action {

@@ -9,26 +9,44 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.base.ArbitrarySupplier;
-import wily.factoryapi.base.client.FactoryConfigWidgets;
-import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.factoryapi.base.config.FactoryConfig;
-import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.*;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 public class ControllerMappingScreen extends LegacyKeyMappingScreen {
-    private Set<ControllerBinding<?>> recordedBindings = new ObjectOpenHashSet<>();
+    public static final OptionsScreen.Section ADVANCED_CONTROLLER_OPTIONS = new OptionsScreen.Section(
+            Component.translatable("legacy.menu.settings.advanced_options", LegacyOptions.selectedController.getDisplay().name()),
+            screen -> Panel.centered(screen, 250, 180),
+            List.of(
+                    o -> o.getRenderableVList().addOptions(
+                            LegacyOptions.selectedController,
+                            LegacyOptions.selectedControllerHandler,
+                            LegacyOptions.controllerDoubleClick,
+                            LegacyOptions.controllerVirtualCursor,
+                            LegacyOptions.legacyCursor,
+                            LegacyOptions.limitCursor,
+                            LegacyOptions.leftStickDeadZone,
+                            LegacyOptions.rightStickDeadZone,
+                            LegacyOptions.leftTriggerDeadZone,
+                            LegacyOptions.rightTriggerDeadZone),
+                    o -> o.getRenderableVList().addOptionsCategory(Component.translatable("key.categories.misc"),
+                            LegacyOptions.controllerLedRed,
+                            LegacyOptions.controllerLedGreen,
+                            LegacyOptions.controllerLedBlue),
+                    o -> o.getRenderableVList().addRenderable(new RGBPreviewWidget(0, 0, 241, 20))));
+
+    private final Set<ControllerBinding<?>> recordedBindings = new ObjectOpenHashSet<>();
 
     public ControllerMappingScreen(Screen parent) {
-        super(parent, Component.translatable("legacy.options.selectedController"));
+        super(parent, LegacyOptions.selectedController.getDisplay().name());
+        advancedOptionsScreen = ADVANCED_CONTROLLER_OPTIONS.build(this);
     }
 
     @Override
@@ -48,30 +66,20 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.controllerToggleCrouch,
                 LegacyOptions.controllerToggleSprint,
                 LegacyOptions.invertControllerButtons,
-                LegacyOptions.controllerVirtualCursor,
-                LegacyOptions.legacyCursor,
-                LegacyOptions.limitCursor,
-                LegacyOptions.controllerDoubleClick,
-                LegacyOptions.controllerCursorAtFirstInventorySlot,
-                LegacyOptions.selectedController,
-                LegacyOptions.selectedControllerHandler);
-        renderableVList.addMultSliderOption(LegacyOptions.controllerSensitivity, 2);
-        renderableVList.addOptions(
-                LegacyOptions.leftStickDeadZone,
-                LegacyOptions.rightStickDeadZone,
-                LegacyOptions.leftTriggerDeadZone,
-                LegacyOptions.rightTriggerDeadZone);
+                LegacyOptions.controllerCursorAtFirstInventorySlot);
 
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
                 renderableVList.addCategory(Component.translatable(category));
-                if (category.equals("key.categories.movement"))
+                if (category.equals("key.categories.movement")) {
                     renderableVList.addOptions(
                             LegacyOptions.invertYController,
                             LegacyOptions.smoothMovement,
                             LegacyOptions.forceSmoothMovement,
                             LegacyOptions.linearCameraMovement);
+                    renderableVList.addMultSliderOption(LegacyOptions.controllerSensitivity, 2);
+                }
             }
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
