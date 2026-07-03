@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.ConduitRotationCache;
 import wily.legacy.client.LegacyInteractionAnimations;
 import wily.legacy.client.LegacyMusicFader;
@@ -156,7 +157,8 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
 
     @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
     public void handleSystemChat(ClientboundSystemChatPacket clientboundSystemChatPacket, CallbackInfo ci) {
-        if (!LegacyOptions.deathMessages.get() && clientboundSystemChatPacket.content().getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.")) {
+        boolean deathMessage = isDeathMessage(clientboundSystemChatPacket.content());
+        if (!LegacyOptions.deathMessages.get() && deathMessage) {
             ci.cancel();
             return;
         }
@@ -164,9 +166,20 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
             ci.cancel();
             return;
         }
+        Component content = clientboundSystemChatPacket.content();
+        if (deathMessage && CommonColor.DEATH_MESSAGE_TEXT.isOverridden()) {
+            content = content.copy().withStyle(s -> s.withColor(CommonColor.DEATH_MESSAGE_TEXT.get() & 0x00FFFFFF));
+        }
         if (!LegacyOptions.systemMessagesAsOverlay.get()) {
-            minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);
+            minecraft.getChatListener().handleSystemMessage(content, false);
+            ci.cancel();
+        } else if (content != clientboundSystemChatPacket.content()) {
+            minecraft.getChatListener().handleSystemMessage(content, clientboundSystemChatPacket.overlay());
             ci.cancel();
         }
+    }
+
+    private static boolean isDeathMessage(Component component) {
+        return component.getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.");
     }
 }

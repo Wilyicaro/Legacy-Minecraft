@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -85,6 +86,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Unique
     private double legacyElytraBoostYBobMovement;
     @Unique
+    private Vec3 legacyPreviousDeltaMovement = Vec3.ZERO;
+    @Unique
     private boolean legacyElytraBoostBobbing;
     @Unique
     private boolean legacyWasJumpHeld;
@@ -131,6 +134,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Override
     public double getLegacyElytraBoostYBobMovement() {
         return legacyElytraBoostYBobMovement;
+    }
+
+    @Override
+    public Vec3 getLegacyPreviousDeltaMovement() {
+        return legacyPreviousDeltaMovement;
+    }
+
+    @Inject(method = "aiStep", at = @At("HEAD"))
+    private void legacy$capturePreviousDeltaMovement(CallbackInfo ci) {
+        legacyPreviousDeltaMovement = getDeltaMovement();
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else if <1.21.5 {*/3/*?} else {*//*1*//*?}*/))
@@ -387,6 +400,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*/"handleConfusionTransitionEffect"/*?} else {*//*"handlePortalTransitionEffect"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
     public boolean handleConfusionTransitionEffect(boolean original) {
         return original || Legacy4JClient.hasModOnServer();
+    }
+
+    @ModifyArg(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*/"handleConfusionTransitionEffect"/*?} else {*//*"handlePortalTransitionEffect"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 1)
+    private float legacy$portalTriggerPitch(float pitch) {
+        return 1.0f;
+    }
+
+    @ModifyArg(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*/"handleConfusionTransitionEffect"/*?} else {*//*"handlePortalTransitionEffect"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forLocalAmbience(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"), index = 2)
+    private float legacy$portalTriggerVolume(float volume) {
+        return 1.0f;
     }
 
     @Inject(method = /*? if <1.21.5 {*/"serverAiStep"/*?} else {*//*"applyInput"*//*?}*/, at = @At("RETURN"))

@@ -21,7 +21,7 @@ public abstract class BlockStateBaseMixin {
     protected abstract BlockState asState();
 
     @Inject(method = "getOffset", at = @At("HEAD"), cancellable = true)
-    private void getOffset(/*? if <1.21.5 {*/BlockGetter level, /*?}*/BlockPos pos, CallbackInfoReturnable<Vec3> cir) {
+    private void getOffset(/*? if <1.21.2 {*/BlockGetter level, /*?}*/BlockPos pos, CallbackInfoReturnable<Vec3> cir) {
         if (legacy$hasModOnServer() && asState().getBlock() instanceof TallFlowerBlock) {
             cir.setReturnValue(Vec3.ZERO);
         }

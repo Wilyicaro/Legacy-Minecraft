@@ -21,6 +21,7 @@ public class LegacyGameRules {
     public static final GameRules.Key<GameRules.BooleanValue> TNT_EXPLODES = GameRules.register("tntExplodes", GameRules.Category.MISC, GameRules.BooleanValue.create(true));
     //?}
     public static final GameRules.Key<GameRules.IntegerValue> TNT_LIMIT = GameRules.register("tntLimit", GameRules.Category.MISC, GameRules.IntegerValue.create(20));
+    public static final GameRules.Key<GameRules.IntegerValue> FALLING_BLOCK_LIMIT = GameRules.register("fallingBlockLimit", GameRules.Category.MOBS, createInteger(0, 0, Integer.MAX_VALUE, (server, integerValue) -> {}));
     public static final GameRules.Key<GameRules.BooleanValue> PLAYER_VS_PLAYER = GameRules.register("playerVsPlayer", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
     public static final GameRules.Key<GameRules.BooleanValue> PLAYER_STARTING_MAP = GameRules.register("playerStartingMap", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
     public static final GameRules.Key<GameRules.IntegerValue> DEFAULT_MAP_SIZE = GameRules.register("defaultMapSize", GameRules.Category.MISC, createInteger(0, 0, 4, ((server, integerValue) -> {})));

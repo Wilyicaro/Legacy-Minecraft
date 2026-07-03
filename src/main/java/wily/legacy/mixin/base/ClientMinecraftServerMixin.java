@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.objectweb.asm.Opcodes;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -100,25 +101,37 @@ public abstract class ClientMinecraftServerMixin {
     *///?}
     @Inject(method = "stopServer", at = @At("RETURN"))
     private void stopServer(CallbackInfo ci){
+        legacy$waitForSave();
         if (Legacy4JClient.saveExit) {
             Legacy4JClient.saveExit = false;
             Legacy4JClient.saveLevel(storageSource);
+        }
+        if (LegacyOptions.alwaysClearSaveCache.get() && Legacy4JClient.isCurrentWorldSource(storageSource)) {
+            FileUtils.deleteQuietly(Legacy4JClient.currentWorldSource.getBaseDir().resolve(storageSource.getLevelId()).toFile());
         }
     }
     @Inject(method = "saveEverything", at = @At("RETURN"))
     public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
         if (!Legacy4JClient.isCurrentWorldSource(storageSource)) return;
+        isSaving = true;
         CompletableFuture.runAsync(()->{
-            isSaving = true;
             Iterable<ServerLevel> levels = getAllLevels();
-            levels.forEach(l->l.noSave = true);
-            Legacy4JClient.saveLevel(storageSource);
-            levels.forEach(l->l.noSave = false);
-            isSaving = false;
+            try {
+                levels.forEach(l->l.noSave = true);
+                Legacy4JClient.saveLevel(storageSource);
+            } finally {
+                levels.forEach(l->l.noSave = false);
+                isSaving = false;
+            }
         },executor);
     }
     @Inject(method = "stopServer", at = @At("HEAD"))
     private void stopServerHead(CallbackInfo ci){
+        legacy$waitForSave();
+    }
+
+    @Unique
+    private void legacy$waitForSave() {
         while (isSaving) {
             Thread.onSpinWait();
         }

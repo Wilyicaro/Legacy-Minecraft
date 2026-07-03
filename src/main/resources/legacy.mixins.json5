@@ -87,6 +87,7 @@
     "ClientPacketListenerMixin",
     "ClientPrimaryLevelDataMixin",
     "ClientTextTooltipMixin",
+    "client.CrouchToggleMixin",
     "client.ConduitBlockEntityRendererMixin",
     "client.ConduitBlockMixin",
     "client.DragonEggBlockMixin",
@@ -121,6 +122,9 @@
     *///?}
     "EditBoxMixin",
     "client.enchantment.EnchantmentScreenMixin",
+    //? if >=1.21.3 {
+    /*"client.EndCrystalModelMixin",
+    *///?}
     "EndCrystalRendererMixin",
     "EntityRendererMixin",
     "FireworkEntityRendererMixin",
@@ -138,6 +142,9 @@
     "GuiGameRendererMixin",
     "GuiGraphicsMixin",
     "client.gui.GuiMixin",
+    //? if >=1.21.10 {
+    "client.gui.LocatorBarRendererMixin",
+    //?}
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
     "HugeExplosionParticleMixin",
@@ -222,6 +229,7 @@
     "client.gui.PlayerTabOverlayMixin",
     "AbstractScrollWidgetMixin",
     "MultilineEditBoxMixin",
+    "MultilineTextFieldMixin",
     "EvokerFangsRendererMixin",
     "WindowMixin",
     "MenuScreensMixin",
@@ -339,6 +347,10 @@
     "ShulkerAccessor",
     "StatsCounterMixin",
     "SnowLayerBlockMixin",
+    "SpiderMixin",
+    "FallingBlockEntityMixin",
+    "FallingBlockAccessor",
+    "FallingBlockMixin",
     "SweetBerryBushBlockMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
@@ -347,6 +359,7 @@
     "TntBlockMixin",
     "VillagerGoalPackagesMixin",
     "VillagerMixin",
+    "VindicatorMixin",
     "WanderingTraderMixin",
     "villager_spawn_egg.VillagerEggMixin",
     "villager_spawn_egg.WanderingTraderEggMixin",

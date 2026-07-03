@@ -73,6 +73,7 @@ import wily.factoryapi.base.network.CommonRecipeManager;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.TntBlock;
@@ -269,6 +270,7 @@ public class Legacy4J {
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
         *///?}
         registerTridentDispenseBehavior();
+        ComposterBlock.COMPOSTABLES.put(Items.GRASS_BLOCK, 0.3f);
 
         //? if <1.21.5 {
         DispenserBlock.registerBehavior(Blocks.TNT, new OptionalDispenseItemBehavior() {

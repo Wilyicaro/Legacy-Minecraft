@@ -37,7 +37,7 @@ public abstract class DoublePlantBlockMixin extends /*? if <1.21.5 {*/BushBlock/
             return LEGACY_TALL_FLOWER_SHAPE;
         }
         if (state.is(Blocks.TALL_GRASS) || state.is(Blocks.LARGE_FERN)) {
-            Vec3 offset = state.getOffset(/*? if <1.21.5 {*/level, /*?}*/pos);
+            Vec3 offset = state.getOffset(/*? if <1.21.2 {*/level, /*?}*/pos);
             return LEGACY_TALL_FLOWER_SHAPE.move(offset.x, offset.y, offset.z);
         }
         return super.getShape(state, level, pos, context);

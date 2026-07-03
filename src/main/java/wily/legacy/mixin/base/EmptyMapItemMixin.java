@@ -59,7 +59,8 @@ public class EmptyMapItemMixin {
         ItemStack map = player.getItemInHand(interactionHand);
         Component name = FactoryItemUtil.hasCustomName(map) ? map.getHoverName() : null;
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        byte scale = custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*//*.orElse((byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE))*//*?}*/ : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE);
+        byte defaultScale = legacy$getDefaultMapSize(level);
+        byte scale = custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*//*.orElse(defaultScale)*//*?}*/ : defaultScale;
         map.consume(1, player);
         ItemStack existingMap = legacy$getExistingMap(level, player, arg, i, scale, b, bl);
         ItemStack result = existingMap.isEmpty() ? original.call(level, arg, i, scale, b, bl) : existingMap.copyWithCount(1);
@@ -68,6 +69,11 @@ public class EmptyMapItemMixin {
     }
 
     //?}
+
+    @Unique
+    private byte legacy$getDefaultMapSize(Level level) {
+        return (byte) /*? if <1.21.2 {*/level/*?} else {*//*((ServerLevel) level)*//*?}*/.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE);
+    }
 
     @Unique
     private ItemStack legacy$getExistingMap(Level level, Player player, int x, int z, byte scale, boolean trackingPosition, boolean unlimitedTracking) {

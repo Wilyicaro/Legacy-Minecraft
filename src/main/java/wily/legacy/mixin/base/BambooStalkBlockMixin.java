@@ -26,7 +26,7 @@ public abstract class BambooStalkBlockMixin {
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (!legacy$hasModOnServer()) return;
-        Vec3 offset = state.getOffset(/*? if <1.21.5 {*/level, /*?}*/pos);
+        Vec3 offset = state.getOffset(/*? if <1.21.2 {*/level, /*?}*/pos);
         VoxelShape shape = state.getValue(BambooStalkBlock.AGE) == 0 ? LEGACY_THIN_BAMBOO_STALK_SHAPE : LEGACY_THICK_BAMBOO_STALK_SHAPE;
         cir.setReturnValue(shape.move(offset.x, offset.y, offset.z));
     }

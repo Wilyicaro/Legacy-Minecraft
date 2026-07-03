@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PlayerIdentifier;
@@ -155,7 +156,7 @@ public abstract class MapRendererMixin {
             poseStack.pushPose();
             poseStack.translate(-0.2f,0.4f,-0.1f);
             poseStack.scale(1f, 0.95f, 1);
-            font.drawInBatch(I18n.get("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
+            font.drawInBatch(I18n.get("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, CommonColor.MAP_COORDINATE_TEXT.get(), false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
             poseStack.popPose();
         }
     }

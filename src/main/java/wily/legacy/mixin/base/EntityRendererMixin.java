@@ -35,6 +35,11 @@ import wily.legacy.util.ScreenUtil;
 public abstract class EntityRendererMixin {
     @Shadow @Final private Font font;
 
+    @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
+    protected void renderNameTagHead(/*? if <1.21.2 {*/ Entity/*?} else {*/ /*EntityRenderState*//*?}*/ entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, /*? if >=1.20.5 && <1.21.2 {*/float f, /*?}*/CallbackInfo ci) {
+        if (!LegacyOptions.inGameOnlineIds.get() && entity instanceof /*? if <1.21.2 {*/ AbstractClientPlayer/*?} else {*/ /*PlayerRenderState*//*?}*/) ci.cancel();
+    }
+
     @Inject(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", shift = At.Shift.AFTER))
     protected void renderNameTag(/*? if <1.21.2 {*/ Entity/*?} else {*/ /*EntityRenderState*//*?}*/ entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, /*? if >=1.20.5 && <1.21.2 {*/float f, /*?}*/CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();

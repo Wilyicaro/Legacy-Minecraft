@@ -1,5 +1,7 @@
 package wily.legacy.entity;
 
+import net.minecraft.world.phys.Vec3;
+
 public interface LegacyLocalPlayer {
 
     boolean canSprintController();
@@ -9,4 +11,6 @@ public interface LegacyLocalPlayer {
     boolean isLegacyElytraBoostBobbing();
 
     double getLegacyElytraBoostYBobMovement();
+
+    Vec3 getLegacyPreviousDeltaMovement();
 }

@@ -1,10 +1,13 @@
 //? if >=1.21.2 {
 /*package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.phys.Vec3;
@@ -13,17 +16,40 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
 @Mixin(ServerExplosion.class)
 public abstract class ServerExplosionMixin implements Explosion {
+    private static final double LEGACY_TNT_THROUGH_BLOCK_KNOCKBACK = 0.5;
+
     @Shadow @Final private ServerLevel level;
 
     @Shadow @Final private Vec3 center;
 
+    @Shadow @Final private Entity source;
+
     @Shadow @Final private float radius;
+
+    @ModifyArg(method = "hurtEntities()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0, require = 0)
+    private double getKnockbackPower(double power, @Local Entity entity) {
+        return getThroughBlockKnockbackPower(entity, power);
+    }
+
+    @ModifyArg(method = "hurtEntities(Ljava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0, require = 0)
+    private double getKnockbackPowerWithBlocks(double power, @Local Entity entity) {
+        return getThroughBlockKnockbackPower(entity, power);
+    }
+
+    private double getThroughBlockKnockbackPower(Entity entity, double power) {
+        if (!(source instanceof PrimedTnt)) return power;
+        double doubleRadius = radius * 2.0F;
+        if (doubleRadius <= 0.0) return power;
+        double dist = Math.sqrt(entity.distanceToSqr(center)) / doubleRadius;
+        return Math.max(power, (1.0 - dist) * LEGACY_TNT_THROUGH_BLOCK_KNOCKBACK);
+    }
 
     @Inject(method = "interactWithBlocks", at = @At("RETURN"))
     private void explode(List<BlockPos> list, CallbackInfo ci){

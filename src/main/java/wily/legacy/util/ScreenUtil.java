@@ -80,6 +80,7 @@ import wily.legacy.client.*;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
+import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
 import wily.legacy.skins.skin.ClientSkinAssets;
@@ -771,7 +772,7 @@ public class ScreenUtil {
         if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()){
             float f = FactoryAPIClient.getGamePartialTick(false);
             Vec3 vec3 = mc.player.getViewVector(f);
-            Vec3 vec32 = mc.player.getDeltaMovementLerped(f);
+            Vec3 vec32 = getFlyingViewMovement(f);
             double d = vec32.horizontalDistanceSqr();
             double e = vec3.horizontalDistanceSqr();
             if (d > 0.0 && e > 0.0) {
@@ -791,7 +792,7 @@ public class ScreenUtil {
         if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()) {
             float f = FactoryAPIClient.getGamePartialTick(false);
             Vec3 vec3 = mc.player.getViewVector(f);
-            Vec3 vec32 = mc.player.getDeltaMovementLerped(f);
+            Vec3 vec32 = getFlyingViewMovement(f);
             double d = vec32.horizontalDistanceSqr();
             double e = vec3.horizontalDistanceSqr();
             if (d > 0.01 && e > 0.01) {
@@ -805,6 +806,13 @@ public class ScreenUtil {
             }
         }
         return original;
+    }
+
+    private static Vec3 getFlyingViewMovement(float partialTick) {
+        if (mc.player instanceof LegacyLocalPlayer player) {
+            return player.getLegacyPreviousDeltaMovement().lerp(mc.player.getDeltaMovement(), partialTick);
+        }
+        return mc.player.getDeltaMovementLerped(partialTick);
     }
 
     public static void renderGameOverlay(GuiGraphics graphics){

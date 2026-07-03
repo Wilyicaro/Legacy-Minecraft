@@ -15,6 +15,7 @@ import net.minecraft.world.level.LevelReader;
 /*import net.minecraft.world.level.ScheduledTickAccess;
 *///?}
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Fallable;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
@@ -23,9 +24,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.block.LegacyBlockExtension;
 
 @Mixin(SnowLayerBlock.class)
-public class SnowLayerBlockMixin extends Block implements Fallable {
+public class SnowLayerBlockMixin extends Block implements Fallable, LegacyBlockExtension {
     public SnowLayerBlockMixin(Properties properties) {
         super(properties);
     }
@@ -55,6 +57,35 @@ public class SnowLayerBlockMixin extends Block implements Fallable {
         FallingBlockEntity.fall(serverLevel, blockPos, blockState);
     }
 
+    @Override
+    public void onBrokenAfterFall(Level level, BlockPos blockPos, FallingBlockEntity fallingBlockEntity) {
+        BlockState state = level.getBlockState(blockPos);
+        if (state.is(Blocks.SNOW)) {
+            ((FallingBlockAccessor) fallingBlockEntity).setCancelDrop(true);
+            mergeSnowLayers(level, blockPos, fallingBlockEntity.getBlockState(), fallingBlockEntity.getBlockState().getValue(SnowLayerBlock.LAYERS));
+        }
+    }
+
+    private void mergeSnowLayers(Level level, BlockPos blockPos, BlockState fallingState, int layers) {
+        BlockPos targetPos = blockPos;
+        int remainingLayers = layers;
+        while (remainingLayers > 0) {
+            BlockState targetState = level.getBlockState(targetPos);
+            if (targetState.is(Blocks.SNOW)) {
+                int totalLayers = targetState.getValue(SnowLayerBlock.LAYERS) + remainingLayers;
+                level.setBlock(targetPos, targetState.setValue(SnowLayerBlock.LAYERS, Math.min(SnowLayerBlock.MAX_HEIGHT, totalLayers)), Block.UPDATE_ALL);
+                remainingLayers = Math.max(0, totalLayers - SnowLayerBlock.MAX_HEIGHT);
+            } else if (targetState.isAir() || targetState.canBeReplaced()) {
+                int placedLayers = Math.min(SnowLayerBlock.MAX_HEIGHT, remainingLayers);
+                level.setBlock(targetPos, fallingState.setValue(SnowLayerBlock.LAYERS, placedLayers), Block.UPDATE_ALL);
+                remainingLayers -= placedLayers;
+            } else {
+                return;
+            }
+            targetPos = targetPos.above();
+        }
+    }
+
     protected int getDelayAfterPlace() {
         return 2;
     }
@@ -64,5 +95,10 @@ public class SnowLayerBlockMixin extends Block implements Fallable {
         if (randomSource.nextInt(16) == 0 && FallingBlock.isFree(level.getBlockState(blockPos.below()))) {
             ParticleUtils.spawnParticleBelow(level, blockPos, randomSource, new BlockParticleOption(ParticleTypes.FALLING_DUST, blockState));
         }
+    }
+
+    @Override
+    public boolean l4j$isFreeForFalling(BlockState state) {
+        return state.getValue(SnowLayerBlock.LAYERS) < SnowLayerBlock.MAX_HEIGHT;
     }
 }
