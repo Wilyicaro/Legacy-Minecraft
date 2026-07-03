@@ -46,6 +46,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.compat.BisectModCompat;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -151,6 +152,7 @@ public class ServerRenderableList extends RenderableVList {
         Component component = this.getMultiplayerDisabledReason();
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
         if (LegacyOptions.displayRealmsButton.get()) addIconButton(this,Legacy4J.createModLocation("creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(getScreen())),tooltip);
+        if (FactoryAPI.isModLoaded("bhmenu")) addRenderable(BisectModCompat.createButton(this));
         for (int i = 0; i < servers.size(); i++) {
             addRenderable(new ServerButton(0,0,0,30,i));
         }
