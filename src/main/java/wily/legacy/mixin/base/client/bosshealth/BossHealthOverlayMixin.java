@@ -19,8 +19,10 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.ScreenUtil;
@@ -39,11 +41,16 @@ public abstract class BossHealthOverlayMixin {
             graphics.pose().translate(graphics.guiWidth() / 2f,j,0);
             if (!b) graphics.pose().scale(2/3f,2/3f,2/3f);
             graphics.pose().translate(-font.width(component) / 2f,0,0);
-            graphics.drawString(font,component,0,0,k);
+            graphics.drawString(font,component,0,0,bossTextColor(CommonColor.BOSS_TEXT.isOverridden() ? CommonColor.BOSS_TEXT.get() : k));
             graphics.pose().popPose();
             Legacy4JClient.forceVanillaFontShadowColor = false;
         });
         return 0;
+    }
+
+    @Unique
+    private static int bossTextColor(int color) {
+        return ColorUtil.withAlpha(color, ScreenUtil.getHUDOpacity());
     }
     //? if >1.20.1 {
     @Shadow protected abstract void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2);

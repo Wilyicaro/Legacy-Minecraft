@@ -186,6 +186,8 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 296), accessor.getInteger("scroller.y", panel.y + 27));
         scroller.height = accessor.getInteger("scroller.height", 135);
         scroller.width = accessor.getInteger("scroller.width", 13);
+        scroller.trackSprite = accessor.getResourceLocation("scroller.trackSprite", scroller.trackSprite);
+        scroller.thumbSprite = accessor.getResourceLocation("scroller.thumbSprite", scroller.thumbSprite);
         scroller.offset(new Vec3(ScreenUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0.0f));
         if (arrangement.get() == 2){
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);

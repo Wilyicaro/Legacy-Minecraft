@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,6 +61,17 @@ public abstract class ChatComponentMixin {
         return LegacyOptions.displayChatIndicators.get() ? i : 0;
     }
 
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;III)I"), index = 1)
+    private FormattedCharSequence changeChatTextColor(FormattedCharSequence text) {
+        if (!CommonColor.CHAT_TEXT.isOverridden()) return text;
+        int color = CommonColor.CHAT_TEXT.get() & 0x00FFFFFF;
+        return sink -> text.accept((index, style, codePoint) -> sink.accept(index, chatTextStyle(style, color), codePoint));
+    }
+
+    private static Style chatTextStyle(Style style, int color) {
+        return style.getColor() == null ? style.withColor(color) : style;
+    }
+
     @Redirect(method = "getMessageTagAt",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
     private double changeMessageTagXPos(ChatComponent instance, double d) {
         return screenToChatX(d) + Math.round(ScreenUtil.getChatSafeZone());
@@ -75,7 +88,8 @@ public abstract class ChatComponentMixin {
     @Inject(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER, ordinal = 0))
     private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, /*? if >=1.20.5 {*/boolean bl,/*?}*/ CallbackInfo ci) {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.pose().translate(ScreenUtil.getChatSafeZone(), ScreenUtil.getHUDDistance() - 42,0.0F);
+        double scale = Math.max(getScale(), 0.0001D);
+        guiGraphics.pose().translate(ScreenUtil.getChatSafeZone() / scale, (ScreenUtil.getHUDDistance() - 42) / scale,0.0F);
     }
     @Inject(method = "screenToChatX",at = @At("RETURN"), cancellable = true)
     private void screenToChatX(double d, CallbackInfoReturnable<Double> cir) {

@@ -75,6 +75,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
 
     @Shadow private float scrollSpeed;
 
+    @Shadow private int totalScrollLength;
+
     @Shadow private List<FormattedCharSequence> lines;
 
     @Shadow private boolean speedupActive;
@@ -101,6 +103,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
             int k = this.width / 2 - 161;
             for(int n = 0; n < this.lines.size(); ++n) {
+                int lineAdvance = getPoemLineAdvance(n);
                 if (n == this.lines.size() - 1) {
                     float h = (float)m + g - (float)(this.height / 2 - 6);
                     if (h < 0.0F) {
@@ -122,7 +125,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                     guiGraphics.pose().popPose();
                 }
 
-                m += 72;
+                m += lineAdvance;
             }
             guiGraphics.pose().popPose();
             Legacy4JClient.defaultFontOverride = null;
@@ -172,6 +175,12 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
         }
         ci.cancel();
     }
+
+    @Unique
+    private int getPoemLineAdvance(int index) {
+        return 24;
+    }
+
     @Inject(method = "keyPressed", at = @At("HEAD"))
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if (i == InputConstants.KEY_UP || i == InputConstants.KEY_DOWN) {
@@ -188,6 +197,19 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     private void init(CallbackInfo ci){
         this.titleLines = new IntOpenHashSet();
     }
+
+    @Inject(method = "init", at = @At("TAIL"))
+    private void updateTotalScrollLength(CallbackInfo ci) {
+        if (poem) {
+            totalScrollLength = 0;
+            for (int i = 0; i < lines.size(); i++) {
+                totalScrollLength += getPoemLineAdvance(i);
+            }
+        } else {
+            totalScrollLength = lines.size() * 18;
+        }
+    }
+
     @Redirect(method = "addPoemFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addEmptyLine()V", ordinal = 0))
     private void addPoemFile(WinScreen instance) {
     }

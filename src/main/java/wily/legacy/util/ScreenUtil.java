@@ -102,11 +102,14 @@ public class ScreenUtil {
     public static final boolean isNvidia;
     public static final ResourceLocation GUI_ATLAS = FactoryAPI.createVanillaLocation("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
+    public static Integer tooltipTextColorOverride;
+    public static boolean tooltipTextColorOverrideForcesStyle;
     public static long lastHotbarSelectionChange = -1;
     public static long animatedCharacterTime;
     public static long remainingAnimatedCharacterTime;
     public static int lastHotbarSelection = -1;
     public static long lastGui = -1;
+    public static boolean autoFocusedWidget;
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
     public static final PanoramaRenderer panoramaRenderer = /*? if <1.20.5 {*//*new PanoramaRenderer(TitleScreen.CUBE_MAP)*//*?} else {*/LegacyScreen.PANORAMA_RENDERER/*?}*/;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
@@ -557,6 +560,10 @@ public class ScreenUtil {
         return mc.screen == null && (hudDelay == 0 || Util.getMillis() - lastGui > hudDelay);
     }
 
+    public static boolean hasAutoFocusButtonAnimation() {
+        return autoFocusedWidget && CommonValue.AUTOFOCUS_BUTTON_ANIMATION.get();
+    }
+
     public static void renderAnimatedCharacter(GuiGraphics guiGraphics){
         if (!LegacyOptions.animatedCharacter.get()) return;
         if (mc.getCameraEntity() instanceof LivingEntity character) {
@@ -655,6 +662,13 @@ public class ScreenUtil {
             Object2IntMap<Component> tooltipLines = tooltip.stream().limit(ScreenUtil.getSelectedItemTooltipLines()).map(c-> tooltip.indexOf(c) == ScreenUtil.getSelectedItemTooltipLines() - 1 && LegacyOptions.itemTooltipEllipsis.get() ? MORE : c).collect(Collectors.toMap(Function.identity(),font::width,(a, b)->b, Object2IntLinkedOpenHashMap::new));
             int l = Math.min((int)((float)GuiAccessor.getInstance().getToolHighlightTimer() * 256.0f / 10.0f),255);
             if (l > 0) {
+                int itemNameText = CommonColor.ITEM_NAME_TEXT.get();
+                int itemTooltipText = CommonColor.ITEM_TOOLTIP_TEXT.get();
+                int itemNameColor = withHUDTooltipAlpha(itemNameText, l);
+                int itemTooltipColor = withHUDTooltipAlpha(itemTooltipText, l);
+                int defaultColor = 0x00FFFFFF | Math.round(l * getHUDOpacity()) << 24;
+                boolean overrideItemNameColor = CommonColor.ITEM_NAME_TEXT.isOverridden();
+                boolean overrideItemTooltipColor = CommonColor.ITEM_TOOLTIP_TEXT.isOverridden();
                 int height = LegacyOptions.selectedItemTooltipSpacing.get() * (tooltipLines.size() -1);
                 guiGraphics.pose().translate(0, -height, 0);
                 if (!mc.options.backgroundForChatOnly().get()) {
@@ -664,15 +678,34 @@ public class ScreenUtil {
                     ScreenUtil.renderPointerPanel(guiGraphics, backgroundX, -4, backgroundWidth, height + 15);
                     FactoryGuiGraphics.of(guiGraphics).clearColor();
                 }
+                int[] line = {0};
                 tooltipLines.forEach((mutableComponent, width) -> {
                     int x = (guiGraphics.guiWidth() - width) / 2;
-                    guiGraphics.drawString(font, mutableComponent, x, 0, 0xFFFFFF + (l << 24));
+                    boolean itemNameLine = line[0]++ == 0;
+                    boolean useItemNameColor = itemNameLine && overrideItemNameColor;
+                    boolean useItemTooltipColor = !itemNameLine && overrideItemTooltipColor;
+                    Component text = mutableComponent;
+                    int color = defaultColor;
+                    if (useItemNameColor) {
+                        text = mutableComponent.copy().withStyle(s -> s.withColor(itemNameText & 0x00FFFFFF));
+                        color = itemNameColor;
+                    } else if (useItemTooltipColor) {
+                        text = mutableComponent.copy().withStyle(s -> s.withColor(itemTooltipText & 0x00FFFFFF));
+                        color = itemTooltipColor;
+                    }
+                    guiGraphics.drawString(font, text, x, 0, color);
                     guiGraphics.pose().translate(0, LegacyOptions.selectedItemTooltipSpacing.get(), 0);
                 });
             }
         }
         FactoryAPIClient.getProfiler().pop();
         ScreenUtil.finalizeHUDRender(guiGraphics);
+    }
+
+    private static int withHUDTooltipAlpha(int color, int fade) {
+        int alpha = color >>> 24;
+        if (alpha == 0) alpha = 255;
+        return (color & 0x00FFFFFF) | Math.round(alpha * fade / 255f * getHUDOpacity()) << 24;
     }
 
     public static void renderGuiEffects(GuiGraphics guiGraphics){
@@ -742,9 +775,33 @@ public class ScreenUtil {
             double d = vec32.horizontalDistanceSqr();
             double e = vec3.horizontalDistanceSqr();
             if (d > 0.0 && e > 0.0) {
-                int dir = (int) -Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
-                float z = (float) (Math.min(Math.PI / 8, Math.acos((vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e)) / 2.5));
-                if (z > 0) return dir*z;
+                double dot = (vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e);
+                double angle = Math.acos(Mth.clamp(dot, -1.0, 1.0));
+                double z = Math.min(Math.PI / 8, angle / 2.5);
+                if (z > 0.0) {
+                    double dir = -Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
+                    return (float)(original + dir * z);
+                }
+            }
+        }
+        return original;
+    }
+
+    public static float getFlyingViewYRotation(float original) {
+        if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()) {
+            float f = FactoryAPIClient.getGamePartialTick(false);
+            Vec3 vec3 = mc.player.getViewVector(f);
+            Vec3 vec32 = mc.player.getDeltaMovementLerped(f);
+            double d = vec32.horizontalDistanceSqr();
+            double e = vec3.horizontalDistanceSqr();
+            if (d > 0.01 && e > 0.01) {
+                double dot = (vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e);
+                double angle = Math.acos(Mth.clamp(dot, -1.0, 1.0));
+                double forwardAlignment = Mth.clamp(dot, 0.0, 1.0);
+                if (angle > 0.0 && forwardAlignment > 0.0) {
+                    double dir = -Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
+                    return (float)(original + dir * angle * forwardAlignment * 0.25);
+                }
             }
         }
         return original;

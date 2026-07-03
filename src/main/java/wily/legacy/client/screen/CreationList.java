@@ -67,11 +67,11 @@ public class CreationList extends RenderableVList{
                 LevelSummary summary = access.getSummary(/*? if >1.20.2 {*/access.getDataTag()/*?}*/);
                 access.close();
                 if (t.directJoin()) {
-                    LoadSaveScreen.loadWorld(getScreen(), minecraft, Legacy4JClient.getLevelStorageSource(), summary);
+                    Legacy4JClient.hideNextExperimentalWorldWarning(() -> LoadSaveScreen.loadWorld(getScreen(), minecraft, Legacy4JClient.getLevelStorageSource(), summary));
                 } else minecraft.setScreen(new LoadSaveScreen(getScreen(),summary,access,t.isLocked()) {
                     @Override
                     public void onClose() {
-                        if (!LegacyOptions.saveCache.get()) FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
+                        if (!LegacyOptions.saveCache.get() || LegacyOptions.alwaysClearSaveCache.get()) FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
                         super.onClose();
                     }
                 });

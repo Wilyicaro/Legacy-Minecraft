@@ -41,6 +41,16 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
     private void onPress(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         lastTimePressed = Util.getMillis();
     }
+    @Unique
+    private void legacy$renderAutoFocusButtonBase(GuiGraphics guiGraphics) {
+        FactoryGuiGraphics.of(guiGraphics).setColor(1.0F, 1.0F, 1.0F, this.alpha);
+        FactoryScreenUtil.enableBlend();
+        FactoryScreenUtil.enableDepthTest();
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BUTTON, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        FactoryGuiGraphics.of(guiGraphics).setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        float timer = (Util.getMillis() % 1200) / 1200.0f;
+        alpha *= 0.5f + (timer >= 0.5f ? 1 - timer : timer);
+    }
     //? if >1.20.1 {
     @ModifyVariable(method = "renderWidget", at = @At(value = "STORE"), ordinal = 2)
     protected int renderWidget(int k) {
@@ -49,6 +59,11 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
     @Inject(method = "renderWidget", at = @At("HEAD"))
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         alpha = active ? 1 : 0.8f;
+        if (ScreenUtil.hasAutoFocusButtonAnimation()) legacy$renderAutoFocusButtonBase(guiGraphics);
+    }
+    @Inject(method = "renderWidget", at = @At("RETURN"))
+    protected void renderWidgetReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        if (ScreenUtil.hasAutoFocusButtonAnimation()) alpha = active ? 1 : 0.8f;
     }
     @Redirect(method = "renderWidget", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
     protected boolean renderWidget(AbstractButton instance) {
@@ -62,13 +77,15 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         ci.cancel();
         alpha = active ? 1 : 0.8f;
         Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
+        if (ScreenUtil.hasAutoFocusButtonAnimation()) legacy$renderAutoFocusButtonBase(guiGraphics);
+        FactoryGuiGraphics.of(guiGraphics).setColor(1.0F, 1.0F, 1.0F, this.alpha);
         FactoryScreenUtil.enableBlend();
         FactoryScreenUtil.enableDepthTest();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON , this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        FactoryGuiGraphics.of(guiGraphics).setColor(1.0F, 1.0F, 1.0F, 1.0F);
         int k = ScreenUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
         this.renderString(guiGraphics, minecraft.font, k | Mth.ceil(this.alpha * 255.0F) << 24);
+        if (ScreenUtil.hasAutoFocusButtonAnimation()) alpha = active ? 1 : 0.8f;
     }
     *///?}
 

@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.ScreenUtil;
@@ -108,10 +109,19 @@ public abstract class GuiGraphicsMixin {
 
         int t;
         ClientTooltipComponent tooltipComponent;
-        for(t = 0; t < list.size(); ++t) {
-            tooltipComponent = list.get(t);
-            tooltipComponent.renderText(font, 0, s, this.pose.last().pose(), this.bufferSource);
-            s += tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
+        try {
+            Integer itemNameText = CommonColor.ITEM_NAME_TEXT.isOverridden() ? CommonColor.ITEM_NAME_TEXT.get() : null;
+            Integer itemTooltipText = CommonColor.ITEM_TOOLTIP_TEXT.isOverridden() ? CommonColor.ITEM_TOOLTIP_TEXT.get() : null;
+            for(t = 0; t < list.size(); ++t) {
+                tooltipComponent = list.get(t);
+                ScreenUtil.tooltipTextColorOverride = t == 0 ? itemNameText : itemTooltipText;
+                ScreenUtil.tooltipTextColorOverrideForcesStyle = t == 0 && itemNameText != null;
+                tooltipComponent.renderText(font, 0, s, this.pose.last().pose(), this.bufferSource);
+                s += tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
+            }
+        } finally {
+            ScreenUtil.tooltipTextColorOverride = null;
+            ScreenUtil.tooltipTextColorOverrideForcesStyle = false;
         }
 
         s = 0;
