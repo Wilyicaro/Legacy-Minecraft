@@ -191,7 +191,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
 
             Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, fontOverride -> {
                 float topTooltipScale = accessor.getFloat("topTooltip.scale", ScreenUtil.is720p() ? 2 / 3f : 1.0f);
-                int topTextColor = CommonColor.WHITE.get();
+                int topTextColor = CommonColor.ITEM_NAME_TEXT.get();
                 graphics.pose().pushPose();
                 Component filter = filterText();
                 graphics.pose().translate(filterTooltipX + (filterTooltipWidth - font.width(filter) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("filterText.y", 6), 0);
