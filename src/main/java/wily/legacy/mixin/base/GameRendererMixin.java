@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
@@ -65,6 +66,14 @@ public abstract class GameRendererMixin {
     private void tick(CallbackInfo ci){
         if (itemActivationItem == null && Legacy4JClient.itemActivationRenderReplacement != null) Legacy4JClient.itemActivationRenderReplacement = null;
     }
+
+    //? if <1.21.1 {
+    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getYRot()F"))
+    private float applyFlyingViewYRotation(float yRot) {
+        float base = -yRot * Mth.DEG_TO_RAD;
+        return yRot - (ScreenUtil.getFlyingViewYRotation(base) - base) / Mth.DEG_TO_RAD;
+    }
+    //?}
 
     @Inject(method = "pick", at = @At("RETURN"))
     private void pick(float tickDelta, CallbackInfo ci) {

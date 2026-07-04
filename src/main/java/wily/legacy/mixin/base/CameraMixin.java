@@ -7,6 +7,11 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
+//? if <1.21.1 {
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Final;
+//?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +23,29 @@ import wily.legacy.util.ScreenUtil;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
+    //? if <1.21.1 {
+    private static final float LEGACY_CAMERA_DEGREES_TO_RADIANS = Mth.DEG_TO_RAD;
+
+    @Shadow
+    private float xRot;
+
+    @Shadow
+    @Final
+    private Quaternionf rotation;
+
+    @Shadow
+    @Final
+    private Vector3f forwards;
+
+    @Shadow
+    @Final
+    private Vector3f up;
+
+    @Shadow
+    @Final
+    private Vector3f left;
+    //?}
+
     @Shadow
     private float yRot;
 
@@ -36,6 +64,19 @@ public abstract class CameraMixin {
     protected float setFlyingViewRollingRotation(float f) {
         return ScreenUtil.getFlyingViewRollingRotation(f);
     }
+
+    //? if <1.21.1 {
+    @Inject(method = "setRotation", at = @At("TAIL"))
+    private void setFlyingViewRotation(float yRot, float xRot, CallbackInfo ci) {
+        float yaw = ScreenUtil.getFlyingViewYRotation(-this.yRot * LEGACY_CAMERA_DEGREES_TO_RADIANS);
+        float pitch = this.xRot * LEGACY_CAMERA_DEGREES_TO_RADIANS;
+        float roll = ScreenUtil.getFlyingViewRollingRotation(0.0f);
+        rotation.rotationYXZ(yaw, pitch, roll);
+        forwards.set(0.0f, 0.0f, 1.0f).rotate(rotation);
+        up.set(0.0f, 1.0f, 0.0f).rotate(rotation);
+        left.set(1.0f, 0.0f, 0.0f).rotate(rotation);
+    }
+    //?}
 
     @Inject(method = "setup", at = @At("TAIL"))
     private void setup(BlockGetter blockGetter, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTicks, CallbackInfo ci) {
