@@ -65,20 +65,42 @@ public final class ContentReinstaller {
         if (!ContentPackDownloader.needsUpdate(pack, category)) {
             return CompletableFuture.completedFuture(state);
         }
-        return prepare(job).thenCompose(v -> ContentPackDownloader.download(pack, category)).handle((installed, throwable) -> {
-            if (throwable != null) {
+        return prepare(job)
+            .thenCompose(v -> ContentPackDownloader.download(pack, category))
+            .thenCompose(installed -> finish(job, state, installed))
+            .exceptionally(throwable -> {
                 state.failed++;
                 Legacy4J.LOGGER.warn("Failed to reinstall content pack {}", pack.id(), throwable);
-            } else if (ContentPackDownloader.isInstalled(pack, category)) {
-                state.updated++;
-                state.requiresResourceReload |= category.requiresResourceReload();
-                Legacy4J.LOGGER.info("Reinstall Content updated {} ({}) from {}.", pack.name(), pack.id(), category.id());
-            } else {
-                state.failed++;
-                Legacy4J.LOGGER.warn("Failed to reinstall content pack {}", pack.id());
-            }
+                return state;
+            });
+    }
+
+    private static CompletableFuture<State> finish(Job job, State state, boolean installed) {
+        Pack pack = job.pack();
+        Category category = job.category();
+        if (!installed || !ContentPackDownloader.isInstalled(pack, category)) {
+            state.failed++;
+            Legacy4J.LOGGER.warn("Failed to reinstall content pack {}", pack.id());
+            return CompletableFuture.completedFuture(state);
+        }
+        return applyAutoResourcePacks(job).thenApply(appliedResourcePacks -> {
+            state.updated++;
+            state.requiresResourceReload |= category.requiresResourceReload() || appliedResourcePacks;
+            Legacy4J.LOGGER.info("Reinstall Content updated {} ({}) from {}.", pack.name(), pack.id(), category.id());
             return state;
         });
+    }
+
+    private static CompletableFuture<Boolean> applyAutoResourcePacks(Job job) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        Minecraft.getInstance().execute(() -> {
+            try {
+                future.complete(ContentManager.applyAutoResourcePacks(job.pack(), job.category()));
+            } catch (Exception e) {
+                future.completeExceptionally(e);
+            }
+        });
+        return future;
     }
 
     private static CompletableFuture<Void> prepare(Job job) {

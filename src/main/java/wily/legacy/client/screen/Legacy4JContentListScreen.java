@@ -191,7 +191,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private void finishDownload(ContentManager.Pack pack, boolean installedAnything, boolean reloadResources) {
         downloadingPacks.remove(pack.id());
         refreshInstalledPacks();
-        if (installedAnything && reloadResources) {
+        boolean appliedResourcePacks = installedAnything && ContentManager.applyAutoResourcePacks(pack, category);
+        if (installedAnything && (reloadResources || appliedResourcePacks)) {
             if (minecraft.screen == this) needsReload = true;
             else minecraft.reloadResourcePacks();
         }

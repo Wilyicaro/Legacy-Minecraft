@@ -372,6 +372,17 @@ public class ContentManager {
     }
 
     public static boolean applyAutoResourcePacks(Pack pack, Category category) {
+        boolean changed = applyAutoResourcePack(pack, category);
+        for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
+            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
+            if (bundleCategory.isPresent()) {
+                changed |= applyAutoResourcePacks(bundlePack.toPack(), bundleCategory.get());
+            }
+        }
+        return changed;
+    }
+
+    private static boolean applyAutoResourcePack(Pack pack, Category category) {
         if (!isRootResourcePackCategory(category) || !AUTO_APPLY_RESOURCE_PACKS.contains(downloadKey(category, pack))) return false;
         Minecraft minecraft = Minecraft.getInstance();
         PackRepository repository = minecraft.getResourcePackRepository();
