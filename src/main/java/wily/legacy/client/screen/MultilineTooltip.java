@@ -7,9 +7,11 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationThunk;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class MultilineTooltip extends Tooltip {
@@ -23,10 +25,10 @@ public class MultilineTooltip extends Tooltip {
         this(message, Component.empty());
     }
     public MultilineTooltip(Component message, int width){
-        this(Minecraft.getInstance().font.split(message,width),message);
+        this(split(message, width),message);
     }
     public MultilineTooltip(List<Component> content, int width){
-        this(content.stream().map(c-> Minecraft.getInstance().font.split(c,width)).flatMap(List::stream).toList());
+        this(content.stream().map(c-> split(c,width)).flatMap(List::stream).toList());
     }
     public MultilineTooltip(int width, Component... message){
         this(Arrays.stream(message).toList(), width);
@@ -40,5 +42,11 @@ public class MultilineTooltip extends Tooltip {
     @Override
     public List<FormattedCharSequence> toCharSequence(Minecraft minecraft) {
         return lines;
+    }
+
+    private static List<FormattedCharSequence> split(Component message, int width) {
+        AtomicReference<List<FormattedCharSequence>> lines = new AtomicReference<>(List.of());
+        ScreenUtil.applySDFont(ignored -> lines.set(Minecraft.getInstance().font.split(message, width)));
+        return lines.get();
     }
 }

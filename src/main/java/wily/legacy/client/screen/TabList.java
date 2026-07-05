@@ -98,9 +98,11 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
             b.setWidth(width / tabButtons.size());
             b.setX(accessor.getInteger(name + ".x", leftPos) + i);
             b.setY(accessor.getInteger(name + ".y", topPos));
-            //Backport?
-            //b.offset = accessor.getElementValue(name + ".offset", LegacyTabButton.StateOffset.DEFAULT, LegacyTabButton.StateOffset.class);
+            b.offset = accessor.getElementValue(name + ".offset", LegacyTabButton.StateOffset.DEFAULT, LegacyTabButton.StateOffset.class);
             b.spriteRender = accessor.getElementValue(name + ".sprites", LegacyTabButton.ToggleableTabSprites.DEFAULT, LegacyTabButton.Render.class);
+            b.textXPadding = accessor.getInteger(name + ".textXPadding", 6);
+            b.textYOffset = accessor.getInteger(name + ".textYOffset", -2);
+            b.textBottomPadding = accessor.getInteger(name + ".textBottomPadding", 1);
             buttonManager.accept(b, i);
         }, false);
     }
@@ -118,7 +120,16 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         for (int index = 0; index < tabButtons.size(); index++) {
             LegacyTabButton tabButton = tabButtons.get(index);
             tabButton.selected = selectedTab == index;
+            if (tabButton.selected) continue;
             tabButton.render(graphics,i, j, f);
+        }
+    }
+
+    public void renderSelected(GuiGraphics graphics, int i, int j, float f) {
+        if (selectedTab >= 0 && selectedTab < tabButtons.size()) {
+            LegacyTabButton tabButton = tabButtons.get(selectedTab);
+            tabButton.selected = true;
+            tabButton.render(graphics, i, j, f);
         }
     }
 

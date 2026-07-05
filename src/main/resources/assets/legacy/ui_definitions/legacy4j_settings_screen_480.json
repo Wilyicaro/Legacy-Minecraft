@@ -1,0 +1,48 @@
+{
+  "targetUI": "wily.legacy.client.screen.Legacy4JSettingsScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 180,
+    "panel.height": 178,
+    "searchBox.width": "${panel.width}-50",
+    "searchBox.height": 16,
+    "searchBox.x": "${panel.x}+25",
+    "searchBox.y": "${panel.y}+10",
+    "renderableVList.x": "${panel.x}+10",
+    "renderableVList.y": "${panel.y}+40",
+    "renderableVList.width": "${panel.width}-20",
+    "renderableVList.height": "${panel.height}-50",
+    "tabList.buttonWidth": 100,
+    "tabList.buttonHeight": 25,
+    "tabList.x": "${panel.x}-${tabList.buttonWidth}+6",
+    "tabList.y": "${panel.y}+4",
+    "tabList.textYOffset": 0,
+    "tabList.offset": {
+      "type": "put_tab_state_offset",
+      "value": {
+        "unselected": [
+          3.4,
+          0.4
+        ]
+      }
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_vert_tab_up",
+          "middle": "legacy:tiles/big_high_vert_tab_middle",
+          "right": "legacy:tiles/big_high_vert_tab_bottom"
+        },
+        "down": "legacy:tiles/big_low_vert_tab"
+      }
+    }
+  }
+}

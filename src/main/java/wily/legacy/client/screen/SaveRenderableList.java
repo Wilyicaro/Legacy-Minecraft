@@ -214,11 +214,11 @@ public class SaveRenderableList extends RenderableVList {
         super.init(name, leftPos, topPos, listWidth, listHeight);
     }
 
-    public class SaveButton extends AbstractButton implements ControlTooltip.ActionHolder {
+    public class SaveButton extends IconButton implements ControlTooltip.ActionHolder {
         public final LevelSummary summary;
 
         public SaveButton(int i, int j, int k, int l, LevelSummary summary) {
-            super(i, j, k, l, Component.literal(summary.getLevelName()));
+            super(SaveRenderableList.this, i, j, k, l, Component.literal(summary.getLevelName()));
             this.summary = summary;
         }
 
@@ -229,7 +229,9 @@ public class SaveRenderableList extends RenderableVList {
         @Override
         public void onClick(double d, double e) {
             if (summary.isDisabled()) return;
-            boolean hoverIcon = ScreenUtil.isMouseOver(d, e, getX() + 5, getY() + 5, 20, height);
+            int iconWidth = iconWidth();
+            int iconHeight = iconHeight();
+            boolean hoverIcon = ScreenUtil.isMouseOver(d, e, getX() + iconX(iconWidth), getY() + iconY(iconHeight), iconWidth, iconHeight);
             if (hoverIcon || isFocused()) onPress();
         }
 
@@ -256,61 +258,57 @@ public class SaveRenderableList extends RenderableVList {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
+        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
             FactoryScreenUtil.enableBlend();
-            FactoryGuiGraphics.of(guiGraphics).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + 5, getY() + 5, 0, 0, 20, 20, 20, 20);
+            FactoryGuiGraphics.of(guiGraphics).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + x, getY() + y, 0, 0, width, height, width, height);
             FactoryScreenUtil.disableBlend();
-            if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-
-                boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
-                ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
-                ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
-                ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
-                ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
-                if (summary instanceof LevelSummary.SymlinkLevelSummary/*? if >=1.20.3 {*/ || summary instanceof LevelSummary.CorruptedLevelSummary/*?}*/) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + 5, getY() + 5, 20, 20);
-                    return;
-                }
-                if (summary.isLocked()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
-                    if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175));
-                    }
-                } else if (summary.requiresManualConversion()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
-                    if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175));
-                    }
-                } else if (!summary.isCompatible()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
-                    if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175));
-                    }
-                } else if (summary./*? if >1.20.2 {*/shouldBackup/*?} else {*//*markVersionInList*//*?}*/()) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + 5, getY() + 5, 20, 20);
-                    if (summary./*? if >1.20.2 {*/isDowngrade/*?} else {*//*requiresManualConversion*//*?}*/()) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
-                        if (hoverIcon) {
-                            getScreen().setTooltipForNextRenderPass(ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()));
-                        }
-                    } else if (!SharedConstants.getCurrentVersion().isStable()) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX() + 5, getY() + 5, 20, 20);
-                        if (hoverIcon) {
-                            getScreen().setTooltipForNextRenderPass(ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()));
-                        }
-                    }
-                } else {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX() + 5, getY() + 5, 20, 20);
-                }
-            }
         }
 
         @Override
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+        public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+            super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
+
+            boolean hoverIcon = ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height);
+            ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
+            ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
+            ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
+            ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
+            if (summary instanceof LevelSummary.SymlinkLevelSummary/*? if >=1.20.3 {*/ || summary instanceof LevelSummary.CorruptedLevelSummary/*?}*/) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);
+                return;
+            }
+            if (summary.isLocked()) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                if (hoverIcon) {
+                    getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175));
+                }
+            } else if (summary.requiresManualConversion()) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                if (hoverIcon) {
+                    getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175));
+                }
+            } else if (!summary.isCompatible()) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                if (hoverIcon) {
+                    getScreen().setTooltipForNextRenderPass(minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175));
+                }
+            } else if (summary./*? if >1.20.2 {*/shouldBackup/*?} else {*//*markVersionInList*//*?}*/()) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);
+                if (summary./*? if >1.20.2 {*/isDowngrade/*?} else {*//*requiresManualConversion*//*?}*/()) {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
+                    if (hoverIcon) {
+                        getScreen().setTooltipForNextRenderPass(ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()));
+                    }
+                } else if (!SharedConstants.getCurrentVersion().isStable()) {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX() + x, getY() + y, width, height);
+                    if (hoverIcon) {
+                        getScreen().setTooltipForNextRenderPass(ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()));
+                    }
+                }
+            } else {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX() + x, getY() + y, width, height);
+            }
         }
 
         @Override

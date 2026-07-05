@@ -158,6 +158,10 @@ public class LegacyComponents {
     public static final Component DISABLE_AUTO_SAVE_MESSAGE = Component.translatable("legacy.menu.disable_autosave_message");
     public static final Component SERVER_OPTIONS = Component.translatable("legacy.menu.server_options");
     public static final Component SERVER_OPTIONS_MESSAGE = Component.translatable("legacy.menu.server_options_message");
+    public static final Component ADD_SERVER = Component.translatable("manageServer.add.title");
+    public static final Component EDIT_SERVER = Component.translatable("manageServer.edit.title");
+    public static final Component ENTER_NAME = Component.translatable("manageServer.enterName");
+    public static final Component ENTER_IP = Component.translatable("manageServer.enterIp");
     public static final Component MISSING_WORLD_TEMPLATE = Component.translatable("legacy.menu.missing_world_template");
     public static final Component GAME_OPTIONS = Component.translatable("legacy.menu.game_options");
     public static final Component CUSTOM_SKIN_PACK_OPTIONS = Component.translatable("legacy.menu.custom_skin_pack_options");

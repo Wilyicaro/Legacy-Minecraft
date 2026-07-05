@@ -37,7 +37,7 @@ public class BisectModCompat {
 
             @Override
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int color, int packedLight) {
-                ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 35, getY(), getX() + getWidth(), getY() + getHeight(), packedLight, true);
+                ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 35, getY(), getX() + getWidth(), getY() + getHeight(), packedLight, true));
             }
 
             @Override

@@ -1,0 +1,38 @@
+{
+  "targetUI": "wily.legacy.client.screen.FlatWorldLayerSelector",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "title.y": 7,
+    "panel.width": 207,
+    "panel.height": 159,
+    "scroller.x": "${panel.x}+183",
+    "scroller.y": "${panel.y}+16",
+    "scroller.width": 12,
+    "scroller.height": 80,
+    "slots.size": 16,
+    "slots.x": 13,
+    "slots.y": 16,
+    "layerSlider.x": "${panel.x}+29",
+    "layerSlider.y": "${panel.y}+101",
+    "layerSlider.width": 149,
+    "panelRecess.x": "${panel.x}+12",
+    "panelRecess.y": "${panel.y}+119",
+    "panelRecess.width": 184,
+    "panelRecess.height": 19,
+    "okButton.x": "${panel.x}+29",
+    "okButton.y": "${panel.y}+138",
+    "okButton.width": 150,
+    "okButton.height": 15,
+    "layerItem.scale": "10/16.0",
+    "layerItem.x": 34,
+    "layerCount.x": 33,
+    "layerName.x": 44
+  }
+}

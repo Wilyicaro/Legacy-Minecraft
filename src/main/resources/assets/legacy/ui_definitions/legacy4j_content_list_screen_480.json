@@ -1,0 +1,41 @@
+{
+  "targetUI": "wily.legacy.client.screen.Legacy4JContentListScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 171,
+    "panel.height": 151,
+    "panel.y": "(${height}-${panel.height})/2+11",
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    },
+    "panelRecess.width": 158,
+    "panelRecess.height": 124,
+    "panelRecess.x": "${panel.x}+7",
+    "panelRecess.y": "${panel.y}+20",
+    "renderableVList.x": "${panel.x}+13",
+    "renderableVList.y": "${panel.y}+42",
+    "renderableVList.width": 145,
+    "renderableVList.height": 98,
+    "title.y": "${panelRecess.y}+8",
+    "renderableVList.buttonMessage.xOffset": 6,
+    "renderableVList.buttonMessage.right": 139,
+    "renderableVList.buttonMessage.statusRight": 121,
+    "renderableVList.loadingIcon.size": 12,
+    "renderableVList.loadingIcon.rightPadding": 6,
+    "renderableVList.loadingIcon.scale": 3,
+    "renderableVList.loadingIcon.spacing": 1,
+    "renderableVList.statusIcon.size": 12,
+    "renderableVList.statusIcon.rightPadding": 6,
+    "tooltipBox.width": 160,
+    "previewImage.size": 60,
+    "buttonsHeight": 20
+  }
+}

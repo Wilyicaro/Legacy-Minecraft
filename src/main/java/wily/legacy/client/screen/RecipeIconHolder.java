@@ -36,6 +36,7 @@ import java.util.Optional;
 
 public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements ControlTooltip.ActionHolder {
     public static final Component NOT_ENOUGH_INGREDIENTS = Component.translatable("legacy.hint.not_enough_ingredients");
+    public boolean compactMode = false;
     protected int selectionOffset = 0;
     boolean isHoveredTop = false;
     boolean isHoveredBottom = false;
@@ -49,8 +50,9 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     }
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        isHoveredTop = isFocused() && getFocusedRecipes().size() > 2 && isMouseOver(i,j,-1);
-        isHoveredBottom = isFocused() && getFocusedRecipes().size() >= 2 && isMouseOver(i,j,1);
+        compactMode = LegacyOptions.getUIMode().isSD();
+        isHoveredTop = isFocused() && !compactMode && getFocusedRecipes().size() > 2 && isMouseOver(i,j,-1);
+        isHoveredBottom = isFocused() && !compactMode && getFocusedRecipes().size() >= 2 && isMouseOver(i,j,1);
         itemIcon = isValidIndex() ? getFocusedRecipes().get(0).getResultItem() : ItemStack.EMPTY;
         super.render(graphics, i, j, f);
     }
@@ -71,6 +73,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         return focusedRecipes == null ? getRecipes() : focusedRecipes;
     }
     protected abstract List<RecipeInfo<R>> getRecipes();
+    public abstract LegacyScrollRenderer getScrollRenderer();
     @Override
     public void setFocused(boolean bl) {
         if (bl){
@@ -127,15 +130,17 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         }
         int oldSelection = selectionOffset;
         if ((i == 265 || i == 264) && isValidIndex()) {
-            if (i == InputConstants.KEY_UP && (getRecipes().size() > 2 || selectionOffset == 1))
-                selectionOffset = Math.max(selectionOffset - 1, -1);
-            if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
-                selectionOffset = Math.min(selectionOffset + 1, 1);
+            if (!compactMode) {
+                if (i == InputConstants.KEY_UP && (getRecipes().size() > 2 || selectionOffset == 1))
+                    selectionOffset = Math.max(selectionOffset - 1, -1);
+                if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
+                    selectionOffset = Math.min(selectionOffset + 1, 1);
+            }
             if (oldSelection != selectionOffset || canScroll()) {
                 ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
-                if (oldSelection == selectionOffset && selectionOffset != 0)
-                    Collections.rotate(getFocusedRecipes(), -selectionOffset);
-                updateRecipeDisplay(getFocusedRecipe());
+                if (oldSelection == selectionOffset && (compactMode || selectionOffset != 0))
+                    Collections.rotate(getFocusedRecipes(), i == InputConstants.KEY_UP ? 1 : -1);
+                updateRecipeDisplay();
                 return true;
             }
         }
@@ -151,18 +156,22 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     @Override
     public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
         if (isValidIndex()) {
-            graphics.pose().pushPose();
-            graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
-            applyOffset(graphics);
-            FactoryGuiGraphics.of(graphics).disableDepthTest();
-            if (getFocusedRecipes().size() == 2) {
-                FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION, 0, -12, 36, 78);
-            }else if (getFocusedRecipes().size() > 2)
-                FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
-            graphics.pose().popPose();
-            if (getFocusedRecipes().size() >= 2){
-                ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(),getX(),getY() + 27,false));
-                if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),getX(),getY() - 27,false));
+            if (compactMode) {
+                if (canScroll()) renderScroll(graphics, getScrollRenderer());
+            } else {
+                graphics.pose().pushPose();
+                graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
+                applyOffset(graphics);
+                FactoryGuiGraphics.of(graphics).disableDepthTest();
+                if (getFocusedRecipes().size() == 2) {
+                    FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION, 0, -12, 36, 78);
+                }else if (getFocusedRecipes().size() > 2)
+                    FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
+                graphics.pose().popPose();
+                if (getFocusedRecipes().size() >= 2){
+                    ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(),getX(),getY() + 27,false));
+                    if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),getX(),getY() - 27,false));
+                }
             }
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         }
@@ -172,7 +181,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         graphics.pose().popPose();
     }
     protected boolean canScroll(){
-        return getRecipes().size() >= 3;
+        return getRecipes().size() >= (compactMode ? 2 : 3);
     }
     protected boolean isValidIndex() {
         return !getRecipes().isEmpty();

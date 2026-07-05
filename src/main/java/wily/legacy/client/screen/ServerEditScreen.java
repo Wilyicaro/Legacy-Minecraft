@@ -4,9 +4,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.Arrays;
 
@@ -16,7 +19,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     private final ServerData serverData;
 
     public ServerEditScreen(PlayGameScreen parent, ServerData serverData, boolean add) {
-        super(parent, 230, 187, Component.translatable("addServer.title"), Component.translatable("addServer.enterName"), (b)->{});
+        super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 140 : 187, add ? LegacyComponents.ADD_SERVER : LegacyComponents.EDIT_SERVER, LegacyComponents.ENTER_NAME, (b)->{});
         this.serverData = serverData;
         okAction =  s->{
             serverData.name = nameBox.getValue();
@@ -45,8 +48,11 @@ public class ServerEditScreen extends ConfirmationScreen{
     @Override
     protected void init() {
         super.init();
-        nameBox = new EditBox(font, width / 2 - 100,panel.y + 47,200, 20, Component.empty());
-        ipBox = new EditBox(font, width / 2 - 100,panel.y + 87,200, 20, Component.translatable("addServer.enterIp"));
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        int editBoxesHeight = sd ? 16 : 20;
+        int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
+        nameBox = new EditBox(font, layoutX, panel.y + (sd ? 32 : 47), renderableVList.listWidth, editBoxesHeight, CommonComponents.EMPTY);
+        ipBox = new EditBox(font, layoutX, panel.y + (sd ? 67 : 87), renderableVList.listWidth, editBoxesHeight, LegacyComponents.ENTER_IP);
         nameBox.setValue(serverData.name);
         ipBox.setValue(serverData.ip);
         ipBox.setMaxLength(128);
@@ -54,7 +60,7 @@ public class ServerEditScreen extends ConfirmationScreen{
         ipBox.setResponder(s-> updateAddButtonStatus());
         addRenderableWidget(nameBox);
         addRenderableWidget(ipBox);
-        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("addServer.resourcePack"),b.getObjectValue().getName()),b-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
+        this.addRenderableWidget(new LegacySliderButton<>(layoutX, panel.y + (sd ? 86 : 112), renderableVList.listWidth, 16, b-> b.getDefaultMessage(Component.translatable("manageServer.resourcePack"),b.getObjectValue().getName()),b-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
         this.setInitialFocus(this.nameBox);
         updateAddButtonStatus();
     }
@@ -62,7 +68,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        ScreenUtil.applySDFont(sd -> guiGraphics.drawString(this.font, LegacyComponents.ENTER_IP, panel.x + (panel.width - renderableVList.listWidth) / 2, panel.y + (sd ? 53 : 73), CommonColor.INVENTORY_GRAY_TEXT.get(),false));
     }
 
     private void updateAddButtonStatus() {

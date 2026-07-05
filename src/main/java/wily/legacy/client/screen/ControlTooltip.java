@@ -295,6 +295,11 @@ public interface ControlTooltip {
 
     interface Icon {
         int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate);
+
+        default int getWidth() {
+            return render(null, 0, 0, false, true);
+        }
+
         static Icon createCompound(Icon[] icons){
             return (graphics, x, y, allowPressed, simulate) -> {
                 int totalWidth = 0;
@@ -369,9 +374,11 @@ public interface ControlTooltip {
             Font font = Minecraft.getInstance().font;
             int cw = c == null ? 0 : font.width(c);
             int cow = co == null ? 0 : font.width(co);
-            if (!pressed() && getPressInterval() % 1 < 0.1) startPressTime = 0;
-            if (allowPressed && pressed() && !lastPressed && startPressTime == 0) startPressTime = Util.getMillis();
-            lastPressed = pressed();
+            if (!simulate) {
+                if (!pressed() && getPressInterval() % 1 < 0.1 && getPressInterval() >= 1) startPressTime = 0;
+                if (allowPressed && pressed() && !lastPressed && startPressTime == 0) startPressTime = Util.getMillis();
+                lastPressed = pressed();
+            }
 
             if (!simulate && c != null) {
                 graphics.drawString(font,c,x + (co == null || cw > cow ? 0 : (cow - cw) / 2),y,0xFFFFFF,false);
@@ -430,6 +437,10 @@ public interface ControlTooltip {
             long window = Minecraft.getInstance().getWindow().getWindow();
             return iconGetter.apply(key,()->(key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window, key.getValue()) == 1));
         }
+    }
+
+    static float getAlpha() {
+        return Math.max(Minecraft.getInstance().screen == null ? 0.0f : 0.2f, ScreenUtil.getHUDOpacity());
     }
 
 
@@ -511,37 +522,43 @@ public interface ControlTooltip {
 
         @Override
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            if (!LegacyOptions.inGameTooltips.get() && minecraft.screen == null || !LegacyOptions.displayControlTooltips.get()) return;
+            boolean inGame = minecraft.screen == null;
+            if (!LegacyOptions.displayControlTooltips.get() || inGame && (!LegacyOptions.displayHUD.get() || minecraft.options.hideGui || !LegacyOptions.inGameTooltips.get())) return;
             renderTooltips.clear();
             for (ControlTooltip tooltip : tooltips) {
                 Component action;
                 Icon icon;
                 if ((action = tooltip.getAction()) == null || (icon = tooltip.getIcon()) == null) continue;
+                if (LegacyOptions.getUIMode().isSD())
+                    action = action.copy().withStyle(action.getStyle().withFont(LegacyIconHolder.MOJANGLES_11_FONT));
                 renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOptions.displayMultipleControlsFromAction.get() ? existingIcon : COMPOUND_ICON_FUNCTION.apply(new Icon[]{existingIcon,SPACE_ICON, icon}));
             }
-            RenderSystem.setShaderColor(1.0f,1.0f,1.0f, Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
+            FactoryScreenUtil.enableBlend();
+            RenderSystem.setShaderColor(1.0f,1.0f,1.0f, getAlpha());
             guiGraphics.pose().pushPose();
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
             double hudDistance = Math.max(0.0D, LegacyOptions.hudDistance.get() - 0.5D) * 2.0D;
             double hudDiff = 1.0D - hudDistance;
             double xDiff = 32.0D - 30.0D * hudDiff;
-            double y = guiGraphics.guiHeight() - (29.0D - 16.0D * hudDiff);
+            double y = guiGraphics.guiHeight() - (29.0D - (15.0D - ControlType.getActiveType().iconHeight()) / 2.0D - 16.0D * hudDiff);
             guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, y,1000);
 
             renderTooltips.forEach((action,icon)->{
                 if (left) {
                     int controlWidth = icon.render(guiGraphics, 0, 0, allowPressed(), false);
                     if (controlWidth > 0) {
-                        guiGraphics.drawString(minecraft.font, action, controlWidth + 2, 0, CommonColor.ACTION_TEXT.get());
+                        guiGraphics.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0, 0);
+                        guiGraphics.drawString(minecraft.font, action, controlWidth, 0, CommonColor.ACTION_TEXT.get());
                         guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 10, 0, 0);
                         guiGraphics.flush();
                     }
                 } else {
-                    int controlWidth = icon.render(guiGraphics, 0, 0, allowPressed(), true);
+                    int controlWidth = icon.getWidth();
                     if (controlWidth > 0) {
                         guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0, 0);
                         icon.render(guiGraphics, 0, 0, allowPressed(), false);
-                        guiGraphics.drawString(minecraft.font, action, controlWidth + 2, 0, CommonColor.ACTION_TEXT.get());
+                        guiGraphics.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0, 0);
+                        guiGraphics.drawString(minecraft.font, action, controlWidth, 0, CommonColor.ACTION_TEXT.get());
                         guiGraphics.pose().translate(-12, 0, 0);
                         guiGraphics.flush();
                     }

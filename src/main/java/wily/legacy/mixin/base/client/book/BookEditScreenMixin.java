@@ -32,6 +32,7 @@ import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Predicate;
 
@@ -152,19 +153,23 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/TextFieldHelper;<init>(Ljava/util/function/Supplier;Ljava/util/function/Consumer;Ljava/util/function/Supplier;Ljava/util/function/Consumer;Ljava/util/function/Predicate;)V", ordinal = 0), index = 4)
     private Predicate<String> changeTextFieldHelperWidth(Predicate<String> predicate){
-        return string-> string.length() < 2304 && this.font.wordWrapHeight(string, 159) <= 176;
+        return string -> {
+            boolean[] allowed = {false};
+            ScreenUtil.applySDFont(ignored -> allowed[0] = string.length() < 2304 && this.font.wordWrapHeight(string, panel.splitWidth()) <= panel.editHeight());
+            return allowed[0];
+        };
     }
     @ModifyArg(method = "rebuildDisplayCache", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/StringSplitter;splitLines(Ljava/lang/String;ILnet/minecraft/network/chat/Style;ZLnet/minecraft/client/StringSplitter$LinePosConsumer;)V"), index = 1)
     private int rebuildDisplayCache(int i) {
-        return 159;
+        return panel.splitWidth();
     }
     @Inject(method = "convertScreenToLocal", at = @At("HEAD"), cancellable = true)
     private void convertScreenToLocal(BookEditScreen.Pos2i pos2i, CallbackInfoReturnable<BookEditScreen.Pos2i> cir) {
-        cir.setReturnValue(new BookEditScreen.Pos2i(pos2i.x - panel.x - 20, pos2i.y - panel.y - 37));
+        cir.setReturnValue(new BookEditScreen.Pos2i(pos2i.x - panel.textX(), pos2i.y - panel.textY()));
     }
     @Inject(method = "convertLocalToScreen", at = @At("HEAD"), cancellable = true)
     private void convertLocalToScreen(BookEditScreen.Pos2i pos2i, CallbackInfoReturnable<BookEditScreen.Pos2i> cir) {
-        cir.setReturnValue(new BookEditScreen.Pos2i(pos2i.x + panel.x + 20, pos2i.y + panel.y + 37));
+        cir.setReturnValue(new BookEditScreen.Pos2i(pos2i.x + panel.textX(), pos2i.y + panel.textY()));
     }
 
     @Override
@@ -183,24 +188,24 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
             this.isSigning = true;
             this.updateButtonVisibility();
             setFocused(panel);
-        }).bounds(this.width / 2 - 108, panel.y + panel.height + 5, 100, 20).build());
+        }).bounds(this.width / 2 - 108, panel.screenButtonY(), 100, 20).build());
         this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> {
             this.minecraft.setScreen(null);
             this.saveChanges(false);
-        }).bounds(this.width / 2 + 8, panel.y + panel.height + 5, 100, 20).build());
+        }).bounds(this.width / 2 + 8, panel.screenButtonY(), 100, 20).build());
         this.finalizeButton = this.addRenderableWidget(Button.builder(Component.translatable("book.finalizeButton"), (button) -> {
             if (this.isSigning) {
                 this.saveChanges(true);
                 this.minecraft.setScreen(null);
             }
-        }).bounds(this.width / 2 - 108, panel.y + panel.height + 5, 100, 20).build());
+        }).bounds(this.width / 2 - 108, panel.screenButtonY(), 100, 20).build());
         this.cancelButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> {
             if (this.isSigning) this.isSigning = false;
             this.updateButtonVisibility();
-        }).bounds(this.width / 2 + 8, panel.y + panel.height + 5, 100, 20).build());
+        }).bounds(this.width / 2 + 8, panel.screenButtonY(), 100, 20).build());
 
-        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + panel.width - 62, panel.y + panel.height - 34, true, (button) -> this.pageForward(), true));
-        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + 26, panel.y + panel.height - 34, false, (button) -> this.pageBack(), true));
+        this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.nextPageButtonX(), panel.pageButtonY(), true, (button) -> this.pageForward(), true));
+        this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.previousPageButtonX(), panel.pageButtonY(), false, (button) -> this.pageBack(), true));
         setFocused(panel);
         this.updateButtonVisibility();
     }
@@ -222,30 +227,27 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         super.render(guiGraphics, i, j, f);
-        int n;
-        int o;
-        if (this.isSigning) {
-            boolean bl = this.frameTick / 6 % 2 == 0;
-            FormattedCharSequence formattedCharSequence = FormattedCharSequence.composite(FormattedCharSequence.forward(this.title, Style.EMPTY), bl ? BLACK_CURSOR : GRAY_CURSOR);
-            guiGraphics.drawString(this.font, EDIT_TITLE_LABEL, panel.x + 20, panel.y + 37, 0, false);
-            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 50, 0, false);
-            guiGraphics.drawString(this.font, this.ownerText, panel.x + 20, panel.y + 61, 0, false);
-            guiGraphics.drawWordWrap(this.font, FINALIZE_WARNING_LABEL, panel.x + 20, panel.y + 85, 159, 0/*? if >=1.21.4 {*//*, false*//*?}*/);
-        } else {
-            guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
-            BookEditScreen.DisplayCache displayCache = this.getDisplayCache();
-            BookEditScreen.LineInfo[] var15 = displayCache.lines;
-            n = var15.length;
-
-            for(o = 0; o < n; ++o) {
-                BookEditScreen.LineInfo lineInfo = var15[o];
-                guiGraphics.drawString(this.font, lineInfo.asComponent, lineInfo.x, lineInfo.y, -16777216, false);
+        ScreenUtil.applySDFont(ignored -> {
+            if (this.isSigning) {
+                boolean bl = this.frameTick / 6 % 2 == 0;
+                FormattedCharSequence formattedCharSequence = FormattedCharSequence.composite(FormattedCharSequence.forward(this.title, Style.EMPTY), bl ? BLACK_CURSOR : GRAY_CURSOR);
+                guiGraphics.drawString(this.font, EDIT_TITLE_LABEL, panel.textX(), panel.textY(), 0, false);
+                guiGraphics.drawString(this.font, formattedCharSequence, panel.textX(), panel.titleEditY(), 0, false);
+                guiGraphics.drawString(this.font, this.ownerText, panel.textX(), panel.ownerY(), 0, false);
+                guiGraphics.drawWordWrap(this.font, FINALIZE_WARNING_LABEL, panel.textX(), panel.finalizeTextY(), panel.splitWidth(), 0/*? if >=1.21.4 {*//*, false*//*?}*/);
+            } else {
+                guiGraphics.drawString(this.font, this.pageMsg, panel.pageNumberX() - font.width(pageMsg), panel.pageNumberY(), 0, false);
+                BookEditScreen.DisplayCache displayCache = this.getDisplayCache();
+                BookEditScreen.LineInfo[] lines = displayCache.lines;
+                for (BookEditScreen.LineInfo lineInfo : lines) {
+                    guiGraphics.drawString(this.font, lineInfo.asComponent, lineInfo.x, lineInfo.y, -16777216, false);
+                }
+                if (panel.isFocused()) {
+                    this.renderHighlight(guiGraphics, displayCache.selection);
+                    this.renderCursor(guiGraphics, displayCache.cursor, displayCache.cursorAtEnd);
+                }
             }
-            if (panel.isFocused()) {
-                this.renderHighlight(guiGraphics, displayCache.selection);
-                this.renderCursor(guiGraphics, displayCache.cursor, displayCache.cursorAtEnd);
-            }
-        }
+        });
     }
 
     @Override

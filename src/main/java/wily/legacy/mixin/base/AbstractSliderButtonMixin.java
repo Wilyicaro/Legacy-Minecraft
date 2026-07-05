@@ -1,7 +1,6 @@
 package wily.legacy.mixin.base;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
@@ -18,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.LegacySliderButton;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -47,7 +48,9 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         FactoryGuiGraphics.of(guiGraphics).blitSprite(isHovered() ? LegacySprites.SLIDER_HANDLE_HIGHLIGHTED : LegacySprites.SLIDER_HANDLE, this.getX() + (int)(this.value * (double)(this.width - 8)), this.getY(), 8, this.getHeight());
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
         int k = ScreenUtil.getDefaultTextColor(!isHoveredOrFocused());
-        this.renderScrollingString(guiGraphics, minecraft.font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24);
+        Object widget = this;
+        ResourceLocation fontOverride = widget instanceof LegacySliderButton<?> slider ? slider.fontOverrideSupplier.get() : null;
+        Legacy4JClient.applyFontOverrideIf(fontOverride != null, fontOverride, ignored -> this.renderScrollingString(guiGraphics, minecraft.font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24));
     }
 
     @Override

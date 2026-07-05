@@ -10,7 +10,8 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -26,6 +27,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.factoryapi.util.ModInfo;
@@ -41,7 +43,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class ModsScreen extends PanelVListScreen {
@@ -60,6 +61,7 @@ public class ModsScreen extends PanelVListScreen {
         return new SizedLocation(defaultLogo,1,1);
     });
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
+    protected final Panel panelRecess;
 
     public record SizedLocation(ResourceLocation location, int width, int height){
         public int getScaledWidth(int height){
@@ -106,6 +108,7 @@ public class ModsScreen extends PanelVListScreen {
         super(parent,282,243, Component.empty());
         renderableVList.layoutSpacing(l->0);
         fillMods();
+        panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 14, panel.height - 14), p -> p.pos(panel.x + 7, panel.y + 7));
     }
 
     public void fillMods(){
@@ -113,7 +116,7 @@ public class ModsScreen extends PanelVListScreen {
         if (sorting.get() != 0) mods = mods.stream().sorted(Comparator.comparing(ModInfo::getName)).toList();
         mods.forEach(mod->{
             if (mod.isHidden()) return;
-            renderableVList.addRenderable(new AbstractButton(0,0,260,30, Component.literal(mod.getName())) {
+            renderableVList.addRenderable(new ListButton(renderableVList, 0,0,260,30, Component.literal(mod.getName())) {
                 @Override
                 public void onPress() {
                     if (isFocused()){
@@ -128,14 +131,21 @@ public class ModsScreen extends PanelVListScreen {
                     if (isFocused()) focusedMod = mod;
                     FactoryScreenUtil.enableBlend();
                     SizedLocation logo = modLogosCache.apply(mod);
-                    if (logo != null) FactoryGuiGraphics.of(guiGraphics).blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
+                    if (logo != null) {
+                        int iconHeight = accessor.getInteger(listName() + ".buttonIcon.size", 20);
+                        int iconPos = (height - iconHeight) / 2;
+                        FactoryGuiGraphics.of(guiGraphics).blit(logo.location,getX() + iconPos, getY() + iconPos, 0,0, logo.getScaledWidth(iconHeight),iconHeight,logo.getScaledWidth(iconHeight),iconHeight);
+                    }
                     
                     FactoryScreenUtil.disableBlend();
                 }
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                     SizedLocation logo = modLogosCache.apply(mod);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(),this.getX() + 10 + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j,true);
+                    int iconHeight = accessor.getInteger(listName() + ".buttonIcon.size", 20);
+                    int iconPos = (height - iconHeight) / 2;
+                    int x = getX() + iconPos + accessor.getInteger(listName() + ".buttonMessage.xOffset", 10) + (logo == null ? iconHeight : logo.getScaledWidth(iconHeight));
+                    ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), getX() + getWidth() - i, this.getY() + this.getHeight(), j,true));
                 }
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -157,8 +167,10 @@ public class ModsScreen extends PanelVListScreen {
             if (logo != null)
                 FactoryGuiGraphics.of(guiGraphics).blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
             if (logo == null || logo.getScaledWidth(28) < 120) {
-                ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
-                ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
+                ScreenUtil.applySDFont(ignored -> {
+                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
+                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
+                });
             }
             scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.render(guiGraphics, i, j + Math.round(scrollableRenderer.getYOffset()), f));
         }
@@ -181,9 +193,21 @@ public class ModsScreen extends PanelVListScreen {
 
     @Override
     public void renderableVListInit() {
-        addRenderableOnly(((guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         tooltipBox.init();
-        getRenderableVList().init(panel.x + 11,panel.y + 11,260, panel.height - 21);
+        panelRecess.init("panelRecess");
+        addRenderableOnly(panelRecess);
+        getRenderableVList().init(panel.x + 11,panel.y + 11,panel.width - 22, panel.height - 21);
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) widget).setHeight(accessor.getInteger("buttonsHeight", 30));
+            *///?} else {
+            widget.setHeight(accessor.getInteger("buttonsHeight", 30));
+            //?}
+        }
     }
 
     @Override

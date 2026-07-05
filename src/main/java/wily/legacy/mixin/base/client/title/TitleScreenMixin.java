@@ -27,6 +27,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ContentManager;
@@ -50,7 +52,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     /*@Shadow(remap = false) private TitleScreenModUpdateIndicator modUpdateNotification;
     *///?}
     @Unique
-    private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l->5);
+    private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
     @Unique
     private int legacy$lastFocusedButtonIndex = -1;
     @Unique
@@ -132,8 +134,25 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) widget).setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+            *///?} else {
+            widget.setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+            //?}
+        }
+    }
+
+    @Override
     public void renderableVListInit() {
-        getRenderableVList().init(width / 2 - 112,this.height / 3 + 10,225,0);
+        UIAccessor accessor = UIAccessor.of(this);
+        int listWidth = accessor.getInteger("renderableVList.width", 225);
+        getRenderableVList().init(
+                accessor.getInteger("renderableVList.x", width / 2 - listWidth / 2),
+                accessor.getInteger("renderableVList.y", this.height / 3 + 5),
+                listWidth,
+                accessor.getInteger("renderableVList.height", 0));
     }
 
     @Inject(method = "added", at = @At("RETURN"))

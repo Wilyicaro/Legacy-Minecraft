@@ -87,32 +87,23 @@ public class CreationList extends RenderableVList{
 
     public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip){
         AbstractButton button;
-        list.addRenderable(button = new AbstractButton(0,0,270,30,message) {
+        list.addRenderable(button = new IconButton(list,0,0,270,30,message) {
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
                 if (!list.accessor.getBoolean("allowButtonsWithIcons",true)) return;
                 FactoryScreenUtil.enableBlend();
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + 5, getY() + 5, 20, 20);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + x, getY() + y, width, height);
                 FactoryScreenUtil.disableBlend();
-                if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
-                    guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                }
             }
 
             @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+            public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                if (list.accessor.getBoolean("allowButtonsWithIcons",true)) super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
             }
 
             @Override
             public void onPress() {
                 onPress.accept(this);
-            }
-
-            @Override
-            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                defaultButtonNarrationText(narrationElementOutput);
             }
         });
         button.setTooltip(tooltip);
@@ -120,34 +111,25 @@ public class CreationList extends RenderableVList{
 
     public static void addTemplateButton(RenderableVList list, LegacyWorldTemplate template, Consumer<AbstractButton> onPress){
         AbstractButton button;
-        list.addRenderable(button = new AbstractButton(0,0,270,30,template.buttonMessage()) {
+        list.addRenderable(button = new IconButton(list,0,0,270,30,template.buttonMessage()) {
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
                 if (!list.accessor.getBoolean("allowButtonsWithIcons",true)) return;
                 FactoryScreenUtil.enableBlend();
                 ResourceLocation icon = getTemplatePackIcon(template);
-                if (icon == null) FactoryGuiGraphics.of(guiGraphics).blitSprite(template.icon(), getX() + 5, getY() + 5, 20, 20);
-                else FactoryGuiGraphics.of(guiGraphics).blit(icon, getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+                if (icon == null) FactoryGuiGraphics.of(guiGraphics).blitSprite(template.icon(), getX() + x, getY() + y, width, height);
+                else FactoryGuiGraphics.of(guiGraphics).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
                 FactoryScreenUtil.disableBlend();
-                if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
-                    guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                }
             }
 
             @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+            public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                if (list.accessor.getBoolean("allowButtonsWithIcons",true)) super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
             }
 
             @Override
             public void onPress() {
                 onPress.accept(this);
-            }
-
-            @Override
-            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                defaultButtonNarrationText(narrationElementOutput);
             }
         });
     }
@@ -160,7 +142,8 @@ public class CreationList extends RenderableVList{
         if (packId == null || packId.isBlank()) return null;
         if (packId.startsWith("file/")) packId = packId.substring(5);
         try {
-            return packIcons.getUnchecked(packId);
+            ResourceLocation icon = packIcons.getUnchecked(packId);
+            return PackAlbum.Selector.DEFAULT_ICON.equals(icon) ? null : icon;
         } catch (Exception e) {
             return null;
         }

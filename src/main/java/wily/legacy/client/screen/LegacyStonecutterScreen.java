@@ -19,6 +19,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.controller.BindingState;
@@ -39,6 +40,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event,ControlTooltip.Event {
     public static final Vec3 DISPLAY_OFFSET = new Vec3(0.5,0,0);
+    public static final Vec3 ALT_DISPLAY_OFFSET = new Vec3(0.4,0,0);
     protected List<RecipeIconHolder<StonecutterRecipe>>  craftingButtons = new ArrayList<>();;
     protected List<List<RecipeInfo<StonecutterRecipe>>> recipesByGroup = new ArrayList<>();
     protected List<List<RecipeInfo<StonecutterRecipe>>> filteredRecipesByGroup = Collections.emptyList();
@@ -96,13 +98,17 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
 
     @Override
     public void init() {
-        imageWidth = 348;
-        imageHeight = 215;
+        imageWidth = accessor.getInteger("imageWidth", 348);
+        imageHeight = accessor.getInteger("imageHeight", 215);
         super.init();
         menu.addSlotListener(listener);
         if (selectedCraftingButton < craftingButtons.size()) setFocused(craftingButtons.get(selectedCraftingButton));
+        int craftingButtonsX = accessor.getInteger("craftingButtons.x", 13);
+        int craftingButtonsY = accessor.getInteger("craftingButtons.y", 38);
+        int craftingButtonsSize = accessor.getInteger("craftingButtons.size", 27);
         craftingButtons.forEach(b->{
-            b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
+            b.width = b.height = craftingButtonsSize;
+            b.setPos(leftPos + craftingButtonsX + craftingButtons.indexOf(b) * craftingButtonsSize,topPos + craftingButtonsY);
             addRenderableWidget(b);
         });
         craftingButtonsOffset.max = Math.max(0,recipesByGroup.size() - 12);
@@ -118,17 +124,27 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     }
     *///?}
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, title,(imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        ScreenUtil.applySDFont(ignored -> {
+            guiGraphics.drawString(this.font, title,(imageWidth - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
+            int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+            int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 163);
+            guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle))/ 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 6), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        });
     }
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9,topPos + 103,163,105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 176,topPos + 103,163,105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,leftPos + 79,topPos + 158,22,15);
-        if (craftingButtonsOffset.get() > 0) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
-        if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
+        int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+        int craftingGridPanelX = accessor.getInteger("craftingGridPanel.x", 9);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + craftingGridPanelX,topPos + bottomPanelY,panelWidth,bottomPanelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + accessor.getInteger("inventoryPanel.x", 176),topPos + bottomPanelY,accessor.getInteger("inventoryPanel.width", 163),bottomPanelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : ARROW,leftPos + craftingGridPanelX + accessor.getInteger("craftingArrow.x", 70),topPos + bottomPanelY + accessor.getInteger("craftingArrow.y", 55),sd ? 16 : 22,sd ? 14 : 15);
+        if (craftingButtonsOffset.get() > 0) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + accessor.getInteger("horizontalScroll.x", 5), topPos + accessor.getInteger("horizontalScroll.y", 45));
+        if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 11, topPos + accessor.getInteger("horizontalScroll.y", 45));
     }
 
     @Override
@@ -196,6 +212,11 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 }
 
                 @Override
+                public LegacyScrollRenderer getScrollRenderer() {
+                    return scrollRenderer;
+                }
+
+                @Override
                 protected void updateRecipeDisplay(RecipeInfo<StonecutterRecipe> rcp) {
                     ingredientSlot = rcp == null ? Collections.singletonList(Optional.empty()) : rcp.getOptionalIngredients();
                 }
@@ -216,10 +237,13 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 @Override
                 public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
                     super.renderTooltip(minecraft, graphics, i, j);
+                    int xDiff = leftPos + accessor.getInteger("craftingGridPanel.x", 9);
+                    int yDiff = topPos + accessor.getInteger("bottomPanel.y", 103);
+                    int stonecutterSlotSize = accessor.getInteger("stonecutterSlot.size", 36);
                     if (isFocused()) {
-                        if (!ingredientSlot.isEmpty() && ScreenUtil.isMouseOver(i,j, leftPos + 38, topPos + 149, 36,36))
+                        if (!ingredientSlot.isEmpty() && ScreenUtil.isMouseOver(i,j, xDiff + accessor.getInteger("inputSlot.x", 29), yDiff + accessor.getInteger("inputSlot.y", 43), stonecutterSlotSize,stonecutterSlotSize))
                             renderTooltip(minecraft, graphics, getActualItem(ingredientSlot.get(0)), i, j);
-                        if (ScreenUtil.isMouseOver(i,j, leftPos + 110, topPos + 149, 36,36))
+                        if (ScreenUtil.isMouseOver(i,j, xDiff + accessor.getInteger("resultSlot.x", 101), yDiff + accessor.getInteger("resultSlot.y", 43), stonecutterSlotSize,stonecutterSlotSize))
                             renderTooltip(minecraft, graphics, getFocusedResult(), i, j);
                     }
                 }
@@ -227,12 +251,18 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 @Override
                 public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
                     boolean warning = !canCraft(getFocusedRecipe());
-                    ScreenUtil.iconHolderRenderer.itemHolder(leftPos+38,topPos+149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, DISPLAY_OFFSET).render(graphics, i, j, f);
-                    ScreenUtil.iconHolderRenderer.itemHolder(leftPos+110,topPos+149,36,36,getFocusedResult(), warning, DISPLAY_OFFSET).render(graphics, i, j, f);
+                    int xDiff = leftPos + accessor.getInteger("craftingGridPanel.x", 9);
+                    int yDiff = topPos + accessor.getInteger("bottomPanel.y", 103);
+                    int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);
+                    int stonecutterSlotSize = accessor.getInteger("stonecutterSlot.size", 36);
+                    Vec3 displayOffset = ScreenUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET;
+                    ScreenUtil.iconHolderRenderer.itemHolder(xDiff + accessor.getInteger("inputSlot.x", 29),yDiff + accessor.getInteger("inputSlot.y", 43),stonecutterSlotSize,stonecutterSlotSize, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, displayOffset).render(graphics, i, j, f);
+                    ScreenUtil.iconHolderRenderer.itemHolder(xDiff + accessor.getInteger("resultSlot.x", 101),yDiff + accessor.getInteger("resultSlot.y", 43),stonecutterSlotSize,stonecutterSlotSize,getFocusedResult(), warning, displayOffset).render(graphics, i, j, f);
 
                     if (getFocusedRecipe() != null) {
                         Component resultName = getFocusedRecipe().getName();
-                        ScreenUtil.renderScrollingString(graphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                        int titleY = yDiff + accessor.getInteger("craftingTitle.y", 11);
+                        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(graphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, titleY, xDiff + panelWidth - 2, titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
                     }
                     super.renderSelection(graphics, i, j, f);
                 }

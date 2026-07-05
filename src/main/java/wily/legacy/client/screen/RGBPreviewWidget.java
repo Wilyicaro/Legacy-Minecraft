@@ -33,7 +33,7 @@ public class RGBPreviewWidget extends AbstractButton {
 
     @Override
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int margin, int color) {
-        ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + margin, getY(), getX() + getWidth() - margin, getY() + getHeight(), color, true);
+        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + margin, getY(), getX() + getWidth() - margin, getY() + getHeight(), color, true));
     }
 
     private int rgb() {

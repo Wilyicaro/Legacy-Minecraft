@@ -286,7 +286,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         EditBox nameBox = new EditBox(Minecraft.getInstance().font, 0,0,200, 20, Component.translatable("legacy.menu.album_info"));
         MultiLineEditBox descriptionBox = new MultiLineEditBox(Minecraft.getInstance().font, 0,0,200, 60, defaultDescription, nameBox.getMessage());
         nameBox.setHint(defaultName);
-        return new ConfirmationScreen(parent, 230, 184, title, nameBox.getMessage(), p -> editAlbum.accept(nameBox.getValue().isBlank() ? defaultName : Component.literal(nameBox.getValue()), descriptionBox.getValue().isBlank() ? defaultDescription : Component.literal(descriptionBox.getValue()))) {
+        return new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 140 : 184, title, nameBox.getMessage(), p -> editAlbum.accept(nameBox.getValue().isBlank() ? defaultName : Component.literal(nameBox.getValue()), descriptionBox.getValue().isBlank() ? defaultDescription : Component.literal(descriptionBox.getValue()))) {
             @Override
             protected void init() {
                 super.init();
@@ -449,7 +449,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 }
                 if (i == InputConstants.KEY_O){
                     Screen screen = Minecraft.getInstance().screen;
-                    minecraft.setScreen(new ConfirmationScreen(minecraft.screen,230,133, ALBUM_OPTIONS, ALBUM_OPTIONS_MESSAGE, b->{}){
+                    minecraft.setScreen(new ConfirmationScreen(minecraft.screen, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 108 : 133, ALBUM_OPTIONS, ALBUM_OPTIONS_MESSAGE, b->{}) {
                         @Override
                         protected void addButtons() {
                             renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).build());
@@ -619,7 +619,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
-            guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused()));
             guiGraphics.pose().popPose();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

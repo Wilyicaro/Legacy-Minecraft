@@ -35,7 +35,7 @@ public abstract class BossHealthOverlayMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
     public int drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
-        Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
+        ScreenUtil.applySmallerFont(LegacyIconHolder.MOJANGLES_11_FONT, b->{
             Legacy4JClient.forceVanillaFontShadowColor = true;
             graphics.pose().pushPose();
             graphics.pose().translate(graphics.guiWidth() / 2f,j,0);

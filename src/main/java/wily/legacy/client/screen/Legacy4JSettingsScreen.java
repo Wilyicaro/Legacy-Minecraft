@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
-import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
@@ -26,7 +26,9 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
 
 
     public Legacy4JSettingsScreen(Screen screen) {
-        super(screen,s-> Panel.centered(s,250,250, 50, 0), CommonComponents.EMPTY);
+        super(screen, s -> Panel.createPanel(s,
+                p -> p.appearance(LegacyOptions.getUIMode().isSD() ? 180 : 250, Math.min(LegacyOptions.getUIMode().isSD() ? 178 : 250, s.height - (LegacyOptions.getUIMode().isSD() ? 36 : 52))),
+                p -> p.pos(p.centeredLeftPos(s) + (LegacyOptions.getUIMode().isSD() ? 32 : 50), p.centeredTopPos(s))), CommonComponents.EMPTY);
         tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, LegacyComponents.ALL,null, b->resetElements());
         renderablesByTab.add(new ArrayList<>());
         OptionsScreen.Section.list.forEach(this::addOptionSection);
@@ -37,7 +39,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
         tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, section.title(),null, b->resetElements());
         section.elements().forEach(c->c.accept(this));
         section.advancedSection().ifPresent(s1-> {
-            getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(),0,1,200,9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+            getRenderableVList().addCategory(s1.title());
             if (s1 == Section.ADVANCED_USER_INTERFACE) getRenderableVList().addOptions(LegacyOptions.advancedOptionsMode);
             s1.elements().forEach(c -> c.accept(this));
         });
@@ -76,20 +78,40 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     protected void init() {
         addRenderableWidget(tabList);
         super.init();
+        addRenderableOnly(tabList::renderSelected);
         addRenderableWidget(editBox);
-        editBox.setPosition(panel.getX() + (panel.width - editBox.getWidth()) / 2, panel.getY() + 10);
+        editBox.setWidth(accessor.getInteger("searchBox.width", panel.width - 50));
+        //? if <=1.20.1 {
+        /*((WidgetAccessor) editBox).setHeight(accessor.getInteger("searchBox.height", LegacyOptions.getUIMode().isSD() ? 16 : 20));
+        *///?} else {
+        editBox.setHeight(accessor.getInteger("searchBox.height", LegacyOptions.getUIMode().isSD() ? 16 : 20));
+        //?}
+        editBox.setPosition(accessor.getInteger("searchBox.x", panel.getX() + (panel.width - editBox.getWidth()) / 2), accessor.getInteger("searchBox.y", panel.getY() + 10));
         editBox.setResponder(s->resetElements());
         tabList.init((b, i)->{
             b.spriteRender = accessor.getElementValue("tabList.sprites", LegacyTabButton.ToggleableTabSprites.VERTICAL, LegacyTabButton.Render.class);
-            b.setX(panel.x - b.getWidth() + 6);
-            b.setY(panel.y + i + 4);
-            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4, 0.4, 0);
+            b.setWidth(accessor.getInteger("tabList.buttonWidth", 100));
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) b).setHeight(accessor.getInteger("tabList.buttonHeight", 25));
+            *///?} else {
+            b.setHeight(accessor.getInteger("tabList.buttonHeight", 25));
+            //?}
+            b.setX(accessor.getInteger("tabList.x", panel.x - b.getWidth() + 6));
+            b.setY(accessor.getInteger("tabList.y", panel.y + 4) + i);
+            b.offset = accessor.getElementValue("tabList.offset", new LegacyTabButton.StateOffset(Vec3.ZERO, new Vec3(3.4, 0.4, 0), LegacyTabButton.DEFAULT_DESACTIVE_OFFSET), LegacyTabButton.StateOffset.class);
+            b.textXPadding = accessor.getInteger("tabList.textXPadding", 6);
+            b.textYOffset = accessor.getInteger("tabList.textYOffset", -2);
+            b.textBottomPadding = accessor.getInteger("tabList.textBottomPadding", 1);
         },true);
     }
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 10,panel.y + 40,panel.width - 20,panel.height-50);
+        getRenderableVList().init(
+                accessor.getInteger("renderableVList.x", panel.x + 10),
+                accessor.getInteger("renderableVList.y", panel.y + 40),
+                accessor.getInteger("renderableVList.width", panel.width - 20),
+                accessor.getInteger("renderableVList.height", panel.height - 50));
     }
 
     @Override

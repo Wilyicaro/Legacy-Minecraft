@@ -2,7 +2,9 @@ package wily.legacy.mixin.base.client.pause;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.*;
@@ -60,7 +63,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initScreen(CallbackInfo ci){
-        renderableVList = new RenderableVList(this).layoutSpacing(l->5);
+        renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
         renderableVLists = Collections.singletonList(renderableVList);
         renderableVList.addRenderables(Button.builder(Component.translatable("menu.returnToGame"), button -> {
                     this.minecraft.setScreen(null);
@@ -111,8 +114,25 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) widget).setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+            *///?} else {
+            widget.setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+            //?}
+        }
+    }
+
+    @Override
     public void renderableVListInit() {
-        renderableVList.init(width / 2 - 112,this.height / 3 + 10,225,0);
+        UIAccessor accessor = UIAccessor.of(this);
+        int listWidth = accessor.getInteger("renderableVList.width", 225);
+        renderableVList.init(
+                accessor.getInteger("renderableVList.x", width / 2 - listWidth / 2),
+                accessor.getInteger("renderableVList.y", this.height / 3 + 10),
+                listWidth,
+                accessor.getInteger("renderableVList.height", 0));
     }
 
     @Override

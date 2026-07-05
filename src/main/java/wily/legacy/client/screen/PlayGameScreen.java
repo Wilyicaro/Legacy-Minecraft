@@ -6,8 +6,10 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
@@ -20,9 +22,11 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
@@ -42,7 +46,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     public boolean isLoading = false;
-    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
+    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT, this::renderTabString,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE, this::renderTabString,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, this::renderJoinTabString,Component.translatable("legacy.menu.join"), b-> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
         else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
@@ -60,6 +64,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private final ServerStatusPinger pinger = new ServerStatusPinger();
     public final SaveRenderableList saveRenderableList = new SaveRenderableList(accessor);
     public final CreationList creationList = new CreationList(accessor);
+    protected final Panel panelRecess;
     protected final ServerRenderableList serverRenderableList = PublishScreen.hasWorldHost() ? new FriendsServerRenderableList(accessor) : new ServerRenderableList(accessor);
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
@@ -68,7 +73,8 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         renderer.add(()-> tabList.selectedTab != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
     }
     public PlayGameScreen(Screen parent, int initialTab) {
-        super(s-> Panel.centered(s,300,256,()-> 0, ()-> UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0),Component.translatable("legacy.menu.play_game"));
+        super(s-> Panel.createPanel(s, p-> p.appearance(300, Math.min(256, s.height - 52)), p-> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0))),Component.translatable("legacy.menu.play_game"));
+        panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 18, panel.height - 18 - (hasStorageBar() ? 21 : 0)), p -> p.pos(panel.x + 9, panel.y + 9));
         this.parent = parent;
         tabList.selectedTab = initialTab;
         renderableVLists.clear();
@@ -79,6 +85,10 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     public boolean hasTabList(){
         return accessor.getBoolean("hasTabList",true);
+    }
+
+    public boolean hasStorageBar() {
+        return tabList.selectedTab == 0 && accessor.getBoolean("storageBar.isVisible", LegacyOptions.getUIMode().isFHD());
     }
 
     public PlayGameScreen(Screen parent) {
@@ -102,6 +112,15 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         return serverRenderableList.hasOnlineFriends() && Util.getMillis() % 1000 < 500;
     }
 
+    protected void renderTabString(LegacyTabButton tab, GuiGraphics guiGraphics, int i, int j, float f) {
+        tab.renderString(guiGraphics, font, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+    }
+
+    protected void renderJoinTabString(LegacyTabButton tab, GuiGraphics guiGraphics, int i, int j, float f) {
+        boolean notify = canNotifyOnlineFriends();
+        tab.renderString(guiGraphics, font, notify ? 0xFFFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(), notify);
+    }
+
     @Override
     public TabList getTabList() {
         return tabList;
@@ -115,17 +134,29 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     protected void init() {
-        panel.height = Math.min(256,height-52);
         if (hasTabList()) addWidget(tabList);
         panel.init();
+        panelRecess.init("panelRecess");
         renderableVListInit();
         if (hasTabList()) tabList.init(panel.x, panel.y - 25, panel.width, 31);
     }
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedTab == 0 ? 21 : 0));
-        if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedTab == 0 ? 21 : 0));
+        String listName = hasTabList() && tabList.selectedTab == 2 ? "serverRenderableVList" : "renderableVList";
+        getRenderableVList().init(listName, panel.x + 15,panel.y + 15,panel.width - 30, panel.height - 30 - (hasStorageBar() ? 21 : 0));
+        if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,panel.width - 30, panel.height - 30 - (hasStorageBar() ? 21 : 0));
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) widget).setHeight(accessor.getInteger("buttonsHeight", 30));
+            *///?} else {
+            widget.setHeight(accessor.getInteger("buttonsHeight", 30));
+            //?}
+        }
     }
 
     @Override
@@ -133,8 +164,9 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
         if (hasTabList()) tabList.render(guiGraphics,i,j,f);
         panel.render(guiGraphics,i,j,f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0)));
-        if (hasTabList() && tabList.selectedTab == 0){
+        if (hasTabList()) tabList.renderSelected(guiGraphics,i,j,f);
+        panelRecess.render(guiGraphics,i,j,f);
+        if (hasStorageBar()){
             if (saveRenderableList.currentlyDisplayedLevels != null) {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
@@ -155,8 +187,12 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             }
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
-        if (isLoading)
-            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112, panel.y + 66);
+        if (isLoading) {
+            int blockSize = accessor.getInteger("loadingIcon.blockSize", LegacyOptions.getUIMode().isSD() ? 6 : 21);
+            int spacing = accessor.getInteger("loadingIcon.spacing", LegacyOptions.getUIMode().isSD() ? 3 : 6);
+            int size = blockSize * 3 + spacing * 2;
+            ScreenUtil.drawGenericLoading(guiGraphics, panelRecess.x + (panelRecess.width - size) / 2, panelRecess.y + (panelRecess.height - size) / 2, blockSize, spacing);
+        }
     }
 
     @Override
@@ -213,7 +249,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         }
         if (i == InputConstants.KEY_X && tabList.selectedTab == 2){
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
-            minecraft.setScreen(new ConfirmationScreen(this, 230, 120, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
+            minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 120, serverBox.getMessage(), Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
                 boolean released = false;
                 @Override
                 protected void addButtons() {
@@ -236,7 +272,13 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                 @Override
                 protected void init() {
                     super.init();
-                    serverBox.setPosition(panel.getX() + 15, panel.getY() + 45);
+                    serverBox.setWidth(renderableVList.listWidth);
+                    //? if <=1.20.1 {
+                    /*((WidgetAccessor)serverBox).setHeight(LegacyOptions.getUIMode().isSD() ? 16 : 20);
+                    *///?} else {
+                    serverBox.setHeight(LegacyOptions.getUIMode().isSD() ? 16 : 20);
+                    //?}
+                    serverBox.setPosition(panel.getX() + (panel.getWidth() - serverBox.getWidth()) / 2, panel.getY() + (LegacyOptions.getUIMode().isSD() ? 32 : 45));
                     serverBox.setResponder(s-> okButton.active = ServerAddress.isValidAddress(s));
                     addRenderableWidget(serverBox);
                 }

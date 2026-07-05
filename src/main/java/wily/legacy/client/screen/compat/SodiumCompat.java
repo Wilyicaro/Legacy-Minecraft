@@ -32,10 +32,8 @@ import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.core.util.ReflectionUtil;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
-import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.*;
 
 import java.lang.reflect.Field;
@@ -90,7 +88,7 @@ public class SodiumCompat {
         for (OptionPage page : pages) {
             List<AbstractWidget> widgets = page.getOptions().stream().map(SodiumCompat::getSodiumOptionWidget).filter(Objects::nonNull).toList();
             if (!widgets.isEmpty()){
-                screen.getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(page.getName(),0,1,200,9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+                screen.getRenderableVList().addCategory(page.getName());
                 screen.getRenderableVList().renderables.addAll(widgets);
             }
         }

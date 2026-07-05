@@ -76,7 +76,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
     @Override
     protected void panelInit() {
         super.panelInit();
-        addRenderableOnly((guiGraphics, i, j, f) ->  guiGraphics.drawString(font,getTitle(),panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        addRenderableOnly((guiGraphics, i, j, f) -> ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getTitle(),panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
     }
 
     @Override
@@ -113,7 +113,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                     }
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+                        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true));
                     }
                     @Override
                     public void onPress() {
@@ -218,7 +218,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+            ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true));
         }
 
         @Override

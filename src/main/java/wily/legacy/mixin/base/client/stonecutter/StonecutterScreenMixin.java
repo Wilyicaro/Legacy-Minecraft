@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
@@ -97,57 +98,75 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
 
     @Override
     public void init() {
-        imageWidth = 215;
-        imageHeight = 208;
-        inventoryLabelX = 14;
-        inventoryLabelY = 95;
-        titleLabelX = 14;
-        titleLabelY = 10;
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        imageWidth = sd ? 130 : 215;
+        imageHeight = sd ? 135 : 208;
+        inventoryLabelX = sd ? 7 : 14;
+        inventoryLabelY = sd ? 63 : 95;
+        titleLabelX = sd ? 7 : 14;
+        titleLabelY = sd ? 5 : 10;
+        int slotsSize = sd ? 13 : 21;
+        LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return slotsSize;
+            }
+        };
         super.init();
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0) {
-                LegacySlotDisplay.override(s, 31, 45,new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, sd ? 12 : 31, sd ? 30 : 45,new LegacySlotDisplay(){
                     public int getWidth() {
-                        return 23;
+                        return sd ? 13 : 23;
                     }
                 });
             } else if (i == 1) {
-                LegacySlotDisplay.override(s, 166, 41,new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, sd ? 102 : 166, sd ? 27 : 41,new LegacySlotDisplay(){
                     public int getWidth() {
-                        return 32;
+                        return sd ? 21 : 32;
                     }
                 });
             } else if (i < menu.slots.size() - 9) {
-                LegacySlotDisplay.override(s, 14 + (s.getContainerSlot() - 9) % 9 * 21,108 + (s.getContainerSlot() - 9) / 9 * 21);
+                LegacySlotDisplay.override(s, inventoryLabelX + (s.getContainerSlot() - 9) % 9 * slotsSize, (sd ? 72 : 108) + (s.getContainerSlot() - 9) / 9 * slotsSize, defaultDisplay);
             } else {
-                LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,178);
+                LegacySlotDisplay.override(s, inventoryLabelX + s.getContainerSlot() * slotsSize, sd ? 116 : 178, defaultDisplay);
             }
         }
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 70,  topPos+ 18, 75, 75);
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        int panelSize = sd ? 51 : 75;
+        int panelX = leftPos + (sd ? 32 : 70);
+        int panelY = topPos + (sd ? 12 : 18);
+        int buttonSize = sd ? 12 : 18;
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panelX, panelY, panelSize, panelSize);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 148.5, topPos + 18, 0f);
+        guiGraphics.pose().translate(panelX + panelSize + 2.5f, panelY, 0f);
         if (isScrollBarActive() && getOffscreenRows() > 0) {
             if (getOffscreenRows() != startIndex)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 79);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, panelSize + 4);
             if (startIndex > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
         }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
-        guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() ?  61.5f * startIndex / getOffscreenRows() : 0), 0f);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,panelSize);
+        guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() && getOffscreenRows() > 0 ?  (panelSize - 13.5f) * startIndex / getOffscreenRows() : 0), 0f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 71.5f,topPos + 19.5f,0);
+        guiGraphics.pose().translate(panelX + 1.5f,panelY + 1.5f,0);
         if (this.displayRecipes) {
             int size = getRecipes().size();
             block0: for (int p = 0; p < 4; ++p) {
@@ -155,10 +174,14 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     int r = p + this.startIndex;
                     int s = r * 4 + q;
                     if (s >= size) break block0;
-                    int t = q * 18;
-                    int u = p * 18;
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
-                    guiGraphics.renderItem(getResultItem(getRecipes().get(s)), 1 + t, 1 + u);
+                    int t = q * buttonSize;
+                    int u = p * buttonSize;
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,panelX + 1.5f + t,panelY + 1.5f + u,buttonSize,buttonSize)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, buttonSize, buttonSize);
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(t, u, 0);
+                    guiGraphics.pose().scale(buttonSize / 18.0f, buttonSize / 18.0f, 1.0f);
+                    guiGraphics.renderItem(getResultItem(getRecipes().get(s)), 1, 1);
+                    guiGraphics.pose().popPose();
                 }
             }
         }
@@ -168,19 +191,24 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         this.scrolling = false;
         if (this.displayRecipes) {
-            double j = this.leftPos + 71.5;
-            double k = this.topPos + 19.5;
+            boolean sd = LegacyOptions.getUIMode().isSD();
+            int panelSize = sd ? 51 : 75;
+            int panelX = leftPos + (sd ? 32 : 70);
+            int panelY = topPos + (sd ? 12 : 18);
+            int buttonSize = sd ? 12 : 18;
+            double j = panelX + 1.5;
+            double k = panelY + 1.5;
             for (int m = this.startIndex; m < startIndex + 16; ++m) {
                 int n = m - this.startIndex;
-                double f = d - (j + n % 4 * 18);
-                double g = e - (k + n / 4 * 18);
-                if (!(f >= 0.0) || !(g >= 0.0) || !(f < 18.0) || !(g < 18.0) || !this.menu.clickMenuButton(this.minecraft.player, m)) continue;
+                double f = d - (j + n % 4 * buttonSize);
+                double g = e - (k + n / 4 * buttonSize);
+                if (!(f >= 0.0) || !(g >= 0.0) || !(f < buttonSize) || !(g < buttonSize) || !this.menu.clickMenuButton(this.minecraft.player, m)) continue;
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_STONECUTTER_SELECT_RECIPE, 1.0f));
                 this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, m);
                 cir.setReturnValue(true);
                 return;
             }
-            if (ScreenUtil.isMouseOver(d,e,leftPos + 148.5,topPos + 18,13,75)) this.scrolling = true;
+            if (ScreenUtil.isMouseOver(d,e,panelX + panelSize + 2.5f,panelY,13,panelSize)) this.scrolling = true;
         }
         cir.setReturnValue(super.mouseClicked(d, e, i));
     }
@@ -190,12 +218,16 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         super.renderTooltip(guiGraphics, i, j);
         if (this.displayRecipes) {
             int size = getRecipes().size();
+            boolean sd = LegacyOptions.getUIMode().isSD();
+            int panelX = leftPos + (sd ? 32 : 70);
+            int panelY = topPos + (sd ? 12 : 18);
+            int buttonSize = sd ? 12 : 18;
             block0: for (int p = 0; p < 4; ++p) {
                 for (int q = 0; q < 4; ++q) {
                     int r = p + this.startIndex;
                     int s = r * 4 + q;
                     if (s >= size) break block0;
-                    if (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, getResultItem(getRecipes().get(s)), i, j);
+                    if (ScreenUtil.isMouseOver(i,j,panelX + 1.5f + q * buttonSize,panelY + 1.5f + p * buttonSize,buttonSize,buttonSize)) guiGraphics.renderTooltip(this.font, getResultItem(getRecipes().get(s)), i, j);
                 }
             }
         }
@@ -203,8 +235,11 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
     public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         if (this.scrolling && this.displayRecipes && isScrollBarActive()) {
+            boolean sd = LegacyOptions.getUIMode().isSD();
+            int panelSize = sd ? 51 : 75;
+            int panelY = topPos + (sd ? 12 : 18);
             int oldIndex = startIndex;
-            this.startIndex = (int) Math.max(Math.round(getOffscreenRows() * Math.min(1,(e - (topPos + 18)) / 75)), 0) * 4;
+            this.startIndex = (int) Math.max(Math.round(getOffscreenRows() * Math.min(1,(e - panelY) / panelSize)), 0) * 4;
             if (oldIndex != startIndex){
                 scrollRenderer.updateScroll(oldIndex - startIndex > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
             }

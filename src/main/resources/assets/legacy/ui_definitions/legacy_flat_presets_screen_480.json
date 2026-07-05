@@ -1,0 +1,27 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyFlatPresetsScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 164,
+    "panel.height": 145,
+    "panelRecess.x": "${panel.x}+4",
+    "panelRecess.y": "${panel.y}+13",
+    "panelRecess.width": 155,
+    "panelRecess.height": 126,
+    "renderableVList.presetIcon.scale": "10/16.0",
+    "renderableVList.presetIcon.x": 2,
+    "renderableVList.presetMessage.xOffset": 18,
+    "renderableVList.x": "${panel.x}+8",
+    "renderableVList.y": "${panel.y}+18",
+    "renderableVList.width": 146,
+    "renderableVList.height": 117,
+    "buttonsHeight": 15
+  }
+}

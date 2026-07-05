@@ -5,15 +5,17 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
@@ -50,7 +52,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
 
     private final ContentManager.Category category;
     private final List<ContentManager.Pack> packs;
-    private final Panel tooltipBox = Panel.tooltipBoxOf(panel, TOOLTIP_WIDTH);
+    private final Panel tooltipBox = Panel.tooltipBoxOf(panel, () -> accessor.getInteger("tooltipBox.width", TOOLTIP_WIDTH));
     private final Panel panelRecess;
     private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final ScrollableRenderer scrollableRenderer = new ScrollableRenderer(scrollRenderer);
@@ -79,9 +81,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
         }
     }
 
-    private static ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
+    private ImageSize fitRemoteImage(RemoteImage image, int maxWidth, int maxHeight) {
         if (image.width == image.height) {
-            int size = LegacyOptions.getUIMode().isSD() ? SD_STORE_IMAGE_SIZE : HD_STORE_IMAGE_SIZE;
+            int defaultSize = LegacyOptions.getUIMode().isSD() ? SD_STORE_IMAGE_SIZE : HD_STORE_IMAGE_SIZE;
+            int size = accessor.getInteger("previewImage.size", defaultSize);
             if (size <= maxWidth && size <= maxHeight + STORE_IMAGE_SIZE_TOLERANCE) {
                 return new ImageSize(size, size);
             }
@@ -111,7 +114,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private void addMenuButton(ContentManager.Pack pack) {
-        renderableVList.addRenderable(new PackButton(0, 0, LIST_WIDTH, BUTTON_HEIGHT, pack) {
+        renderableVList.addRenderable(new PackButton(renderableVList, 0, 0, LIST_WIDTH, BUTTON_HEIGHT, pack) {
             @Override
             public void onPress() {
                 if (isDownloading(pack)) return;
@@ -130,15 +133,15 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private Screen createDeleteScreen(ContentManager.Pack pack) {
-        return new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> 95, pack.nameComponent(), Component.translatable("legacy.menu.delete_message"), b -> {}) {
+        return new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 95, pack.nameComponent(), Component.translatable("legacy.menu.delete_message"), b -> {}) {
             @Override
             protected void addButtons() {
                 renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent))
-                        .bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
+                        .build());
                 renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.delete"), b -> {
                     deletePack(pack);
                     minecraft.setScreen(parent);
-                }).bounds(panel.x + 15, panel.getRectangle().bottom() - 30, 200, 20).build());
+                }).build());
             }
         };
     }
@@ -285,12 +288,23 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
         addRenderableOnly((guiGraphics, i, j, f) -> Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored ->
-                guiGraphics.drawString(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panelRecess.y + 8, CommonColor.GRAY_TEXT.get(), false)));
+                guiGraphics.drawString(font, getTitle(), accessor.getInteger("title.x", panel.x + (panel.width - font.width(getTitle())) / 2), accessor.getInteger("title.y", panelRecess.y + 8), CommonColor.GRAY_TEXT.get(), false)));
     }
 
     @Override
     public Component getTitle() {
         return packs.isEmpty() ? Component.translatable("legacy.menu.store_no_content") : super.getTitle();
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) widget).setHeight(accessor.getInteger("buttonsHeight", BUTTON_HEIGHT));
+            *///?} else {
+            widget.setHeight(accessor.getInteger("buttonsHeight", BUTTON_HEIGHT));
+            //?}
+        }
     }
 
     @Override
@@ -338,7 +352,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
             return imageHeight + 10;
         }
         if (remoteImage == null) {
-            ScreenUtil.drawGenericLoading(guiGraphics, x + (width - 30) / 2, y + Math.max(0, (maxHeight - 30) / 2), 6, 3);
+            int blockSize = 6;
+            int spacing = 3;
+            int size = blockSize * 3 + spacing * 2;
+            ScreenUtil.drawGenericLoading(guiGraphics, x + (width - size) / 2, y + Math.max(0, (maxHeight - size) / 2), blockSize, spacing);
             return maxHeight + 10;
         }
         return 0;
@@ -350,30 +367,39 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
     }
 
-    private abstract class PackButton extends AbstractButton {
+    private abstract class PackButton extends ListButton {
         private final ContentManager.Pack pack;
 
-        PackButton(int x, int y, int width, int height, ContentManager.Pack pack) {
-            super(x, y, width, height, pack.nameComponent());
+        PackButton(RenderableVList list, int x, int y, int width, int height, ContentManager.Pack pack) {
+            super(list, x, y, width, height, pack.nameComponent());
             this.pack = pack;
         }
 
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             super.renderWidget(guiGraphics, i, j, f);
+            String name = listName();
             if (isDownloading(pack)) {
-                ScreenUtil.drawGenericLoading(guiGraphics, getX() + getWidth() - 24, getY() + 7, 4, 2);
+                int size = list.accessor.getInteger(name + ".loadingIcon.size", 16);
+                int rightPadding = list.accessor.getInteger(name + ".loadingIcon.rightPadding", 11);
+                int scale = list.accessor.getInteger(name + ".loadingIcon.scale", 4);
+                int spacing = list.accessor.getInteger(name + ".loadingIcon.spacing", 2);
+                ScreenUtil.drawGenericLoading(guiGraphics, getX() + getWidth() - size - rightPadding, getY() + (getHeight() - size) / 2, scale, spacing);
             } else if (isInstalled(pack)) {
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, getX() + getWidth() - 24, getY() + 6, 18, 18);
+                int size = list.accessor.getInteger(name + ".statusIcon.size", 18);
+                int rightPadding = list.accessor.getInteger(name + ".statusIcon.rightPadding", 7);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, getX() + getWidth() - size - rightPadding, getY() + (getHeight() - size) / 2, size, size);
             }
         }
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int color) {
-            int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
-            int textX = getX() + 8;
+            String name = listName();
+            int textX = getX() + list.accessor.getInteger(name + ".buttonMessage.xOffset", 8);
+            int textY = getY() + list.accessor.getInteger(name + ".buttonMessage.yOffset", (getHeight() - font.lineHeight) / 2 + 1);
             boolean hasStatusIcon = isDownloading(pack) || isInstalled(pack);
-            int maxWidth = getWidth() - (hasStatusIcon ? 44 : 16);
+            int textRight = getX() + (hasStatusIcon ? list.accessor.getInteger(name + ".buttonMessage.statusRight", getWidth() - 44) : list.accessor.getInteger(name + ".buttonMessage.right", getWidth() - 16));
+            int maxWidth = Math.max(0, textRight - textX);
             Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> {
                 String text = getMessage() == null ? "" : getMessage().getString();
                 String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";

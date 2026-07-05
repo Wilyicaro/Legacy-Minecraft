@@ -95,25 +95,25 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         //? if <=1.20.1
         /*ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);*/
         super.render(guiGraphics, i, j, f);
-        int x = width / 2 - 160;
-        int y = height / 2 + 16;
+        int loadingBarX = accessor.getInteger("loadingBar.x", width / 2 - 160);
+        int loadingBarY = accessor.getInteger("loadingBar.y", height / 2 + 15);
         ResourceLocation fontOverride = accessor.getElementValue("fontOverride",null,ResourceLocation.class);
         if (!isGenericLoading()) {
             if (getProgress() != -1) {
                 if (getLoadingStage() != null)
-                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",y - 10), CommonColor.STAGE_TEXT.get()));
+                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",loadingBarX + 1), accessor.getInteger("loadingStage.y",loadingBarY - 10), CommonColor.STAGE_TEXT.get()));
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()){
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y - 1, 320, 320 * contents.height() / contents.width());
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, loadingBarX, loadingBarY, 320, 320 * contents.height() / contents.width());
                 }
                 if (getProgress() >= 0) {
                     try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BAR).contents()) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, x + 1, y,0, (int) (318 * Math.max(0, Math.min(getProgress() / 100F, 1))), 318 * contents.height() / contents.width());
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, loadingBarX + 1, loadingBarY + 1,0, (int) (318 * Math.max(0, Math.min(getProgress() / 100F, 1))), 318 * contents.height() / contents.width());
                     }
                 }
                 LegacyTip tip = getLoadingTip();
                 if (tip != null) {
-                    tip.setX((width - tip.width) / 2);
-                    tip.setY(y + 8 + ((height - (y + 8)) - tip.height) / 2);
+                    tip.setX(accessor.getInteger("loadingTip.x", (width - tip.width) / 2));
+                    tip.setY(accessor.getInteger("loadingTip.y", loadingBarY + 10 + ((height - (loadingBarY + 10)) - tip.height) / 2));
                     tip.render(guiGraphics, i, j, f);
                 }
             }

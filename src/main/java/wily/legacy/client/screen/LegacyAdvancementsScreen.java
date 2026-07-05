@@ -41,12 +41,13 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     protected final Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(accessor, new PagedList<>(page, this::getMaxTabCount));
     protected final List<DisplayInfo> displayInfos = new ArrayList<>();
+    protected final Panel panelRecess;
     protected boolean showDescription = false;
     protected boolean oldLegacyTooltipsValue;
     public static final List<ResourceLocation> vanillaOrder = List.of(FactoryAPI.createVanillaLocation("story/root"),FactoryAPI.createVanillaLocation("adventure/root"),FactoryAPI.createVanillaLocation("husbandry/root"),FactoryAPI.createVanillaLocation("nether/root"),FactoryAPI.createVanillaLocation("end/root"));
 
     public LegacyAdvancementsScreen(Screen parent) {
-        super(parent,s-> Panel.createPanel(s, p-> p.centeredLeftPos(s), p-> p.centeredTopPos(s) + (((LegacyAdvancementsScreen)s).displayInfos.isEmpty() ? 0 : 18), 450,252),TITLE);
+        super(parent,s-> Panel.createPanel(s, p-> p.centeredLeftPos(s), p-> p.centeredTopPos(s) + (((LegacyAdvancementsScreen)s).displayInfos.isEmpty() ? 0 : ((LegacyAdvancementsScreen)s).getTabYOffset()), 450,252),TITLE);
         renderableVLists.clear();
         StreamSupport.stream(getActualAdvancements()./*? if >1.20.1 {*/roots/*?} else {*//*getRoots*//*?}*/().spliterator(),false).sorted(Comparator.comparingInt(n->vanillaOrder.contains(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()) ? vanillaOrder.indexOf(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()): Integer.MAX_VALUE)).forEach(a-> {
             DisplayInfo displayInfo = a./*? if >1.20.1 {*/advancement().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
@@ -58,6 +59,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             displayInfos.add(displayInfo);
             getActualAdvancements()./*? if >1.20.1 {*/nodes/*?} else {*//*getAllAdvancements*//*?}*/().stream().filter(n1 -> !n1.equals(a) && n1./*? if >1.20.1 {*/root/*?} else {*//*getRoot*//*?}*/().equals(a)).sorted(Comparator.comparingInt(LegacyAdvancementsScreen::getRootDistance)).forEach(node -> addAdvancementButton(renderableVList, node));
         });
+        panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.getWidth() - 24, panel.getHeight() - 66), p -> p.pos(panel.getX() + 12, panel.getY() + 50));
     }
 
     public static int getRootDistance( /*? if >1.20.1 {*/AdvancementNode/*?} else {*//*Advancement*//*?}*/ advancement) {
@@ -166,17 +168,20 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     protected void panelInit() {
         addRenderableWidget(tabList);
         super.panelInit();
+        panelRecess.init("panelRecess");
+        addRenderableOnly(tabList::renderSelected);
         addRenderableOnly(((guiGraphics, i, j, f) ->{
-            guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+            Component title = showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle();
+            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,title,panel.x + (panel.width - font.width(title))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false));
             if (!displayInfos.isEmpty()) {
                 ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.texturePath()*//*?}*/;
-                if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
+                if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,panelRecess.width - 4,23,16,16);
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
-            if (getFocused() instanceof AdvancementButton a) guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF);
+            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, panelRecess.width, 27);
+            if (getFocused() instanceof AdvancementButton a) ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF));
             FactoryScreenUtil.disableBlend();
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));
+        addRenderableOnly(panelRecess);
         tabList.init(panel.x, panel.y - 37, panel.width, 43, (b, i) -> {
             int index = tabList.tabButtons.indexOf(b);
             b.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
@@ -191,7 +196,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 17, panel.y + 55, 416,176);
+        getRenderableVList().init(panel.x + 17, panel.y + 55, panelRecess.width - 10, panelRecess.height - 10);
     }
 
     @Override

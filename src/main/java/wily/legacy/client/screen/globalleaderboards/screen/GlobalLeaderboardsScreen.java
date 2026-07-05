@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -11,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardBoard;
@@ -21,11 +23,13 @@ import wily.legacy.api.client.leaderboards.GlobalLeaderboardViewMode;
 import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.PanelVListScreen;
+import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.client.screen.globalleaderboards.board.GlobalLeaderboardBoardRegistry;
 import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
@@ -127,8 +131,10 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON, getX(), getY(), getWidth(), getHeight());
-                    guiGraphics.drawString(font, rank, getX() + accessor.getInteger("renderableVList.buttonRank.x", 40) - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    ScreenUtil.applySDFont(ignored -> {
+                        guiGraphics.drawString(font, rank, getX() + accessor.getInteger("renderableVList.buttonRank.x", 40) - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                        guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    });
 
                     int added = 0;
                     List<GlobalLeaderboardColumn> columns = board.columns();
@@ -140,8 +146,10 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                         GlobalLeaderboardColumn column = columns.get(index);
                         Component value = column.format(row.columnValue(column.id()));
                         SimpleLayoutRenderable renderable = renderables.get(index);
-                        int w = font.width(value);
-                        guiGraphics.drawString(font, value, renderable.getX() + (renderable.getWidth() - w) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+                        ScreenUtil.applySDFont(ignored -> {
+                            int w = font.width(value);
+                            guiGraphics.drawString(font, value, renderable.getX() + (renderable.getWidth() - w) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+                        });
                         added++;
                     }
                 }
@@ -151,6 +159,17 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                     defaultButtonNarrationText(narrationElementOutput);
                 }
             });
+        }
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((WidgetAccessor) widget).setHeight(accessor.getInteger("buttonsHeight", 20));
+            *///?} else {
+            widget.setHeight(accessor.getInteger("buttonsHeight", 20));
+            //?}
         }
     }
 
@@ -189,8 +208,8 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 return;
             }
 
-            Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, fontOverride -> {
-                float topTooltipScale = accessor.getFloat("topTooltip.scale", ScreenUtil.is720p() ? 2 / 3f : 1.0f);
+            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyIconHolder.MOJANGLES_11_FONT, fontOverride -> {
+                float topTooltipScale = accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isFHD() ? 2 / 3f : 1.0f);
                 int topTextColor = CommonColor.ITEM_NAME_TEXT.get();
                 graphics.pose().pushPose();
                 Component filter = filterText();
@@ -225,8 +244,10 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 return;
             }
 
-            graphics.drawString(font, LeaderboardsScreen.RANK, panel.x + accessor.getInteger("rankText.x", 40), panel.y + accessor.getInteger("rankText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            graphics.drawString(font, LeaderboardsScreen.USERNAME, panel.x + accessor.getInteger("usernameText.x", 108), panel.y + accessor.getInteger("usernameText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            ScreenUtil.applySDFont(ignored -> {
+                graphics.drawString(font, LeaderboardsScreen.RANK, panel.x + accessor.getInteger("rankText.x", 40), panel.y + accessor.getInteger("rankText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                graphics.drawString(font, LeaderboardsScreen.USERNAME, panel.x + accessor.getInteger("usernameText.x", 108), panel.y + accessor.getInteger("usernameText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            });
 
             int statsBoardX = accessor.getInteger("statsBoard.x", 182);
             int statsBoardY = accessor.getInteger("statsBoard.y", 22);
@@ -246,16 +267,16 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
             FactoryScreenUtil.enableBlend();
             graphics.pose().pushPose();
             graphics.pose().translate(boardTooltipX + accessor.getInteger("boardControlTooltip.x", 2), topTooltipY + accessor.getInteger("boardControlTooltip.y", 6), 0);
-            graphics.pose().scale(ScreenUtil.is720p() ? 1.0f : 0.5f, ScreenUtil.is720p() ? 1.0f : 0.5f, 1.0f);
+            float controlScale = accessor.getFloat("boardControlTooltip.scale", LegacyOptions.getUIMode().isSD() ? 1.2f : 0.6f);
+            graphics.pose().scale(controlScale, controlScale, controlScale);
             (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false, false);
             graphics.pose().popPose();
 
             ControlTooltip.Icon difficultyControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
             graphics.pose().pushPose();
             graphics.pose().translate(boardTooltipX + boardTooltipWidth + accessor.getInteger("boardPageTooltip.x", -4), topTooltipY + accessor.getInteger("boardControlTooltip.y", 6), 0);
-            if (!ScreenUtil.is720p()) {
-                graphics.pose().scale(0.5f, 0.5f, 0.5f);
-            }
+            float pageControlScale = accessor.getFloat("boardPageTooltip.scale", LegacyOptions.getUIMode().isSD() ? 1.0f : 0.5f);
+            graphics.pose().scale(pageControlScale, pageControlScale, pageControlScale);
             difficultyControl.render(graphics, -difficultyControl.render(graphics, 0, 0, false, true), 0, false, false);
             graphics.pose().popPose();
             FactoryScreenUtil.disableBlend();
@@ -283,7 +304,11 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
 
     @Override
     public void renderableVListInit() {
-        renderableVList.init(panel.x + 9, panel.y + 39, 551, 226);
+        renderableVList.init(
+                accessor.getInteger("renderableVList.x", panel.x + 9),
+                accessor.getInteger("renderableVList.y", panel.y + 39),
+                accessor.getInteger("renderableVList.width", panel.width - 17),
+                accessor.getInteger("renderableVList.height", panel.height - 49));
     }
 
     @Override

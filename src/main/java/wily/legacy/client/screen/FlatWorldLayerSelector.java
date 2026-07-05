@@ -13,9 +13,8 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.Fluids;
 import wily.factoryapi.ItemContainerPlatform;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.CommonColor;
-import wily.legacy.util.LegacySprites;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
 
@@ -30,6 +29,7 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
         super(parent,s-> Panel.centered(s,325,245), component);
         this.applyLayer = applyLayer;
         layerSlider = LegacySliderButton.createFromIntRange(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),(b)-> null, 1, 1, maxLayerHeight, b-> {});
+        layerSlider.fontOverrideSupplier = () -> null;
     }
 
     @Override
@@ -60,12 +60,13 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     @Override
     protected void init() {
         super.init();
-        layerSlider.setPosition(panel.x + 21, panel.y + 167);
-        addRenderableWidget(layerSlider);
-        addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b-> {
+        layerSlider.setPosition(accessor.getInteger("layerSlider.x", panel.x + 21), accessor.getInteger("layerSlider.y", panel.y + 167));
+        layerSlider.setWidth(accessor.getInteger("layerSlider.width", 271));
+        addRenderableWidget(accessor.putWidget("layerSlider", layerSlider));
+        addRenderableWidget(accessor.putWidget("okButton", Button.builder(Component.translatable("gui.ok"), b-> {
             applyLayer.accept(this);
             onClose();
-        }).bounds(panel.x + 57,panel.y + 216,200,20).build());
+        }).bounds(accessor.getInteger("okButton.x", panel.x + 57), accessor.getInteger("okButton.y", panel.y + 216), accessor.getInteger("okButton.width", 200), accessor.getInteger("okButton.height", 20)).build()));
     }
 
     @Override
@@ -77,17 +78,25 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 20, panel. y + 187, 275, 27);
+        int panelRecessY = accessor.getInteger("panelRecess.y", panel.y + 187);
+        int panelRecessHeight = accessor.getInteger("panelRecess.height", 27);
+        ScreenUtil.renderPanelRecess(accessor, guiGraphics, "panelRecess", panel.x + 20, panelRecessY, 275, panelRecessHeight);
 
-        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", layerSlider.getObjectValue());
-        guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
-        guiGraphics.drawString(this.font, selectedLayer.getName(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
+        ScreenUtil.applySDFont(ignored -> {
+            guiGraphics.drawString(this.font, this.title, panel.x + accessor.getInteger("title.x", (panel.width - font.width(title)) / 2), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false);
+            Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", layerSlider.getObjectValue());
+            int layerCountY = panelRecessY + accessor.getInteger("layerCount.y", (panelRecessHeight - font.lineHeight) / 2 + 1);
+            int layerNameY = panelRecessY + accessor.getInteger("layerName.y", (panelRecessHeight - font.lineHeight) / 2 + 1);
+            guiGraphics.drawString(this.font, layerCount, panel.x + accessor.getInteger("layerCount.x", 49) - font.width(layerCount), layerCountY, 0xFFFFFF, true);
+            guiGraphics.drawString(this.font, selectedLayer.getName(), panel.x + accessor.getInteger("layerName.x", 70), layerNameY, 0xFFFFFF, true);
+        });
 
 
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(panel.x + 50, panel.y + 190, 0);
-        guiGraphics.pose().scale(1.25f, 1.25f, 1.25f);
+        float scale = accessor.getFloat("layerItem.scale", 1.25f);
+        int layerItemY = accessor.getInteger("layerItem.y", panelRecessY + (panelRecessHeight - Math.round(16 * scale)) / 2);
+        guiGraphics.pose().translate(panel.x + accessor.getInteger("layerItem.x", 50), layerItemY, 0);
+        guiGraphics.pose().scale(scale, scale, scale);
         guiGraphics.renderItem(displayLayer, 0, 0);
         guiGraphics.pose().popPose();
     }

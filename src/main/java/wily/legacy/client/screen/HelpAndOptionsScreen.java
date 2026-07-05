@@ -37,7 +37,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s->Panel.centered(s, LegacySprites.PANEL, 240, Math.min(7, (int)HowToPlayScreen.Section.getWithButton().count())*25+24, 0, 20), new ArrayList<>(List.of(o-> HowToPlayScreen.Section.getWithButton().forEach(s-> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section){
         @Override
         public void renderableVListInit() {
-            getRenderableVList().cyclic(false).layoutSpacing(l->5).init(panel.x + (panel.width - 225) / 2,panel.getY() + 8,225,panel.getHeight()-16);
+            getRenderableVList().cyclic(false).layoutSpacing(l->5).init(panel.x + 8,panel.getY() + 8,panel.getWidth() - 16,panel.getHeight()-16);
         }
     }));
 

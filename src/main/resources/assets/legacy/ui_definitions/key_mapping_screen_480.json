@@ -1,0 +1,37 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyKeyMappingScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.width": {
+      "type": "put_number",
+      "value": 201
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 180
+    },
+    "mappingIcon.x": {
+      "type": "put_number",
+      "value": 175
+    },
+    "mappingIcon.y": {
+      "type": "put_number",
+      "value": 4
+    },
+    "mappingText.x": {
+      "type": "put_number",
+      "value": 5
+    },
+    "mappingText.right": {
+      "type": "put_number",
+      "value": 161
+    },
+    "versionText.visible": {
+      "type": "put_boolean",
+      "value": false
+    }
+  }
+}

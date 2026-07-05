@@ -25,6 +25,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyClientWorldSettings;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -56,6 +57,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected final PackAlbum.Selector resourceAssortSelector;
     protected final TickBox onlineTickBox;
     protected final PublishScreen publishScreen;
+    protected boolean focusMoreOptionsButton;
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
@@ -69,7 +71,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0,0,220,publishScreen.publish, b-> PublishScreen.getPublishComponent(), b->PublishScreen.getPublishTooltip(), button -> {
-            if (wily.legacy.client.LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.legacySettingsMenus.get()) {
                 if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
                 publishScreen.publish = button.selected;
                 return;
@@ -108,21 +110,41 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         }
     }
 
+    public int getLayoutWidth() {
+        return accessor.getInteger("layout.width", 220);
+    }
+
+    public int getLayoutX() {
+        return accessor.getInteger("layout.x", panel.x + 13);
+    }
+
     @Override
     protected void init() {
         panel.init();
-        gameTypeSlider.setPosition(panel.x + 13, panel.y + 65);
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.getObjectValue())).active = !LegacyClientWorldSettings.of(summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
-        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(this))).bounds(panel.x + 13, panel.y + 178,220,20).build());
-        Button loadButton = addRenderableWidget(Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> onLoad()).bounds(panel.x + 13, panel.y + 203,220,20).build());
-        addRenderableWidget(gameTypeSlider);
+        int layoutX = getLayoutX();
+        int layoutWidth = getLayoutWidth();
+        gameTypeSlider.setPosition(layoutX, accessor.getInteger("gameTypeSlider.y", panel.y + 65));
+        gameTypeSlider.setWidth(layoutWidth);
+        addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, accessor.getInteger("difficultySlider.y", panel.y + 90), layoutWidth, accessor.getInteger("difficultySlider.height", 16), b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.getObjectValue()))).active = !LegacyClientWorldSettings.of(summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
+        Button moreOptionsButton = addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> {
+            focusMoreOptionsButton = true;
+            minecraft.setScreen(new WorldMoreOptionsScreen(this));
+        }).bounds(layoutX, accessor.getInteger("moreOptionsButton.y", panel.y + 178), layoutWidth, accessor.getInteger("moreOptionsButton.height", 20)).build()));
+        Button loadButton = addRenderableWidget(accessor.putWidget("loadButton", Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> onLoad()).bounds(layoutX, accessor.getInteger("loadButton.y", panel.y + 203), layoutWidth, accessor.getInteger("loadButton.height", 20)).build()));
+        addRenderableWidget(accessor.putWidget("gameTypeSlider", gameTypeSlider));
         onlineTickBox.selected = publishScreen.publish;
-        onlineTickBox.setPosition(panel.x+ 14, panel.y+161);
-        addRenderableWidget(onlineTickBox);
-        setInitialFocus(loadButton);
-        resourceAssortSelector.setX(panel.x + 13);
-        resourceAssortSelector.setY(panel.y + 112);
-        addRenderableWidget(resourceAssortSelector);
+        onlineTickBox.setPosition(layoutX + 1, accessor.getInteger("onlineTickBox.y", panel.y + 161));
+        onlineTickBox.setWidth(layoutWidth);
+        onlineTickBox.updateHeight();
+        addRenderableWidget(accessor.putWidget("onlineTickBox", onlineTickBox));
+        if (focusMoreOptionsButton) {
+            setFocused(moreOptionsButton);
+            focusMoreOptionsButton = false;
+        } else setInitialFocus(loadButton);
+        resourceAssortSelector.setX(layoutX);
+        resourceAssortSelector.setY(accessor.getInteger("resourceAlbumSelector.y", panel.y + 112));
+        resourceAssortSelector.setWidth(layoutWidth);
+        addRenderableWidget(accessor.putWidget("resourceAlbumSelector", resourceAssortSelector));
     }
 
     public void onLoad() {
@@ -232,21 +254,29 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.5f,0,0);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.x + 12, panel.y + 9, 32,32);
+        int iconSize = accessor.getInteger("saveIcon.size", 29);
+        int iconX = accessor.getInteger("saveIcon.x", panel.x + 14);
+        int iconY = accessor.getInteger("saveIcon.y", panel.y + 10);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL, iconX - 2, iconY - 1, iconSize + 3, iconSize + 3);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0,0.5f,0);
-        FactoryGuiGraphics.of(guiGraphics).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
-        guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        FactoryGuiGraphics.of(guiGraphics).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(), iconX, iconY, 0,0, iconSize, iconSize, iconSize, iconSize);
+        ScreenUtil.applySDFont(ignored -> {
+            guiGraphics.drawString(font, summary.getLevelName(), accessor.getInteger("nameText.x", panel.x + 48), accessor.getInteger("nameText.y", panel.y + 12), CommonColor.GRAY_TEXT.get(), false);
+            guiGraphics.drawString(font, Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()), accessor.getInteger("creationText.x", panel.x + 48), accessor.getInteger("creationText.y", panel.y + 29), CommonColor.GRAY_TEXT.get(), false);
+        });
         guiGraphics.pose().popPose();
-        if (!isLocked) guiGraphics.drawString(font,Component.translatable("commands.seed.success",LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        if (!isLocked) ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font, Component.translatable("commands.seed.success",LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()), accessor.getInteger("seedText.x", panel.x + 13), accessor.getInteger("seedText.y", panel.y + 49), CommonColor.GRAY_TEXT.get(), false));
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        if (ScreenUtil.isMouseOver(i,j,panel.x + 14.5, panel.y + 10,29,29)) guiGraphics.renderTooltip(font,Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
+        int iconSize = accessor.getInteger("saveIcon.size", 29);
+        int iconX = accessor.getInteger("saveIcon.x", panel.x + 14);
+        int iconY = accessor.getInteger("saveIcon.y", panel.y + 10);
+        if (ScreenUtil.isMouseOver(i,j, iconX, iconY, iconSize, iconSize)) guiGraphics.renderTooltip(font,Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, String levelId) {

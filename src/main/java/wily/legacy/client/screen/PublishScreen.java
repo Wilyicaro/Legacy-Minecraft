@@ -42,7 +42,7 @@ public class PublishScreen extends ConfirmationScreen{
     }
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {
-        super(parent, 230, 145, LAN_SERVER, Component.translatable("lanServer.port"), b-> {});
+        super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 108 : 145, LAN_SERVER, Component.translatable("lanServer.port"), b-> {});
         this.okAction = s-> {
             publish = true;
             okAction.accept(this);
@@ -62,7 +62,9 @@ public class PublishScreen extends ConfirmationScreen{
     @Override
     protected void init() {
         super.init();
-        portEdit = new EditBox(font, panel.x + panel.width / 2 - 100,panel.y + 45,200, 20,PORT_INFO_TEXT);
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
+        portEdit = new EditBox(font, layoutX, panel.y + (sd ? 32 : 45), renderableVList.listWidth, sd ? 16 : 20, PORT_INFO_TEXT);
         portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
         portEdit.setMaxLength(128);
         portEdit.setResponder(string -> {
@@ -80,7 +82,8 @@ public class PublishScreen extends ConfirmationScreen{
             }
         });
         addRenderableWidget(portEdit);
-        gameTypeSlider.setPosition(panel.x + panel.width / 2 - 100, panel.y + 69);
+        gameTypeSlider.setPosition(layoutX, panel.y + (sd ? 51 : 69));
+        gameTypeSlider.setWidth(renderableVList.listWidth);
         addRenderableWidget(gameTypeSlider);
     }
     public void publish(IntegratedServer server){

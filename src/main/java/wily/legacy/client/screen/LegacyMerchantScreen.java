@@ -25,6 +25,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.util.LegacyComponents;
@@ -52,6 +53,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     protected final ContainerListener listener;
     protected final Stocker.Sizeable tradingButtonsOffset = new Stocker.Sizeable(0);
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    protected final UIAccessor accessor = UIAccessor.of(this);
 
     public LegacyMerchantScreen(LegacyMerchantMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
@@ -142,10 +144,20 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
 
             @Override
             public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+                int xDiff = leftPos + accessor.getInteger("tradingGridPanel.x", 12);
+                int yDiff = topPos + accessor.getInteger("bottomPanel.y", 79);
+                int slotSize = accessor.getInteger("tradingSlot.size", 27);
+                int tradeSlotX = accessor.getInteger("tradingSlot.x", 5);
+                int tradeSlotY = accessor.getInteger("tradingSlot.y", 51);
+                int firstTradeSlotY = accessor.getInteger("firstTradingSlot.y", 35);
+                int secondTradeSlotY = accessor.getInteger("secondTradingSlot.y", 65);
+                int resultSlotX = accessor.getInteger("resultSlot.x", 74);
                 for (int index = 0; index < 3; index++) {
                     MerchantOffer offer = getSelectedMerchantOffer();
                     if (index == 1 && (offer == null || offer.getCostB().isEmpty())) continue;
-                    LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer == null || offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27,offer == null || index == 0 ? ItemStack.EMPTY : index == 1 ? offer.getCostB() : offer.getResult(),offer != null && displaySlotsWarning[index], Vec3.ZERO);
+                    int slotX = index == 2 ? resultSlotX : tradeSlotX;
+                    int slotY = index == 0 ? offer == null || offer.getCostB().isEmpty() ? tradeSlotY : firstTradeSlotY : index == 1 ? secondTradeSlotY : tradeSlotY;
+                    LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.itemHolder(xDiff + slotX, yDiff + slotY, slotSize,slotSize,offer == null || index == 0 ? ItemStack.EMPTY : index == 1 ? offer.getCostB() : offer.getResult(),offer != null && displaySlotsWarning[index], Vec3.ZERO);
                     iconHolder.render(graphics, i, j, f);
                     if (offer == null || index != 0) continue;
                     iconHolder.renderItem(graphics,()->{
@@ -179,7 +191,12 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 if (offer != null)
                     for (int index = 0; index < 3; index++) {
                         ItemStack s = index == 0 ? offer.getCostA() : index == 1 ? offer.getCostB() : offer.getResult();
-                        if (!s.isEmpty() && ScreenUtil.isMouseOver(i,j,leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27)) renderTooltip(minecraft,graphics,s, i, j);
+                        int xDiff = leftPos + accessor.getInteger("tradingGridPanel.x", 12);
+                        int yDiff = topPos + accessor.getInteger("bottomPanel.y", 79);
+                        int slotX = index == 2 ? accessor.getInteger("resultSlot.x", 74) : accessor.getInteger("tradingSlot.x", 5);
+                        int slotY = index == 0 ? offer.getCostB().isEmpty() ? accessor.getInteger("tradingSlot.y", 51) : accessor.getInteger("firstTradingSlot.y", 35) : index == 1 ? accessor.getInteger("secondTradingSlot.y", 65) : accessor.getInteger("tradingSlot.y", 51);
+                        int slotSize = accessor.getInteger("tradingSlot.size", 27);
+                        if (!s.isEmpty() && ScreenUtil.isMouseOver(i,j,xDiff + slotX, yDiff + slotY, slotSize,slotSize)) renderTooltip(minecraft,graphics,s, i, j);
                     }
             }
 
@@ -239,19 +256,25 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     *///?}
 
     public void init() {
-        imageWidth = 294;
-        imageHeight = 181;
-        titleLabelX = (imageWidth - font.width(title)) / 2;
-        titleLabelY = 12;
-        inventoryLabelX = 128 + (153 - font.width(playerInventoryTitle))/2;
-        inventoryLabelY = 87;
+        imageWidth = accessor.getInteger("imageWidth", 294);
+        imageHeight = accessor.getInteger("imageHeight", 181);
+        ScreenUtil.applySDFont(ignored -> {
+            titleLabelX = (imageWidth - font.width(title)) / 2;
+            inventoryLabelX = accessor.getInteger("inventoryPanel.x", 126) + (accessor.getInteger("inventoryPanel.width", 157) - font.width(playerInventoryTitle))/2;
+        });
+        titleLabelY = accessor.getInteger("title.y", 12);
+        inventoryLabelY = accessor.getInteger("bottomPanel.y", 79) + accessor.getInteger("inventoryTitle.y", 8);
         super.init();
         updateSlotsDisplay();
         if (!(getFocused() instanceof LegacyIconHolder)) setFocused(merchantTradeButtons.get(0));
+        int tradingButtonsX = accessor.getInteger("tradingButtons.x", 13);
+        int tradingButtonsY = accessor.getInteger("tradingButtons.y", 44);
+        int tradingButtonsSize = accessor.getInteger("tradingButtons.size", 27);
         merchantTradeButtons.forEach(holder->{
             int i = merchantTradeButtons.indexOf(holder);
-            holder.setX(leftPos + 13 + 27*i);
-            holder.setY(topPos + 44);
+            holder.width = holder.height = tradingButtonsSize;
+            holder.setX(leftPos + tradingButtonsX + tradingButtonsSize * i);
+            holder.setY(topPos + tradingButtonsY);
             addRenderableWidget(holder);
         });
         menu.addSlotListener(listener);
@@ -301,22 +324,23 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         if (k >= 5) {
             return;
         }
+        int width = accessor.getInteger("progressBar.width", 243);
+        int height = accessor.getInteger("progressBar.height", 6);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + (imageWidth - 1.5f* 161) / 2,topPos + 28,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, 161, 4);
+        guiGraphics.pose().translate(leftPos + accessor.getInteger("progressBar.x", (imageWidth - width) / 2),topPos + accessor.getInteger("progressBar.y", 28),0);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, width, height);
         int m = VillagerData.getMinXpPerLevel(k);
         if (l < m || !VillagerData.canLevelUp(k)) {
             guiGraphics.pose().popPose();
             return;
         }
-        float f = 161.0f / (float)(VillagerData.getMaxXpPerLevel(k) - m);
-        int o = Math.min(Mth.floor(f * (float)(l - m)), 161);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_CURRENT, 161, 4, 0, 0, 0, 0, 0, o, 4);
+        float f = width / (float)(VillagerData.getMaxXpPerLevel(k) - m);
+        int o = Math.min(Mth.floor(f * (float)(l - m)), width);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_CURRENT, width, height, 0, 0, 0, 0, 0, o, height);
         int p = getSelectedMerchantOffer() != null ? getSelectedMerchantOffer().getXp() : 0;
         if (p > 0) {
-            int q = Math.min(Mth.floor((float)p * f), 161 - o);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT, 161, 4, o, 0, o, 0, 0, q, 4);
+            int q = Math.min(Mth.floor((float)p * f), width - o);
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT, width, height, o, 0, o, 0, 0, q, height);
         }
         guiGraphics.pose().popPose();
     }
@@ -327,44 +351,61 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
 
     @Override
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        int k = this.menu.merchantLevel;
-        if (k > 0 && k <= 5 && this.menu.showProgressBar) {
-            MutableComponent component = getMerchantTile(title,k);
-            guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        } else {
-            guiGraphics.drawString(this.font, this.title, titleLabelX, titleLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        }
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        if (getSelectedMerchantOffer() != null && menu.showProgressBar) {
-            int level = ((LegacyMerchantOffer)getSelectedMerchantOffer()).getRequiredLevel();
-            if (level > 0) {
-                Component c = Component.translatable("merchant.level." + level);
-                guiGraphics.drawString(this.font, c, 15 + (105 - font.width(c)) / 2, 100, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        ScreenUtil.applySDFont(ignored -> {
+            int titleY = accessor.getInteger("title.y", 12);
+            int k = this.menu.merchantLevel;
+            if (k > 0 && k <= 5 && this.menu.showProgressBar) {
+                MutableComponent component = getMerchantTile(title,k);
+                guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            } else {
+                guiGraphics.drawString(this.font, this.title, titleLabelX, titleY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             }
-        }
+            int bottomPanelY = accessor.getInteger("bottomPanel.y", 79);
+            int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 126);
+            int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 157);
+            guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 8), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            if (getSelectedMerchantOffer() != null && menu.showProgressBar) {
+                int level = ((LegacyMerchantOffer)getSelectedMerchantOffer()).getRequiredLevel();
+                if (level > 0) {
+                    Component c = Component.translatable("merchant.level." + level);
+                    int tradingGridPanelX = accessor.getInteger("tradingGridPanel.x", 12);
+                    int tradingPanelWidth = accessor.getInteger("tradingGridPanel.width", 110);
+                    guiGraphics.drawString(this.font, c, tradingGridPanelX + (tradingPanelWidth - font.width(c)) / 2, bottomPanelY + accessor.getInteger("levelTitle.y", 21), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                }
+            }
+        });
     }
 
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 12,topPos + 79,110,93);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 126,topPos + 79,157,93);
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
+        int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 93);
+        int tradingPanelWidth = accessor.getInteger("tradingGridPanel.width", 110);
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 79);
+        int tradingGridPanelX = accessor.getInteger("tradingGridPanel.x", 12);
+        int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 126);
+        int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 157);
+        int tradingArrowX = accessor.getInteger("tradingArrow.x", 35);
+        int tradingArrowY = accessor.getInteger("tradingArrow.y", 52);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + tradingGridPanelX,topPos + bottomPanelY,tradingPanelWidth,bottomPanelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + inventoryPanelX,topPos + bottomPanelY,inventoryPanelWidth,bottomPanelHeight);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 47,topPos + 131,0);
+        guiGraphics.pose().translate(leftPos + tradingGridPanelX + tradingArrowX,topPos + bottomPanelY + tradingArrowY,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW,0,0,sd ? 16 : 22,sd ? 14 : 15);
         if (getSelectedMerchantOffer() != null && getSelectedMerchantOffer().isOutOfStock())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popPose();
         if (getSelectedMerchantOffer() instanceof LegacyMerchantOffer o && o.getRequiredLevel() > menu.merchantLevel)
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, leftPos + 56,  topPos + 134, 16, 16);
-        if (UIAccessor.of(this).getBoolean("showProgressBar", menu.showProgressBar))
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, leftPos + tradingGridPanelX + tradingArrowX + 9,  topPos + bottomPanelY + tradingArrowY + 3, 16, 16);
+        if (accessor.getBoolean("showProgressBar", menu.showProgressBar))
             renderProgressBar(guiGraphics);
 
         if (tradingButtonsOffset.get() > 0)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 52);
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + accessor.getInteger("horizontalScroll.x", 5), topPos + accessor.getInteger("horizontalScroll.y", 52));
         if (tradingButtonsOffset.max > 0 && tradingButtonsOffset.get() < tradingButtonsOffset.max)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 283, topPos + 52);
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 11, topPos + accessor.getInteger("horizontalScroll.y", 52));
 
     }
 }

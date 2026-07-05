@@ -299,7 +299,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
-            guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused()));
             guiGraphics.pose().popPose();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

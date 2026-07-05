@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.AdvancedTextWidget;
-import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
@@ -73,7 +72,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
+                renderableVList.addCategory(Component.translatable(category));
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
@@ -118,13 +117,21 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             super.renderWidget(guiGraphics, i, j, f);
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
             if (c != null){
-                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font, c, getX() + bindingIconX() - Minecraft.getInstance().font.width(c) / 2, getY() + bindingIconY(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused())));
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
             FactoryScreenUtil.enableBlend();
-            icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
+            icon.render(guiGraphics, getX() + bindingIconX() - icon.render(guiGraphics,0,0,false,true) / 2, getY() + bindingIconY(),false,false);
             FactoryScreenUtil.disableBlend();
+        }
+
+        protected int bindingIconX() {
+            return LegacyKeyMappingScreen.this.accessor.getInteger("mappingIcon.x", width - 20);
+        }
+
+        protected int bindingIconY() {
+            return LegacyKeyMappingScreen.this.accessor.getInteger("mappingIcon.y", (height - font.lineHeight) / 2 + 1);
         }
 
         private boolean isPressed(){
@@ -133,7 +140,9 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+            int textX = LegacyKeyMappingScreen.this.accessor.getInteger("mappingText.x", 8);
+            int textRight = LegacyKeyMappingScreen.this.accessor.getInteger("mappingText.right", getWidth() - 32);
+            ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + textX, this.getY(), getX() + Math.max(textX + 10, textRight), this.getY() + this.getHeight(), j,true));
         }
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -250,7 +259,9 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             }
         }));
         super.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
+        if (accessor.getBoolean("versionText.visible", true)) {
+            addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + accessor.getInteger("versionText.x", panel.getWidth() + 81), panel.getY() + accessor.getInteger("versionText.y", panel.getHeight() - 7), CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+        }
     }
 
     @Override

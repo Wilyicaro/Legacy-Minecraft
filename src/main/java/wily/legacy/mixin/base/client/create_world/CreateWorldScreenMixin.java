@@ -27,16 +27,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyClientWorldSettings;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
 import wily.legacy.client.screen.*;
-import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -59,6 +57,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     protected Bearer<ResourceKey<WorldPreset>> legacyBiomeScale = Bearer.of(WorldPresets.NORMAL);
     protected Panel panel;
     protected PublishScreen publishScreen;
+    protected TickBox onlineTickBox;
     protected PackAlbum.Selector resourceAssortSelector;
 
     protected CreateWorldScreenMixin(Component component) {
@@ -71,7 +70,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Inject(method = "<init>",at = @At("RETURN"))
     public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ /*CreateWorldCallback createWorldCallback, *//*?}*/ CallbackInfo ci){
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
-        panel = Panel.createPanel(this, p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(this)) ? 160 : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
+        panel = Panel.createPanel(this, p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
         resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
         legacyBiomeScale.set(WorldMoreOptionsScreen.getLegacyBiomeScalePreset(uiState.getWorldType().preset()));
@@ -86,36 +85,48 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
+        UIAccessor accessor = UIAccessor.of(this);
         panel.init();
+        int layoutX = accessor.getInteger("layout.x", panel.x + 13);
+        int layoutWidth = accessor.getInteger("layout.width", 220);
         addRenderableOnly(panel);
-        EditBox nameEdit = new EditBox(font, panel.x + 13, panel.y + 25,220, 20, Component.translatable("selectWorld.enterName"));
+
+        EditBox nameEdit = new EditBox(font, layoutX, accessor.getInteger("nameEditBox.y", panel.y + 25), layoutWidth, accessor.getInteger("nameEditBox.height", 20), Component.translatable("selectWorld.enterName"));
         nameEdit.setValue(uiState.getName());
         nameEdit.setResponder(uiState::setName);
         uiState.addListener(worldCreationUiState -> nameEdit.setTooltip(Tooltip.create(Component.translatable("selectWorld.targetFolder", Component.literal(worldCreationUiState.getTargetFolder()).withStyle(ChatFormatting.ITALIC)))));
         setInitialFocus(nameEdit);
-        addRenderableWidget(nameEdit);
-        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 51, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().displayName),b->Tooltip.create(uiState.getGameMode().getInfo()),uiState.getGameMode(),()-> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b->uiState.setGameMode(b.getObjectValue())));
+        addRenderableWidget(accessor.putWidget("nameEditBox", nameEdit));
+
+        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, accessor.getInteger("gameTypeSlider.y", panel.y + 51), layoutWidth, accessor.getInteger("gameTypeSlider.height", 16), b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().displayName),b->Tooltip.create(uiState.getGameMode().getInfo()),uiState.getGameMode(),()-> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b->uiState.setGameMode(b.getObjectValue()))));
         uiState.addListener(worldCreationUiState -> gameModeButton.active = !worldCreationUiState.isDebug());
-        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 77, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(uiState.getDifficulty().getInfo()),uiState.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b->uiState.setDifficulty(b.getObjectValue())));
+
+        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, accessor.getInteger("difficultySlider.y", panel.y + 77), layoutWidth, accessor.getInteger("difficultySlider.height", 16), b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(uiState.getDifficulty().getInfo()),uiState.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b->uiState.setDifficulty(b.getObjectValue()))));
         uiState.addListener(worldCreationUiState -> {
             difficultyButton.setObjectValue(uiState.getDifficulty());
             difficultyButton.active = !uiState.isHardcore();
         });
 
-        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(panel.x + 13, panel.y + 172,220,20).build());
-        addRenderableWidget(Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(panel.x + 13, panel.y + 197,220,20).build());
-        addRenderableWidget(new TickBox(panel.x+ 14, panel.y+155,220,publishScreen.publish, b-> PublishScreen.getPublishComponent(), b->PublishScreen.getPublishTooltip(), button -> {
+        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, accessor.getInteger("moreOptionsButton.y", panel.y + 172), layoutWidth, accessor.getInteger("moreOptionsButton.height", 20)).build()));
+        addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(layoutX, accessor.getInteger("createButton.y", panel.y + 197), layoutWidth, accessor.getInteger("createButton.height", 20)).build()));
+
+        onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, accessor.getInteger("onlineTickBox.y", panel.y + 155), layoutWidth, publishScreen.publish, b-> PublishScreen.getPublishComponent(), b->PublishScreen.getPublishTooltip(), button -> {
             if (LegacyOptions.legacySettingsMenus.get()) {
                 if (button.selected) publishScreen.setGameType(uiState.getGameMode().gameType);
                 publishScreen.publish = button.selected;
                 return;
             }
-            if (button.selected) minecraft.setScreen(publishScreen);
-            button.selected = publishScreen.publish = false;
-        }));
-        resourceAssortSelector.setX(panel.x + 13);
-        resourceAssortSelector.setY(panel.y + 106);
-        addRenderableWidget(resourceAssortSelector);
+            if (!button.selected) {
+                publishScreen.publish = false;
+                return;
+            }
+            publishScreen.setGameType(uiState.getGameMode().gameType);
+            minecraft.setScreen(publishScreen);
+        }, () -> publishScreen.publish)));
+        resourceAssortSelector.setX(layoutX);
+        resourceAssortSelector.setY(accessor.getInteger("resourceAlbumSelector.y", panel.y + 106));
+        resourceAssortSelector.setWidth(layoutWidth);
+        addRenderableWidget(accessor.putWidget("resourceAlbumSelector", resourceAssortSelector));
         this.uiState.onChanged();
     }
 
@@ -174,10 +185,15 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
+        if (onlineTickBox != null) onlineTickBox.updateValue();
         ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         resourceAssortSelector.renderTooltipBox(guiGraphics,panel);
         super.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        UIAccessor accessor = UIAccessor.of(this);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15), 0);
+        ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,NAME_LABEL, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(),false));
+        guiGraphics.pose().popPose();
     }
 
     @Override

@@ -28,9 +28,11 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -43,6 +45,9 @@ public class LegacyTabButton extends AbstractButton {
     private final Consumer<LegacyTabButton> onPress;
     public boolean selected;
     public Type type;
+    public int textXPadding = 6;
+    public int textYOffset = -2;
+    public int textBottomPadding = 1;
 
     public Function<LegacyTabButton, Vec3> offset = (t)-> {
         if (!isActive()) return DEFAULT_DESACTIVE_OFFSET;
@@ -89,18 +94,20 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     public void renderString(GuiGraphics guiGraphics, Font font, int x, int y, int i, boolean shadow){
-        ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(6, (getWidth() - font.width(getMessage())) / 2), y - 2, x + getWidth() - 6, y + getHeight() - 1, i,shadow);
+        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(textXPadding, (getWidth() - font.width(getMessage())) / 2), y + textYOffset, x + getWidth() - textXPadding, y + getHeight() - textBottomPadding, i,shadow));
     }
 
     public  void renderIconSprite(ResourceLocation icon, GuiGraphics guiGraphics){
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
+        int size = LegacyOptions.getUIMode().isSD() ? 16 : 24;
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(icon, getX() + width / 2 - size / 2, getY() + height / 2 - size / 2, size, size);
     }
 
     public  void renderItemIcon(ItemStack itemIcon, GuiGraphics guiGraphics){
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
-        guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
-        guiGraphics.renderItem(itemIcon, 0, 0);
+        guiGraphics.pose().translate(getX() + width / 2f, getY() + height / 2f, 0);
+        float scale = LegacyOptions.getUIMode().isSD() ? 0.75f : 1.5f;
+        guiGraphics.pose().scale(scale, scale, scale);
+        guiGraphics.renderItem(itemIcon, -8, -8);
         guiGraphics.pose().popPose();
     }
 
@@ -169,6 +176,21 @@ public class LegacyTabButton extends AbstractButton {
         @Override
         public ResourceLocation getSprite(LegacyTabButton button) {
             return sprite();
+        }
+    }
+
+    public record StateOffset(Vec3 selected, Vec3 unselected, Vec3 inactive) implements Function<LegacyTabButton, Vec3> {
+        public static final Codec<Vec3> OFFSET_CODEC = Codec.either(DynamicUtil.VEC3_OBJECT_CODEC, Codec.DOUBLE.listOf().comapFlatMap(list -> {
+            if (list.size() < 2) return DataResult.error(() -> "Expected at least two values");
+            return DataResult.success(new Vec3(list.get(0), list.get(1), list.size() > 2 ? list.get(2) : 0.0));
+        }, vec -> vec.z == 0.0 ? List.of(vec.x, vec.y) : List.of(vec.x, vec.y, vec.z))).xmap(e -> e.map(v -> v, v -> v), Either::right);
+        public static final StateOffset DEFAULT = new StateOffset(Vec3.ZERO, DEFAULT_UNSELECTED_OFFSET, DEFAULT_DESACTIVE_OFFSET);
+        public static final Codec<StateOffset> CODEC = RecordCodecBuilder.create(i -> i.group(OFFSET_CODEC.fieldOf("selected").orElse(Vec3.ZERO).forGetter(StateOffset::selected), OFFSET_CODEC.fieldOf("unselected").orElse(DEFAULT_UNSELECTED_OFFSET).forGetter(StateOffset::unselected), OFFSET_CODEC.fieldOf("inactive").orElse(DEFAULT_DESACTIVE_OFFSET).forGetter(StateOffset::inactive)).apply(i, StateOffset::new));
+
+        @Override
+        public Vec3 apply(LegacyTabButton tab) {
+            if (!tab.isActive()) return inactive;
+            return tab.selected ? selected : unselected;
         }
     }
 

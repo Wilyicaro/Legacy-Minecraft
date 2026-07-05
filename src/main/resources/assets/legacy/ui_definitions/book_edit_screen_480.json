@@ -1,0 +1,29 @@
+{
+  "targetUI": "net.minecraft.client.gui.screens.inventory.BookEditScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.width": 146,
+    "panel.height": 180,
+    "panel.x": "(${width}-146)/2",
+    "panel.y": "(${height}-180)/2",
+    "panel.text.x": 15,
+    "panel.text.y": 27,
+    "panel.text.width": 115,
+    "panel.edit.width": 117,
+    "panel.edit.height": 126,
+    "panel.edit.lineLimit": 14,
+    "panel.titleEdit.y": 36,
+    "panel.owner.y": 44,
+    "panel.finalizeText.y": 62,
+    "panel.pageNumber.x": 129,
+    "panel.pageNumber.y": 16,
+    "panel.previousPageButton.x": 19,
+    "panel.nextPageButton.x": 101,
+    "panel.pageButton.y": 155,
+    "panel.pageButton.scale": 1,
+    "panel.screenButton.y": 185
+  }
+}

@@ -48,6 +48,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.base.client.WidgetAccessor;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
@@ -160,37 +161,50 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     protected void renderLabels(GuiGraphics guiGraphics,int i, int j){
         if (!searchMode) {
             Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().selectedTab).getMessage() : CommonComponents.EMPTY;
-            guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         }
-        int inventoryPanelX = accessor.getInteger("inventoryPanelX", 176);
-        int inventoryPanelWidth = accessor.getInteger("inventoryPanelWidth", 163);
-        if (infoType.get() <= 0) guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, accessor.getInteger("bottomPanelTitleY", 114), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        int inventoryPanelX = accessor.getInteger("inventoryPanel.x", accessor.getInteger("inventoryPanelX", 176));
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+        int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", accessor.getInteger("inventoryPanelWidth", 163));
+        int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
+        if (infoType.get() <= 0) ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", accessor.getInteger("bottomPanelTitleY", 114) - bottomPanelY), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         else {
             if (selectedCraftingButton < getCraftingButtons().size()) {
                 RecipeIconHolder<VanillaCrafting> h = craftingButtons.get(selectedCraftingButton);
                 if (infoType.get() == 1 && LegacyTipManager.hasTip(h.getFocusedResult())) {
-                    List<FormattedCharSequence> l = font.split(LegacyTipManager.getTipComponent(h.getFocusedResult()), inventoryPanelWidth - 11);
-                    scrollableRenderer.scrolled.max = Math.max(0, l.size() - 7);
-                    scrollableRenderer.render(guiGraphics, inventoryPanelX + 5, 105, inventoryPanelWidth - 11, 84, () -> {
-                        for (int i1 = 0; i1 < l.size(); i1++)
-                            guiGraphics.drawString(font, l.get(i1),  inventoryPanelX + 5, 108 + i1 * 12, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    ScreenUtil.applySDFont(sdFont -> {
+                        List<FormattedCharSequence> l = font.split(LegacyTipManager.getTipComponent(h.getFocusedResult()), inventoryPanelWidth - 11);
+                        int lineSpacing = sdFont ? 8 : 12;
+                        int lineAmount = (bottomPanelHeight - 21) / lineSpacing;
+                        scrollableRenderer.lineHeight = lineSpacing;
+                        scrollableRenderer.scrolled.max = Math.max(0, l.size() - lineAmount);
+                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 5, bottomPanelY + 2, inventoryPanelWidth - 11, lineAmount * lineSpacing + 2, () -> {
+                            for (int i1 = 0; i1 < l.size(); i1++)
+                                guiGraphics.drawString(font, l.get(i1),  inventoryPanelX + 5, bottomPanelY + 5 + i1 * lineSpacing, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                        });
                     });
 
                 } else if (infoType.get() == 2) {
-                    guiGraphics.drawString(this.font, LegacyComponents.INGREDIENTS, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.INGREDIENTS)) / 2, 108, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, LegacyComponents.INGREDIENTS, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.INGREDIENTS)) / 2, bottomPanelY + accessor.getInteger("ingredientsTitle.y", 5), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
                     if (h.getFocusedRecipe() != null) {
+                        int ingredientSize = accessor.getInteger("ingredientSlot.size", 14);
+                        int ingredientX = inventoryPanelX + accessor.getInteger("ingredientSlot.x", 4);
+                        int ingredientY = bottomPanelY + accessor.getInteger("ingredientSlot.y", 21);
+                        float textScale = LegacyOptions.getUIMode().isFHD() ? 2 / 3f : LegacyOptions.getUIMode().isSD() ? 1 / 2f : 1.0f;
                         compactItemStackList.clear();
                         RecipeMenu.handleCompactItemStackList(compactItemStackList, ()-> h.getFocusedRecipe().getOptionalIngredients().stream().map(RecipeIconHolder::getActualItem).iterator());
                         scrollableRenderer.scrolled.max = Math.max(0, compactItemStackList.size() - 4);
-                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 2, 122, 152, 60, () -> {
+                        scrollableRenderer.lineHeight = ingredientSize + 1;
+                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 2, ingredientY - 2, inventoryPanelWidth - 11, (ingredientSize + 1) * 4 + 1, () -> {
                             for (int i1 = 0; i1 < compactItemStackList.size(); i1++) {
                                 ItemStack ing = compactItemStackList.get(i1);
-                                ScreenUtil.iconHolderRenderer.itemHolder(inventoryPanelX + 4, 124 + 15 * i1, 14, 14, ing, false, Vec3.ZERO).render(guiGraphics, i, j, 0);
+                                ScreenUtil.iconHolderRenderer.itemHolder(ingredientX, ingredientY + (ingredientSize + 1) * i1, ingredientSize, ingredientSize, ing, false, Vec3.ZERO).render(guiGraphics, i, j, 0);
                                 guiGraphics.pose().pushPose();
-                                guiGraphics.pose().translate(inventoryPanelX + 22, 128 + 15 * i1, 0);
-                                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b -> {
-                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
-                                    guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                                guiGraphics.pose().translate(ingredientX + ingredientSize + accessor.getInteger("ingredientText.x", 4), ingredientY + ingredientSize / 2 + (ingredientSize + 1) * i1, 0);
+                                Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyIconHolder.MOJANGLES_11_FONT, b -> {
+                                    guiGraphics.pose().scale(textScale, textScale, textScale);
+                                    guiGraphics.pose().translate(0, -3, 0);
+                                    ScreenUtil.renderScrollingString(guiGraphics, font, ing.getHoverName(), 0,-2, Math.round((inventoryPanelWidth - 22 - 2) / textScale), 7, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                                 });
                                 guiGraphics.pose().popPose();
                             }
@@ -393,18 +407,28 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
     @Override
     protected void init() {
-        imageWidth = 349;
-        imageHeight = 215;
+        imageWidth = accessor.getInteger("imageWidth", 349);
+        imageHeight = accessor.getInteger("imageHeight", 215);
         super.init();
-        topPos += 18;
+        topPos += getTabYOffset();
+        int invSlotSize = accessor.getInteger("inventorySlot.size", 16);
+        int invSlotX = accessor.getInteger("inventory.x", 186);
+        int invSlotY = accessor.getInteger("inventory.y", 133);
+        int quickSelectY = accessor.getInteger("quickSelect.y", 186);
+        int slotSize = accessor.getInteger("craftingGridSlot.size", 23);
+        int craftingGridPanelX = accessor.getInteger("craftingGridPanel.x", 9);
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+        int craftingGridSlotX = accessor.getInteger("craftingGridSlot.x", is2x2 ? 24 : 12);
+        int craftingGridSlotY = accessor.getInteger("craftingGridSlot.y", 30);
+        int resultSlotSize = accessor.getInteger("craftingResultSlot.size", 36);
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0){
-                LegacySlotDisplay.override(s,123, 151, new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, craftingGridPanelX + accessor.getInteger("resultSlot.x", 104) + (is2x2 ? 0 : slotSize / 2), bottomPanelY + accessor.getInteger("resultSlot.y", 48), new LegacySlotDisplay(){
 
                     @Override
                     public int getWidth() {
-                        return 36;
+                        return resultSlotSize;
                     }
 
                     @Override
@@ -426,10 +450,10 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                     }
                 });
             } else if (i < (is2x2 ? 5 : 10)) {
-                LegacySlotDisplay.override(s,21 + s.getContainerSlot() % menu.getGridWidth() * 23, (is2x2 ? 145 : 133) + s.getContainerSlot() / menu.getGridHeight() * 23, new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, craftingGridPanelX + craftingGridSlotX + s.getContainerSlot() % menu.getGridWidth() * slotSize, bottomPanelY + craftingGridSlotY + (is2x2 ? slotSize / 2 : 0) + s.getContainerSlot() / menu.getGridHeight() * slotSize, new LegacySlotDisplay(){
                     @Override
                     public int getWidth() {
-                        return 23;
+                        return slotSize;
                     }
 
                     @Override
@@ -458,10 +482,10 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                     }
                 });
             } else if (i < menu.slots.size() - (is2x2 ? 10 : 9)) {
-                LegacySlotDisplay.override(s, 186 + (s.getContainerSlot() - 9) % 9 * 16, 133 + (s.getContainerSlot() - 9) / 9 * 16, new LegacySlotDisplay() {
+                LegacySlotDisplay.override(s, invSlotX + (s.getContainerSlot() - 9) % 9 * invSlotSize, invSlotY + (s.getContainerSlot() - 9) / 9 * invSlotSize, new LegacySlotDisplay() {
                     @Override
                     public int getWidth() {
-                        return 16;
+                        return invSlotSize;
                     }
 
                     @Override
@@ -470,10 +494,10 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                     }
                 });
             } else if (i < menu.slots.size() - (is2x2 ? 1 : 0)) {
-                LegacySlotDisplay.override(s, 186 + s.getContainerSlot() * 16,186, new LegacySlotDisplay() {
+                LegacySlotDisplay.override(s, invSlotX + s.getContainerSlot() * invSlotSize, quickSelectY, new LegacySlotDisplay() {
                     @Override
                     public int getWidth() {
-                        return 16;
+                        return invSlotSize;
                     }
 
                     @Override
@@ -484,13 +508,23 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             }
         }
         if (searchMode){
-            searchBox.setPosition(leftPos + (imageWidth - searchBox.getWidth()) / 2, topPos + 11);
-            addRenderableWidget(searchBox);
+            searchBox.setWidth(accessor.getInteger("searchBox.width", 200));
+            //? if <=1.20.1 {
+            /*((WidgetAccessor)searchBox).setHeight(accessor.getInteger("searchBox.height", 20));
+             *///?} else {
+            searchBox.setHeight(accessor.getInteger("searchBox.height", 20));
+            //?}
+            searchBox.setPosition(accessor.getInteger("searchBox.x", leftPos + (imageWidth - searchBox.getWidth()) / 2), accessor.getInteger("searchBox.y", topPos + 11));
+            addRenderableWidget(accessor.putWidget("searchBox", searchBox));
         }
         if (selectedCraftingButton < getCraftingButtons().size() && !searchMode)
             setFocused(getCraftingButtons().get(selectedCraftingButton));
+        int craftingButtonsX = accessor.getInteger("craftingButtons.x", 13);
+        int craftingButtonsY = accessor.getInteger("craftingButtons.y", 38);
+        int craftingButtonsSize = accessor.getInteger("craftingButtons.size", 27);
         getCraftingButtons().forEach(b -> {
-            b.setPos(leftPos + accessor.getInteger("craftingButtonsX", 13) + getCraftingButtons().indexOf(b) * 27, topPos + 38);
+            b.width = b.height = craftingButtonsSize;
+            b.setPos(leftPos + craftingButtonsX + getCraftingButtons().indexOf(b) * b.width, topPos + craftingButtonsY);
             addWidget(b);
         });
         addWidget(getTabList());
@@ -509,11 +543,11 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
     @Override
     public int getTabYOffset() {
-        return 18;
+        return accessor.getInteger("tabYOffset", 18);
     }
 
     protected int getMaxTabCount(){
-        return accessor.getInteger("maxTabCount",4);
+        return accessor.getInteger("maxTabCount",5);
     }
 
     protected void addCraftingButtons() {
@@ -534,6 +568,11 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
                 protected List<RecipeInfo<VanillaCrafting>> getRecipes() {
                     return recipesByGroup.size() <= craftingButtonsOffset.get() + index ? Collections.emptyList() : recipesByGroup.get(craftingButtonsOffset.get() + index);
+                }
+
+                @Override
+                public LegacyScrollRenderer getScrollRenderer() {
+                    return scrollRenderer;
                 }
 
                 @Override
@@ -617,16 +656,22 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j){
         getTabList().render(guiGraphics, i, j, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite", LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
-        int panelWidth = accessor.getInteger("craftingGridPanelWidth", 163);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 9, topPos + 103, panelWidth, 105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + accessor.getInteger("inventoryPanelX", 176), topPos + accessor.getInteger("inventoryPanelY", 103), accessor.getInteger("inventoryPanelWidth", 163), 105);
-        int contentsWidth = (is2x2 ? 2 : 3) * 23 + 69;
-        int xDiff = leftPos + 9 + (panelWidth - contentsWidth) / 2;
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(SMALL_ARROW, xDiff + (is2x2 ? 2 : 3) * 23 + 8, topPos + 161, 16, 13);
+        getTabList().renderSelected(guiGraphics, i, j, f);
+        int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
+        int panelWidth = accessor.getInteger("craftingGridPanel.width", accessor.getInteger("craftingGridPanelWidth", 163));
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+        int craftingGridPanelX = accessor.getInteger("craftingGridPanel.x", 9);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + craftingGridPanelX, topPos + bottomPanelY, panelWidth, bottomPanelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + accessor.getInteger("inventoryPanel.x", accessor.getInteger("inventoryPanelX", 176)), topPos + bottomPanelY, accessor.getInteger("inventoryPanel.width", accessor.getInteger("inventoryPanelWidth", 163)), bottomPanelHeight);
+        int slotSize = accessor.getInteger("craftingGridSlot.size", 23);
+        int xDiff = leftPos + craftingGridPanelX;
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(SMALL_ARROW, xDiff + accessor.getInteger("craftingArrow.x", 77) + (is2x2 ? 0 : slotSize / 2), topPos + bottomPanelY + accessor.getInteger("craftingArrow.y", 57), 16, 14);
+        int horizontalScrollX = accessor.getInteger("horizontalScroll.x", 5);
+        int horizontalScrollY = accessor.getInteger("horizontalScroll.y", 45);
         if (craftingButtonsOffset.get() > 0)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + horizontalScrollX, topPos + horizontalScrollY);
         if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 11, topPos + 45);
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 6 - horizontalScrollX, topPos + horizontalScrollY);
     }
 
     @Override
@@ -669,15 +714,18 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         renderBackground(guiGraphics, i, j, f);
         //?}
         super.render(guiGraphics, i, j, f);
-        int panelWidth = accessor.getInteger("craftingGridPanelWidth", 163);
+        int panelWidth = accessor.getInteger("craftingGridPanel.width", accessor.getInteger("craftingGridPanelWidth", 163));
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+        int craftingGridPanelX = accessor.getInteger("craftingGridPanel.x", 9);
+        int xDiff = leftPos + craftingGridPanelX;
         ItemStack resultStack = craftingButtons.get(selectedCraftingButton).getFocusedResult();
         if (!resultStack.isEmpty() && allowRecipeDisplay) {
             Component resultName = getCraftingButtons().get(selectedCraftingButton).getFocusedRecipe().getName();
             Component description = getCraftingButtons().get(selectedCraftingButton).getFocusedRecipe().getDescription();
-            int titleY = accessor.getInteger("bottomPanelTitleY", 114) - (description == null ? 0 : 6);
-            ScreenUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, leftPos + 7 + panelWidth, topPos + titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            int titleY = bottomPanelY + accessor.getInteger("craftingTitle.y", accessor.getInteger("bottomPanelTitleY", 114) - bottomPanelY) - (description == null ? 0 : 6);
+            ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             if (description != null)
-                ScreenUtil.renderScrollingString(guiGraphics, font, description.copy().setStyle(Style.EMPTY), leftPos + 11 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, leftPos + 7 + panelWidth, topPos + titleY + 23, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, description.copy().setStyle(Style.EMPTY), xDiff + 2 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, xDiff + panelWidth - 2, topPos + titleY + 23, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
 
         }
 

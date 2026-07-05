@@ -1,0 +1,18 @@
+{
+  "targetUI": "wily.legacy.client.screen.ModsScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.width": 180,
+    "panel.height": 180,
+    "buttonsHeight": 17,
+    "renderableVList.buttonIcon.size": 11,
+    "renderableVList.buttonMessage.xOffset": 8,
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    }
+  }
+}

@@ -59,13 +59,14 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
             }
         };
         for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
-            menu.slots.add(LegacySlotDisplay.override(new Slot(layerSelectionGrid, i, 23 + i % 10 * 27, 24 + i / 10 * 27), new LegacySlotDisplay() {
+            Slot slot = new Slot(layerSelectionGrid, i, 23 + i % 10 * 27, 24 + i / 10 * 27);
+            menu.slots.add(LegacySlotDisplay.override(slot, new LegacySlotDisplay() {
                 public int getWidth() {
-                    return 27;
+                    return accessor.getInteger("slots.size", 27);
                 }
 
                 public int getHeight() {
-                    return 27;
+                    return accessor.getInteger("slots.size", 27);
                 }
             }));
         }
@@ -88,7 +89,14 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     @Override
     protected void init() {
         panel.init();
-        scroller.setPosition(panel.x + 299, panel.y + 23);
+        int slotSize = accessor.getInteger("slots.size", 27);
+        for (int i = 0; i < menu.slots.size(); i++) {
+            Slot slot = menu.slots.get(i);
+            LegacySlotDisplay.override(slot, accessor.getInteger("slots.x", 23) + i % 10 * slotSize, accessor.getInteger("slots.y", 24) + i / 10 * slotSize, LegacySlotDisplay.of(slot));
+        }
+        scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 299), accessor.getInteger("scroller.y", panel.y + 23));
+        scroller.width = accessor.getInteger("scroller.width", scroller.width);
+        scroller.height = accessor.getInteger("scroller.height", scroller.height);
         scroller.offset(new Vec3(0.5f, 0, 0));
         fillLayerGrid();
     }

@@ -240,6 +240,18 @@ public class OptionsScreen extends PanelVListScreen {
         return screen;
     }
 
+    private static Panel centeredOptionsPanel(Screen screen, int height, int yOffset) {
+        return Panel.centered(screen,
+                () -> LegacyOptions.getUIMode().isSD() ? 180 : 250,
+                () -> LegacyOptions.getUIMode().isSD() ? Math.min(height, 178) : height,
+                () -> 0,
+                () -> LegacyOptions.getUIMode().isSD() ? Math.min(yOffset, 9) : yOffset);
+    }
+
+    private static Panel advancedOptionsPanel(Screen screen) {
+        return centeredOptionsPanel(screen, 215, 20);
+    }
+
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
@@ -316,7 +328,7 @@ public class OptionsScreen extends PanelVListScreen {
                 ()-> Section.ADVANCED_GAME_OPTIONS));
         public static final Section ADVANCED_GAME_OPTIONS = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",GAME_OPTIONS.title()),
-                s->Panel.centered(s,250,215,0,20),
+                OptionsScreen::advancedOptionsPanel,
                 new ArrayList<>(List.of(
                         o-> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),
@@ -383,7 +395,7 @@ public class OptionsScreen extends PanelVListScreen {
                 ()-> Section.ADVANCED_AUDIO));
         public static final Section ADVANCED_AUDIO = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",AUDIO.title()),
-                s->Panel.centered(s,250,215,0,20),
+                OptionsScreen::advancedOptionsPanel,
                 new ArrayList<>(List.of(
                         o-> o.renderableVList.addOptions(
                                 LegacyOptions.of(mc.options.soundDevice()),
@@ -398,7 +410,7 @@ public class OptionsScreen extends PanelVListScreen {
                         ? Panel.createPanel(s,
                                 p -> p.appearance(250, ((OptionsScreen) s).getLegacyPanelHeight(96, true)),
                                 p -> p.pos(p.centeredLeftPos(s), (s.height - 88) / 2 - 30))
-                        : Panel.centered(s, 250,222, 0, 24),
+                        : centeredOptionsPanel(s, 222, 24),
                 new ArrayList<>(List.of(
                         o -> {
                             if (useLegacySettingsMenusOptions()) o.renderableVList.addRenderable(createRenderCloudsTickBox());
@@ -477,7 +489,7 @@ public class OptionsScreen extends PanelVListScreen {
                 }));
         public static final Section ADVANCED_GRAPHICS = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",GRAPHICS.title()),
-                s->Panel.centered(s, 250,215,0,20),
+                OptionsScreen::advancedOptionsPanel,
                 new ArrayList<>(List.of(
                         o->o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.videoTitle"),
@@ -571,12 +583,16 @@ public class OptionsScreen extends PanelVListScreen {
                             if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.inGameOnlineIds,
                                     LegacyOptions.classicCrafting,
-                                    LegacyOptions.hudScale);
-                            else o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(LegacyOptions.create(mc.options.guiScale()), i -> {
-                                //? if <1.20.4 {
-                                /*mc.resizeDisplay();
-                                *///?}
-                            }));
+                                    LegacyOptions.hudScale,
+                                    LegacyOptions.uiMode);
+                            else {
+                                o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(LegacyOptions.create(mc.options.guiScale()), i -> {
+                                    //? if <1.20.4 {
+                                    /*mc.resizeDisplay();
+                                    *///?}
+                                }));
+                                o.renderableVList.addOptions(LegacyOptions.uiMode);
+                            }
                         },
                         o -> {
                             if (!useLegacySettingsMenusOptions()) o.getRenderableVList().addLinkedOptions(
@@ -604,7 +620,7 @@ public class OptionsScreen extends PanelVListScreen {
                 ()-> Section.ADVANCED_USER_INTERFACE));
         public static final Section ADVANCED_USER_INTERFACE = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",USER_INTERFACE.title()),
-                s->Panel.centered(s, 250,215,0,20),
+                OptionsScreen::advancedOptionsPanel,
                 new ArrayList<>(List.of(
                         o-> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),

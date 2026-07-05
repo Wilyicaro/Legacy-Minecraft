@@ -6,8 +6,10 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
@@ -19,6 +21,7 @@ import java.util.function.Supplier;
 
 public class LegacySliderButton<T> extends AbstractSliderButton {
     private final Function<LegacySliderButton<T>,Component> messageGetter;
+    public Supplier<ResourceLocation> fontOverrideSupplier = () -> LegacyOptions.getUIMode().isSD() ? LegacyIconHolder.MOJANGLES_11_FONT : null;
 
     private final Function<LegacySliderButton<T>, T> valueGetter;
     private final Function<T, Double> valueSetter;

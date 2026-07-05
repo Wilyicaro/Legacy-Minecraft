@@ -1,249 +1,758 @@
 {
-  "elements": {
-    "scrollable_renderer": {
-      "type": "put_scrollable_renderer",
-      "x": "${width}/2-228",
-      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
-      "width": 200,
-      "height": 222,
+  "elements": [
+    {
+      "name": "trading_fhd_hd",
+      "type": "children",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "applyPrefix": false,
       "elements": {
-        "text": {
-          "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.trading_message", "allowVariables": true, "args": ["controlIcon.key.use"]},
-          "width": 176
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-228",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+          "width": 200,
+          "height": 222,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trading_message",
+                "allowVariables": true,
+                "args": [
+                  "controlIcon.key.use"
+                ]
+              },
+              "width": 176
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/small_panel",
+          "width": 294,
+          "height": 181,
+          "x": "${width}/2-26",
+          "y": "(${height}-${panel.height})/2+31"
+        },
+        "trader_title": {
+          "type": "draw_string",
+          "component": {
+            "translate": "merchant.title",
+            "with": [
+              {
+                "translate": "entity.minecraft.villager.cleric"
+              },
+              {
+                "translate": "merchant.level.3"
+              }
+            ]
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+${panel.width}/2-${trader_title.component.width}/2",
+          "y": "${panel.y}+12"
+        },
+        "experience_bar_background": {
+          "type": "blit_sprite",
+          "sprite": "hud/experience_bar_background",
+          "width": 161,
+          "height": 4,
+          "scaleX": 1.5,
+          "scaleY": 1.5,
+          "translateX": "${panel.x}+(${panel.width}-1.5*161)/2",
+          "translateY": "${panel.y}+28"
+        },
+        "experience_bar_progress": {
+          "type": "blit",
+          "texture": "textures/gui/sprites/hud/experience_bar_progress.png",
+          "width": 121,
+          "height": 4,
+          "imageWidth": 161,
+          "imageHeight": 4,
+          "scaleX": 1.5,
+          "scaleY": 1.5,
+          "translateX": "${experience_bar_background.translateX}",
+          "translateY": "${experience_bar_background.translateY}"
+        },
+        "experience_bar_result": {
+          "type": "blit",
+          "texture": "legacy:textures/gui/sprites/container/experience_bar_result.png",
+          "uvX": 121,
+          "width": 16,
+          "height": 4,
+          "imageWidth": 161,
+          "imageHeight": 4,
+          "scaleX": 1.5,
+          "scaleY": 1.5,
+          "translateX": "${experience_bar_background.translateX}+121*1.5",
+          "translateY": "${experience_bar_background.translateY}"
+        },
+        "warning_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "isWarning": true,
+          "fakeItem": "emerald",
+          "x": "${panel.x}+13",
+          "y": "${panel.y}+44",
+          "width": 27,
+          "height": 27
+        },
+        "redstone_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "redstone",
+            "count": 2
+          },
+          "x": "${panel.x}+13+27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "second_warning_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "isWarning": true,
+          "fakeItem": "emerald",
+          "x": "${panel.x}+13+2*27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "lapis_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "lapis_lazuli",
+          "x": "${panel.x}+13+3*27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "third_warning_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "isWarning": true,
+          "fakeItem": "emerald",
+          "x": "${panel.x}+13+4*27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "glowstone_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "glowstone",
+            "count": 3
+          },
+          "x": "${panel.x}+13+5*27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "locked_offers": {
+          "type": "put_legacy_slot",
+          "range": "[0,1]",
+          "isFake": true,
+          "fakeContainer": [
+            "emerald",
+            "ender_pearl"
+          ],
+          "spriteOverride": "legacy:container/gray_icon_holder",
+          "x": "${panel.x}+13+(${locked_offers.index}+6)*27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "blank_offers": {
+          "type": "put_legacy_slot",
+          "range": "[0,1]",
+          "isFake": true,
+          "x": "${panel.x}+13+(${blank_offers.index}+8)*27",
+          "y": "${panel.y}+44",
+          "width": 27
+        },
+        "locked_icons": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/padlock",
+          "width": 16,
+          "height": 16,
+          "amount": 2,
+          "x": "${panel.x}+13+(${locked_icons.index}+6)*27",
+          "y": "${panel.y}+44",
+          "translateX": 4.5,
+          "translateY": 4.5,
+          "translateZ": 332
+        },
+        "trade_cursor": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/select_icon_highlight",
+          "width": 36,
+          "height": 36,
+          "x": "${panel.x}+7+5*27",
+          "y": "${panel.y}+38",
+          "translateZ": 332
+        },
+        "trade_panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "width": 110,
+          "height": 93,
+          "x": "${panel.x}+12",
+          "y": "${panel.y}+79"
+        },
+        "inventory_panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "width": 157,
+          "height": 93,
+          "x": "${panel.x}+126",
+          "y": "${panel.y}+79"
+        },
+        "arrow": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/arrow",
+          "x": "${panel.x}+47",
+          "y": "${panel.y}+131",
+          "width": 33,
+          "height": 22
+        },
+        "trading_slot": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "emerald",
+          "x": "${panel.x}+17",
+          "y": "${panel.y}+130",
+          "width": 27,
+          "height": 27
+        },
+        "result_slot": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "glowstone",
+            "count": 3
+          },
+          "x": "${panel.x}+86",
+          "y": "${panel.y}+130",
+          "width": 27,
+          "height": 27
+        },
+        "trade_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "merchant.level.3"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+15+(${trade_panel.width}-${trade_label.component.width})/2",
+          "y": "${panel.y}+100"
+        },
+        "inventory_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "container.inventory"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+128+(${inventory_panel.width}-${inventory_label.component.width})/2",
+          "y": "${panel.y}+87"
+        },
+        "inventory": {
+          "type": "put_legacy_slot",
+          "range": "[0,26]",
+          "isFake": true,
+          "fakeContainer": [
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
+            "air",
+            "air",
+            "oak_fence_gate",
+            "air",
+            "air",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
+            "air",
+            "dark_oak_door",
+            "air",
+            "emerald",
+            "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
+            "air",
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
+          ],
+          "x": "${panel.x}+133+(${inventory.index}%9)*16",
+          "y": "${panel.y}+98+(${inventory.index}/9)*16",
+          "width": 16,
+          "height": 16
+        },
+        "quick_select": {
+          "type": "put_legacy_slot",
+          "range": "[0,8]",
+          "isFake": true,
+          "fakeContainer": [
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
+          ],
+          "x": "${panel.x}+133+(${quick_select.index}%9)*16",
+          "y": "${panel.y}+154",
+          "width": 16,
+          "height": 16
         }
       }
     },
-    "panel": {
-      "type":"blit_sprite",
-      "sprite":"legacy:tiles/small_panel",
-      "width":294,
-      "height":181,
-      "x":"${width}/2-26",
-      "y":"(${height}-${panel.height})/2+31"
-    },
-    "trader_title": {
-      "type":"draw_string",
-      "component": {"translate": "merchant.title", "with": [{"translate": "entity.minecraft.villager.cleric"},{"translate": "merchant.level.3"}]},
-      "color": "${commonColor.inventory_gray_text}",
-      "shadow": false,
-      "x":"${panel.x}+${panel.width}/2-${trader_title.component.width}/2",
-      "y":"${panel.y}+12"
-    },
-    "experience_bar_background": {
-      "type": "blit_sprite",
-      "sprite": "hud/experience_bar_background",
-      "width": 161,
-      "height": 4,
-      "scaleX": 1.5,
-      "scaleY": 1.5,
-      "translateX": "${panel.x}+(${panel.width}-1.5*161)/2",
-      "translateY": "${panel.y}+28"
-    },
-    "experience_bar_progress": {
-      "type": "blit",
-      "texture": "textures/gui/sprites/hud/experience_bar_progress.png",
-      "width": 121,
-      "height": 4,
-      "imageWidth": 161,
-      "imageHeight": 4,
-      "scaleX": 1.5,
-      "scaleY": 1.5,
-      "translateX": "${experience_bar_background.translateX}",
-      "translateY": "${experience_bar_background.translateY}"
-    },
-    "experience_bar_result": {
-      "type": "blit",
-      "texture": "legacy:textures/gui/sprites/container/experience_bar_result.png",
-      "uvX": 121,
-      "width": 16,
-      "height": 4,
-      "imageWidth": 161,
-      "imageHeight": 4,
-      "scaleX": 1.5,
-      "scaleY": 1.5,
-      "translateX": "${experience_bar_background.translateX}+121*1.5",
-      "translateY": "${experience_bar_background.translateY}"
-    },
-    "warning_offer": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "isWarning": true,
-      "fakeItem": "emerald",
-      "x":"${panel.x}+13",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "redstone_offer": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "fakeItem": {"item": "redstone", "count": 2},
-      "x":"${panel.x}+13+27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "second_warning_offer": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "isWarning": true,
-      "fakeItem": "emerald",
-      "x":"${panel.x}+13+2*27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "lapis_offer": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "fakeItem": "lapis_lazuli",
-      "x":"${panel.x}+13+3*27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "third_warning_offer": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "isWarning": true,
-      "fakeItem": "emerald",
-      "x":"${panel.x}+13+4*27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "glowstone_offer": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "fakeItem": {"item": "glowstone", "count": 3},
-      "x":"${panel.x}+13+5*27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "locked_offers": {
-      "type":"put_legacy_slot",
-      "range":"[0,1]",
-      "isFake":true,
-      "fakeContainer": ["emerald","ender_pearl"],
-      "spriteOverride": "legacy:container/gray_icon_holder",
-      "x":"${panel.x}+13+(${locked_offers.index}+6)*27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "blank_offers": {
-      "type":"put_legacy_slot",
-      "range":"[0,1]",
-      "isFake":true,
-      "x":"${panel.x}+13+(${blank_offers.index}+8)*27",
-      "y":"${panel.y}+44",
-      "width":27,
-      "height":27
-    },
-    "locked_icons": {
-      "type":"blit_sprite",
-      "sprite":"legacy:container/padlock",
-      "width":16,
-      "height":16,
-      "amount": 2,
-      "x":"${panel.x}+13+(${locked_icons.index}+6)*27",
-      "y":"${panel.y}+44",
-      "translateX": 4.5,
-      "translateY": 4.5,
-      "translateZ": 332
-    },
-    "trade_cursor": {
-      "type":"blit_sprite",
-      "sprite":"legacy:container/select_icon_highlight",
-      "width":36,
-      "height":36,
-      "x":"${panel.x}+7+5*27",
-      "y":"${panel.y}+38",
-      "translateZ": 332
-    },
-    "trade_panel": {
-      "type":"blit_sprite",
-      "sprite":"legacy:tiles/square_recessed_panel",
-      "width":110,
-      "height":93,
-      "x":"${panel.x}+12",
-      "y":"${panel.y}+79"
-    },
-    "inventory_panel": {
-      "type":"blit_sprite",
-      "sprite":"legacy:tiles/square_recessed_panel",
-      "width":157,
-      "height":93,
-      "x":"${panel.x}+126",
-      "y":"${panel.y}+79"
-    },
-    "arrow": {
-      "type":"blit_sprite",
-      "sprite": "legacy:container/arrow",
-      "x": "${panel.x}+47",
-      "y": "${panel.y}+131",
-      "width": 33,
-      "height": 22
-    },
-    "trading_slot": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "fakeItem": "emerald",
-      "x":"${panel.x}+17",
-      "y":"${panel.y}+130",
-      "width":27,
-      "height":27
-    },
-    "result_slot": {
-      "type":"put_legacy_slot",
-      "isFake":true,
-      "fakeItem": {"item": "glowstone", "count": 3},
-      "x":"${panel.x}+86",
-      "y":"${panel.y}+130",
-      "width":27,
-      "height":27
-    },
-    "trade_label": {
-      "type":"draw_string",
-      "component": {"translate": "merchant.level.3"},
-      "color": "${commonColor.inventory_gray_text}",
-      "shadow": false,
-      "x":"${panel.x}+15+(${trade_panel.width}-${trade_label.component.width})/2",
-      "y":"${panel.y}+100"
-    },
-    "inventory_label": {
-      "type":"draw_string",
-      "component": {"translate": "container.inventory"},
-      "color": "${commonColor.inventory_gray_text}",
-      "shadow": false,
-      "x":"${panel.x}+128+(${inventory_panel.width}-${inventory_label.component.width})/2",
-      "y":"${panel.y}+87"
-    },
-    "inventory": {
-      "type":"put_legacy_slot",
-      "range":"[0,26]",
-      "isFake":true,
-      "fakeContainer": [
-        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
-        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
-        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
-      ],
-      "x":"${panel.x}+133+(${inventory.index}%9)*16",
-      "y":"${panel.y}+98+(${inventory.index}/9)*16",
-      "width":16,
-      "height":16
-    },
-    "quick_select": {
-      "type":"put_legacy_slot",
-      "range":"[0,8]",
-      "isFake":true,
-      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
-      "x":"${panel.x}+133+(${quick_select.index}%9)*16",
-      "y":"${panel.y}+154",
-      "width":16,
-      "height":16
+    {
+      "name": "trading_sd",
+      "type": "children",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "applyPrefix": false,
+      "elements": {
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-144",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+          "contentX": 10,
+          "contentY": 8,
+          "width": 140,
+          "height": 137,
+          "lineHeight": 8,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trading_message",
+                "font": "legacy:default_11",
+                "allowVariables": true,
+                "args": [
+                  "controlIcon.key.use"
+                ]
+              },
+              "width": 120,
+              "lineSpacing": 8
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/panel",
+          "width": 213,
+          "height": 121,
+          "x": "${width}/2 - 2",
+          "y": "${scrollable_renderer.y}+(${scrollable_renderer.height}-${panel.height})/2"
+        },
+        "trader_title": {
+          "type": "draw_string",
+          "component": {
+            "translate": "merchant.title",
+            "font": "legacy:default_11",
+            "with": [
+              {
+                "translate": "entity.minecraft.villager.cleric"
+              },
+              {
+                "translate": "merchant.level.3"
+              }
+            ]
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${panel.x}+(${panel.width}-${trader_title.component.width})/2",
+          "y": "${panel.y}+6"
+        },
+        "experience_bar_background": {
+          "type": "blit_sprite",
+          "sprite": "hud/experience_bar_background",
+          "width": 182,
+          "height": 5,
+          "translateX": "${panel.x}+(${panel.width}-182)/2",
+          "translateY": "${panel.y}+14"
+        },
+        "experience_bar_progress": {
+          "type": "blit",
+          "texture": "textures/gui/sprites/hud/experience_bar_progress.png",
+          "width": 136,
+          "height": 5,
+          "imageWidth": 182,
+          "imageHeight": 5,
+          "translateX": "${experience_bar_background.translateX}",
+          "translateY": "${experience_bar_background.translateY}"
+        },
+        "experience_bar_result": {
+          "type": "blit",
+          "texture": "legacy:textures/gui/sprites/container/experience_bar_result.png",
+          "uvX": 136,
+          "width": 18,
+          "height": 5,
+          "imageWidth": 182,
+          "imageHeight": 5,
+          "translateX": "${experience_bar_background.translateX}+136",
+          "translateY": "${experience_bar_background.translateY}"
+        },
+        "warning_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "isWarning": true,
+          "fakeItem": "emerald",
+          "x": "${panel.x}+(${panel.width}-20*10)/2",
+          "y": "${panel.y}+22",
+          "width": 20
+        },
+        "redstone_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "redstone",
+            "count": 2
+          },
+          "x": "${warning_offer.x}+20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20,
+          "height": 20
+        },
+        "second_warning_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "isWarning": true,
+          "fakeItem": "emerald",
+          "x": "${warning_offer.x}+2*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20
+        },
+        "lapis_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "lapis_lazuli",
+          "x": "${warning_offer.x}+3*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20
+        },
+        "third_warning_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "isWarning": true,
+          "fakeItem": "emerald",
+          "x": "${warning_offer.x}+4*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20
+        },
+        "glowstone_offer": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "glowstone",
+            "count": 3
+          },
+          "x": "${warning_offer.x}+5*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20
+        },
+        "locked_offers": {
+          "type": "put_legacy_slot",
+          "range": "[0,1]",
+          "isFake": true,
+          "fakeContainer": [
+            "emerald",
+            "ender_pearl"
+          ],
+          "spriteOverride": "legacy:container/gray_icon_holder",
+          "x": "${warning_offer.x}+(${locked_offers.index}+6)*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20
+        },
+        "blank_offers": {
+          "type": "put_legacy_slot",
+          "range": "[0,1]",
+          "isFake": true,
+          "x": "${warning_offer.x}+(${blank_offers.index}+8)*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "width": 20
+        },
+        "locked_icons": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/padlock",
+          "width": 16,
+          "height": 16,
+          "amount": 2,
+          "x": "${warning_offer.x}+(${locked_icons.index}+6)*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "translateX": 1,
+          "translateY": 1,
+          "translateZ": 332
+        },
+        "trade_cursor": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/select_icon_highlight_small",
+          "width": 21,
+          "height": 21,
+          "x": "${warning_offer.x}+5*20",
+          "y": {
+            "reference": "warning_offer.y"
+          },
+          "translateX": -1.4,
+          "translateY": -1.5,
+          "translateZ": 332
+        },
+        "trade_panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "width": 90,
+          "height": 71,
+          "x": "${panel.x}+5",
+          "y": "${panel.y}+44"
+        },
+        "inventory_panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "width": 110,
+          "height": 71,
+          "x": "${panel.x}+98",
+          "y": "${panel.y}+44"
+        },
+        "arrow": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/small_arrow",
+          "x": "${trade_panel.x}+35",
+          "y": "${trade_panel.y}+30",
+          "width": 24,
+          "height": 21
+        },
+        "trading_slot": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": "emerald",
+          "x": "${trade_panel.x}+8",
+          "y": "${trade_panel.y}+30",
+          "width": 25
+        },
+        "result_slot": {
+          "type": "put_legacy_slot",
+          "isFake": true,
+          "fakeItem": {
+            "item": "glowstone",
+            "count": 3
+          },
+          "x": "${trade_panel.x}+64",
+          "y": "${trade_panel.y}+30",
+          "width": 25
+        },
+        "trade_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "merchant.level.3",
+            "font": "legacy:default_11"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${trade_panel.x}+(${trade_panel.width}-${trade_label.component.width})/2",
+          "y": "${trade_panel.y}+8"
+        },
+        "inventory_label": {
+          "type": "draw_string",
+          "component": {
+            "translate": "container.inventory",
+            "font": "legacy:default_11"
+          },
+          "color": "${commonColor.inventory_gray_text}",
+          "shadow": false,
+          "x": "${inventory_panel.x}+(${inventory_panel.width}-${inventory_label.component.width})/2",
+          "y": "${inventory_panel.y}+3"
+        },
+        "inventory": {
+          "type": "put_legacy_slot",
+          "range": "[0,26]",
+          "isFake": true,
+          "fakeContainer": [
+            {
+              "item": "stone",
+              "count": 32
+            },
+            {
+              "item": "oak_planks",
+              "count": 17
+            },
+            "air",
+            "air",
+            "oak_fence_gate",
+            "air",
+            "air",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "stick",
+              "count": 10
+            },
+            {
+              "item": "bookshelf",
+              "count": 3
+            },
+            "air",
+            "dark_oak_door",
+            "air",
+            "emerald",
+            "air",
+            {
+              "item": "cobblestone_wall",
+              "count": 7
+            },
+            "oak_sign",
+            "air",
+            {
+              "item": "stone_brick_stairs",
+              "count": 24
+            },
+            {
+              "item": "cobblestone_stairs",
+              "count": 16
+            },
+            "air",
+            {
+              "item": "oak_log",
+              "count": 7
+            },
+            {
+              "item": "acacia_stairs",
+              "count": 15
+            },
+            "air",
+            "diamond_pickaxe",
+            {
+              "item": "paper",
+              "count": 21
+            },
+            {
+              "item": "gunpowder",
+              "count": 15
+            }
+          ],
+          "x": "${inventory_panel.x}+6+(${inventory.index}%9)*11",
+          "y": "${inventory_panel.y}+16+(${inventory.index}/9)*11",
+          "width": 11
+        },
+        "quick_select": {
+          "type": "put_legacy_slot",
+          "range": "[0,8]",
+          "isFake": true,
+          "fakeContainer": [
+            "iron_sword",
+            "bow",
+            {
+              "item": "arrow",
+              "count": 64
+            },
+            {
+              "item": "flint_and_steel",
+              "components": {
+                "damage": 28
+              },
+              "nbt": {
+                "Damage": 28
+              }
+            },
+            "clock",
+            "shears",
+            {
+              "item": "iron_axe",
+              "components": {
+                "damage": 65
+              },
+              "nbt": {
+                "Damage": 65
+              }
+            },
+            "fishing_rod",
+            "compass"
+          ],
+          "x": "${inventory_panel.x}+6+(${quick_select.index}%9)*11",
+          "y": "${inventory_panel.y}+53",
+          "width": 11
+        }
+      }
     }
-  }
+  ]
 }

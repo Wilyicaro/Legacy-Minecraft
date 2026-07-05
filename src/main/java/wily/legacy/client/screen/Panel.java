@@ -3,10 +3,10 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -86,12 +86,17 @@ public class Panel extends SimpleLayoutRenderable {
     }
 
     public static Panel tooltipBoxOf(Panel panel, int boxWidth){
+        return tooltipBoxOf(panel, () -> boxWidth);
+    }
+
+    public static Panel tooltipBoxOf(Panel panel, Supplier<Integer> boxWidth){
         Panel p = new Panel(panel.accessor){
             @Override
             public void init(String name) {
                 super.init(name);
-                panel.x-=(boxWidth - 2)/ 2;
-                appearance(LegacySprites.POINTER_PANEL, boxWidth, panel.height - 10);
+                int width = boxWidth.get();
+                panel.x-=(width - 2)/ 2;
+                appearance(LegacySprites.POINTER_PANEL, width, panel.height - 10);
                 pos(panel.x + panel.width - 2,panel.y + 5);
             }
 
@@ -119,7 +124,9 @@ public class Panel extends SimpleLayoutRenderable {
     }
 
     public void pos(int x, int y){
-        setPosition(accessor.putStaticElement(name+".x",accessor.getInteger(name+".x",x)),accessor.putStaticElement(name+".y",accessor.getInteger(name+".y",y)));
+        setX(x);
+        setY(y);
+        setPosition(accessor.putIntegerBearer(name + ".x", Bearer.of(this::getX, this::setX)), accessor.putIntegerBearer(name + ".y", Bearer.of(this::getY, this::setY)));
     }
 
     public void centered(Screen screen){

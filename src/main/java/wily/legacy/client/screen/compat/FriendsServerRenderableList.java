@@ -85,7 +85,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
 
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true));
                     }
 
                     @Override

@@ -28,8 +28,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -47,28 +49,46 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     public void init(CallbackInfo ci) {
         ci.cancel();
         this.bookModel = new BookModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.BOOK));
-        imageWidth = 215;
-        imageHeight = 217;
-        inventoryLabelX = 14;
-        inventoryLabelY = 104;
-        titleLabelX = 14;
-        titleLabelY = 10;
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        imageWidth = sd ? 130 : 215;
+        imageHeight = sd ? 140 : 217;
+        inventoryLabelX = sd ? 7 : 14;
+        inventoryLabelY = sd ? 67 : 104;
+        titleLabelX = sd ? 7 : 14;
+        titleLabelY = sd ? 5 : 10;
+        int slotsSize = sd ? 13 : 21;
+        LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return slotsSize;
+            }
+        };
         super.init();
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0){
-                LegacySlotDisplay.override(s, 19, 66, new LegacySlotDisplay() {
+                LegacySlotDisplay.override(s, sd ? 10 : 19, sd ? 49 : 66, new LegacySlotDisplay() {
                     @Override
                     public ResourceLocation getIconSprite() {
                         return s.hasItem() ? null : LegacySprites.ENCHANTING_SLOT;
                     }
+
+                    @Override
+                    public int getWidth() {
+                        return sd ? 16 : 21;
+                    }
                 });
             } else if (i == 1) {
-                LegacySlotDisplay.override(s, 50, 66);
+                LegacySlotDisplay.override(s, sd ? 31 : 50, sd ? 49 : 66, new LegacySlotDisplay() {
+                    @Override
+                    public int getWidth() {
+                        return sd ? 16 : 21;
+                    }
+                });
             } else if (i < menu.slots.size() - 9) {
-                LegacySlotDisplay.override(s, 14 + (s.getContainerSlot() - 9) % 9 * 21,115 + (s.getContainerSlot() - 9) / 9 * 21);
+                LegacySlotDisplay.override(s, inventoryLabelX + (s.getContainerSlot() - 9) % 9 * slotsSize, (sd ? 77 : 115) + (s.getContainerSlot() - 9) / 9 * slotsSize, defaultDisplay);
             } else {
-                LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,185);
+                LegacySlotDisplay.override(s, inventoryLabelX + s.getContainerSlot() * slotsSize, sd ? 122 : 185, defaultDisplay);
             }
         }
     }
@@ -86,10 +106,13 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
 
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        int buttonWidth = sd ? 70 : 120;
+        int buttonHeight = sd ? 15 : 21;
         for (int l = 0; l < 3; ++l) {
-            double f = d - (leftPos + 80.5);
-            double g = e - (topPos + 23.5 + 21 * l);
-            if (!(f >= 0.0) || !(g >= 0.0) || !(f < 120) || !(g < 21) || !this.menu.clickMenuButton(this.minecraft.player, l)) continue;
+            double f = d - (leftPos + (sd ? 52.5 : 80.5));
+            double g = e - (topPos + (sd ? 17.5 : 23.5) + buttonHeight * l);
+            if (!(f >= 0.0) || !(g >= 0.0) || !(f < buttonWidth) || !(g < buttonHeight) || !this.menu.clickMenuButton(this.minecraft.player, l)) continue;
             this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, l);
             cir.setReturnValue(true);
             return;
@@ -97,50 +120,64 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
        cir.setReturnValue(super.mouseClicked(d, e, i));
     }
 
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+    }
+
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
-        guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-        this.renderBook(guiGraphics, 0, 0, f);
-        guiGraphics.pose().popPose();
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + (sd ? 51 : 79),  topPos + (sd ? 16 : 22), sd ? 73 : 123, sd ? 48 : 66);
+        if (sd) {
+            this.renderBook(guiGraphics, leftPos - 5, topPos, f);
+        } else {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
+            guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+            this.renderBook(guiGraphics, 0, 0, f);
+            guiGraphics.pose().popPose();
+        }
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
+        int buttonWidth = sd ? 70 : 120;
+        int buttonHeight = sd ? 15 : 21;
+        int levelSize = sd ? 16 : 24;
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 80.5f,topPos+ 2.5f,0f);
+        guiGraphics.pose().translate(leftPos + (ScreenUtil.hasHorizontalArtifacts() ? sd ? 52.4f : 80.4f : sd ? 52.5f : 80.5f),topPos + (sd ? 17.4f : 23.4f) - buttonHeight,0f);
         for (int n = 0; n < 3; ++n) {
-            guiGraphics.pose().translate(0f,21f,0f);
+            guiGraphics.pose().translate(0f,buttonHeight,0f);
             int enchantCost = this.menu.costs[n];
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_EMPTY, 0, 0, 120, 21);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DISABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_EMPTY : LegacySprites.ENCHANTMENT_BUTTON_EMPTY, 0, 0, buttonWidth, buttonHeight);
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DISABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
             if (enchantCost == 0)
                 continue;
             String string = "" + enchantCost;
-            int r = 86 - this.font.width(string);
+            int r = (sd ? 58 : 86) - this.font.width(string);
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
                 int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : CommonColor.INVALID_ENCHANTMENT_TEXT.get();
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/);
+                ScreenUtil.applySDFont(ignored -> guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/));
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
-                double t = i - (leftPos + 80.5);
-                double u = j - (topPos + 23.5 + 21 * n);
-                if (t >= 0 && u >= 0 && t < 120 && u < 21) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
+                double t = i - (leftPos + (sd ? 52.5 : 80.5));
+                double u = j - (topPos + (sd ? 17.5 : 23.5) + buttonHeight * n);
+                if (t >= 0 && u >= 0 && t < buttonWidth && u < buttonHeight) {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_SELECTED : LegacySprites.ENCHANTMENT_BUTTON_SELECTED, 0, 0, buttonWidth, buttonHeight);
                     s = CommonColor.HIGHLIGHTED_ENCHANTMENT_TEXT.get();
                 } else {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ENCHANTMENT_BUTTON_ACTIVE : LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, buttonWidth, buttonHeight);
                 }
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
                 int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : s;
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/);
+                ScreenUtil.applySDFont(ignored -> guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/));
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
-            guiGraphics.drawString(this.font, string, 120 - this.font.width(string), 12, s);
+            int color = s;
+            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, string, buttonWidth - this.font.width(string) - (sd ? 2 : 0), sd ? 8 : 12, color));
         }
         guiGraphics.pose().popPose();
     }
@@ -157,9 +194,11 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess()./*? if <1.21.2 {*/registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l])/*?} else {*//*lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l])*//*?}*/;
             int n = this.menu.levelClue[l];
             int o = l + 1;
-            double t = i - (leftPos + 80.5);
-            double u = j - (topPos + 23.5 + 21 * l);
-            if (!(t >= 0 && u >= 0 && t < 120 && u < 21) || m <= 0 || n < 0 || optional.isEmpty()) continue;
+            boolean sd = LegacyOptions.getUIMode().isSD();
+            int buttonHeight = sd ? 15 : 21;
+            double t = i - (leftPos + (sd ? 52.5 : 80.5));
+            double u = j - (topPos + (sd ? 17.5 : 23.5) + buttonHeight * l);
+            if (!(t >= 0 && u >= 0 && t < (sd ? 70 : 120) && u < buttonHeight) || m <= 0 || n < 0 || optional.isEmpty()) continue;
             ArrayList<Component> list = Lists.newArrayList();
             optional.get().value();
             list.add(Component.translatable("container.enchant.clue", /*? if <1.20.5 {*//*optional.get().value().getFullname(n)*//*?} else {*/Enchantment.getFullname(optional.get(), n)/*?}*/).withStyle(ChatFormatting.WHITE));

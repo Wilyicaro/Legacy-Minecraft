@@ -2,7 +2,9 @@ package wily.legacy.client.screen;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -25,6 +27,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,6 +39,7 @@ public class RenderableVList {
     protected int topPos;
     public int listWidth;
     protected int listHeight;
+    protected String name;
     public final List<Renderable> renderables = new ArrayList<>();
     public final UIAccessor accessor;
     protected int renderablesCount;
@@ -46,7 +50,7 @@ public class RenderableVList {
     protected int verticalScrollArrowOffsetX = 0;
     protected int verticalScrollArrowOffsetY = 0;
     public boolean cyclic = true;
-    protected Function<LayoutElement,Integer> layoutSeparation = w-> 3;
+    protected Function<LayoutElement,Integer> layoutSeparation = w-> LegacyOptions.getUIMode().isSD() ? 2 : 3;
 
     public RenderableVList(UIAccessor accessor){
         this.accessor = accessor;
@@ -133,7 +137,7 @@ public class RenderableVList {
     }
 
     public RenderableVList addCategory(Component title) {
-        addRenderable(SimpleLayoutRenderable.createDrawString(title, 1, 4, listWidth, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        addRenderable(new LayoutText(title, CommonColor.GRAY_TEXT, () -> LegacyOptions.getUIMode().isSD() ? 9 : 13));
         return this;
     }
 
@@ -186,11 +190,42 @@ public class RenderableVList {
         }
     }
 
+    private boolean focusEdgeRenderable(boolean last) {
+        int start = last ? renderables.size() - 1 : 0;
+        int step = last ? -1 : 1;
+        for (int i = start; i >= 0 && i < renderables.size(); i += step) {
+            Renderable renderable = renderables.get(i);
+            if (renderable instanceof GuiEventListener) {
+                revealRenderable(renderable);
+                if (renderable instanceof GuiEventListener listener && getScreen().children().contains(listener)) {
+                    getScreen().changeFocus(ComponentPath.path(listener, getScreen()));
+                } else {
+                    focusRenderable(renderable);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEdgeFocused(boolean last) {
+        GuiEventListener focused = getScreen().getFocused();
+        if (focused == null) return false;
+        int start = last ? renderables.size() - 1 : 0;
+        int step = last ? -1 : 1;
+        for (int i = start; i >= 0 && i < renderables.size(); i += step) {
+            Renderable renderable = renderables.get(i);
+            if (renderable instanceof GuiEventListener) return renderable == focused;
+        }
+        return false;
+    }
+
     public void init(int leftPos, int topPos, int listWidth, int listHeight) {
         init("renderableVList", leftPos, topPos, listWidth, listHeight);
     }
 
     public void init(String name, int leftPos, int topPos, int listWidth, int listHeight) {
+        this.name = name;
         this.leftPos = accessor.getInteger(name+".x",leftPos);
         this.topPos = accessor.getInteger(name+".y",topPos);
         this.listWidth = accessor.getInteger(name+".width",listWidth);
@@ -245,16 +280,27 @@ public class RenderableVList {
 
     private void revealRenderable(int index) {
         if (listHeight <= 0) return;
-        if (index < 0) return;
-        while (index < scrolledList.get() && scrolledList.get() > 0) mouseScrolled(false);
-        while (index >= scrolledList.get() + renderablesCount && canScrollDown) mouseScrolled(true);
+        if (index < 0 || index >= renderables.size()) return;
+        int visibleCount = Math.max(1, renderablesCount);
+        int scroll = scrolledList.get();
+        if (index < scroll) {
+            scroll = index;
+        } else if (index >= scroll + visibleCount) {
+            scroll = index - visibleCount + 1;
+        }
+        scroll = Math.max(0, Math.min(scroll, renderables.size() - 1));
+        if (scroll != scrolledList.get()) {
+            scrolledList.set(scroll);
+            accessor.reloadUI();
+        }
     }
 
     public int getLineAmount(int scroll){
         if (forceWidth) return scroll;
         int xDiff = 0;
         int rowAmount = 0;
-        for (int i = scrolledList.get(); i < scrolledList.get() + renderablesCount; i++) {
+        int end = Math.min(renderables.size(), scrolledList.get() + renderablesCount);
+        for (int i = scrolledList.get(); i < end; i++) {
             if (renderables.get(i) instanceof LayoutElement e) xDiff += (xDiff == 0 ? 0 : layoutSeparation.apply(e)) + e.getWidth();
             rowAmount += scroll;
             if (xDiff + 30 > listWidth) break;
@@ -313,29 +359,24 @@ public class RenderableVList {
     public boolean keyPressed(int i, boolean cyclic){
         if (renderables.contains(getScreen().getFocused()) && renderablesCount > 1) {
             if (i == InputConstants.KEY_DOWN) {
+                if (!canScrollDown && cyclic && isEdgeFocused(true)) return focusEdgeRenderable(false);
                 ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.DOWN);
                 if (isInvalidFocus(path,true)) {
                     if (canScrollDown) {
                         while (canScrollDown && isDirectionFocused(ScreenDirection.DOWN,true)) mouseScrolled(true);
                     } else if (cyclic) {
-                        if (path == null && scrolledList.get() > 0) {
-                            scrolledList.set(0);
-                            accessor.reloadUI();
-                            setLastFocusInDirection(ScreenDirection.DOWN);
-                        }
+                        if (path == null && focusEdgeRenderable(false)) return true;
                     } else if (path == null) return true;
                 }
             }
             if (i == InputConstants.KEY_UP) {
+                if (scrolledList.get() == 0 && cyclic && isEdgeFocused(false)) return focusEdgeRenderable(true);
                 ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.UP);
                 if (isInvalidFocus(path,true)) {
                     if (scrolledList.get() > 0) {
                         while (scrolledList.get() > 0 && isDirectionFocused(ScreenDirection.UP,true)) mouseScrolled(false);
                     } else if (cyclic){
-                        if (path == null) {
-                            while (canScrollDown)
-                                mouseScrolled(true);
-                        }
+                        if (path == null && focusEdgeRenderable(true)) return true;
                     } else if (path == null) return true;
                 }
             }
@@ -407,6 +448,32 @@ public class RenderableVList {
                 if (renderableVList.isHovered(x,y)) return renderableVList;
             }
             return null;
+        }
+    }
+
+    public static class LayoutText extends SimpleLayoutRenderable implements RenderableVListEntry {
+        public final Component text;
+        public final Supplier<Integer> color;
+        public final Supplier<Integer> heightSupplier;
+
+        public LayoutText(Component text, Supplier<Integer> color) {
+            this(text, color, () -> LegacyOptions.getUIMode().isSD() ? 9 : 13);
+        }
+
+        public LayoutText(Component text, Supplier<Integer> color, Supplier<Integer> height) {
+            this.text = text;
+            this.color = color;
+            this.heightSupplier = height;
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(Minecraft.getInstance().font, text, getX() + 1, getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
+        }
+
+        @Override
+        public void initRenderable(RenderableVList list) {
+            height = heightSupplier.get();
         }
     }
 }

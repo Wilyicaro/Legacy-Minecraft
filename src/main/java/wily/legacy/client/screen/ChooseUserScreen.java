@@ -3,25 +3,24 @@ package wily.legacy.client.screen;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.MCAccount;
@@ -46,11 +45,13 @@ public class ChooseUserScreen extends PanelVListScreen {
     public static final Component ADD_WITHOUT_ENCRYPTION = Component.translatable("legacy.menu.choose_user.add.encryption.absent");
     public static final Component VISIBLE_PASSWORD = Component.translatable("legacy.menu.choose_user.add.encryption.visible_password");
     public static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
+    protected final Panel panelRecess;
 
     public ChooseUserScreen(Screen parent) {
         super(parent, s-> Panel.centered(s, 260,215,0,10), CHOOSE_USER);
         renderableVList.layoutSpacing(i->0);
         addAccountButtons();
+        panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.getWidth() - 20, panel.getHeight() - 26), p -> p.pos(panel.getX() + 10, panel.getY() + 13));
     }
 
     @Override
@@ -79,18 +80,28 @@ public class ChooseUserScreen extends PanelVListScreen {
 
     @Override
     public void renderableVListInit() {
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.getX() + 10, panel.getY() + 13, panel.getWidth() - 20, panel.getHeight() - 26);
-            guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        }));
+        panelRecess.init("panelRecess");
+        addRenderableOnly(panelRecess);
+        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
         getRenderableVList().init(panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 50);
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget) {
+            //? if <=1.20.1 {
+            /*((wily.factoryapi.base.client.WidgetAccessor) widget).setHeight(accessor.getInteger("buttonsHeight", 30));
+            *///?} else {
+            widget.setHeight(accessor.getInteger("buttonsHeight", 30));
+            //?}
+        }
     }
 
     public static ConfirmationScreen passwordScreen(Screen parent, Consumer<String> pass){
         EditBox passWordBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.add.encryption.password"));
         TickBox tickBox = new TickBox(0,0,true, bol->VISIBLE_PASSWORD,bol-> null, t->passWordBox.setFormatter((s,i)-> FormattedCharSequence.forward(t.selected ? s : "*".repeat(s.length()), Style.EMPTY)));
         tickBox.onPress();
-        return new ConfirmationScreen(parent,230, 120,passWordBox.getMessage(),Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1-> pass.accept(passWordBox.getValue())){
+        return new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 98 : 120, passWordBox.getMessage(),Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1-> pass.accept(passWordBox.getValue())){
             @Override
             protected void addButtons() {
                 super.addButtons();
@@ -100,17 +111,27 @@ public class ChooseUserScreen extends PanelVListScreen {
             @Override
             protected void init() {
                 super.init();
-                tickBox.setPosition(panel.getX() + 15, panel.getY() + 68);
-                addRenderableWidget(tickBox);
-                passWordBox.setPosition(panel.getX() + 15, panel.getY() + 45);
+                boolean sd = LegacyOptions.getUIMode().isSD();
+                int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
+                passWordBox.setPosition(layoutX, panel.getY() + (sd ? 32 : 45));
+                passWordBox.setWidth(renderableVList.listWidth);
+                //? if <=1.20.1 {
+                /*((wily.factoryapi.base.client.WidgetAccessor) passWordBox).setHeight(sd ? 16 : 20);
+                *///?} else {
+                passWordBox.setHeight(sd ? 16 : 20);
+                //?}
                 passWordBox.setResponder(s-> okButton.active = !s.isEmpty());
                 addRenderableWidget(passWordBox);
+                tickBox.setPosition(layoutX, panel.getY() + (sd ? 51 : 68));
+                tickBox.setWidth(renderableVList.listWidth);
+                tickBox.updateHeight();
+                addRenderableWidget(tickBox);
             }
         };
     }
 
     public static ConfirmationScreen accountScreen(Component title, Screen parent, boolean allowEncryption, Consumer<MCAccount> press){
-        return new ConfirmationScreen(parent,230, 120,title, CHOOSE_USER_MESSAGE){
+        return new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 80 : 120, title, CHOOSE_USER_MESSAGE){
             @Override
             protected void addButtons() {
                 renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).build());
@@ -127,7 +148,7 @@ public class ChooseUserScreen extends PanelVListScreen {
                 }).build());
                 renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.choose_user.offline"), b-> {
                     EditBox usernameBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.offline.username"));
-                    minecraft.setScreen(new ConfirmationScreen(this, 230, 120, usernameBox.getMessage(),Component.translatable("legacy.menu.choose_user.offline.username_message"), b1-> press.accept(MCAccount.create(new GameProfile(UUID.nameUUIDFromBytes(("offline:"+usernameBox.getValue()).getBytes()),usernameBox.getValue()),false,null,null))){
+                    minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 120, usernameBox.getMessage(),Component.translatable("legacy.menu.choose_user.offline.username_message"), b1-> press.accept(MCAccount.create(new GameProfile(UUID.nameUUIDFromBytes(("offline:"+usernameBox.getValue()).getBytes()),usernameBox.getValue()),false,null,null))){
                         @Override
                         protected void addButtons() {
                             super.addButtons();
@@ -137,7 +158,15 @@ public class ChooseUserScreen extends PanelVListScreen {
                         @Override
                         protected void init() {
                             super.init();
-                            usernameBox.setPosition(panel.getX() + 15, panel.getY() + 45);
+                            boolean sd = LegacyOptions.getUIMode().isSD();
+                            int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
+                            usernameBox.setPosition(layoutX, panel.getY() + (sd ? 32 : 45));
+                            usernameBox.setWidth(renderableVList.listWidth);
+                            //? if <=1.20.1 {
+                            /*((wily.factoryapi.base.client.WidgetAccessor) usernameBox).setHeight(sd ? 16 : 20);
+                            *///?} else {
+                            usernameBox.setHeight(sd ? 16 : 20);
+                            //?}
                             usernameBox.setResponder(s-> {
                                 boolean matches = usernamePattern.matcher(s).matches();
                                 usernameBox.setTextColor(matches ? 0xFFFFFF : 0xFF5555);
@@ -166,32 +195,30 @@ public class ChooseUserScreen extends PanelVListScreen {
             minecraft.setScreen(ChooseUserScreen.this);
         })));
         for (MCAccount account : MCAccount.list) {
-            renderableVList.addRenderable(new AbstractButton(0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user",account.getProfile().getName()) : Component.literal(account.getProfile().getName())) {
+            renderableVList.addRenderable(new IconButton(renderableVList, 0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user",account.getProfile().getName()) : Component.literal(account.getProfile().getName())) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
-                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager()./*? if >1.20.1 {*/getInsecureSkin/*?} else {*//*getInsecureSkinLocation*//*?}*/(account.getProfile()), getX() + 5, getY() + 5, 20);
-                    if (minecraft.options.touchscreen().get().booleanValue() || isHovered()) {
-                        guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(ScreenUtil.isMouseOver(i,j,getX()+5,getY()+5,20,20) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + 5, getY() + 5, 20, 20);
-                    }
+                public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager()./*? if >1.20.1 {*/getInsecureSkin/*?} else {*//*getInsecureSkinLocation*//*?}*/(account.getProfile()), getX() + x, getY() + y, Math.max(width, height));
                 }
 
                 @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+                public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(ScreenUtil.isMouseOver(mouseX,mouseY,getX()+x,getY()+y,width,height) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + x, getY() + y, width, height);
                 }
 
                 @Override
                 public boolean mouseClicked(double d, double e, int i) {
-                    if (ScreenUtil.isMouseOver(d,e,getX()+5,getY()+5,20,20)) manageLogin(account);
+                    int iconWidth = iconWidth();
+                    int iconHeight = iconHeight();
+                    if (ScreenUtil.isMouseOver(d,e,getX()+iconX(iconWidth),getY()+iconY(iconHeight),iconWidth,iconHeight)) manageLogin(account);
                     return super.mouseClicked(d, e, i);
                 }
 
                 @Override
                 public boolean keyPressed(int i, int j, int k) {
                     if (i == InputConstants.KEY_O) {
-                        minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, 230, 120, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {}){
+                        minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 120, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {}){
                             @Override
                             protected void addButtons() {
                                 renderableVList.addRenderable(Button.builder(CommonComponents.GUI_CANCEL, b-> onClose()).build());

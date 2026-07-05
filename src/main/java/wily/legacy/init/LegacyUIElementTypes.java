@@ -261,6 +261,9 @@ public class LegacyUIElementTypes {
     public static final UIDefinitionManager.ElementType PUT_TOGGLEABLE_TAB_SPRITES = UIDefinitionManager.ElementType.registerConditional("put_toggleable_tab_sprites", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "value", (s, d) -> LegacyTabButton.ToggleableTabSprites.CODEC.parse(d).result().map((c) -> UIDefinition.createBeforeInit((a) -> a.putStaticElement(elementName, c))).orElse(null));
     }));
+    public static final UIDefinitionManager.ElementType PUT_TAB_STATE_OFFSET = UIDefinitionManager.ElementType.registerConditional("put_tab_state_offset", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "value", (s, d) -> LegacyTabButton.StateOffset.CODEC.parse(d).result().map((c) -> UIDefinition.createBeforeInit((a) -> a.putStaticElement(elementName, c))).orElse(null));
+    }));
 
     public static void init(){
     }

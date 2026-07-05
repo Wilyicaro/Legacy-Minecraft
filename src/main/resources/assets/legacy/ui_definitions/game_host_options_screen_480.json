@@ -1,0 +1,31 @@
+{
+  "targetUI": "wily.legacy.client.screen.GameHostOptionsScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 215,
+    "panel": {
+      "type": "children",
+      "elements": [
+        {
+          "applyCondition": "${isOp}",
+          "type": "put_number",
+          "name": "height",
+          "value": 149
+        },
+        {
+          "applyCondition": "!${isOp}",
+          "type": "put_number",
+          "name": "height",
+          "value": 100
+        }
+      ]
+    }
+  }
+}

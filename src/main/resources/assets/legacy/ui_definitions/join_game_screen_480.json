@@ -1,0 +1,26 @@
+{
+  "targetUI": "wily.legacy.client.screen.JoinGameScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 164,
+    "panel.height": 126,
+    "panel.y": "(${height}-${panel.height})/2+18",
+    "tooltipBox.width": 142,
+    "joinButton.x": "${panel.x}",
+    "joinButton.y": "${panel.y}-18",
+    "joinButton.width": "${panel.width}",
+    "joinButton.height": 15,
+    "renderableVList.x": "${panel.x}+8",
+    "renderableVList.y": "${panel.y}+8",
+    "renderableVList.width": "${panel.width}-16",
+    "renderableVList.height": "${panel.height}-16",
+    "buttonsHeight": 20
+  }
+}

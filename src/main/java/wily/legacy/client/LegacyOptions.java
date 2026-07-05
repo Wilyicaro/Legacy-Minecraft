@@ -38,6 +38,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.*;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.ScreenUtil;
 
 import java.io.*;
 import java.util.*;
@@ -47,18 +48,40 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 
 public class LegacyOptions {
-    public enum UIMode {
-        HD(false),
-        SD(true);
+    public enum UIMode implements StringRepresentable {
+        AUTO("auto"),
+        FHD("fhd"),
+        HD("hd"),
+        SD("sd");
 
-        private final boolean sd;
+        public static final EnumCodec<UIMode> CODEC = StringRepresentable.fromEnum(UIMode::values);
+        private final String name;
+        public final Component displayName;
 
-        UIMode(boolean sd) {
-            this.sd = sd;
+        UIMode(String name) {
+            this.name = name;
+            this.displayName = Component.translatable("legacy.options.uiMode." + name);
+        }
+
+        public boolean isFHD() {
+            return this == FHD;
+        }
+
+        public boolean isHD() {
+            return this == HD;
         }
 
         public boolean isSD() {
-            return sd;
+            return this == SD;
+        }
+
+        public boolean isHDOrLower() {
+            return isHD() || isSD();
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
         }
     }
 
@@ -123,7 +146,11 @@ public class LegacyOptions {
     }
 
     public static UIMode getUIMode() {
-        return UIMode.HD;
+        if (uiMode.get() == UIMode.AUTO) {
+            if (ScreenUtil.getStandardHeight() == 1080) return UIMode.FHD;
+            return ScreenUtil.getStandardHeight() > 540 ? UIMode.HD : UIMode.SD;
+        }
+        return uiMode.get();
     }
 
     private static void reloadCloudRendering() {
@@ -289,6 +316,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Double> leftTriggerDeadZone = CLIENT_STORAGE.register(createDouble("leftTriggerDeadZone", LegacyOptions::percentValueLabel, 0.2));
     public static final FactoryConfig<Double> rightTriggerDeadZone = CLIENT_STORAGE.register(createDouble("rightTriggerDeadZone", LegacyOptions::percentValueLabel, 0.2));
     public static final FactoryConfig<Integer> hudScale = CLIENT_STORAGE.register(createInteger("hudScale", Options::genericValueLabel, 1, ()->3, 2));
+    public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay), CLIENT_STORAGE));
     public static final FactoryConfig<Double> hudOpacity = CLIENT_STORAGE.register(createDouble("hudOpacity", LegacyOptions::percentValueLabel, 0.8));
     public static final FactoryConfig<Double> hudDistance = CLIENT_STORAGE.register(createDouble("hudDistance", LegacyOptions::percentValueLabel, 1.0));
     public static final FactoryConfig<Double> interfaceSensitivity = CLIENT_STORAGE.register(createDouble("interfaceSensitivity", (c, d)-> percentValueLabel(c, d*2), 0.5, d -> {}));

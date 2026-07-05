@@ -153,6 +153,10 @@ public class ScreenUtil {
         blitTranslucentSprite(graphics, LegacySprites.PANEL_TRANSLUCENT_RECESS, x, y, width, height);
     }
 
+    public static void renderPanelRecess(UIAccessor accessor, GuiGraphics graphics, String name, int x, int y, int width, int height) {
+        FactoryGuiGraphics.of(graphics).blitSprite(accessor.getElementValue(name + ".sprite", LegacySprites.PANEL_RECESS, ResourceLocation.class), accessor.getInteger(name + ".x", x), accessor.getInteger(name + ".y", y), accessor.getInteger(name + ".width", width), accessor.getInteger(name + ".height", height));
+    }
+
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F,0.5F,1);
@@ -190,10 +194,27 @@ public class ScreenUtil {
     }
 
     public static void renderLegacyLogo(GuiGraphics guiGraphics){
+        renderLegacyLogo(guiGraphics, 30);
+    }
+
+    public static float getLogoScale() {
+        return LegacyOptions.getUIMode().isSD() ? 321 / 571f : 1.0f;
+    }
+
+    public static boolean hasLegacyLogo() {
+        return mc.getResourceManager().getResource(ControlType.getActiveType().getMinecraftLogo()).isPresent() || mc.getResourceManager().getResource(MINECRAFT).isPresent();
+    }
+
+    public static boolean hasMinecraftLogoResource() {
+        return mc.getResourceManager().getResource(MINECRAFT).isPresent();
+    }
+
+    public static void renderLegacyLogo(GuiGraphics guiGraphics, int y){
         FactoryScreenUtil.enableBlend();
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
-        guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+        float scale = getLogoScale();
+        guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f * scale) / 2, y,0);
+        guiGraphics.pose().scale(0.5f * scale,0.5f * scale,0.5f);
         FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : ControlType.getActiveType().getMinecraftLogo(),0,0,0,0,571,138,571,138);
         guiGraphics.pose().popPose();
         FactoryScreenUtil.disableBlend();
@@ -206,7 +227,7 @@ public class ScreenUtil {
     }
 
     public static void renderUsername(GuiGraphics graphics){
-        if (mc.level != null || LegacyOptions.legacySettingsMenus.get()) return;
+        if (mc.level != null || !LegacyOptions.getUIMode().isFHD() || LegacyOptions.legacySettingsMenus.get()) return;
         String username = MCAccount.isOfflineUser() ? I18n.get("legacy.menu.offline_user",mc.getUser().getName()) : mc.getUser().getName();
         graphics.drawString(mc.font, username, graphics.guiWidth() - 33 - mc.font.width(username), graphics.guiHeight() - 27, 0xFFFFFF);
     }
@@ -262,6 +283,22 @@ public class ScreenUtil {
         graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale() ,3f / getHUDScale());
     }
 
+    public static void applyFontOverrideIf(boolean condition, ResourceLocation font, Consumer<Boolean> render) {
+        Legacy4JClient.applyFontOverrideIf(condition, font, render);
+    }
+
+    public static void applySDFont(Consumer<Boolean> render) {
+        applyDefault11If(LegacyOptions.getUIMode().isSD(), render);
+    }
+
+    public static void applyDefault11If(boolean condition, Consumer<Boolean> render) {
+        Legacy4JClient.applyFontOverrideIf(condition, LegacyIconHolder.MOJANGLES_11_FONT, render);
+    }
+
+    public static void applySmallerFont(ResourceLocation font, Consumer<Boolean> render) {
+        Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isHDOrLower(), font, render);
+    }
+
     public static void prepareHUDRender(GuiGraphics graphics){
         graphics.pose().pushPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f, getHUDOpacity());
@@ -284,11 +321,15 @@ public class ScreenUtil {
     }
 
     public static float getHUDScale(){
-        return Math.max(1.5f, 4 - LegacyOptions.hudScale.get());
+        return switch (LegacyOptions.hudScale.get()) {
+            case 2 -> LegacyOptions.getUIMode().isFHD() ? 1.474f : LegacyOptions.getUIMode().isSD() ? 1.0f : 1.5f;
+            case 3 -> LegacyOptions.getUIMode().isSD() ? 1.324f : 2.0f;
+            default -> LegacyOptions.getUIMode().isSD() ? 0.8f : 1.0f;
+        };
     }
 
     public static float getHUDSize(){
-        return 6 + 3f / ScreenUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
+        return 6 + ScreenUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
     }
 
     public static double getHUDDistance(){
@@ -322,6 +363,10 @@ public class ScreenUtil {
 
     public static boolean hasProgrammerArt(){
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
+    }
+
+    public static ResourceLocation getSpriteOrFallback(ResourceLocation sprite, ResourceLocation fallback) {
+        return FactoryGuiGraphics.getSprites().textureAtlas.texturesByName.containsKey(sprite) ? sprite : fallback;
     }
 
     public static void playSimpleUISound(SoundEvent sound, float volume, float pitch, boolean randomPitch){
@@ -533,7 +578,7 @@ public class ScreenUtil {
     }
 
     public static float getAutoGuiScale() {
-        return getStandardHeight() / 360.0f;
+        return getStandardHeight() / (LegacyOptions.getUIMode().isSD() ? 240.0f : 360.0f);
     }
 
     public static int getStandardHeight(){
@@ -545,7 +590,7 @@ public class ScreenUtil {
     }
 
     public static float getTextScale(){
-        return LegacyOptions.legacyItemTooltipScaling.get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
+        return LegacyOptions.legacyItemTooltipScaling.get() && LegacyOptions.getUIMode().isFHD() ? 2 / 3f : 1.0f;
     }
 
     public static float getChatSafeZone(){
@@ -573,15 +618,17 @@ public class ScreenUtil {
                 ScreenUtil.updateAnimatedCharacterTime(450);
             }
             if (Util.getMillis() - ScreenUtil.animatedCharacterTime <= ScreenUtil.remainingAnimatedCharacterTime) {
+                float scale = ScreenUtil.getHUDScale();
                 float xRot = character.getXRot();
                 float xRotO = character.xRotO;
                 if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
                 guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18,-200);
-                ScreenUtil.applyHUDScale(guiGraphics);
+                float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2;
+                float hudDiff = 1.0f - hudDistance;
+                guiGraphics.pose().translate(32f * hudDistance, character.isFallFlying() ? 44 - hudDiff * 34 : 18 - hudDiff * 8,-200);
                 float f = LegacyOptions.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
                 ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(false);
-                ScreenUtil.renderEntity(guiGraphics, 10f, (character.isFallFlying() ? -character.getViewXRot(f) / 180 * 40 : 36), 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
+                ScreenUtil.renderEntity(guiGraphics, 10 * scale, (character.isFallFlying() ? -character.getViewXRot(f) / 180 * 40 : 36) * scale, Math.round(12 * scale), f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
                 ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(true);
                 guiGraphics.pose().popPose();
                 character.setXRot(xRot);
@@ -609,7 +656,7 @@ public class ScreenUtil {
             if (bl) {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(x + 25, y + 7,0);
-                Legacy4JClient.applyFontOverrideIf(is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
+                ScreenUtil.applySmallerFont(LegacyIconHolder.MOJANGLES_11_FONT, b->{
                     Component effect = getEffectName(mobEffectInstance);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(mc.font, effect, 0, 0, 0xFFFFFF);
@@ -656,6 +703,7 @@ public class ScreenUtil {
         ScreenUtil.prepareHUDRender(guiGraphics);
         guiGraphics.pose().translate(0, guiGraphics.guiHeight() - Math.max(shift, ScreenUtil.getHUDSize()),0);
         FactoryAPIClient.getProfiler().push("selectedItemName");
+        ScreenUtil.applySDFont(ignored -> {
         if (GuiAccessor.getInstance().getToolHighlightTimer() > 0 && !GuiAccessor.getInstance().getLastToolHighlight().isEmpty()) {
             Font font = /*? if forge || neoforge {*//*Objects.requireNonNullElse(IClientItemExtensions.of(GuiAccessor.getInstance().getLastToolHighlight()).getFont(GuiAccessor.getInstance().getLastToolHighlight(), IClientItemExtensions.FontContext.SELECTED_ITEM_NAME), mc.font)*//*?} else {*/  mc.font/*?}*/;
             List<Component> tooltip = ScreenUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight());
@@ -699,6 +747,7 @@ public class ScreenUtil {
                 });
             }
         }
+        });
         FactoryAPIClient.getProfiler().pop();
         ScreenUtil.finalizeHUDRender(guiGraphics);
     }

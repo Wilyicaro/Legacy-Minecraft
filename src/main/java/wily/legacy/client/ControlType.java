@@ -29,6 +29,9 @@ public interface ControlType  {
     ControlType STADIA = createDefault("stadia");
     ControlType PSVITA = createDefault("playstation_vita");
     ControlType PS5 = createDefault("playstation_5");
+    Set<String> HD_FONTS = Set.of("java", "xbox_360", "xbox_one", "playstation_4", "playstation_5", "switch", "steam", "stadia");
+    Set<String> SD_FONTS = Set.of("java", "xbox_360", "xbox_one", "playstation_3", "playstation_4", "playstation_5", "steam", "stadia");
+    Set<String> SMALL_ICON_FONTS = Set.of("playstation_vita");
 
     static ControlType createDefault(String name){
         return createDefault(name,false);
@@ -64,13 +67,22 @@ public interface ControlType  {
 
             @Override
             public Style getStyle() {
-                return style;
+                return style.getFont().equals(id) ? Style.EMPTY.withFont(sizedFont(id)) : style;
             }
 
             @Override
             public ResourceLocation getMinecraftLogo() {
                 return minecraftLogoLocation;
             }
+        };
+    }
+
+    static ResourceLocation sizedFont(ResourceLocation id) {
+        String path = id.getPath();
+        return switch (LegacyOptions.getUIMode()) {
+            case HD -> HD_FONTS.contains(path) ? id.withPath(path + "_hd") : id;
+            case SD -> SD_FONTS.contains(path) ? id.withPath(path + "_sd") : id;
+            default -> id;
         };
     }
 
@@ -108,6 +120,12 @@ public interface ControlType  {
     Style getStyle();
 
     ResourceLocation getMinecraftLogo();
+
+    default int iconHeight() {
+        String path = getId().getPath();
+        boolean smallFont = (LegacyOptions.getUIMode().isSD() && SD_FONTS.contains(path)) || SMALL_ICON_FONTS.contains(path);
+        return smallFont ? 9 : 15;
+    }
 
     class Holder implements RegisterListing.Holder<ControlType> {
         public static final Holder AUTO = new Holder(null){

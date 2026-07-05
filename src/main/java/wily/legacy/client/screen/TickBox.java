@@ -111,7 +111,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
 
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
+        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused()));
     }
 
     public boolean updateValue() {

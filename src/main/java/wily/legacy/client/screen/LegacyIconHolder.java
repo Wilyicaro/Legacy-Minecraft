@@ -9,6 +9,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
@@ -30,7 +31,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 
@@ -38,6 +39,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public static final ResourceLocation ICON_HOLDER = Legacy4J.createModLocation("container/icon_holder");
     public static final ResourceLocation SIZEABLE_ICON_HOLDER = Legacy4J.createModLocation("container/sizeable_icon_holder");
     public static final ResourceLocation SELECT_ICON_HIGHLIGHT = Legacy4J.createModLocation("container/select_icon_highlight");
+    public static final ResourceLocation SELECT_ICON_HIGHLIGHT_SMALL = Legacy4J.createModLocation("container/select_icon_highlight_small");
     public static final ResourceLocation RED_ICON_HOLDER = Legacy4J.createModLocation("container/red_icon_holder");
     public static final ResourceLocation GRAY_ICON_HOLDER = Legacy4J.createModLocation("container/gray_icon_holder");
     public static final ResourceLocation WARNING_ICON = Legacy4J.createModLocation("container/icon_warning");
@@ -167,10 +169,10 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return getHeight() - 2 * (isSizeable() ?  1 : getHeight() / 20f);
     }
     public boolean isSizeable(){
-        return Math.min(getWidth(),getHeight()) < 18 && ScreenUtil.is720p();
+        return Math.min(getWidth(),getHeight()) < 18 && LegacyOptions.getUIMode().isHDOrLower();
     }
     public boolean canSizeIcon(){
-        return Math.min(getWidth(),getHeight()) > 21;
+        return getMinSize() < 18 || getMinSize() > 21;
     }
 
     public void applyOffset(GuiGraphics graphics){
@@ -249,12 +251,28 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.disableScissor();
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
-        renderChild(graphics,getXCorner() - 4.5f, getYCorner() - 4.5f,()-> {
-            graphics.pose().translate(0,0,332);
-            FactoryGuiGraphics.of(graphics).disableDepthTest();
-            FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
-            FactoryGuiGraphics.of(graphics).enableDepthTest();
-        });
+        if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20)
+            renderChild(graphics, getXCorner() - (21f - getWidth()) / 2, getYCorner() - (21f - getHeight()) / 2, () -> FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT_SMALL, 0, 0, 21, 21));
+        else
+            renderChild(graphics,getXCorner() - 4.5f, getYCorner() - 4.5f,()-> {
+                graphics.pose().translate(0,0,332);
+                FactoryGuiGraphics.of(graphics).disableDepthTest();
+                FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
+                FactoryGuiGraphics.of(graphics).enableDepthTest();
+            });
+    }
+    public void renderScroll(GuiGraphics graphics, LegacyScrollRenderer scrollRenderer) {
+        if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20) {
+            renderChild(graphics, getXCorner() + (getWidth() - 7) / 2.0f, getYCorner() - 0.5f, () -> {
+                scrollRenderer.renderSmallScroll(graphics, true, 0, -5);
+                scrollRenderer.renderSmallScroll(graphics, false, 0, getHeight() + 2);
+            });
+        } else {
+            renderChild(graphics, getXCorner() + (getWidth() - 13) / 2.0f, getYCorner(), () -> {
+                scrollRenderer.renderScroll(graphics, ScreenDirection.UP, -1, -12);
+                scrollRenderer.renderScroll(graphics, ScreenDirection.DOWN, -1, getHeight() + 5);
+            });
+        }
     }
     public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
         renderChild(graphics,x,y,()->{
@@ -280,7 +298,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(),MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
+        if (!stack.isEmpty()) ScreenUtil.applySmallerFont(MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
     }
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();

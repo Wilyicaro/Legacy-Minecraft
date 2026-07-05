@@ -150,10 +150,13 @@ public class ServerRenderableList extends RenderableVList {
             }
         }
     }
-    public static void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
+    public static void drawIcon(GuiGraphics guiGraphics, int x, int y, int width, int height, ResourceLocation resourceLocation) {
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+        FactoryGuiGraphics.of(guiGraphics).blit(resourceLocation, x, y, 0.0f, 0.0f, width, height, width, height);
         FactoryScreenUtil.disableBlend();
+    }
+    public static void drawIcon(GuiGraphics guiGraphics, int x, int y, ResourceLocation resourceLocation) {
+        drawIcon(guiGraphics, x + 5, y + 5, 20, 20, resourceLocation);
     }
     public void updateServers(){
         renderables.clear();
@@ -172,16 +175,24 @@ public class ServerRenderableList extends RenderableVList {
         if (lanServers != null){
             for (LanServer lanServer : lanServers) {
                 AbstractButton lanButton;
-                addRenderable(lanButton = new AbstractButton(0,0,0,30,Component.literal(lanServer.getMotd())) {
+                addRenderable(lanButton = new IconButton(this,0,0,0,30,Component.literal(lanServer.getMotd())) {
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, getX() + 32 + 3, getY() + 1, 0xFFFFFF, false);
-                        guiGraphics.drawString(minecraft.font, lanServer.getMotd(), getX() + 32 + 3, getY() + 12, -8355712, false);
-                        if (minecraft.options.hideServerAddress) {
-                            guiGraphics.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, getX() + 32 + 3,getY() + 12 + 11, 0x303030, false);
-                        } else {
-                            guiGraphics.drawString(minecraft.font, lanServer.getAddress(), getX() + 32 + 3, getY() + 12 + 11, 0x303030, false);
-                        }
+                        int messageX = getX() + accessor.getInteger(listName() + ".buttonMessage.xOffset", 35);
+                        int messageY = getY() + (getHeight() < 20 ? (getHeight() - font.lineHeight) / 2 : 3);
+                        ScreenUtil.applySDFont(ignored -> {
+                            if (getHeight() < 20) {
+                                ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), messageX, getY(), getX() + getWidth() - 2, getY() + getHeight(), j, false);
+                                return;
+                            }
+                            guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, messageX, messageY, 0xFFFFFF, false);
+                            guiGraphics.drawString(minecraft.font, lanServer.getMotd(), messageX, messageY + 11, -8355712, false);
+                            if (minecraft.options.hideServerAddress) {
+                                guiGraphics.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, messageX, messageY + 20, 0x303030, false);
+                            } else {
+                                guiGraphics.drawString(minecraft.font, lanServer.getAddress(), messageX, messageY + 20, 0x303030, false);
+                            }
+                        });
                     }
 
                     @Override
@@ -199,16 +210,18 @@ public class ServerRenderableList extends RenderableVList {
             }
         }else {
             AbstractButton scanningButton;
-            addRenderable(scanningButton = new AbstractButton(0,0,0,30, SCANNING_LABEL) {
+            addRenderable(scanningButton = new IconButton(this,0,0,0,30, SCANNING_LABEL) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
-                    ScreenUtil.drawGenericLoading(guiGraphics, getX() + 5, getY() + 5, 6, 1);
+                public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    String name = listName();
+                    int blockSize = accessor.getInteger(name + ".loadingIcon.blockSize", accessor.getInteger("loadingIcon.blockSize", (width - 2) / 3));
+                    int spacing = accessor.getInteger(name + ".loadingIcon.spacing", 1);
+                    int size = blockSize * 3 + spacing * 2;
+                    ScreenUtil.drawGenericLoading(guiGraphics, getX() + x + (width - size) / 2, getY() + y + (height - size) / 2, blockSize, spacing);
                 }
 
                 @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
                 }
 
                 @Override
@@ -224,7 +237,7 @@ public class ServerRenderableList extends RenderableVList {
         }
     }
 
-    public class ServerButton extends AbstractButton implements ControlTooltip.ActionHolder {
+    public class ServerButton extends IconButton implements ControlTooltip.ActionHolder {
         public final ServerData server;
         public final int serverIndex;
         private byte @Nullable [] lastIconBytes;
@@ -236,7 +249,7 @@ public class ServerRenderableList extends RenderableVList {
         public final FaviconTexture icon;
 
         public ServerButton(int i, int j, int k, int l, int serverIndex) {
-            super(i, j, k, l, Component.literal(servers.get(serverIndex).name));
+            super(ServerRenderableList.this, i, j, k, l, Component.literal(servers.get(serverIndex).name));
             this.serverIndex = serverIndex;
             this.server = servers.get(serverIndex);
             this.icon = FaviconTexture.forServer(minecraft.getTextureManager(), server.ip);;
@@ -244,7 +257,6 @@ public class ServerRenderableList extends RenderableVList {
 
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
             //? if >=1.20.5 {
             if (server.state() == ServerData.State.INITIAL) {
                 server.setState(ServerData.State.PINGING);
@@ -287,18 +299,28 @@ public class ServerRenderableList extends RenderableVList {
             }
             refreshStatus();
             *///?}
-            guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
-            guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-            List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(width-36,minecraft.font.width(server.motd) / 2 + 20));
-            for (int p = 0; p < Math.min(2,list.size()); ++p) {
-                ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,width-36 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
-            }
-            guiGraphics.pose().popPose();
+            super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+        }
+
+        @Override
+        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+            String name = listName();
             Component component = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
-            int q = minecraft.font.width(component);
-            guiGraphics.drawString(minecraft.font, component, getX() + width - q - 15 - 2, getY() + 3, -8355712, false);
+            ScreenUtil.applySDFont(ignored -> {
+                int q = minecraft.font.width(component);
+                int iconX = accessor.getInteger(name + ".statusIcon.x", getWidth() - 15);
+                int iconY = accessor.getInteger(name + ".statusIcon.y", 3);
+                int statusRight = accessor.getInteger(name + ".statusText.right", iconX - 2);
+                int statusY = getY() + accessor.getInteger(name + ".statusText.y", getHeight() < 20 ? (getHeight() - minecraft.font.lineHeight) / 2 : 3);
+                guiGraphics.drawString(minecraft.font, component, getX() + statusRight - q, statusY, -8355712, false);
+                int s = mouseX - getX();
+                int t = mouseY - getY();
+                if (statusIconTooltip != null && s >= iconX && s <= iconX + statusIconWidth() && t >= iconY && t <= iconY + statusIconHeight()) {
+                    guiGraphics.renderTooltip(minecraft.font,statusIconTooltip, mouseX,mouseY);
+                } else if (showOnlinePlayersTooltip && s >= statusRight - q && s <= statusRight && t >= iconY && t <= iconY + statusIconHeight()) {
+                    guiGraphics.renderComponentTooltip(minecraft.font,server.playerList, mouseX,mouseY);
+                }
+            });
 
             if (pingCompleted()) {
                 int p = (int)(Util.getMillis() / 100L + (long)(serverIndex * 2) & 7L);
@@ -314,7 +336,7 @@ public class ServerRenderableList extends RenderableVList {
                 };
 
             }
-            if (statusIcon != null) FactoryGuiGraphics.of(guiGraphics).blitSprite(statusIcon, getX() + width - 15, getY() + 3, 10, 8);
+            if (statusIcon != null) FactoryGuiGraphics.of(guiGraphics).blitSprite(statusIcon, getX() + accessor.getInteger(name + ".statusIcon.x", getWidth() - 15), getY() + accessor.getInteger(name + ".statusIcon.y", 3), statusIconWidth(), statusIconHeight());
             byte[] bs = server.getIconBytes();
             if (!Arrays.equals(bs, this.lastIconBytes)) {
                 if (this.uploadServerIcon(bs)) {
@@ -324,36 +346,29 @@ public class ServerRenderableList extends RenderableVList {
                     this.updateServerList();
                 }
             }
-            drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
-            int s = mouseX - getX();
-            int t = mouseY - getY();
-            if (statusIconTooltip != null && s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
-                guiGraphics.renderTooltip(minecraft.font,statusIconTooltip, mouseX,mouseY);
-            } else if (showOnlinePlayersTooltip && s >= width - q - 15 - 2 && s <= width - 15 - 2 && t >= 2 && t <= 10) {
-                guiGraphics.renderComponentTooltip(minecraft.font,server.playerList, mouseX,mouseY);
+            drawIcon(guiGraphics, getX() + x, getY() + y, width, height, icon.textureLocation());
+        }
+
+        @Override
+        public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+            super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
+            if (ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x + width / 2, getY() + y, width / 2, height)) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED,  getX() + x, getY() + y, width, height);
+            } else {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN,  getX() + x, getY() + y, width, height);
             }
-            if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                int u = mouseX - getX();
-                int v = mouseY - getY();
-                if (u < 32 && u > 16) {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED,  getX() + 5, getY() + 5, 20, 20);
+            if (serverIndex > 0) {
+                if (ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width / 2, height / 2)) {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED,  getX() + x, getY() + y, width, height);
                 } else {
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN,  getX() + 5, getY() + 5, 20, 20);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP,  getX() + x, getY() + y, width, height);
                 }
-                if (serverIndex > 0) {
-                    if (u < 16 && v < 16) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED,  getX(), getY(), 32, 32);
-                    } else {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP,  getX(), getY(), 32, 32);
-                    }
-                }
-                if (serverIndex < getScreen(PlayGameScreen.class).getServers().size() - 1) {
-                    if (u < 16 && v > 16) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED,  getX(), getY(), 32, 32);
-                    } else {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN,  getX(), getY(), 32, 32);
-                    }
+            }
+            if (serverIndex < getScreen(PlayGameScreen.class).getServers().size() - 1) {
+                if (ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y + height / 2, width / 2, height / 2)) {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED,  getX() + x, getY() + y, width, height);
+                } else {
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN,  getX() + x, getY() + y, width, height);
                 }
             }
         }
@@ -417,6 +432,14 @@ public class ServerRenderableList extends RenderableVList {
             getScreen(PlayGameScreen.class).getServers().save();
         }
 
+        protected int statusIconWidth() {
+            return accessor.getInteger(listName() + ".statusIcon.width", 10);
+        }
+
+        protected int statusIconHeight() {
+            return accessor.getInteger(listName() + ".statusIcon.height", 8);
+        }
+
         private boolean uploadServerIcon(@Nullable byte[] bs) {
             if (bs == null) {
                 icon.clear();
@@ -432,25 +455,49 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            int textY = getY() + (getHeight() < 20 ? (getHeight() - font.lineHeight) / 2 : 3);
+            Component status = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
+            ScreenUtil.applySDFont(ignored -> {
+                String name = listName();
+                int textX = getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35);
+                int textRight = getX() + accessor.getInteger(name + ".buttonMessage.right", getWidth() - 20);
+                if (!status.getString().isBlank()) textRight -= font.width(status) + 4;
+                ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), textX, getY(), Math.max(textX + 10, textRight), getY() + getHeight(), j, false);
+            });
+            if (getHeight() < 30) return;
+            guiGraphics.pose().pushPose();
+            String name = listName();
+            int textX = accessor.getInteger(name + ".buttonMessage.xOffset", 35);
+            int textRight = accessor.getInteger(name + ".buttonMessage.right", getWidth() - 20);
+            float textScale = accessor.getFloat(name + ".motd.scale", LegacyOptions.getUIMode().isSD() ? 1.0f : 2 / 3f);
+            guiGraphics.pose().translate(getX() + textX, getY() + accessor.getInteger(name + ".motd.y", 10),0);
+            guiGraphics.pose().scale(textScale,textScale,textScale);
+            int textWidth = Math.max(1, Math.round((textRight - textX) / textScale));
+            List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(textWidth,minecraft.font.width(server.motd) / 2 + 20));
+            ScreenUtil.applySDFont(ignored -> {
+                for (int p = 0; p < Math.min(2,list.size()); ++p) {
+                    ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0, minecraft.font.lineHeight * p, textWidth, 11 + minecraft.font.lineHeight * p, -8355712, false, Math.round(minecraft.font.width(list.get(p)) * textScale));
+                }
+            });
+            guiGraphics.pose().popPose();
         }
 
         @Override
         public void onClick(double d, double e) {
-            double f = d - (double) getX();
-            double g = e - (double) getY();
-            if (f <= 32.0) {
-                if (f < 16.0 && g < 16.0 && serverIndex > 0) {
-                    this.swap(serverIndex, serverIndex - 1);
-                    return;
-                }
-                if (f < 16.0 && g > 16.0 && serverIndex < servers.size() - 1) {
-                    this.swap(serverIndex, serverIndex + 1);
-                    return;
-                }
-                join(server);
-            }else {
-                super.onClick(d,e);
+            int iconWidth = iconWidth();
+            int iconHeight = iconHeight();
+            int iconX = iconX(iconWidth);
+            int iconY = iconY(iconHeight);
+            if (serverIndex > 0 && ScreenUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY, iconWidth / 2, iconHeight / 2)) {
+                this.swap(serverIndex, serverIndex - 1);
+                return;
             }
+            if (serverIndex < servers.size() - 1 && ScreenUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY + iconHeight / 2, iconWidth / 2, iconHeight / 2)) {
+                this.swap(serverIndex, serverIndex + 1);
+                return;
+            }
+            if (ScreenUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY, iconWidth, iconHeight)) join(server);
+            else super.onClick(d,e);
         }
 
         @Override
@@ -568,7 +615,7 @@ public class ServerRenderableList extends RenderableVList {
     private void joinLanServer(LanServer lanServer) {
         join(new ServerData(lanServer.getMotd(),lanServer.getAddress(),/*? if >1.20.1 {*/ServerData.Type.LAN/*?} else {*//*true*//*?}*/));
     }
-    private void join(ServerData serverData) {
+    public void join(ServerData serverData) {
         ConnectScreen.startConnecting(getScreen(), this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false/*? if >=1.20.5 {*/,null/*?}*/);
     }
 }

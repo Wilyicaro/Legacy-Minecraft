@@ -16,7 +16,7 @@ import wily.legacy.util.ScreenUtil;
 public class HudHelperMixin {
     @ModifyArg(method = "apply", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
     private static float apply(float f) {
-        return f * 3 / ScreenUtil.getHUDScale();
+        return f * ScreenUtil.getHUDScale();
     }
 
     //? if forge || neoforge {

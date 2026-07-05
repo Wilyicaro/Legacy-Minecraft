@@ -61,13 +61,19 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*AbstractContainerScreen*//*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event, ControlTooltip.Event, TabList.Access {
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
-    protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page,8));
+    protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page, this::getMaxTabCount));
     protected final Panel panel;
     public static final Container creativeModeGrid = new SimpleContainer(50);
+    public static final LegacySlotDisplay DEFAULT_SLOT_DISPLAY = new LegacySlotDisplay() {
+        @Override
+        public int getWidth() {
+            return 27;
+        }
+    };
     private CreativeInventoryListener listener;
     protected boolean hasClickedOutside;
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
-    protected final LegacyScroller scroller = LegacyScroller.create(135, ()-> tabsScrolledList.get(page.get() * 8 + tabList.selectedTab));
+    protected final LegacyScroller scroller = LegacyScroller.create(135, ()-> tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab));
     protected final List<List<ItemStack>> displayListing = new ArrayList<>();
     protected final Stocker.Sizeable arrangement = new Stocker.Sizeable(0,2);
     protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, LegacyComponents.SEARCH_ITEMS);
@@ -175,8 +181,15 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
             minecraft.setScreen(new InventoryScreen(minecraft.player));
             return;
         }
+        for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
+            LegacySlotDisplay.override(menu.getSlot(i), 21 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
+        }
+        for (int i = 0; i < 9; i++) {
+            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 35 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
+        }
         addRenderableWidget(tabList);
         addRenderableOnly(panel);
+        addRenderableOnly(tabList::renderSelected);
         panel.init();
         imageWidth = panel.width;
         imageHeight = panel.height;
@@ -190,8 +203,15 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         scroller.thumbSprite = accessor.getResourceLocation("scroller.thumbSprite", scroller.thumbSprite);
         scroller.offset(new Vec3(ScreenUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0.0f));
         if (arrangement.get() == 2){
-            searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);
-            addRenderableWidget(searchBox);
+            boolean sd = LegacyOptions.getUIMode().isSD();
+            searchBox.setWidth(accessor.getInteger("searchBox.width", sd ? 70 : 200));
+            //? if <=1.20.1 {
+            /*((wily.factoryapi.base.client.WidgetAccessor)searchBox).setHeight(accessor.getInteger("searchBox.height", sd ? 10 : 20));
+            *///?} else {
+            searchBox.setHeight(accessor.getInteger("searchBox.height", sd ? 10 : 20));
+            //?}
+            searchBox.setPosition(accessor.getInteger("searchBox.x", panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6), accessor.getInteger("searchBox.y", panel.getY() + (sd ? 3 : 7)));
+            addRenderableWidget(accessor.putWidget("searchBox", searchBox));
         }
         this.minecraft.player.inventoryMenu.removeSlotListener(this.listener);
         this.listener = new CreativeInventoryListener(this.minecraft);
@@ -203,7 +223,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                 if (!t.selected) return new Vec3(0,1.4,0);
                 return Vec3.ZERO;
             };
-            t.setWidth(41);
+            t.setWidth(accessor.getInteger("tabList.buttonWidth", 41));
             t.setX(t.getX() - tabList.tabButtons.indexOf(t));
         });
         fillCreativeGrid();
@@ -253,7 +273,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         if (arrangement.get() == 2) return;
         Component tabTitle = tabList.tabButtons.get(tabList.selectedTab).getMessage();
-        guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 
     @Override

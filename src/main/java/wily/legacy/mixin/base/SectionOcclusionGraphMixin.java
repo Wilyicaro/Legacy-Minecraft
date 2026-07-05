@@ -38,7 +38,7 @@ public class SectionOcclusionGraphMixin {
     }
     *///?}
 
-    //? if <1.21.5 {
+    //? if <1.21.3 {
     @Inject(method = "addSectionsInFrustum", at = @At("TAIL"))
     private void addSectionsInFrustum(Frustum frustum, List<SectionRenderDispatcher.RenderSection> visibleSections, CallbackInfo ci) {
         if (LegacyChunkLoading.filter(visibleSections, null)) {

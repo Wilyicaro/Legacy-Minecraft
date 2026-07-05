@@ -294,7 +294,7 @@ public class Legacy4JClient {
         else if (screen instanceof DisconnectedScreen s)
             return ConfirmationScreen.createInfoScreen(getReplacementScreen(DisconnectedScreenAccessor.of(s).getParent()), s.getTitle(),DisconnectedScreenAccessor.of(s).getReason());
         else if (screen instanceof AlertScreen s) {
-            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 97, s.getTitle(), s.messageText, LegacyScreen::onClose) {
+            return new ConfirmationScreen(Minecraft.getInstance().screen, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 50 : 75, s.getTitle(), s.messageText, LegacyScreen::onClose) {
                 protected void addButtons() {
                     renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"), b -> s.callback.run()).bounds(panel.x + 15, panel.y + panel.height - 30, 200, 20).build());
                 }
@@ -309,7 +309,7 @@ public class Legacy4JClient {
                 minecraft.execute(() -> BackupConfirmScreenAccessor.of(s).proceed(false, false));
                 return minecraft.screen;
             }
-            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 141 + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? 14 : 0), s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription(), LegacyScreen::onClose) {
+            return new ConfirmationScreen(Minecraft.getInstance().screen, ConfirmationScreen::getPanelWidth, () -> (LegacyOptions.getUIMode().isSD() ? 94 : 141) + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? LegacyOptions.getUIMode().isSD() ? 11 : 14 : 0), s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription(), LegacyScreen::onClose) {
                 boolean eraseCache = false;
                 protected void addButtons() {
                     if (BackupConfirmScreenAccessor.of(s).hasCacheErase()) renderableVList.addRenderable(new TickBox(panel.x + 15, panel.y + panel.height - 88,eraseCache,b->Component.translatable("selectWorld.backupEraseCache"),b->null,b-> eraseCache = b.selected));
@@ -577,7 +577,7 @@ public class Legacy4JClient {
             //?}
 
             String[] nonScaledElements = new String[]{FactoryGuiElement.SELECTED_ITEM_NAME.name(), FactoryGuiElement.OVERLAY_MESSAGE.name(), FactoryGuiElement.SPECTATOR_TOOLTIP.name()};
-            ArbitrarySupplier<Float> hudScale = ()-> 3 / ScreenUtil.getHUDScale();
+            ArbitrarySupplier<Float> hudScale = ScreenUtil::getHUDScale;
             ArbitrarySupplier<Float> crosshairScale = ()-> ScreenUtil.getStandardHeight() >= 1080 ? switch (LegacyOptions.hudScale.get()){
                 case 1,2 -> 0.9f;
                 default -> 1f;
@@ -656,6 +656,9 @@ public class Legacy4JClient {
                 ControlType.types.forEach((s,c)->{
                     a.getElements().put("activeControlType."+s, ()-> ControlType.getActiveType().equals(c));
                 });
+                a.getElements().put("uiMode.fhd", () -> LegacyOptions.getUIMode().isFHD());
+                a.getElements().put("uiMode.hd", () -> LegacyOptions.getUIMode().isHD());
+                a.getElements().put("uiMode.sd", () -> LegacyOptions.getUIMode().isSD());
 
             }));
         });
