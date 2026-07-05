@@ -14,7 +14,9 @@
     //? fabric || neoforge {
     "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.BlockRendererMixin",
+    // TODO - drop the pre-0.9 OcclusionCuller path once baseline is firmly on Sodium 0.9
     "compat.sodium.OcclusionCullerMixin",
+    "compat.sodium.OcclusionCuller09Mixin",
     "compat.sodium.LevelSliceMixin",
     //?}
     //? (fabric || >=1.21 && neoforge && <26.1) {
