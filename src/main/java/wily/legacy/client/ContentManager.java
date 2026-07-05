@@ -16,6 +16,8 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.skins.skin.CustomSkinPackStore;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.IOUtil;
 
 import java.io.*;
@@ -330,12 +332,37 @@ public class ContentManager {
         return category.id() + ":" + pack.id();
     }
 
+    static Optional<Category> getCategory(String categoryId) {
+        return CATEGORIES.stream().filter(c -> c.id().equals(categoryId)).findFirst();
+    }
+
     public static boolean isPackDownloading(Pack pack, Category category) {
         return ContentPackDownloader.isDownloading(pack, category);
     }
 
     public static boolean isPackInstalled(Pack pack, Category category) {
         return ContentPackDownloader.isInstalled(pack, category);
+    }
+
+    public static void prepareDownloadTarget(Pack pack, Category category) throws IOException {
+        prepareManagedTarget(category);
+        if (!pack.hasBundlePacks()) return;
+        for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
+            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
+            if (bundleCategory.isPresent() && !bundleCategory.get().id().equals(category.id())) {
+                prepareManagedTarget(bundleCategory.get());
+            }
+        }
+    }
+
+    private static void prepareManagedTarget(Category category) throws IOException {
+        String folderName = category.targetDirectoryName();
+        Minecraft minecraft = Minecraft.getInstance();
+        if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
+            DownloadedSkinPackStore.enableResourcePack(minecraft);
+        } else if (CustomSkinPackStore.managesTargetDirectory(folderName)) {
+            CustomSkinPackStore.enableResourcePack(minecraft);
+        }
     }
 
     public static void downloadPack(Pack pack, Category category, Consumer<Boolean> onComplete) {
