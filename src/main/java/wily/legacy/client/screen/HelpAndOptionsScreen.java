@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.client.ContentReinstaller;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 
@@ -19,6 +20,8 @@ import java.util.List;
 public class HelpAndOptionsScreen extends RenderableVListScreen {
     private static final Component LEGACY_SKIN_OPTIONS = Component.literal("Legacy4J Skin Options");
     private static final Component VANILLA_SKIN_OPTIONS = Component.literal("Vanilla Skin Options");
+    private static final Component REINSTALL_CONTENT = Component.translatable("legacy.menu.reinstall_content");
+    private static final Component REINSTALLING_CONTENT = Component.translatable("legacy.menu.reinstall_content.running");
 
     public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 240, Math.min(7, s.renderableVList.renderables.size()) * 25 + 24), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 20)), new ArrayList<>(List.of(o -> HowToPlayScreen.Section.getWithButton().forEach(s -> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section) {
         @Override
@@ -28,6 +31,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     }));
     public static final OptionsScreen.Section CHANGE_SKIN_OPTIONS = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(HelpAndOptionsScreen::addPlayerSkinOptions)));
     public static ScreenSection<?> CHANGE_SKIN = CHANGE_SKIN_OPTIONS;
+
     private static Screen createMouseSettingsScreen(Screen parent) {
         return new OptionsScreen(parent, new OptionsScreen.Section(
                 Component.translatable("options.mouse_settings.title"),
@@ -71,6 +75,44 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> createControlsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"), () -> new SettingsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCreditsScreen(this)).build());
+        renderableVList.addRenderable(Button.builder(REINSTALL_CONTENT, this::reinstallContent).build());
+    }
+
+    private void reinstallContent(Button button) {
+        setReinstallButtonActive(button, false);
+        ContentReinstaller.reinstallInstalledContent().whenComplete((result, throwable) ->
+            Minecraft.getInstance().execute(() -> finishReinstallContent(button, result, throwable))
+        );
+    }
+
+    private void finishReinstallContent(Button button, ContentReinstaller.Result result, Throwable throwable) {
+        setReinstallButtonActive(button, true);
+        Minecraft client = Minecraft.getInstance();
+        if (result != null && result.requiresResourceReload()) client.reloadResourcePacks();
+        if (client.screen != this) return;
+        if (throwable != null) {
+            client.setScreen(ConfirmationScreen.createInfoScreen(this, REINSTALL_CONTENT, Component.translatable("legacy.menu.reinstall_content.error")));
+            return;
+        }
+        client.setScreen(ConfirmationScreen.createInfoScreen(this, REINSTALL_CONTENT, reinstallContentMessage(result)));
+    }
+
+    private void setReinstallButtonActive(Button button, boolean active) {
+        button.active = active;
+        button.setMessage(active ? REINSTALL_CONTENT : REINSTALLING_CONTENT);
+    }
+
+    private Component reinstallContentMessage(ContentReinstaller.Result result) {
+        if (result.failed() > 0 && result.updated() > 0) {
+            return Component.translatable("legacy.menu.reinstall_content.partial", result.updated(), result.failed());
+        }
+        if (result.failed() > 0) {
+            return Component.translatable("legacy.menu.reinstall_content.failed", result.failed());
+        }
+        if (result.updated() > 0) {
+            return Component.translatable("legacy.menu.reinstall_content.success", result.updated());
+        }
+        return Component.translatable("legacy.menu.reinstall_content.none");
     }
 
     private static void addPlayerSkinOptions(OptionsScreen screen) {

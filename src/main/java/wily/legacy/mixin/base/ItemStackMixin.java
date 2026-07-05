@@ -40,6 +40,8 @@ import wily.legacy.util.LegacyItemAttributeDisplay;
 import wily.legacy.util.LegacyItemUtil;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
@@ -83,16 +85,18 @@ public abstract class ItemStackMixin implements DataComponentHolder {
 
     @Redirect(method = "addAttributeTooltips", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;forEachModifier(Lnet/minecraft/world/entity/EquipmentSlotGroup;Lorg/apache/commons/lang3/function/TriConsumer;)V"))
     private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> arg, Consumer<Component> consumer/*? if >=1.21.5 {*/, TooltipDisplay tooltipDisplay/*?}*/, @Nullable Player player) {
-        if (LegacyItemUtil.isSkullItem(self())) return;
         Bearer<Boolean> noSpace = Bearer.of(true);
         forEachModifier(equipmentSlotGroup, (holder, attributeModifier, display) -> {
+            List<Component> components = new ArrayList<>();
+            display.apply(components::add, player, holder, attributeModifier);
+            if (components.isEmpty()) return;
             if (noSpace.get()) {
                 consumer.accept(CommonComponents.EMPTY);
                 if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat))
                     consumer.accept(Component.translatable("item.modifiers." + equipmentSlotGroup.getSerializedName()).withStyle(ChatFormatting.GRAY));
                 noSpace.set(false);
             }
-            display.apply(consumer, player, holder, attributeModifier);
+            components.forEach(consumer);
         });
     }
 
@@ -100,10 +104,9 @@ public abstract class ItemStackMixin implements DataComponentHolder {
     public void forEachModifier(EquipmentSlotGroup equipmentSlotGroup, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> triConsumer, CallbackInfo ci) {
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) {
             ci.cancel();
-            LegacyItemAttributeDisplay display = new LegacyItemAttributeDisplay(self());
             ItemAttributeModifiers itemAttributeModifiers = this.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-            itemAttributeModifiers.forEach(equipmentSlotGroup, ((attributeHolder, attributeModifier, u) -> triConsumer.accept(attributeHolder, attributeModifier, display)));
-            EnchantmentHelper.forEachModifier(self(), equipmentSlotGroup, (holder, attributeModifier) -> triConsumer.accept(holder, attributeModifier, new LegacyItemAttributeDisplay(self())));
+            itemAttributeModifiers.forEach(equipmentSlotGroup, ((attributeHolder, attributeModifier, display) -> triConsumer.accept(attributeHolder, attributeModifier, LegacyItemAttributeDisplay.wrap(self(), display))));
+            EnchantmentHelper.forEachModifier(self(), equipmentSlotGroup, (holder, attributeModifier) -> triConsumer.accept(holder, attributeModifier, LegacyItemAttributeDisplay.of(self())));
         }
     }
 }
