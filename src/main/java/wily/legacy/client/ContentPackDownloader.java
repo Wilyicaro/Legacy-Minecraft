@@ -12,6 +12,7 @@ import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiPredicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -41,9 +43,13 @@ final class ContentPackDownloader {
     static boolean isInstalled(Pack pack, Category category) {
         if (pack.hasBundlePacks()) {
             boolean standaloneInstalled = !hasStandaloneContent(pack) || isStandalonePackInstalled(pack, category);
-            return standaloneInstalled && areBundleChildrenInstalled(pack) && (!pack.hasResourceAlbum() || DownloadedResourceAlbums.hasManagedBundleAlbum(pack));
+            return standaloneInstalled && areBundleChildren(pack, ContentPackDownloader::isInstalled) && (!pack.hasResourceAlbum() || DownloadedResourceAlbums.hasManagedBundleAlbum(pack));
         }
         return isStandalonePackInstalled(pack, category);
+    }
+
+    static boolean needsUpdate(Pack pack, Category category) {
+        return hasInstalledContent(pack, category) && !isInstalled(pack, category);
     }
 
     static CompletableFuture<Boolean> download(Pack pack, Category category) {
@@ -55,15 +61,11 @@ final class ContentPackDownloader {
             if (hasStandaloneContent(pack)) deleteStandalonePack(pack, category);
             DownloadedResourceAlbums.removeBundle(pack);
             for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
-                getCategory(bundlePack.categoryId()).ifPresent(bundleCategory -> delete(bundlePack.toPack(), bundleCategory));
+                ContentManager.getCategory(bundlePack.categoryId()).ifPresent(bundleCategory -> delete(bundlePack.toPack(), bundleCategory));
             }
             return;
         }
         deleteStandalonePack(pack, category);
-    }
-
-    private static Optional<Category> getCategory(String categoryId) {
-        return ContentManager.CATEGORIES.stream().filter(c -> c.id().equals(categoryId)).findFirst();
     }
 
     private static boolean shouldApplyTransparencyFix(Category category) {
@@ -119,23 +121,41 @@ final class ContentPackDownloader {
     }
 
     private static boolean isStandalonePackInstalled(Pack pack, Category category) {
-        Path path = ContentManager.getContentDir(category.targetDirectoryName()).resolve(pack.id());
-        if (!Files.isDirectory(path)) return false;
         String folderName = category.targetDirectoryName();
+        Path path = ContentManager.getContentDir(folderName).resolve(pack.id());
+        if (!Files.exists(path) || !Files.isDirectory(path)) return false;
         if ((DownloadedSkinPackStore.managesTargetDirectory(folderName) || CustomSkinPackStore.managesTargetDirectory(folderName)) && !DownloadedSkinPackStore.isValidPackInstall(path)) return false;
         if (pack.hasWorldTemplate() && !LegacyWorldTemplate.isDownloadedPackInstalled(pack)) return false;
         if (!pack.downloadVariants().isEmpty() && !pack.activeDownloadKey().equals(readDownloadKey(path))) return false;
+
         if (pack.activeCheckSum().isPresent()) {
             Path checksumFile = path.resolve(".md5");
-            if (!Files.exists(checksumFile)) return false;
-            try {
-                String existingChecksum = Files.readString(checksumFile).trim();
-                return pack.activeCheckSum().get().equals(existingChecksum);
-            } catch (IOException e) {
-                return false;
+            if (Files.exists(checksumFile)) {
+                try {
+                    String existingChecksum = Files.readString(checksumFile).trim();
+                    return pack.activeCheckSum().get().equals(existingChecksum);
+                } catch (IOException e) {
+                    return false;
+                }
             }
+            return false;
         }
+
         return true;
+    }
+
+    private static boolean hasInstalledContent(Pack pack, Category category) {
+        if (pack.hasBundlePacks()) {
+            return hasStandalonePackFiles(pack, category)
+                || pack.hasResourceAlbum() && DownloadedResourceAlbums.hasManagedBundleAlbum(pack)
+                || areBundleChildren(pack, ContentPackDownloader::hasInstalledContent);
+        }
+        return hasStandalonePackFiles(pack, category);
+    }
+
+    private static boolean hasStandalonePackFiles(Pack pack, Category category) {
+        Path path = ContentManager.getContentDir(category.targetDirectoryName()).resolve(pack.id());
+        return hasStandaloneContent(pack) && Files.isDirectory(path);
     }
 
     private static boolean hasStandaloneContent(Pack pack) {
@@ -168,7 +188,7 @@ final class ContentPackDownloader {
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
         if (hasStandaloneContent(pack)) futures.add(isStandalonePackInstalled(pack, category) ? CompletableFuture.completedFuture(false) : downloadPackFiles(pack, category, !pack.hasResourceAlbum(), false));
         futures.addAll(bundlePacks.stream().map(bundlePack -> {
-            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
+            Optional<Category> bundleCategory = ContentManager.getCategory(bundlePack.categoryId());
             if (bundleCategory.isEmpty()) {
                 Legacy4J.LOGGER.warn("Unknown bundle pack category {} while installing {}", bundlePack.categoryId(), pack.id());
                 return CompletableFuture.completedFuture(false);
@@ -182,7 +202,7 @@ final class ContentPackDownloader {
             }
             if (pack.hasResourceAlbum()) {
                 boolean standaloneInstalled = !hasStandaloneContent(pack) || isStandalonePackInstalled(pack, category);
-                if (standaloneInstalled && areBundleChildrenInstalled(pack)) {
+                if (standaloneInstalled && areBundleChildren(pack, ContentPackDownloader::isInstalled)) {
                     installedAnything |= DownloadedResourceAlbums.syncBundle(pack);
                 } else {
                     DownloadedResourceAlbums.removeBundle(pack);
@@ -202,16 +222,18 @@ final class ContentPackDownloader {
     }
 
     private static CompletableFuture<Boolean> downloadPackFiles(Pack pack, Category category, boolean syncResourceAlbum, boolean trackActiveDownload) {
-        Path contentDir = ContentManager.getContentDir(category.targetDirectoryName());
+        String folderName = category.targetDirectoryName();
+        Path contentDir = ContentManager.getContentDir(folderName);
         if (trackActiveDownload) ACTIVE_DOWNLOADS.add(downloadKey(category, pack));
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Optional<java.net.URI> downloadURI = pack.activeDownloadURI();
+                Optional<URI> downloadURI = pack.activeDownloadURI();
                 if (downloadURI.isEmpty()) {
                     Legacy4J.LOGGER.warn("Pack {} has no download URI.", pack.id());
                     return false;
                 }
                 Path downloadedTempFile = downloadTemp(downloadURI.get().toURL(), "legacy_pack_");
+
                 Optional<String> checkSum = pack.activeCheckSum();
                 if (checkSum.isPresent()) {
                     String fileHash = ContentManager.readFileCheckSum(downloadedTempFile);
@@ -221,9 +243,11 @@ final class ContentPackDownloader {
                         return false;
                     }
                 }
+
                 Path targetFolder = contentDir.resolve(pack.id());
                 if (Files.exists(targetFolder)) deleteDirectoryRecursively(targetFolder.toFile());
                 Files.createDirectories(targetFolder);
+
                 extractZip(downloadedTempFile, targetFolder);
                 if (shouldApplyTransparencyFix(category)) {
                     Optional<byte[]> originalPackIcon = readOptionalFileBytes(targetFolder.resolve("pack.png"));
@@ -236,7 +260,6 @@ final class ContentPackDownloader {
                 if (rootResourcePack) {
                     DownloadedPackMetadata.write(targetFolder, pack, category);
                 }
-                String folderName = category.targetDirectoryName();
                 if (DownloadedSkinPackStore.managesTargetDirectory(folderName)) {
                     DownloadedSkinPackStore.normalizeInstalledPack(targetFolder);
                 } else if (CustomSkinPackStore.managesTargetDirectory(folderName)) {
@@ -250,10 +273,12 @@ final class ContentPackDownloader {
                 }
                 LegacyWorldTemplate.downloadDownloadedPack(pack);
                 Files.deleteIfExists(downloadedTempFile);
+
                 writeDownloadKey(targetFolder, pack);
                 if (checkSum.isPresent()) {
                     Files.writeString(targetFolder.resolve(".md5"), checkSum.get());
                 }
+
                 PackAlbum.Selector.invalidatePackAssets(pack.id());
                 Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
                 return true;
@@ -277,11 +302,10 @@ final class ContentPackDownloader {
         Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
     }
 
-    private static boolean areBundleChildrenInstalled(Pack pack) {
-        if (!pack.hasBundlePacks()) return false;
+    private static boolean areBundleChildren(Pack pack, BiPredicate<Pack, Category> check) {
         for (Pack.BundlePack bundlePack : pack.bundlePacks()) {
-            Optional<Category> bundleCategory = getCategory(bundlePack.categoryId());
-            if (bundleCategory.isEmpty() || !isInstalled(bundlePack.toPack(), bundleCategory.get())) return false;
+            Optional<Category> bundleCategory = ContentManager.getCategory(bundlePack.categoryId());
+            if (bundleCategory.isEmpty() || !check.test(bundlePack.toPack(), bundleCategory.get())) return false;
         }
         return true;
     }

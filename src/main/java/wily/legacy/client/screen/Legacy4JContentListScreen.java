@@ -23,8 +23,6 @@ import wily.legacy.client.ContentManager;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.skins.skin.CustomSkinPackStore;
-import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -165,24 +163,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
     }
 
     private boolean prepareDownloadTarget(ContentManager.Pack pack) {
-        if (!prepareManagedTarget(category)) return false;
-        if (!pack.hasBundlePacks()) return true;
-        for (ContentManager.Pack.BundlePack bundlePack : pack.bundlePacks()) {
-            Optional<ContentManager.Category> bundleCategory = ContentManager.CATEGORIES.stream().filter(c -> c.id().equals(bundlePack.categoryId())).findFirst();
-            if (bundleCategory.isPresent() && !bundleCategory.get().id().equals(category.id()) && !prepareManagedTarget(bundleCategory.get())) return false;
-        }
-        return true;
-    }
-
-    private boolean prepareManagedTarget(ContentManager.Category targetCategory) {
-        if (!DownloadedSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName()) && !CustomSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName())) return true;
         try {
-            if (DownloadedSkinPackStore.managesTargetDirectory(targetCategory.targetDirectoryName())) DownloadedSkinPackStore.enableResourcePack(minecraft);
-            else CustomSkinPackStore.enableResourcePack(minecraft);
+            ContentManager.prepareDownloadTarget(pack, category);
             return true;
         } catch (IOException e) {
             String message = e.getMessage();
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, targetCategory.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
+            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
             return false;
         }
     }
