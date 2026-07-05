@@ -292,8 +292,7 @@ public class LegacyItemUtil {
         if (tooltip.stream().anyMatch(LegacyItemUtil::isPeacefulSpawnEggTip)) {
             tooltip = tooltip.stream().filter(component -> !isPeacefulSpawnEggTip(component)).toList();
         }
-        if (!isSkullItem(stack) || tooltip.size() < 2) return tooltip;
-        return List.of(tooltip.getFirst());
+        return tooltip;
     }
 
     private static boolean isPeacefulSpawnEggTip(Component component) {

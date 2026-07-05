@@ -51,9 +51,24 @@ final class ContentIndexLoader {
         for (JsonElement element : json.getAsJsonArray("packs")) {
             if (!element.isJsonObject()) continue;
             JsonObject packJson = element.getAsJsonObject();
-            if (packJson.has("id") && hasAutoApplyResourcePackTag(packJson)) {
-                ContentManager.AUTO_APPLY_RESOURCE_PACKS.add(prefix + packJson.get("id").getAsString());
-            }
+            loadAutoApplyTag(category.id(), packJson);
+            loadBundleAutoApplyTags(packJson);
+        }
+    }
+
+    private static void loadBundleAutoApplyTags(JsonObject packJson) {
+        if (!packJson.has("bundlePacks") || !packJson.get("bundlePacks").isJsonArray()) return;
+        for (JsonElement element : packJson.getAsJsonArray("bundlePacks")) {
+            if (!element.isJsonObject()) continue;
+            JsonObject bundlePackJson = element.getAsJsonObject();
+            if (bundlePackJson.has("categoryId")) loadAutoApplyTag(bundlePackJson.get("categoryId").getAsString(), bundlePackJson);
+            loadBundleAutoApplyTags(bundlePackJson);
+        }
+    }
+
+    private static void loadAutoApplyTag(String categoryId, JsonObject packJson) {
+        if (packJson.has("id") && hasAutoApplyResourcePackTag(packJson)) {
+            ContentManager.AUTO_APPLY_RESOURCE_PACKS.add(categoryId + ":" + packJson.get("id").getAsString());
         }
     }
 

@@ -1,6 +1,6 @@
 {
-  "targetUI": "net.minecraft.client.gui.screens.inventory.BookViewScreen",
-  "targetType": "class",
+  "targetUI": "minecraft:book_view_screen",
+  "targetType": "id",
   "applyCondition": {
     "reference": "uiMode.sd"
   },
