@@ -536,6 +536,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyEntityFireTint,
                                 LegacyOptions.legacyItemPickup,
                                 LegacyOptions.enhancedPistonMovingRenderer,
+                                LegacyOptions.legacyPotionsBar,
                                 FactoryOptions.RANDOM_BLOCK_ROTATIONS,
                                 LegacyOptions.defaultParticlePhysics,
                                 LegacyOptions.of(mc.options.particles()),

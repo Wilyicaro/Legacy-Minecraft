@@ -292,6 +292,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> hoverFocusSound = CLIENT_STORAGE.register(createBoolean("hoverFocusSound", false));
     public static final FactoryConfig<Boolean> unlinkMusicFromMasterVolume = CLIENT_STORAGE.register(createBoolean("unlinkMusicFromMasterVolume", true, b-> updateSoundVolume()));
     public static final FactoryConfig<Boolean> caveSounds = CLIENT_STORAGE.register(createBoolean("caveSounds", true));
+    public static final FactoryConfig<Boolean> legacyPotionsBar = CLIENT_STORAGE.register(createBoolean("legacyPotionsBar", false));
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
     public static final FactoryConfig<Boolean> inGameOnlineIds = CLIENT_STORAGE.register(createBoolean("inGameOnlineIds", true));

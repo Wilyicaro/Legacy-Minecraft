@@ -909,6 +909,22 @@ public class ScreenUtil {
         }
     }
 
+    public static void renderPotionLevel(GuiGraphics graphics, int x, int y, ItemStack stack) {
+        if (!LegacyOptions.legacyPotionsBar.get()) return;
+        int potionLevel = Legacy4J.getPotionLevel(stack);
+        if (potionLevel <= 0) return;
+        int barX = x + 3;
+        int barY = y + 13;
+        graphics.flush();
+        graphics.pose().pushPose();
+        graphics.pose().translate(0, 0, 200);
+        graphics.fill(barX, barY, barX + 11, barY + 2, -16777216);
+        for (int level = 0; level < potionLevel; level++) {
+            graphics.fill(barX + level * 3, barY, barX + level * 3 + 2, barY + 2, 0xFF00DDE5);
+        }
+        graphics.pose().popPose();
+    }
+
     public static Screen getInitialScreen(){
         TitleScreen titleScreen = new TitleScreen(LegacyOptions.titleScreenFade.get());
         if (LegacyOptions.skipInitialSaveWarning.get()){

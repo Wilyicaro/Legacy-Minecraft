@@ -67,6 +67,7 @@ public abstract class GuiGraphicsMixin {
     }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
+        ScreenUtil.renderPotionLevel(self(), i, j, itemStack);
         Legacy4JClient.legacyFont = true;
     }
     @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)

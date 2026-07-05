@@ -520,6 +520,26 @@ public class Legacy4J {
         //?}
     }
 
+    public static int getPotionLevel(ItemStack stack) {
+        //? if <1.20.5 {
+        /*Holder<Potion> potion = BuiltInRegistries.POTION.wrapAsHolder(PotionUtils.getPotion(stack));
+        List<MobEffectInstance> customEffects = PotionUtils.getCustomEffects(stack);
+        if (potion.value() == Potions.EMPTY) return customEffects.stream().mapToInt(MobEffectInstance::getAmplifier).max().orElse(-1) + 1;
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("strong_")) return 2;
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("long_")) return 3;
+        if (!customEffects.isEmpty()) return customEffects.stream().mapToInt(MobEffectInstance::getAmplifier).max().orElse(0) + 1;
+        return potion.value().getEffects().isEmpty() ? 0 : 1;
+        *///?} else {
+        PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        Holder<Potion> potion = potionContents.potion().orElse(null);
+        if (potion == null) return potionContents.customEffects().stream().mapToInt(MobEffectInstance::getAmplifier).max().orElse(-1) + 1;
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("strong_")) return 2;
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("long_")) return 3;
+        if (!potionContents.customEffects().isEmpty()) return potionContents.customEffects().stream().mapToInt(MobEffectInstance::getAmplifier).max().orElse(0) + 1;
+        return potion.value().getEffects().isEmpty() ? 0 : 1;
+        //?}
+    }
+
     public static ItemStack setItemStackPotion(ItemStack stack, Holder<Potion> potion){
         //? if <1.20.5 {
         /*return PotionUtils.setPotion(stack, potion.value());
