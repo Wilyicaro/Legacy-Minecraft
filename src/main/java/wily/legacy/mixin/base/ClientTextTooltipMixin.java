@@ -34,7 +34,7 @@ public class ClientTextTooltipMixin {
     }
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true)
     public void getHeight(CallbackInfoReturnable<Integer> cir) {
-        if (LegacyOptions.legacyItemTooltips.get()) cir.setReturnValue(12);
+        if (LegacyOptions.legacyItemTooltips.get()) cir.setReturnValue(LegacyOptions.getUIMode().isSD() ? 9 : 12);
     }
 
     private static Style tooltipStyle(Style style, Integer color, boolean force) {

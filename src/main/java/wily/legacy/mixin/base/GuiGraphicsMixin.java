@@ -88,6 +88,14 @@ public abstract class GuiGraphicsMixin {
         i = preEvent.getX();
         j = preEvent.getY();
         *///?}
+        Font tooltipFont = font;
+        int tooltipX = i;
+        int tooltipY = j;
+        ScreenUtil.applySDFont(ignored -> renderLegacyTooltipInternal(tooltipFont, list, tooltipX, tooltipY, clientTooltipPositioner));
+    }
+
+    @Unique
+    private void renderLegacyTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner) {
         int k = 0;
         int l = 0;
 
@@ -96,16 +104,23 @@ public abstract class GuiGraphicsMixin {
             l+= tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
         }
 
-        Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(this.guiWidth(), this.guiHeight(), i, j, (int) (k*ScreenUtil.getTextScale()), (int) (l*ScreenUtil.getTextScale()));
+        float scale = ScreenUtil.getTextScale();
+        Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(this.guiWidth(), this.guiHeight(), i, j, (int) (k * scale), (int) (l * scale));
         int p = vector2ic.x();
         int q = vector2ic.y();
         this.pose.pushPose();
         this.pose.translate(0, 0, 800.0F);
         if (p == (int)Legacy4JClient.controllerManager.getPointerX() && q == (int)Legacy4JClient.controllerManager.getPointerY()) this.pose.translate(Legacy4JClient.controllerManager.getPointerX() - i, Legacy4JClient.controllerManager.getPointerY() - j,0.0f);
-        ScreenUtil.renderPointerPanel(self(),p - Math.round(5 * ScreenUtil.getTextScale()),q - Math.round(9 * ScreenUtil.getTextScale()),Math.round((k + 11) *  ScreenUtil.getTextScale()),Math.round((l + 13) * ScreenUtil.getTextScale()));
+        int scaledWidth = Math.round(k * scale);
+        int scaledHeight = Math.round(l * scale);
+        switch (LegacyOptions.getUIMode()) {
+            case FHD -> ScreenUtil.renderPointerPanel(self(), p - 3, q - 6, scaledWidth + 7, scaledHeight + 9);
+            case SD -> ScreenUtil.renderPointerPanel(self(), p - 3, q - 4, scaledWidth + 7, scaledHeight + 6);
+            default -> ScreenUtil.renderPointerPanel(self(), p - 5, q - 9, scaledWidth + 11, scaledHeight + 13);
+        }
         this.pose.translate(p, q, 0.0F);
         FactoryScreenUtil.disableDepthTest();
-        this.pose.scale(ScreenUtil.getTextScale(), ScreenUtil.getTextScale(),1.0f);
+        this.pose.scale(scale, scale,1.0f);
         int s = 0;
 
         int t;
