@@ -19,6 +19,7 @@ public abstract class BindingState {
     public int blockAmount = 0;
     public boolean pressed;
     public boolean released;
+    protected boolean nextUpdatePress = false;
 
     public static BindingState create(ControllerBinding<?> component, Predicate<Controller> update){
         return new BindingState(component) {
@@ -34,11 +35,19 @@ public abstract class BindingState {
     }
 
     public void update(boolean pressed){
+        if (nextUpdatePress) {
+            pressed = true;
+            nextUpdatePress = false;
+        }
         if (this.released = (!pressed && this.pressed)) timePressed = -1;
         if (pressed) timePressed++;
         this.justPressed = pressed && !this.pressed;
         this.pressed = pressed;
         if (justPressed) blockAmount--;
+    }
+
+    public void nextUpdatePress() {
+        nextUpdatePress = true;
     }
 
     public ControlTooltip.ComponentIcon getIcon(){

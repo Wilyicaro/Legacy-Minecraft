@@ -296,15 +296,46 @@ public interface ControlTooltip {
     interface Icon {
         int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate);
 
+        default void clickIfInside(double tooltipX, double mouseX, double mouseY, int button) {
+            click(mouseX, mouseY, button);
+        }
+
+        default void click(double mouseX, double mouseY, int button) {
+        }
+
+        default void release(double mouseX, double mouseY, int button) {
+        }
+
         default int getWidth() {
             return render(null, 0, 0, false, true);
         }
 
         static Icon createCompound(Icon[] icons){
-            return (graphics, x, y, allowPressed, simulate) -> {
-                int totalWidth = 0;
-                for (Icon icon : icons) totalWidth+= icon.render(graphics, x + totalWidth, y, allowPressed, simulate);
-                return totalWidth;
+            return new Icon() {
+                @Override
+                public void clickIfInside(double tooltipX, double mouseX, double mouseY, int button) {
+                    for (int i = 0; i < icons.length; i++) {
+                        Icon icon = icons[i];
+                        double diffX = mouseX - tooltipX;
+                        if ((diffX >= 0 && diffX < icon.getWidth()) || i == icons.length - 1) {
+                            icon.clickIfInside(tooltipX, mouseX, mouseY, button);
+                            break;
+                        }
+                        tooltipX += icon.getWidth();
+                    }
+                }
+
+                @Override
+                public void release(double mouseX, double mouseY, int button) {
+                    for (Icon icon : icons) icon.release(mouseX, mouseY, button);
+                }
+
+                @Override
+                public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate) {
+                    int totalWidth = 0;
+                    for (Icon icon : icons) totalWidth+= icon.render(graphics, x + totalWidth, y, allowPressed, simulate);
+                    return totalWidth;
+                }
             };
         }
     }
@@ -329,11 +360,45 @@ public interface ControlTooltip {
         }
 
         static ComponentIcon createCompound(ComponentIcon[] componentIcons){
+            ComponentIcon[] icons = Arrays.stream(componentIcons).filter(Objects::nonNull).toArray(ComponentIcon[]::new);
             MutableComponent allIcons = Component.empty();
-            for (ComponentIcon componentIcon : componentIcons) {
+            boolean additive = false;
+            for (ComponentIcon componentIcon : icons) {
                 allIcons.append(componentIcon.getComponent());
+                if (componentIcon == PLUS_ICON) additive = true;
             }
-            return of(allIcons);
+            boolean additiveClick = additive;
+            return new ComponentIcon() {
+                @Override
+                public Component getComponent() {
+                    return allIcons;
+                }
+
+                @Override
+                public void clickIfInside(double tooltipX, double mouseX, double mouseY, int button) {
+                    for (int i = 0; i < icons.length; i++) {
+                        ComponentIcon icon = icons[i];
+                        double diffX = mouseX - tooltipX;
+                        if (additiveClick || (diffX >= 0 && diffX < icon.getWidth()) || i == icons.length - 1) {
+                            icon.clickIfInside(tooltipX, mouseX, mouseY, button);
+                            if (!additiveClick) break;
+                        }
+                        tooltipX += icon.getWidth();
+                    }
+                }
+
+                @Override
+                public void release(double mouseX, double mouseY, int button) {
+                    for (ComponentIcon icon : icons) icon.release(mouseX, mouseY, button);
+                }
+
+                @Override
+                public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate) {
+                    int totalWidth = 0;
+                    for (ComponentIcon icon : icons) totalWidth += icon.render(graphics, x + totalWidth, y, allowPressed, simulate);
+                    return totalWidth;
+                }
+            };
         }
 
         static ComponentIcon createCompound(Component[] components){
@@ -363,6 +428,12 @@ public interface ControlTooltip {
         public float getPressInterval(){
             return (Util.getMillis() - startPressTime) / 280f;
         }
+
+        @Override
+        public void click(double mouseX, double mouseY, int button) {
+            startPressTime = Util.getMillis();
+        }
+
         public Component getActualIcon(char[] chars, boolean allowPressed, ControlType type){
             return chars == null ? null : ControlTooltip.getControlIcon(String.valueOf(chars[chars.length > 1 && allowPressed && startPressTime != 0 && (canLoop() || getPressInterval() <= 1) ? 1 + Math.round(((getPressInterval() / 2) <= 1.4f ? (getPressInterval() / 2f) % 1f : 0.4f) * (chars.length - 2)) : 0]),type).getComponent();
         }
@@ -400,10 +471,18 @@ public interface ControlTooltip {
         }
 
         public static LegacyIcon create(InputConstants.Key key, char[] iconChars, char[] iconOverlayChars, Character tipIcon){
-            return create(key, (k,b)-> create(b,iconChars,iconOverlayChars,tipIcon,()-> k.getType() != InputConstants.Type.MOUSE, ControlType::getKbmActiveType));
+            return create(key, (k,b)-> create(b,iconChars,iconOverlayChars,tipIcon,()-> k.getType() != InputConstants.Type.MOUSE, ControlType::getKbmActiveType, () -> pressKey(k, true), () -> pressKey(k, false)));
         }
 
         public static LegacyIcon create(BooleanSupplier pressed, char[] iconChars, char[] iconOverlayChars, Character tipIcon, BooleanSupplier loop, Supplier<ControlType> type){
+            return create(pressed, iconChars, iconOverlayChars, tipIcon, loop, type, () -> {}, () -> {});
+        }
+
+        public static LegacyIcon create(BooleanSupplier pressed, char[] iconChars, char[] iconOverlayChars, Character tipIcon, BooleanSupplier loop, Supplier<ControlType> type, Runnable clickAction){
+            return create(pressed, iconChars, iconOverlayChars, tipIcon, loop, type, clickAction, () -> {});
+        }
+
+        public static LegacyIcon create(BooleanSupplier pressed, char[] iconChars, char[] iconOverlayChars, Character tipIcon, BooleanSupplier loop, Supplier<ControlType> type, Runnable clickAction, Runnable releaseAction){
             return new LegacyIcon() {
 
                 @Override
@@ -430,7 +509,24 @@ public interface ControlTooltip {
                 public boolean canLoop() {
                     return loop.getAsBoolean();
                 }
+
+                @Override
+                public void click(double mouseX, double mouseY, int button) {
+                    super.click(mouseX, mouseY, button);
+                    clickAction.run();
+                }
+
+                @Override
+                public void release(double mouseX, double mouseY, int button) {
+                    releaseAction.run();
+                }
             };
+        }
+
+        public static void pressKey(InputConstants.Key key, boolean pressed) {
+            if (key.getType() == InputConstants.Type.KEYSYM) {
+                Legacy4JClient.controllerManager.simulateKeyAction(key.getValue(), pressed, false);
+            }
         }
 
         public static LegacyIcon create(InputConstants.Key key, BiFunction<InputConstants.Key,BooleanSupplier, LegacyIcon> iconGetter){
@@ -568,6 +664,29 @@ public interface ControlTooltip {
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
             FactoryScreenUtil.disableBlend();
         }
+
+        public void press(double mouseX, double mouseY, int button, boolean clicked) {
+            boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
+            double hudDistance = Math.max(0.0D, LegacyOptions.hudDistance.get() - 0.5D) * 2.0D;
+            double hudDiff = 1.0D - hudDistance;
+            double xDiff = 32.0D - 30.0D * hudDiff;
+            double tooltipX = left ? xDiff : minecraft.getWindow().getGuiScaledWidth() - xDiff;
+            double tooltipY = minecraft.getWindow().getGuiScaledHeight() - (29.0D - (15.0D - ControlType.getActiveType().iconHeight()) / 2.0D - 16.0D * hudDiff);
+            for (Map.Entry<Component, Icon> entry : renderTooltips.entrySet()) {
+                Icon icon = entry.getValue();
+                int tooltipWidth = icon.getWidth() + minecraft.font.width(entry.getKey());
+                if (!left) tooltipX -= tooltipWidth;
+                if (ScreenUtil.isMouseOver(mouseX, mouseY, tooltipX, tooltipY - 1, tooltipWidth, 9)) {
+                    if (clicked) {
+                        icon.clickIfInside(tooltipX, mouseX, mouseY, button);
+                    } else {
+                        icon.release(mouseX, mouseY, button);
+                    }
+                    return;
+                }
+                tooltipX += left ? tooltipWidth + 12 : -12;
+            }
+        }
     }
 
     static ComponentIcon getKbmIcon(String key){
@@ -596,6 +715,21 @@ public interface ControlTooltip {
             @Override
             public boolean canLoop() {
                 return k.getType() != InputConstants.Type.MOUSE;
+            }
+
+            @Override
+            public void click(double mouseX, double mouseY, int button) {
+                super.click(mouseX, mouseY, button);
+                if (k.getType() == InputConstants.Type.KEYSYM) {
+                    Legacy4JClient.controllerManager.simulateKeyAction(k.getValue(), true, false);
+                }
+            }
+
+            @Override
+            public void release(double mouseX, double mouseY, int button) {
+                if (k.getType() == InputConstants.Type.KEYSYM) {
+                    Legacy4JClient.controllerManager.simulateKeyAction(k.getValue(), false, false);
+                }
             }
         }));
     }

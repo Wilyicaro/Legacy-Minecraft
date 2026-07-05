@@ -178,7 +178,9 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
         addIcons(resourceManager,location,(s,o)->{
             ControllerBinding<?> binding = ControllerBinding.map.get(s);
-            if (binding != null) addIcon.accept(s, ControlTooltip.LegacyIcon.create(()->binding.getMapped().state().pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)),()-> !binding.getMapped().state().isBlocked(), ControlType::getActiveControllerType));
+            if (binding != null) addIcon.accept(s, ControlTooltip.LegacyIcon.create(()->binding.getMapped().state().pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)),()-> !binding.getMapped().state().isBlocked(), ControlType::getActiveControllerType, () -> {
+                if (Legacy4JClient.controllerManager.connectedController != null) binding.getMapped().state().nextUpdatePress();
+            }));
         });
     }
 
