@@ -146,8 +146,8 @@
     "GuiGraphicsMixin",
     "client.gui.GuiMixin",
     //? if >=1.21.10 {
-    "client.gui.LocatorBarRendererMixin",
-    //?}
+    /*"client.gui.LocatorBarRendererMixin",
+    *///?}
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
     "HugeExplosionParticleMixin",

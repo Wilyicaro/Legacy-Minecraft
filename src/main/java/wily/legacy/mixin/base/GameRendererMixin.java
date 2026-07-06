@@ -68,12 +68,12 @@ public abstract class GameRendererMixin {
     }
 
     //? if <1.21.1 {
-    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getYRot()F"))
+    /*@ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getYRot()F"))
     private float applyFlyingViewYRotation(float yRot) {
         float base = -yRot * Mth.DEG_TO_RAD;
         return yRot - (ScreenUtil.getFlyingViewYRotation(base) - base) / Mth.DEG_TO_RAD;
     }
-    //?}
+    *///?}
 
     @Inject(method = "pick", at = @At("RETURN"))
     private void pick(float tickDelta, CallbackInfo ci) {

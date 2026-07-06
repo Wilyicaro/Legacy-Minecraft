@@ -8,9 +8,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
 //? if <1.21.1 {
-import net.minecraft.network.chat.Component;
+/*import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
-//?}
+*///?}
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -123,7 +123,7 @@ public abstract class ChatComponentMixin {
     }
 
     //? if <1.21.1 {
-    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;ILnet/minecraft/client/GuiMessageTag;Z)V", at = @At("HEAD"))
+    /*@Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;ILnet/minecraft/client/GuiMessageTag;Z)V", at = @At("HEAD"))
     private void changeQueuedChatFont(Component component, MessageSignature messageSignature, int i, GuiMessageTag guiMessageTag, boolean bl, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD()) Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
     }
@@ -132,8 +132,8 @@ public abstract class ChatComponentMixin {
     private void changeQueuedChatFontAfter(Component component, MessageSignature messageSignature, int i, GuiMessageTag guiMessageTag, boolean bl, CallbackInfo ci) {
         Legacy4JClient.defaultFontOverride = null;
     }
-    //?} else {
-    /*@Inject(method = "addMessageToDisplayQueue(Lnet/minecraft/client/GuiMessage;)V", at = @At("HEAD"))
+    *///?} else {
+    @Inject(method = "addMessageToDisplayQueue(Lnet/minecraft/client/GuiMessage;)V", at = @At("HEAD"))
     private void changeQueuedChatFont(GuiMessage guiMessage, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD()) Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
     }
@@ -142,7 +142,7 @@ public abstract class ChatComponentMixin {
     private void changeQueuedChatFontAfter(GuiMessage guiMessage, CallbackInfo ci) {
         Legacy4JClient.defaultFontOverride = null;
     }
-    *///?}
+    //?}
 
     @Inject(method = "isChatFocused",at = @At(value = "HEAD"), cancellable = true)
     private void isChatFocused(CallbackInfoReturnable<Boolean> cir) {
