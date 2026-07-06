@@ -53,7 +53,6 @@ public class ControllerManager {
     private static final float DIAGONAL_SPEED = 0.4F;
     private static final float ANGLE8 = 45F * Mth.DEG_TO_RAD;
     private static final float ANGLE16 = 22.5F * Mth.DEG_TO_RAD;
-    private static final long POLL_INTERVAL_MS = 8L;
     private static final int MAX_INPUT_TICKS = 32;
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
@@ -91,14 +90,22 @@ public class ControllerManager {
         this.minecraft = minecraft;
         this.orderedKeyMappings = minecraft.options.keyMappings.clone();
         updateCursorInputMode();
+        restartPoller();
+    }
 
+    public synchronized void restartPoller() {
+        if (minecraft == null) return;
         if (poller != null) poller.shutdownNow();
         poller = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r, "Legacy4J Controller Poller");
             thread.setDaemon(true);
             return thread;
         });
-        poller.scheduleWithFixedDelay(this::queueControllerUpdate, 0, POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+        poller.scheduleWithFixedDelay(this::queueControllerUpdate, 0, getPollIntervalMs(), TimeUnit.MILLISECONDS);
+    }
+
+    private long getPollIntervalMs() {
+        return Mth.clamp(LegacyOptions.controllerPollingRate.get(), 1, 16);
     }
 
     private void queueControllerUpdate() {

@@ -1903,6 +1903,8 @@
   "legacy.options.controllerLedRed": "Controller LED: Red",
   "legacy.options.controllerMappingConflicting": "Button Conflict Detected. Please assign a button to this action.",
   "legacy.options.controllerMappingTooltip": "Press any button or press %s to cancel.",
+  "legacy.options.controllerPollingRate": "Controller Polling Rate",
+  "legacy.options.controllerPollingRate.tooltip": "Time between controller polls. Lower values may feel more responsive, but can use more CPU, drain wireless controller batteries faster, and be less stable after sleep/resume. If unsure, leave this alone.",
   "legacy.options.controllerToasts": "Display Connection Toasts",
   "legacy.options.controllerVirtualCursor": "Virtual Cursor",
   "legacy.options.creativeTab": "Legacy Creative Interface",

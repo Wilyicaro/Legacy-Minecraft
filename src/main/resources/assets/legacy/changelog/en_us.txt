@@ -44,6 +44,7 @@
  - `Legacy Offhand Limits`
 - Added `Minecraft Store`, with a lot of packs and resource albums available by default for download, thanks to BrandonItaly
 - Added `Advanced Options` for the controller section
+- Added `Controller Polling Rate` to Advanced Controller Options
 - Added Controller LED RGB sliders with a preview
 - Added Decay potions and tipped arrows
 - Added all the missing SD UIs, including How To Play, More World Options, Book & quill, and Host Options interfaces
@@ -140,4 +141,5 @@
 - Fixed y view bobbing not working anymore
 - Fixed Death screen not having the reason
 - Fixed locator bar pips not following Hud Opacity
+- Fixed the game freezing after resuming a device from sleep
 - Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
