@@ -15,6 +15,7 @@ public abstract class BindingState {
     public final ControllerBinding<?> binding;
     public boolean justPressed = false;
     public int timePressed = -1;
+    protected int previousTimePressed = -1;
     public int blockAmount = 0;
     public boolean pressed;
     public boolean released;
@@ -38,6 +39,7 @@ public abstract class BindingState {
             pressed = true;
             nextUpdatePress = false;
         }
+        previousTimePressed = timePressed;
         boolean wasPressed = this.pressed;
         if (this.released = (!pressed && wasPressed)) timePressed = -1;
         if (pressed) timePressed = wasPressed ? timePressed + Legacy4JClient.controllerManager.getInputTicks() : 0;
@@ -59,13 +61,17 @@ public abstract class BindingState {
     }
 
     public boolean canClick(int delay) {
-        return (timePressed == 0 || timePressed >= 3 * delay) && timePressed % delay == 0 && !isBlocked();
+        return !isBlocked() && (crossedTime(0) || timePressed >= 3 * delay && previousTimePressed / delay < timePressed / delay);
     }
 
     public boolean onceClick(int timeDelay) {
-        int lastTimePressed = timePressed;
-        if (timePressed == 0) timePressed = timeDelay;
-        return lastTimePressed == 0 && !isBlocked();
+        boolean clicked = crossedTime(0) && !isBlocked();
+        if (clicked) timePressed = timeDelay;
+        return clicked;
+    }
+
+    public boolean crossedTime(int time) {
+        return previousTimePressed < time && timePressed >= time;
     }
 
     public int getDefaultDelay() {
@@ -101,7 +107,7 @@ public abstract class BindingState {
     }
 
     public boolean canDownKeyMapping(KeyMapping mapping) {
-        return !(mapping instanceof ToggleKeyMapping) && canClick() || timePressed == 0;
+        return !(mapping instanceof ToggleKeyMapping) && canClick() || crossedTime(0);
     }
 
     public boolean canReleaseKeyMapping(KeyMapping mapping) {

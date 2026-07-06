@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
@@ -1178,7 +1179,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                 }
 
                 double dz = stick.getDeadZone();
-                double dx = dz > Math.abs(sx) ? 0 : -sx * 0.12;
+                double dx = dz > Math.abs(sx) ? 0 : -sx * 0.12 * Legacy4JClient.controllerManager.getInputScale();
                 if (dx != 0) {
                     if (rotateCenterPreview(dx, 0)) {
                         state.block();
