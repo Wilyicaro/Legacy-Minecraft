@@ -10,22 +10,8 @@ import wily.legacy.mobcaps.LegacyMobCaps;
 
 @Mixin(ServerLevel.class)
 public class ServerLevelMixin {
-    @Inject(method = "addFreshEntity", at = @At("RETURN"))
-    private void addFreshEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) {
-            LegacyMobCaps.handleEntityAdded(entity);
-        }
-    }
-
-    @Inject(method = "addWithUUID", at = @At("RETURN"))
-    private void addWithUUID(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) {
-            LegacyMobCaps.handleEntityAdded(entity);
-        }
-    }
-
-    @Inject(method = "tryAddFreshEntityWithPassengers", at = @At("RETURN"))
-    private void tryAddFreshEntityWithPassengers(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "addEntity", at = @At("RETURN"))
+    private void addEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
             LegacyMobCaps.handleEntityAdded(entity);
         }
