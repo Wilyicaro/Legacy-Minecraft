@@ -27,7 +27,7 @@ public class LegacyGamma implements AutoCloseable {
         float value = LegacyOptions.legacyGamma.get().floatValue();
         CommandEncoder commandEncoder = RenderSystem.getDevice().createCommandEncoder();
         try (GpuBuffer.MappedView mappedView = commandEncoder.mapBuffer(this.ubo.currentBuffer(), false, true)) {
-            Std140Builder.intoBuffer(mappedView.data()).putFloat(value >= 0.5f ? (value - 0.5f) * 1.12f + 1.08f : value * 0.96f + 0.6f);
+            Std140Builder.intoBuffer(mappedView.data()).putFloat(value * 1.5f + 0.5f);
         }
 
         RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
