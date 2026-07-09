@@ -35,6 +35,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int PACK_LIST_VISIBLE_ROWS = 6;
     private static final int COMPACT_PACK_LIST_VISIBLE_ROWS = 5;
     private static final int PACK_LIST_FOOTER_RESERVE = 12;
+    private static final int PACK_BUTTON_BORDER_OVERLAP = 1;
     private static final float HD_MENU_SCALE = 1.10f;
     private static final ChangeSkinScreenLayout HD_LAYOUT = new ChangeSkinScreenLayout(
             false, hd(180), hd(290), hd(400),
@@ -338,11 +339,13 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         packList.setReorderMode(isReorderingCustomPack());
         int visibleRows = visiblePackRows();
         int maxListBottom = arrowTop - sc(4);
-        int rowHeight = Math.max(10, resolvedPackRowHeight);
-        int h = rowHeight * visibleRows + PACK_LIST_FOOTER_RESERVE;
-        int y = maxListBottom - rowHeight * visibleRows;
+        int rowPitch = Math.max(10, resolvedPackRowHeight);
+        int buttonHeight = rowPitch + PACK_BUTTON_BORDER_OVERLAP;
+        int h = rowPitch * visibleRows + PACK_LIST_FOOTER_RESERVE + PACK_BUTTON_BORDER_OVERLAP;
+        int frameListTop = maxListBottom - rowPitch * visibleRows;
+        int y = frameListTop - PACK_BUTTON_BORDER_OVERLAP;
         int packFrameRenderX = frameX - sc(2);
-        int packFrameRenderY = isCompact480() ? y - sc(3) : y - sc(4);
+        int packFrameRenderY = isCompact480() ? frameListTop - sc(3) : frameListTop - sc(4);
         int packFrameRenderW = frameW + sc(4);
         int packFrameRenderH = frameY + frameH - packFrameRenderY;
         int packIconTop = panel.y + sc(FRAME_TOP);
@@ -380,7 +383,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
         addRenderableOnly((g, i, j, f) ->
                 blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, packFrameRenderX, packFrameRenderY, packFrameRenderW, packFrameRenderH));
-        packList.applyResolvedButtonHeight(rowHeight);
+        packList.applyResolvedButtonHeight(buttonHeight);
         getRenderableVList().renderables.clear();
         if (packList.getPackCount() == 0) {
             getRenderableVList().addRenderable(new ChangeSkinPackList.PackButton(packList, -1, packList.getWrappedLabelForIndex(0), packList.getButtonHeight()));
@@ -398,7 +401,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         boolean windowResized = width != lastLayoutWidth || height != lastLayoutHeight;
         refreshSharedLayout();
         applyScreenScaleAdjustment();
-        renderableVList.layoutSpacing(l -> -1);
+        renderableVList.layoutSpacing(l -> -PACK_BUTTON_BORDER_OVERLAP);
         if (windowResized) {
             getRenderableVList().resetScroll();
         }
