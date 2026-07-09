@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.skins.client.util.BirthdayCapeUtil;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
@@ -79,5 +80,11 @@ public abstract class AvatarSkinMixin {
     private void consoleskins$patchStateSkin(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
         if (avatar == null || state == null) return;
         consoleskins$applySkinToState(avatar, state);
+        boolean blockedByElytra = avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA);
+        PlayerSkin birthdaySkin = BirthdayCapeUtil.apply(state.skin, blockedByElytra);
+        if (birthdaySkin != state.skin) {
+            state.skin = birthdaySkin;
+            state.showCape = true;
+        }
     }
 }
