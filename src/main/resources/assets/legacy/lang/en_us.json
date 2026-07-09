@@ -1928,6 +1928,7 @@
   "legacy.options.displayNameTagBorder": "Display Name Tag Border",
   "legacy.options.displayPackManagementTooltips": "Display Pack Management Tooltips",
   "legacy.options.displayRealmsButton": "Display Realms Button",
+  "legacy.options.displayReinstallContentButton": "Display Reinstall Content Button",
   "legacy.options.enhancedItemTranslucency": "Enhanced Item Translucency",
   "legacy.options.enhancedPistonMovingRenderer": "Enhanced Piston Moving Renderer",
   "legacy.options.fakeAutosaveScreen": "Fake Autosave Screen",

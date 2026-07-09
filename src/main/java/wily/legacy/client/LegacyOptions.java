@@ -333,6 +333,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> menusWithBackground = CLIENT_STORAGE.register(createBoolean("menusWithBackground", false));
     public static final FactoryConfig<Boolean> legacyPanorama = CLIENT_STORAGE.register(createBoolean("legacyPanorama", true));
     public static final FactoryConfig<Boolean> displayRealmsButton = CLIENT_STORAGE.register(createBoolean("displayRealmsButton", true));
+    public static final FactoryConfig<Boolean> displayReinstallContentButton = CLIENT_STORAGE.register(createBoolean("displayReinstallContentButton", true));
     public static final FactoryConfig<Boolean> hideSodiumSettings = CLIENT_STORAGE.register(createBoolean("hideSodiumSettings", false));
     public static final FactoryConfig<Boolean> hideExperimentalWorldWarning = CLIENT_STORAGE.register(createBoolean("hideExperimentalWorldWarning", false));
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
