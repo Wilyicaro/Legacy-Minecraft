@@ -398,7 +398,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         boolean windowResized = width != lastLayoutWidth || height != lastLayoutHeight;
         refreshSharedLayout();
         applyScreenScaleAdjustment();
-        renderableVList.layoutSpacing(l -> 0);
+        renderableVList.layoutSpacing(l -> -1);
         if (windowResized) {
             getRenderableVList().resetScroll();
         }
