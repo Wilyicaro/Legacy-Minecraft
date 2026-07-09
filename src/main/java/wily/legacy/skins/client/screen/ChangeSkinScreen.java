@@ -230,7 +230,14 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private float mainTextScale() {
-        return isCompact480() ? compactTextScale() : bigTextScale();
+        if (isCompact480()) return compactTextScale();
+        float scale = bigTextScale();
+        int framebufferHeight = minecraft.getWindow().getHeight();
+        int guiHeight = minecraft.getWindow().getGuiScaledHeight();
+        if (framebufferHeight <= 0 || guiHeight <= 0) return scale;
+        float framebufferScale = framebufferHeight / (float) guiHeight;
+        return Math.max(1.0f / framebufferScale,
+                Math.round(scale * framebufferScale) / framebufferScale);
     }
 
     private float packTypeTextScale() {

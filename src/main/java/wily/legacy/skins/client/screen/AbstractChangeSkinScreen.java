@@ -28,6 +28,7 @@ import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
 import wily.legacy.skins.skin.*;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.IOException;
@@ -1252,12 +1253,37 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         int textWidth = minecraft.font.width(text);
         int textX = -textWidth / 2;
+        float scaleX = scale;
+        float scaleY = scale;
+        float drawX = centerX;
+        float drawY = yAdj;
+        boolean alignToFramebuffer = scale > 1.0f || !isCompact480();
+        if (alignToFramebuffer) {
+            var window = minecraft.getWindow();
+            int framebufferWidth = window.getWidth();
+            int framebufferHeight = window.getHeight();
+            int guiWidth = window.getGuiScaledWidth();
+            int guiHeight = window.getGuiScaledHeight();
+            if (framebufferWidth > 0 && framebufferHeight > 0 && guiWidth > 0 && guiHeight > 0) {
+                float framebufferScaleX = framebufferWidth / (float) guiWidth;
+                float framebufferScaleY = framebufferHeight / (float) guiHeight;
+                int pixelScale = Math.max(1, Math.round(scale * framebufferScaleY));
+                scaleX = pixelScale / framebufferScaleX;
+                scaleY = pixelScale / framebufferScaleY;
+                drawX = Math.round(centerX * framebufferScaleX) / framebufferScaleX;
+                drawY = Math.round(yAdj * framebufferScaleY) / framebufferScaleY;
+            }
+        }
         var pose = g.pose();
         pose.pushMatrix();
-        pose.translate((float) centerX, (float) yAdj);
-        pose.scale(scale, scale);
-        g.drawString(minecraft.font, text, textX, 0, color, shadow);
-        pose.popMatrix();
+        try {
+            pose.translate(drawX, drawY);
+            pose.scale(scaleX, scaleY);
+            LegacyFontUtil.applyShadowScale(alignToFramebuffer ? scaleY : 1.0f,
+                    () -> g.drawString(minecraft.font, text, textX, 0, color, shadow));
+        } finally {
+            pose.popMatrix();
+        }
     }
 
     protected record ChangeSkinLayoutMetrics(
