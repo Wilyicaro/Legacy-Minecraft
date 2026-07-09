@@ -106,23 +106,29 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         float groupWidth = layout.basePanelWidth() + layout.baseTooltipWidth() - 2f;
         float groupHeight = layout.basePanelHeight() + Math.max(0f, layout.tooltipYOffset() - layout.tooltipHeightInset());
         float footerReserve = controlTooltipFooterReserve();
-        boolean compact480 = layout.compact480();
-        if (compact480) {
+        boolean compact = layout.compact480();
+        if (compact) {
             groupWidth += 10f;
             groupHeight += 22f;
             footerReserve += 10f;
         }
-        float sw = (w - 20f) / groupWidth;
-        float sh = (h - 20f - footerReserve) / groupHeight;
-        float sc = Math.min(1f, Math.min(sw, sh));
-        if (compact480) {
-            sc = Math.min(sc, 0.82f);
-            sc *= 0.88f;
+        float widthScale = (w - 20f) / groupWidth;
+        float heightScale = (h - 20f - footerReserve) / groupHeight;
+        float scale = Math.min(1f, Math.min(widthScale, heightScale));
+        if (compact) {
+            scale = Math.min(scale, 0.82f);
+            scale *= 0.88f;
+            scale *= 0.93f;
+        } else {
+            float reduction = 0.93f;
+            if (scale > 0.8f) {
+                float transition = (scale - 0.8f) / 0.2f;
+                reduction += ((0.92f * 0.93f) - reduction) * transition;
+            }
+            scale *= reduction;
         }
-        if (sc > 0.8f) sc *= 0.92f;
-        sc *= 0.93f;
-        if (sc <= 0f) sc = 1f;
-        return sc;
+        if (scale <= 0f) scale = 1f;
+        return scale;
     }
 
     private static int findSkinIndex(List<SkinEntry> skins, String skinId, int limit) {

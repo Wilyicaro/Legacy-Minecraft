@@ -6,11 +6,11 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -346,19 +346,12 @@ public final class ChangeSkinPackList {
 
         @Override
         public void renderString(GuiGraphics graphics, Font font, int color) {
-            String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
-            float textScale = height < 20 && LegacyOptions.getUIMode().isSD() ? 0.84f : 1.0f;
-            int centerX = getX() + getWidth() / 2;
-            float textY = getY() + (getHeight() - font.lineHeight * textScale) / 2.0f;
-            if (textScale == 1.0f) {
-                graphics.drawCenteredString(font, visibleText, centerX, Math.round(textY), color);
-                return;
-            }
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(centerX, textY);
-            graphics.pose().scale(textScale, textScale);
-            graphics.drawCenteredString(font, visibleText, 0, 0, color);
-            graphics.pose().popMatrix();
+            LegacyFontUtil.applySDFont(ignored -> {
+                String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
+                int centerX = getX() + getWidth() / 2;
+                int textY = getY() + (getHeight() - font.lineHeight) / 2;
+                graphics.drawCenteredString(font, visibleText, centerX, textY, color);
+            });
         }
     }
 }
