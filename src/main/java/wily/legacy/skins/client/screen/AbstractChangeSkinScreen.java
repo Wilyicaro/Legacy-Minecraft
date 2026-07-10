@@ -958,7 +958,8 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (firstOpen) focusInitialPack();
         super.init();
         ensurePreviewWidgets();
-        for (PlayerSkinWidget widget : previewWidgets) addRenderableWidget(widget);
+        for (PlayerSkinWidget widget : previewWidgets) addWidget(widget);
+        addRenderableOnly(playerSkinWidgetList);
         restorePackButtonFocus();
         refreshSkinPackState();
     }

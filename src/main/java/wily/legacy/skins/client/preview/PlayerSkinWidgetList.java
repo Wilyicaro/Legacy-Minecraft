@@ -1,12 +1,14 @@
 package wily.legacy.skins.client.preview;
 
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class PlayerSkinWidgetList {
+public class PlayerSkinWidgetList implements Renderable {
     private static final int OFFSET = 80;
     private static final float FACING_FROM_LEFT = -45f;
     private static final float FACING_FROM_RIGHT = 45f;
@@ -120,6 +122,22 @@ public class PlayerSkinWidgetList {
 
     public PlayerSkinWidget getCenter() {
         return getVisible(0);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        for (int distance = VISIBLE_RADIUS; distance >= 2; distance--) {
+            renderSlot(guiGraphics, mouseX, mouseY, partialTick, -distance);
+            renderSlot(guiGraphics, mouseX, mouseY, partialTick, distance);
+        }
+        renderSlot(guiGraphics, mouseX, mouseY, partialTick, 0);
+        renderSlot(guiGraphics, mouseX, mouseY, partialTick, -1);
+        renderSlot(guiGraphics, mouseX, mouseY, partialTick, 1);
+    }
+
+    private void renderSlot(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, int offset) {
+        int slotIndex = offset + VISIBLE_RADIUS;
+        if (slotIndex >= 0 && slotIndex < ring.size()) ring.get(slotIndex).render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     public int getCenterAnchorX() {

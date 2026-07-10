@@ -63,7 +63,8 @@ public final class GuiDollRender {
 
     private static void submit(GuiGraphics gui, int left, int right, PreviewLayout layout, AvatarRenderState state) {
         applyPreviewLighting();
-        gui.submitEntityRenderState(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left, layout.expandedTop(), right, layout.expandedBottom());
+        int horizontalPadding = right - left;
+        gui.submitEntityRenderState(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left - horizontalPadding, layout.expandedTop(), right + horizontalPadding, layout.expandedBottom());
     }
 
     private static AvatarRenderState buildState(PlayerSkin skin, String selectionId, ResourceLocation texture, ResourceLocation boxTexture, ResourceLocation modelId, wily.legacy.skins.client.render.boxloader.BuiltBoxModel boxModel, float bboxHeight, float bboxWidth, float yawOffset, boolean crouching, float attackTime, boolean showCape) {
