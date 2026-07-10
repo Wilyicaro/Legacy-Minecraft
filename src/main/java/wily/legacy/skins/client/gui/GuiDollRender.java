@@ -23,7 +23,7 @@ public final class GuiDollRender {
     private static final float BASE_TRANSLATE_Y = BASE_BBOX_HEIGHT / 2.0F;
     private static final float SCALE_DIVISOR = 2.75F;
     private static final float CROUCH_Y_OFFSET = -0.25F;
-    private static final int MIN_RENDER_SIZE = 20;
+    private static final int MIN_RENDER_SIZE = 1;
 
     private GuiDollRender() {
     }
