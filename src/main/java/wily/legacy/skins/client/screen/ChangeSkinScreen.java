@@ -131,7 +131,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (isCompact480()) {
             uiScale = Math.min(1f, uiScale * 1.10f);
         } else {
-            uiScale = Math.min(1f, uiScale * 1.14f);
+            uiScale = Math.min(1f, uiScale * 1.10f);
         }
         tooltipWidth = Math.max(1, Math.round(layoutProfile.baseTooltipWidth() * uiScale));
     }
