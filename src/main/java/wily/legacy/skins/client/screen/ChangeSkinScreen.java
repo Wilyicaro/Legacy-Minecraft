@@ -44,11 +44,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             1.485f, 0.65f, 1.045f, 0.60f,
             ChangeSkinLayoutMetrics.DEFAULT
     );
-    private static final int SKIN_TICK_SOURCE_SIZE = 28;
+    private static final int SKIN_TICK_SOURCE_SIZE = 21;
     private static final int SKIN_TICK_FULL_FRAMEBUFFER_SIZE = SKIN_TICK_SOURCE_SIZE * 2;
     private static final int PADLOCK_TEXTURE_SIZE = 32;
     private static final int HEART_TEXTURE_SIZE = 9;
     private static final int PACK_BUTTON_BASE_HEIGHT = 20;
+    private static final int PACK_LIST_RECESS_HEIGHT_EXTRA = 3;
 
     private static final ReferenceSize FRAME_TEXTURE_SIZE = new ReferenceSize(1125, 818);
     private static final int PREVIEW_OPENING_RIGHT = 1095;
@@ -100,6 +101,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int TEXT_CENTER_INSET_X = 5;
     private static final int TEXT_CENTER_WIDTH_TRIM = 18;
     private static final int SKIN_NAME_BOTTOM_TRIM = 49;
+    private static final int SELECTED_SKIN_TEXT_Y_OFFSET = 5;
     private static final int THEME_TEXT_WIDTH_TRIM = 26;
     private static final int THEME_TEXT_GAP = 6;
     private static final int THEME_BOTTOM_INSET = 12;
@@ -352,7 +354,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int frameListTop = maxListBottom - rowPitch * visibleRows;
         int y = frameListTop - PACK_BUTTON_BORDER_OVERLAP;
         int packFrameRenderX = frameX - sc(2);
-        int packFrameRenderY = isCompact480() ? frameListTop - sc(3) : frameListTop - sc(4);
+        int packFrameRenderY = (isCompact480() ? frameListTop - sc(3) : frameListTop - sc(4))
+                - PACK_LIST_RECESS_HEIGHT_EXTRA;
         int packFrameRenderW = frameW + sc(4);
         int packFrameRenderH = frameY + frameH - packFrameRenderY;
         int packIconTop = panel.y + sc(FRAME_TOP);
@@ -649,6 +652,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         } else {
             skinNameY = panel.y + tooltipBox.getHeight() - sc(SKIN_NAME_BOTTOM_TRIM);
         }
+        skinNameY += SELECTED_SKIN_TEXT_Y_OFFSET;
         int maxTextWidth = Math.max(1,
                 (int) ((tooltipBox.getWidth() - sc(THEME_TEXT_WIDTH_TRIM)) / textScale));
         String clippedName = PlayerSkinWidget.clipText(minecraft.font, name, maxTextWidth);
@@ -659,7 +663,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
         String clippedTheme = PlayerSkinWidget.clipText(minecraft.font, theme, maxTextWidth);
         int themeY = skinNameY + scaledLineHeight + textGap;
-        int maxThemeY = panel.y + tooltipBox.getHeight() - sc(THEME_BOTTOM_INSET);
+        int maxThemeY = panel.y + tooltipBox.getHeight() - sc(THEME_BOTTOM_INSET)
+                + SELECTED_SKIN_TEXT_Y_OFFSET;
         drawScaledCentered(g, Component.literal(clippedTheme), textX, Math.min(themeY, maxThemeY),
                 LegacyRenderUtil.getDefaultTextColor(true), textScale, true);
     }
