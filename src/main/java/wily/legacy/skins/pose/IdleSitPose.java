@@ -47,11 +47,11 @@ public final class IdleSitPose {
         Minecraft mc = Minecraft.getInstance();
         if (mc != null && mc.level != null) {
             Player p = mc.level.getPlayerByUUID(uuid);
-            if (p == null || p.isFallFlying() || p.getAbilities().flying) {
+            if (p == null || p.isFallFlying()) {
                 IdleSitTracker.reset(uuid);
                 return false;
             }
-            moving = moving || !p.onGround();
+            moving = moving || (!p.onGround() && !p.getAbilities().flying);
         }
 
         if (state.pose != Pose.STANDING && state.pose != Pose.CROUCHING) {
