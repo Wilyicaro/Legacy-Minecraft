@@ -40,7 +40,8 @@ void main() {
     );
 
     if (floor(texCoord.x * 16) < 15) {
-        color = color * lightmapInfo.BlockLightColor;
+        vec3 blockLightColor = mix(lightmapInfo.BlockLightColor, vec3(1.0), lightmapInfo.NightVisionFactor);
+        color = color * blockLightColor;
     }
 
     color = mix(color, lightmapInfo.AmbientColor, lightmapInfo.AmbientLightFactor);
