@@ -6,6 +6,10 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.util.profiling.Profiler;
@@ -15,9 +19,9 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
 public class LegacyGamma implements AutoCloseable {
-    public static final LegacyGamma INSTANCE = new LegacyGamma();
-
     private final MappableRingBuffer ubo;
+    private GpuTexture inputTexture;
+    private GpuTextureView inputView;
 
     public LegacyGamma() {
         ubo = new MappableRingBuffer(() -> "gamma SamplerInfo", 130, 4);
@@ -31,22 +35,56 @@ public class LegacyGamma implements AutoCloseable {
         }
 
         RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
-        RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(target.getDepthTexture(), 1.0);
+        resizeInput(target);
+        commandEncoder.copyTextureToTexture(target.getColorTexture(), inputTexture, 0, 0, 0, 0, 0, target.width, target.height);
+        commandEncoder.clearDepthTexture(target.getDepthTexture(), 1.0);
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("legacyGamma");
         try (RenderPass renderPass = commandEncoder.createRenderPass(() -> "Display Legacy Gamma", target.getColorTextureView(), OptionalInt.empty(), target.useDepth ? target.getDepthTextureView() : null, OptionalDouble.empty())) {
             renderPass.setPipeline(LegacyRenderPipelines.GAMMA);
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("GammaInfo", this.ubo.currentBuffer());
-            renderPass.bindSampler("InSampler", target.getColorTextureView());
+            renderPass.bindSampler("InSampler", inputView);
             renderPass.draw(0, 3);
         }
         this.ubo.rotate();
         profilerFiller.pop();
     }
 
+    private void resizeInput(RenderTarget target) {
+        if (inputTexture != null && inputTexture.getWidth(0) == target.width && inputTexture.getHeight(0) == target.height) {
+            return;
+        }
+
+        closeInput();
+        inputTexture = RenderSystem.getDevice().createTexture(
+            "legacy gamma input",
+            GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING,
+            target.getColorTexture().getFormat(),
+            target.width,
+            target.height,
+            1,
+            1
+        );
+        inputTexture.setAddressMode(AddressMode.CLAMP_TO_EDGE);
+        inputTexture.setTextureFilter(FilterMode.NEAREST, false);
+        inputView = RenderSystem.getDevice().createTextureView(inputTexture);
+    }
+
+    private void closeInput() {
+        if (inputView != null) {
+            inputView.close();
+            inputView = null;
+        }
+        if (inputTexture != null) {
+            inputTexture.close();
+            inputTexture = null;
+        }
+    }
+
     @Override
     public void close() {
+        closeInput();
         ubo.close();
     }
 }

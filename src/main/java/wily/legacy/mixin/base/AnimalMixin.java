@@ -6,6 +6,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -90,7 +91,7 @@ public abstract class AnimalMixin extends AgeableMob {
 
     @Inject(method = "removeWhenFarAway", at = @At("HEAD"), cancellable = true)
     public void removeWhenFarAway(double distance, CallbackInfoReturnable<Boolean> cir) {
-        if (level() instanceof ServerLevel serverLevel && LegacyMobCaps.isEnabled(serverLevel) && legacy$despawnable) {
+        if (level() instanceof ServerLevel serverLevel && LegacyMobCaps.isEnabled(serverLevel) && legacy$despawnable && !legacy$isOwned()) {
             cir.setReturnValue(true);
         }
     }
@@ -99,7 +100,7 @@ public abstract class AnimalMixin extends AgeableMob {
     private void legacy$updateDespawnProtection() {
         if (!(level() instanceof ServerLevel serverLevel) || !LegacyMobCaps.isEnabled(serverLevel)) return;
         if (legacy$protectedPos != null && (tickCount + getId()) % legacy$despawnCheckInterval != 0) return;
-        if (legacy$protectedPos == null || isPersistenceRequired() || requiresCustomPersistence()) {
+        if (legacy$protectedPos == null || isPersistenceRequired() || requiresCustomPersistence() || legacy$isOwned()) {
             legacy$setDespawnProtected();
             return;
         }
@@ -117,6 +118,11 @@ public abstract class AnimalMixin extends AgeableMob {
         if (level().isClientSide()) return;
         legacy$protectedPos = blockPosition();
         legacy$despawnable = false;
+    }
+
+    @Unique
+    private boolean legacy$isOwned() {
+        return this instanceof OwnableEntity owned && owned.getOwnerReference() != null;
     }
 
     @Unique

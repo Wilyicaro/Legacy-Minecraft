@@ -115,8 +115,10 @@ public final class SkinSyncClient {
         if (!accumulator.isComplete()) return;
         STATE.assetChunks.remove(key);
         String assetKey = ClientSkinAssets.runtimeAssetKey(uuid, skinId);
-        if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(assetKey, accumulator.assemble());
-        else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, accumulator.assemble());
+        byte[] bytes = accumulator.assemble();
+        if (assetType == SkinSync.ASSET_TEXTURE) ClientSkinAssets.putTexture(assetKey, bytes);
+        else if (assetType == SkinSync.ASSET_MODEL) ClientSkinAssets.putModel(assetKey, bytes);
+        else if (assetType == SkinSync.ASSET_CAPE) ClientSkinAssets.putCape(assetKey, bytes);
         ClientSkinCache.set(uuid, skinId);
     }
 
@@ -206,6 +208,7 @@ public final class SkinSyncClient {
         ClientSkinAssets.AssetData assets = ClientSkinAssets.resolveAssetData(client, skinId);
         sendAssetChunks(skinId, SkinSync.ASSET_TEXTURE, assets.texture());
         sendAssetChunks(skinId, SkinSync.ASSET_MODEL, assets.model());
+        sendAssetChunks(skinId, SkinSync.ASSET_CAPE, assets.cape());
     }
 
     private static void sendAssetChunks(String skinId, int assetType, byte[] bytes) {

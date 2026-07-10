@@ -7,12 +7,12 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CubicSampler;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import wily.factoryapi.FactoryAPI;
@@ -70,8 +70,8 @@ public final class LegacyCloudAtmosphere {
         return CloudGeometry.DRAW_DISTANCE_CHUNKS * 16;
     }
 
-    public static float getCloudFogEndBlocks(float environmentalEnd) {
-        return Math.max(environmentalEnd, getCloudDrawDistanceBlocks());
+    public static float getCloudFogEndBlocks() {
+        return getCloudDrawDistanceBlocks();
     }
 
     public static boolean shouldUseConsoleAtmosphere(ClientLevel level) {
@@ -82,6 +82,12 @@ public final class LegacyCloudAtmosphere {
         if (!shouldUseConsoleAtmosphere(level)) {
             return false;
         }
+
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        if (camera == null || isNightVisionActive(camera)) {
+            return false;
+        }
+
         float sampledPartialTick = partialTick - Mth.floor(partialTick);
         if (getSunriseColor(level.getTimeOfDay(sampledPartialTick)) == 0) {
             return false;
@@ -90,7 +96,7 @@ public final class LegacyCloudAtmosphere {
         float warmViewThreshold = areLegacyCloudHeightAndTextureEnabled()
             ? CloudTintTuning.LEGACY_HEIGHT_WARM_VIEW_THRESHOLD
             : CloudTintTuning.NORMAL_WARM_VIEW_THRESHOLD;
-        return getSunriseCloudViewBlend(level, sampledPartialTick) > warmViewThreshold;
+        return getSunriseCloudViewBlend(level, camera, sampledPartialTick) > warmViewThreshold;
     }
 
     public static boolean shouldUsePackCloudShader() {
@@ -121,7 +127,7 @@ public final class LegacyCloudAtmosphere {
     public static int getAtmosphericFogColor(ClientLevel level, Camera camera, int renderDistanceChunks, float partialTick) {
         float[] rgb = getDimensionFogRgb(level, camera, partialTick);
 
-        if (renderDistanceChunks >= 4) {
+        if (!isNightVisionActive(camera) && renderDistanceChunks >= 4) {
             int sunriseColor = getSunriseColor(level.getTimeOfDay(partialTick));
             if (sunriseColor != 0) {
                 float sunriseBlend = getSunriseFogBlend(level, camera, partialTick, sunriseColor);
@@ -191,9 +197,12 @@ public final class LegacyCloudAtmosphere {
 
     private static float[] getDimensionFogRgb(ClientLevel level, Camera camera, float partialTick) {
         float brightness = getDayBrightness(level.getTimeOfDay(partialTick));
-        BlockPos blockPos = BlockPos.containing(camera.getPosition());
-        Biome biome = level.getBiome(blockPos).value();
-        Vec3 fogColor = level.effects().getBrightnessDependentFogColor(Vec3.fromRGB24(biome.getFogColor()), brightness);
+        Vec3 samplePosition = camera.getPosition().subtract(2.0d, 2.0d, 2.0d).scale(0.25d);
+        Vec3 baseColor = CubicSampler.gaussianSampleVec3(
+            samplePosition,
+            (x, y, z) -> Vec3.fromRGB24(level.getBiomeManager().getNoiseBiomeAtQuart(x, y, z).value().getFogColor())
+        );
+        Vec3 fogColor = level.effects().getBrightnessDependentFogColor(baseColor, brightness);
         return new float[]{
             (float) fogColor.x,
             (float) fogColor.y,
@@ -239,12 +248,7 @@ public final class LegacyCloudAtmosphere {
         return Mth.clamp(timeWeight * FogTuning.SUNRISE_TINT_STRENGTH * Mth.sqrt(horizontalFacing) * Mth.sqrt(horizonWeight), 0.0f, 1.0f);
     }
 
-    private static float getSunriseCloudViewBlend(ClientLevel level, float partialTick) {
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        if (camera == null) {
-            return 0.0f;
-        }
-
+    private static float getSunriseCloudViewBlend(ClientLevel level, Camera camera, float partialTick) {
         float horizontalFacing = getSunriseHorizontalFacing(level, camera, partialTick);
         if (horizontalFacing <= 0.0f) {
             return 0.0f;
@@ -255,6 +259,12 @@ public final class LegacyCloudAtmosphere {
         float softenedFacing = Mth.sqrt(horizontalFacing);
         float directionalWeight = softenedFacing * (0.65f + 0.35f * softenedFacing);
         return Mth.clamp(directionalWeight * Mth.sqrt(horizonWeight), 0.0f, 1.0f);
+    }
+
+    private static boolean isNightVisionActive(Camera camera) {
+        return camera.getEntity() instanceof LivingEntity entity
+            && entity.hasEffect(MobEffects.NIGHT_VISION)
+            && !entity.hasEffect(MobEffects.DARKNESS);
     }
 
     private static float getSunriseHorizontalFacing(ClientLevel level, Camera camera, float partialTick) {
