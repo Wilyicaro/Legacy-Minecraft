@@ -18,10 +18,12 @@ public abstract class RenderTypeMixin {
     @Final
     public static RenderType.CompositeRenderType LINES;
 
-    private static boolean legacy$skinpackCape(ResourceLocation texture) {
+    private static boolean legacy$capeWithCutout(ResourceLocation texture) {
         if (texture == null) return false;
         String path = texture.getPath();
-        return path != null && path.contains("skinpacks/") && path.contains("/capes/");
+        if (path == null) return false;
+        if (path.startsWith("runtime_capes/")) return true;
+        return path.contains("skinpacks/") && (path.contains("/capes/") || path.contains("/cape/"));
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderStateShard$LineStateShard;<init>(Ljava/util/OptionalDouble;)V", ordinal = 0))
@@ -31,21 +33,21 @@ public abstract class RenderTypeMixin {
 
     @Inject(method = "entityTranslucent(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entityTranslucent(ResourceLocation texture, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
+        if (legacy$capeWithCutout(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
     }
 
     @Inject(method = "entityTranslucent(Lnet/minecraft/resources/ResourceLocation;Z)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entityTranslucent(ResourceLocation texture, boolean outline, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
+        if (legacy$capeWithCutout(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
     }
 
     @Inject(method = "entitySolid(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entitySolid(ResourceLocation texture, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
+        if (legacy$capeWithCutout(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
     }
 
     @Inject(method = "entityNoOutline(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
     private static void legacy$entityNoOutline(ResourceLocation texture, CallbackInfoReturnable<RenderType> cir) {
-        if (legacy$skinpackCape(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
+        if (legacy$capeWithCutout(texture)) cir.setReturnValue(RenderType.entityCutoutNoCull(texture));
     }
 }
