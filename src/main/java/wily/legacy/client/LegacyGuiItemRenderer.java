@@ -95,7 +95,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     }
 
     public static int getScale(Matrix3x2f matrix) {
-        return Math.round(Math.max(getXScale(matrix), getYScale(matrix)) * 16);
+        int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
+        return Math.max(1, Mth.ceil(Math.max(getXScale(matrix), getYScale(matrix)) * 16 * guiScale));
     }
 
     private void createAtlasTextures(int i) {
@@ -111,7 +112,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     public void prepareItemElements(FeatureRenderDispatcher dispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {
         if (!renderState.getItemModelIdentities().isEmpty()) {
             int i = this.getGuiScaleInvalidatingItemAtlasIfChanged();
-            int j = size * i;
+            int j = size;
             int k = this.calculateAtlasSizeInPixels(renderState, j);
             if (this.itemsAtlas == null) {
                 this.createAtlasTextures(k);

@@ -75,7 +75,7 @@ public class GuiRendererMixin {
     private Consumer<GuiItemRenderState> prepareItemElements(Consumer<GuiItemRenderState> consumer) {
         return renderState -> {
             LegacyGuiItemRenderState legacyRenderState = LegacyGuiItemRenderState.of(renderState);
-            if (legacyRenderState.size() == 16 && legacyRenderState.opacity() == 1.0) consumer.accept(renderState);
+            if (legacyRenderState.size() == 16 * Minecraft.getInstance().getWindow().getGuiScale() && legacyRenderState.opacity() == 1.0) consumer.accept(renderState);
             else
                 guiItemRenderers.computeIfAbsent(((long) legacyRenderState.size() << 32) | (Float.floatToIntBits(LegacyOptions.enhancedItemTranslucency.get() ? 1.0f : legacyRenderState.opacity()) & 4294967295L), LegacyGuiItemRenderer::new).markValid();
         };
