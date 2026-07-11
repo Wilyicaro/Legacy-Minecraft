@@ -82,10 +82,10 @@ public class SubtitleOverlayMixin {
 
                 while(iterator.hasNext()) {
                     SubtitleOverlay.Subtitle subtitle2 = iterator.next();
-                    //? if >=1.20.5 {
+                    //? if >=1.21 {
                     subtitle2.purgeOldInstances(3000.0 * d);
                     //?}
-                    if (/*? if <1.20.5 {*//*subtitle2.getTime() + (double)3000.0F * d <= (double)Util.getMillis()*//*?} else {*/!subtitle2.isStillActive()/*?}*/) {
+                    if (/*? if <1.21 {*//*subtitle2.getTime() + (double)3000.0F * d <= (double)Util.getMillis()*//*?} else {*/!subtitle2.isStillActive()/*?}*/) {
                         iterator.remove();
                     } else {
                         j = Math.max(j, this.minecraft.font.width(subtitle2.getText()));
@@ -101,12 +101,12 @@ public class SubtitleOverlayMixin {
                 guiGraphics.pose().translate( - (j / 2.0) - 2.0, 0 ,0);
                 for(SubtitleOverlay.Subtitle subtitle2 : list) {
                     Component component = subtitle2.getText();
-                    //? if >=1.20.5 {
+                    //? if >=1.21 {
                     SubtitleOverlay.SoundPlayedAt soundPlayedAt = subtitle2.getClosest(vec3);
                     if (soundPlayedAt == null) continue;
                     //?}
 
-                    Vec3 vec34 = /*? if <1.20.5 {*//*subtitle2.getLocation()*//*?} else {*/soundPlayedAt.location()/*?}*/.subtract(vec3).normalize();
+                    Vec3 vec34 = /*? if <1.21 {*//*subtitle2.getLocation()*//*?} else {*/soundPlayedAt.location()/*?}*/.subtract(vec3).normalize();
                     double e = vec33.dot(vec34);
                     double f = vec32.dot(vec34);
                     boolean bl = f > (double)0.5F;
@@ -114,7 +114,7 @@ public class SubtitleOverlayMixin {
                     Objects.requireNonNull(this.minecraft.font);
                     int n = lineHeight / 2;
                     int o = this.minecraft.font.width(component);
-                    int p = Mth.floor(Mth.clampedLerp(255.0F, 75.0F, (Util.getMillis() - /*? if <1.20.5 {*//*subtitle2.getTime()*//*?} else {*/soundPlayedAt.time()/*?}*/) / 3000.0 * d));
+                    int p = Mth.floor(Mth.clampedLerp(255.0F, 75.0F, (Util.getMillis() - /*? if <1.21 {*//*subtitle2.getTime()*//*?} else {*/soundPlayedAt.time()/*?}*/) / 3000.0 * d));
                     int q = p << 16 | p << 8 | p;
 
                     int r = q - 16777216;
