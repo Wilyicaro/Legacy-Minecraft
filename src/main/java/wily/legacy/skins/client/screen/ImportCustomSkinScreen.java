@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -14,7 +15,6 @@ import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.TickBox;
 import wily.legacy.skins.SkinsClientBootstrap;
-import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.SkinPackFiles;
@@ -36,6 +36,9 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
     private static final Component THEME = Component.translatable("legacy.menu.custom_skin_theme");
     private static final Component CHOOSE = Component.translatable("legacy.menu.choose_skin_png");
     private static final Component REPLACE = Component.translatable("legacy.menu.replace_skin_png");
+    private static final Component CHOOSE_CAPE = Component.translatable("legacy.menu.choose_cape_png");
+    private static final Component REPLACE_CAPE = Component.translatable("legacy.menu.replace_cape_png");
+    private static final Component REMOVE_CAPE = Component.translatable("legacy.menu.remove_cape");
     private static final Component CHARACTER_ANIMATIONS = Component.translatable("legacy.menu.character_animations");
     private static final Component SLIM_MODE = Component.translatable("legacy.menu.slim_mode");
     private static final Component CONFIRM = Component.translatable("legacy.menu.confirm");
@@ -46,19 +49,22 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
     private final Consumer<String> importedAction;
     private final String initialName;
     private final String initialTheme;
+    private final boolean initialCape;
     private final List<String> poseKeys = new ArrayList<>();
     private EditBox nameBox;
     private EditBox themeBox;
-    private Button poseButton, skinButton;
+    private Button poseButton, skinButton, capeButton, removeCapeButton;
     private Path skinPath;
+    private Path capePath;
+    private boolean capeRemoved;
     private boolean openedPicker;
     private boolean closeOnFirstCancel;
 
     public ImportCustomSkinScreen(Screen parent, Screen rootParent, String packId, Consumer<String> importedAction) {
-        this(parent, rootParent, packId, null, importedAction, "", "", List.of());
+        this(parent, rootParent, packId, null, importedAction, "", "", List.of(), false);
     }
 
-    private ImportCustomSkinScreen(Screen parent, Screen rootParent, String packId, String skinId, Consumer<String> importedAction, String initialName, String initialTheme, List<String> initialPoses) {
+    private ImportCustomSkinScreen(Screen parent, Screen rootParent, String packId, String skinId, Consumer<String> importedAction, String initialName, String initialTheme, List<String> initialPoses, boolean initialCape) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> getBaseHeight(skinId), skinId == null ? IMPORT_TITLE : Component.empty(), skinId == null ? IMPORT_MESSAGE : Component.empty(), screen -> {
         });
         this.rootParent = rootParent;
@@ -67,12 +73,13 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         this.importedAction = importedAction;
         this.initialName = initialName == null ? "" : initialName;
         this.initialTheme = initialTheme == null ? "" : initialTheme;
+        this.initialCape = initialCape;
         if (initialPoses != null) poseKeys.addAll(initialPoses);
         okAction = screen -> importSkin();
     }
 
-    public static ImportCustomSkinScreen edit(Screen parent, Screen rootParent, String packId, String skinId, String name, String theme, List<String> poses, Consumer<String> savedAction) {
-        return new ImportCustomSkinScreen(parent, rootParent, packId, skinId, savedAction, name, theme, poses);
+    public static ImportCustomSkinScreen edit(Screen parent, Screen rootParent, String packId, String skinId, String name, String theme, List<String> poses, boolean hasCape, Consumer<String> savedAction) {
+        return new ImportCustomSkinScreen(parent, rootParent, packId, skinId, savedAction, name, theme, poses, hasCape);
     }
 
     private static int getBaseHeight(String skinId) {
@@ -164,16 +171,16 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         return themeY() + fieldHeight() + (sd() ? 10 : 12);
     }
 
-    private int skinY() {
+    private int capeY() {
         return (showPoseButton() ? poseY() + fieldHeight() : themeY() + fieldHeight()) + (sd() ? 6 : 8);
     }
 
-    private int fileY() {
-        return skinY() + fieldHeight() + (sd() ? 6 : 8);
+    private int skinY() {
+        return capeY() + fieldHeight() + (sd() ? 1 : 2);
     }
 
     private int formBottomY() {
-        return fileY() + font.lineHeight;
+        return skinY() + fieldHeight();
     }
 
     private int buttonsY() {
@@ -198,9 +205,18 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
                     .bounds(fieldX(), poseY(), renderableVList.listWidth, fieldHeight())
                     .build());
         }
+        capeButton = addRenderableWidget(Button.builder(CHOOSE_CAPE, button -> browseForCape())
+                .bounds(fieldX(), capeY(), renderableVList.listWidth, fieldHeight())
+                .build());
+        removeCapeButton = addRenderableWidget(Button.builder(Component.literal("X"), button -> removeCape())
+                .bounds(fieldX() + renderableVList.listWidth - fieldHeight(), capeY(), fieldHeight(), fieldHeight())
+                .build());
+        removeCapeButton.setTooltip(Tooltip.create(REMOVE_CAPE));
+        updateCapeButtons();
         skinButton = addRenderableWidget(Button.builder(skinId == null ? CHOOSE : REPLACE, button -> browseForSkin())
                 .bounds(fieldX(), skinY(), renderableVList.listWidth, fieldHeight())
                 .build());
+        updateSkinButton();
         setInitialFocus(nameBox);
         updateImportButtonStatus();
         if (skinId == null && !openedPicker && minecraft != null) {
@@ -239,15 +255,11 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         if (skinButton == null) return;
         int textX = fieldX();
-        int fileValueY = fileY();
-        String fileText = skinPath == null ? null : PlayerSkinWidget.clipText(font, skinPath.getFileName().toString(), renderableVList.listWidth);
         Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> {
             if (editing())
                 guiGraphics.drawString(font, EDIT_TITLE, textX, titleY(), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.drawString(font, NAME, textX, nameLabelY(), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.drawString(font, THEME, textX, themeLabelY(), CommonColor.GRAY_TEXT.get(), false);
-            if (fileText != null)
-                guiGraphics.drawString(font, fileText, textX, fileValueY, CommonColor.GRAY_TEXT.get(), false);
         });
     }
 
@@ -279,19 +291,59 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
                 nameBox.setValue(dot > 0 ? fileName.substring(0, dot) : fileName);
             }
             updateImportButtonStatus();
+            updateSkinButton();
         } catch (Exception ex) {
             showError(ex);
         }
+    }
+
+    private void updateSkinButton() {
+        if (skinButton == null) return;
+        skinButton.setTooltip(skinPath == null || skinPath.getFileName() == null ? null : Tooltip.create(Component.literal(skinPath.getFileName().toString())));
+    }
+
+    private void browseForCape() {
+        try {
+            Path selected = SkinPackFiles.choosePng(minecraft, CHOOSE_CAPE.getString());
+            if (selected == null) return;
+            capePath = selected;
+            capeRemoved = false;
+            updateCapeButtons();
+        } catch (Exception ex) {
+            showError(ex);
+        }
+    }
+
+    private void removeCape() {
+        capePath = null;
+        capeRemoved = true;
+        updateCapeButtons();
+    }
+
+    private boolean hasCape() {
+        return capePath != null || initialCape && !capeRemoved;
+    }
+
+    private void updateCapeButtons() {
+        if (capeButton == null || removeCapeButton == null) return;
+        boolean hasCape = hasCape();
+        int gap = sd() ? 2 : 4;
+        int removeWidth = fieldHeight();
+        capeButton.setMessage(hasCape ? REPLACE_CAPE : CHOOSE_CAPE);
+        capeButton.setWidth(hasCape ? renderableVList.listWidth - removeWidth - gap : renderableVList.listWidth);
+        capeButton.setTooltip(capePath == null || capePath.getFileName() == null ? null : Tooltip.create(Component.literal(capePath.getFileName().toString())));
+        removeCapeButton.visible = hasCape;
+        removeCapeButton.active = hasCape;
     }
 
     private void importSkin() {
         if (minecraft == null || nameBox == null) return;
         try {
             String savedSkinId = skinId == null
-                    ? CustomSkinPackStore.importSkin(minecraft, packId, nameBox.getValue(), themeBox == null ? "" : themeBox.getValue(), List.copyOf(poseKeys), skinPath)
+                    ? CustomSkinPackStore.importSkin(minecraft, packId, nameBox.getValue(), themeBox == null ? "" : themeBox.getValue(), List.copyOf(poseKeys), skinPath, capePath)
                     : skinId;
             if (skinId != null) {
-                CustomSkinPackStore.updateSkin(minecraft, packId, skinId, nameBox.getValue(), themeBox == null ? "" : themeBox.getValue(), List.copyOf(poseKeys), skinPath);
+                CustomSkinPackStore.updateSkin(minecraft, packId, skinId, nameBox.getValue(), themeBox == null ? "" : themeBox.getValue(), List.copyOf(poseKeys), skinPath, capePath, capeRemoved);
             }
             if (importedAction != null) {
                 importedAction.accept(savedSkinId);

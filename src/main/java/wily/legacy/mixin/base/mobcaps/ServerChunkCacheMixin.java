@@ -1,5 +1,4 @@
-//? if >=1.21.5 {
-/*package wily.legacy.mixin.base.mobcaps;
+package wily.legacy.mixin.base.mobcaps;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.server.level.ServerChunkCache;
@@ -22,13 +21,21 @@ public class ServerChunkCacheMixin {
     @Final
     private ServerLevel level;
 
-    @ModifyExpressionValue(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/NaturalSpawner;getFilteredSpawningCategories(Lnet/minecraft/world/level/NaturalSpawner$SpawnState;ZZZ)Ljava/util/List;"))
+    //? if >=1.21.3 && <1.21.5 {
+    /*@ModifyExpressionValue(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/NaturalSpawner;getFilteredSpawningCategories(Lnet/minecraft/world/level/NaturalSpawner$SpawnState;ZZZ)Ljava/util/List;"))
+    *///?} else if >=1.21.5 {
+    /*@ModifyExpressionValue(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/NaturalSpawner;getFilteredSpawningCategories(Lnet/minecraft/world/level/NaturalSpawner$SpawnState;ZZZ)Ljava/util/List;"))
+    *///?}
     private List<MobCategory> getFilteredSpawningCategories(List<MobCategory> categories) {
-        if (!LegacyMobCaps.isEnabled(level) || !Level.OVERWORLD.equals(level.dimension()) || categories.contains(MobCategory.CREATURE)) return categories;
-        if (!ConsoleMobCaps.canNaturalCategorySpawn(level, MobCategory.CREATURE)) return categories;
+        if (!LegacyMobCaps.isEnabled(level) || !Level.OVERWORLD.equals(level.dimension()) || categories.contains(MobCategory.CREATURE)) {
+            return categories;
+        }
+        if (!ConsoleMobCaps.canNaturalCategorySpawn(level, MobCategory.CREATURE)) {
+            return categories;
+        }
+
         List<MobCategory> result = new ArrayList<>(categories);
         result.add(MobCategory.CREATURE);
         return result;
     }
 }
-*///?}

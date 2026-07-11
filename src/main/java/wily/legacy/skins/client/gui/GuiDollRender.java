@@ -54,8 +54,8 @@ public final class GuiDollRender {
     private static final float BASE_BBOX_WIDTH = 0.6F;
     private static final float BASE_TRANSLATE_Y = BASE_BBOX_HEIGHT / 2.0F;
     private static final float SCALE_DIVISOR = 2.75F;
-    private static final float CROUCH_Y_OFFSET = -0.125F;
-    private static final int MIN_RENDER_SIZE = 20;
+    private static final float CROUCH_Y_OFFSET = -0.25F;
+    private static final int MIN_RENDER_SIZE = 1;
     private static final int CAPE_TEXTURE_WIDTH = 64;
     private static final int CAPE_TEXTURE_HEIGHT = 32;
     private static PlayerModel wideModel;
@@ -72,11 +72,10 @@ public final class GuiDollRender {
         if (mc != null) mc.getTextureManager().getTexture(skinTexture);
 
         ClientSkinAssets.ResolvedSkin resolved = ClientSkinAssets.resolveSkin(selectionId, skinTexture, null, null);
-        var entry = resolved == null ? null : resolved.entry();
         ResourceLocation resolvedTexture = resolved != null && resolved.texture() != null ? resolved.texture() : skinTexture;
         ResourceLocation boxTexture = resolved != null && resolved.boxTexture() != null ? resolved.boxTexture() : resolvedTexture;
         BuiltBoxModel boxModel = resolved == null ? null : resolved.boxModel();
-        ResourceLocation capeTexture = ClientSkinAssets.hasCape(resolved) && entry != null ? entry.cape() : null;
+        ResourceLocation capeTexture = ClientSkinAssets.hasCape(resolved) ? resolved.capeTexture() : null;
         if (mc != null && boxTexture != null) mc.getTextureManager().getTexture(boxTexture);
         if (mc != null && capeTexture != null) mc.getTextureManager().getTexture(capeTexture);
         renderResolvedDollInRect(gui, selectionId, resolvedTexture, boxTexture, capeTexture, resolved == null ? null : resolved.modelId(), boxModel, ClientSkinAssets.isSlimModel(selectionId, resolved), yawOffset, crouching, attackTime, partialTick, left, top, right, bottom, sizeCap);
@@ -99,7 +98,8 @@ public final class GuiDollRender {
         float centerX = (left + right) / 2.0F;
         float centerY = (top + bottom) / 2.0F;
 
-        renderModelInRect(gui, model, selectionId, texture, boxTexture, capeTexture, modelId, boxModel, centerX, centerY, size, yawOffset, crouching, attackTime, partialTick, left, top - baseHeight, right, bottom + baseHeight);
+        int horizontalPadding = right - left;
+        renderModelInRect(gui, model, selectionId, texture, boxTexture, capeTexture, modelId, boxModel, centerX, centerY, size, yawOffset, crouching, attackTime, partialTick, left - horizontalPadding, top - baseHeight, right + horizontalPadding, bottom + baseHeight);
     }
 
     private static PlayerModel getModel(boolean slim) {

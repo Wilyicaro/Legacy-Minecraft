@@ -212,6 +212,9 @@
     "PaintingRendererMixin",
     "skins.client.LivingEntityRendererAccessor",
     "skins.client.PlayerSkinMixin",
+    //? if <1.21.2 {
+    "skins.client.BirthdayCapeLayerMixin",
+    //?}
     //? if >=1.21.2 {
     /*"skins.client.SkinIdStateMixin",
     "skins.client.PlayerRendererSkinStateMixin",
@@ -312,10 +315,10 @@
     "mobcaps.ItemFrameItemMixin",
     "mobcaps.NaturalSpawnerMixin",
     "mobcaps.PhantomSpawnerMixin",
-    //? if >=1.21.5 {
+    //? if >=1.21.3 {
     /*"mobcaps.ServerChunkCacheMixin",
     *///?}
-    "mobcaps.ServerLevelMixin",
+    "mobcaps.PersistentEntitySectionManagerMixin",
     "mobcaps.SpawnEggItemMixin",
     "mobcaps.ThrownEggMixin",
     "ItemStackMixin",

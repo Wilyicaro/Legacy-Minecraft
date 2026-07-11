@@ -40,6 +40,7 @@ public final class ClientSkinAssets {
     private static final Map<String, byte[]> BOX_TEXTURE_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> CAPE_BYTES = new ConcurrentHashMap<>();
     private static final Map<String, byte[]> MODEL_BYTES = new ConcurrentHashMap<>();
+    private static final Set<String> CAPE_ASSETS = ConcurrentHashMap.newKeySet();
     //? if >1.20.1 {
     private static final Map<String, PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, PlayerSkin> SKIN_CACHE_CAPE = new ConcurrentHashMap<>();
@@ -116,10 +117,9 @@ public final class ClientSkinAssets {
 
     private static ResourceLocation resolveCape(String assetKey, String skinId, SkinEntry entry) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return null;
-        ResourceLocation cape = assetKey == null ? null : CAPES.get(assetKey);
-        if (cape != null) return cape;
-        cape = CAPES.get(skinId);
-        return cape != null ? cape : entry != null ? entry.cape() : null;
+        if (assetKey != null && CAPE_ASSETS.contains(assetKey)) return CAPES.get(assetKey);
+        if (CAPE_ASSETS.contains(skinId)) return CAPES.get(skinId);
+        return entry == null ? null : entry.cape();
     }
 
     private static ResourceLocation resolveBoxTexture(String assetKey, String skinId, ResourceLocation modelId, ResourceLocation texture) {
@@ -262,8 +262,9 @@ public final class ClientSkinAssets {
     }
 
     public static void putCape(String skinId, byte[] capePng) {
-        if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return;
+        if (SkinIdUtil.isBlankOrAutoSelect(skinId) || capePng == null) return;
         invalidateSkinCache(skinId);
+        CAPE_ASSETS.add(skinId);
         putTextureInternal(skinId, capePng, CAPE_BYTES, CAPES, "cape|" + skinId, "legacy_runtime_cape_");
     }
 
@@ -325,6 +326,7 @@ public final class ClientSkinAssets {
         BOX_TEXTURE_BYTES.clear();
         CAPE_BYTES.clear();
         MODEL_BYTES.clear();
+        CAPE_ASSETS.clear();
         //? if >=1.20.5 {
         SKIN_CACHE.clear();
         SKIN_CACHE_CAPE.clear();

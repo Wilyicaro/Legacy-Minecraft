@@ -899,7 +899,7 @@ public class ScreenUtil {
             graphics.flush();
             FactoryScreenUtil.enableBlend();
             FactoryScreenUtil.disableDepthTest();
-            float tweakedGamma = gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f;
+            float tweakedGamma = gamma * 1.5f + 0.5f;
             //? if <1.21.5 {
             gammaEffect.passes.forEach(p-> p./*? if <1.21.2 {*/getEffect/*?} else {*//*getShader*//*?}*/().safeGetUniform("gamma").set(tweakedGamma));
             //?}

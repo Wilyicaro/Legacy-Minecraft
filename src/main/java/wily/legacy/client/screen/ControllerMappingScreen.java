@@ -28,6 +28,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                     o -> o.getRenderableVList().addOptions(
                             LegacyOptions.selectedController,
                             LegacyOptions.selectedControllerHandler,
+                            LegacyOptions.controllerPollingRate,
                             LegacyOptions.controllerDoubleClick,
                             LegacyOptions.controllerVirtualCursor,
                             LegacyOptions.legacyCursor,
@@ -165,7 +166,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     public void bindingStateTick(BindingState state) {
         if (selectedMapping != null) {
             if (state.is(ControllerBinding.BACK)) {
-                if (state.canClick() && state.timePressed >= state.getDefaultDelay())
+                if (state.crossedTime(state.getDefaultDelay()))
                     applyBinding(ControllerBinding.BACK);
                 else if (state.released) applyBinding(null);
             }

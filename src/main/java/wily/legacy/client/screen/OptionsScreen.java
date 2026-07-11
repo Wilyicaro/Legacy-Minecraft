@@ -651,7 +651,8 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.legacyIntroAndReloading,
                                     LegacyOptions.legacyLoadingAndConnecting,
                                     LegacyOptions.legacyPanorama,
-                                    LegacyOptions.displayRealmsButton);
+                                    LegacyOptions.displayRealmsButton,
+                                    LegacyOptions.displayReinstallContentButton);
                             if (FactoryAPI.isModLoaded("sodium")) {
                                 o.renderableVList.addOptions(LegacyOptions.hideSodiumSettings);
                             }

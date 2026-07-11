@@ -37,7 +37,8 @@ void main() {
     );
 
     if (floor(texCoord.x * 16) < 15) {
-        color = color * BlockLightColor;
+        vec3 blockLightColor = mix(BlockLightColor, vec3(1.0), NightVisionFactor);
+        color = color * blockLightColor;
     }
 
     if (UseBrightLightmap != 0) {

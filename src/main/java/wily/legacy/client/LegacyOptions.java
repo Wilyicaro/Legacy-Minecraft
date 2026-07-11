@@ -309,6 +309,7 @@ public class LegacyOptions {
         ControllerBinding.LEFT_STICK.state().block(2);
         if (Legacy4JClient.controllerManager.connectedController != null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);
     }));
+    public static final FactoryConfig<Integer> controllerPollingRate = CLIENT_STORAGE.register(createInteger("controllerPollingRate", i -> Component.translatable("legacy.options.controllerPollingRate.tooltip"), (c, i) -> CommonComponents.optionNameValue(c, Component.literal(i + " ms")), 1, () -> 16, 8, i -> Legacy4JClient.controllerManager.restartPoller()));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b-> {}));
     public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBoolean("unfocusedInputs", false));
@@ -454,6 +455,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> menusWithBackground = CLIENT_STORAGE.register(createBoolean("menusWithBackground", false));
     public static final FactoryConfig<Boolean> legacyPanorama = CLIENT_STORAGE.register(createBoolean("legacyPanorama", true));
     public static final FactoryConfig<Boolean> displayRealmsButton = CLIENT_STORAGE.register(createBoolean("displayRealmsButton", true));
+    public static final FactoryConfig<Boolean> displayReinstallContentButton = CLIENT_STORAGE.register(createBoolean("displayReinstallContentButton", true));
     public static final FactoryConfig<Boolean> hideSodiumSettings = CLIENT_STORAGE.register(createBoolean("hideSodiumSettings", false));
     public static final FactoryConfig<Boolean> hideExperimentalWorldWarning = CLIENT_STORAGE.register(createBoolean("hideExperimentalWorldWarning", false));
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));

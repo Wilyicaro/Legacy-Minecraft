@@ -17,6 +17,7 @@ import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
+import wily.legacy.skins.client.util.BirthdayCapeUtil;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class PlayerSkinMixin {
@@ -33,11 +34,16 @@ public abstract class PlayerSkinMixin {
     @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true, require = 0)
     private void consoleskins$overrideSkin(CallbackInfoReturnable<PlayerSkin> callbackInfo) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
+        PlayerSkin skin = callbackInfo.getReturnValue();
+        if (skin == null) return;
+        boolean blockedByElytra = player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA);
         ClientSkinAssets.ResolvedSkin resolved = consoleskins$resolveSkin();
-        if (resolved == null || callbackInfo.getReturnValue() == null) return;
-        boolean showCape = ClientSkinAssets.shouldShowCape(resolved, player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA));
-        PlayerSkin skin = ClientSkinAssets.resolvePlayerSkin(SkinFairness.effectiveSkinId(Minecraft.getInstance(), ClientSkinCache.get(player.getUUID(), player.getScoreboardName())), resolved, showCape);
-        if (skin != null) callbackInfo.setReturnValue(skin);
+        if (resolved != null) {
+            boolean showCape = ClientSkinAssets.shouldShowCape(resolved, blockedByElytra);
+            PlayerSkin customSkin = ClientSkinAssets.resolvePlayerSkin(SkinFairness.effectiveSkinId(Minecraft.getInstance(), ClientSkinCache.get(player.getUUID(), player.getScoreboardName())), resolved, showCape);
+            if (customSkin != null) skin = customSkin;
+        }
+        callbackInfo.setReturnValue(BirthdayCapeUtil.apply(skin, blockedByElytra));
     }
     //?} else {
     /*@Inject(method = "getSkinTextureLocation", at = @At("RETURN"), cancellable = true, require = 0)
@@ -50,8 +56,10 @@ public abstract class PlayerSkinMixin {
     private void consoleskins$overrideCloakTexture(CallbackInfoReturnable<ResourceLocation> callbackInfo) {
         AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
         ClientSkinAssets.ResolvedSkin resolved = consoleskins$resolveSkin();
-        boolean showCape = ClientSkinAssets.shouldShowCape(resolved, player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA));
+        boolean blockedByElytra = player.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA);
+        boolean showCape = ClientSkinAssets.shouldShowCape(resolved, blockedByElytra);
         if (showCape && resolved.capeTexture() != null) callbackInfo.setReturnValue(resolved.capeTexture());
+        if (!blockedByElytra && BirthdayCapeUtil.isActiveNow()) callbackInfo.setReturnValue(BirthdayCapeUtil.texture());
     }
 
     @Inject(method = "getModelName", at = @At("RETURN"), cancellable = true, require = 0)

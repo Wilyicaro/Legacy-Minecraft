@@ -17,6 +17,9 @@ import wily.legacy.skins.skin.SkinIdUtil;
 import java.util.EnumMap;
 
 public final class MenuDollPose {
+    private static final float MENU_DOLL_WALK_SPEED = 3.63825F;
+    private static final float MENU_DOLL_WALK_AMPLITUDE = 0.101871F;
+
     private MenuDollPose() {
     }
 
@@ -203,8 +206,7 @@ public final class MenuDollPose {
             head.yRot = 0.15F;
         }
         float t = (System.currentTimeMillis() % 1_000_000L) / 1000.0F;
-        float speed = 3.0F;
-        float swing = (float) Math.sin(t * speed) * 0.084F;
+        float swing = (float) Math.sin(t * MENU_DOLL_WALK_SPEED) * MENU_DOLL_WALK_AMPLITUDE;
         model.rightArm.xRot += swing;
         model.leftArm.xRot -= swing;
         model.rightLeg.xRot -= swing;

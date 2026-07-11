@@ -1,8 +1,11 @@
 package wily.legacy.mixin.base;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +24,9 @@ public abstract class ClientLevelMixin {
 
     @Inject(method = "getCloudColor", at = @At("RETURN"), cancellable = true)
     private void getCloudColor(float partialTick, CallbackInfoReturnable</*? if <1.21.2 {*/Vec3/*?} else {*//*Integer*//*?}*/> cir) {
+        if (Minecraft.getInstance().gameRenderer.getMainCamera().getEntity() instanceof LivingEntity entity
+                && entity.hasEffect(MobEffects.NIGHT_VISION)
+                && !entity.hasEffect(MobEffects.DARKNESS)) return;
         if (!LegacyCloudAtmosphere.shouldUseConsoleAtmosphere(effects())) return;
         //? if <1.21.2 {
         cir.setReturnValue(LegacyCloudAtmosphere.getWarmCloudColor(cir.getReturnValue(), LegacyCloudAtmosphere.getTimeOfDay((ClientLevel) (Object) this, partialTick)));

@@ -147,6 +147,7 @@ public class Legacy4JClient {
     public static final List<Runnable> whenResetOptions = new ArrayList<>();
     public static LevelStorageSource currentWorldSource;
     public static boolean legacyFont = true;
+    private static float fontShadowScale = 1.0F;
     public static boolean forceVanillaFontShadowColor = false;
     public static ResourceLocation defaultFontOverride = null;
     public static ControlType lastControlType;
@@ -241,6 +242,28 @@ public class Legacy4JClient {
         if (b) defaultFontOverride = override;
         fontRender.accept(b);
         if (b) defaultFontOverride = null;
+    }
+
+    public static boolean hasLegacyFont() {
+        return legacyFont && LegacyOptions.legacyFont.get();
+    }
+
+    public static float getFontShadowOffset() {
+        return (hasLegacyFont() ? 0.4F : 1.0F) / fontShadowScale;
+    }
+
+    public static float getFontShadowDim() {
+        return !hasLegacyFont() || forceVanillaFontShadowColor ? 0.25F : CommonValue.LEGACY_FONT_DIM_FACTOR.get();
+    }
+
+    public static void applyFontShadowScale(float scale, Runnable render) {
+        float previousScale = fontShadowScale;
+        fontShadowScale = scale > 0.0F ? scale : 1.0F;
+        try {
+            render.run();
+        } finally {
+            fontShadowScale = previousScale;
+        }
     }
 
     public static LevelStorageSource getLevelStorageSource(){

@@ -39,11 +39,11 @@ public final class IdleSitPose {
 
         boolean moving = ArmPoseSupport.isMoving(state);
         Player player = ArmPoseSupport.getPlayer(state);
-        if (player == null || ArmPoseSupport.isFallFlying(state) || player.getAbilities().flying) {
+        if (player == null || ArmPoseSupport.isFallFlying(state)) {
             IdleSitTracker.reset(uuid);
             return false;
         }
-        moving = moving || !player.onGround();
+        moving = moving || !player.onGround() && !player.getAbilities().flying;
 
         Pose pose = ArmPoseSupport.getPose(state);
         if (pose != Pose.STANDING && pose != Pose.CROUCHING) {

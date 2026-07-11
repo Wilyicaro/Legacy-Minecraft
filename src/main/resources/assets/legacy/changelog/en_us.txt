@@ -46,6 +46,7 @@
 - Added `Minecraft Store`, with a lot of packs and resource albums available by default for download, thanks to BrandonItaly
 - Added `Reinstall Content`, allowing installed content packs to be checked and updated from Help & Options
 - Added `Advanced Options` for the controller section
+- Added `Controller Polling Rate` to Advanced Controller Options
 - Added Controller LED RGB sliders with a preview
 - Added Decay potions and tipped arrows
 - Added all the missing SD UIs, including How To Play, More World Options, Book & quill, and Host Options interfaces
@@ -117,3 +118,7 @@
 - Biome overrides can now define Birch leaves individual color
 - Added a new common value , `minecraft:ps4_end_crystal_model` , to enable the use of PS4 end crystal model in resource packs
 - Added additional common colors for use in resource packs
+
+## Fixed
+
+- Fixed the game freezing after resuming a device from sleep
