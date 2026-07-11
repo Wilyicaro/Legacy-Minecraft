@@ -13,14 +13,19 @@ import java.util.Iterator;
 import java.util.Map;
 
 public final class LegacyMobCaps {
+    private static final int REFRESH_INTERVAL_TICKS = 20;
     private static final Map<ResourceKey<Level>, WorldMobCapTracker> TRACKERS = new HashMap<>();
+    private static int refreshTicks;
 
     private LegacyMobCaps() {
     }
 
     public static void init() {
         FactoryEvent.afterServerTick(LegacyMobCaps::refreshTrackers);
-        FactoryEvent.serverStopping(server -> TRACKERS.clear());
+        FactoryEvent.serverStopping(server -> {
+            TRACKERS.clear();
+            refreshTicks = 0;
+        });
     }
 
     public static WorldMobCapTracker tracker(ServerLevel level) {
@@ -32,12 +37,15 @@ public final class LegacyMobCaps {
     }
 
     public static void handleEntityAdded(Entity entity) {
-        if (!(entity.level() instanceof ServerLevel level) || !isEnabled(level)) {
+        if (!(entity.level() instanceof ServerLevel level)) {
             return;
         }
 
-        WorldMobCapTracker tracker = tracker(level);
-        entity.getSelfAndPassengers().forEach(tracked -> tracker.track(tracked, 1));
+        WorldMobCapTracker tracker = TRACKERS.get(level.dimension());
+        if (tracker == null) {
+            return;
+        }
+        tracker.track(entity, 1);
     }
 
     public static void handleEntityRemoved(Entity entity) {
@@ -50,10 +58,15 @@ public final class LegacyMobCaps {
             return;
         }
 
-        entity.getSelfAndPassengers().forEach(tracked -> tracker.track(tracked, -1));
+        tracker.track(entity, -1);
     }
 
     private static void refreshTrackers(MinecraftServer server) {
+        if (++refreshTicks < REFRESH_INTERVAL_TICKS) {
+            return;
+        }
+        refreshTicks = 0;
+
         Iterator<Map.Entry<ResourceKey<Level>, WorldMobCapTracker>> iterator = TRACKERS.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<ResourceKey<Level>, WorldMobCapTracker> entry = iterator.next();
@@ -64,9 +77,10 @@ public final class LegacyMobCaps {
         }
 
         for (ServerLevel level : server.getAllLevels()) {
-            if (isEnabled(level)) {
-                TRACKERS.put(level.dimension(), WorldMobCapTracker.scan(level));
+            if (!isEnabled(level)) {
+                continue;
             }
+            TRACKERS.computeIfAbsent(level.dimension(), ignored -> WorldMobCapTracker.scan(level));
         }
     }
 }

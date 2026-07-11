@@ -24,6 +24,9 @@ import java.util.EnumMap;
 
 @Mixin(PlayerModel.class)
 public abstract class MenuDollMixin {
+    private static final float MENU_DOLL_WALK_SPEED = 3.63825F;
+    private static final float MENU_DOLL_WALK_AMPLITUDE = 0.101871F;
+
     private static boolean consoleskins$shouldSyncArms(AvatarRenderState state, String skinId) {
         if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.SYNC_ARMS, skinId)) return false;
         return state != null && state.id == GuiDollRender.MENU_DOLL_ID;
@@ -187,8 +190,7 @@ public abstract class MenuDollMixin {
                 head.yRot = 0.15F;
             }
             float t = (System.currentTimeMillis() % 1_000_000L) / 1000.0F;
-            float speed = 3.0F;
-            float swing = (float) Math.sin(t * speed) * 0.084F;
+            float swing = (float) Math.sin(t * MENU_DOLL_WALK_SPEED) * MENU_DOLL_WALK_AMPLITUDE;
             self.rightArm.xRot += swing;
             self.leftArm.xRot -= swing;
             self.rightLeg.xRot -= swing;

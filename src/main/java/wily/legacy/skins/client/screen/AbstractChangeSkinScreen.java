@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
@@ -27,6 +28,7 @@ import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
 import wily.legacy.skins.skin.*;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.IOException;
@@ -105,23 +107,29 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         float groupWidth = layout.basePanelWidth() + layout.baseTooltipWidth() - 2f;
         float groupHeight = layout.basePanelHeight() + Math.max(0f, layout.tooltipYOffset() - layout.tooltipHeightInset());
         float footerReserve = controlTooltipFooterReserve();
-        boolean compact480 = layout.compact480();
-        if (compact480) {
+        boolean compact = layout.compact480();
+        if (compact) {
             groupWidth += 10f;
             groupHeight += 22f;
             footerReserve += 10f;
         }
-        float sw = (w - 20f) / groupWidth;
-        float sh = (h - 20f - footerReserve) / groupHeight;
-        float sc = Math.min(1f, Math.min(sw, sh));
-        if (compact480) {
-            sc = Math.min(sc, 0.82f);
-            sc *= 0.88f;
+        float widthScale = (w - 20f) / groupWidth;
+        float heightScale = (h - 20f - footerReserve) / groupHeight;
+        float scale = Math.min(1f, Math.min(widthScale, heightScale));
+        if (compact) {
+            scale = Math.min(scale, 0.82f);
+            scale *= 0.88f;
+            scale *= 0.93f;
+        } else {
+            float reduction = 0.93f;
+            if (scale > 0.8f) {
+                float transition = (scale - 0.8f) / 0.2f;
+                reduction += ((0.92f * 0.93f) - reduction) * transition;
+            }
+            scale *= reduction;
         }
-        if (sc > 0.8f) sc *= 0.92f;
-        sc *= 0.93f;
-        if (sc <= 0f) sc = 1f;
-        return sc;
+        if (scale <= 0f) scale = 1f;
+        return scale;
     }
 
     private static int findSkinIndex(List<SkinEntry> skins, String skinId, int limit) {
@@ -950,7 +958,8 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         if (firstOpen) focusInitialPack();
         super.init();
         ensurePreviewWidgets();
-        for (PlayerSkinWidget widget : previewWidgets) addRenderableWidget(widget);
+        for (PlayerSkinWidget widget : previewWidgets) addWidget(widget);
+        addRenderableOnly(playerSkinWidgetList);
         restorePackButtonFocus();
         refreshSkinPackState();
     }
@@ -1178,7 +1187,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                 }
 
                 double dz = stick.getDeadZone();
-                double dx = dz > Math.abs(sx) ? 0 : -sx * 0.12;
+                double dx = dz > Math.abs(sx) ? 0 : -sx * 0.12 * Legacy4JClient.controllerManager.getInputScale();
                 if (dx != 0) {
                     if (rotateCenterPreview(dx, 0)) {
                         state.block();
@@ -1245,12 +1254,37 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         int textWidth = minecraft.font.width(text);
         int textX = -textWidth / 2;
+        float scaleX = scale;
+        float scaleY = scale;
+        float drawX = centerX;
+        float drawY = yAdj;
+        boolean alignToFramebuffer = scale > 1.0f || !isCompact480();
+        if (alignToFramebuffer) {
+            var window = minecraft.getWindow();
+            int framebufferWidth = window.getWidth();
+            int framebufferHeight = window.getHeight();
+            int guiWidth = window.getGuiScaledWidth();
+            int guiHeight = window.getGuiScaledHeight();
+            if (framebufferWidth > 0 && framebufferHeight > 0 && guiWidth > 0 && guiHeight > 0) {
+                float framebufferScaleX = framebufferWidth / (float) guiWidth;
+                float framebufferScaleY = framebufferHeight / (float) guiHeight;
+                int pixelScale = Math.max(1, Math.round(scale * framebufferScaleY));
+                scaleX = pixelScale / framebufferScaleX;
+                scaleY = pixelScale / framebufferScaleY;
+                drawX = Math.round(centerX * framebufferScaleX) / framebufferScaleX;
+                drawY = Math.round(yAdj * framebufferScaleY) / framebufferScaleY;
+            }
+        }
         var pose = g.pose();
         pose.pushMatrix();
-        pose.translate((float) centerX, (float) yAdj);
-        pose.scale(scale, scale);
-        g.drawString(minecraft.font, text, textX, 0, color, shadow);
-        pose.popMatrix();
+        try {
+            pose.translate(drawX, drawY);
+            pose.scale(scaleX, scaleY);
+            LegacyFontUtil.applyShadowScale(alignToFramebuffer ? scaleY : 1.0f,
+                    () -> g.drawString(minecraft.font, text, textX, 0, color, shadow));
+        } finally {
+            pose.popMatrix();
+        }
     }
 
     protected record ChangeSkinLayoutMetrics(

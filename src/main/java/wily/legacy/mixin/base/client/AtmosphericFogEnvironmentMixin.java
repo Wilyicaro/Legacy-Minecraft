@@ -29,7 +29,7 @@ public abstract class AtmosphericFogEnvironmentMixin {
     @Inject(method = "setupFog", at = @At("TAIL"))
     private void setupCloudFogOptions(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (LegacyCloudAtmosphere.areLceCloudsEnabled()) {
-            fogData.cloudEnd = LegacyCloudAtmosphere.getCloudFogEndBlocks(fogData.environmentalEnd);
+            fogData.cloudEnd = LegacyCloudAtmosphere.getCloudFogEndBlocks();
         }
     }
 

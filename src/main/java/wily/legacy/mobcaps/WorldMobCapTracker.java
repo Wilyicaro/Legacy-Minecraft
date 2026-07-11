@@ -27,12 +27,13 @@ public final class WorldMobCapTracker {
     }
 
     void track(Entity entity, int delta) {
-        updateTypeCount(entity.getType(), delta);
-
         TrackedMobCap bucket = ConsoleMobCaps.bucketForEntity(entity);
-        if (bucket != null) {
-            updateBucketCount(bucket, delta);
+        if (bucket == null) {
+            return;
         }
+
+        updateTypeCount(entity.getType(), delta);
+        updateBucketCount(bucket, delta);
     }
 
     int count(TrackedMobCap cap) {

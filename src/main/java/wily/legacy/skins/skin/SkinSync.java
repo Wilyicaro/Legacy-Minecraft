@@ -122,7 +122,7 @@ public final class SkinSync {
         if (skinId == null || skinId.isBlank()) return;
         for (int assetType = ASSET_TEXTURE; assetType <= ASSET_BOX_TEXTURE; assetType++) {
             byte[] bytes = SERVER_ASSETS.get(assetKey(owner, skinId, assetType));
-            if (bytes == null || bytes.length == 0) continue;
+            if (bytes == null || (bytes.length == 0 && assetType != ASSET_CAPE)) continue;
             int type = assetType;
             forEachChunk(bytes, UploadAssetChunkC2S.MAX_CHUNK, (index, total, chunk) ->
                     CommonNetwork.sendToPlayer(to, new SyncAssetChunkS2C(owner, skinId, type, index, total, chunk))

@@ -22,8 +22,8 @@ public final class GuiDollRender {
     private static final float BASE_BBOX_WIDTH = 0.6F;
     private static final float BASE_TRANSLATE_Y = BASE_BBOX_HEIGHT / 2.0F;
     private static final float SCALE_DIVISOR = 2.75F;
-    private static final float CROUCH_Y_OFFSET = -0.125F;
-    private static final int MIN_RENDER_SIZE = 20;
+    private static final float CROUCH_Y_OFFSET = -0.25F;
+    private static final int MIN_RENDER_SIZE = 1;
 
     private GuiDollRender() {
     }
@@ -63,7 +63,8 @@ public final class GuiDollRender {
 
     private static void submit(GuiGraphics gui, int left, int right, PreviewLayout layout, AvatarRenderState state) {
         applyPreviewLighting();
-        gui.submitEntityRenderState(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left, layout.expandedTop(), right, layout.expandedBottom());
+        int horizontalPadding = right - left;
+        gui.submitEntityRenderState(state, layout.scale(), layout.translate(), layout.bodyRotation(), layout.cameraRotation(), left - horizontalPadding, layout.expandedTop(), right + horizontalPadding, layout.expandedBottom());
     }
 
     private static AvatarRenderState buildState(PlayerSkin skin, String selectionId, Identifier texture, Identifier boxTexture, Identifier modelId, wily.legacy.skins.client.render.boxloader.BuiltBoxModel boxModel, float bboxHeight, float bboxWidth, float yawOffset, boolean crouching, float attackTime, boolean showCape) {

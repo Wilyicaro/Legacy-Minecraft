@@ -15,6 +15,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
 import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ClickType;
@@ -35,7 +36,10 @@ import wily.legacy.mixin.base.client.MouseHandlerAccessor;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -49,6 +53,7 @@ public class ControllerManager {
     private static final float DIAGONAL_SPEED = 0.4F;
     private static final float ANGLE8 = 45F * Mth.DEG_TO_RAD;
     private static final float ANGLE16 = 22.5F * Mth.DEG_TO_RAD;
+    private static final int MAX_INPUT_TICKS = 32;
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
@@ -60,6 +65,11 @@ public class ControllerManager {
     protected boolean isControllerTheLastInput = false;
     private KeyMapping[] orderedKeyMappings;
     private KeyMapping controllerDebugOverlayKey;
+    private ScheduledExecutorService poller;
+    private final AtomicBoolean updateQueued = new AtomicBoolean();
+    private long lastPollError;
+    private long lastInputMillis;
+    private int inputTicks = 1;
 
     public static Controller.Handler getHandler() {
         return LegacyOptions.selectedControllerHandler.get();
@@ -68,7 +78,7 @@ public class ControllerManager {
     public static void updatePlayerCamera(BindingState.Axis stick, Controller controller) {
         Minecraft minecraft = Minecraft.getInstance();
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || minecraft.screen != null || !stick.pressed || minecraft.player == null) return;
-        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * (minecraft.player.isScoping() ? 0.125 : 1.0);
+        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * Legacy4JClient.controllerManager.getInputScale() * (minecraft.player.isScoping() ? 0.125 : 1.0);
         minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyOptions.invertYController.get() ? -1 : 1));
     }
 
@@ -81,31 +91,78 @@ public class ControllerManager {
         this.minecraft = minecraft;
         this.orderedKeyMappings = minecraft.options.keyMappings.clone();
         updateCursorInputMode();
+        restartPoller();
+    }
 
-        CompletableFuture.runAsync(() -> new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                minecraft.execute(getHandler()::init);
-                if (minecraft.isRunning() && getHandler().update()) {
-                    Setup.EVENT.invoker.accept(ControllerManager.this);
-                    if (!getHandler().isValidController(LegacyOptions.selectedController.get())) {
-                        if (connectedController != null) {
-                            connectedController.disconnect(ControllerManager.this);
-                            safeDisconnect();
-                        }
-                        return;
-                    }
-                    if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null)
-                        connectedController.connect(ControllerManager.this);
-                    minecraft.execute(() -> {
-                        if (connectedController != null) getHandler().setup(ControllerManager.this);
-                    });
-                }
-            }
-        }, 0, 1)).exceptionally(t -> {
-            Legacy4J.LOGGER.warn(t.getMessage());
-            return null;
+    public synchronized void restartPoller() {
+        if (minecraft == null) return;
+        if (poller != null) poller.shutdownNow();
+        poller = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread thread = new Thread(r, "Legacy4J Controller Poller");
+            thread.setDaemon(true);
+            return thread;
         });
+        poller.scheduleWithFixedDelay(this::queueControllerUpdate, 0, getPollIntervalMs(), TimeUnit.MILLISECONDS);
+    }
+
+    private long getPollIntervalMs() {
+        return Mth.clamp(LegacyOptions.controllerPollingRate.get(), 1, 16);
+    }
+
+    private void queueControllerUpdate() {
+        if (!minecraft.isRunning() || !updateQueued.compareAndSet(false, true)) return;
+        try {
+            minecraft.execute(() -> {
+                try {
+                    updateController();
+                } catch (RuntimeException e) {
+                    warnControllerPoll(e);
+                } finally {
+                    updateQueued.set(false);
+                }
+            });
+        } catch (RuntimeException e) {
+            updateQueued.set(false);
+            warnControllerPoll(e);
+        }
+    }
+
+    private void updateController() {
+        updateInputTiming();
+        getHandler().init();
+        if (!minecraft.isRunning() || !getHandler().update()) return;
+        Setup.EVENT.invoker.accept(ControllerManager.this);
+        if (!getHandler().isValidController(LegacyOptions.selectedController.get())) {
+            if (connectedController != null) {
+                connectedController.disconnect(ControllerManager.this);
+                safeDisconnect();
+            }
+            return;
+        }
+        if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null)
+            connectedController.connect(ControllerManager.this);
+        if (connectedController != null) getHandler().setup(ControllerManager.this);
+    }
+
+    private void warnControllerPoll(RuntimeException e) {
+        long now = Util.getMillis();
+        if (now - lastPollError < 5000L) return;
+        lastPollError = now;
+        Legacy4J.LOGGER.warn("Controller update failed", e);
+    }
+
+    private void updateInputTiming() {
+        long now = Util.getMillis();
+        inputTicks = lastInputMillis == 0L ? 1 : Mth.clamp((int) (now - lastInputMillis), 1, MAX_INPUT_TICKS);
+        lastInputMillis = now;
+    }
+
+    public int getInputTicks() {
+        return inputTicks;
+    }
+
+    public float getInputScale() {
+        return inputTicks;
     }
 
     public void setPointerPos(double x, double y) {
@@ -212,7 +269,7 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
                         double moveX;
                         double moveY;
-                        double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5;
+                        double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5 * getInputScale();
 
                         if (LegacyOptions.legacyCursor.get()) {
                             double deadzone = stick.getDeadZone();
@@ -286,7 +343,7 @@ public class ControllerManager {
 
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s ->
                         state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick) &&
-                        ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.timePressed == state.getDefaultDelay() / 2 && isHoveringWidget());
+                        ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.crossedTime(state.getDefaultDelay() / 2) && isHoveringWidget());
                 if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)))
                     simulateKeyAction(InputConstants.KEY_UP, state, !state.released, false);
                 else if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)))

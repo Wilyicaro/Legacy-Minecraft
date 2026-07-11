@@ -205,7 +205,7 @@ final class CustomSkinPackFlow {
         Boolean slim = skin.modelId() == null ? null : BoxModelManager.getSlimFlag(skin.modelId());
         if (slim == null && skin.slimArms()) slim = true;
         if (Boolean.TRUE.equals(slim) && !poses.contains("slim")) poses.add(0, "slim");
-        screen.minecraft.setScreen(ImportCustomSkinScreen.edit(screen, screen.rootParentScreen(), packId, skin.id(), skin.name(), theme, poses, savedSkinId -> queueRefresh(packId, savedSkinId)));
+        screen.minecraft.setScreen(ImportCustomSkinScreen.edit(screen, screen.rootParentScreen(), packId, skin.id(), skin.name(), theme, poses, skin.cape() != null, savedSkinId -> queueRefresh(packId, savedSkinId)));
         screen.playPressSound();
     }
 

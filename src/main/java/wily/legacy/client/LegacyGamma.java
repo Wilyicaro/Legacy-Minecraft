@@ -18,8 +18,6 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
 public class LegacyGamma implements AutoCloseable {
-    public static final LegacyGamma INSTANCE = new LegacyGamma();
-
     private final MappableRingBuffer ubo;
     private GpuTexture inputTexture;
     private GpuTextureView inputView;
@@ -32,7 +30,7 @@ public class LegacyGamma implements AutoCloseable {
         float value = LegacyOptions.legacyGamma.get().floatValue();
         CommandEncoder commandEncoder = RenderSystem.getDevice().createCommandEncoder();
         try (GpuBuffer.MappedView mappedView = commandEncoder.mapBuffer(this.ubo.currentBuffer(), false, true)) {
-            Std140Builder.intoBuffer(mappedView.data()).putFloat(value >= 0.5f ? (value - 0.5f) * 1.12f + 1.08f : value * 0.96f + 0.6f);
+            Std140Builder.intoBuffer(mappedView.data()).putFloat(value * 1.5f + 0.5f);
         }
 
         RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
@@ -53,9 +51,20 @@ public class LegacyGamma implements AutoCloseable {
     }
 
     private void resizeInput(RenderTarget target) {
-        if (inputTexture != null && inputTexture.getWidth(0) == target.width && inputTexture.getHeight(0) == target.height) return;
+        if (inputTexture != null && inputTexture.getWidth(0) == target.width && inputTexture.getHeight(0) == target.height) {
+            return;
+        }
+
         closeInput();
-        inputTexture = RenderSystem.getDevice().createTexture("legacy gamma input", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING, target.getColorTexture().getFormat(), target.width, target.height, 1, 1);
+        inputTexture = RenderSystem.getDevice().createTexture(
+            "legacy gamma input",
+            GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING,
+            target.getColorTexture().getFormat(),
+            target.width,
+            target.height,
+            1,
+            1
+        );
         inputView = RenderSystem.getDevice().createTextureView(inputTexture);
     }
 

@@ -105,6 +105,7 @@ public class LegacySprites {
     public static final Identifier TICKBOX_HOVERED = Legacy4J.createModLocation("widget/tickbox_hovered");
     public static final Identifier TICK = Legacy4J.createModLocation("widget/tick");
     public static final Identifier SMALL_TICK = Legacy4J.createModLocation("widget/small_tick");
+    public static final Identifier SKIN_TICK = Legacy4J.createModLocation("widget/skin_tick");
     public static final Identifier RGB_PREVIEW = Legacy4J.createModLocation("widget/rgb_preview");
     public static final Identifier LOOM_ERROR = FactoryAPI.createVanillaLocation("container/loom/error");
     public static final Identifier FUEL_LENGTH_SPRITE = FactoryAPI.createVanillaLocation("container/brewing_stand/fuel_length");
