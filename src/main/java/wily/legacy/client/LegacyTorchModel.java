@@ -3,6 +3,7 @@ package wily.legacy.client;
 //? if >=1.21.5 {
 /*import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.SingleVariant;
 *///?} else {
 import net.minecraft.client.resources.model.BakedModel;
 //? if <1.21.3 {
@@ -27,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LegacyTorchModel implements /*? if >=1.21.5 {*//*BlockStateModel, BlockModelPart*//*?} else {*/BakedModel/*?}*/ {
+public class LegacyTorchModel implements /*? if >=1.21.5 {*//*BlockModelPart*//*?} else {*/BakedModel/*?}*/ {
     private static final Map<Key, /*? if >=1.21.5 {*//*BlockStateModel*//*?} else {*/BakedModel/*?}*/> CACHE = new HashMap<>();
 
     //? if <1.21.5 {
@@ -51,17 +52,12 @@ public class LegacyTorchModel implements /*? if >=1.21.5 {*//*BlockStateModel, B
         TextureAtlasSprite particle = /*? if >=1.21.5 {*//*model.particleIcon()*//*?} else {*/model.getParticleIcon()/*?}*/;
         Key key = new Key(particle, state.getValue(BlockStateProperties.HORIZONTAL_FACING));
         synchronized (CACHE) {
-            return CACHE.computeIfAbsent(key, k -> new LegacyTorchModel(/*? if <1.21.5 {*/model, /*?}*/k.particle, k.facing));
+            return CACHE.computeIfAbsent(key, k -> /*? if >=1.21.5 {*//*new SingleVariant(*//*?}*/new LegacyTorchModel(/*? if <1.21.5 {*/model, /*?}*/k.particle, k.facing)/*? if >=1.21.5 {*//*)*//*?}*/);
         }
     }
 
     //? if >=1.21.5 {
     /*@Override
-    public void collectParts(RandomSource randomSource, List<BlockModelPart> parts) {
-        parts.add(this);
-    }
-
-    @Override
     public TextureAtlasSprite particleIcon() {
         return particle;
     }
