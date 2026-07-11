@@ -143,6 +143,7 @@ public final class SkinPackFiles {
 
     static void deleteSkinFiles(Path packDir, String skinId) throws IOException {
         Files.deleteIfExists(packDir.resolve("skins").resolve(skinId + ".png"));
+        Files.deleteIfExists(packDir.resolve("capes").resolve(skinId + ".png"));
         Files.deleteIfExists(packDir.resolve("box_models").resolve(skinId + ".json"));
         Files.deleteIfExists(packDir.resolve("box_textures").resolve(skinId + ".png"));
         Files.deleteIfExists(packDir.resolve("advancement_faces").resolve(skinId + ".png"));
@@ -170,6 +171,29 @@ public final class SkinPackFiles {
             }
         } catch (RuntimeException ex) {
             throw new IOException("Skin must be a valid PNG", ex);
+        }
+    }
+
+    static void copyCapePng(Path source, Path target) throws IOException {
+        validateCapePng(source);
+        Files.createDirectories(target.getParent());
+        if (!source.toAbsolutePath().normalize().equals(target.toAbsolutePath().normalize())) {
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    static void validateCapePng(Path source) throws IOException {
+        if (source == null || !Files.isRegularFile(source)) throw new IOException("Cape file was not found");
+        try (InputStream in = Files.newInputStream(source); NativeImage image = NativeImage.read(in)) {
+            if (image == null) throw new IOException("Cape must be a valid PNG");
+            int width = image.getWidth();
+            int height = image.getHeight();
+            boolean supportedWidth = width == 64 || width == 128 || width == 256;
+            if (!supportedWidth || height != width / 2 && height != width) {
+                throw new IOException("Cape must use a 2:1 or square layout at 64, 128, or 256 pixels wide");
+            }
+        } catch (RuntimeException ex) {
+            throw new IOException("Cape must be a valid PNG", ex);
         }
     }
 

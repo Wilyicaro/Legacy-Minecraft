@@ -15,8 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.level.Level;
 
-import java.util.function.Predicate;
-
 public final class ConsoleMobCaps {
     private static final String MAX_GENERAL_ANIMALS_SPAWNED = "legacy.message.mobcap.max_general_animals_spawned";
     private static final String MAX_MOOSHROOMS_SPAWNED = "legacy.message.mobcap.max_mooshrooms_spawned";
@@ -255,15 +253,15 @@ public final class ConsoleMobCaps {
     }
 
     public static boolean canPlaceBoat(ServerLevel level) {
-        return !LegacyMobCaps.isEnabled(level) || countLoaded(level, entity -> entity instanceof AbstractBoat) < TrackedMobCap.BOATS.manualLimit();
+        return !LegacyMobCaps.isEnabled(level) || LegacyMobCaps.tracker(level).count(TrackedMobCap.BOATS) < TrackedMobCap.BOATS.manualLimit();
     }
 
     public static boolean canPlaceHanging(ServerLevel level) {
-        return !LegacyMobCaps.isEnabled(level) || countLoaded(level, entity -> entity instanceof HangingEntity) < TrackedMobCap.HANGING.manualLimit();
+        return !LegacyMobCaps.isEnabled(level) || LegacyMobCaps.tracker(level).count(TrackedMobCap.HANGING) < TrackedMobCap.HANGING.manualLimit();
     }
 
     public static boolean canPlaceArmorStand(ServerLevel level) {
-        return !LegacyMobCaps.isEnabled(level) || countLoaded(level, entity -> entity instanceof ArmorStand) < TrackedMobCap.ARMOR_STANDS.manualLimit();
+        return !LegacyMobCaps.isEnabled(level) || LegacyMobCaps.tracker(level).count(TrackedMobCap.ARMOR_STANDS) < TrackedMobCap.ARMOR_STANDS.manualLimit();
     }
 
     public static boolean canTriggerSummon(ServerLevel level, EntityType<?> type) {
@@ -344,13 +342,4 @@ public final class ConsoleMobCaps {
             || type == EntityType.TADPOLE;
     }
 
-    private static int countLoaded(ServerLevel level, Predicate<Entity> predicate) {
-        int count = 0;
-        for (Entity entity : level.getAllEntities()) {
-            if (predicate.test(entity)) {
-                count++;
-            }
-        }
-        return count;
-    }
 }

@@ -75,7 +75,9 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> createControlsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"), () -> new SettingsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCreditsScreen(this)).build());
-        renderableVList.addRenderable(Button.builder(REINSTALL_CONTENT, this::reinstallContent).build());
+        if (LegacyOptions.displayReinstallContentButton.get()) {
+            renderableVList.addRenderable(Button.builder(REINSTALL_CONTENT, this::reinstallContent).build());
+        }
     }
 
     private void reinstallContent(Button button) {

@@ -52,7 +52,7 @@ public final class CustomSkinPackStore {
         return packId;
     }
 
-    public static String importSkin(Minecraft minecraft, String packId, String name, String theme, List<String> poses, Path skinPath) throws IOException {
+    public static String importSkin(Minecraft minecraft, String packId, String name, String theme, List<String> poses, Path skinPath, Path capePng) throws IOException {
         Path packDir = requirePackDir(minecraft, packId);
         String displayName = SkinIdUtil.cleanName(name, "Custom Skin");
         String themeText = SkinIdUtil.trimToNull(theme);
@@ -61,8 +61,10 @@ public final class CustomSkinPackStore {
         int order = SkinPackJson.nextSkinOrder(packDir.resolve("pack.json"));
         String nameKey = "custom." + packId + "." + skinId + ".name";
         String themeKey = "custom." + packId + "." + skinId + ".theme";
+        if (capePng != null) SkinPackFiles.validateCapePng(capePng);
         SkinPackFiles.copySkinPng(skinPath, packDir.resolve("skins").resolve(skinId + ".png"));
-        appendSkin(packDir.resolve("pack.json"), createSkinEntry(skinId, "key:" + nameKey, "skins/" + skinId + ".png", order));
+        if (capePng != null) SkinPackFiles.copyCapePng(capePng, capeFile(packDir, skinId));
+        appendSkin(packDir.resolve("pack.json"), createSkinEntry(skinId, "key:" + nameKey, "skins/" + skinId + ".png", capePng == null ? null : capePath(skinId), order));
         writeSkinLang(packDir.resolve("lang/en_us.json"), packId, skinId, displayName, themeText);
         writeSkinModel(packDir.resolve("box_models").resolve(skinId + ".json"), themeText == null ? null : themeKey, poseKeys);
         return skinId;
@@ -116,14 +118,22 @@ public final class CustomSkinPackStore {
         }
     }
 
-    public static void updateSkin(Minecraft minecraft, String packId, String skinId, String name, String theme, List<String> poses, Path skinPath) throws IOException {
+    public static void updateSkin(Minecraft minecraft, String packId, String skinId, String name, String theme, List<String> poses, Path skinPath, Path capePng, boolean removeCape) throws IOException {
         Path dir = requirePackDir(minecraft, packId);
         requireEditableSkin(minecraft, packId, skinId, "edited");
         String displayName = SkinIdUtil.cleanName(name, "Custom Skin");
         String themeText = SkinIdUtil.trimToNull(theme);
         List<String> poseKeys = normalizePoses(poses);
+        if (capePng != null) SkinPackFiles.validateCapePng(capePng);
         if (skinPath != null) {
             SkinPackFiles.copySkinPng(skinPath, dir.resolve("skins").resolve(skinId + ".png"));
+        }
+        if (capePng != null) {
+            SkinPackFiles.copyCapePng(capePng, capeFile(dir, skinId));
+            updateSkinCape(dir.resolve("pack.json"), skinId, capePath(skinId));
+        } else if (removeCape) {
+            updateSkinCape(dir.resolve("pack.json"), skinId, null);
+            Files.deleteIfExists(capeFile(dir, skinId));
         }
         writeSkinLang(dir.resolve("lang/en_us.json"), packId, skinId, displayName, themeText);
         writeSkinModel(dir.resolve("box_models").resolve(skinId + ".json"), themeText == null ? null : "custom." + packId + "." + skinId + ".theme", poseKeys);
@@ -198,18 +208,37 @@ public final class CustomSkinPackStore {
         root.addProperty("sort_index", sortIndex);
         root.addProperty("sort_sub_index", 0);
         JsonArray skins = new JsonArray();
-        skins.add(createSkinEntry(importSkinId, "key:" + IMPORT_NAME_KEY, "skins/" + importSkinId + ".png", 1));
+        skins.add(createSkinEntry(importSkinId, "key:" + IMPORT_NAME_KEY, "skins/" + importSkinId + ".png", null, 1));
         root.add("skins", skins);
         SkinPackFiles.writeJson(path, root);
     }
 
-    private static JsonObject createSkinEntry(String skinId, String name, String texture, int order) {
+    private static JsonObject createSkinEntry(String skinId, String name, String texture, String cape, int order) {
         JsonObject skin = new JsonObject();
         skin.addProperty("id", skinId);
         skin.addProperty("name", name);
         skin.addProperty("texture", texture);
+        if (cape != null) skin.addProperty("cape", cape);
         skin.addProperty("order", order);
         return skin;
+    }
+
+    private static Path capeFile(Path packDir, String skinId) {
+        return packDir.resolve("capes").resolve(skinId + ".png");
+    }
+
+    private static String capePath(String skinId) {
+        return "capes/" + skinId + ".png";
+    }
+
+    private static void updateSkinCape(Path path, String skinId, String cape) throws IOException {
+        ArrayList<JsonObject> skins = SkinPackJson.readOrderedSkins(path);
+        int index = SkinPackJson.indexOfSkin(skins, skinId);
+        if (index < 0) throw new IOException("Custom skin was not found");
+        JsonObject skin = skins.get(index);
+        if (cape == null) skin.remove("cape");
+        else skin.addProperty("cape", cape);
+        SkinPackJson.writeOrderedSkins(path, skins);
     }
 
     private static void appendSkin(Path path, JsonObject skin) throws IOException {
