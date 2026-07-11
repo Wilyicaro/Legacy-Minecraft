@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 public class LegacyGuiItemRenderer implements AutoCloseable {
     public static final Logger LOGGER = LogManager.getLogger("legacy_gui_item_renderer");
     private static final int MAXIMUM_ITEM_ATLAS_SIZE = RenderSystem.getDevice().getMaxTextureSize();
+    private static final int ITEM_ATLAS_GUTTER = 1;
     public static float OPACITY = 1;
     private final int size;
     private final float opacity;
@@ -112,7 +113,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         if (!renderState.getItemModelIdentities().isEmpty()) {
             int i = this.getGuiScaleInvalidatingItemAtlasIfChanged();
             int j = size * i;
-            int k = this.calculateAtlasSizeInPixels(renderState, j);
+            int slotSize = j + ITEM_ATLAS_GUTTER * 2;
+            int k = this.calculateAtlasSizeInPixels(renderState, slotSize);
             if (this.itemsAtlas == null) {
                 this.createAtlasTextures(k);
             }
@@ -136,13 +138,13 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                     TrackingItemStackRenderState trackingItemStackRenderState = guiItemRenderState.itemStackRenderState();
                                     AtlasPosition atlasPosition = this.atlasPositions.get(trackingItemStackRenderState.getModelIdentity());
                                     if (atlasPosition == null || trackingItemStackRenderState.isAnimated() && atlasPosition.lastAnimatedOnFrame != frameNumber) {
-                                        if (this.itemAtlasX + j > k) {
+                                        if (this.itemAtlasX + slotSize > k) {
                                             this.itemAtlasX = 0;
-                                            this.itemAtlasY += j;
+                                            this.itemAtlasY += slotSize;
                                         }
 
                                         boolean bl = trackingItemStackRenderState.isAnimated() && atlasPosition != null;
-                                        if (!bl && this.itemAtlasY + j > k) {
+                                        if (!bl && this.itemAtlasY + slotSize > k) {
                                             if (mutableBoolean.isFalse()) {
                                                 LOGGER.warn("Trying to render too many items in GUI at the same time. Skipping some of them.");
                                                 mutableBoolean.setTrue();
@@ -151,12 +153,14 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                             int kx = bl ? atlasPosition.x : this.itemAtlasX;
                                             int l = bl ? atlasPosition.y : this.itemAtlasY;
                                             if (bl) {
-                                                RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0, kx, k - l - j, j, j);
+                                                RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0, kx, k - l - slotSize, slotSize, slotSize);
                                             }
 
-                                            this.renderItemToAtlas(dispatcher, submitNodeCollector, bufferSource, trackingItemStackRenderState, poseStack, kx, l, j);
-                                            float f = (float) kx / k;
-                                            float g = (float) (k - l) / k;
+                                            int itemX = kx + ITEM_ATLAS_GUTTER;
+                                            int itemY = l + ITEM_ATLAS_GUTTER;
+                                            this.renderItemToAtlas(dispatcher, submitNodeCollector, bufferSource, trackingItemStackRenderState, poseStack, itemX, itemY, j);
+                                            float f = (float) itemX / k;
+                                            float g = (float) (k - itemY) / k;
                                             this.submitBlitFromItemAtlas(renderState, guiItemRenderState, f, g, j, k);
                                             if (bl) {
                                                 atlasPosition.lastAnimatedOnFrame = frameNumber;
@@ -166,7 +170,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                                                 guiItemRenderState.itemStackRenderState().getModelIdentity(),
                                                                 new AtlasPosition(this.itemAtlasX, this.itemAtlasY, f, g, frameNumber)
                                                         );
-                                                this.itemAtlasX += j;
+                                                this.itemAtlasX += slotSize;
                                             }
                                         }
                                     } else {
