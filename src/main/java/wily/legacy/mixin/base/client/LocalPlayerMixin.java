@@ -13,6 +13,8 @@ import net.minecraft.client.player.ClientInput;
 //?}
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -64,8 +66,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private boolean crouching;
     @Shadow
     private boolean lastOnGround;
-
-
     private double legacyStoredElytraBoost;
     private double legacyActiveElytraReleaseBoost;
     private double legacyElytraBoostYBobMovement;
@@ -74,6 +74,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private boolean legacyWasLookingDownForElytraBoost;
     private boolean legacyReleasedElytraBoostByLook;
     private boolean legacyAutoShielding;
+    private float legacyUnderwaterVisionTime;
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
@@ -113,6 +114,18 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Override
     public double getLegacyElytraBoostYBobMovement() {
         return legacyElytraBoostYBobMovement;
+    }
+
+    @Override
+    public float getLegacyUnderwaterVisionClarity() {
+        if (legacyUnderwaterVisionTime < 5.0F) return Mth.lerp(legacyUnderwaterVisionTime / 5.0F, 0.0F, 0.6F);
+        return Mth.lerp((legacyUnderwaterVisionTime - 5.0F) / 5.0F, 0.6F, 1.0F);
+    }
+
+    @Inject(method = "aiStep", at = @At("RETURN"))
+    private void legacy$updateUnderwaterVisionTime(CallbackInfo ci) {
+        float change = isAlive() && isInWater() && isEyeInFluid(FluidTags.WATER) ? 0.05F : -0.5F;
+        legacyUnderwaterVisionTime = Mth.clamp(legacyUnderwaterVisionTime + change, 0.0F, 10.0F);
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else if <1.21.5 {*//*3*//*?} else {*/1/*?}*/))

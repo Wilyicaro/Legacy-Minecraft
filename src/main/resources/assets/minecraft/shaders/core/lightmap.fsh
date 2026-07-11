@@ -8,6 +8,7 @@ layout(std140) uniform LightmapInfo {
     float DarknessScale;
     float DarkenWorldFactor;
     float BrightnessFactor;
+    float UnderwaterVisionFactor;
     vec3 SkyLightColor;
     vec3 AmbientColor;
     vec3 BlockLightColor;
@@ -60,6 +61,14 @@ void main() {
         if (max_component < 1.0) {
             vec3 bright_color = color / max_component;
             color = mix(color, bright_color, lightmapInfo.NightVisionFactor);
+        }
+    }
+
+    if (lightmapInfo.UnderwaterVisionFactor > 0.0) {
+        float max_component = max(color.r, max(color.g, color.b));
+        if (max_component < 1.0) {
+            vec3 bright_color = color / max_component;
+            color = mix(color, bright_color, lightmapInfo.UnderwaterVisionFactor);
         }
     }
 
