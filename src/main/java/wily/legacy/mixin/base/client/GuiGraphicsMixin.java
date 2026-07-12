@@ -14,9 +14,11 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -70,6 +72,7 @@ public abstract class GuiGraphicsMixin {
 
     @WrapOperation(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;submitItem(Lnet/minecraft/client/gui/render/state/GuiItemRenderState;)V"))
     private void renderItem(GuiRenderState instance, GuiItemRenderState arg, Operation<Void> original, @Nullable LivingEntity livingEntity, @Nullable Level level, ItemStack itemStack, int i, int j) {
+        if (itemStack.is(ItemTags.WOOL_CARPETS) || itemStack.is(Items.MOSS_CARPET) || itemStack.is(Items.PALE_MOSS_CARPET) || itemStack.is(Items.SNOW)) arg.pose().translate(0.0F, -2.0F);
         float g = (float) itemStack.getPopTime() - FactoryAPIClient.getGamePartialTick(true);
         if (g > 0.0F && (minecraft.screen == null || minecraft.screen instanceof LegacyMenuAccess<?> m && m.allowItemPopping())) {
             float h = 1.0F + g / 5.0F;
