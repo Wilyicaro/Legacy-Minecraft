@@ -200,7 +200,6 @@
     "client.EntityRendererMixin",
     "client.NameTagFeatureRendererStorageMixin",
     "client.AvatarRendererMixin",
-    "client.LevelLoadingScreenAccessor",
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
