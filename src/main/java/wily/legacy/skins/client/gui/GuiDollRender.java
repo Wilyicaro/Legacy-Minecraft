@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 *///?}
+import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -179,6 +180,7 @@ public final class GuiDollRender {
         float yawRad = yaw * ((float) Math.PI / 180.0F);
         model.head.yRot = yawRad * 0.18F;
         model.hat.yRot = model.head.yRot;
+        AnimationUtils.bobArms(model.rightArm, model.leftArm, 0.0F);
 
         if (crouching) applyCrouch(model);
         if (attackTime > 0.0F) applyAttack(model, attackTime);
@@ -210,7 +212,7 @@ public final class GuiDollRender {
         state.isBaby = false;
         state.scale = 1.0F;
         state.ageScale = 1.0F;
-        state.ageInTicks = (System.currentTimeMillis() % 1_000_000L) / 50.0F + partialTick;
+        state.ageInTicks = 0.0F;
         state.walkAnimationPos = 0.0F;
         state.walkAnimationSpeed = 0.0F;
         state.speedValue = 1.0F;
