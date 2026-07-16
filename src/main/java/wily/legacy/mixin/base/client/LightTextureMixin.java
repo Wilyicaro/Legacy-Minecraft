@@ -18,6 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -76,7 +77,8 @@ public class LightTextureMixin {
                 || eyePosition.y >= eyePos.getY() + fluidState.getHeight(level, eyePos)) return 0.0F;
 
         int skyLight = level.getBrightness(LightLayer.SKY, eyePos);
-        return skyLight * Math.max(level.getSkyDarken(), 0.2F) / 15.0F;
+        float skyLightFactor = minecraft.gameRenderer.getMainCamera().attributeProbe().getValue(EnvironmentAttributes.SKY_LIGHT_FACTOR, partialTick);
+        return skyLight * Math.max(skyLightFactor, 0.2F) / 15.0F;
     }
 
     @ModifyExpressionValue(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/buffers/Std140Builder;putVec3(Lorg/joml/Vector3fc;)Lcom/mojang/blaze3d/buffers/Std140Builder;", remap = false, ordinal = 1))
