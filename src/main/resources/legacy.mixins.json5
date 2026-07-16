@@ -82,6 +82,7 @@
     "client.FireworkEntityRendererMixin",
     "client.AirBasedFogEnvironmentMixin",
     "client.AtmosphericFogEnvironmentMixin",
+    "client.FogRendererMixin",
     "client.FontMixin",
     "client.FrustumMixin",
     "client.GameRendererMixin",
@@ -196,7 +197,6 @@
     "client.EntityRendererMixin",
     "client.NameTagFeatureRendererStorageMixin",
     "client.AvatarRendererMixin",
-    "client.LevelLoadingScreenAccessor",
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
@@ -234,6 +234,7 @@
     "ChunkTrackingViewMixin",
     "ChunkMapMixin",
     "ChunkStatusTasksMixin",
+    "SerializableChunkDataMixin",
     "CarpetBlockMixin",
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",

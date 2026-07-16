@@ -33,6 +33,11 @@ public record LegacyBiomeOverride(Identifier id, Optional<Component> name, Optio
         return Legacy4JClient.legacyBiomeOverrides.map().computeIfAbsent(DEFAULT_LOCATION, LegacyBiomeOverride::new);
     }
 
+    public static boolean hasDefaultWaterFogDistance() {
+        LegacyBiomeOverride defaultOverride = Legacy4JClient.legacyBiomeOverrides.map().get(DEFAULT_LOCATION);
+        return defaultOverride != null && defaultOverride.waterFogDistance.isPresent();
+    }
+
     public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey) {
         return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().identifier());
     }
