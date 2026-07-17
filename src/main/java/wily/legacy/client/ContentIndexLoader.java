@@ -91,6 +91,7 @@ final class ContentIndexLoader {
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
             bundlePacks,
             Optional.empty(),
             List.of(),
@@ -123,6 +124,7 @@ final class ContentIndexLoader {
                         pack.worldTemplateDownloadURI(),
                         pack.worldTemplateCheckSum(),
                         pack.worldTemplateFolderName(),
+                        pack.worldTemplateIconUrl(),
                         pack.downloadVariants(),
                         pack.worldTemplateVariants()
                     ));
