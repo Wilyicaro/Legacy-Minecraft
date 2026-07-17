@@ -10,20 +10,22 @@ import wily.legacy.Legacy4J;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class DownloadedPackMetadata {
     private static final String FILE_NAME = ".legacy4j_content.json";
-    private static final Entry EMPTY = new Entry(null, null, null, false);
-    private static final Map<String, Entry> CACHE = new HashMap<>();
+    private static final Entry EMPTY = new Entry(null, null, null, false, false);
+    private static final Map<String, Entry> CACHE = new ConcurrentHashMap<>();
 
     private DownloadedPackMetadata() {
     }
 
-    public record Entry(String name, String description, String worldTemplateFolderName, boolean useResourceAlbum) {
+    public record Entry(String name, String description, String worldTemplateFolderName, boolean useResourceAlbum, boolean hasWorldTemplate) {
         public Component title(Component fallback) {
             return name == null || name.isBlank() ? fallback : Component.literal(name);
         }
@@ -31,20 +33,36 @@ public final class DownloadedPackMetadata {
         public Component description(Component fallback) {
             return description == null || description.isBlank() ? fallback : Component.literal(description);
         }
-
-        public boolean hasWorldTemplate() {
-            return worldTemplateFolderName != null && !worldTemplateFolderName.isBlank();
-        }
     }
 
     public static void write(Path packDir, ContentManager.Pack pack, ContentManager.Category category) throws IOException {
+        Entry entry = from(pack, category);
         JsonObject root = new JsonObject();
-        root.addProperty("name", pack.name());
-        root.addProperty("useResourceAlbum", category.useResourceAlbum());
-        if (!pack.description().isBlank()) root.addProperty("description", pack.description());
-        pack.worldTemplateFolderName().filter(s -> !s.isBlank()).ifPresent(s -> root.addProperty("worldTemplateFolderName", s));
-        Files.writeString(packDir.resolve(FILE_NAME), root.toString(), StandardCharsets.UTF_8);
-        CACHE.put(normalize(pack.id()), new Entry(pack.name(), pack.description(), pack.worldTemplateFolderName().orElse(null), category.useResourceAlbum()));
+        root.addProperty("name", entry.name());
+        if (entry.description() != null) root.addProperty("description", entry.description());
+        if (entry.worldTemplateFolderName() != null) root.addProperty("worldTemplateFolderName", entry.worldTemplateFolderName());
+        root.addProperty("useResourceAlbum", entry.useResourceAlbum());
+        root.addProperty("hasWorldTemplate", entry.hasWorldTemplate());
+        Path metadataPath = packDir.resolve(FILE_NAME);
+        Path tempPath = Files.createTempFile(packDir, FILE_NAME, ".tmp");
+        try {
+            Files.writeString(tempPath, root.toString(), StandardCharsets.UTF_8);
+            try {
+                Files.move(tempPath, metadataPath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tempPath, metadataPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(tempPath);
+        }
+        CACHE.put(normalize(pack.id()), entry);
+    }
+
+    public static boolean sync(Path packDir, ContentManager.Pack pack, ContentManager.Category category) throws IOException {
+        Entry entry = from(pack, category);
+        if (Files.isRegularFile(packDir.resolve(FILE_NAME)) && entry.equals(get(pack.id()))) return false;
+        write(packDir, pack, category);
+        return true;
     }
 
     public static void clear(String packId) {
@@ -94,7 +112,10 @@ public final class DownloadedPackMetadata {
             String description = root.has("description") ? root.get("description").getAsString() : null;
             String worldTemplateFolderName = root.has("worldTemplateFolderName") ? root.get("worldTemplateFolderName").getAsString() : null;
             boolean useResourceAlbum = !root.has("useResourceAlbum") || root.get("useResourceAlbum").getAsBoolean();
-            return new Entry(name, description, worldTemplateFolderName, useResourceAlbum);
+            boolean hasWorldTemplate = root.has("hasWorldTemplate")
+                ? root.get("hasWorldTemplate").getAsBoolean()
+                : worldTemplateFolderName != null && !worldTemplateFolderName.isBlank();
+            return new Entry(name, description, worldTemplateFolderName, useResourceAlbum, hasWorldTemplate);
         } catch (Exception e) {
             Legacy4J.LOGGER.warn("Failed to read downloaded pack metadata for {}", packId, e);
             return EMPTY;
@@ -111,5 +132,12 @@ public final class DownloadedPackMetadata {
 
     private static String normalize(String packId) {
         return packId.startsWith("file/") ? packId.substring(5) : packId;
+    }
+
+    private static Entry from(ContentManager.Pack pack, ContentManager.Category category) {
+        String name = pack.name();
+        String description = pack.description().isBlank() ? null : pack.description();
+        String worldTemplateFolderName = pack.worldTemplateFolderName().filter(s -> !s.isBlank()).orElse(null);
+        return new Entry(name, description, worldTemplateFolderName, category.useResourceAlbum(), pack.hasWorldTemplate());
     }
 }
