@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ContentManager.Category;
 import wily.legacy.client.ContentManager.Pack;
+import wily.legacy.client.screen.CreationList;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 
@@ -133,15 +134,28 @@ final class ContentPackDownloader {
             if (Files.exists(checksumFile)) {
                 try {
                     String existingChecksum = Files.readString(checksumFile).trim();
-                    return pack.activeCheckSum().get().equals(existingChecksum);
+                    if (!pack.activeCheckSum().get().equals(existingChecksum)) return false;
                 } catch (IOException e) {
                     return false;
                 }
-            }
-            return false;
+            } else return false;
         }
 
-        return true;
+        return syncDownloadedPackMetadata(pack, path);
+    }
+
+    private static boolean syncDownloadedPackMetadata(Pack pack, Path packDir) {
+        if (!ContentManager.isRootResourcePackDirectory(packDir.getParent())) return true;
+        try {
+            if (DownloadedPackMetadata.sync(packDir, pack)) {
+                if (!pack.hasWorldTemplate()) LegacyWorldTemplate.removeDownloadedPack(pack.id());
+                Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
+            }
+            return true;
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Failed to sync world template metadata for {}", pack.id(), e);
+            return false;
+        }
     }
 
     private static boolean hasInstalledContent(Pack pack, Category category) {
@@ -279,8 +293,7 @@ final class ContentPackDownloader {
                     Files.writeString(targetFolder.resolve(".md5"), checkSum.get());
                 }
 
-                PackAlbum.Selector.invalidatePackAssets(pack.id());
-                Minecraft.getInstance().execute(LegacyWorldTemplate::refreshDownloadedPacks);
+                refreshDownloadedPackAssets(pack.id());
                 return true;
             } catch (Exception e) {
                 deleteStandalonePack(pack, category);
@@ -297,9 +310,16 @@ final class ContentPackDownloader {
         if (Files.exists(packDir)) deleteDirectoryRecursively(packDir.toFile());
         DownloadedPackMetadata.clear(pack.id());
         DownloadedResourceAlbums.remove(pack.id());
-        PackAlbum.Selector.invalidatePackAssets(pack.id());
         LegacyWorldTemplate.removeDownloadedPack(pack.id());
-        LegacyWorldTemplate.refreshDownloadedPacks();
+        refreshDownloadedPackAssets(pack.id());
+    }
+
+    private static void refreshDownloadedPackAssets(String packId) {
+        Minecraft.getInstance().execute(() -> {
+            PackAlbum.Selector.invalidatePackAssets(packId);
+            CreationList.invalidatePackIcon(packId);
+            LegacyWorldTemplate.refreshDownloadedPacks();
+        });
     }
 
     private static boolean areBundleChildren(Pack pack, BiPredicate<Pack, Category> check) {

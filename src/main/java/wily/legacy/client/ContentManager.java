@@ -72,6 +72,7 @@ public class ContentManager {
         Optional<URI> worldTemplateDownloadURI,
         Optional<String> worldTemplateCheckSum,
         Optional<String> worldTemplateFolderName,
+        Optional<URI> worldTemplateIconUrl,
         List<BundlePack> bundlePacks,
         Optional<ResourceAlbum> resourceAlbum,
         List<Variant> downloadVariants,
@@ -140,6 +141,7 @@ public class ContentManager {
             Optional<URI> worldTemplateDownloadURI,
             Optional<String> worldTemplateCheckSum,
             Optional<String> worldTemplateFolderName,
+            Optional<URI> worldTemplateIconUrl,
             List<Variant> downloadVariants,
             List<Variant> worldTemplateVariants
         ) {
@@ -152,18 +154,19 @@ public class ContentManager {
                 Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(BundlePack::imageUrl),
                 Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(BundlePack::worldTemplateDownloadURI),
                 Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(BundlePack::worldTemplateFolderName),
+                Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateIconUrl").forGetter(BundlePack::worldTemplateIconUrl),
                 Variant.CODEC.listOf().optionalFieldOf("downloadVariants", List.of()).forGetter(BundlePack::downloadVariants),
                 Variant.CODEC.listOf().optionalFieldOf("worldTemplateVariants", List.of()).forGetter(BundlePack::worldTemplateVariants)
             ).apply(i, BundlePack::create));
 
-            public static BundlePack create(String categoryId, String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
+            public static BundlePack create(String categoryId, String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, Optional<URI> worldTemplateIconUrl, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
                 ParsedURI download = ParsedURI.of(compoundDownloadURI);
                 ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-                return new BundlePack(categoryId, id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, downloadVariants, worldTemplateVariants);
+                return new BundlePack(categoryId, id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, worldTemplateIconUrl, downloadVariants, worldTemplateVariants);
             }
 
             public Pack toPack() {
-                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, List.of(), Optional.empty(), downloadVariants, worldTemplateVariants);
+                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, worldTemplateIconUrl, List.of(), Optional.empty(), downloadVariants, worldTemplateVariants);
             }
         }
 
@@ -175,6 +178,7 @@ public class ContentManager {
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(Pack::worldTemplateDownloadURI),
             Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName),
+            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateIconUrl").forGetter(Pack::worldTemplateIconUrl),
             BundlePack.CODEC.listOf().optionalFieldOf("bundlePacks", List.of()).forGetter(Pack::bundlePacks),
             ResourceAlbum.CODEC.optionalFieldOf("resourceAlbum").forGetter(Pack::resourceAlbum),
             Variant.CODEC.listOf().optionalFieldOf("downloadVariants", List.of()).forGetter(Pack::downloadVariants),
@@ -183,10 +187,10 @@ public class ContentManager {
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
+        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, Optional<URI> worldTemplateIconUrl, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
             ParsedURI download = ParsedURI.of(compoundDownloadURI);
             ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, bundlePacks, resourceAlbum, downloadVariants, worldTemplateVariants);
+            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, worldTemplateIconUrl, bundlePacks, resourceAlbum, downloadVariants, worldTemplateVariants);
         }
 
         public Component nameComponent() {
