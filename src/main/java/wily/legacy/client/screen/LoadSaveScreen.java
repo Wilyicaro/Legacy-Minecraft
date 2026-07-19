@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
@@ -61,6 +62,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public boolean hostPrivileges;
     public Difficulty difficulty;
     protected boolean focusMoreOptionsButton;
+    private boolean preparingRemoteResourceAlbum;
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
         super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
@@ -212,6 +214,36 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     public void onLoad() {
+        if (preparingRemoteResourceAlbum) return;
+        Optional<CompletableFuture<PackAlbum>> install = RemoteResourceAlbums.install(resourceAlbumSelector.getSelectedAlbum());
+        if (install.isPresent()) {
+            preparingRemoteResourceAlbum = true;
+            LegacyLoadingScreen loadingScreen = new LegacyLoadingScreen();
+            loadingScreen.setGenericLoading(true);
+            loadingScreen.setBlackBackground(true);
+            minecraft.setScreen(loadingScreen);
+            install.get().whenComplete((installedAlbum, throwable) -> minecraft.execute(() -> {
+                preparingRemoteResourceAlbum = false;
+                if (throwable != null || installedAlbum == null) {
+                    Legacy4J.LOGGER.warn("Failed to prepare remote resource album before loading world", throwable);
+                    minecraft.setScreen(this);
+                    return;
+                }
+                try {
+                    minecraft.getResourcePackRepository().reload();
+                    resourceAlbumSelector.selectAlbum(installedAlbum);
+                    continueLoad();
+                } catch (Throwable preparationThrowable) {
+                    Legacy4J.LOGGER.warn("Failed to prepare remote resource album before loading world", preparationThrowable);
+                    minecraft.setScreen(this);
+                }
+            }));
+            return;
+        }
+        continueLoad();
+    }
+
+    private void continueLoad() {
         if (dimensionsToReset.isEmpty()) {
             completeLoad();
         } else {

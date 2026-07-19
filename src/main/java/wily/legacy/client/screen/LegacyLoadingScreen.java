@@ -20,6 +20,7 @@ import java.util.function.BooleanSupplier;
 
 public class LegacyLoadingScreen extends Screen implements LegacyLoading, ControlTooltip.Event {
     private final LegacyLoadingRenderer renderer = new LegacyLoadingRenderer();
+    private boolean blackBackground;
 
     public LegacyLoadingScreen() {
         super(GameNarrator.NO_TITLE);
@@ -29,6 +30,10 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
         this();
         this.setLoadingHeader(loadingHeader);
         this.setLoadingStage(loadingStage);
+    }
+
+    public void setBlackBackground(boolean blackBackground) {
+        this.blackBackground = blackBackground;
     }
 
     public static LegacyLoadingScreen getDimensionChangeScreen(BooleanSupplier levelReady, ResourceKey<Level> lastLevel, ResourceKey<Level> newLevel) {
@@ -173,7 +178,8 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
     @Override
     public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         renderer.prepareRender(minecraft, UIAccessor.of(this));
-        renderer.extractBackground(GuiGraphicsExtractor, i, j, f);
+        if (blackBackground) GuiGraphicsExtractor.fill(0, 0, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), 0xFF000000);
+        else renderer.extractBackground(GuiGraphicsExtractor, i, j, f);
     }
     //?}
 
