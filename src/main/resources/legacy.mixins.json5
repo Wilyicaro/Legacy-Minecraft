@@ -138,6 +138,7 @@
     "client.RenderTypeMixin",
     "client.ScreenEffectRendererMixin",
     "client.ScreenMixin",
+    "client.ShulkerBulletRendererMixin",
     "client.sign.SignEditScreenMixin",
     "client.SimpleSoundInstanceMixin",
     "client.SlotMixin",
