@@ -86,6 +86,7 @@
     "client.AtmosphericFogEnvironmentMixin",
     "client.FogRendererMixin",
     "client.FontMixin",
+    "client.FishRendererMixin",
     "client.FrustumMixin",
     "client.GameRendererMixin",
     "client.SectionCompilerMixin",
