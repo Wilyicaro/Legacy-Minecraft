@@ -51,11 +51,11 @@ public class PublishScreen extends ConfirmationScreen {
     }
 
     public static Component getPublishComponent() {
-        return Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
+        return Component.translatable(LegacyOptions.useLegacyWorldOptions() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
     }
 
     public static Tooltip getPublishTooltip() {
-        return Tooltip.create(Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost()
+        return Tooltip.create(Component.translatable(LegacyOptions.useLegacyWorldOptions() || hasWorldHost()
                 ? "legacy.menu.online.description"
                 : "menu.shareToLan.description"));
     }
@@ -130,6 +130,6 @@ public class PublishScreen extends ConfirmationScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+        if (LegacyOptions.useLegacyWorldOptions()) guiGraphics.deferredTooltip = null;
     }
 }

@@ -49,6 +49,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     public HostOptionsScreen() {
         this(PLAYERS_INVITE);
+        LegacyOptions.resetAdvancedWorldOptions();
     }
 
     public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphics guiGraphics, int x, int y) {

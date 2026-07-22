@@ -331,7 +331,7 @@ public class LegacyComponents {
     }
 
     public static Component getMenuGameRuleName(GameRules.Key<?> key) {
-        if (!LegacyOptions.legacySettingsMenus.get()) return Component.translatable(key.getDescriptionId());
+        if (!LegacyOptions.useLegacyWorldOptions()) return Component.translatable(key.getDescriptionId());
         if (key == GameRules.RULE_DOFIRETICK) return Component.translatable("legacy.gamerule.fire_spreads");
         if (key == LegacyGameRules.getTntExplodes()) return Component.translatable("legacy.gamerule.tnt_explodes");
         if (key == LegacyGameRules.getPvp()) return Component.translatable("legacy.gamerule.player_vs_player");
