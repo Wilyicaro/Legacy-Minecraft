@@ -152,6 +152,7 @@
     "client.ThrownTridentRendererMixin",
     "client.TntMinecartRendererMixin",
     "client.TntRendererMixin",
+    "client.WeatherEffectRendererMixin",
     "client.title.TitleScreenMixin",
     "client.ToastComponentMixin",
     "client.TutorialToastMixin",
