@@ -81,6 +81,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     public HostOptionsScreen() {
         this(PLAYERS_INVITE);
+        LegacyOptions.resetAdvancedWorldOptions();
     }
     public void reloadPlayerButtons(){
         int i = renderableVList.renderables.indexOf(getFocused());

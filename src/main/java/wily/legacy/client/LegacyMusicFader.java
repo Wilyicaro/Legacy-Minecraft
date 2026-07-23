@@ -11,15 +11,16 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class LegacyMusicFader {
-    private static final long FADE_TICKS = 70;
+    private static final long FADE_TICKS = 200;
     private static long ticks = 0;
     private static final Minecraft mc = Minecraft.getInstance();
     private static final SoundManager soundManager = mc.getSoundManager();
     private static final MusicManagerAccessor musicManagerAccessor = (MusicManagerAccessor) mc.getMusicManager();
 
-    public static SoundInstance queuedSong = null;
-    public static Map<SoundInstance, Long> fadingSongs = new HashMap<>();
+    private static SoundInstance queuedSong = null;
+    private static final Map<SoundInstance, Long> fadingSongs = new HashMap<>();
     public static boolean musicManagerShouldTick = true;
+    private static boolean resumeMusicManager;
 
     public static void fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundInstance music;
@@ -38,7 +39,19 @@ public class LegacyMusicFader {
 
     public static void fadeOutBgMusic(boolean startMusicManager) {
         SoundInstance music = ((MusicManagerAccessor) mc.getMusicManager()).getCurrentMusic();
-        if (music != null) fadeOutMusic(music, startMusicManager, false);
+        if (music != null) {
+            fadeOutMusic(music, startMusicManager, true);
+            musicManagerAccessor.setCurrentMusic(null);
+        }
+    }
+
+    public static void fadeOutDimensionMusic() {
+        SoundInstance music = musicManagerAccessor.getCurrentMusic();
+        if (music == null) return;
+        fadingSongs.put(music, ticks + FADE_TICKS);
+        musicManagerAccessor.setCurrentMusic(null);
+        musicManagerShouldTick = false;
+        resumeMusicManager = true;
     }
 
     public static void tick() {
@@ -58,6 +71,11 @@ public class LegacyMusicFader {
         if (fadingSongs.isEmpty() && queuedSong != null) {
             soundManager.play(queuedSong);
             queuedSong = null;
+        }
+        if (fadingSongs.isEmpty() && resumeMusicManager) {
+            musicManagerAccessor.setNextSongDelay(0);
+            musicManagerShouldTick = true;
+            resumeMusicManager = false;
         }
     }
 }

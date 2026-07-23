@@ -1,14 +1,62 @@
+//? if <1.21.2 {
+package wily.legacy.mixin.base;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+
+@Mixin(Explosion.class)
+public abstract class ServerExplosionMixin {
+    private static final float LEGACY_OCCLUDED_KNOCKBACK = 0.25F;
+
+    @Shadow
+    @Final
+    private double x;
+
+    @Shadow
+    @Final
+    private double y;
+
+    @Shadow
+    @Final
+    private double z;
+
+    @ModifyExpressionValue(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Explosion;getSeenPercent(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/entity/Entity;)F"))
+    private float legacy$occludedKnockback(float exposure) {
+        return exposure == 0.0F ? LEGACY_OCCLUDED_KNOCKBACK : exposure;
+    }
+
+    @WrapOperation(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
+    private boolean legacy$hurtEntity(Entity entity, DamageSource source, float amount, Operation<Boolean> original) {
+        return legacy$getExposure(entity) > 0.0F && original.call(entity, source, amount);
+    }
+
+    private float legacy$getExposure(Entity entity) {
+        return Explosion.getSeenPercent(new Vec3(x, y, z), entity);
+    }
+}
+//?}
+
 //? if >=1.21.2 {
 /*package wily.legacy.mixin.base;
 
-import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.PrimedTnt;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
@@ -16,39 +64,32 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
 @Mixin(ServerExplosion.class)
-public abstract class ServerExplosionMixin implements Explosion {
-    private static final double LEGACY_TNT_THROUGH_BLOCK_KNOCKBACK = 0.5;
+public abstract class ServerExplosionMixin {
+    private static final float LEGACY_OCCLUDED_KNOCKBACK = 0.25F;
 
     @Shadow @Final private ServerLevel level;
 
     @Shadow @Final private Vec3 center;
 
-    @Shadow @Final private Entity source;
-
     @Shadow @Final private float radius;
 
-    @ModifyArg(method = "hurtEntities()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0, require = 0)
-    private double getKnockbackPower(double power, @Local Entity entity) {
-        return getThroughBlockKnockbackPower(entity, power);
+    @ModifyExpressionValue(method = "hurtEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;getSeenPercent(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/entity/Entity;)F"))
+    private float legacy$occludedKnockback(float exposure) {
+        return exposure == 0.0F ? LEGACY_OCCLUDED_KNOCKBACK : exposure;
     }
 
-    @ModifyArg(method = "hurtEntities(Ljava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0, require = 0)
-    private double getKnockbackPowerWithBlocks(double power, @Local Entity entity) {
-        return getThroughBlockKnockbackPower(entity, power);
+    @WrapOperation(method = "hurtEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
+    private boolean legacy$hurtEntity(Entity entity, ServerLevel level, DamageSource source, float amount, Operation<Boolean> original) {
+        return legacy$getExposure(entity) > 0.0F && original.call(entity, level, source, amount);
     }
 
-    private double getThroughBlockKnockbackPower(Entity entity, double power) {
-        if (!(source instanceof PrimedTnt)) return power;
-        double doubleRadius = radius * 2.0F;
-        if (doubleRadius <= 0.0) return power;
-        double dist = Math.sqrt(entity.distanceToSqr(center)) / doubleRadius;
-        return Math.max(power, (1.0 - dist) * LEGACY_TNT_THROUGH_BLOCK_KNOCKBACK);
+    private float legacy$getExposure(Entity entity) {
+        return ServerExplosion.getSeenPercent(center, entity);
     }
 
     @Inject(method = "interactWithBlocks", at = @At("RETURN"))

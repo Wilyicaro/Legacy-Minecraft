@@ -12,5 +12,7 @@ public interface LegacyLocalPlayer {
 
     double getLegacyElytraBoostYBobMovement();
 
+    float getLegacyUnderwaterVisionClarity();
+
     Vec3 getLegacyPreviousDeltaMovement();
 }

@@ -11,6 +11,7 @@
     { "name": "SkyLightColor",      "type": "float",     "count": 3,  "values": [1.0] },
     { "name": "BlockLightColor",    "type": "float",     "count": 3,  "values": [1.0] },
     { "name": "NightVisionFactor",  "type": "float",     "count": 1,  "values": [0.0] },
+    { "name": "UnderwaterVisionFactor", "type": "float", "count": 1,  "values": [0.0] },
     { "name": "DarknessScale",      "type": "float",     "count": 1,  "values": [0.0] },
     { "name": "DarkenWorldFactor",  "type": "float",     "count": 1,  "values": [0.0] },
     { "name": "BrightnessFactor",   "type": "float",     "count": 1,  "values": [1.0] }

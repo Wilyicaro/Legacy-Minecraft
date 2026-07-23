@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -40,12 +41,12 @@ public class GameHostOptionsScreen extends PanelVListScreen {
 
     public GameHostOptionsScreen(Screen parent, Minecraft minecraft) {
         super(parent, s -> Panel.createPanel(s,
-                p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.hasPermissions(2), LegacyOptions.legacySettingsMenus.get())),
+                p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.hasPermissions(2), LegacyOptions.useLegacyWorldOptions())),
                 p -> p.centered(s)), HostOptionsScreen.HOST_OPTIONS);
         getRenderableVList().layoutSpacing(l -> 2);
 
         boolean isOp = minecraft.player.hasPermissions(2);
-        boolean legacyMenus = LegacyOptions.legacySettingsMenus.get();
+        boolean legacyMenus = LegacyOptions.useLegacyWorldOptions();
         accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", isOp)));
 
         if (!isOp) {
@@ -153,6 +154,18 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     @Override
     public void renderableVListInit() {
         getRenderableVList().init(panel.x + 8, panel.y + 8, panel.width - 16, panel.height - 16);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            GameHostOptionsScreen screen = new GameHostOptionsScreen(parent, minecraft);
+            screen.nonOpGamerules.putAll(nonOpGamerules);
+            screen.actionsOnClose.putAll(actionsOnClose);
+            minecraft.setScreen(screen);
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

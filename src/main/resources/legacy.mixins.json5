@@ -12,6 +12,7 @@
     //? if <1.21.2 {
     "AbstractFurnaceRecipeBookComponentMixin",
     "ClientExplosionMixin",
+    "ServerExplosionMixin",
     //?} else {
     /*"GhostSlotsMixin",
     "OldMinecartBehaviorMixin",
@@ -132,6 +133,7 @@
     "EntityRendererMixin",
     "FireworkEntityRendererMixin",
     "FogRendererMixin",
+    "client.FishRendererMixin",
     "FontMixin",
     "FrustumMixin",
     "GameRendererMixin",
@@ -190,6 +192,7 @@
     "RenderTypeMixin",
     "ScreenEffectRendererMixin",
     "ScreenMixin",
+    "client.ShulkerBulletRendererMixin",
     "client.sign.SignEditScreenMixin",
     "client.ElytraOnPlayerSoundInstanceMixin",
     "SimpleSoundInstanceMixin",
@@ -202,6 +205,12 @@
     "client.title.SplashRendererMixin",
     "client.stonecutter.StonecutterScreenMixin",
     "ThrownTridentRendererMixin",
+    "client.TntMinecartRendererMixin",
+    "client.TntRendererMixin",
+    //? if >=1.21.2 {
+    /*"client.WeatherEffectRendererMixin",
+    "client.WeatherColumnInstanceAccessor",
+    *///?}
     "client.title.TitleScreenMixin",
     "ToastComponentMixin",
     "TutorialToastMixin",
@@ -269,6 +278,11 @@
     "ChunkMapMixin",
     //? if <1.21 {
     /*"ChunkStatusMixin",
+    *///?}
+    //? if <1.21.3 {
+    "ChunkSerializerMixin",
+    //?} else {
+    /*"SerializableChunkDataMixin",
     *///?}
     //? if >1.20.1 {
     "ChunkTrackingViewMixin",

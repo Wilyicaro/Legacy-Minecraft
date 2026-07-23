@@ -163,6 +163,7 @@ public class LegacyComponents {
     public static final Component ENTER_NAME = Component.translatable("manageServer.enterName");
     public static final Component ENTER_IP = Component.translatable("manageServer.enterIp");
     public static final Component MISSING_WORLD_TEMPLATE = Component.translatable("legacy.menu.missing_world_template");
+    public static final Component DOWNLOADING_WORLD_TEMPLATE = Component.translatable("legacy.menu.downloading_world_template");
     public static final Component GAME_OPTIONS = Component.translatable("legacy.menu.game_options");
     public static final Component CUSTOM_SKIN_PACK_OPTIONS = Component.translatable("legacy.menu.custom_skin_pack_options");
     public static final Component WORLD_OPTIONS = Component.translatable("createWorld.tab.world.title");
@@ -251,7 +252,7 @@ public class LegacyComponents {
     }
 
     public static Component getMenuGameRuleName(GameRules.Key<?> key) {
-        if (!LegacyOptions.legacySettingsMenus.get()) return Component.translatable(key.getDescriptionId());
+        if (!LegacyOptions.useLegacyWorldOptions()) return Component.translatable(key.getDescriptionId());
         if (key == GameRules.RULE_DOFIRETICK) return Component.translatable("legacy.gamerule.fire_spreads");
         if (key == LegacyGameRules.getTntExplodes()) return Component.translatable("legacy.gamerule.tnt_explodes");
         if (key == LegacyGameRules.PLAYER_VS_PLAYER) return Component.translatable("legacy.gamerule.player_vs_player");

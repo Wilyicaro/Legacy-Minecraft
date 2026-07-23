@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface MusicManagerAccessor {
     @Accessor
     SoundInstance getCurrentMusic();
+    @Accessor
+    void setCurrentMusic(SoundInstance soundInstance);
     @Accessor("nextSongDelay")
     void setNextSongDelay(int delay);
 }

@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.TallFlowerBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -25,6 +26,15 @@ public abstract class BlockStateBaseMixin {
         if (legacy$hasModOnServer() && asState().getBlock() instanceof TallFlowerBlock) {
             cir.setReturnValue(Vec3.ZERO);
         }
+    }
+
+    @Inject(method = "getLightBlock", at = @At("RETURN"), cancellable = true)
+    private void legacy$waterLightBlock(
+            //? if <1.21.3 {
+            /*BlockGetter level, BlockPos pos,
+            *///?}
+            CallbackInfoReturnable<Integer> cir) {
+        if (asState().getFluidState().is(FluidTags.WATER)) cir.setReturnValue(Math.max(cir.getReturnValueI(), 2));
     }
 
     @Unique

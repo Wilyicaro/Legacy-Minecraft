@@ -11,10 +11,14 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BasePressurePlateBlock;
 //? forge {
 /*import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -59,6 +63,11 @@ public abstract class GuiGraphicsMixin {
     @Unique
     GuiGraphics self(){
         return (GuiGraphics) (Object) this;
+    }
+
+    @Unique
+    private static boolean legacy$hasLegacyThinItemOffset(ItemStack itemStack) {
+        return itemStack.is(ItemTags.WOOL_CARPETS) || itemStack.is(Items.MOSS_CARPET) || /*? if >=1.21.4 {*//*itemStack.is(Items.PALE_MOSS_CARPET) || *//*?}*/itemStack.is(Items.SNOW) || itemStack.is(Items.DAYLIGHT_DETECTOR) || itemStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof BasePressurePlateBlock;
     }
 
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
@@ -153,6 +162,7 @@ public abstract class GuiGraphicsMixin {
 
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void renderItem(LivingEntity livingEntity, Level level, ItemStack itemStack, int i, int j, int k, int l, CallbackInfo ci){
+        if (legacy$hasLegacyThinItemOffset(itemStack)) pose().translate(0.0F, -2.0F, 0.0F);
         float g = (float)itemStack.getPopTime() - FactoryAPIClient.getGamePartialTick(true);
         if (g > 0.0F && (minecraft.screen == null || minecraft.screen instanceof LegacyMenuAccess<?> m && m.allowItemPopping())) {
             float h = 1.0F + g / 5.0F;

@@ -316,6 +316,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         private final PackRepository packRepository;
         private final Minecraft minecraft;
         protected final List<String> oldSelection;
+        private boolean userSelectedAlbum;
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
@@ -339,16 +340,60 @@ public record PackAlbum(String id, int version, Component displayName, Component
             PackRepository repository = Minecraft.getInstance().getResourcePackRepository();
             Path packPath = Minecraft.getInstance().getResourcePackDirectory();
             FactoryConfig<GlobalPacks> globalConfig = GlobalPacks.globalResources;
-            return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, resourceById(defaultResourceAlbum.get()), repository, packPath, Selector::reloadResourcesChanges, globalConfig, hasTooltip){
+            ListMap<String, PackAlbum> albums = RemoteResourceAlbums.createAlbumMap();
+            String selectedAlbumId = defaultResourceAlbum.get();
+            Selector selector = new Selector(i, j, k, l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), albums, albums.getOrDefault(selectedAlbumId, MINECRAFT), repository, packPath, Selector::reloadResourcesChanges, globalConfig, hasTooltip) {
                 @Override
                 public void applyChanges(boolean reloadAndSave) {
+                    if (RemoteResourceAlbums.isPlaceholder(this.savedAlbum)) {
+                        PackAlbum appliedAlbum = RemoteResourceAlbums.isPlaceholder(this.initialAlbum) ? MINECRAFT : this.initialAlbum;
+                        globalConfig.get().applyPacks(repository, appliedAlbum.packs());
+                        defaultResourceAlbum.set(this.savedAlbum.id());
+                        save();
+                        if (reloadAndSave && !this.oldSelection.equals(getSelectedIds(repository))) {
+                            updateSavedResourcePacks();
+                            Minecraft.getInstance().reloadResourcePacks();
+                        }
+                        return;
+                    }
                     globalConfig.get().applyPacks(repository, this.savedAlbum.packs());
+                    defaultResourceAlbum.set(this.savedAlbum.id());
+                    save();
+                    if (reloadAndSave && !this.oldSelection.equals(getSelectedIds(repository))) {
+                        updateSavedResourcePacks();
+                        Minecraft.getInstance().reloadResourcePacks();
+                    }
                 }
             };
+            selector.loadRemoteAlbums(selectedAlbumId);
+            return selector;
+        }
+
+        public static Selector creationResources(int i, int j, int k, int l, boolean hasTooltip) {
+            ListMap<String, PackAlbum> albums = RemoteResourceAlbums.createAlbumMap();
+            String selectedAlbumId = defaultResourceAlbum.get();
+            Selector selector = new Selector(i, j, k, l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), albums, albums.getOrDefault(selectedAlbumId, MINECRAFT), Minecraft.getInstance().getResourcePackRepository(), Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip) {
+                @Override
+                public void applyChanges(boolean reloadAndSave) {
+                    super.applyChanges(reloadAndSave);
+                    if (!Minecraft.getInstance().hasSingleplayerServer()) {
+                        defaultResourceAlbum.set(savedAlbum.id());
+                        save();
+                    }
+                }
+            };
+            selector.loadRemoteAlbums(selectedAlbumId);
+            return selector;
         }
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip, PackAlbum selectedAlbum) {
-            return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, selectedAlbum, Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip);
+            ListMap<String, PackAlbum> albums = RemoteResourceAlbums.createAlbumMap();
+            PackAlbum initialAlbum = selectedAlbum == null ? MINECRAFT : selectedAlbum;
+            if (albums.get(initialAlbum.id()) == null) albums.put(initialAlbum.id(), initialAlbum);
+            initialAlbum = albums.get(initialAlbum.id());
+            Selector selector = new Selector(i, j, k, l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), albums, initialAlbum, Minecraft.getInstance().getResourcePackRepository(), Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip);
+            selector.loadRemoteAlbums(initialAlbum.id());
+            return selector;
         }
 
         public Selector(int i, int j, int k, int l, Component component, Component screenComponent, ListMap<String, PackAlbum> albums, PackAlbum savedAlbum, PackRepository packRepository, Path packPath, Consumer<Selector> reloadChanges, FactoryConfig<GlobalPacks> globalPacks, boolean hasTooltip) {
@@ -406,8 +451,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 boolean sd = LegacyOptions.getUIMode().isSD();
                 BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? sdLabelsCache : labelsCache;
                 Pack displayPack = getSelectedAlbum().getDisplayPack(packRepository);
-                if (getSelectedAlbum().iconSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(),x + 7,y + 5,32,32);
-                else FactoryGuiGraphics.of(graphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
+                renderAlbumIcon(graphics, getSelectedAlbum(), displayPack, x + 7, y + 5, 32, 32);
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 graphics.enableScissor(x + 40, y + 4,x + 40 + nameWidth, y + 44);
@@ -438,6 +482,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 }
                 if (CommonInputs.selected(i)) {
                     savedAlbum = getSelectedAlbum();
+                    userSelectedAlbum = true;
                     playDownSound(Minecraft.getInstance().getSoundManager());
                     return true;
                 }
@@ -507,6 +552,33 @@ public record PackAlbum(String id, int version, Component displayName, Component
             updateTooltip();
         }
 
+        public void selectAlbum(PackAlbum album) {
+            if (album == null) return;
+            albums.put(album.id(), album);
+            savedAlbum = album;
+            updateScrollBounds(albums.size());
+            setSelectedIndex(((List<PackAlbum>) albums.values()).indexOf(album));
+            if (selectedIndex < scrolledList.get()) scrolledList.set(selectedIndex);
+            else if (selectedIndex >= scrolledList.get() + getMaxPacks()) scrolledList.set(selectedIndex - getMaxPacks() + 1);
+            updateTooltip();
+        }
+
+        private void loadRemoteAlbums(String selectedAlbumId) {
+            RemoteResourceAlbums.load().whenComplete((unused, throwable) -> {
+                if (throwable != null) {
+                    Legacy4J.LOGGER.warn("Failed to load remote resource albums", throwable);
+                    return;
+                }
+                minecraft.execute(() -> {
+                    String activeAlbumId = userSelectedAlbum ? savedAlbum.id() : selectedAlbumId;
+                    RemoteResourceAlbums.addTo(albums);
+                    updateScrollBounds(albums.size());
+                    PackAlbum selectedAlbum = albums.get(activeAlbumId);
+                    if (selectedAlbum != null) selectAlbum(selectedAlbum);
+                });
+            });
+        }
+
         public void applyChanges(boolean reloadAndSave){
             globalPacks.get().applyPacks(packRepository, savedAlbum.packs());
             if (Minecraft.getInstance().hasSingleplayerServer()) LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(savedAlbum);
@@ -574,6 +646,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (ScreenUtil.isMouseOver(d,e, getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
                     setSelectedIndex(index + scrolledList.get());
                     savedAlbum = getSelectedAlbum();
+                    userSelectedAlbum = true;
                     playDownSound(Minecraft.getInstance().getSoundManager());
                     return;
                 }
@@ -610,8 +683,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (visibleCount>=getMaxPacks() || scrolledList.get() + index >= albums.size()) break;
                 PackAlbum album = albums.getByIndex(scrolledList.get() + index);
                 Pack displayPack = album.getDisplayPack(packRepository);
-                if (album.iconSprite().isPresent()) FactoryGuiGraphics.of(guiGraphics).blitSprite(album.iconSprite().get(),getX() + 21 + 30 * index,getY() + font.lineHeight + 4,28,28);
-                else FactoryGuiGraphics.of(guiGraphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
+                renderAlbumIcon(guiGraphics, album, displayPack, getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 28, 28);
                 if (scrolledList.get() + index == selectedIndex)
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
                 visibleCount++;
@@ -625,6 +697,23 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
                 if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
             }
+        }
+
+        private void renderAlbumIcon(GuiGraphics graphics, PackAlbum album, Pack displayPack, int x, int y, int width, int height) {
+            if (album.iconSprite().isPresent()) {
+                FactoryGuiGraphics.of(graphics).blitSprite(album.iconSprite().get(), x, y, width, height);
+                return;
+            }
+            ResourceLocation remoteIcon = RemoteResourceAlbums.getIcon(album);
+            if (remoteIcon != null) {
+                FactoryGuiGraphics.of(graphics).blit(remoteIcon, x, y, 0.0f, 0.0f, width, height, width, height);
+                return;
+            }
+            if (RemoteResourceAlbums.isIconPending(album)) {
+                ScreenUtil.drawGenericLoading(graphics, x, y, (width - 2) / 3, 1);
+                return;
+            }
+            FactoryGuiGraphics.of(graphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, x, y, 0.0f, 0.0f, width, height, width, height);
         }
 
         public static ResourceLocation loadPackIcon(TextureManager textureManager, Pack pack, String icon, ResourceLocation fallback) {

@@ -21,6 +21,7 @@ import org.apache.commons.io.FilenameUtils;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.screen.CreationList;
 import wily.legacy.util.JsonUtil;
 
 import java.io.*;
@@ -117,6 +118,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
             }
             Files.createDirectories(path.getParent());
             Files.copy(temp, path, StandardCopyOption.REPLACE_EXISTING);
+            invalidateWorldIcon(path);
         } finally {
             Files.deleteIfExists(temp);
         }
@@ -124,7 +126,8 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
 
     public static void removeDownloadedPack(String packId) {
         try {
-            Files.deleteIfExists(downloadedPackPath(packId));
+            Path path = downloadedPackPath(packId);
+            if (Files.deleteIfExists(path)) invalidateWorldIcon(path);
         } catch (IOException e) {
             Legacy4J.LOGGER.warn("Failed to remove downloaded world template {}", packId, e);
         }
@@ -172,6 +175,11 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
 
     private static String normalizeDownloadedPackId(String packId) {
         return packId.startsWith("file/") ? packId.substring(5) : packId;
+    }
+
+    private static void invalidateWorldIcon(Path path) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft != null) minecraft.execute(() -> CreationList.invalidateWorldIcon(path));
     }
 
     private static boolean isManagedDownloadedPack(LegacyWorldTemplate template) {

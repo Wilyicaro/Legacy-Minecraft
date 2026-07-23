@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,6 +28,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
+import wily.legacy.client.RemoteResourceAlbums;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -38,6 +40,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
@@ -58,10 +61,12 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected final TickBox onlineTickBox;
     protected final PublishScreen publishScreen;
     protected boolean focusMoreOptionsButton;
+    private boolean preparingRemoteResourceAlbum;
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
         super(s-> Panel.createPanel(s, p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        LegacyOptions.resetAdvancedWorldOptions();
         this.isLocked = isLocked;
         this.parent = screen;
         this.summary = summary;
@@ -71,7 +76,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0,0,220,publishScreen.publish, b-> PublishScreen.getPublishComponent(), b->PublishScreen.getPublishTooltip(), button -> {
-            if (LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.useLegacyWorldOptions()) {
                 if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
                 publishScreen.publish = button.selected;
                 return;
@@ -92,6 +97,16 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public void addControlTooltips(Renderer renderer) {
         super.addControlTooltips(renderer);
         OptionsScreen.setupSelectorControlTooltips(renderer,this);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            onlineTickBox.setMessage(PublishScreen.getPublishComponent());
+            onlineTickBox.updateMessage();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public static boolean hasCommands(LevelSummary levelSummary){
@@ -148,6 +163,36 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     public void onLoad() {
+        if (preparingRemoteResourceAlbum) return;
+        Optional<CompletableFuture<PackAlbum>> install = RemoteResourceAlbums.install(resourceAssortSelector.getSelectedAlbum());
+        if (install.isPresent()) {
+            preparingRemoteResourceAlbum = true;
+            LegacyLoadingScreen loadingScreen = new LegacyLoadingScreen();
+            loadingScreen.setGenericLoading(true);
+            loadingScreen.setBlackBackground(true);
+            minecraft.setScreen(loadingScreen);
+            install.get().whenComplete((installedAlbum, throwable) -> minecraft.execute(() -> {
+                preparingRemoteResourceAlbum = false;
+                if (throwable != null || installedAlbum == null) {
+                    Legacy4J.LOGGER.warn("Failed to prepare remote resource album before loading world", throwable);
+                    minecraft.setScreen(this);
+                    return;
+                }
+                try {
+                    minecraft.getResourcePackRepository().reload();
+                    resourceAssortSelector.selectAlbum(installedAlbum);
+                    continueLoad();
+                } catch (Throwable preparationThrowable) {
+                    Legacy4J.LOGGER.warn("Failed to prepare remote resource album before loading world", preparationThrowable);
+                    minecraft.setScreen(this);
+                }
+            }));
+            return;
+        }
+        continueLoad();
+    }
+
+    private void continueLoad() {
         if (dimensionsToReset.isEmpty()){
             completeLoad();
         } else {

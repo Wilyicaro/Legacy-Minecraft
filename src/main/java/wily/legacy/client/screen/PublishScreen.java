@@ -34,11 +34,11 @@ public class PublishScreen extends ConfirmationScreen{
     }
 
     public static Component getPublishComponent() {
-        return Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
+        return Component.translatable(LegacyOptions.useLegacyWorldOptions() || hasWorldHost() ? "legacy.menu.online" : "menu.shareToLan");
     }
 
     public static Tooltip getPublishTooltip() {
-        return Tooltip.create(Component.translatable(LegacyOptions.legacySettingsMenus.get() || hasWorldHost() ? "legacy.menu.online.description" : "menu.shareToLan.description"));
+        return Tooltip.create(Component.translatable(LegacyOptions.useLegacyWorldOptions() || hasWorldHost() ? "legacy.menu.online.description" : "menu.shareToLan.description"));
     }
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {

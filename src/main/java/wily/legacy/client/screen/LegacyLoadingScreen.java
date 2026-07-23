@@ -39,6 +39,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     private Component loadingHeader;
     private Component loadingStage;
     private boolean genericLoading;
+    private boolean blackBackground;
     private UIAccessor accessor = UIAccessor.of(this);
 
     protected RandomSource random = RandomSource.create();
@@ -50,6 +51,10 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         this();
         this.setLoadingHeader(loadingHeader);
         this.setLoadingStage(loadingStage);
+    }
+
+    public void setBlackBackground(boolean blackBackground) {
+        this.blackBackground = blackBackground;
     }
 
     public void prepareRender(Minecraft minecraft,int width, int height,Component loadingHeader, Component loadingStage, int progress, boolean genericLoading){
@@ -86,14 +91,16 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);
+        if (blackBackground) guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
+        else ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);
     }
     //?}
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         FactoryScreenUtil.disableDepthTest();
         //? if <=1.20.1
-        /*ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);*/
+        /*if (blackBackground) guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
+        else ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);*/
         super.render(guiGraphics, i, j, f);
         int loadingBarX = accessor.getInteger("loadingBar.x", width / 2 - 160);
         int loadingBarY = accessor.getInteger("loadingBar.y", height / 2 + 15);

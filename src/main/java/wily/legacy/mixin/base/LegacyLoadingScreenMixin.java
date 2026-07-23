@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
@@ -16,6 +17,11 @@ import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
 @Mixin({LevelLoadingScreen.class, ProgressScreen.class, ReceivingLevelScreen.class, ConnectScreen.class})
 public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
+    @Unique
+    private static final long LEGACY_PROGRESS_CYCLE_MS = 1000L;
+    @Unique
+    private long legacy$loadingStarted;
+
     protected LegacyLoadingScreenMixin(Component component) {
         super(component);
     }
@@ -40,10 +46,10 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             boolean genericLoading = false;
             int progress = 0;
             if (self() instanceof ReceivingLevelScreen) progress = -1;
-            if (self() instanceof LevelLoadingScreen loading) {
+            if (self() instanceof LevelLoadingScreen) {
                 lastLoadingHeader = Component.translatable("legacy.connect.initializing");
                 lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
-                progress = loading.progressListener.getProgress();
+                progress = legacy$loadingProgress();
             }
             if (self() instanceof ProgressScreen p) {
                 lastLoadingHeader = p.header;
@@ -98,5 +104,12 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
     @Override
     public void setGenericLoading(boolean genericLoading) {
         legacyLoadingScreen.setGenericLoading(genericLoading);
+    }
+
+    @Unique
+    private int legacy$loadingProgress() {
+        long now = Util.getMillis();
+        if (legacy$loadingStarted == 0L) legacy$loadingStarted = now;
+        return (int) (((now - legacy$loadingStarted) % LEGACY_PROGRESS_CYCLE_MS) * 100 / LEGACY_PROGRESS_CYCLE_MS);
     }
 }

@@ -42,6 +42,11 @@ public class LegacyBiomeOverride {
         return map.get(DEFAULT_LOCATION);
     }
 
+    public static boolean hasDefaultWaterFogDistance() {
+        LegacyBiomeOverride defaultOverride = map.get(DEFAULT_LOCATION);
+        return defaultOverride != null && defaultOverride.waterFogDistance != null;
+    }
+
     public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey){
         return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().location());
     }
