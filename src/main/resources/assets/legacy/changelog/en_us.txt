@@ -34,6 +34,7 @@
   - `In-Game Online IDs`
   - `Hide Advanced Options Tooltip`
   - `Display Pack Management Tooltips`
+  - `Display Reinstall Content Button`
   - `Fake Manual Save Screen`
   - `Legacy Font`
   - `Legacy Settings Menus`, a menu purist mode for accuracy with LE
@@ -42,7 +43,9 @@
  - `Legacy Mobcap Limits`
  - `Falling Block Limit`
  - `Legacy Offhand Limits`
-- Added `Minecraft Store`, with a lot of packs and resource albums available by default for download, thanks to BrandonItaly
+- Added `Minecraft Store`, with texture and mash-up packs available through Remote Resource Albums and World Templates; remote content can be downloaded and applied during world loading, thanks to BrandonItaly
+- Added a `Reinstall Content` action for updating downloaded content
+- Added missing mob information tooltips
 - Added `Advanced Options` for the controller section
 - Added `Controller Polling Rate` to Advanced Controller Options
 - Added Controller LED RGB sliders with a preview
@@ -106,6 +109,14 @@
 - Skeleton horses can be ridden without a saddle
 - Spider Jockeys in the nether will become Wither Jockeys
 - Baby zombies have a 15% to become a jockey , they will seek out the nearest rideable mob
+- Added Legacy Console Edition underwater fog
+- The world-loading progress bar now loops like Legacy Console Edition
+- Music now fades out when changing dimensions, and fades out at legacy's 200 ticks
+- Shulker bullets now render at 50% opacity
+- Primed TNT and TNT minecarts now flash increasingly white as they approach detonation
+- Added Legacy Console Edition rain rendering, including its world-anchored animation, opacity fade, and intensity
+- Fish now use the Legacy Console Edition flopping animation out of water
+- Gamma now uses Legacy Console Edition's brightness curve
 
 ## General Changes
 
@@ -143,3 +154,5 @@
 - Fixed locator bar pips not following Hud Opacity
 - Fixed the game freezing after resuming a device from sleep
 - Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
+- Fixed GUI items in inventories having artifacts at certain resolutions
+- Fixed Legacy Gamma sometimes causing a black screen
