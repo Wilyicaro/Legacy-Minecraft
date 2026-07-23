@@ -20,7 +20,7 @@ public class WeatherEffectRendererMixin {
         return radius == 10 ? 9 : radius;
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/WeatherEffectRenderer;renderInstances(Lcom/mojang/blaze3d/vertex/VertexConsumer;Ljava/util/List;Lnet/minecraft/world/phys/Vec3;FIF)V"), index = 5)
+    @ModifyExpressionValue(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getRainLevel(F)F"))
     private float squareRainLevel(float rainLevel) {
         return rainLevel * rainLevel;
     }
