@@ -12,14 +12,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class LegacyMusicFader {
-    private static final long FADE_TICKS = 70;
+    private static final long FADE_TICKS = 200;
     private static final Minecraft mc = Minecraft.getInstance();
     private static final SoundManager soundManager = mc.getSoundManager();
     private static final MusicManagerAccessor musicManagerAccessor = (MusicManagerAccessor) mc.getMusicManager();
-    public static SoundInstance queuedSong = null;
-    public static Map<SoundInstance, Long> fadingSongs = new HashMap<>();
+    private static SoundInstance queuedSong = null;
+    private static final Map<SoundInstance, Long> fadingSongs = new HashMap<>();
     public static boolean musicManagerShouldTick = true;
     private static long ticks = 0;
+    private static boolean resumeMusicManager;
 
     public static SoundEngine.PlayResult fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundEngine.PlayResult result = SoundEngine.PlayResult.STARTED;
@@ -37,6 +38,16 @@ public class LegacyMusicFader {
         else fadingSongs.putIfAbsent(fadeMusic, ticks + FADE_TICKS);
         if (startMusicManager) musicManagerShouldTick = true;
         if (delayMusicManager) musicManagerAccessor.setNextSongDelay(1200);
+    }
+
+    public static void fadeOutDimensionMusic() {
+        SoundInstance music = musicManagerAccessor.getCurrentMusic();
+        if (music == null) return;
+        fadingSongs.put(music, ticks + FADE_TICKS);
+        musicManagerAccessor.setCurrentMusic(null);
+        musicManagerShouldTick = false;
+        resumeMusicManager = true;
+        mc.getToastManager().hideNowPlayingToast();
     }
 
     public static void fadeOutBgMusic(boolean startMusicManager) {
@@ -65,6 +76,11 @@ public class LegacyMusicFader {
         if (fadingSongs.isEmpty() && queuedSong != null) {
             soundManager.play(queuedSong);
             queuedSong = null;
+        }
+        if (fadingSongs.isEmpty() && resumeMusicManager) {
+            musicManagerAccessor.setNextSongDelay(0);
+            musicManagerShouldTick = true;
+            resumeMusicManager = false;
         }
     }
 }

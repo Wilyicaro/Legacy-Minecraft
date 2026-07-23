@@ -1,5 +1,7 @@
 package wily.legacy.client;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -7,10 +9,13 @@ import net.minecraft.resources.Identifier;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +45,7 @@ public final class RemoteResourceAlbums {
         List<CompletableFuture<List<ContentManager.Pack>>> futures = categories.stream().map(ContentManager::fetchIndex).toList();
         CompletableFuture<Void> result = new CompletableFuture<>();
         loadFuture = result;
-        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).whenComplete((unused, throwable) -> {
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).thenCombine(fetchOrder(categories.getFirst()), (unused, order) -> order).whenComplete((order, throwable) -> {
             if (throwable != null) {
                 result.completeExceptionally(throwable);
                 return;
@@ -53,6 +58,7 @@ public final class RemoteResourceAlbums {
                     loaded.add(new Entry(category, pack, createPlaceholder(pack)));
                 }
             }
+            applyOrder(loaded, order);
             Runnable register = () -> {
                 synchronized (RemoteResourceAlbums.class) {
                     ENTRIES.clear();
@@ -67,6 +73,36 @@ public final class RemoteResourceAlbums {
             else minecraft.execute(register);
         });
         return result;
+    }
+
+    private static CompletableFuture<List<String>> fetchOrder(ContentManager.Category category) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (InputStream stream = ContentManager.openRemoteStream(URI.create(category.indexUrl()).resolve("../album_index.json").toURL(), 5000, 10000);
+                 InputStreamReader reader = new InputStreamReader(stream)) {
+                JsonElement root = JsonParser.parseReader(reader);
+                if (!root.isJsonObject()) return List.of();
+                JsonElement orderElement = root.getAsJsonObject().get("order");
+                if (orderElement == null || !orderElement.isJsonArray()) return List.of();
+                List<String> order = new ArrayList<>();
+                for (JsonElement element : orderElement.getAsJsonArray()) {
+                    if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) order.add(element.getAsString());
+                }
+                return order;
+            } catch (FileNotFoundException e) {
+                return List.of();
+            } catch (Exception e) {
+                Legacy4J.LOGGER.warn("Failed to load remote resource album order: {}", e.getMessage());
+                return List.of();
+            }
+        });
+    }
+
+    private static void applyOrder(List<Entry> entries, List<String> order) {
+        entries.sort(Comparator.comparingInt(entry -> {
+            int index = order.indexOf(entry.pack().id());
+            if (index < 0) index = order.indexOf(entry.placeholder().id());
+            return index < 0 ? order.size() : index;
+        }));
     }
 
     public static synchronized ListMap<String, PackAlbum> createAlbumMap() {

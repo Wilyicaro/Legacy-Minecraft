@@ -1,11 +1,13 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
@@ -66,6 +68,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
         super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        LegacyOptions.resetAdvancedWorldOptions();
         this.isLocked = isLocked;
         this.parent = screen;
         this.summary = summary;
@@ -75,7 +78,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
-            if (LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.useLegacyWorldOptions()) {
                 if (button.selected) publishScreen.setGameType(gameTypeSlider.getObjectValue());
                 publishScreen.publish = button.selected;
                 return;
@@ -174,6 +177,16 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public void addControlTooltips(Renderer renderer) {
         super.addControlTooltips(renderer);
         OptionsScreen.setupSelectorControlTooltips(renderer, this);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            onlineTickBox.setMessage(PublishScreen.getPublishComponent());
+            onlineTickBox.updateMessage();
+            return true;
+        }
+        return super.keyPressed(keyEvent);
     }
 
     public int getLayoutWidth() {
@@ -339,7 +352,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         onlineTickBox.updateValue();
         super.extractRenderState(GuiGraphicsExtractor, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) GuiGraphicsExtractor.deferredTooltip = null;
+        if (LegacyOptions.useLegacyWorldOptions()) GuiGraphicsExtractor.deferredTooltip = null;
         if (LegacyRenderUtil.isMouseOver(i, j, panel.x + 14.5, panel.y + 10, 29, 29))
             GuiGraphicsExtractor.setTooltipForNextFrame(font, Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)), i, j);
     }
