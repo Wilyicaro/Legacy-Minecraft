@@ -350,6 +350,22 @@ public class LegacyOptions {
         FactoryConfig.saveOptionAndConsume(advancedOptionsMode, AdvancedOptionsMode.MERGE, v -> {});
     }
 
+    private static boolean advancedWorldOptionsVisible;
+
+    public static boolean useLegacyWorldOptions() {
+        return legacySettingsMenus.get() && !advancedWorldOptionsVisible;
+    }
+
+    public static boolean revealAdvancedWorldOptions() {
+        if (!useLegacyWorldOptions()) return false;
+        advancedWorldOptionsVisible = true;
+        return true;
+    }
+
+    public static void resetAdvancedWorldOptions() {
+        advancedWorldOptionsVisible = false;
+    }
+
     public static String getLastUsedCustomPackIdOrNull() {
         String packId = lastUsedCustomPackId.get();
         return packId == null || packId.isBlank() ? null : packId;

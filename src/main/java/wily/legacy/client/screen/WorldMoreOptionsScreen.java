@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import net.minecraft.ChatFormatting;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
     public static final Component ENTER_SEED = Component.translatable("selectWorld.enterSeed");
@@ -71,11 +73,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected ScrollableRenderer scrollableRenderer = new ScrollableRenderer(new LegacyScrollRenderer());
     protected Runnable onClose = () -> {
     };
+    protected final Supplier<WorldMoreOptionsScreen> advancedOptionsScreen;
 
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
+        advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent, trustPlayers, onlineGame, biomeScale);
         renderableVLists.add(gameRenderables);
-        if (LegacyOptions.legacySettingsMenus.get()) {
+        if (LegacyOptions.useLegacyWorldOptions()) {
             initLegacyCreateWorldOptions(parent, trustPlayers, onlineGame, biomeScale);
         } else {
             initDefaultCreateWorldOptions(parent, trustPlayers);
@@ -217,7 +221,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private Button createCustomizeButton(CreateWorldScreen parent) {
-        Component defaultMessage = LegacyOptions.legacySettingsMenus.get()
+        Component defaultMessage = LegacyOptions.useLegacyWorldOptions()
                 ? Component.translatable("legacy.menu.selectWorld.customize_superflat")
                 : Component.translatable("selectWorld.customizeType");
         Button customizeButton = new LegacyButton(defaultMessage, button -> {
@@ -227,7 +231,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         });
         parent.getUiState().addListener(s -> {
             customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
-            customizeButton.setMessage(LegacyOptions.legacySettingsMenus.get()
+            customizeButton.setMessage(LegacyOptions.useLegacyWorldOptions()
                     ? Component.translatable("legacy.menu.selectWorld.customize_superflat")
                     : Component.translatable("selectWorld.customizeType"));
             customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
@@ -286,7 +290,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private Component getResetDimensionComponent(ResourceKey<Level> dimension) {
-        if (LegacyOptions.legacySettingsMenus.get()) {
+        if (LegacyOptions.useLegacyWorldOptions()) {
             if (Level.NETHER.equals(dimension)) return Component.translatable("legacy.menu.load_save.reset_nether");
             if (Level.END.equals(dimension)) return Component.translatable("legacy.menu.load_save.reset_end");
         }
@@ -298,7 +302,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private boolean shouldUseExpandedResetDimensionTooltip(Component message) {
-        return message != null && LegacyOptions.legacySettingsMenus.get() && (message.equals(Component.translatable("legacy.menu.load_save.reset_nether.description")) || message.equals(Component.translatable("legacy.menu.load_save.reset_end.description")));
+        return message != null && LegacyOptions.useLegacyWorldOptions() && (message.equals(Component.translatable("legacy.menu.load_save.reset_nether.description")) || message.equals(Component.translatable("legacy.menu.load_save.reset_end.description")));
     }
 
     private void setWorldPreset(CreateWorldScreen parent, ResourceKey<WorldPreset> presetKey) {
@@ -332,15 +336,16 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
         super(parent,
-                s -> LegacyOptions.legacySettingsMenus.get()
+                s -> LegacyOptions.useLegacyWorldOptions()
                         ? Panel.createPanel(s,
                                 p -> p.appearance(244, ((WorldMoreOptionsScreen) s).getLegacyPanelHeight(199, true)),
                                 p -> p.pos(p.centeredLeftPos(s), (s.height - 199) / 2))
                         : Panel.centered(s, 244, 199),
                 Component.translatable("createWorld.tab.more.title"));
+        advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent);
         renderableVLists.add(gameRenderables);
         tabList.setSelected(1);
-        if (LegacyOptions.legacySettingsMenus.get()) {
+        if (LegacyOptions.useLegacyWorldOptions()) {
             initLegacyLoadSaveOptions(parent);
         } else {
             initDefaultLoadSaveOptions(parent);
@@ -398,7 +403,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     protected int getLegacyPanelHeight(int baseHeight, boolean shrinkOnly) {
-        if (!LegacyOptions.legacySettingsMenus.get()) return baseHeight;
+        if (!LegacyOptions.useLegacyWorldOptions()) return baseHeight;
 
         int contentHeight = 20;
         int entryCount = 0;
@@ -488,7 +493,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 message = widget.getTooltip().get().message;
 
             boolean sd = LegacyOptions.getUIMode().isSD();
-            boolean compactLegacyTooltip = LegacyOptions.legacySettingsMenus.get() && !sd;
+            boolean compactLegacyTooltip = LegacyOptions.useLegacyWorldOptions() && !sd;
             int tooltipContentPadding = sd ? 20 : compactLegacyTooltip ? 36 : 44;
 
             MultiLineLabel label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
@@ -521,6 +526,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            minecraft.setScreen(advancedOptionsScreen.get());
+            return true;
+        }
         tabList.controlTab(keyEvent.key());
         return super.keyPressed(keyEvent);
     }

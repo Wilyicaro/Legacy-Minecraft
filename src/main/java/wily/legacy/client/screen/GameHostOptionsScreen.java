@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -7,6 +8,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -45,11 +47,11 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     protected final Map<Object, Runnable> actionsOnClose = new LinkedHashMap<>();
 
     public GameHostOptionsScreen(Screen parent, Minecraft minecraft) {
-        super(parent, s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER), LegacyOptions.legacySettingsMenus.get())), p -> p.centered(s)), HostOptionsScreen.HOST_OPTIONS);
+        super(parent, s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER), LegacyOptions.useLegacyWorldOptions())), p -> p.centered(s)), HostOptionsScreen.HOST_OPTIONS);
         getRenderableVList().layoutSpacing(l -> 2);
 
         boolean isOp =  minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
-        boolean legacyMenus = LegacyOptions.legacySettingsMenus.get();
+        boolean legacyMenus = LegacyOptions.useLegacyWorldOptions();
 
         accessor.addStatic(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", isOp)));
 
@@ -158,6 +160,18 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     }
 
     @Override
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            GameHostOptionsScreen screen = new GameHostOptionsScreen(parent, minecraft);
+            screen.nonOpGamerules.putAll(nonOpGamerules);
+            screen.actionsOnClose.putAll(actionsOnClose);
+            minecraft.setScreen(screen);
+            return true;
+        }
+        return super.keyPressed(keyEvent);
+    }
+
+    @Override
     protected void panelInit() {
         panel.init();
     }
@@ -181,6 +195,6 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+        if (LegacyOptions.useLegacyWorldOptions()) guiGraphics.deferredTooltip = null;
     }
 }

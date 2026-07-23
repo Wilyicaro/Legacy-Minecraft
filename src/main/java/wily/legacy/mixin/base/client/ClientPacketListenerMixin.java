@@ -53,7 +53,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
     @Redirect(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;stopPlaying()V"))
     public void handleRespawnMusic(MusicManager instance) {
-        LegacyMusicFader.fadeOutBgMusic(true);
+        LegacyMusicFader.fadeOutDimensionMusic();
     }
 
     @Inject(method = "handleLogin", at = @At("TAIL"))

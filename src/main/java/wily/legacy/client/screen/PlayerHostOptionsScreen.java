@@ -96,6 +96,6 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+        if (LegacyOptions.useLegacyWorldOptions()) guiGraphics.deferredTooltip = null;
     }
 }

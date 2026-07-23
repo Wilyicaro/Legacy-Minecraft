@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client.create_world;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -106,6 +107,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initReturn(Minecraft minecraft, Runnable runnable, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CreateWorldCallback createWorldCallback, CallbackInfo ci     /*? if >=1.21.2 {*/  /*?}*/) {
+        LegacyOptions.resetAdvancedWorldOptions();
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
         panel = Panel.createPanel(this, p -> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (height - p.height) / 2, 245, 228);
         resourceAlbumSelector = PackAlbum.Selector.creationResources(panel.x + 13, panel.y + 106, 220, 45, !LegacyRenderUtil.hasTooltipBoxes());
@@ -134,7 +136,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         setInitialFocus(nameEdit);
         addRenderableWidget(accessor.putWidget("nameEditBox", nameEdit));
         LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, panel.y + 51, layoutWidth, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().displayName), b -> Tooltip.create(uiState.getGameMode().getInfo()), uiState.getGameMode(), () -> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b -> {
-            if (LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.useLegacyWorldOptions()) {
                 legacy$preservedAllowCommands = uiState./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/();
                 legacy$restoreAllowCommandsAfterGameModeChange = true;
             }
@@ -158,7 +160,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> legacy$createWorld()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
-            if (LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.useLegacyWorldOptions()) {
                 if (button.selected) publishScreen.setGameType(uiState.getGameMode().gameType);
                 publishScreen.publish = button.selected;
                 return;
@@ -265,7 +267,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         resourceAlbumSelector.renderTooltipBox(guiGraphics, panel);
         super.render(guiGraphics, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) guiGraphics.deferredTooltip = null;
+        if (LegacyOptions.useLegacyWorldOptions()) guiGraphics.deferredTooltip = null;
         UIAccessor accessor = UIAccessor.of(this);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15));
@@ -276,6 +278,11 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            onlineTickBox.setMessage(PublishScreen.getPublishComponent());
+            onlineTickBox.updateMessage();
+            return true;
+        }
         return super.keyPressed(keyEvent);
     }
 
