@@ -63,18 +63,14 @@ public class GameHostOptionsScreen extends PanelVListScreen {
 
         int initialWeather = minecraft.level.isThundering() ? 2 : minecraft.level.isRaining() ? 1 : 0;
         List<GameRules.Key<GameRules.BooleanValue>> worldRules = legacyMenus ? HostOptionsScreen.LEGACY_WORLD_RULES : HostOptionsScreen.WORLD_RULES;
-        for (GameRules.Key<GameRules.BooleanValue> key : worldRules) {
+        for (GameRules.Key<GameRules.BooleanValue> key : worldRules)
             getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b -> LegacyComponents.getMenuGameRuleName(key), b -> null, b -> queueHostCommand(key.getId(), "gamerule %s %s".formatted(key.getId(), b.selected))));
-        }
-
-        getRenderableVList().addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_day"), b -> queueHostAction("time", () -> runHostAction(ServerHostOptionsPayload.time("day"), "time set day"))).bounds(0, 0, 215, 20).build());
-        getRenderableVList().addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_night"), b -> queueHostAction("time", () -> runHostAction(ServerHostOptionsPayload.time("night"), "time set night"))).bounds(0, 0, 215, 20).build());
-        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(minecraft.level.getDifficulty().getInfo()), minecraft.level.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b -> queueHostAction("difficulty", () -> runHostAction(ServerHostOptionsPayload.difficulty(b.getObjectValue()), "difficulty " + b.getObjectValue().getKey()))));
-
-        GameType gameType = Legacy4JClient.defaultServerGameType == null ? minecraft.gameMode.getPlayerMode() : Legacy4JClient.defaultServerGameType;
+        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_day"), b1 -> queueHostAction("time", () -> runHostAction(ServerHostOptionsPayload.time("day"), "time set day"))));
+        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_night"), b1 -> queueHostAction("time", () -> runHostAction(ServerHostOptionsPayload.time("night"), "time set night"))));
+        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"), b1.getObjectValue().getDisplayName()), b1 -> Tooltip.create(minecraft.level.getDifficulty().getInfo()), minecraft.level.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b1 -> queueHostAction("difficulty", () -> runHostAction(ServerHostOptionsPayload.difficulty(b1.getObjectValue()), "difficulty " + b1.getObjectValue().getSerializedName()))));
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
-        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), gameType, () -> gameTypes, b -> queueHostAction("gameMode", () -> runHostAction(ServerHostOptionsPayload.defaultGameMode(b.getObjectValue()), "defaultgamemode " + b.getObjectValue().getName()))));
-        getRenderableVList().addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_world_spawn"), b -> queueHostAction("worldSpawn", () -> runHostAction(ServerHostOptionsPayload.worldSpawn(), "setworldspawn"))).bounds(0, 0, 215, 20).build());
+        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), b1 -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b1.getObjectValue().getName() + ".info")), Legacy4JClient.defaultServerGameType, () -> gameTypes, b1 -> queueHostAction("gameMode", () -> runHostAction(ServerHostOptionsPayload.defaultGameMode(b1.getObjectValue()), "defaultgamemode " + b1.getObjectValue().getName()))));
+        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_world_spawn"), b1 -> queueHostAction("worldSpawn", () -> runHostAction(ServerHostOptionsPayload.worldSpawn(), "setworldspawn"))));
         getRenderableVList().addRenderables(SimpleLayoutRenderable.create(240, 12, l -> (graphics, i, j, f) -> {}));
         getRenderableVList().addCategory(Component.translatable("soundCategory.weather"));
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b -> Component.translatable("legacy.weather_state." + b.getObjectValue()), b -> null, WEATHERS.get(initialWeather), () -> WEATHERS, b -> {
@@ -98,14 +94,14 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     }
 
     protected Button createTeleportButton(Minecraft minecraft, boolean toPlayer, Component title) {
-        return Button.builder(title, b -> minecraft.setScreen(new HostOptionsScreen(title) {
+        return new LegacyButton(title, b1 -> minecraft.setScreen(new HostOptionsScreen(title) {
             @Override
             protected void addHostOptionsButton() {
             }
 
             @Override
             protected void addPlayerButtons() {
-                addPlayerButtons(false, (profile, button) -> {
+                addPlayerButtons(false, (profile, b1) -> {
                     if (toPlayer) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().getName()));
                     else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().getName()));
                 });
@@ -114,7 +110,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
             public boolean isPauseScreen() {
                 return false;
             }
-        })).bounds(0, 0, 215, 20).build();
+        }));
     }
 
     protected void runHostAction(ServerHostOptionsPayload payload, String fallbackCommand) {

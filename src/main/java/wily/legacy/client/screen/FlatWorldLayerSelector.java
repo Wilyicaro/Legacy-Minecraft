@@ -63,10 +63,10 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
         layerSlider.setPosition(accessor.getInteger("layerSlider.x", panel.x + 21), accessor.getInteger("layerSlider.y", panel.y + 167));
         layerSlider.setWidth(accessor.getInteger("layerSlider.width", 271));
         addRenderableWidget(accessor.putWidget("layerSlider", layerSlider));
-        addRenderableWidget(accessor.putWidget("okButton", Button.builder(Component.translatable("gui.ok"), b-> {
+        addRenderableWidget(accessor.putWidget("okButton", new LegacyButton(accessor.getInteger("okButton.x", panel.x + 57), accessor.getInteger("okButton.y", panel.y + 216), accessor.getInteger("okButton.width", 200), accessor.getInteger("okButton.height", 20), Component.translatable("gui.ok"), b-> {
             applyLayer.accept(this);
             onClose();
-        }).bounds(accessor.getInteger("okButton.x", panel.x + 57), accessor.getInteger("okButton.y", panel.y + 216), accessor.getInteger("okButton.width", 200), accessor.getInteger("okButton.height", 20)).build()));
+        })));
     }
 
     @Override

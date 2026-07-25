@@ -202,7 +202,7 @@ public class LegacyUIElementTypes {
         RandomSource random = RandomSource.create();
         Bearer<Boolean> canOpenBook = Bearer.of(false);
         uiDefinition.getDefinitions().add(UIDefinition.createBeforeInit(a-> {
-            if (!a.initialized()) {
+            if (!a.initialized() || bookModel.isEmpty()) {
                 bookModel.set(new BookModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BOOK)));
                 flip.set(0f);
                 oFlip.set(0f);
@@ -234,6 +234,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit((a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
+            if (bookModel.isEmpty()) return;
             float g = Mth.lerp(f, oOpen.get(), open.get());
             float f1 = Mth.lerp(f, oFlip.get(), flip.get());
             guiGraphics.flush();

@@ -55,7 +55,7 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
             }));
         }
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + playerInfo.getGameMode().getName() + ".info")), playerInfo.getGameMode(), () -> gameTypes, b -> actionsOnClose.put(b, () -> runHostAction(minecraft, ServerHostOptionsPayload.gameMode(b.getObjectValue(), playerInfo.getProfile().getId()), "gamemode %s %s".formatted(b.getObjectValue().getName(), playerInfo.getProfile().getName())))));
-        getRenderableVList().addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"), b -> actionsOnClose.put(b, () -> runHostAction(minecraft, ServerHostOptionsPayload.playerSpawn(playerInfo.getProfile().getId()), "spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().getName())))).bounds(0, 0, 215, 20).build());
+        getRenderableVList().addRenderable(new LegacyButton(0, 0, 215, 20, Component.translatable("legacy.menu.host_options.set_player_spawn"), b -> actionsOnClose.put(b, () -> runHostAction(minecraft, ServerHostOptionsPayload.playerSpawn(playerInfo.getProfile().getId()), "spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().getName())))));
     }
 
     protected void runHostAction(Minecraft minecraft, ServerHostOptionsPayload payload, String fallbackCommand) {

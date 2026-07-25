@@ -113,7 +113,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
             };
         }
-        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
+        renderableVList.addRenderable(new LegacyButton(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())));
         renderableVList.addRenderable(new TickBox(0,0, trustPlayers.get(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> tooltip(Component.translatable("legacy.menu.selectWorld.trust_players.description")),t-> trustPlayers.set(t.selected)));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(hostPrivileges);
@@ -190,11 +190,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private Button createCustomizeButton(CreateWorldScreen parent) {
-        Button customizeButton = Button.builder(LegacyOptions.useLegacyWorldOptions() ? Component.translatable("legacy.menu.selectWorld.customize_superflat") : Component.translatable("selectWorld.customizeType"), button -> {
+        Button customizeButton = new LegacyButton(LegacyOptions.useLegacyWorldOptions() ? Component.translatable("legacy.menu.selectWorld.customize_superflat") : Component.translatable("selectWorld.customizeType"), button -> {
             PresetEditor presetEditor = parent.getUiState().getPresetEditor();
             if (presetEditor != null)
                 minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
-        }).build();
+        });
         parent.getUiState().addListener(s -> {
             customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
             customizeButton.setMessage(LegacyOptions.useLegacyWorldOptions() ? Component.translatable("legacy.menu.selectWorld.customize_superflat") : Component.translatable("selectWorld.customizeType"));
