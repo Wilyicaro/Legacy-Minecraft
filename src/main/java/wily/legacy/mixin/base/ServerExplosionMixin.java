@@ -1,18 +1,26 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.ServerExplosion;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -22,7 +30,10 @@ import java.util.List;
 
 @Mixin(ServerExplosion.class)
 public abstract class ServerExplosionMixin implements Explosion {
-    private static final double LEGACY_TNT_THROUGH_BLOCK_KNOCKBACK = 0.5;
+    private static final double LEGACY_OCCLUDED_KNOCKBACK = 0.25;
+
+    @Unique
+    private List<BlockPos> legacy$explodedPositions = List.of();
 
     @Shadow
     @Final
@@ -34,28 +45,40 @@ public abstract class ServerExplosionMixin implements Explosion {
 
     @Shadow
     @Final
-    private Entity source;
+    private ExplosionDamageCalculator damageCalculator;
 
     @Shadow
     @Final
     private float radius;
 
-    @ModifyArg(method = "hurtEntities()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0, require = 0)
-    private double getKnockbackPower(double power, @Local Entity entity) {
-        return getThroughBlockKnockbackPower(entity, power);
+    @ModifyExpressionValue(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;calculateExplodedPositions()Ljava/util/List;"))
+    private List<BlockPos> legacy$captureExplodedPositions(List<BlockPos> positions) {
+        legacy$explodedPositions = positions;
+        return positions;
     }
 
-    @ModifyArg(method = "hurtEntities(Ljava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0, require = 0)
-    private double getKnockbackPowerWithBlocks(double power, @Local Entity entity) {
-        return getThroughBlockKnockbackPower(entity, power);
+    @WrapOperation(method = "hurtEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
+    private boolean legacy$hurtEntity(Entity entity, ServerLevel level, DamageSource source, float amount, Operation<Boolean> original) {
+        return legacy$intersectsBlast(entity) && original.call(entity, level, source, amount);
     }
 
-    private double getThroughBlockKnockbackPower(Entity entity, double power) {
-        if (!(source instanceof PrimedTnt)) return power;
+    @ModifyArg(method = "hurtEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0)
+    private double legacy$getKnockbackPower(double power, @Local Entity entity) {
+        if (legacy$intersectsBlast(entity)) return power;
         double doubleRadius = radius * 2.0F;
         if (doubleRadius <= 0.0) return power;
         double dist = Math.sqrt(entity.distanceToSqr(center)) / doubleRadius;
-        return Math.max(power, (1.0 - dist) * LEGACY_TNT_THROUGH_BLOCK_KNOCKBACK);
+        double resistance = entity instanceof LivingEntity livingEntity ? livingEntity.getAttributeValue(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE) : 0.0;
+        return (1.0 - dist) * damageCalculator.getKnockbackMultiplier(entity) * (1.0 - resistance) * LEGACY_OCCLUDED_KNOCKBACK;
+    }
+
+    @Unique
+    private boolean legacy$intersectsBlast(Entity entity) {
+        AABB bounds = entity.getBoundingBox();
+        for (BlockPos position : legacy$explodedPositions) {
+            if (bounds.intersects(position)) return true;
+        }
+        return false;
     }
 
     @Inject(method = "interactWithBlocks", at = @At("RETURN"))

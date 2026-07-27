@@ -160,6 +160,7 @@
   "options.autosaveIndicator": "Display Save Icon",
   "options.language": "Languages",
   "options.reducedDebugInfo": "Reduced Debug Information",
+  "options.sensitivity": "Game Sensitivity",
   "selectServer.delete": "Delete Server",
   "selectWorld.delete": "Delete Save",
   "selectWorld.mapFeatures.info": "When enabled, structures such as Villages and Strongholds will generate in the world.",

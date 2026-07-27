@@ -68,6 +68,7 @@ public class ContentManager {
         String description,
         Optional<URI> downloadURI,
         Optional<URI> imageUrl,
+        Optional<URI> resourceAlbumIconUrl,
         Optional<String> checkSum,
         Optional<URI> worldTemplateDownloadURI,
         Optional<String> worldTemplateCheckSum,
@@ -166,7 +167,7 @@ public class ContentManager {
             }
 
             public Pack toPack() {
-                return new Pack(id, name, description, downloadURI, imageUrl, checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, worldTemplateIconUrl, List.of(), Optional.empty(), downloadVariants, worldTemplateVariants);
+                return new Pack(id, name, description, downloadURI, imageUrl, Optional.empty(), checkSum, worldTemplateDownloadURI, worldTemplateCheckSum, worldTemplateFolderName, worldTemplateIconUrl, List.of(), Optional.empty(), downloadVariants, worldTemplateVariants);
             }
         }
 
@@ -176,6 +177,7 @@ public class ContentManager {
             Codec.STRING.optionalFieldOf("description", "").forGetter(Pack::description),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(Pack::downloadURI),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl),
+            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("resourceAlbumIconUrl").forGetter(Pack::resourceAlbumIconUrl),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateDownloadURI").forGetter(Pack::worldTemplateDownloadURI),
             Codec.STRING.optionalFieldOf("worldTemplateFolderName").forGetter(Pack::worldTemplateFolderName),
             Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("worldTemplateIconUrl").forGetter(Pack::worldTemplateIconUrl),
@@ -187,10 +189,10 @@ public class ContentManager {
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
 
-        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, Optional<URI> worldTemplateIconUrl, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
+        public static Pack create(String id, String name, String description, Optional<URI> compoundDownloadURI, Optional<URI> imageUrl, Optional<URI> resourceAlbumIconUrl, Optional<URI> compoundWorldTemplateDownloadURI, Optional<String> worldTemplateFolderName, Optional<URI> worldTemplateIconUrl, List<BundlePack> bundlePacks, Optional<ResourceAlbum> resourceAlbum, List<Variant> downloadVariants, List<Variant> worldTemplateVariants) {
             ParsedURI download = ParsedURI.of(compoundDownloadURI);
             ParsedURI worldTemplate = ParsedURI.of(compoundWorldTemplateDownloadURI);
-            return new Pack(id, name, description, download.uri(), imageUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, worldTemplateIconUrl, bundlePacks, resourceAlbum, downloadVariants, worldTemplateVariants);
+            return new Pack(id, name, description, download.uri(), imageUrl, resourceAlbumIconUrl, download.checkSum(), worldTemplate.uri(), worldTemplate.checkSum(), worldTemplateFolderName, worldTemplateIconUrl, bundlePacks, resourceAlbum, downloadVariants, worldTemplateVariants);
         }
 
         public Component nameComponent() {
@@ -302,6 +304,7 @@ public class ContentManager {
                     }
                 });
             });
+            RemoteResourceAlbums.load();
         }
 
         @Override

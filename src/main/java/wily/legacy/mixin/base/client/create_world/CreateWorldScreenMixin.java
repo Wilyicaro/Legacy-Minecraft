@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client.create_world;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Event {
@@ -62,6 +65,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private boolean legacy$restoringAllowCommands;
     @Unique
     private boolean legacy$preservedAllowCommands;
+    @Unique
+    private boolean legacy$preparingRemoteResourceAlbum;
+    @Unique
+    private boolean legacy$resourceAlbumPrepared;
     @Shadow
     @Final
     private WorldCreationUiState uiState;
@@ -100,9 +107,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initReturn(Minecraft minecraft, Runnable runnable, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CreateWorldCallback createWorldCallback, CallbackInfo ci     /*? if >=1.21.2 {*/  /*?}*/) {
+        LegacyOptions.resetAdvancedWorldOptions();
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
         panel = Panel.createPanel(this, p -> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (height - p.height) / 2, 245, 228);
-        resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220, 45, !LegacyRenderUtil.hasTooltipBoxes());
+        resourceAlbumSelector = PackAlbum.Selector.creationResources(panel.x + 13, panel.y + 106, 220, 45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
         legacyBiomeScale.set(WorldMoreOptionsScreen.getLegacyBiomeScalePreset(uiState.getWorldType().preset()));
     }
@@ -128,7 +136,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         setInitialFocus(nameEdit);
         addRenderableWidget(accessor.putWidget("nameEditBox", nameEdit));
         LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, panel.y + 51, layoutWidth, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().displayName), b -> Tooltip.create(uiState.getGameMode().getInfo()), uiState.getGameMode(), () -> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b -> {
-            if (LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.useLegacyWorldOptions()) {
                 legacy$preservedAllowCommands = uiState./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/();
                 legacy$restoreAllowCommandsAfterGameModeChange = true;
             }
@@ -150,9 +158,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         });
 
         addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
-        addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
+        addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> legacy$createWorld()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
-            if (LegacyOptions.legacySettingsMenus.get()) {
+            if (LegacyOptions.useLegacyWorldOptions()) {
                 if (button.selected) publishScreen.setGameType(uiState.getGameMode().gameType);
                 publishScreen.publish = button.selected;
                 return;
@@ -180,7 +188,8 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Inject(method = "createWorldAndCleanup", at = @At("RETURN"))
     private void onCreate(CallbackInfo ci) {
-        resourceAlbumSelector.applyChanges(true);
+        resourceAlbumSelector.applyChanges(!legacy$resourceAlbumPrepared);
+        legacy$resourceAlbumPrepared = false;
         Legacy4JClient.serverPlayerJoinConsumer = s -> {
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
             LegacyClientWorldSettings.of(server.getWorldData()).setTrustPlayers(trustPlayers.get());
@@ -189,6 +198,49 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
         };
+    }
+
+    @Unique
+    private void legacy$createWorld() {
+        if (legacy$preparingRemoteResourceAlbum) return;
+        legacy$resourceAlbumPrepared = false;
+        Optional<CompletableFuture<PackAlbum>> install = RemoteResourceAlbums.install(resourceAlbumSelector.getSelectedAlbum());
+        if (install.isEmpty()) {
+            onCreate();
+            return;
+        }
+        legacy$preparingRemoteResourceAlbum = true;
+        LegacyLoadingScreen loadingScreen = new LegacyLoadingScreen();
+        loadingScreen.setGenericLoading(true);
+        loadingScreen.setBlackBackground(true);
+        minecraft.setScreen(loadingScreen);
+        install.get().whenComplete((installedAlbum, throwable) -> minecraft.execute(() -> {
+            if (throwable != null || installedAlbum == null) {
+                legacy$finishRemoteResourceAlbum(throwable == null ? new IOException("Failed to install resource pack") : throwable);
+                return;
+            }
+            try {
+                minecraft.getResourcePackRepository().reload();
+                resourceAlbumSelector.selectAlbum(installedAlbum);
+                resourceAlbumSelector.applyChanges(false);
+                PackAlbum.updateSavedResourcePacks();
+                minecraft.reloadResourcePacks().whenComplete((unused, reloadThrowable) -> minecraft.execute(() -> legacy$finishRemoteResourceAlbum(reloadThrowable)));
+            } catch (Throwable preparationThrowable) {
+                legacy$finishRemoteResourceAlbum(preparationThrowable);
+            }
+        }));
+    }
+
+    @Unique
+    private void legacy$finishRemoteResourceAlbum(@Nullable Throwable throwable) {
+        legacy$preparingRemoteResourceAlbum = false;
+        if (throwable != null) {
+            Legacy4J.LOGGER.warn("Failed to prepare remote resource album before world creation", throwable);
+            minecraft.setScreen(self());
+            return;
+        }
+        legacy$resourceAlbumPrepared = true;
+        onCreate();
     }
 
     @ModifyExpressionValue(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))
@@ -215,7 +267,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), GuiGraphicsExtractor, false);
         resourceAlbumSelector.renderTooltipBox(GuiGraphicsExtractor, panel);
         super.extractRenderState(GuiGraphicsExtractor, i, j, f);
-        if (LegacyOptions.legacySettingsMenus.get()) GuiGraphicsExtractor.deferredTooltip = null;
+        if (LegacyOptions.useLegacyWorldOptions()) GuiGraphicsExtractor.deferredTooltip = null;
         UIAccessor accessor = UIAccessor.of(this);
         GuiGraphicsExtractor.pose().pushMatrix();
         GuiGraphicsExtractor.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15));
@@ -226,6 +278,11 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
+            onlineTickBox.setMessage(PublishScreen.getPublishComponent());
+            onlineTickBox.updateMessage();
+            return true;
+        }
         return super.keyPressed(keyEvent);
     }
 

@@ -92,6 +92,7 @@ final class ContentIndexLoader {
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
             bundlePacks,
             Optional.empty(),
             List.of(),

@@ -1254,7 +1254,7 @@
   "legacy.action.sail": "Naviga",
   "legacy.action.scrape": "Raschia",
   "legacy.action.search_mode": "Modalità Ricerca",
-  "legacy.action.select_skin": "Seleziona Skin",
+  "legacy.action.select_skin": "Seleziona",
   "legacy.action.select_tab": "Seleziona Scheda",
   "legacy.action.send_command": "Invia Comando",
   "legacy.action.send_message": "Invia Messaggio",
@@ -2287,5 +2287,5 @@
   "structure.minecraft.villages": "Villaggi",
   "structure.minecraft.villages.description": "Insediamenti situati nei biomi Pianura, Savana, Deserto, Taiga o Pianura Innevata. Sorvegliati da Golem di Ferro e casa di Agricoltori, Bibliotecari, Chierici, Ferrai e Macellai.",
   "structure.minecraft.woodland_mansions": "Magioni",
-  "structure.minecraft.woodland_mansions.description": "Magioni trovate nelle Foreste di Quercia Scura. Casa di Vessanti e Illager."
+  "structure.minecraft.woodland_mansions.description": "Magioni che si trovano nelle Foreste di Quercia Scura. Dimora dei Vessanti e degli Illager."
 }
