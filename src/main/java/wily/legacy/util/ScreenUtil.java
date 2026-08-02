@@ -80,6 +80,7 @@ import wily.legacy.client.*;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
+import wily.legacy.client.screen.SaveInfoScreen;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
@@ -929,7 +930,7 @@ public class ScreenUtil {
         TitleScreen titleScreen = new TitleScreen(LegacyOptions.titleScreenFade.get());
         if (LegacyOptions.skipInitialSaveWarning.get()){
             return titleScreen;
-        } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
+        } else return new SaveInfoScreen(titleScreen);
     }
 
     public static ScreenDirection getScreenDirection(double x, double y) {

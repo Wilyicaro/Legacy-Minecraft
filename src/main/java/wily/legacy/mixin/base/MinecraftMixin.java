@@ -542,6 +542,13 @@ public abstract class MinecraftMixin {
         return !(newScreen instanceof OverlayPanelScreen s) || s.parent != instance;
     }
 
+    @Inject(method = "resizeDisplay", at = @At("RETURN"))
+    private void resizeDisplay(CallbackInfo ci) {
+        LegacyTipManager.rebuildActual();
+        LegacyTipManager.rebuildActualLoading();
+        gui.getChat().rescaleChat();
+    }
+
     @Inject(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
     private void addedScreen(Screen screen, CallbackInfo ci){
         ControlTooltip.Event.of(screen).setupControlTooltips();

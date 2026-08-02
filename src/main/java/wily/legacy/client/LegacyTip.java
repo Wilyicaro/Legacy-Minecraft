@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.ScreenUtil;
@@ -32,6 +33,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     public Component title = null;
 
     protected boolean centered = false;
+    protected boolean compactMode;
 
     protected Minecraft minecraft = Minecraft.getInstance();
     protected Screen initScreen = minecraft.screen;
@@ -43,20 +45,25 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     public LegacyIconHolder holder = null;
 
 
-    public LegacyTip(Component tip, int width, int height){
+    public LegacyTip(Component tip, int width, int height, boolean compactMode) {
         super(width, height);
+        this.compactMode = compactMode;
         tip(tip);
     }
 
-    public LegacyTip(Component title, Component tip){
-        this(tip, 250,0);
-        title(title);
-        height = (title == null ? 26 : 38) + tipLabel.getHeight();
-        setY(25);
-        canRemove(()-> initScreen != minecraft.screen);
+    public LegacyTip(Component tip, int width, int height) {
+        this(tip, width, height, LegacyOptions.getUIMode().isSD());
     }
 
-    public LegacyTip(Component tip){
+    public LegacyTip(Component title, Component tip) {
+        this(tip, LegacyOptions.getUIMode().isSD() ? 136 : 250, 0);
+        title(title);
+        height = (title == null ? LegacyOptions.getUIMode().isSD() ? 14 : 26 : LegacyOptions.getUIMode().isSD() ? 22 : 38) + tipLabel.getHeight();
+        setY(25);
+        canRemove(() -> initScreen != minecraft.screen);
+    }
+
+    public LegacyTip(Component tip) {
         this(null, tip);
     }
 
@@ -75,9 +82,9 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         return this;
     }
 
-    public LegacyTip tip(Component tip){
-        tipLabel.withLines(tip, width-26) ;
-        return disappearTime(tip.getString().toCharArray().length * 80L);
+    public LegacyTip tip(Component tip) {
+        ScreenUtil.applyFontOverrideIf(compactMode, LegacyIconHolder.MOJANGLES_11_FONT, b -> tipLabel.lineSpacing(b ? 8 : 12).withLines(tip, width - (b ? 10 : 26)));
+        return disappearTime(tip.getString().length() * 80L);
     }
 
     public LegacyTip disappearTime(long disappearTime){
@@ -88,7 +95,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         return this;
     }
 
-    public LegacyTip itemStack(ItemStack itemStack){
+    public LegacyTip itemStack(ItemStack itemStack) {
         if (!itemStack.isEmpty()) {
             height += 32;
             if (holder == null) {
@@ -96,7 +103,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
                 holder.allowItemDecorations = false;
             }
             holder.setX((width - 32) / 2);
-            holder.setY(13 + tipLabel.getHeight() + (title == null ? 0 : 12));
+            holder.setY((LegacyOptions.getUIMode().isSD() ? 5 : 13) + tipLabel.getHeight() + (title == null ? 0 : LegacyOptions.getUIMode().isSD() ? 8 : 12));
             holder.itemIcon = itemStack;
         }
         return this;
@@ -141,10 +148,11 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
         if (canRemove.get() || l >= disappearTime) visibility = Visibility.HIDE;
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getX(),getY(),800);
+        guiGraphics.pose().translate(getX(), getY(), 800);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
-        if (title != null) guiGraphics.drawString(minecraft.font,title, (centered ? (width() - minecraft.font.width(title)) / 2 : 13),13, CommonColor.TIP_TITLE_TEXT.get());
-        tipLabel.centered(centered).withShadow(centered).withPos(13, title == null ? 13 : 25).render(guiGraphics, i, j, f);
+        if (title != null)
+            ScreenUtil.applyFontOverrideIf(compactMode, LegacyIconHolder.MOJANGLES_11_FONT, b -> guiGraphics.drawString(minecraft.font, title, (centered ? (width() - minecraft.font.width(title)) / 2 : b ? 5 : 13), b ? 5 : 13, CommonColor.TIP_TITLE_TEXT.get()));
+        ScreenUtil.applyFontOverrideIf(compactMode, LegacyIconHolder.MOJANGLES_11_FONT, b -> tipLabel.centered(centered).withColor(CommonColor.TIP_TEXT.get()).withShadow(centered).withPos(b ? 5 : 13, title == null ? b ? 5 : 13 : b ? 13 : 25).render(guiGraphics, i, j, f));
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

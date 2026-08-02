@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyLoading;
-
-import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
+import wily.legacy.client.screen.LegacyLoadingRenderer;
 
 @Mixin({LevelLoadingScreen.class, ProgressScreen.class, ReceivingLevelScreen.class, ConnectScreen.class})
 public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
@@ -44,7 +44,7 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             Component lastLoadingHeader = null;
             Component lastLoadingStage = null;
             boolean genericLoading = false;
-            int progress = 0;
+            float progress = 0;
             if (self() instanceof ReceivingLevelScreen) progress = -1;
             if (self() instanceof LevelLoadingScreen) {
                 lastLoadingHeader = Component.translatable("legacy.connect.initializing");
@@ -61,55 +61,16 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             if (self() instanceof ConnectScreen p) {
                 lastLoadingHeader = p.status;
             }
-            legacyLoadingScreen.prepareRender(minecraft, width, height, lastLoadingHeader, lastLoadingStage, progress, genericLoading);
-            legacyLoadingScreen.render(guiGraphics, i, j, f);
+            LegacyLoadingRenderer.getInstance().prepareRender(minecraft, UIAccessor.of(this), lastLoadingHeader, lastLoadingStage, progress, genericLoading);
+            LegacyLoadingRenderer.getInstance().render(guiGraphics, i, j, f);
         }
     }
 
-    @Override
-    public int getProgress() {
-        return legacyLoadingScreen.getProgress();
-    }
-
-    @Override
-    public void setProgress(int progress) {
-        legacyLoadingScreen.setProgress(progress);
-    }
-
-    @Override
-    public Component getLoadingHeader() {
-        return legacyLoadingScreen.getLoadingHeader();
-    }
-
-    @Override
-    public void setLoadingHeader(Component loadingHeader) {
-        legacyLoadingScreen.setLoadingHeader(loadingHeader);
-    }
-
-    @Override
-    public Component getLoadingStage() {
-        return legacyLoadingScreen.getLoadingStage();
-    }
-
-    @Override
-    public void setLoadingStage(Component loadingStage) {
-        legacyLoadingScreen.setLoadingStage(loadingStage);
-    }
-
-    @Override
-    public boolean isGenericLoading() {
-        return legacyLoadingScreen.isGenericLoading();
-    }
-
-    @Override
-    public void setGenericLoading(boolean genericLoading) {
-        legacyLoadingScreen.setGenericLoading(genericLoading);
-    }
-
     @Unique
-    private int legacy$loadingProgress() {
+    private float legacy$loadingProgress() {
         long now = Util.getMillis();
         if (legacy$loadingStarted == 0L) legacy$loadingStarted = now;
-        return (int) (((now - legacy$loadingStarted) % LEGACY_PROGRESS_CYCLE_MS) * 100 / LEGACY_PROGRESS_CYCLE_MS);
+        long elapsed = (now - legacy$loadingStarted) % LEGACY_PROGRESS_CYCLE_MS;
+        return elapsed * 100 / LEGACY_PROGRESS_CYCLE_MS / 100.0F;
     }
 }

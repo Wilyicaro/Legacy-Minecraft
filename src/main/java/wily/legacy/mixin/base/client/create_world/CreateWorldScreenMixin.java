@@ -111,9 +111,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, accessor.getInteger("gameTypeSlider.y", panel.y + 51), layoutWidth, accessor.getInteger("gameTypeSlider.height", 16), b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().displayName),b->Tooltip.create(uiState.getGameMode().getInfo()),uiState.getGameMode(),()-> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b->uiState.setGameMode(b.getObjectValue()))));
         uiState.addListener(worldCreationUiState -> gameModeButton.active = !worldCreationUiState.isDebug());
 
-        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, accessor.getInteger("difficultySlider.y", panel.y + 77), layoutWidth, accessor.getInteger("difficultySlider.height", 16), b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(uiState.getDifficulty().getInfo()),uiState.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b->uiState.setDifficulty(b.getObjectValue()))));
+        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, panel.y + 77, layoutWidth, 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(uiState.getDifficulty().getInfo()), uiState.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b -> uiState.setDifficulty(b.getObjectValue()), uiState::getDifficulty)));
         uiState.addListener(worldCreationUiState -> {
-            difficultyButton.setObjectValue(uiState.getDifficulty());
+            difficultyButton.updateValue();
+            difficultyButton.updateMessage();
             difficultyButton.active = !uiState.isHardcore();
         });
 

@@ -15,22 +15,23 @@ public class LegacyConfigWidgets {
         FactoryConfigDisplay<T> d = config.getDisplay();
         if (d == null) return null;
 
-        Function<T,Tooltip> tooltipFunction = v-> FactoryConfigWidgets.getCachedTooltip(d.tooltip().apply(v));
+        Function<T, Tooltip> tooltipFunction = v -> FactoryConfigWidgets.getCachedTooltip(d.tooltip().apply(v));
 
         AbstractWidget override = FactoryConfigWidgets.getOverride(config, tooltipFunction, x, y, width, afterSet);
         if (override != null) return override;
 
-        if (config.control().equals(FactoryConfigControl.TOGGLE)){
-            return new TickBox(x,y,width,config.secureCast(Boolean.class).get(), b-> d.name(), (Function<Boolean, Tooltip>) tooltipFunction, t-> FactoryConfig.saveOptionAndConsume((FactoryConfig<Boolean>)config, t.selected,(Consumer<Boolean>) afterSet));
-        } else if (config.control() instanceof FactoryConfigControl.FromInt<T> c){
-            return LegacySliderButton.createFromInt(x,y,width,16, s-> d.captionFunction().apply(d.name(), s.getObjectValue()), s-> tooltipFunction.apply(s.getObjectValue()), config.get(), c.valueGetter(), c.valueSetter(), c.valuesSize(), s-> FactoryConfig.saveOptionAndConsume(config,s.getObjectValue(),afterSet));
-        } else if (config.control() instanceof FactoryConfigControl.FromDouble<T> c){
-            return new LegacySliderButton<>(x, y, width,16, s-> d.captionFunction().apply(d.name(),s.getObjectValue()), b->tooltipFunction.apply(b.getObjectValue()), config.get(), s-> c.valueGetter().apply(s.getValue()), c.valueSetter(), s-> FactoryConfig.saveOptionAndConsume(config,s.getObjectValue(),afterSet), rangeMultiplier);
+        if (config.control().equals(FactoryConfigControl.TOGGLE)) {
+            return new TickBox(x, y, width, config.secureCast(Boolean.class).get(), b -> d.name(), (Function<Boolean, Tooltip>) tooltipFunction, t -> FactoryConfig.saveOptionAndConsume((FactoryConfig<Boolean>) config, t.selected, (Consumer<Boolean>) afterSet), () -> (Boolean) config.get());
+        } else if (config.control() instanceof FactoryConfigControl.FromInt<T> c) {
+            return LegacySliderButton.createFromInt(x, y, width, 16, s -> d.getMessage(s.getObjectValue()), s -> tooltipFunction.apply(s.getObjectValue()), config.get(), c.valueGetter(), c.valueSetter(), c.valuesSize(), s -> FactoryConfig.saveOptionAndConsume(config, s.getObjectValue(), afterSet), config);
+        } else if (config.control() instanceof FactoryConfigControl.FromDouble<T> c) {
+            return new LegacySliderButton<>(x, y, width, 16, s -> d.getMessage(s.getObjectValue()), b -> tooltipFunction.apply(b.getObjectValue()), config.get(), s -> c.valueGetter().apply(s.getValue()), c.valueSetter(), s -> FactoryConfig.saveOptionAndConsume(config, s.getObjectValue(), afterSet), config, rangeMultiplier);
         } else if (config.control() instanceof FactoryConfigControl.Int c) {
-            return LegacySliderButton.createFromIntRange(x, y, width, 16, s-> d.captionFunction().apply(d.name(), (T) s.getObjectValue()), b-> tooltipFunction.apply((T) b.getObjectValue()), (Integer) config.get(), c.min(), c.max(), s-> FactoryConfig.saveOptionAndConsume(config, (T) s.getObjectValue(), afterSet));
+            return LegacySliderButton.createFromIntRange(x, y, width, 16, s -> d.getMessage((T) s.getObjectValue()), b -> tooltipFunction.apply((T) b.getObjectValue()), (Integer) config.get(), c.min(), c.max(), s -> FactoryConfig.saveOptionAndConsume(config, (T) s.getObjectValue(), afterSet), (Supplier<Integer>) config);
         }
         return null;
     }
+
     public static <T> AbstractWidget createWidget(FactoryConfig<T> config, int x, int y, int width, Consumer<T> afterSet) {
         return createWidget(config, x, y, width, afterSet, 1);
     }

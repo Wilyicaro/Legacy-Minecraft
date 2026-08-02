@@ -125,32 +125,6 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
         });
     }
 
-    public static ConfirmationScreen createSaveInfoScreen(Screen parent){
-        return new ConfirmationScreen(parent, () -> LegacyOptions.getUIMode().isSD() ? 184 : 275, () -> LegacyOptions.getUIMode().isSD() ? 92 : 130, () -> 0, () -> LegacyOptions.getUIMode().isSD() ? 12 : 25, Component.empty(), LegacyComponents.AUTOSAVE_MESSAGE, LegacyScreen::onClose){
-            protected void addButtons() {
-                transparentBackground = false;
-                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"), b-> okAction.accept(this)).build());
-            }
-            @Override
-            public void renderableVListInit(){
-                boolean sd = LegacyOptions.getUIMode().isSD();
-                int listWidth = sd ? panel.width - 30 : 220;
-                messageYOffset.set(sd ? 48 : 68);
-                renderableVList.init(panel.x + (panel.width - listWidth) / 2, panel.y + panel.height - (sd ? 29 : 40), listWidth, 0);
-            }
-
-            @Override
-            public boolean shouldCloseOnEsc() {
-                return false;
-            }
-
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.render(guiGraphics, i, j, f);
-                ScreenUtil.drawAutoSavingIcon(guiGraphics,panel.x + panel.width / 2 - 10, panel.y + (LegacyOptions.getUIMode().isSD() ? 25 : 36));
-            }
-        };
-    }
-
     @Override
     protected void init() {
         if (!initialized){
@@ -217,7 +191,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
         }
         //?}
         super.render(guiGraphics, i, j, f);
-        int textX = panel.x + (LegacyOptions.getUIMode().isSD() ? 6 : 15);
+        int textX = panel.x + (panel.width - messageLabel.width) / 2;
         ScreenUtil.applySDFont(ignored -> {
             List<FormattedCharSequence> titleLines = titleLines(panel.width);
             for (int line = 0; line < titleLines.size(); line++) {

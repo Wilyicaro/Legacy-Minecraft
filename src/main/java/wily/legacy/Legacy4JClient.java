@@ -156,7 +156,6 @@ public class Legacy4JClient {
     public static boolean retakeWorldIcon = false;
     public static boolean canSprint = false;
     public static int sprintTicksLeft = -1;
-    public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static Renderable itemActivationRenderReplacement = null;
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
     public static final LegacyCreativeTabListing.Manager legacyCreativeListingManager = new LegacyCreativeTabListing.Manager();

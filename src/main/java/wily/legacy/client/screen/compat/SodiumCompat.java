@@ -69,7 +69,7 @@ public class SodiumCompat {
                     option.applyChanges();
                     option.getStorage().save();
                 }
-            });
+            }, () -> c.getOption().getValue());
         }else if (option.getControl() instanceof CyclingControl<?> c) {
             List<Enum<?>> values = List.of((Enum<?>[])ReflectionUtil.getFieldValue(SODIUM_CYCLING_CONTROL_FIELDS.get("allowedValues"),c));
             Component[] components = (Component[]) ReflectionUtil.getFieldValue(SODIUM_CYCLING_CONTROL_FIELDS.get("names"),c);

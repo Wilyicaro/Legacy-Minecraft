@@ -3,6 +3,7 @@ package wily.legacy.client;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -12,6 +13,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +38,6 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
     public static final int MAX_TIP_TICKS = MOVEMENT_TIP_TICKS * 2 + PAUSE_TIP_TICKS;
     private static final String TIPS = "texts/tips.json";
 
-    public static float tipDiffPercentage;
     private static LegacyTip actualTip;
     private static Supplier<LegacyTip> actualTipSupplier;
     private static LegacyTip lastTip;
@@ -45,6 +46,31 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
     public static boolean returningTip = false;
     public static final List<Supplier<LegacyTip>> tips = new ArrayList<>();
     public static final List<Supplier<LegacyTip>> loadingTips = new ArrayList<>();
+    private static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>();
+    private static LegacyTip actualLoadingTip;
+    private static Supplier<LegacyTip> actualLoadingTipSupplier;
+    private final RandomSource random = RandomSource.create();
+
+    public static LegacyTip getLoadingTip(RandomSource random) {
+        if (usingLoadingTips.isEmpty()) {
+            if (loadingTips.isEmpty()) return null;
+            else usingLoadingTips.addAll(loadingTips);
+        }
+        if (actualLoadingTip == null) {
+            int i = random.nextInt(usingLoadingTips.size());
+            actualLoadingTip = usingLoadingTips.get(i).get();
+            actualLoadingTipSupplier = usingLoadingTips.remove(i);
+        } else if (actualLoadingTip.visibility == Toast.Visibility.HIDE) {
+            actualLoadingTip = null;
+            actualLoadingTipSupplier = null;
+            return getLoadingTip(random);
+        }
+        return actualLoadingTip;
+    }
+
+    public static LegacyTip getRebuiltLoadingTip() {
+        return actualLoadingTipSupplier == null ? null : actualLoadingTipSupplier.get();
+    }
 
     public static LegacyTip getActualTip() {
         return actualTip;
@@ -110,6 +136,10 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         return setTip(actualTipSupplier);
     }
 
+    public static void rebuildActualLoading() {
+        actualLoadingTip = getRebuiltLoadingTip();
+    }
+
     public static boolean setTip(Supplier<LegacyTip> tipSupplier){
         if (tipSupplier != null) {
             setActualTip(tipSupplier.get());
@@ -131,20 +161,20 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         addTip(getTip(entityType));
     }
 
-    public static LegacyTip getTipFromBuilder(LegacyTipBuilder builder){
+    public static LegacyTip getTipFromBuilder(LegacyTipBuilder builder) {
         return getTipFromBuilder(builder.getTitle(), builder.getTip(), builder.getItem(), builder.getTime() * 1000L);
     }
 
-    public static LegacyTip getTipFromBuilder(Optional<Component> title, Optional<Component> tip, ItemStack stack, long time){
-        return new LegacyTip(title.orElse(null),tip.orElse(CommonComponents.EMPTY)).itemStack(stack).disappearTime(time);
+    public static LegacyTip getTipFromBuilder(Optional<Component> title, Optional<Component> tip, ItemStack stack, long time) {
+        return new LegacyTip(title.orElse(null), tip.orElse(CommonComponents.EMPTY)).itemStack(stack).disappearTime(time);
     }
 
-    public static LegacyTip getLoadingTipFromBuilder(LegacyTipBuilder builder){
+    public static LegacyTip getLoadingTipFromBuilder(LegacyTipBuilder builder) {
         return getLoadingTipFromBuilder(builder.getTitle(), builder.getTip(), builder.getItem(), builder.getTime() * 1000L);
     }
 
-    public static LegacyTip getLoadingTipFromBuilder(Optional<Component> title, Optional<Component> tip, ItemStack stack, long time){
-        return new LegacyTip(tip.orElse(CommonComponents.EMPTY),400,55).centered().title(title.orElse(null)).itemStack(stack).disappearTime(time);
+    public static LegacyTip getLoadingTipFromBuilder(Optional<Component> title, Optional<Component> tip, ItemStack stack, long time) {
+        return new LegacyTip(tip.orElse(CommonComponents.EMPTY), LegacyOptions.getUIMode().isSD() ? 325 : 400, 55, false).centered().title(title.orElse(null)).itemStack(stack).disappearTime(time);
     }
 
     public static Supplier<LegacyTip> getTip(ItemStack item, LegacyTipBuilder modifier){
@@ -212,12 +242,15 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         return Component.translatable(location.toLanguageKey() +".tip");
     }
 
+    public LegacyTip getLoadingTip() {
+        return getLoadingTip(random);
+    }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager){
         loadingTips.clear();
-        LegacyLoadingScreen.usingLoadingTips.clear();
-        LegacyLoadingScreen.actualLoadingTip = null;
+        usingLoadingTips.clear();
+        actualLoadingTip = null;
         resourceManager.getNamespaces().forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name,TIPS)).ifPresent(r->{
             try (BufferedReader bufferedReader = r.openAsReader()) {
                 JsonObject obj = GsonHelper.parse(bufferedReader);

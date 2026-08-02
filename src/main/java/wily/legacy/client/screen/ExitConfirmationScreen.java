@@ -15,7 +15,7 @@ import wily.legacy.client.SoundManagerAccessor;
 
 public class ExitConfirmationScreen extends ConfirmationScreen {
     public ExitConfirmationScreen(Screen parent) {
-        super(parent, 230, Legacy4JClient.hasSaveSystem(Minecraft.getInstance()) ? 120 : 97, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && LegacyOptions.autoSaveInterval.get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
+        super(parent, ConfirmationScreen::getPanelWidth, () -> getBaseHeight() + (Legacy4JClient.hasSaveSystem(Minecraft.getInstance()) ? LegacyOptions.getUIMode().isSD() ? 19 : 33 : 0), Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && LegacyOptions.autoSaveInterval.get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b -> {});
     }
 
     @Override
