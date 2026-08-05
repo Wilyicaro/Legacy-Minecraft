@@ -39,16 +39,13 @@ import java.util.Optional;
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
     @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
-    @Shadow private BookModel bookModel;
 
     public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init",at = @At("RETURN"))
     public void init(CallbackInfo ci) {
-        ci.cancel();
-        this.bookModel = new BookModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.BOOK));
         boolean sd = LegacyOptions.getUIMode().isSD();
         imageWidth = sd ? 130 : 215;
         imageHeight = sd ? 140 : 217;
@@ -63,7 +60,6 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                 return slotsSize;
             }
         };
-        super.init();
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0){

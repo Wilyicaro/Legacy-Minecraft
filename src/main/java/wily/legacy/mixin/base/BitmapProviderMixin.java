@@ -63,6 +63,11 @@ public abstract class BitmapProviderMixin {
                             public float getAdvance() {
                                 return (q + 1) * f;
                             }
+
+                            @Override
+                            public float getBoldOffset() {
+                                return f;
+                            }
                         });
                         if (glyph != null) {
                             Legacy4J.LOGGER.warn("Codepoint '{}' declared multiple times in {}", Integer.toHexString(o), resourceLocation);

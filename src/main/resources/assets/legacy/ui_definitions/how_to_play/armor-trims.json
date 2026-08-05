@@ -64,12 +64,12 @@
           "height": 23
         },
         "stand": {
-          "type": "render_armor_stand",
-          "x": "${panel.x}",
-          "y": "${panel.y}",
-          "width": 364,
-          "height": 150,
-          "scale": 35
+          "type": "blit_sprite",
+          "sprite": "legacy:container/how_to_play/armor_stand_trim",
+          "x": "${panel.x}+159",
+          "y": "${panel.y}+49",
+          "width": 44,
+          "height": 61
         },
         "template": {
           "type": "put_legacy_slot",
@@ -315,12 +315,12 @@
           "height": 14
         },
         "stand": {
-          "type": "render_armor_stand",
-          "x": "${panel.x}",
-          "y": "${panel.y}",
-          "width": 228,
-          "height": 100,
-          "scale": 20
+          "type": "blit_sprite",
+          "sprite": "legacy:container/how_to_play/armor_stand_trim",
+          "x": "${panel.x}+100",
+          "y": "${panel.y}+28",
+          "width": 25,
+          "height": 35
         },
         "template": {
           "type": "put_legacy_slot",

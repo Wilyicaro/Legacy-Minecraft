@@ -73,11 +73,11 @@
             },
             "book": {
               "type": "render_enchanted_book",
-              "x": "${panel.x}+22",
-              "y": "${panel.y}+26",
-              "width": 44,
-              "height": 40,
-              "scale": 50
+              "translateX": "${panel.x}+2",
+              "translateY": "${panel.y}+4",
+              "scaleX": 1.25,
+              "scaleY": 1.25,
+              "scaleZ": 1.25
             },
             "buttons": {
               "type": "children",
@@ -407,11 +407,8 @@
             },
             "book": {
               "type": "render_enchanted_book",
-              "x": "${panel.x}+5",
-              "y": "${panel.y}+14",
-              "width": 44,
-              "height": 40,
-              "scale": 40
+              "translateX": "${panel.x}-5",
+              "translateY": "${panel.y}"
             },
             "buttons": {
               "type": "children",

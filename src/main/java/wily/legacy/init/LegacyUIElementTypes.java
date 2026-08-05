@@ -235,7 +235,7 @@ public class LegacyUIElementTypes {
             flipA.set(flipA.get() + (f1 - flipA.get()) * 0.9F);
             flip.set(flip.get() + flipA.get());
         }));
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "scale");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit((a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             if (bookModel.isEmpty()) return;
@@ -245,7 +245,8 @@ public class LegacyUIElementTypes {
             Lighting.setupForEntityInInventory();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate( a.getInteger(elementName+".x", 0) + 33.0F, a.getInteger(elementName+".y", 0) + 31.0F, 100.0F);
-            guiGraphics.pose().scale(-40.0F, 40.0F, 40.0F);
+            float scale = a.getInteger(elementName+".scale", 40);
+            guiGraphics.pose().scale(-scale, scale, scale);
             guiGraphics.pose().mulPose(Axis.XP.rotationDegrees(25.0F));
             guiGraphics.pose().translate((1.0F - g) * 0.2F, (1.0F - g) * 0.1F, (1.0F - g) * 0.25F);
             float f3 = -(1.0F - g) * 90.0F - 90.0F;
