@@ -1,0 +1,84 @@
+name: Sync translations
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: Branch to update
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    if: ${{ inputs.target_branch != 'main' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+      - name: Checkout target
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          path: target
+      - name: Copy translations
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          source = Path("source/src/main/resources/assets/legacy/lang")
+          target = Path("target/src/main/resources/assets/legacy/lang")
+
+          def read(path):
+              return json.loads(path.read_text(encoding="utf-8"))
+
+          main_english = read(source / "en_us.json")
+          target_english = read(target / "en_us.json")
+          changed_files = 0
+
+          for target_file in target.glob("*.json"):
+              source_file = source / target_file.name
+              if target_file.name == "en_us.json" or not source_file.exists():
+                  continue
+
+              main_translations = read(source_file)
+              target_translations = read(target_file)
+              changed = False
+
+              for key, english in target_english.items():
+                  translation = main_translations.get(key)
+                  current = target_translations.get(key)
+                  if main_english.get(key) == english and translation not in (None, "", english) and current in (None, "", english):
+                      target_translations[key] = translation
+                      changed = True
+
+              if changed:
+                  target_file.write_text(json.dumps(target_translations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                  changed_files += 1
+
+          print(f"Updated {changed_files} language files")
+      - name: Create pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: ${{ inputs.target_branch }}
+          LANGUAGE_DIRECTORY: src/main/resources/assets/legacy/lang
+        working-directory: target
+        run: |
+          if git diff --quiet -- "$LANGUAGE_DIRECTORY"; then
+            echo "No translation changes found"
+            exit 0
+          fi
+          branch="translation-sync-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add "$LANGUAGE_DIRECTORY"
+          git commit -m "Sync translations from main to $TARGET_BRANCH"
+          git push origin "$branch"
+          gh pr create --base "$TARGET_BRANCH" --head "$branch" --title "Sync translations from main to $TARGET_BRANCH" --body "Applies translation changes from main."
