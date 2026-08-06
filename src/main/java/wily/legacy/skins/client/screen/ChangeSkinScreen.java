@@ -349,10 +349,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int visibleRows = visiblePackRows();
         int maxListBottom = arrowTop - sc(4);
         int rowPitch = Math.max(10, resolvedPackRowHeight);
-        int buttonHeight = rowPitch + PACK_BUTTON_BORDER_OVERLAP;
-        int h = rowPitch * visibleRows + PACK_LIST_FOOTER_RESERVE + PACK_BUTTON_BORDER_OVERLAP;
+        int buttonHeight = rowPitch;
+        int h = rowPitch * visibleRows + PACK_LIST_FOOTER_RESERVE;
         int frameListTop = maxListBottom - rowPitch * visibleRows;
-        int y = frameListTop - PACK_BUTTON_BORDER_OVERLAP;
+        int y = frameListTop;
         int packFrameRenderX = frameX - sc(2);
         int packFrameRenderY = (isCompact480() ? frameListTop - sc(3) : frameListTop - sc(4))
                 - PACK_LIST_RECESS_HEIGHT_EXTRA;
@@ -411,7 +411,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         boolean windowResized = width != lastLayoutWidth || height != lastLayoutHeight;
         refreshSharedLayout();
         applyScreenScaleAdjustment();
-        renderableVList.layoutSpacing(l -> -PACK_BUTTON_BORDER_OVERLAP);
+        renderableVList.layoutSpacing(l -> 0);
         if (windowResized) {
             getRenderableVList().resetScroll();
         }
