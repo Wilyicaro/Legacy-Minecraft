@@ -9,9 +9,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Unique;
 import wily.factoryapi.base.Stocker;
@@ -25,6 +27,7 @@ import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.*;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
@@ -101,6 +104,30 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         imageWidth = accessor.getInteger("imageWidth", 348);
         imageHeight = accessor.getInteger("imageHeight", 215);
         super.init();
+        LegacySlotDisplay display = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return 16;
+            }
+
+            @Override
+            public Vec3 getOffset() {
+                return menu.inventoryOffset;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return menu.inventoryActive;
+            }
+        };
+        for (int i = 0; i < 36; i++) {
+            Slot s = menu.slots.get(i);
+            if (i < 27) {
+                LegacySlotDisplay.override(s, 186 + (s.getContainerSlot() - 9) % 9 * 16, 133 + (s.getContainerSlot() - 9) / 9 * 16, display);
+            } else {
+                LegacySlotDisplay.override(s, 186 + s.getContainerSlot() * 16, 186, display);
+            }
+        }
         menu.addSlotListener(listener);
         if (selectedCraftingButton < craftingButtons.size()) setFocused(craftingButtons.get(selectedCraftingButton));
         int craftingButtonsX = accessor.getInteger("craftingButtons.x", 13);

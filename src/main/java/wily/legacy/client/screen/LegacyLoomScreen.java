@@ -19,6 +19,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.entity.BannerPattern;
@@ -42,6 +43,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.LoomTabListing;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -301,6 +303,30 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         imageWidth = accessor.getInteger("imageWidth", 348);
         imageHeight = accessor.getInteger("imageHeight", 215);
         super.init();
+        LegacySlotDisplay display = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return 16;
+            }
+
+            @Override
+            public Vec3 getOffset() {
+                return menu.inventoryOffset;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return menu.inventoryActive;
+            }
+        };
+        for (int i = 0; i < 36; i++) {
+            Slot s = menu.slots.get(i);
+            if (i < 27) {
+                LegacySlotDisplay.override(s, 186 + (s.getContainerSlot() - 9) % 9 * 16, 133 + (s.getContainerSlot() - 9) / 9 * 16, display);
+            } else {
+                LegacySlotDisplay.override(s, 186 + s.getContainerSlot() * 16, 186, display);
+            }
+        }
         topPos += getTabYOffset();
         menu.addSlotListener(listener);
         craftingTabList.selectedTab = selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.selectedTab,1);

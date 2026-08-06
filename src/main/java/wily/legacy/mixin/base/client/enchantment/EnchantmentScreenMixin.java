@@ -44,7 +44,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Inject(method = "init",at = @At("RETURN"))
+    @Inject(method = "init",at = @At("HEAD"))
     public void init(CallbackInfo ci) {
         boolean sd = LegacyOptions.getUIMode().isSD();
         imageWidth = sd ? 130 : 215;

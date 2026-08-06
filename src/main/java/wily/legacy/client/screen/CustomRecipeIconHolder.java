@@ -186,7 +186,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             updateRecipe();
             return true;
         }
-        if (!nextItem.isEmpty() && i == 265 || !previousItem.isEmpty() && i == 264){
+        if (!nextItem.isEmpty() && i == InputConstants.KEY_UP || !previousItem.isEmpty() && i == InputConstants.KEY_DOWN) {
             ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i == 265 ? nextItem : previousItem;
             updateRecipe();
@@ -206,8 +206,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         graphics.pose().pushPose();
         applyOffset(graphics);
         if (!previousItem.isEmpty() && previousItem!=itemIcon || !nextItem.isEmpty() && nextItem!=itemIcon){
-            getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
-            getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
+            renderScroll(graphics, getScrollRenderer());
         }
         graphics.pose().popPose();
     }

@@ -65,7 +65,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
-        super(s-> Panel.createPanel(s, p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
         LegacyOptions.resetAdvancedWorldOptions();
         this.isLocked = isLocked;
         this.parent = screen;

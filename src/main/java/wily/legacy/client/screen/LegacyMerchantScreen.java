@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -28,6 +29,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.RecipeMenu;
@@ -265,6 +267,30 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         titleLabelY = accessor.getInteger("title.y", 12);
         inventoryLabelY = accessor.getInteger("bottomPanel.y", 79) + accessor.getInteger("inventoryTitle.y", 8);
         super.init();
+        LegacySlotDisplay display = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return 16;
+            }
+
+            @Override
+            public Vec3 getOffset() {
+                return menu.inventoryOffset;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return menu.inventoryActive;
+            }
+        };
+        for (int i = 0; i < 36; i++) {
+            Slot s = menu.slots.get(i);
+            if (i < 27) {
+                LegacySlotDisplay.override(s, 133 + (s.getContainerSlot() - 9) % 9 * 16, 98 + (s.getContainerSlot() - 9) / 9 * 16, display);
+            } else {
+                LegacySlotDisplay.override(s, 133 + s.getContainerSlot() * 16, 154, display);
+            }
+        }
         updateSlotsDisplay();
         if (!(getFocused() instanceof LegacyIconHolder)) setFocused(merchantTradeButtons.get(0));
         int tradingButtonsX = accessor.getInteger("tradingButtons.x", 13);

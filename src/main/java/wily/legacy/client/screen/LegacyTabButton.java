@@ -123,7 +123,6 @@ public class LegacyTabButton extends AbstractButton {
             guiGraphics.pose().translate(translate.x,translate.y,translate.z);
             isHovered = isMouseOver(i,j);
         }
-        if (selected) guiGraphics.pose().translate(0F,0f,1F);
         spriteRender.render(this, guiGraphics, i, j, f);
         if (!selected) guiGraphics.pose().translate(0,-1,0);
         if (active) {

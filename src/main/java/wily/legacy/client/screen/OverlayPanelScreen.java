@@ -20,20 +20,16 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (transparentBackground) {
-            /*? if <=1.20.1 {*//*ScreenUtil.*//*?}*/renderTransparentBackground(guiGraphics);
-            ScreenUtil.renderUsername(guiGraphics);
-        }
-    }
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (parent != null){
+        if (parent != null) {
             parent.render(guiGraphics, 0, 0, f);
             deferredTooltipRendering = null;
         }
         guiGraphics.pose().translate(0,0, 1200);
-        super.render(guiGraphics, i, j, f);
+
+        if (transparentBackground) {
+            /*? if <=1.20.1 {*//*ScreenUtil.*//*?}*/renderTransparentBackground(guiGraphics);
+            ScreenUtil.renderUsername(guiGraphics);
+        }
     }
 
     @Override

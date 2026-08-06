@@ -133,7 +133,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? null : ControllerBinding.RIGHT_STICK.getIcon(), ()-> LegacyComponents.MOVE_KEYBOARD);
+        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.RIGHT_STICK.getIcon(), () -> LegacyComponents.MOVE_KEYBOARD);
     }
 
     public static boolean isOpenKey(int i){
@@ -180,6 +180,16 @@ public class KeyboardScreen extends OverlayPanelScreen {
     public boolean keyPressed(int i, int j, int k) {
         if (renderableVList.keyPressed(i)) return true;
         return super.keyPressed(i, j, k);
+    }
+
+    @Override
+    public boolean mouseDragged(double x, double y, int i, double d, double e) {
+        if ((d != 0 || e != 0) && i == InputConstants.MOUSE_BUTTON_LEFT && ScreenUtil.isMouseOver(x, y, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight())) {
+            xDiff = Math.max(0, Math.min(panel.getX() + Math.round((float) d), width - panel.getWidth())) - lastX;
+            yDiff = Math.max(0, Math.min(panel.getY() + Math.round((float) e), height - panel.getHeight())) - lastY;
+            repositionElements();
+        }
+        return super.mouseDragged(x, y, i, d, e);
     }
 
     @Override

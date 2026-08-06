@@ -101,7 +101,6 @@
     "client.crafting.CraftingScreenMixin",
     "client.CustomHeadLayerMixin",
     "client.create_world.CreateWorldScreenMixin",
-    "CyclingSlotBackgroundMixin",
     "DeathScreenMixin",
     "client.drowned.DrownedModelMixin",
     "client.drowned.DrownedRendererMixin",
@@ -265,7 +264,9 @@
     "VillagerModelMixin",
     "BubbleParticleMixin",
     "client.gui.SubtitleOverlayMixin",
-    "ItemPickupParticleMixin"
+    "ItemPickupParticleMixin",
+    "client.CyclingSlotBackgroundMixin",
+    "client.beacon.BeaconScreenButtonMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

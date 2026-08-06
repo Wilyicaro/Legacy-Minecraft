@@ -18,10 +18,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerListener;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.TransientCraftingContainer;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.*;
 //? if >=1.20.5 {
 import net.minecraft.world.item.component.FireworkExplosion;
@@ -45,6 +42,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.client.WidgetAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.base.network.CommonRecipeManager;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ModInfo;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4J;
@@ -52,6 +50,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.ImpossibleIngredient;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.mixin.base.FireworkRocketRecipeAccessor;
 import wily.legacy.mixin.base.FireworkStarRecipeAccessor;
 import wily.legacy.network.ServerMenuCraftPayload;
@@ -506,6 +505,30 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         imageWidth = accessor.getInteger("imageWidth", 348);
         imageHeight = accessor.getInteger("imageHeight", 215);
         super.init();
+        LegacySlotDisplay display = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return 16;
+            }
+
+            @Override
+            public Vec3 getOffset() {
+                return menu.inventoryOffset;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return menu.inventoryActive;
+            }
+        };
+        for (int i = 0; i < 36; i++) {
+            Slot s = menu.slots.get(i);
+            if (i < 27) {
+                LegacySlotDisplay.override(s, 186 + (s.getContainerSlot() - 9) % 9 * 16, 133 + (s.getContainerSlot() - 9) / 9 * 16, display);
+            } else {
+                LegacySlotDisplay.override(s, 186 + s.getContainerSlot() * 16, 186, display);
+            }
+        }
         if (hasTypeTabList())
             leftPos+=getTabXOffset();
         topPos+=getTabYOffset();
@@ -737,7 +760,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         if (hasTypeTabList()) typeTabList.render(guiGraphics, i, j, f);
         getTabList().render(guiGraphics, i, j, f);
+        FactoryScreenUtil.disableDepthTest();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
+        FactoryScreenUtil.enableDepthTest();
         getTabList().renderSelected(guiGraphics, i, j, f);
         if (hasTypeTabList()) typeTabList.renderSelected(guiGraphics, i, j, f);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);

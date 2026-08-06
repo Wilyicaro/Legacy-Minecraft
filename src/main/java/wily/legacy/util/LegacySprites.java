@@ -52,6 +52,10 @@ public class LegacySprites {
     public static final ResourceLocation BEACON_3 = Legacy4J.createModLocation("container/beacon_3");
     public static final ResourceLocation BEACON_4 = Legacy4J.createModLocation("container/beacon_4");
     public static final ResourceLocation BEACON_CONFIRM = Legacy4J.createModLocation("container/beacon_check");
+    public static final ResourceLocation BEACON_BUTTON_DISABLED_SPRITE = FactoryAPI.createVanillaLocation("container/beacon/button_disabled");
+    public static final ResourceLocation BEACON_BUTTON_SELECTED_SPRITE = FactoryAPI.createVanillaLocation("container/beacon/button_selected");
+    public static final ResourceLocation BEACON_BUTTON_HIGHLIGHTED_SPRITE = FactoryAPI.createVanillaLocation("container/beacon/button_highlighted");
+    public static final ResourceLocation BEACON_BUTTON_SPRITE = FactoryAPI.createVanillaLocation("container/beacon/button");
     public static final ResourceLocation HEAD_SLOT = Legacy4J.createModLocation("container/head_slot");
     public static final ResourceLocation CHEST_SLOT = Legacy4J.createModLocation("container/chest_slot");
     public static final ResourceLocation LEGS_SLOT = Legacy4J.createModLocation("container/legs_slot");

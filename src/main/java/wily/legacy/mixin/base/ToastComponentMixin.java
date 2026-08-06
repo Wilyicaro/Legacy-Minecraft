@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(targets = /*? if <1.21.2 {*/"net.minecraft.client.gui.components.toasts.ToastComponent$ToastInstance"/*?} else {*/ /*"net.minecraft.client.gui.components.toasts.ToastManager$ToastInstance"*//*?}*/)
 public abstract class ToastComponentMixin {
@@ -35,6 +36,6 @@ public abstract class ToastComponentMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void render(PoseStack instance, float f, float g, float h, /*? if >=1.21.2 {*//*GuiGraphics guiGraphics, *//*?}*/int i){
-        instance.translate((i - this.toast.width()) / 2f,-toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*//*firstSlotIndex*//*?} else {*/index/*?}*/ * 32f) * /*? if <1.21.2 {*/this.getVisibility(Util.getMillis())/*?} else {*//*visiblePortion*//*?}*/, h);
+        instance.translate((i - this.toast.width()) / 2f,-toast.height() + ((LegacyOptions.getUIMode().isSD() ? 20 : 50) + toast.height() + this./*? if >=1.21.2 {*//*firstSlotIndex*//*?} else {*/index/*?}*/ * 32f) * /*? if <1.21.2 {*/this.getVisibility(Util.getMillis())/*?} else {*//*visiblePortion*//*?}*/, h);
     }
 }

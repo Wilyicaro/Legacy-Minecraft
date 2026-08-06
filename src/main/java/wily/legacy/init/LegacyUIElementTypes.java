@@ -121,7 +121,7 @@ public class LegacyUIElementTypes {
         }));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "backgroundSprite", ResourceLocation.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", UIDefinitionManager.ElementType::parseBoolean);
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "contentX", "contentY");
         UIDefinitionManager.parseAllElements(uiDefinition, a-> a.getElementValue(elementName+".renderables", a, UIAccessor.class), element, s-> s);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(a-> a.addRenderable(elementName, ((guiGraphics, i, j, f) -> {
             int x = a.getInteger(elementName + ".x", 0);
@@ -131,7 +131,7 @@ public class LegacyUIElementTypes {
             int width = a.getInteger(elementName + ".width", 0);
             int height = a.getInteger(elementName + ".height", 0);
             int lineHeight = a.getInteger(elementName + ".lineHeight", 12);
-            if (a.getBoolean(elementName+".hasBackground", true)) ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height );
+            if (a.getBoolean(elementName+".hasBackground", true)) ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height);
             a.getElement(elementName, ScrollableRenderer.class).ifPresent(s-> s.render(guiGraphics, x + xd, y + yd, width - 2 * xd, height - 2 * yd - 6, ()-> {
                 int yOffset = 0;
                 for (Renderable r : a.getElementValue(elementName+".renderables", a, UIAccessor.class).getChildrenRenderables()) {

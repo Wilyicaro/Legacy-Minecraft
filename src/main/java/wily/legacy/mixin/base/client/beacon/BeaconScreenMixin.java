@@ -84,7 +84,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
             @Override
             protected void renderIcon(GuiGraphics guiGraphics) {
                 FactoryScreenUtil.enableBlend();
-                int iconSize = LegacyOptions.getUIMode().isSD() ? 10 : 14;
+                int iconSize = 14;
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM,this.getX() + (this.getWidth() - iconSize) / 2, this.getY() + (this.getHeight() - iconSize) / 2, iconSize, iconSize);
                 FactoryScreenUtil.disableBlend();
             }
