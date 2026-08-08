@@ -37,15 +37,6 @@
     "requiresResourceReload": true
   },
   {
-    "id": "soundtracks",
-    "title": {
-      "translate": "legacy.menu.store.soundtracks"
-    },
-    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/soundtracks/index.json",
-    "targetDirectoryName": "resourcepacks",
-    "requiresResourceReload": true
-  },
-  {
     "id": "mashup_packs",
     "title": {
       "translate": "legacy.menu.store.mashup_packs"
@@ -60,6 +51,16 @@
       "translate": "legacy.menu.store.bundle_packs"
     },
     "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/Bundle%20Packs/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true,
+    "useResourceAlbum": false
+  },
+  {
+    "id": "soundtracks",
+    "title": {
+      "translate": "legacy.menu.store.soundtracks"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/soundtracks/index.json",
     "targetDirectoryName": "resourcepacks",
     "requiresResourceReload": true,
     "useResourceAlbum": false
