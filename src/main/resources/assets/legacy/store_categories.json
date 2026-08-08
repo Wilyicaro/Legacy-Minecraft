@@ -37,6 +37,15 @@
     "requiresResourceReload": true
   },
   {
+    "id": "soundtracks",
+    "title": {
+      "translate": "legacy.menu.store.soundtracks"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creepereater201/L4JDownloadableContent/main/soundtracks/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true
+  },
+  {
     "id": "mashup_packs",
     "title": {
       "translate": "legacy.menu.store.mashup_packs"
