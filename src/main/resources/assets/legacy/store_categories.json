@@ -41,7 +41,7 @@
     "title": {
       "translate": "legacy.menu.store.soundtracks"
     },
-    "indexUrl": "https://raw.githubusercontent.com/creepereater201/L4JDownloadableContent/main/soundtracks/index.json",
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/soundtracks/index.json",
     "targetDirectoryName": "resourcepacks",
     "requiresResourceReload": true
   },
