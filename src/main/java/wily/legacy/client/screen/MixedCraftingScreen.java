@@ -252,6 +252,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
             if (!collection.hasAnySelected() || searchCollections != null && !searchCollections.contains(collection))
                 continue;
             var selectedRecipes = collection.getSelectedRecipes(onlyCraftableRecipes ? RecipeCollection.CraftableStatus.CRAFTABLE : RecipeCollection.CraftableStatus.ANY);
+            selectedRecipes.removeIf(e -> e.craftingRequirements().filter(ingredients -> ingredients.size() > menu.getGridWidth() * menu.getGridHeight()).isPresent());
 
 
             if (selectedRecipes.isEmpty()) continue;
