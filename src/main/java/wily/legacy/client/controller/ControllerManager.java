@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -54,6 +55,7 @@ public class ControllerManager {
     private static final float ANGLE8 = 45F * Mth.DEG_TO_RAD;
     private static final float ANGLE16 = 22.5F * Mth.DEG_TO_RAD;
     private static final int MAX_INPUT_TICKS = 32;
+    private static final long MAX_QUEUED_UPDATE_TIME = 1000L;
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
@@ -67,6 +69,8 @@ public class ControllerManager {
     private KeyMapping controllerDebugOverlayKey;
     private ScheduledExecutorService poller;
     private final AtomicBoolean updateQueued = new AtomicBoolean();
+    private final AtomicLong updateSequence = new AtomicLong();
+    private volatile long updateQueuedAt;
     private long lastPollError;
     private long lastInputMillis;
     private int inputTicks = 1;
@@ -97,6 +101,7 @@ public class ControllerManager {
     public synchronized void restartPoller() {
         if (minecraft == null) return;
         if (poller != null) poller.shutdownNow();
+        resetControllerUpdates();
         poller = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread thread = new Thread(r, "Legacy4J Controller Poller");
             thread.setDaemon(true);
@@ -110,7 +115,15 @@ public class ControllerManager {
     }
 
     private void queueControllerUpdate() {
-        if (!minecraft.isRunning() || !updateQueued.compareAndSet(false, true)) return;
+        if (!minecraft.isRunning()) return;
+        long now = Util.getMillis();
+        if (!updateQueued.compareAndSet(false, true)) {
+            if (now - updateQueuedAt < MAX_QUEUED_UPDATE_TIME) return;
+            updateQueued.set(false);
+            if (!updateQueued.compareAndSet(false, true)) return;
+        }
+        updateQueuedAt = now;
+        long sequence = updateSequence.incrementAndGet();
         try {
             minecraft.execute(() -> {
                 try {
@@ -118,13 +131,18 @@ public class ControllerManager {
                 } catch (RuntimeException e) {
                     warnControllerPoll(e);
                 } finally {
-                    updateQueued.set(false);
+                    if (updateSequence.get() == sequence) updateQueued.set(false);
                 }
             });
         } catch (RuntimeException e) {
-            updateQueued.set(false);
+            if (updateSequence.get() == sequence) updateQueued.set(false);
             warnControllerPoll(e);
         }
+    }
+
+    private void resetControllerUpdates() {
+        updateSequence.incrementAndGet();
+        updateQueued.set(false);
     }
 
     private void updateController() {
@@ -199,6 +217,7 @@ public class ControllerManager {
     }
 
     public void connectTo(int jid) {
+        resetControllerUpdates();
         if (connectedController != null) connectedController.disconnect(this);
         if (getHandler().isValidController(jid)) {
             Controller controller = getHandler().getController(jid);
