@@ -100,7 +100,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
-import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.util.ColorUtil;
@@ -707,11 +706,11 @@ public interface ControlTooltip {
             if (actualItem.is(Items.WATER_BUCKET) && entity != null && bucketable.contains(entity.getType()))
                 return LegacyComponents.COLLECT;
             BlockHitResult bucketHitResult;
-            if (actualItem.getItem() instanceof BucketItem i  && !(blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock)&& (bucketHitResult = mayInteractItemAt(minecraft, actualItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ItemContainerPlatform.getBucketFluid(i) == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE))) != null) {
+            if (actualItem.getItem() instanceof BucketItem i  && !(blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock)&& (bucketHitResult = mayInteractItemAt(minecraft, actualItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, LegacyItemUtil.getBucketFluid(i) == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE))) != null) {
                 BlockState state = minecraft.level.getBlockState(bucketHitResult.getBlockPos());
-                if (ItemContainerPlatform.getBucketFluid(i) != Fluids.EMPTY) {
-                    BlockState resultState = state.getBlock() instanceof LiquidBlockContainer && ItemContainerPlatform.getBucketFluid(i) == Fluids.WATER ? state : minecraft.level.getBlockState(bucketHitResult.getBlockPos().relative(bucketHitResult.getDirection()));
-                    if (resultState.canBeReplaced(ItemContainerPlatform.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), resultState, ItemContainerPlatform.getBucketFluid(i)))
+                if (LegacyItemUtil.getBucketFluid(i) != Fluids.EMPTY) {
+                    BlockState resultState = state.getBlock() instanceof LiquidBlockContainer && LegacyItemUtil.getBucketFluid(i) == Fluids.WATER ? state : minecraft.level.getBlockState(bucketHitResult.getBlockPos().relative(bucketHitResult.getDirection()));
+                    if (resultState.canBeReplaced(LegacyItemUtil.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), resultState, LegacyItemUtil.getBucketFluid(i)))
                         return LegacyComponents.EMPTY;
                 } else if (state.getBlock() instanceof BucketPickup && !state.getFluidState().isEmpty()) return LegacyComponents.COLLECT;
             }
