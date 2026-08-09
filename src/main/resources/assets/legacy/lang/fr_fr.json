@@ -2161,5 +2161,11 @@
   "structure.minecraft.villages": "Villages",
   "structure.minecraft.villages.description": "Établissements situés dans les biomes de plaines, savane, désert, taïga ou plaines enneigées. Gardés par des golems de fer et domicile de fermiers, bibliothécaires, clercs, forgerons et bouchers.",
   "structure.minecraft.woodland_mansions": "Manoirs des bois",
-  "structure.minecraft.woodland_mansions.description": "Manoirs trouvés dans les forêts de chêne noir. Domicile des vex et des illageois."
+  "structure.minecraft.woodland_mansions.description": "Manoirs trouvés dans les forêts de chêne noir. Domicile des vex et des illageois.",
+  "legacy.menu.how_to_play.trial-chamber": "Chambres d'épreuve",
+  "legacy.menu.how_to_play.bundle_message_2": "The Bundle tooltip shows what is inside and how full it is. If several item types are visible, use %s to choose which item will come out next.\n\nSome container items cannot be packed inside Bundles. When holding a filled Bundle in the world, use %s to release items from it.",
+  "legacy.menu.leaderboard.board_difficulty": "%s (%s)",
+  "legacy.menu.leaderboard.toggle_view": "Changer le filtre",
+  "legacy.menu.leaderboard.view.around_me": "Mon score",
+  "legacy.menu.leaderboard.view.top": "Global"
 }

@@ -1858,7 +1858,7 @@
   "legacy.menu.store.legacy4j": "Legacy4J",
   "legacy.menu.store.mashup_packs": "Mash-up Packs",
   "legacy.menu.store.skinpacks": "Skin Packs",
-   "legacy.menu.store.soundtracks": "Soundtracks",
+  "legacy.menu.store.soundtracks": "Soundtracks",
   "legacy.menu.store.starterpacks": "STARTERPACKS",
   "legacy.menu.store.starterpacks.download_all": "Download All!",
   "legacy.menu.store.starterpacks.download_all.description": "Download every mash-up pack, skin pack, texture pack, and more!",
@@ -2162,5 +2162,10 @@
   "structure.minecraft.villages": "Villages",
   "structure.minecraft.villages.description": "Settlements situated in Plains, Savanna, Desert, Taiga or Snowy Plains biomes. Guarded by Iron Golems and home to Farmers, Librarians, Clerics, Blacksmiths and Butchers.",
   "structure.minecraft.woodland_mansions": "Woodland Mansions",
-  "structure.minecraft.woodland_mansions.description": "Masions found in Dark Oak Forests. Home to Vexes and Illagers."
+  "structure.minecraft.woodland_mansions.description": "Masions found in Dark Oak Forests. Home to Vexes and Illagers.",
+  "legacy.menu.how_to_play.bundle_message_2": "The Bundle tooltip shows what is inside and how full it is. If several item types are visible, use %s to choose which item will come out next.\n\nSome container items cannot be packed inside Bundles. When holding a filled Bundle in the world, use %s to release items from it.",
+  "legacy.menu.leaderboard.board_difficulty": "%s (%s)",
+  "legacy.menu.leaderboard.toggle_view": "Toggle Leaderboard View",
+  "legacy.menu.leaderboard.view.around_me": "Around Me",
+  "legacy.menu.leaderboard.view.top": "Top"
 }

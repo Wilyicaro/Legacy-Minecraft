@@ -2161,5 +2161,11 @@
   "structure.minecraft.villages": "村庄",
   "structure.minecraft.villages.description": "位于平原、稀树草原、沙漠、针叶林或雪原生物群系的定居点。由铁傀儡守护，居住着农民、图书管理员、牧师、铁匠和屠夫。",
   "structure.minecraft.woodland_mansions": "林地府邸",
-  "structure.minecraft.woodland_mansions.description": "位于深色橡树林的府邸，居住着恼鬼和恶魂。"
+  "structure.minecraft.woodland_mansions.description": "位于深色橡树林的府邸，居住着恼鬼和恶魂。",
+  "legacy.menu.how_to_play.trial-chamber": "试炼厅",
+  "legacy.menu.how_to_play.bundle_message_2": "The Bundle tooltip shows what is inside and how full it is. If several item types are visible, use %s to choose which item will come out next.\n\nSome container items cannot be packed inside Bundles. When holding a filled Bundle in the world, use %s to release items from it.",
+  "legacy.menu.leaderboard.board_difficulty": "%s (%s)",
+  "legacy.menu.leaderboard.toggle_view": "更改筛选器",
+  "legacy.menu.leaderboard.view.around_me": "我的得分",
+  "legacy.menu.leaderboard.view.top": "总览"
 }

@@ -2165,5 +2165,11 @@
   "structure.minecraft.villages": "Vilas",
   "structure.minecraft.villages.description": "Assentamentos encontrados nas Planícies, na Savana, no Deserto, na Taiga ou nas Planícies nevadas. Guardado por Golens de Ferro e casa para Agricultores, Bibliotecários, Clérigos, Ferreiros e Açougueiros.",
   "structure.minecraft.woodland_mansions": "Mansões da Mata",
-  "structure.minecraft.woodland_mansions.description": "Mansões encontradas em Florestas escuras. Lar dos Vexes e Illagers."
+  "structure.minecraft.woodland_mansions.description": "Mansões encontradas em Florestas escuras. Lar dos Vexes e Illagers.",
+  "legacy.menu.how_to_play.trial-chamber": "Câmaras do Desafio",
+  "legacy.menu.how_to_play.bundle_message_2": "The Bundle tooltip shows what is inside and how full it is. If several item types are visible, use %s to choose which item will come out next.\n\nSome container items cannot be packed inside Bundles. When holding a filled Bundle in the world, use %s to release items from it.",
+  "legacy.menu.leaderboard.board_difficulty": "%s (%s)",
+  "legacy.menu.leaderboard.toggle_view": "Trocar Filtro",
+  "legacy.menu.leaderboard.view.around_me": "Minha Pontuação",
+  "legacy.menu.leaderboard.view.top": "Geral"
 }

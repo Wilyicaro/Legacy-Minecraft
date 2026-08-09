@@ -2161,5 +2161,10 @@
   "structure.minecraft.villages": "Aldeas",
   "structure.minecraft.villages.description": "Asentamientos situados en biomas de Llanuras, Sabana, Desierto, Taiga o Llanuras Nevadas. Custodiados por Gólems de Hierro y hogar de Agricultores, Bibliotecarios, Clérigos, Herreros y Carniceros.",
   "structure.minecraft.woodland_mansions": "Mansiones del Bosque",
-  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers."
+  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers.",
+  "legacy.menu.how_to_play.bundle_message_2": "The Bundle tooltip shows what is inside and how full it is. If several item types are visible, use %s to choose which item will come out next.\n\nSome container items cannot be packed inside Bundles. When holding a filled Bundle in the world, use %s to release items from it.",
+  "legacy.menu.leaderboard.board_difficulty": "%s (%s)",
+  "legacy.menu.leaderboard.toggle_view": "Toggle Leaderboard View",
+  "legacy.menu.leaderboard.view.around_me": "Around Me",
+  "legacy.menu.leaderboard.view.top": "Top"
 }
