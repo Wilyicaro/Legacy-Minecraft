@@ -633,7 +633,7 @@ public class Legacy4JClient {
             FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> Legacy4JClient.legacyFont = true);
             accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->{
                 if (!LegacyMixinOptions.legacyGui.get()) return;
-                a.getElements().put(FactoryGuiElement.VIGNETTE.name()+".isVisible", ()-> false);
+                a.getElements().put(FactoryGuiElement.VIGNETTE.name()+".isVisible", LegacyOptions.vignette::get);
                 a.getElements().put("isGuiVisible", ScreenUtil::canDisplayHUD);
                 a.getElements().put("hud.scaleX", hudScale);
                 a.getElements().put("hud.scaleY", hudScale);
