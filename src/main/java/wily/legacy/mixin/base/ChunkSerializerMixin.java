@@ -11,8 +11,8 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.ChunkSerializer;
 //? if >=1.21 {
-/*import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
-*///?}
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
+//?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,8 +30,8 @@ public abstract class ChunkSerializerMixin {
     private static void legacy$invalidateOldWaterSkyLight(
             ServerLevel level, PoiManager poiManager,
             //? if >=1.21 {
-            /*RegionStorageInfo regionStorageInfo,
-            *///?}
+            RegionStorageInfo regionStorageInfo,
+            //?}
             ChunkPos chunkPos, CompoundTag chunkTag, CallbackInfoReturnable<ProtoChunk> cir) {
         if (!level.dimensionType().hasSkyLight()
                 || chunkTag.getInt(LEGACY_WATER_LIGHT_VERSION_TAG) >= LEGACY_WATER_LIGHT_VERSION) return;
