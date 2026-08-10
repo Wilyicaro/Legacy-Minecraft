@@ -225,10 +225,13 @@ public final class SkinPackLoader {
                 String packId = parsePackId(path);
                 if (packId == null || packId.isEmpty()) continue;
                 if (state.packs.containsKey(packId)) continue;
-                JsonObject json = SkinPackJson.readObject(jsons.get(rl));
+                Resource resource = jsons.get(rl);
+                JsonObject json = SkinPackJson.readObject(resource);
                 if (json == null) continue;
                 String prefix = path.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
-                loadSinglePack(ns, packId, packId, prefix, json, rm, state);
+                boolean storeDownloaded = DownloadedSkinPackStore.isManagedResourcePackId(resource.sourcePackId())
+                    || CustomSkinPackStore.isManagedResourcePackId(resource.sourcePackId()) && !SkinPackJson.bool(json.get("editable"), false);
+                loadSinglePack(ns, packId, packId, prefix, json, storeDownloaded, rm, state);
             }
         } finally {
             SkinPoseRegistry.endReload();
@@ -358,6 +361,7 @@ public final class SkinPackLoader {
                                        String packFolder,
                                        String packPrefix,
                                        JsonObject json,
+                                       boolean storeDownloaded,
                                        ResourceManager rm,
                                        PackLoadState state) {
         if (state == null) return;
@@ -387,7 +391,7 @@ public final class SkinPackLoader {
                 if (skinName == null || skinName.isBlank()) skinName = sourceId;
                 skinName = SkinPackLang.translateMaybeKey(skinName, sourceId);
                 int order = SkinPackJson.integer(o.get("order"), i + 1);
-                boolean fair = SkinPackJson.bool(o.get("fair"), true);
+                boolean fair = storeDownloaded && SkinPackJson.bool(o.get("fair"), true);
                 String capePath = SkinPackJson.string(o.get("cape"));
                 boolean slimArms = SkinPackJson.bool(o.get("slim"), false);
                 boolean modelExplicit = o.has("slim") && o.get("slim").isJsonPrimitive();
