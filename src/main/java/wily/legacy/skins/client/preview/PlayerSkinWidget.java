@@ -484,7 +484,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private void renderNamePlate(GuiGraphicsExtractor GuiGraphicsExtractor, String id, int left, int right, int bottom) {
         String displayId = resolveNamePlateId(id);
         if (displayId == null || displayId.isBlank()) return;
-        String label = SkinIdUtil.isAutoSelect(displayId) ? "Current Skin" : nameLabel(displayId);
+        String label = nameLabel(displayId);
         if (label == null) label = "";
         int plateW = CENTER_NAME_PLATE_W;
         int plateH = CENTER_NAME_PLATE_H;

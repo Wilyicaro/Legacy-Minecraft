@@ -144,7 +144,7 @@ public interface ChangeSkinScreenSource {
 
         @Override
         public String skinName(@Nullable String skinId) {
-            if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return "";
+            if (!SkinIdUtil.hasSkin(skinId)) return "";
             SkinEntry entry = skin(skinId);
             return entry == null ? skinId : skinName(entry);
         }
