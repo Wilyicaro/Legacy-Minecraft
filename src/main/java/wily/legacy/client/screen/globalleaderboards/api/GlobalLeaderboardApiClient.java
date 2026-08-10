@@ -84,8 +84,16 @@ public final class GlobalLeaderboardApiClient {
       }
       if (viewMode == GlobalLeaderboardViewMode.AROUND_ME) {
          query.append("&window=").append(boardRequest.aroundWindow());
-      } else {
-         query.append("&limit=").append(boardRequest.topLimit());
+      }
+      query.append("&limit=").append(boardRequest.topLimit());
+      if (!boardRequest.cursor().isBlank()) {
+         query.append("&cursor=").append(encode(boardRequest.cursor()));
+      } else if (boardRequest.afterRank() > 0) {
+         query.append("&afterRank=").append(boardRequest.afterRank());
+      } else if (!boardRequest.previousCursor().isBlank()) {
+         query.append("&beforeCursor=").append(encode(boardRequest.previousCursor()));
+      } else if (boardRequest.beforeRank() > 0) {
+         query.append("&beforeRank=").append(boardRequest.beforeRank());
       }
 
       HttpRequest request = HttpRequest.newBuilder(this.resolve("/leaderboards/board/" + encode(boardId) + "?" + query))
@@ -122,7 +130,11 @@ public final class GlobalLeaderboardApiClient {
             statsObject.entrySet().forEach(statEntry -> statValues.put(statEntry.getKey(), valueFromJson(statEntry.getValue())));
             parsed.add(new GlobalLeaderboardRow(intValue(entry, "rank"), stringValue(entry, "playerUuid"), stringValue(entry, "playerName"), longValue(entry, "totalScore"), statValues));
          });
-         return GlobalLeaderboardPage.successful(parsed);
+         boolean initialAroundPage = viewMode == GlobalLeaderboardViewMode.AROUND_ME && boardRequest.cursor().isBlank() && boardRequest.afterRank() == 0 && boardRequest.previousCursor().isBlank() && boardRequest.beforeRank() == 0;
+         int expectedRows = initialAroundPage ? boardRequest.aroundWindow() * 2 + 1 : boardRequest.topLimit();
+         boolean hasMore = booleanValue(object, "hasMore", parsed.size() >= expectedRows);
+         boolean hasPrevious = booleanValue(object, "hasPrevious", viewMode == GlobalLeaderboardViewMode.AROUND_ME && parsed.stream().mapToInt(GlobalLeaderboardRow::rank).filter(rank -> rank > 0).min().orElse(1) > 1);
+         return GlobalLeaderboardPage.successful(parsed, hasMore, stringValue(object, "nextCursor"), hasPrevious, stringValue(object, "previousCursor"));
       } catch (IOException | InterruptedException | RuntimeException err) {
          if (err instanceof InterruptedException) {
             Thread.currentThread().interrupt();
@@ -191,6 +203,11 @@ public final class GlobalLeaderboardApiClient {
    private static long longValue(JsonObject object, String key) {
       JsonElement element = object.get(key);
       return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber() ? element.getAsLong() : 0L;
+   }
+
+   private static boolean booleanValue(JsonObject object, String key, boolean fallback) {
+      JsonElement element = object.get(key);
+      return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive().isBoolean() ? element.getAsBoolean() : fallback;
    }
 
    private static GlobalLeaderboardValue valueFromJson(JsonElement element) {
