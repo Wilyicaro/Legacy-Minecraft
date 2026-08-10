@@ -349,7 +349,7 @@ public final class ChangeSkinPackList {
             LegacyFontUtil.applySDFont(ignored -> {
                 String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
                 int centerX = getX() + getWidth() / 2;
-                int textY = getY() + (getHeight() - font.lineHeight) / 2;
+                int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                 graphics.drawCenteredString(font, visibleText, centerX, textY, color);
             });
         }
