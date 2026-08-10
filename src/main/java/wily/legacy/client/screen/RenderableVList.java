@@ -178,6 +178,18 @@ public class RenderableVList {
         canScrollDown = false;
     }
 
+    public boolean isNearEnd(int remaining) {
+        return !renderables.isEmpty() && renderables.size() - scrolledList.get() - renderablesCount <= Math.max(0, remaining);
+    }
+
+    public boolean isNearStart(int remaining) {
+        return scrolledList.get() <= Math.max(0, remaining);
+    }
+
+    public void offsetScroll(int amount) {
+        scrolledList.set(Math.max(0, Math.min(scrolledList.get() + amount, Math.max(0, renderables.size() - 1))));
+    }
+
     public void focusRenderable(Renderable renderable){
         if (renderables.isEmpty()) return;
         int index = renderables.indexOf(renderable);

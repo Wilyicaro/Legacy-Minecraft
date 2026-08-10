@@ -23,6 +23,8 @@ import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardCac
 import wily.legacy.client.screen.globalleaderboards.storage.GlobalStatsAggregator;
 import wily.legacy.globalleaderboards.GlobalDifficultyStatsStore;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ public final class GlobalLeaderboardsFeature {
         return thread;
     });
     private static final int MISSING_CACHE_RETRY_SECONDS = 30;
+    private static final int PAGE_SIZE = 25;
     private static final GlobalLeaderboardProvider LEGACY_PROVIDER = new GlobalLeaderboardProvider() {
         @Override
         public String id() {
@@ -59,6 +62,10 @@ public final class GlobalLeaderboardsFeature {
     };
     private static final Set<String> IN_FLIGHT_REQUESTS = ConcurrentHashMap.newKeySet();
     private static final Map<String, Long> REQUEST_TIMES = new ConcurrentHashMap<>();
+    private static final Map<String, String> NEXT_PAGE_CURSORS = new ConcurrentHashMap<>();
+    private static final Set<String> FINISHED_PAGES = ConcurrentHashMap.newKeySet();
+    private static final Map<String, String> PREVIOUS_PAGE_CURSORS = new ConcurrentHashMap<>();
+    private static final Set<String> FINISHED_PREVIOUS_PAGES = ConcurrentHashMap.newKeySet();
     private static final AtomicInteger CACHE_VERSION = new AtomicInteger();
     private static volatile boolean started;
     private static volatile boolean launchTaskScheduled;
@@ -123,6 +130,10 @@ public final class GlobalLeaderboardsFeature {
             lastSyncAt = 0L;
             boardCaches = Map.of();
             REQUEST_TIMES.clear();
+            NEXT_PAGE_CURSORS.clear();
+            FINISHED_PAGES.clear();
+            PREVIOUS_PAGE_CURSORS.clear();
+            FINISHED_PREVIOUS_PAGES.clear();
             CACHE_VERSION.incrementAndGet();
         }
         launchTaskScheduled = true;
@@ -216,6 +227,10 @@ public final class GlobalLeaderboardsFeature {
         launchTaskScheduled = false;
         IN_FLIGHT_REQUESTS.clear();
         REQUEST_TIMES.clear();
+        NEXT_PAGE_CURSORS.clear();
+        FINISHED_PAGES.clear();
+        PREVIOUS_PAGE_CURSORS.clear();
+        FINISHED_PREVIOUS_PAGES.clear();
         apiConfig = null;
         apiClient = null;
         CACHE_VERSION.incrementAndGet();
@@ -260,7 +275,74 @@ public final class GlobalLeaderboardsFeature {
             return;
         }
 
-        String requestKey = requestKey(queryBoard, viewMode);
+        GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
+        requestBoardPage(queryBoard, viewMode, "", 0, "", 0, config.topLimit(), true, false);
+    }
+
+    public static void requestNextPage(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, GlobalLeaderboardDifficulty difficulty) {
+        GlobalLeaderboardBoard queryBoard = requestBoard(board, difficulty);
+        if (isOptedOut() || queryBoard == null || queryBoard.id().isBlank() || LegacyLeaderboards.provider(queryBoard.providerId()) == null) {
+            return;
+        }
+
+        GlobalLeaderboardBoardCache cache = boardCache(queryBoard);
+        List<GlobalLeaderboardRow> entries = cache == null ? List.of() : viewMode == GlobalLeaderboardViewMode.TOP ? cache.topEntries() : cache.aroundEntries();
+        if (entries.isEmpty()) {
+            requestBoard(board, viewMode, difficulty);
+            return;
+        }
+
+        String paginationKey = requestKey(queryBoard, viewMode);
+        if (FINISHED_PAGES.contains(paginationKey)) {
+            return;
+        }
+
+        String cursor = NEXT_PAGE_CURSORS.getOrDefault(paginationKey, "");
+        int afterRank = entries.stream().mapToInt(GlobalLeaderboardRow::rank).max().orElse(0);
+        if (cursor.isBlank() && afterRank <= 0) {
+            return;
+        }
+        requestBoardPage(queryBoard, viewMode, cursor, afterRank, "", 0, PAGE_SIZE, false, false);
+    }
+
+    public static void requestPreviousPage(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, GlobalLeaderboardDifficulty difficulty) {
+        if (viewMode != GlobalLeaderboardViewMode.AROUND_ME) {
+            return;
+        }
+        GlobalLeaderboardBoard queryBoard = requestBoard(board, difficulty);
+        if (isOptedOut() || queryBoard == null || queryBoard.id().isBlank() || LegacyLeaderboards.provider(queryBoard.providerId()) == null) {
+            return;
+        }
+
+        GlobalLeaderboardBoardCache cache = boardCache(queryBoard);
+        List<GlobalLeaderboardRow> entries = cache == null ? List.of() : cache.aroundEntries();
+        if (entries.isEmpty()) {
+            requestBoard(board, viewMode, difficulty);
+            return;
+        }
+
+        String paginationKey = requestKey(queryBoard, viewMode);
+        if (FINISHED_PREVIOUS_PAGES.contains(paginationKey)) {
+            return;
+        }
+
+        String cursor = PREVIOUS_PAGE_CURSORS.getOrDefault(paginationKey, "");
+        int beforeRank = entries.stream().mapToInt(GlobalLeaderboardRow::rank).filter(rank -> rank > 0).min().orElse(0);
+        if (cursor.isBlank() && beforeRank <= 1) {
+            FINISHED_PREVIOUS_PAGES.add(paginationKey);
+            return;
+        }
+        requestBoardPage(queryBoard, viewMode, "", 0, cursor, beforeRank, PAGE_SIZE, false, true);
+    }
+
+    private static void requestBoardPage(GlobalLeaderboardBoard queryBoard, GlobalLeaderboardViewMode viewMode, String cursor, int afterRank, String previousCursor, int beforeRank, int limit, boolean initial, boolean previous) {
+        String requestKey = pageRequestKey(queryBoard, viewMode, cursor, afterRank, previousCursor, beforeRank);
+        long now = System.currentTimeMillis();
+        Long requestedAt = REQUEST_TIMES.get(requestKey);
+        if (requestedAt != null && now - requestedAt < MISSING_CACHE_RETRY_SECONDS * 1000L) {
+            return;
+        }
+
         String requestPlayerUuid = playerUuid;
         String requestPlayerName = playerName;
         String requestPlayerKey = playerKey();
@@ -281,7 +363,7 @@ public final class GlobalLeaderboardsFeature {
             }
 
             GlobalLeaderboardsConfig.Values config = GlobalLeaderboardsConfig.get();
-            GlobalLeaderboardRequest request = new GlobalLeaderboardRequest(queryBoard, viewMode, requestPlayerUuid, requestPlayerName, config.aroundWindow(), config.topLimit());
+            GlobalLeaderboardRequest request = new GlobalLeaderboardRequest(queryBoard, viewMode, requestPlayerUuid, requestPlayerName, config.aroundWindow(), limit, cursor, afterRank, previousCursor, beforeRank);
             CompletableFuture<GlobalLeaderboardPage> future;
             try {
                 future = provider.fetch(request);
@@ -301,7 +383,34 @@ public final class GlobalLeaderboardsFeature {
                     if (err != null) {
                         Legacy4J.LOGGER.warn("Failed to fetch global leaderboard board {}", queryBoard.id(), err);
                     } else if (!isOptedOut() && page != null && page.successful() && requestPlayerKey.equals(playerKey())) {
-                        mergeBoardCache(queryBoard, viewMode, page.rows());
+                        int added = mergeBoardCache(queryBoard, viewMode, page.rows(), !initial);
+                        String paginationKey = requestKey(queryBoard, viewMode);
+                        if (initial || !previous) {
+                            if (!page.hasMore() || !initial && added == 0) {
+                                FINISHED_PAGES.add(paginationKey);
+                                NEXT_PAGE_CURSORS.remove(paginationKey);
+                            } else {
+                                FINISHED_PAGES.remove(paginationKey);
+                                if (page.nextCursor().isBlank()) {
+                                    NEXT_PAGE_CURSORS.remove(paginationKey);
+                                } else {
+                                    NEXT_PAGE_CURSORS.put(paginationKey, page.nextCursor());
+                                }
+                            }
+                        }
+                        if (initial || previous) {
+                            if (!page.hasPrevious() || !initial && added == 0) {
+                                FINISHED_PREVIOUS_PAGES.add(paginationKey);
+                                PREVIOUS_PAGE_CURSORS.remove(paginationKey);
+                            } else {
+                                FINISHED_PREVIOUS_PAGES.remove(paginationKey);
+                                if (page.previousCursor().isBlank()) {
+                                    PREVIOUS_PAGE_CURSORS.remove(paginationKey);
+                                } else {
+                                    PREVIOUS_PAGE_CURSORS.put(paginationKey, page.previousCursor());
+                                }
+                            }
+                        }
                     }
                 } finally {
                     IN_FLIGHT_REQUESTS.remove(requestKey);
@@ -430,7 +539,7 @@ public final class GlobalLeaderboardsFeature {
             return false;
         }
 
-        String requestKey = requestKey(board, viewMode);
+        String requestKey = pageRequestKey(board, viewMode, "", 0, "", 0);
         long now = System.currentTimeMillis();
         long cooldown = Math.max(0, GlobalLeaderboardsConfig.get().fetchCooldownSeconds()) * 1000L;
         GlobalLeaderboardBoardCache cache = boardCaches.get(board.key());
@@ -458,20 +567,38 @@ public final class GlobalLeaderboardsFeature {
         return viewMode == GlobalLeaderboardViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
     }
 
-    private static synchronized void mergeBoardCache(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, List<GlobalLeaderboardRow> entries) {
+    private static synchronized int mergeBoardCache(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, List<GlobalLeaderboardRow> entries, boolean append) {
         LinkedHashMap<String, GlobalLeaderboardBoardCache> merged = new LinkedHashMap<>(boardCaches);
         GlobalLeaderboardBoardCache existing = merged.get(board.key());
         if (existing == null) {
             existing = new GlobalLeaderboardBoardCache(board.providerId(), board.id(), board.id(), 0L, List.of(), List.of(), 0L, 0L);
         }
 
+        List<GlobalLeaderboardRow> current = viewMode == GlobalLeaderboardViewMode.TOP ? existing.topEntries() : existing.aroundEntries();
+        List<GlobalLeaderboardRow> updatedEntries = entries;
+        int added = entries.size();
+        if (append) {
+            LinkedHashMap<String, GlobalLeaderboardRow> combined = new LinkedHashMap<>();
+            current.forEach(row -> combined.put(rowKey(row), row));
+            int previousSize = combined.size();
+            entries.forEach(row -> combined.put(rowKey(row), row));
+            added = combined.size() - previousSize;
+            if (added == 0) {
+                return 0;
+            }
+            ArrayList<GlobalLeaderboardRow> sorted = new ArrayList<>(combined.values());
+            sorted.sort(Comparator.comparingInt(GlobalLeaderboardRow::rank));
+            updatedEntries = sorted;
+        }
+
         GlobalLeaderboardBoardCache updated = viewMode == GlobalLeaderboardViewMode.TOP
-                ? existing.withTopEntries(entries, System.currentTimeMillis())
-                : existing.withAroundEntries(entries, System.currentTimeMillis());
+                ? existing.withTopEntries(updatedEntries, System.currentTimeMillis())
+                : existing.withAroundEntries(updatedEntries, System.currentTimeMillis());
         merged.put(board.key(), updated);
         boardCaches = Map.copyOf(merged);
         persistCache();
         CACHE_VERSION.incrementAndGet();
+        return added;
     }
 
     private static void persistCache() {
@@ -480,6 +607,20 @@ public final class GlobalLeaderboardsFeature {
 
     private static String requestKey(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode) {
         return viewMode == GlobalLeaderboardViewMode.AROUND_ME ? board.key() + "|" + viewMode.name() + "|" + playerKey() : board.key() + "|" + viewMode.name();
+    }
+
+    private static String pageRequestKey(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, String cursor, int afterRank, String previousCursor, int beforeRank) {
+        if (!previousCursor.isBlank()) {
+            return requestKey(board, viewMode) + "|beforeCursor:" + previousCursor;
+        }
+        if (beforeRank > 0) {
+            return requestKey(board, viewMode) + "|beforeRank:" + beforeRank;
+        }
+        return requestKey(board, viewMode) + "|" + (cursor.isBlank() ? "rank:" + afterRank : "cursor:" + cursor);
+    }
+
+    private static String rowKey(GlobalLeaderboardRow row) {
+        return row.playerUuid().isBlank() ? "rank:" + row.rank() + "|name:" + row.playerName() : "uuid:" + row.playerUuid();
     }
 
     private static String playerKey() {

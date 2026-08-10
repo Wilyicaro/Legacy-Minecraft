@@ -62,7 +62,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
         refreshBoardDefinitions();
         selectFirstNonEmptyBoard();
         rebuildRenderableVList(Minecraft.getInstance());
-        renderableVList.layoutSpacing(layout -> 1);
+        renderableVList.layoutSpacing(layout -> 1).cyclic(false);
     }
 
     @Override
@@ -90,9 +90,25 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
             return true;
         }
         if (renderableVList.keyPressed(i)) {
+            if (i == InputConstants.KEY_DOWN || i == InputConstants.KEY_PAGEDOWN) {
+                requestNextPageIfNearEnd();
+            } else if (i == InputConstants.KEY_UP || i == InputConstants.KEY_PAGEUP) {
+                requestPreviousPageIfNearStart();
+            }
             return true;
         }
         return super.keyPressed(i, j, k);
+    }
+
+    @Override
+    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+        boolean handled = super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+        if (g < 0) {
+            requestNextPageIfNearEnd();
+        } else if (g > 0) {
+            requestPreviousPageIfNearStart();
+        }
+        return handled;
     }
 
     public void changeStatBoard(boolean left) {
@@ -180,9 +196,19 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
         int cacheVersion = GlobalLeaderboardsFeature.cacheVersion();
         int boardsVersion = GlobalLeaderboardsFeature.boards().hashCode();
         if (cacheVersion != seenCacheVersion || boardsVersion != seenBoardsVersion) {
+            int previousRowCount = rows.size();
+            GlobalLeaderboardRow previousFirstRow = rows.isEmpty() ? null : rows.get(0);
             seenCacheVersion = cacheVersion;
             seenBoardsVersion = boardsVersion;
             rebuildRenderableVList(minecraft);
+            if (previousRowCount > 1) {
+                int previousFirstRowIndex = indexOfRow(previousFirstRow);
+                if (previousFirstRowIndex > 0) {
+                    renderableVList.offsetScroll(previousFirstRowIndex);
+                } else if (previousFirstRowIndex < 0) {
+                    renderableVList.resetScroll();
+                }
+            }
             repositionElements();
         }
     }
@@ -395,6 +421,33 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
 
     private void requestBoard(GlobalLeaderboardBoard board) {
         GlobalLeaderboardsFeature.requestBoard(board, viewMode, difficulty);
+    }
+
+    private void requestNextPageIfNearEnd() {
+        GlobalLeaderboardBoard board = selectedGlobalBoard();
+        if (board != null && !rows.isEmpty() && renderableVList.isNearEnd(5)) {
+            GlobalLeaderboardsFeature.requestNextPage(board, viewMode, difficulty);
+        }
+    }
+
+    private void requestPreviousPageIfNearStart() {
+        GlobalLeaderboardBoard board = selectedGlobalBoard();
+        if (board != null && !rows.isEmpty() && renderableVList.isNearStart(5)) {
+            GlobalLeaderboardsFeature.requestPreviousPage(board, viewMode, difficulty);
+        }
+    }
+
+    private int indexOfRow(GlobalLeaderboardRow target) {
+        if (target == null) {
+            return -1;
+        }
+        for (int index = 0; index < rows.size(); index++) {
+            GlobalLeaderboardRow row = rows.get(index);
+            if (!target.playerUuid().isBlank() ? target.playerUuid().equals(row.playerUuid()) : target.rank() == row.rank() && target.playerName().equals(row.playerName())) {
+                return index;
+            }
+        }
+        return -1;
     }
 
     private void applyLocalPlayerRow(GlobalLeaderboardBoard board, List<GlobalLeaderboardRow> entries) {
