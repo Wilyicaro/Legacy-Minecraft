@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.PagedList;
@@ -183,15 +184,26 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
             return;
         }
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
-            LegacySlotDisplay.override(menu.getSlot(i), 21 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
+            LegacySlotDisplay.override(menu.getSlot(i), 20 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
         }
         for (int i = 0; i < 9; i++) {
-            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 35 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
+            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 34 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
         }
-        addRenderableWidget(tabList);
-        addRenderableOnly(panel);
-        addRenderableOnly(tabList::renderSelected);
         panel.init();
+        int panelTop = accessor.getInteger("panel.top", 0);
+        float panelScale = accessor.getFloat("panel.scale", 1);
+        int panelRenderWidth = accessor.getInteger("panel.renderWidth", panel.width);
+        int panelRenderHeight = accessor.getInteger("panel.renderHeight", panel.height + panelTop);
+        if (panelTop == 0 && panelScale == 1) addRenderableOnly(panel);
+        else addRenderableOnly((graphics, i, j, f) -> {
+            graphics.pose().pushMatrix();
+            graphics.pose().translate(panel.x + accessor.getFloat("panel.offset.x", 0), panel.y - panelTop + accessor.getFloat("panel.offset.y", 0));
+            graphics.pose().scale(panelScale, panelScale);
+            FactoryGuiGraphics.of(graphics).blitSprite(panel.panelSprite, 0, 0, panelRenderWidth, panelRenderHeight);
+            graphics.pose().popMatrix();
+        });
+        addRenderableWidget(tabList);
+        addRenderableOnly(tabList::renderSelected);
         ((AbstractContainerScreenAccessor)this).legacy$setImageWidth(panel.width);
         ((AbstractContainerScreenAccessor)this).legacy$setImageHeight(panel.height);
         leftPos = panel.x;
@@ -216,9 +228,14 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         tabList.init(panel.x, panel.y - 33, panel.width, 39, (t, i) -> {
             int index = tabList.tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
-            t.offset = TAB_OFFSET;
+            t.offset = accessor.getElementValue("tabList.offset", TAB_OFFSET, LegacyTabButton.StateOffset.class);
+            t.iconOffset = new Vec2(accessor.getFloat("tabList.iconOffset.x", 0), accessor.getFloat("tabList.iconOffset.y", 0));
             t.setWidth(accessor.getInteger("tabList.buttonWidth", 41));
-            t.setX(t.getX() - tabList.tabButtons.indexOf(t));
+            t.spriteScale = accessor.getFloat("tabList.spriteScale", 1);
+            int spriteWidth = accessor.getInteger("tabList.spriteWidth", t.getWidth());
+            t.spriteWidth = t.type == LegacyTabButton.Type.RIGHT ? accessor.getInteger("tabList.rightSpriteWidth", spriteWidth) : spriteWidth;
+            t.spriteHeight = accessor.getInteger("tabList.spriteHeight", t.getHeight());
+            t.setX(t.getX() - index * accessor.getInteger("tabList.buttonOverlap", 1));
         });
         fillCreativeGrid();
     }
@@ -256,7 +273,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         if (arrangement.get() == 2) return;
         Component tabTitle = tabList.tabButtons.get(tabList.getIndex()).getMessage();
-        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 11), CommonColor.GRAY_TEXT.get(), false));
     }
 
     protected void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, float f, int i, int j) {

@@ -1,0 +1,95 @@
+{
+  "targetUI": "wily.legacy.client.screen.CreativeModeScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.hd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:creative/creative_panel_8"
+    },
+    "panel.top": {
+      "type": "put_number",
+      "value": 33
+    },
+    "panel.scale": {
+      "type": "put_number",
+      "value": 0.5
+    },
+    "panel.renderWidth": {
+      "type": "put_number",
+      "value": 643
+    },
+    "panel.renderHeight": {
+      "type": "put_number",
+      "value": 490
+    },
+    "panel.offset.y": {
+      "type": "put_number",
+      "value": 0.5
+    },
+    "panel.width": {
+      "type": "put_number",
+      "value": 322
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 212
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:creative/tab_creative8_l",
+          "middle": "legacy:creative/tab_creative8_m",
+          "right": "legacy:creative/tab_creative8_r"
+        },
+        "down": "legacy:container/empty"
+      }
+    },
+    "tabList.buttonWidth": {
+      "type": "put_number",
+      "value": 42
+    },
+    "tabList.buttonOverlap": {
+      "type": "put_number",
+      "value": 2
+    },
+    "tabList.height": {
+      "type": "put_number",
+      "value": 39
+    },
+    "tabList.y": {
+      "type": "put_number",
+      "value": "${panel.y}-35"
+    },
+    "tabList.offset": {
+      "type": "put_tab_state_offset",
+      "value": {
+        "selected": [0, 1],
+        "unselected": [0, 3]
+      }
+    },
+    "tabList.spriteScale": {
+      "type": "put_number",
+      "value": 0.5
+    },
+    "tabList.spriteWidth": {
+      "type": "put_number",
+      "value": 83
+    },
+    "tabList.spriteHeight": {
+      "type": "put_number",
+      "value": 78
+    },
+    "tabList.iconOffset.x": {
+      "type": "put_number",
+      "value": -0.5
+    },
+    "tabList.iconOffset.y": {
+      "type": "put_number",
+      "value": 1
+    }
+  }
+}
