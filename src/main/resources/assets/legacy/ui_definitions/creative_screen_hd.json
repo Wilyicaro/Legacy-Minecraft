@@ -90,6 +90,10 @@
     "tabList.iconOffset.y": {
       "type": "put_number",
       "value": 1
+    },
+    "title.y": {
+      "type": "put_number",
+      "value": 14
     }
   }
 }

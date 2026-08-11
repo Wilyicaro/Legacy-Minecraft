@@ -97,7 +97,7 @@
     },
     "title.y": {
       "type": "put_number",
-      "value": 11
+      "value": 14
     },
     "creative_menu": {
       "type": "put_legacy_slot",

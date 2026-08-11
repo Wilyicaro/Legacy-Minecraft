@@ -203,6 +203,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
             graphics.pose().popMatrix();
         });
         addRenderableWidget(tabList);
+        addRenderableOnly(this::renderSelectedIconUnderlay);
         addRenderableOnly(tabList::renderSelected);
         ((AbstractContainerScreenAccessor)this).legacy$setImageWidth(panel.width);
         ((AbstractContainerScreenAccessor)this).legacy$setImageHeight(panel.height);
@@ -238,6 +239,20 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
             t.setX(t.getX() - index * accessor.getInteger("tabList.buttonOverlap", 1));
         });
         fillCreativeGrid();
+    }
+
+    protected void renderSelectedIconUnderlay(GuiGraphicsExtractor graphics, int i, int j, float f) {
+        LegacyTabButton button = tabList.selected;
+        if (button == null || !button.active || button.icon == null) return;
+        graphics.pose().pushMatrix();
+        boolean selected = button.selected;
+        button.selected = false;
+        Vec2 translate = button.offset.apply(button);
+        button.selected = selected;
+        graphics.pose().translate(translate.x, translate.y - 1);
+        graphics.pose().translate(button.iconOffset.x, button.iconOffset.y);
+        button.icon.render(button, graphics, i, j, f);
+        graphics.pose().popMatrix();
     }
 
     protected int getMaxTabCount() {
