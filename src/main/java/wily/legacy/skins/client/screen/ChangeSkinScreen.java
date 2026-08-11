@@ -48,7 +48,6 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int PADLOCK_TEXTURE_SIZE = 32;
     private static final int HEART_TEXTURE_SIZE = 9;
     private static final int PACK_BUTTON_BASE_HEIGHT = 20;
-    private static final int PACK_LIST_RECESS_HEIGHT_EXTRA = 3;
 
     private static final ReferenceSize FRAME_TEXTURE_SIZE = new ReferenceSize(1125, 818);
     private static final int PREVIEW_OPENING_RIGHT = 1095;
@@ -346,15 +345,14 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         packList.refreshPackIdsIfNeeded();
         packList.setReorderMode(isReorderingCustomPack());
         int visibleRows = visiblePackRows();
-        int maxListBottom = arrowTop - sc(4);
+        int maxListBottom = arrowTop - Math.round(arrowHeight * 0.75f);
         int rowPitch = Math.max(10, resolvedPackRowHeight);
         int buttonHeight = rowPitch;
         int h = rowPitch * visibleRows + PACK_LIST_FOOTER_RESERVE;
         int frameListTop = maxListBottom - rowPitch * visibleRows;
         int y = frameListTop;
         int packFrameRenderX = frameX - sc(2);
-        int packFrameRenderY = (isCompact480() ? frameListTop - sc(3) : frameListTop - sc(4))
-                - PACK_LIST_RECESS_HEIGHT_EXTRA;
+        int packFrameRenderY = frameListTop - sc(3);
         int packFrameRenderW = frameW + sc(4);
         int packFrameRenderH = frameY + frameH - packFrameRenderY;
         int packIconTop = panel.y + sc(FRAME_TOP);
