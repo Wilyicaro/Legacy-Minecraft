@@ -235,13 +235,12 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         fireworkButtons.add(craftingButtonByList(LegacyComponents.ADD_POWER_TAB, Arrays.stream(FactoryIngredient.of(FireworkCrafting.gunpowderIngredient()).getStacks()).toList(), fireworkRocketUpdateRecipe).enableAddIngredients(h -> ingredientsGrid.stream().filter(i -> i.isPresent() && i.get().equals(FireworkCrafting.gunpowderIngredient())).count() < 3));
         fireworkButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_STAR_TAB, i -> i.is(Items.FIREWORK_STAR) && /*? if <1.20.5 {*//*i.hasTag() && i.getTag().contains("Explosion")*//*?} else {*/i.get(DataComponents.FIREWORK_EXPLOSION) != null/*?}*/, fireworkRocketUpdateRecipe).enableAddIngredients());
 
-        dyeArmorButtons.add(craftingButtonByPredicate(Component.translatable("legacy.container.tab.armour"), i -> /*? if <1.20.5 {*//*i.getItem() instanceof DyeableLeatherItem*//*?} else {*/i.is(ItemTags.CAULDRON_CAN_REMOVE_DYE)/*?}*/, dyeArmorUpdateRecipe));
-        dyeArmorButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, dyeArmorUpdateRecipe).enableAddIngredients());
-        dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"), i -> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b && b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ || i.getItem() instanceof BundleItem/*?}*/), dyeItemUpdateRecipe));
-        dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, dyeItemUpdateRecipe));
-        if (!is2x2)
-            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(LegacyItemUtil.getBannerItem(c))))).toList()));
-        bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i -> i.getItem() instanceof BannerItem && LegacyItemUtil.hasValidPatterns(i), h -> {
+        dyeArmorButtons.add(craftingButtonByPredicate(Component.translatable("legacy.container.tab.armor"), i-> /*? if <1.20.5 {*//*i.getItem() instanceof DyeableLeatherItem*//*?} else {*/i.is(ItemTags.DYEABLE)/*?}*/,dyeArmorUpdateRecipe));
+        dyeArmorButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes,dyeArmorUpdateRecipe).enableAddIngredients());
+        dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"),i-> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b &&  b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ || i.getItem() instanceof BundleItem/*?}*/),dyeItemUpdateRecipe));
+        dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes,dyeItemUpdateRecipe));
+        if (!is2x2) bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c-> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(BannerBlock.byColor(c).asItem())))).toList()));
+        bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i-> i.getItem() instanceof BannerItem && LegacyItemUtil.hasValidPatterns(i), h->{
             clearIngredients(ingredientsGrid);
             if (bannerButtons.isEmpty() || h.itemIcon.isEmpty()) return;
             LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.empty(), Optional.of(StackIngredient.of(true, h.itemIcon.getItem().getDefaultInstance())), Optional.of(StackIngredient.of(true, h.itemIcon.copyWithCount(1)))), gridDimension, 2, 2);

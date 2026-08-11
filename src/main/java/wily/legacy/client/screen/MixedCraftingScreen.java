@@ -72,7 +72,17 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
     public static final Identifier SEARCH_TAB = Legacy4J.createModLocation("search");
     public static final ExtendedRecipeBookCategory[] VANILLA_CATEGORIES = new ExtendedRecipeBookCategory[]{RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_REDSTONE, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_MISC, SearchRecipeBookCategory.CRAFTING};
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
-    protected final StackedItemContents stackedContents = new StackedItemContents();
+    protected final /*? if <1.21.2 {*/ /*StackedContents*//*?} else {*/StackedItemContents/*?}*/ stackedContents = new /*? if <1.21.2 {*/ /*StackedContents*//*?} else {*/StackedItemContents/*?}*/();
+    private int timesInventoryChanged;
+    private final boolean is2x2;
+    private boolean onlyCraftableRecipes = false;
+    protected Stocker.Sizeable infoType = new Stocker.Sizeable(0, 2);
+    protected final UIAccessor accessor = UIAccessor.of(this);
+    protected final List<RecipeIconHolder<VanillaCrafting>> craftingButtons = new PagedList<>(new Stocker.Sizeable(0, 0), () -> accessor.getInteger("maxCraftingButtonsCount", 12));
+    protected List<List<RecipeInfo<VanillaCrafting>>> recipesByGroup = new ArrayList<>();
+    protected final Stocker.Sizeable craftingButtonsOffset = new Stocker.Sizeable(0);
+    protected final TabList craftingTabList = new TabList(accessor).add(43, LegacyTabButton.Type.LEFT, LegacyTabButton.iconOf(LegacySprites.STRUCTURES), LegacyComponents.STRUCTURES, t -> resetElements()).add(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(LegacySprites.MECHANISMS), LegacyComponents.MECHANISMS, t -> resetElements()).add(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(LegacySprites.TOOLS), LegacyComponents.TOOLS_AND_ARMOR, t -> resetElements()).add(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(LegacySprites.MISC), LegacyComponents.MISC, t -> resetElements()).add(43, LegacyTabButton.Type.RIGHT, LegacyTabButton.iconOf(LegacySprites.SEARCH), LegacyComponents.SEARCH_ITEMS, t -> enableSearchMode(true));
+    protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
     protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200, 20, LegacyComponents.SEARCH_ITEMS);
     private final boolean is2x2;

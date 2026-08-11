@@ -17,4 +17,6 @@ classes/
 .vscode
 .settings
 *.launch
-**/META-INF/accesstransformer.cfg
+/src/main/resources/assets/legacy/lang/.vs
+*.lnk
+/src/main/java/wily/legacy/.vs
