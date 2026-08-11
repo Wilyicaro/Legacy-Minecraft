@@ -276,7 +276,8 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
                     }
                 }
                 e.craftingRequirements().ifPresent(ingredients -> {
-                    for (int index = 0; index < ingredients.size(); index++) {
+                    int limit = Math.min(ingredients.size(), ings.size());
+                    for (int index = 0; index < limit; index++) {
                         ings.set(index, Optional.of(ingredients.get(index)));
                     }
                 });
