@@ -20,7 +20,7 @@ public final class ConsoleMobCaps {
     private static final String MAX_MOOSHROOMS_SPAWNED = "legacy.message.mobcap.max_mooshrooms_spawned";
     private static final String MAX_WOLVES_SPAWNED = "legacy.message.mobcap.max_wolves_spawned";
     private static final String MAX_CHICKENS_SPAWNED = "legacy.message.mobcap.max_chickens_spawned";
-    private static final String MAX_SQUID_SPAWNED = "legacy.message.mobcap.max_squid_spawned";
+    private static final String MAX_SQUID = "legacy.message.mobcap.max_squid";
     private static final String MAX_BATS_SPAWNED = "legacy.message.mobcap.max_bats_spawned";
     private static final String MAX_ENEMIES_SPAWNED = "legacy.message.mobcap.max_enemies_spawned";
     private static final String MAX_VILLAGERS_SPAWNED = "legacy.message.mobcap.max_villagers_spawned";
@@ -205,7 +205,7 @@ public final class ConsoleMobCaps {
             return MAX_MOOSHROOMS_SPAWNED;
         }
         if (bucket == TrackedMobCap.SQUIDS && tracker.count(TrackedMobCap.SQUIDS) >= TrackedMobCap.SQUIDS.manualLimit()) {
-            return MAX_SQUID_SPAWNED;
+            return MAX_SQUID;
         }
         if (bucket == TrackedMobCap.AMBIENT && tracker.count(TrackedMobCap.AMBIENT) >= TrackedMobCap.AMBIENT.manualLimit()) {
             return MAX_BATS_SPAWNED;
