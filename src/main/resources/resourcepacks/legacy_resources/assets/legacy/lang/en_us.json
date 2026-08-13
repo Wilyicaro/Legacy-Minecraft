@@ -57,7 +57,7 @@
   "commands.item.source.not_a_container": "Block at %s, %s, %s is not a container",
   "commands.item.target.not_a_container": "Block at %s, %s, %s is not a container",
   "commands.kick.singleplayer.failed": "Cannot kick in an offline singleplayer game",
-  "commands.kick.success": "Kicked %s from the gase: '%s'",
+  "commands.kick.success": "Kicked %s from the game: '%s'",
   "commands.locate.structure.not_found": "Unable to locate any %s feature",
   "commands.locate.structure.success": "Located %s at %s",
   "commands.op.success": "Opped %s",
