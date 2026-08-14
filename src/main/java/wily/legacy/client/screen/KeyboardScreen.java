@@ -36,7 +36,8 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -98,13 +99,13 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 long millis = Util.getMillis();
                 if (!shiftLock){
                     if (pressTime >= 6 || millis - lastRelease <= 300) {
-                        ScreenUtil.playSimpleUISound(LegacyRegistries.SHIFT_LOCK.get(),1.0f);
+                        LegacySoundUtil.playSimpleUISound(LegacyRegistries.SHIFT_LOCK.get(),1.0f);
                         shiftLock = true;
                     }
                     shift = !shift || shiftLock;
                 }else {
                     shiftLock = false;
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SHIFT_UNLOCK.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SHIFT_UNLOCK.get(),1.0f);
                 }
                 lastRelease = millis;
                 super.onRelease();
@@ -184,7 +185,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     @Override
     public boolean mouseDragged(double x, double y, int i, double d, double e) {
-        if ((d != 0 || e != 0) && i == InputConstants.MOUSE_BUTTON_LEFT && ScreenUtil.isMouseOver(x, y, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight())) {
+        if ((d != 0 || e != 0) && i == InputConstants.MOUSE_BUTTON_LEFT && LegacyRenderUtil.isMouseOver(x, y, panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight())) {
             xDiff = Math.max(0, Math.min(panel.getX() + Math.round((float) d), width - panel.getWidth())) - lastX;
             yDiff = Math.max(0, Math.min(panel.getY() + Math.round((float) e), height - panel.getHeight())) - lastY;
             repositionElements();
@@ -247,7 +248,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                     width += font.width(s) + (i1 == 0 ? 0 : 2);
                 }
                 int diffX = 0;
-                ScreenUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
+                LegacyRenderUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
                 for (char c : chars) {
                     String s = String.valueOf(c);
                     guiGraphics.drawString(font,s,getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14,c == getSelectedChar() ? 0xFFFF00 : 0xFFFFFF);
@@ -326,7 +327,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(),getX(),getY(),getWidth(),getHeight());
             FactoryScreenUtil.enableBlend();
-            renderString(guiGraphics,Minecraft.getInstance().font, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            renderString(guiGraphics,Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             FactoryScreenUtil.disableBlend();
         }
         public ResourceLocation getSprite(){
@@ -363,7 +364,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         public void playDownSound(SoundManager soundManager) {
-            if (playSoundOnClick()) ScreenUtil.playSimpleUISound(getDownSoundEvent(),1.0f);
+            if (playSoundOnClick()) LegacySoundUtil.playSimpleUISound(getDownSoundEvent(),1.0f);
         }
         public boolean playSoundOnClick(){
             return pressTime == 0;
@@ -397,9 +398,11 @@ public class KeyboardScreen extends OverlayPanelScreen {
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int bindingOffset = 0;
 
-            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.getIcon().render(guiGraphics,getX() + i, getY() + (getHeight() - 9) / 2 + 1,true,false);
+            if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
+                bindingOffset = binding.getIcon().render(guiGraphics, getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
 
-            if (iconSprite == null) renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
+            if (iconSprite == null)
+                renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
             else {
                 TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().textureAtlas.texturesByName.getOrDefault(iconSprite,null);
                 if (sprite == null) return;
@@ -427,7 +430,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         });
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis a && state.canClick(20)){
-            if (state.canClick()) ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+            if (state.canClick()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             xDiff = Math.max(0, Math.min(panel.getX() + Math.round(a.x*4), width - panel.getWidth())) - lastX;
             yDiff = Math.max(0, Math.min(panel.getY() + Math.round(a.y*4), height - panel.getHeight())) - lastY;
             repositionElements();

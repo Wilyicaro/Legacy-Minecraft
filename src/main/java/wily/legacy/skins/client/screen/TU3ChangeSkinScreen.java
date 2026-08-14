@@ -22,7 +22,8 @@ import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int TU3_TAB_OUTSET = 2;
@@ -226,7 +227,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         int maxPx = Math.max(1, w - sc(tu3Layout.tabLabelWidthTrim()));
         String text = PlayerSkinWidget.clipText(minecraft.font, label, maxPx);
         int drawX = x + (Math.max(1, w) - minecraft.font.width(text)) / 2;
-        Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, b -> {
+        LegacyFontUtil.applySDFont(b -> {
             g.pose().pushPose();
             g.pose().translate(0.4f, 0.4f, 0);
             g.drawString(minecraft.font, Component.literal(text), drawX, y, color, false);
@@ -405,7 +406,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
         renderTu3TabsBehindStrip(g);
         if (tu3StripH > 0)
             tintBlitSprite(g, TU3_TOP_STRIP, 0, tu3StripY, width, tu3StripH, carouselNavActive() ? TU3_GREY_TINT : 1.0f);

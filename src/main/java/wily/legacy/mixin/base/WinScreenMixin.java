@@ -36,7 +36,8 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.io.Reader;
 import java.util.List;
@@ -100,7 +101,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             *///?}
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0.0F, g, 0.0F);
-            Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
             int k = this.width / 2 - 161;
             for(int n = 0; n < this.lines.size(); ++n) {
                 int lineAdvance = getPoemLineAdvance(n);
@@ -128,7 +129,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                 m += lineAdvance;
             }
             guiGraphics.pose().popPose();
-            Legacy4JClient.defaultFontOverride = null;
+            LegacyFontUtil.defaultFontOverride = null;
         } else {
             int fixedWidth = Math.max(guiGraphics.guiHeight() * 16 / 9, guiGraphics.guiWidth());
             int fixedHeight = Math.max(guiGraphics.guiWidth() * 9 / 16, guiGraphics.guiHeight());
@@ -154,7 +155,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().translate(k - font.width(formattedCharSequence) * (title ? 1.5f : 1) / 2, m,0);
                     if (title) guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-                    font.drawInBatch8xOutline(formattedCharSequence,0, 0,0xFFFFFF,0, guiGraphics.pose().last().pose(), ScreenUtil.guiBufferSource(guiGraphics), 15728880);
+                    font.drawInBatch8xOutline(formattedCharSequence,0, 0,0xFFFFFF,0, guiGraphics.pose().last().pose(), LegacyRenderUtil.guiBufferSource(guiGraphics), 15728880);
                     guiGraphics.pose().popPose();
                     guiGraphics.flush();
                 }
@@ -170,7 +171,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0,0,200);
-            ScreenUtil.renderLogo(guiGraphics);
+            LegacyRenderUtil.renderLogo(guiGraphics);
             guiGraphics.pose().popPose();
         }
         ci.cancel();

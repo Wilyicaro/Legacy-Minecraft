@@ -34,7 +34,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.ScreenshotToast;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.util.LegacyBlockProtection;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,7 +54,7 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
     private void render(CallbackInfo ci, @Local(ordinal = 0) GuiGraphics graphics){
-        ScreenUtil.renderGameOverlay(graphics);
+        LegacyRenderUtil.renderGameOverlay(graphics);
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"/*?} else {*//*"Lnet/minecraft/client/gui/components/toasts/ToastManager;render(Lnet/minecraft/client/gui/GuiGraphics;)V"*//*?}*/, shift = At.Shift.AFTER))
@@ -71,7 +71,7 @@ public abstract class GameRendererMixin {
     /*@ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getYRot()F"))
     private float applyFlyingViewYRotation(float yRot) {
         float base = -yRot * Mth.DEG_TO_RAD;
-        return yRot - (ScreenUtil.getFlyingViewYRotation(base) - base) / Mth.DEG_TO_RAD;
+        return yRot - (LegacyRenderUtil.getFlyingViewYRotation(base) - base) / Mth.DEG_TO_RAD;
     }
     *///?}
 
@@ -121,7 +121,7 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "renderLevel", at = @At("HEAD"))
     private void applyFlyingViewRolling(float f, long l, PoseStack poseStack, CallbackInfo ci){
-        float z = ScreenUtil.getFlyingViewRollingRotation(0);
+        float z = LegacyRenderUtil.getFlyingViewRollingRotation(0);
         if (z != 0){
             poseStack.mulPose(Axis.ZN.rotation(z));
         }

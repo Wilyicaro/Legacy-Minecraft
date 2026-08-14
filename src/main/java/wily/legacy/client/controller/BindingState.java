@@ -21,7 +21,11 @@ public abstract class BindingState {
     public boolean released;
     protected boolean nextUpdatePress = false;
 
-    public static BindingState create(ControllerBinding<?> component, Predicate<Controller> update){
+    protected BindingState(ControllerBinding<?> binding) {
+        this.binding = binding;
+    }
+
+    public static BindingState create(ControllerBinding<?> component, Predicate<Controller> update) {
         return new BindingState(component) {
             @Override
             public void update(Controller controller) {
@@ -30,11 +34,7 @@ public abstract class BindingState {
         };
     }
 
-    protected BindingState(ControllerBinding<?> binding){
-        this.binding = binding;
-    }
-
-    public void update(boolean pressed){
+    public void update(boolean pressed) {
         if (nextUpdatePress) {
             pressed = true;
             nextUpdatePress = false;
@@ -52,11 +52,11 @@ public abstract class BindingState {
         nextUpdatePress = true;
     }
 
-    public ControlTooltip.ComponentIcon getIcon(){
+    public ControlTooltip.ComponentIcon getIcon() {
         return binding.getIcon();
     }
 
-    public boolean canClick(){
+    public boolean canClick() {
         return canClick(getDefaultDelay());
     }
 
@@ -74,11 +74,11 @@ public abstract class BindingState {
         return previousTimePressed < time && timePressed >= time;
     }
 
-    public int getDefaultDelay(){
+    public int getDefaultDelay() {
         return 100;
     }
 
-    public boolean onceClick(boolean block){
+    public boolean onceClick(boolean block) {
         boolean onceClick = onceClick(-(justPressed ? 3 : 1) * getDefaultDelay());
         if (block) block();
         return onceClick;
@@ -86,19 +86,19 @@ public abstract class BindingState {
 
     public abstract void update(Controller controller);
 
-    public boolean is(ControllerBinding<?> b){
+    public boolean is(ControllerBinding<?> b) {
         return binding == b;
     }
 
-    public <T extends BindingState> boolean isAnd(ControllerBinding<T> binding, Predicate<T> predicate){
+    public <T extends BindingState> boolean isAnd(ControllerBinding<T> binding, Predicate<T> predicate) {
         return is(binding) && predicate.test((T) this);
     }
 
-    public void block(){
+    public void block() {
         block(1);
     }
 
-    public void block(int blockAmount){
+    public void block(int blockAmount) {
         this.blockAmount = blockAmount;
     }
 
@@ -110,12 +110,12 @@ public abstract class BindingState {
         return !(mapping instanceof ToggleKeyMapping) && canClick() || crossedTime(0);
     }
 
-    public boolean canReleaseKeyMapping(KeyMapping mapping){
+    public boolean canReleaseKeyMapping(KeyMapping mapping) {
         return released;
     }
 
-    public boolean matches(KeyMapping mapping){
-        return ((LegacyKeyMapping)mapping).getBinding() == binding;
+    public boolean matches(KeyMapping mapping) {
+        return ((LegacyKeyMapping) mapping).getBinding() == binding;
     }
 
     public boolean canBlock(KeyMapping keyMapping) {
@@ -149,13 +149,14 @@ public abstract class BindingState {
             this.yAxis = yAxis;
         }
 
-        public static Axis createStick(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, BiConsumer<Axis, Controller> update, boolean left){
-            return new Axis(component, ()-> left ? ControllerBinding.Axis.LEFT_STICK_X : ControllerBinding.Axis.RIGHT_STICK_X, ()-> left ? ControllerBinding.Axis.LEFT_STICK_Y : ControllerBinding.Axis.RIGHT_STICK_Y) {
+        public static Axis createStick(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, BiConsumer<Axis, Controller> update, boolean left) {
+            return new Axis(component, () -> left ? ControllerBinding.Axis.LEFT_STICK_X : ControllerBinding.Axis.RIGHT_STICK_X, () -> left ? ControllerBinding.Axis.LEFT_STICK_Y : ControllerBinding.Axis.RIGHT_STICK_Y) {
 
                 @Override
                 public float getDeadZone() {
                     return deadZoneGetter.get();
                 }
+
                 @Override
                 public void update(Controller controller) {
                     super.update(controller);
@@ -164,8 +165,8 @@ public abstract class BindingState {
             };
         }
 
-        public static Axis createTrigger(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, boolean left){
-            return new Axis(component, ArbitrarySupplier.empty(), ()-> left ? ControllerBinding.Axis.LEFT_TRIGGER : ControllerBinding.Axis.RIGHT_TRIGGER) {
+        public static Axis createTrigger(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, boolean left) {
+            return new Axis(component, ArbitrarySupplier.empty(), () -> left ? ControllerBinding.Axis.LEFT_TRIGGER : ControllerBinding.Axis.RIGHT_TRIGGER) {
                 @Override
                 public float getDeadZone() {
                     return deadZoneGetter.get();
@@ -175,23 +176,27 @@ public abstract class BindingState {
 
         @Override
         public void update(Controller controller) {
-            xAxis.ifPresent(axis-> x = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
-            yAxis.ifPresent(axis-> y = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
+            xAxis.ifPresent(axis -> x = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
+            yAxis.ifPresent(axis -> y = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
             update(getMagnitude() >= getDeadZone());
         }
 
         public abstract float getDeadZone();
 
-        public float getMagnitude(){
-            return Math.max(Math.abs(y),Math.abs(x));
+        public float getMagnitude() {
+            return Math.max(Math.abs(y), Math.abs(x));
         }
 
-        public float getSmoothX(){
-            return (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0)  / (1 - getDeadZone());
+        public float getSmoothMagnitude() {
+            return Math.max(Math.abs(getSmoothY()), Math.abs(getSmoothX()));
         }
 
-        public float getSmoothY(){
-            return (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0)  / (1 - getDeadZone());
+        public float getSmoothX() {
+            return (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0) / (1 - getDeadZone());
+        }
+
+        public float getSmoothY() {
+            return (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0) / (1 - getDeadZone());
         }
 
     }

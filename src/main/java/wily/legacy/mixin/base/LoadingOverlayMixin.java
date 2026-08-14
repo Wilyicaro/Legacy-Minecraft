@@ -22,7 +22,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyIntro;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyResourceManager;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -72,10 +72,10 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null)
                     this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
                 else {
-                    FactoryGuiGraphics.of(guiGraphics).blit(ScreenUtil.LOADING_BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    FactoryGuiGraphics.of(guiGraphics).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }
                 if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())
-                    ScreenUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);
+                    LegacyRenderUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);
 
                 if (g >= 2.0f)
                     this.minecraft.setOverlay(null);

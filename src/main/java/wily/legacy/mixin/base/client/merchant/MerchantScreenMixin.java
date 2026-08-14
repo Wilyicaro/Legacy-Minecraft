@@ -34,7 +34,9 @@ import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
@@ -133,7 +135,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             guiGraphics.pose().translate(lx, ly, 0F);
             for (int index = 0; index < 9; index++) {
                 if (index + scrollOff >= merchantOffers.size()) break;
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(index + scrollOff == shopItem ? LegacySprites.BUTTON_SLOT_SELECTED : ScreenUtil.isMouseOver(i,j,lx,ly + index * buttonHeight,buttonWidth,buttonHeight) ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT, 0, 0, buttonWidth, buttonHeight);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(index + scrollOff == shopItem ? LegacySprites.BUTTON_SLOT_SELECTED : LegacyRenderUtil.isMouseOver(i,j,lx,ly + index * buttonHeight,buttonWidth,buttonHeight) ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT, 0, 0, buttonWidth, buttonHeight);
                 MerchantOffer merchantOffer = merchantOffers.get(index + scrollOff);
                 ItemStack itemStack = merchantOffer.getBaseCostA();
                 ItemStack itemStack2 = merchantOffer.getCostA();
@@ -168,13 +170,13 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 if (index + scrollOff >= merchantOffers.size()) break;
                 MerchantOffer merchantOffer = merchantOffers.get(index + scrollOff);
                 int diffY = index * buttonHeight;
-                if (ScreenUtil.isMouseOver(i,j,lx + costAX, ly + diffY + offerY,itemSize,itemSize)) guiGraphics.renderTooltip(font,merchantOffer.getCostA(),i,j);
-                else if (!merchantOffer.getCostB().isEmpty() && ScreenUtil.isMouseOver(i,j,lx + costBX, ly + diffY + offerY,itemSize,itemSize)) guiGraphics.renderTooltip(font,merchantOffer.getCostB(),i,j);
-                else if (ScreenUtil.isMouseOver(i,j,lx + resultX, ly + diffY + offerY,itemSize,itemSize)) guiGraphics.renderTooltip(font,merchantOffer.getResult(),i,j);
+                if (LegacyRenderUtil.isMouseOver(i,j,lx + costAX, ly + diffY + offerY,itemSize,itemSize)) guiGraphics.renderTooltip(font,merchantOffer.getCostA(),i,j);
+                else if (!merchantOffer.getCostB().isEmpty() && LegacyRenderUtil.isMouseOver(i,j,lx + costBX, ly + diffY + offerY,itemSize,itemSize)) guiGraphics.renderTooltip(font,merchantOffer.getCostB(),i,j);
+                else if (LegacyRenderUtil.isMouseOver(i,j,lx + resultX, ly + diffY + offerY,itemSize,itemSize)) guiGraphics.renderTooltip(font,merchantOffer.getResult(),i,j);
             }
 
             MerchantOffer merchantOffer = merchantOffers.get(this.shopItem);
-            if (shopItem - scrollOff < 9 && shopItem - scrollOff >= 0 && merchantOffer.isOutOfStock() && ScreenUtil.isMouseOver(i, j, lx, ly + buttonHeight * (shopItem - scrollOff), buttonWidth, buttonHeight) && this.menu.canRestock()) {
+            if (shopItem - scrollOff < 9 && shopItem - scrollOff >= 0 && merchantOffer.isOutOfStock() && LegacyRenderUtil.isMouseOver(i, j, lx, ly + buttonHeight * (shopItem - scrollOff), buttonWidth, buttonHeight) && this.menu.canRestock()) {
                 guiGraphics.renderTooltip(this.font, DEPRECATED_TOOLTIP, i, j);
             }
         }
@@ -185,7 +187,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.applySDFont(sd -> {
+        LegacyFontUtil.applySDFont(sd -> {
             int k = this.menu.getTraderLevel();
             int titleY = sd ? 6 : 10;
             int rightHalf = sd ? 126 : 189;
@@ -210,9 +212,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         int buttonHeight = sd ? 12 : 18;
         for (int index = 0; index < 9; index++) {
             boolean hovered = false;
-            if (index + scrollOff >= this.menu.getOffers().size() || (hovered = ScreenUtil.isMouseOver(d,e,lx,ly + index * buttonHeight,buttonWidth,buttonHeight))){
+            if (index + scrollOff >= this.menu.getOffers().size() || (hovered = LegacyRenderUtil.isMouseOver(d,e,lx,ly + index * buttonHeight,buttonWidth,buttonHeight))){
                 if (hovered){
-                    ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
                     if (shopItem == index + scrollOff && ((LegacyMerchantOffer)menu.getOffers().get(index + scrollOff)).getRequiredLevel() <= menu.getTraderLevel()) postButtonClick();
                     else shopItem = index + scrollOff;
                     cir.setReturnValue(true);
@@ -225,7 +227,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         int scrollX = leftPos + (sd ? 76 : 115);
         int scrollY = topPos + (sd ? 14 : 21);
         int scrollHeight = sd ? 110 : 165;
-        if (this.menu.getOffers().size() > 9 && ScreenUtil.isMouseOver(d,e,scrollX,scrollY,13,scrollHeight)) this.isDragging = true;
+        if (this.menu.getOffers().size() > 9 && LegacyRenderUtil.isMouseOver(d,e,scrollX,scrollY,13,scrollHeight)) this.isDragging = true;
 
         cir.setReturnValue(super.mouseClicked(d, e, i));
     }
@@ -258,7 +260,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (CommonInputs.selected(i) && shopItem + scrollOff < menu.getOffers().size()){
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             postButtonClick();
             return true;
         }

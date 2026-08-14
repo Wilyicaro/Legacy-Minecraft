@@ -56,7 +56,7 @@ public class LegacyComponents {
     public static final Component FILL = Component.translatable("legacy.action.fill");
     public static final Component FOLLOW_ME = Component.translatable("legacy.action.follow_me");
     public static final Component FUEL = Component.translatable("legacy.action.fuel");
-    public static final Component GROUP = Component.translatable("legacy.action.group");
+    public static final Component CHANGE_GROUP = Component.translatable("legacy.action.group");
     public static final Component GROW = Component.translatable("legacy.action.grow");
     public static final Component HANG = Component.translatable("legacy.action.hang");
     public static final Component HARVEST = Component.translatable("legacy.action.harvest");
@@ -100,6 +100,7 @@ public class LegacyComponents {
     public static final Component QUICK_MOVE = Component.translatable("legacy.action.quick_move");
     public static final Component RELEASE = Component.translatable("legacy.action.release");
     public static final Component REMOVE = Component.translatable("legacy.action.remove");
+    public static final Component REMOVE_PATTERN = Component.translatable("legacy.action.remove_pattern");
     public static final Component REPAIR = Component.translatable("legacy.action.repair");
     public static final Component RIDE = Component.translatable("legacy.action.ride");
     public static final Component ROTATE = Component.translatable("legacy.action.rotate");

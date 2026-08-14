@@ -24,7 +24,8 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(HorseInventoryScreen.class)
 public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
@@ -97,7 +98,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
@@ -110,7 +111,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
         FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,entityPanelX,entityPanelY,entityPanelSize,entityPanelSize);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + (sd ? 59 : 97),topPos + (sd ? 16 : 20),sd ? 65 : 105,sd ? 39 : 63);
-        ScreenUtil.renderEntityInInventoryFollowsMouse(graphics,entityPanelX + 2,entityPanelY + 2,entityPanelX + entityPanelSize - 2,entityPanelY + entityPanelSize - 2,sd ? 15 : 25,0.0625f,i,j, horse);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,entityPanelX + 2,entityPanelY + 2,entityPanelX + entityPanelSize - 2,entityPanelY + entityPanelSize - 2,sd ? 15 : 25,0.0625f,i,j, horse);
 
     }
 

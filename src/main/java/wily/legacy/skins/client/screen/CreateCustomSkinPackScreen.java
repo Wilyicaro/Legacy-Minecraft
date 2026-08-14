@@ -14,6 +14,7 @@ import wily.legacy.skins.SkinsClientBootstrap;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.SkinPackFiles;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -91,7 +92,7 @@ public class CreateCustomSkinPackScreen extends ConfirmationScreen {
         if (nameBox == null) return;
         int textX = panel.x + (panel.width - renderableVList.listWidth) / 2;
         int textY = nameBox.getY() - (LegacyOptions.getUIMode().isSD() ? 11 : 14);
-        Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> guiGraphics.drawString(font, MESSAGE, textX, textY, CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font, MESSAGE, textX, textY, CommonColor.GRAY_TEXT.get(), false));
     }
 
     private void browseForIcon() {

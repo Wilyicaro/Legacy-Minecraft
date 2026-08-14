@@ -20,7 +20,7 @@ public abstract class BeaconScreenButtonMixin extends AbstractButton {
     }
 
     //? if <=1.20.1 {
-    @Shadow
+    /*@Shadow
     private boolean selected;
 
     @Shadow
@@ -42,5 +42,5 @@ public abstract class BeaconScreenButtonMixin extends AbstractButton {
         FactoryGuiGraphics.of(graphics).blitSprite(sprite, getX(), getY(), getWidth(), getHeight());
         renderIcon(graphics);
     }
-    //?}
+    *///?}
 }

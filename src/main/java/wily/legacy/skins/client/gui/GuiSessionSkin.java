@@ -93,7 +93,7 @@ public final class GuiSessionSkin {
         if (mc == null || profile == null) return;
         String key = getProfileKey(profile);
         if (key == null) return;
-        if (key.equals(cachedLookupKey)/*? if >1.20.1 {*/ && cachedLookup != null/*?} else {*//* && getCachedSessionSkin(profile) != null*//*?}*/) return;
+        if (key.equals(cachedLookupKey)/*? if >1.20.1 {*/ && cachedLookup != null/*?} else {*/ /*&& getCachedSessionSkin(profile) != null*//*?}*/) return;
         try {
             cachedLookupKey = key;
             //? if >1.20.1 {

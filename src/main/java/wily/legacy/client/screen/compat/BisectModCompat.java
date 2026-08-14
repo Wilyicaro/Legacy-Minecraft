@@ -12,7 +12,8 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.RenderableVList;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.lang.reflect.Constructor;
 
@@ -37,7 +38,7 @@ public class BisectModCompat {
 
             @Override
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int color, int packedLight) {
-                ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 35, getY(), getX() + getWidth(), getY() + getHeight(), packedLight, true));
+                LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 35, getY(), getX() + getWidth(), getY() + getHeight(), packedLight, true));
             }
 
             @Override

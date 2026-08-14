@@ -26,7 +26,7 @@ public class ScrollableRenderer {
     }
 
     public void render(GuiGraphics graphics, int x, int y, int width, int height, Runnable scrollable){
-        graphics.enableScissor(x,y, x + width, y + height);
+        FactoryGuiGraphics.of(graphics).enableScissor(x,y, x + width, y + height);
         oldSmoothScrolled = smoothScrolled;
         smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());
         graphics.pose().pushPose();
@@ -38,6 +38,11 @@ public class ScrollableRenderer {
             if (scrolled.get() < scrolled.max) scrollRenderer.renderScroll(graphics, ScreenDirection.DOWN,x + width - 13, y + 3 + height);
             if (scrolled.get() > 0) scrollRenderer.renderScroll(graphics, ScreenDirection.UP, x + width - 29, y + 3 + height);
         }
+    }
+
+    public void resetScrolled() {
+        oldSmoothScrolled = smoothScrolled = 0;
+        scrolled.set(0);
     }
 
     public float getYOffset(){

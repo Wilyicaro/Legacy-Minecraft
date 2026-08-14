@@ -14,7 +14,8 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RenderableVListEntry;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -86,7 +87,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0F);
         guiGraphics.pose().pushPose();
         if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
-        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get());
+        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get());
         guiGraphics.pose().popPose();
     }
 
@@ -111,7 +112,7 @@ public class TickBox extends AbstractButton implements RenderableVListEntry {
 
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused()));
+        LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused()));
     }
 
     public boolean updateValue() {

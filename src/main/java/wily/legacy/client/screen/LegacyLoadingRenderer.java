@@ -13,7 +13,8 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.awt.*;
 
@@ -48,7 +49,7 @@ public class LegacyLoadingRenderer implements Renderable {
     }
 
     public void renderBackground(GuiGraphics GuiGraphicsExtractor, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, true, true, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, GuiGraphicsExtractor, true, true, false);
     }
 
     public void renderForeground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -62,7 +63,7 @@ public class LegacyLoadingRenderer implements Renderable {
                 int loadingBarX = accessor.getInteger("loadingBar.x", width / 2 - 160);
                 int loadingBarY = accessor.getInteger("loadingBar.y", height / 2 + 15);
                 if (loadingStage != null) {
-                    ScreenUtil.applySmallerFont(fontOverride.get(), b -> {
+                    LegacyFontUtil.applySmallerFont(fontOverride.get(), b -> {
                         int stageX = accessor.getInteger("loadingStage.x", loadingBarX + 1);
                         int stageY = accessor.getInteger("loadingStage.y", loadingBarY - 10);
                         guiGraphics.drawString(minecraft.font, loadingStage, stageX, stageY, CommonColor.STAGE_TEXT.get());
@@ -86,7 +87,7 @@ public class LegacyLoadingRenderer implements Renderable {
                     tip.render(guiGraphics, i, j, f);
                 }
             }
-        } else ScreenUtil.drawGenericLoading(guiGraphics, (width - 75) / 2, height / 2);
+        } else LegacyRenderUtil.drawGenericLoading(guiGraphics, (width - 75) / 2, height / 2);
 
         ResourceLocation loadingIcon = accessor.getElementValue("loadingIcon.sprite", null, ResourceLocation.class);
         if (loadingIcon != null) {
@@ -98,12 +99,12 @@ public class LegacyLoadingRenderer implements Renderable {
         }
 
         if (loadingHeader != null) {
-            ScreenUtil.applySmallerFont(fontOverride.get(), b -> {
+            LegacyFontUtil.applySmallerFont(fontOverride.get(), b -> {
                 guiGraphics.pose().pushPose();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
                 guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(loadingHeader) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23), 0.0f);
                 guiGraphics.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f), 1.0f);
-                ScreenUtil.drawOutlinedString(guiGraphics, minecraft.font, loadingHeader, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
+                LegacyRenderUtil.drawOutlinedString(guiGraphics, minecraft.font, loadingHeader, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
                 guiGraphics.pose().popPose();
             });
         }

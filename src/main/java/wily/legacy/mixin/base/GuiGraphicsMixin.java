@@ -39,7 +39,8 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
 
@@ -72,12 +73,12 @@ public abstract class GuiGraphicsMixin {
 
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
-        Legacy4JClient.legacyFont = false;
+        LegacyFontUtil.disableLegacyFont();
     }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
-        ScreenUtil.renderPotionLevel(self(), i, j, itemStack);
-        Legacy4JClient.legacyFont = true;
+        LegacyRenderUtil.renderPotionLevel(self(), i, j, itemStack);
+        LegacyFontUtil.enableLegacyFont();
     }
     @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner,/*? if >=1.21.2 {*/ /*ResourceLocation location,*//*?}*/ CallbackInfo ci){
@@ -100,7 +101,7 @@ public abstract class GuiGraphicsMixin {
         Font tooltipFont = font;
         int tooltipX = i;
         int tooltipY = j;
-        ScreenUtil.applySDFont(ignored -> renderLegacyTooltipInternal(tooltipFont, list, tooltipX, tooltipY, clientTooltipPositioner));
+        LegacyFontUtil.applySDFont(ignored -> renderLegacyTooltipInternal(tooltipFont, list, tooltipX, tooltipY, clientTooltipPositioner));
     }
 
     @Unique
@@ -113,7 +114,7 @@ public abstract class GuiGraphicsMixin {
             l+= tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
         }
 
-        float scale = ScreenUtil.getTextScale();
+        float scale = LegacyRenderUtil.getTextScale();
         Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(this.guiWidth(), this.guiHeight(), i, j, (int) (k * scale), (int) (l * scale));
         int p = vector2ic.x();
         int q = vector2ic.y();
@@ -123,9 +124,9 @@ public abstract class GuiGraphicsMixin {
         int scaledWidth = Math.round(k * scale);
         int scaledHeight = Math.round(l * scale);
         switch (LegacyOptions.getUIMode()) {
-            case FHD -> ScreenUtil.renderPointerPanel(self(), p - 3, q - 6, scaledWidth + 7, scaledHeight + 9);
-            case SD -> ScreenUtil.renderPointerPanel(self(), p - 3, q - 4, scaledWidth + 7, scaledHeight + 6);
-            default -> ScreenUtil.renderPointerPanel(self(), p - 5, q - 9, scaledWidth + 11, scaledHeight + 13);
+            case FHD -> LegacyRenderUtil.renderPointerPanel(self(), p - 3, q - 6, scaledWidth + 7, scaledHeight + 9);
+            case SD -> LegacyRenderUtil.renderPointerPanel(self(), p - 3, q - 4, scaledWidth + 7, scaledHeight + 6);
+            default -> LegacyRenderUtil.renderPointerPanel(self(), p - 5, q - 9, scaledWidth + 11, scaledHeight + 13);
         }
         this.pose.translate(p, q, 0.0F);
         FactoryScreenUtil.disableDepthTest();
@@ -139,14 +140,14 @@ public abstract class GuiGraphicsMixin {
             Integer itemTooltipText = CommonColor.ITEM_TOOLTIP_TEXT.isOverridden() ? CommonColor.ITEM_TOOLTIP_TEXT.get() : null;
             for(t = 0; t < list.size(); ++t) {
                 tooltipComponent = list.get(t);
-                ScreenUtil.tooltipTextColorOverride = t == 0 ? itemNameText : itemTooltipText;
-                ScreenUtil.tooltipTextColorOverrideForcesStyle = t == 0 && itemNameText != null;
+                LegacyRenderUtil.tooltipTextColorOverride = t == 0 ? itemNameText : itemTooltipText;
+                LegacyRenderUtil.tooltipTextColorOverrideForcesStyle = t == 0 && itemNameText != null;
                 tooltipComponent.renderText(font, 0, s, this.pose.last().pose(), this.bufferSource);
                 s += tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
             }
         } finally {
-            ScreenUtil.tooltipTextColorOverride = null;
-            ScreenUtil.tooltipTextColorOverrideForcesStyle = false;
+            LegacyRenderUtil.tooltipTextColorOverride = null;
+            LegacyRenderUtil.tooltipTextColorOverrideForcesStyle = false;
         }
 
         s = 0;

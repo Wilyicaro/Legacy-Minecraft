@@ -18,7 +18,8 @@ import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -44,7 +45,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         int k = this.getX() + getListInteger("presetMessage.xOffset", 33);
                         int l = this.getX() + this.getWidth();
-                        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true));
+                        LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true));
                     }
                     @Override
                     public void onPress() {
@@ -66,14 +67,14 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     @Override
     protected void panelInit() {
         super.panelInit();
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.applySDFont(sd -> guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + (sd ? 5 : 9), CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(accessor, guiGraphics, "panelRecess", panel.x + 6, panel.y + 20, panel.width - 12, panel.height - 29)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + (sd ? 5 : 9), CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyRenderUtil.renderPanelRecess(accessor, guiGraphics, "panelRecess", panel.x + 6, panel.y + 20, panel.width - 12, panel.height - 29)));
     }
 
     @Override

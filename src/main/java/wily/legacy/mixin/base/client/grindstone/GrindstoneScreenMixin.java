@@ -17,7 +17,8 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 import static wily.legacy.util.LegacySprites.ERROR_CROSS;
@@ -74,7 +75,7 @@ public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<Grin
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     //? if >1.20.1 {

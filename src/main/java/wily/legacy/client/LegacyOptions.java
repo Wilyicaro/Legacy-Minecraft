@@ -38,7 +38,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.*;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.*;
 import java.util.*;
@@ -147,8 +147,8 @@ public class LegacyOptions {
 
     public static UIMode getUIMode() {
         if (uiMode.get() == UIMode.AUTO) {
-            if (ScreenUtil.getStandardHeight() == 1080) return UIMode.FHD;
-            return ScreenUtil.getStandardHeight() > 540 ? UIMode.HD : UIMode.SD;
+            if (LegacyRenderUtil.getStandardHeight() == 1080) return UIMode.FHD;
+            return LegacyRenderUtil.getStandardHeight() > 540 ? UIMode.HD : UIMode.SD;
         }
         return uiMode.get();
     }
@@ -344,7 +344,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> terrainFogStart = CLIENT_STORAGE.register(createInteger("terrainFogStart", (c,i)-> CommonComponents.optionNameValue(c, Component.translatable("options.chunks", getTerrainFogStart())), 2, ()-> Minecraft.getInstance().options.renderDistance().get(), 4, d -> {}));
     public static final FactoryConfig<Boolean> overrideTerrainFogEnd = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogEnd", true));
     public static final FactoryConfig<Integer> terrainFogEnd = CLIENT_STORAGE.register(createInteger("terrainFogEnd", (c,i)-> CommonComponents.optionNameValue(c, Component.translatable("options.chunks", i)), 2, ()-> 32, 16, d -> {}));
-    public static final FactoryConfig<ControlType.Holder> selectedControlType = CLIENT_STORAGE.register(FactoryConfig.create("controlType", new FactoryConfigDisplay.Instance<>(optionName("controlType"), (c, i)-> Component.translatable("options.generic_value",c, i.isAuto() ? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().getDisplayName()) : i.get().getDisplayName())), new FactoryConfigControl.FromInt<>(ControlType.Holder.CODEC, i-> i == 0 || ControlType.types.size() < i ? ControlType.Holder.AUTO : ControlType.Holder.of(ControlType.types.getByIndex(i - 1)), s1-> 1 + ControlType.types.indexOf(s1.get()), ()-> ControlType.types.size() + 1), ControlType.Holder.AUTO, v-> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<OptionHolder<ControlType>> selectedControlType = CLIENT_STORAGE.register(FactoryConfig.create("controlType", FactoryConfigDisplay.<OptionHolder<ControlType>>builder().valueToComponent(i -> i.isAuto() ? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().nameOrEmpty()) : i.get().nameOrEmpty()).build(optionName("controlType")), new FactoryConfigControl.FromInt<>(ControlType.OPTION_CODEC, i -> i == 0 || Legacy4JClient.controlTypesManager.map().size() < i ? OptionHolder.auto() : OptionHolder.of(Legacy4JClient.controlTypesManager.map().getByIndex(i - 1)), s1-> 1 + Legacy4JClient.controlTypesManager.map().indexOf(s1.get()), ()-> Legacy4JClient.controlTypesManager.map().size() + 1), OptionHolder.auto(), v-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Difficulty> createWorldDifficulty = CLIENT_STORAGE.register(FactoryConfig.create("createWorldDifficulty", new FactoryConfigDisplay.Instance<>(Component.translatable("options.difficulty"), Difficulty::getInfo, (c, d)-> CommonComponents.optionNameValue(c, d.getDisplayName())), new FactoryConfigControl.FromInt<>(Difficulty::byId, Difficulty::getId, ()->Difficulty.values().length), Difficulty.NORMAL, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> smoothMovement = CLIENT_STORAGE.register(createBoolean("smoothMovement",true));
     public static final FactoryConfig<Boolean> forceSmoothMovement = CLIENT_STORAGE.register(createBoolean("forceSmoothMovement", b-> LegacyComponents.MAY_BE_A_CHEAT,false));

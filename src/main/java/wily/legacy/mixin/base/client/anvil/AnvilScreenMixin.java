@@ -25,7 +25,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.RenameItemMenu;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(AnvilScreen.class)
 public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
@@ -103,7 +104,7 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.applySDFont(sd -> {
+        LegacyFontUtil.applySDFont(sd -> {
             super.renderLabels(guiGraphics, i, j);
             int k = this.menu.getCost();
             if (k > 0) {

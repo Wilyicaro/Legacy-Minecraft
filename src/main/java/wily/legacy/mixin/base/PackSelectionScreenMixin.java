@@ -35,7 +35,8 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -127,7 +128,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
-        ScreenUtil.playBackSound();
+        LegacySoundUtil.playBackSound();
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();
@@ -185,7 +186,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     }
                 }
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000,true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000,true);
                 }
 
                 @Override
@@ -321,7 +322,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     public void render(GuiGraphics guiGraphics, int i, int j, float f/*? if <=1.20.1 {*//*, CallbackInfo ci*//*?}*/) {
         //? if <=1.20.1
         /*ci.cancel();*/
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.6f);

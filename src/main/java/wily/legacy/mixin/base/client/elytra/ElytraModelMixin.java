@@ -6,13 +6,13 @@ import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(ElytraModel.class)
 public class ElytraModelMixin {
     @Redirect(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isFallFlying()Z"))
     private boolean setupAnim(LivingEntity entity) {
-        return !ScreenUtil.suppressInventoryElytraPose && entity.isFallFlying();
+        return !LegacyRenderUtil.suppressInventoryElytraPose && entity.isFallFlying();
     }
 }
 //?}

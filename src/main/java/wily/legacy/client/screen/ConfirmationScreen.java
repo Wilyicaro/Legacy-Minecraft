@@ -17,7 +17,8 @@ import wily.legacy.client.KnownListing;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -131,7 +132,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
             addButtons();
             initialized = true;
         }
-        ScreenUtil.applySDFont(ignored -> textWidgetConsumer.accept(messageLabel));
+        LegacyFontUtil.applySDFont(ignored -> textWidgetConsumer.accept(messageLabel));
         super.init();
         renderableVListInit();
         accessor.putIntegerBearer("messageYOffset", messageYOffset);
@@ -185,14 +186,14 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         //? if <=1.20.1 {
-        if (messageLabel.getLines().isEmpty()) {
+        /*if (messageLabel.getLines().isEmpty()) {
             textWidgetConsumer.accept(messageLabel);
             repositionElements();
         }
-        //?}
+        *///?}
         super.render(guiGraphics, i, j, f);
         int textX = panel.x + (panel.width - messageLabel.width) / 2;
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             List<FormattedCharSequence> titleLines = titleLines(panel.width);
             for (int line = 0; line < titleLines.size(); line++) {
                 guiGraphics.drawString(font, titleLines.get(line), textX, panel.y + (LegacyOptions.getUIMode().isSD() ? 6 : 15) + line * font.lineHeight, CommonColor.INVENTORY_GRAY_TEXT.get(), false);

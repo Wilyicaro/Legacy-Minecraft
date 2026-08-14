@@ -27,7 +27,8 @@ import wily.legacy.client.screen.JoinGameScreen;
 import wily.legacy.client.screen.PlayGameScreen;
 import wily.legacy.client.screen.ServerRenderableList;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.*;
 
@@ -85,7 +86,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
 
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true));
+                        LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true));
                     }
 
                     @Override

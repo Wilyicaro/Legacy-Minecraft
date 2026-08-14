@@ -36,7 +36,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.*;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +131,7 @@ public class LegacyUIElementTypes {
             int width = a.getInteger(elementName + ".width", 0);
             int height = a.getInteger(elementName + ".height", 0);
             int lineHeight = a.getInteger(elementName + ".lineHeight", 12);
-            if (a.getBoolean(elementName+".hasBackground", true)) ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height);
+            if (a.getBoolean(elementName+".hasBackground", true)) LegacyRenderUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height);
             a.getElement(elementName, ScrollableRenderer.class).ifPresent(s-> s.render(guiGraphics, x + xd, y + yd, width - 2 * xd, height - 2 * yd - 6, ()-> {
                 int yOffset = 0;
                 for (Renderable r : a.getElementValue(elementName+".renderables", a, UIAccessor.class).getChildrenRenderables()) {
@@ -191,7 +191,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "color", "outlineColor", "order");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit((a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
-            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> ScreenUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0), a.getFloat(elementName + ".outline", 0.5f)));
+            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
 
@@ -255,9 +255,9 @@ public class LegacyUIElementTypes {
             float f4 = Mth.clamp(Mth.frac(f1 + 0.25F) * 1.6F - 0.3F, 0.0F, 1.0F);
             float f5 = Mth.clamp(Mth.frac(f1 + 0.75F) * 1.6F - 0.3F, 0.0F, 1.0F);
             bookModel.get().setupAnim(0.0F, f4, f5, g);
-            VertexConsumer vertexconsumer = ScreenUtil.guiBufferSource(guiGraphics).getBuffer(bookModel.get().renderType(ENCHANTING_TABLE_BOOK));
+            VertexConsumer vertexconsumer = LegacyRenderUtil.guiBufferSource(guiGraphics).getBuffer(bookModel.get().renderType(ENCHANTING_TABLE_BOOK));
             bookModel.get().renderToBuffer(guiGraphics.pose(), vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY/*? <1.20.5 {*//*, 1.0F, 1.0F, 1.0F, 1.0F*//*?}*/);
-            ScreenUtil.guiBufferSource(guiGraphics).endBatch();
+            LegacyRenderUtil.guiBufferSource(guiGraphics).endBatch();
             guiGraphics.flush();
             guiGraphics.pose().popPose();
             Lighting.setupFor3DItems();

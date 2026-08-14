@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(GhostSlots.class)
 public class GhostSlotsMixin {
@@ -28,7 +28,7 @@ public class GhostSlotsMixin {
     public void render(GuiGraphics guiGraphics, Minecraft minecraft, boolean bl, CallbackInfo ci) {
         ci.cancel();
         ingredients.forEach((slot, ghostSlot) -> {
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
             guiGraphics.pose().pushPose();
             holder.applyOffset(guiGraphics);
             guiGraphics.pose().translate(slot.x, slot.y, 0);

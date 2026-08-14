@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class DisplayRecipe extends GhostRecipe {
         }
         for (int k = 0; k < this.ingredients.size(); ++k) {
             GhostIngredient ghostIngredient = this.ingredients.get(k);
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(ingredientSlots.get(k));
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(ingredientSlots.get(k));
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(ghostIngredient.getX() + leftPos, ghostIngredient.getY() + topPos, 0);
             holder.applyOffset(guiGraphics);

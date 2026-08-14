@@ -31,7 +31,8 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -118,7 +119,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
@@ -142,7 +143,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         int buttonHeight = sd ? 15 : 21;
         int levelSize = sd ? 16 : 24;
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + (ScreenUtil.hasHorizontalArtifacts() ? sd ? 52.4f : 80.4f : sd ? 52.5f : 80.5f),topPos + (sd ? 17.4f : 23.4f) - buttonHeight,0f);
+        guiGraphics.pose().translate(leftPos + (LegacyRenderUtil.hasHorizontalArtifacts() ? sd ? 52.4f : 80.4f : sd ? 52.5f : 80.5f),topPos + (sd ? 17.4f : 23.4f) - buttonHeight,0f);
         for (int n = 0; n < 3; ++n) {
             guiGraphics.pose().translate(0f,buttonHeight,0f);
             int enchantCost = this.menu.costs[n];
@@ -156,7 +157,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
                 int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : CommonColor.INVALID_ENCHANTMENT_TEXT.get();
-                ScreenUtil.applySDFont(ignored -> guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/));
+                LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/));
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + (sd ? 52.5 : 80.5));
@@ -169,11 +170,11 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                 }
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], sd ? 0 : -1, sd ? 0 : -1, levelSize, levelSize);
                 int enchantmentText = CommonColor.ENCHANTMENT_LANGUAGE_TEXT.isOverridden() ? CommonColor.ENCHANTMENT_LANGUAGE_TEXT.get() : s;
-                ScreenUtil.applySDFont(ignored -> guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/));
+                LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawWordWrap(this.font, formattedText, sd ? 16 : 24, sd ? 2 : 3, r, enchantmentText/*? if >=1.21.4 {*//*, false*//*?}*/));
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
             int color = s;
-            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, string, buttonWidth - this.font.width(string) - (sd ? 2 : 0), sd ? 8 : 12, color));
+            LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, string, buttonWidth - this.font.width(string) - (sd ? 2 : 0), sd ? 8 : 12, color));
         }
         guiGraphics.pose().popPose();
     }

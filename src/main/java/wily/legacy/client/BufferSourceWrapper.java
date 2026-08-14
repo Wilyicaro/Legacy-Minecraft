@@ -17,7 +17,7 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
         super(((BufferSourceAccessor)source).buffer(),((BufferSourceAccessor)source).fixedBuffers());
         this.source = source;
     }
-    public static BufferSourceWrapper translucent(BufferSource source){
+    public static BufferSourceWrapper translucent(BufferSource source) {
         return new BufferSourceWrapper(source){
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {

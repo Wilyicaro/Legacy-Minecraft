@@ -17,7 +17,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin({ContainerScreen.class, ShulkerBoxScreen.class, HopperScreen.class, DispenserScreen.class})
 public abstract class ContainerScreenMixin extends AbstractContainerScreen {
@@ -45,9 +46,9 @@ public abstract class ContainerScreenMixin extends AbstractContainerScreen {
         boolean centeredTitle = menu instanceof HopperMenu || menu instanceof DispenserMenu;
         imageWidth = sd ? 130 : 215;
         imageHeight = (sd ? 128 : 207) + yDiff;
-        if (sd) Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
+        if (sd) LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
         titleLabelX = centeredTitle ? (imageWidth - font.width(title)) / 2 : sd ? 7 : 14;
-        Legacy4JClient.defaultFontOverride = null;
+        LegacyFontUtil.defaultFontOverride = null;
         titleLabelY = sd ? 5 : 11;
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = (sd ? 56 : 94) + yDiff;
@@ -73,7 +74,7 @@ public abstract class ContainerScreenMixin extends AbstractContainerScreen {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)

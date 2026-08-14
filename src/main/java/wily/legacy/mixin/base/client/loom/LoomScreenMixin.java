@@ -45,7 +45,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
 
@@ -202,7 +203,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
             this.flag.y = -32.0f;
             //? if >=1.20.5
             DyeColor dyeColor = ((BannerItem)menu.getResultSlot().getItem().getItem()).getColor();
-            BannerRenderer.renderPatterns(guiGraphics.pose(), ScreenUtil.guiBufferSource(guiGraphics), 0xF000F0, OverlayTexture.NO_OVERLAY, this.flag, ModelBakery.BANNER_BASE, true/*? if >=1.20.5 {*/, dyeColor/*?}*/, this.resultBannerPatterns);
+            BannerRenderer.renderPatterns(guiGraphics.pose(), LegacyRenderUtil.guiBufferSource(guiGraphics), 0xF000F0, OverlayTexture.NO_OVERLAY, this.flag, ModelBakery.BANNER_BASE, true/*? if >=1.20.5 {*/, dyeColor/*?}*/, this.resultBannerPatterns);
             guiGraphics.pose().popPose();
             guiGraphics.flush();
         } else if (this.hasMaxPatterns) {
@@ -219,7 +220,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     if (s >= list.size()) break block0;
                     int t = q * buttonSize;
                     int u = p * buttonSize;
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,panelX + 1.5f + t,panelY + 1.5f + u,buttonSize,buttonSize)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, buttonSize, buttonSize);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i,j,panelX + 1.5f + t,panelY + 1.5f + u,buttonSize,buttonSize)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, buttonSize, buttonSize);
                     guiGraphics.pose().pushPose();
                     if (sd) {
                         guiGraphics.pose().translate(t + 2, u + 2, 0);
@@ -238,7 +239,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
@@ -265,7 +266,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     return;
                 }
             }
-            if (ScreenUtil.isMouseOver(d,e,panelX + panelSize + 2.5f,panelY,13,panelSize)) this.scrolling = true;
+            if (LegacyRenderUtil.isMouseOver(d,e,panelX + panelSize + 2.5f,panelY,13,panelSize)) this.scrolling = true;
         }
         cir.setReturnValue(super.mouseClicked(d, e, i));
     }

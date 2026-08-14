@@ -10,7 +10,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -60,8 +60,8 @@ public class ScreenshotToast {
 
         graphics.pose().pushPose();
         graphics.pose().translate(0, 0, 1000);
-        ScreenUtil.renderPointerPanel(graphics, toastX, toastY, TOAST_WIDTH, TOAST_HEIGHT);
-        FactoryGuiGraphics.of(graphics).blit(screenshotImage, toastX + 4, /*? if >=1.21.2 {*/toastX + 36, /*?}*/toastY + 4, /*? if >=1.21.2 {*/toastY + 36, /*?} else {*//*32, 32, *//*?}*/(screenshotWidth - screenshotHeight) / 2f, 0.0f, screenshotHeight, screenshotHeight, screenshotWidth, screenshotHeight);
+        LegacyRenderUtil.renderPointerPanel(graphics, toastX, toastY, TOAST_WIDTH, TOAST_HEIGHT);
+        FactoryGuiGraphics.of(graphics).blit(screenshotImage, toastX + 4, /*? if >=1.21.2 {*//*toastX + 36, *//*?}*/toastY + 4, /*? if >=1.21.2 {*//*toastY + 36, *//*?} else {*/32, 32, /*?}*/(screenshotWidth - screenshotHeight) / 2f, 0.0f, screenshotHeight, screenshotHeight, screenshotWidth, screenshotHeight);
         graphics.drawString(Minecraft.getInstance().font, SCREENSHOT_MESSAGE, toastX + 40, toastY + 8, 0xFFFFFFFF);
         graphics.drawString(Minecraft.getInstance().font, screenshotToast.screenshotName, toastX + 40, toastY + 24, 0xFFFFFFFF);
         graphics.pose().popPose();

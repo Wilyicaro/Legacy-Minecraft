@@ -49,7 +49,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.function.Function;
@@ -104,7 +104,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     public void renderEffects(GuiGraphics guiGraphics/*? if >=1.21 {*/, DeltaTracker deltaTracker/*?}*/, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderGuiEffects(guiGraphics);
+        LegacyRenderUtil.renderGuiEffects(guiGraphics);
     }
     //? if >1.20.1 {
     @Inject(method = /*? if >=1.20.5 {*/"renderItemHotbar"/*?} else {*//*"renderHotbar"*//*?}*/, at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"*//*?}*/, ordinal = 1))
@@ -145,7 +145,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         Objects.requireNonNull(this.getFont());
         int s = m - scores.size() * 9;
         Objects.requireNonNull(this.getFont());
-        ScreenUtil.renderPointerPanel(guiGraphics, o - 6,s - 16,j + 12, scores.size() * 9 + 22);
+        LegacyRenderUtil.renderPointerPanel(guiGraphics, o - 6,s - 16,j + 12, scores.size() * 9 + 22);
         Font var18 = this.getFont();
         int var10003 = o + j / 2 - i / 2;
         Objects.requireNonNull(this.getFont());
@@ -175,20 +175,20 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         int i = this.minecraft.player.experienceLevel;
         if (/*? if >=1.20.5 {*/this.isExperienceBarVisible() && /*?}*/i > 0) {
             //? if >1.20.5
-            ScreenUtil.prepareHUDRender(guiGraphics);
+            LegacyRenderUtil.prepareHUDRender(guiGraphics);
             guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
             //? if >1.20.5
-            ScreenUtil.applyHUDScale(guiGraphics);
+            LegacyRenderUtil.applyHUDScale(guiGraphics);
             FactoryAPIClient.getProfiler().push("expLevel");
             String exp = "" + i;
             int hudScale = LegacyOptions.hudScale.get();
             boolean is720p = minecraft.getWindow().getHeight() % 720 == 0;
             guiGraphics.pose().translate(0,-36f,0);
             if (!is720p && hudScale != 1) guiGraphics.pose().scale(7/8f,7/8f,7/8f);
-            ScreenUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,8453920,0,is720p && hudScale == 3 || !is720p && hudScale == 2 || hudScale == 1 ? 1/2f : 2/3f);
+            LegacyRenderUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,8453920,0,is720p && hudScale == 3 || !is720p && hudScale == 2 || hudScale == 1 ? 1/2f : 2/3f);
             FactoryAPIClient.getProfiler().pop();
             //? if >1.20.5
-            ScreenUtil.finalizeHUDRender(guiGraphics);
+            LegacyRenderUtil.finalizeHUDRender(guiGraphics);
         }
         //? if <=1.20.5
         /*return 0;*/
@@ -201,18 +201,18 @@ public abstract class GuiMixin implements ControlTooltip.Event {
 
     @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
     private boolean tick(ItemStack instance) {
-        return !ScreenUtil.getTooltip(instance).equals(ScreenUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*/getSelected()/*?} else {*//*getSelectedItem()*//*?}*/));
+        return !LegacyRenderUtil.getTooltip(instance).equals(LegacyRenderUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*/getSelected()/*?} else {*//*getSelectedItem()*//*?}*/));
     }
 
     @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
     private Object tick(OptionInstance<Double> instance) {
-        return Math.min(ScreenUtil.getSelectedItemTooltipLines(),ScreenUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*/getSelected()/*?} else {*//*getSelectedItem()*//*?}*/).size()) * instance.get();
+        return Math.min(LegacyRenderUtil.getSelectedItemTooltipLines(),LegacyRenderUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*/getSelected()/*?} else {*//*getSelectedItem()*//*?}*/).size()) * instance.get();
     }
 
     @Inject(method = /*? if forge || neoforge {*/ /*"renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V" *//*?} else {*/"renderSelectedItemName"/*?}*/, at = @At("HEAD"), cancellable = true/*? if forge || neoforge {*//*, remap = false*//*?}*/)
     public void renderSelectedItemName(GuiGraphics guiGraphics, /*? if forge || neoforge {*/ /*int shift, *//*?}*/ CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderHUDTooltip(guiGraphics, /*? if forge || neoforge {*/ /*shift *//*?} else {*/0/*?}*/);
+        LegacyRenderUtil.renderHUDTooltip(guiGraphics, /*? if forge || neoforge {*/ /*shift *//*?} else {*/0/*?}*/);
     }
 
     //? if >=1.20.5 || fabric {

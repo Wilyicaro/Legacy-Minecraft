@@ -9,7 +9,8 @@ import net.minecraft.network.chat.Component;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.Arrays;
 
@@ -68,7 +69,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        ScreenUtil.applySDFont(sd -> guiGraphics.drawString(this.font, LegacyComponents.ENTER_IP, panel.x + (panel.width - renderableVList.listWidth) / 2, panel.y + (sd ? 53 : 73), CommonColor.INVENTORY_GRAY_TEXT.get(),false));
+        LegacyFontUtil.applySDFont(sd -> guiGraphics.drawString(this.font, LegacyComponents.ENTER_IP, panel.x + (panel.width - renderableVList.listWidth) / 2, panel.y + (sd ? 53 : 73), CommonColor.INVENTORY_GRAY_TEXT.get(),false));
     }
 
     private void updateAddButtonStatus() {

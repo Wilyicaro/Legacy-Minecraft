@@ -13,7 +13,7 @@ import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +59,9 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     protected void addActualRenderables(){
         String value = editBox.getValue().toLowerCase(Locale.ROOT);
         if (value.isBlank()) {
-            getRenderableVList().renderables.addAll(renderablesByTab.get(getTabList().selectedTab));
+            getRenderableVList().renderables.addAll(renderablesByTab.get(getTabList().getIndex()));
         } else {
-            for (Renderable renderable : renderablesByTab.get(getTabList().selectedTab)) {
+            for (Renderable renderable : renderablesByTab.get(getTabList().getIndex())) {
                 if (renderable instanceof AbstractWidget w && w.getMessage().getString().toLowerCase(Locale.ROOT).contains(value)){
                     getRenderableVList().renderables.add(w);
                 }
@@ -71,7 +71,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     @Override

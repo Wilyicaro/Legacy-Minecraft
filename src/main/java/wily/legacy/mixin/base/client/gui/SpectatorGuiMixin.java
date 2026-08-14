@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(SpectatorGui.class)
 public abstract class SpectatorGuiMixin {
@@ -26,7 +26,7 @@ public abstract class SpectatorGuiMixin {
 
     @Redirect(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/spectator/SpectatorGui;renderPage(Lnet/minecraft/client/gui/GuiGraphics;FIILnet/minecraft/client/gui/spectator/categories/SpectatorPage;)V"))
     public void renderHotbarPage(SpectatorGui instance, GuiGraphics k, float arg, int f, int i, SpectatorPage j) {
-        this.renderPage(k,arg*ScreenUtil.getHUDOpacity(),f,k.guiHeight()-22,j);
+        this.renderPage(k,arg*LegacyRenderUtil.getHUDOpacity(),f,k.guiHeight()-22,j);
     }
     //? if >1.20.1 {
     @Inject(method = "renderPage", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIII)V"*//*?}*/, ordinal = 1))
@@ -45,6 +45,6 @@ public abstract class SpectatorGuiMixin {
     *///?}
     @Inject(method = "onHotbarSelected", at = @At("HEAD"))
     public void onHotbarSelected(int i, CallbackInfo ci) {
-        if (menu != null && i != menu.getSelectedSlot()) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
+        if (menu != null && i != menu.getSelectedSlot()) LegacyRenderUtil.lastHotbarSelectionChange = Util.getMillis();
     }
 }

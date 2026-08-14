@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -57,20 +57,20 @@ public abstract class CameraMixin {
 
     @ModifyArg(method = /*? if >=1.21 && (neoforge || forge) {*//*"setRotation(FFF)V", remap = false*//*?} else {*/"setRotation"/*?}*/, at = @At(value = "INVOKE", target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;", ordinal = 0, remap = false), index = 0)
     protected float setFlyingViewYRotation(float f) {
-        return ScreenUtil.getFlyingViewYRotation(f);
+        return LegacyRenderUtil.getFlyingViewYRotation(f);
     }
 
     @ModifyArg(method = /*? if >=1.21 && (neoforge || forge) {*//*"setRotation(FFF)V", remap = false*//*?} else {*/"setRotation"/*?}*/, at = @At(value = "INVOKE", target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;", ordinal = 0, remap = false), index = 2)
     protected float setFlyingViewRollingRotation(float f) {
-        return ScreenUtil.getFlyingViewRollingRotation(f);
+        return LegacyRenderUtil.getFlyingViewRollingRotation(f);
     }
 
     //? if <1.21.1 {
     /*@Inject(method = "setRotation", at = @At("TAIL"))
     private void setFlyingViewRotation(float yRot, float xRot, CallbackInfo ci) {
-        float yaw = ScreenUtil.getFlyingViewYRotation(-this.yRot * LEGACY_CAMERA_DEGREES_TO_RADIANS);
+        float yaw = LegacyRenderUtil.getFlyingViewYRotation(-this.yRot * LEGACY_CAMERA_DEGREES_TO_RADIANS);
         float pitch = this.xRot * LEGACY_CAMERA_DEGREES_TO_RADIANS;
-        float roll = ScreenUtil.getFlyingViewRollingRotation(0.0f);
+        float roll = LegacyRenderUtil.getFlyingViewRollingRotation(0.0f);
         rotation.rotationYXZ(yaw, pitch, roll);
         forwards.set(0.0f, 0.0f, 1.0f).rotate(rotation);
         up.set(0.0f, 1.0f, 0.0f).rotate(rotation);

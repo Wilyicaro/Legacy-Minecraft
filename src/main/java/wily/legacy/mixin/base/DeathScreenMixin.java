@@ -22,7 +22,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
@@ -84,7 +84,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20,0);
         guiGraphics.pose().scale(2.0F, 2.0F, 2.0F);
-        ScreenUtil.drawOutlinedString(guiGraphics,this.font, this.title, 0,0, CommonColor.TITLE_TEXT.get(),CommonColor.TITLE_TEXT_OUTLINE.get(),0.5f);
+        LegacyRenderUtil.drawOutlinedString(guiGraphics,this.font, this.title, 0,0, CommonColor.TITLE_TEXT.get(),CommonColor.TITLE_TEXT_OUTLINE.get(),0.5f);
         guiGraphics.pose().popPose();
         if (this.causeOfDeath != null) {
             guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);

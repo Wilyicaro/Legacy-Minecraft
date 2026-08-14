@@ -78,7 +78,7 @@ public abstract class FogRendererMixin {
         if (camera.getEntity() instanceof LocalPlayer localPlayer){
             if (LegacyUnderwaterFog.setupFog(fogData, localPlayer, localPlayer.clientLevel)) return;
             LegacyBiomeOverride override = LegacyBiomeOverride.getOrDefault(localPlayer.clientLevel.getBiome(BlockPos.containing(camera.getPosition())).unwrapKey());
-            if (override.waterFogDistance() != null) fogData.end = override.waterFogDistance();
+            if (override.waterFogDistance().isPresent()) fogData.end = override.waterFogDistance().get();
         }
     }
 }

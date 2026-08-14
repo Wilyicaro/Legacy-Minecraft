@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(ClientTextTooltip.class)
 
@@ -27,9 +27,9 @@ public class ClientTextTooltipMixin {
     public void renderText(Font font, int i, int j, Matrix4f matrix4f, MultiBufferSource.BufferSource bufferSource, CallbackInfo ci) {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
-        Integer color = ScreenUtil.tooltipTextColorOverride;
+        Integer color = LegacyRenderUtil.tooltipTextColorOverride;
         boolean hasStyleOverride = CommonColor.BLUE.isOverridden() || CommonColor.DARK_PURPLE.isOverridden() || CommonColor.RED.isOverridden() || CommonColor.GRAY.isOverridden();
-        FormattedCharSequence text = color == null && !hasStyleOverride ? this.text : sink -> this.text.accept((index, style, codePoint) -> sink.accept(index, tooltipStyle(style, color, ScreenUtil.tooltipTextColorOverrideForcesStyle), codePoint));
+        FormattedCharSequence text = color == null && !hasStyleOverride ? this.text : sink -> this.text.accept((index, style, codePoint) -> sink.accept(index, tooltipStyle(style, color, LegacyRenderUtil.tooltipTextColorOverrideForcesStyle), codePoint));
         font.drawInBatch(text, (float)i, (float)j, color == null ? -1 : color, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
     }
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true)

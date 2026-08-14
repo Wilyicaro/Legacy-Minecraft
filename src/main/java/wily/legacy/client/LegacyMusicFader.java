@@ -4,7 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import wily.legacy.mixin.base.MusicManagerAccessor;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -65,7 +66,7 @@ public class LegacyMusicFader {
                 soundManager.stop(song);
                 it.remove();
             } else {
-                ScreenUtil.setSoundInstanceVolume(song, (songTick - ticks) / (float) FADE_TICKS);
+                LegacySoundUtil.setSoundInstanceVolume(song, (songTick - ticks) / (float) FADE_TICKS);
             }
         }
         if (fadingSongs.isEmpty() && queuedSong != null) {

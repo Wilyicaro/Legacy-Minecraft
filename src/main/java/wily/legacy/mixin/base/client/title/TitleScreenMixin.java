@@ -39,7 +39,7 @@ import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
@@ -221,7 +221,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     //? if <1.20.5 {
     /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/PanoramaRenderer;render(FF)V"))
     public boolean render(PanoramaRenderer instance, float partialTick, float speed, GuiGraphics guiGraphics) {
-        ScreenUtil.renderPanorama(guiGraphics, speed, partialTick);
+        LegacyRenderUtil.renderPanorama(guiGraphics, speed, partialTick);
         return false;
     }
     *///?}

@@ -53,6 +53,8 @@ import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -73,7 +75,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     private CreativeInventoryListener listener;
     protected boolean hasClickedOutside;
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
-    protected final LegacyScroller scroller = LegacyScroller.create(135, ()-> tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab));
+    protected final LegacyScroller scroller = LegacyScroller.create(135, ()-> tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.getIndex()));
     protected final List<List<ItemStack>> displayListing = new ArrayList<>();
     protected final Stocker.Sizeable arrangement = new Stocker.Sizeable(0,2);
     protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, LegacyComponents.SEARCH_ITEMS);
@@ -84,13 +86,14 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
         searchBox.setResponder(s-> {
             fillCreativeGrid();
-            tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab).set(0);
+            tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.getIndex()).set(0);
         });
         searchBox.setMaxLength(50);
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
-        for (LegacyCreativeTabListing tab : LegacyCreativeTabListing.map.values()) {
-            displayListing.add(tab.displayItems().stream().map(Supplier::get).filter(i-> !i.isEmpty() && i.isItemEnabled(Minecraft.getInstance().getConnection().enabledFeatures())).toList());
-            tabList.addTabButton(39, LegacyTabButton.Type.LEFT, tab.icon(), tab.name(), b -> pressCommonTab());
+        for (LegacyCreativeTabListing tab : Legacy4JClient.legacyCreativeListingManager.map().values()) {
+            if (!tab.isValid()) continue;
+            displayListing.add(tab.displayItems().stream().map(Supplier::get).filter(i -> !i.isEmpty() && i.isItemEnabled(Minecraft.getInstance().getConnection().enabledFeatures())).toList());
+            tabList.add(LegacyTabButton.Type.LEFT, tab.icon(), tab.nameOrEmpty(), b -> pressCommonTab());
         }
         BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).forEach(c-> {
             List<ItemStack> displayItems;
@@ -150,12 +153,11 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     public void addControlTooltips(Renderer renderer) {
         Event.super.addControlTooltips(renderer);
         renderer.
-                replace(2,i-> i,a-> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
-                replace(3,i-> i, a-> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_STICK.getIcon() : null,()-> LegacyComponents.PAGE).
-                add(()-> canClearQuickSelect() && ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : null, ()-> LegacyComponents.CLEAR_QUICK_SELECT);
+                replace(2, i -> i, a -> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
+                replace(3, i -> i, a -> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
+                add(() -> page.max > 0 ? CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
+                add(() -> canClearQuickSelect() && ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : null, () -> LegacyComponents.CLEAR_QUICK_SELECT);
     }
-
 
     public boolean canClearQuickSelect(){
         return ControlType.getActiveType().isKbm() || hoveredSlot == null || hoveredSlot.container == minecraft.player.getInventory() && hoveredSlot.getItem().getCount() <= 1;
@@ -201,7 +203,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         scroller.width = accessor.getInteger("scroller.width", 13);
         scroller.trackSprite = accessor.getResourceLocation("scroller.trackSprite", scroller.trackSprite);
         scroller.thumbSprite = accessor.getResourceLocation("scroller.thumbSprite", scroller.thumbSprite);
-        scroller.offset(new Vec3(ScreenUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0.0f));
+        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0.0f));
         if (arrangement.get() == 2){
             boolean sd = LegacyOptions.getUIMode().isSD();
             searchBox.setWidth(accessor.getInteger("searchBox.width", sd ? 70 : 200));
@@ -235,13 +237,13 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
     public void fillCreativeGrid(){
         if (displayListing.isEmpty()) return;
-        List<ItemStack> list = displayListing.get(page.get() * getMaxTabCount() + tabList.selectedTab);
+        List<ItemStack> list = displayListing.get(page.get() * getMaxTabCount() + tabList.getIndex());
         if (arrangement.get() != 0 && (arrangement.get() == 1 || !searchBox.getValue().isEmpty() && minecraft.getConnection() != null)) list = arrangement.get() == 1 ? list.stream().sorted(Comparator.comparing(i->i.getDisplayName().getString())).toList() : getItemsSearchResult(minecraft,searchBox.getValue());
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
-            int index = tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab).get() * 50 + i;
+            int index = tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.getIndex()).get() * 50 + i;
             creativeModeGrid.setItem(i,list.size() > index ?  list.get(index) : ItemStack.EMPTY);
         }
-        tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.selectedTab).max = Math.max(0, (list.size() - 1) / creativeModeGrid.getContainerSize());
+        tabsScrolledList.get(page.get() * getMaxTabCount() + tabList.getIndex()).max = Math.max(0, (list.size() - 1) / creativeModeGrid.getContainerSize());
     }
 
     public static List<ItemStack> getItemsSearchResult(Minecraft minecraft, String value){
@@ -265,15 +267,15 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
         this.renderTooltip(guiGraphics, i, j);
         //? if >=1.21.2 {
-        /*ScreenUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
+        /*LegacyRenderUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
         *///?}
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         if (arrangement.get() == 2) return;
-        Component tabTitle = tabList.tabButtons.get(tabList.selectedTab).getMessage();
-        ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        Component tabTitle = tabList.tabButtons.get(tabList.getIndex()).getMessage();
+        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 
     @Override

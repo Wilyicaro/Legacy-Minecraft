@@ -29,7 +29,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {

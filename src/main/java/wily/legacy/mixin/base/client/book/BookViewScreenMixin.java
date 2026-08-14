@@ -24,7 +24,8 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.BookPanel;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         ci.cancel();
         super.render(guiGraphics, i, j, f);
 
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             if (this.cachedPage != this.currentPage) {
                 FormattedText formattedText = this.bookAccess.getPage(this.currentPage);
                 this.cachedPageComponents = this.font.split(formattedText, panel.splitWidth());
@@ -129,7 +130,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
     @Inject(method = "getClickedComponentStyleAt",at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             if (this.cachedPageComponents.isEmpty()) {
                 cir.setReturnValue(null);
                 return;

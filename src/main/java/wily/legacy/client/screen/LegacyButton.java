@@ -8,7 +8,8 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RenderableVListEntry;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 public class LegacyButton extends Button implements RenderableVListEntry {
     public LegacyButton(Component message, Button.OnPress onPress, Tooltip tooltip) {
@@ -30,7 +31,7 @@ public class LegacyButton extends Button implements RenderableVListEntry {
 
     @Override
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-        ScreenUtil.applySDFont(b -> super.renderScrollingString(guiGraphics, font, i, j));
+        LegacyFontUtil.applySDFont(b -> super.renderScrollingString(guiGraphics, font, i, j));
     }
 
     public static int getDefaultHeight() {

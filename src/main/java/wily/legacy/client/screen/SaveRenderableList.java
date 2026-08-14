@@ -41,7 +41,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -173,7 +173,7 @@ public class SaveRenderableList extends RenderableVList {
             return CompletableFuture.completedFuture(List.of());
         }
         if (levelCandidates.isEmpty()) {
-            getScreen(PlayGameScreen.class).tabList.selectedTab = 1;
+//            getScreen(PlayGameScreen.class).tabList.setSelected(1);
             return CompletableFuture.completedFuture(List.of());
         }
 
@@ -231,7 +231,7 @@ public class SaveRenderableList extends RenderableVList {
             if (summary.isDisabled()) return;
             int iconWidth = iconWidth();
             int iconHeight = iconHeight();
-            boolean hoverIcon = ScreenUtil.isMouseOver(d, e, getX() + iconX(iconWidth), getY() + iconY(iconHeight), iconWidth, iconHeight);
+            boolean hoverIcon = LegacyRenderUtil.isMouseOver(d, e, getX() + iconX(iconWidth), getY() + iconY(iconHeight), iconWidth, iconHeight);
             if (hoverIcon || isFocused()) onPress();
         }
 
@@ -268,7 +268,7 @@ public class SaveRenderableList extends RenderableVList {
         public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
             super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
 
-            boolean hoverIcon = ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height);
+            boolean hoverIcon = LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height);
             ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
             ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
             ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;

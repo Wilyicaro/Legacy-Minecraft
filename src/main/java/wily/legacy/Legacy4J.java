@@ -614,8 +614,8 @@ public class Legacy4J {
         stack.set(DataComponents.BLOCK_STATE, new BlockItemStateProperties(Map.of("north", "false", "east", "false", "south", "false", "west", "false", "up", "false", "down", "false")));
         //?}
         //? if <1.20.5 {
-        /*
-        CompoundTag tag = stack.getOrCreateTag();
+        
+        /*CompoundTag tag = stack.getOrCreateTag();
         CompoundTag blockState = new CompoundTag();
         blockState.putString("north", "false");
         blockState.putString("east", "false");
@@ -631,8 +631,8 @@ public class Legacy4J {
 
     public static boolean isMushroomPore(ItemStack stack) {
         //? if <1.20.5 {
-        /*
-        CompoundTag tag = stack.getTag();
+        
+        /*CompoundTag tag = stack.getTag();
         return stack.is(Items.BROWN_MUSHROOM_BLOCK) && tag != null && tag.getInt("CustomModelData") == MUSHROOM_PORE_MODEL_DATA;
         *///?} else {
         return stack.is(Items.BROWN_MUSHROOM_BLOCK) && stack.get(DataComponents.CUSTOM_MODEL_DATA) instanceof CustomModelData modelData && modelData.value() == MUSHROOM_PORE_MODEL_DATA;

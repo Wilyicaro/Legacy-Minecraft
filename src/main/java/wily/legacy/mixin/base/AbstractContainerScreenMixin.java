@@ -28,16 +28,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyTip;
-import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.*;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.Set;
 
@@ -100,13 +98,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft.screen.isDragging() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
             if (!Legacy4JClient.consumeKeyboardActionKeyPress(InputConstants.KEY_W)) cir.setReturnValue(true);
             else if (LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy())))
-                ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+                LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         }
     }
 
     @Inject(method = "mouseClicked", at = @At("RETURN"))
     private void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
-        if (getChildAt(d,e).isEmpty()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (getChildAt(d,e).isEmpty()) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
 
         boolean downPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed;
         boolean upPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;
@@ -138,7 +136,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     }
     @Inject(method = "isHovering(Lnet/minecraft/world/inventory/Slot;DD)Z", at = @At("HEAD"), cancellable = true)
     private void isHovering(Slot slot, double d, double e, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(ScreenUtil.isHovering(slot,leftPos,topPos,d,e));
+        cir.setReturnValue(LegacyRenderUtil.isHovering(slot,leftPos,topPos,d,e));
     }
     //? if <1.21.2 {
     @ModifyExpressionValue(method = /*? if neoforge {*//*"renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;IIF)V"*//*?} else {*/"render"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
@@ -167,9 +165,9 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void renderSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
-        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
+        LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
         holder.render(graphics, 0, 0, 0);
-        if (ScreenUtil.isHovering(slot,leftPos,topPos,Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY())) holder.renderHighlight(graphics);
+        if (LegacyRenderUtil.isHovering(slot,leftPos,topPos,Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY())) holder.renderHighlight(graphics);
         graphics.pose().pushPose();
         holder.applyOffset(graphics);
         graphics.pose().translate(slot.x,slot.y,0);
@@ -248,7 +246,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "onClose",at = @At("RETURN"))
     public void onClose(CallbackInfo ci) {
         if (Legacy4J.anyArmorSlotMatch(minecraft.player.getInventory(), i-> !i.isEmpty())) {
-            ScreenUtil.updateAnimatedCharacterTime(1500);
+            AnimatedCharacterRenderer.updateTime(1500);
         }
         menu.slots.forEach(s-> LegacySlotDisplay.override(s, LegacySlotDisplay.VANILLA));
     }

@@ -23,8 +23,9 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.MCAccount;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.MCAccount;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -82,7 +83,7 @@ public class ChooseUserScreen extends PanelVListScreen {
     public void renderableVListInit() {
         panelRecess.init("panelRecess");
         addRenderableOnly(panelRecess);
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
         getRenderableVList().init(panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 50);
     }
 
@@ -204,14 +205,14 @@ public class ChooseUserScreen extends PanelVListScreen {
                 @Override
                 public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
                     super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(ScreenUtil.isMouseOver(mouseX,mouseY,getX()+x,getY()+y,width,height) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + x, getY() + y, width, height);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacyRenderUtil.isMouseOver(mouseX,mouseY,getX()+x,getY()+y,width,height) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + x, getY() + y, width, height);
                 }
 
                 @Override
                 public boolean mouseClicked(double d, double e, int i) {
                     int iconWidth = iconWidth();
                     int iconHeight = iconHeight();
-                    if (ScreenUtil.isMouseOver(d,e,getX()+iconX(iconWidth),getY()+iconY(iconHeight),iconWidth,iconHeight)) manageLogin(account);
+                    if (LegacyRenderUtil.isMouseOver(d,e,getX()+iconX(iconWidth),getY()+iconY(iconHeight),iconWidth,iconHeight)) manageLogin(account);
                     return super.mouseClicked(d, e, i);
                 }
 

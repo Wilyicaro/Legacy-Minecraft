@@ -41,7 +41,7 @@ import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.skins.pose.MenuDollPose;
 import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.ClientSkinAssets;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -138,14 +138,14 @@ public final class GuiDollRender {
             pose.scale(-1.0F, -1.0F, 1.0F);
             pose.translate(0.0F, -1.501F, 0.0F);
             Lighting.setupForEntityInInventory();
-            VertexConsumer consumer = ScreenUtil.guiBufferSource(gui).getBuffer(model.renderType(texture));
+            VertexConsumer consumer = LegacyRenderUtil.guiBufferSource(gui).getBuffer(model.renderType(texture));
             renderModel(model, pose, consumer);
             if (capeTexture != null) {
-                VertexConsumer capeConsumer = ScreenUtil.guiBufferSource(gui).getBuffer(RenderType.entityCutoutNoCull(capeTexture));
+                VertexConsumer capeConsumer = LegacyRenderUtil.guiBufferSource(gui).getBuffer(RenderType.entityCutoutNoCull(capeTexture));
                 renderCape(model, pose, capeConsumer);
             }
             if (boxModel != null && boxTexture != null) {
-                VertexConsumer boxConsumer = ScreenUtil.guiBufferSource(gui).getBuffer(RenderType.entityCutoutNoCull(boxTexture));
+                VertexConsumer boxConsumer = LegacyRenderUtil.guiBufferSource(gui).getBuffer(RenderType.entityCutoutNoCull(boxTexture));
                 renderBoxModel(model, boxModel, pose, boxConsumer);
             }
             gui.flush();

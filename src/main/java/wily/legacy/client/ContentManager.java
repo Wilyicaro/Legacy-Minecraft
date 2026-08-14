@@ -18,7 +18,8 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
+import wily.legacy.util.IOUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -251,7 +252,7 @@ public class ContentManager {
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             CATEGORIES.clear();
-            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name -> resourceManager.getResource(FactoryAPI.createLocation(name, CATEGORIES_FILE)).ifPresent(r -> {
+            IOUtil.getOrderedNamespaces(resourceManager).forEach(name -> resourceManager.getResource(FactoryAPI.createLocation(name, CATEGORIES_FILE)).ifPresent(r -> {
                 try (BufferedReader bufferedReader = r.openAsReader()) {
                     Category.LIST_CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(bufferedReader))
                         .resultOrPartial(Legacy4J.LOGGER::warn)

@@ -34,7 +34,7 @@ import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
 import wily.legacy.client.screen.globalleaderboards.storage.GlobalLeaderboardStatCodec;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -245,7 +245,7 @@ public final class GlobalLeaderboardBoardRegistry {
         Predicate<Stat<?>> trackedPredicate = trackedBoardPredicate(boardId);
         LeaderboardsScreen.StatsBoard board;
         if (object.get("predicate") instanceof JsonObject predicateObject) {
-            Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(), predicateObject);
+            Predicate predicate = IOUtil.registryMatches(statType.getRegistry(), predicateObject);
             board = LeaderboardsScreen.StatsBoard.create(statType, displayName, stat -> predicate.test(stat.getValue()) && trackedPredicate.test(stat));
         } else {
             board = LeaderboardsScreen.StatsBoard.create(statType, displayName, trackedPredicate);

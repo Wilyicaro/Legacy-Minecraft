@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.util.FactoryItemUtil;
-import wily.legacy.Legacy4J;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.client.AnimatedCharacterRenderer;
 
 @Mixin(LivingEntity.class)
 public abstract class ClientLivingEntityMixin extends Entity {
@@ -24,7 +23,7 @@ public abstract class ClientLivingEntityMixin extends Entity {
     @Inject(method = "onEquipItem", at = @At("HEAD"))
     public void onEquipItem(EquipmentSlot arg, ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
         if (((Entity)this) == Minecraft.getInstance().player && !FactoryItemUtil.equalItems(itemStack, itemStack2) && !this.firstTick){
-            ScreenUtil.updateAnimatedCharacterTime(1500);
+            AnimatedCharacterRenderer.updateTime(1500);
         }
     }
 }

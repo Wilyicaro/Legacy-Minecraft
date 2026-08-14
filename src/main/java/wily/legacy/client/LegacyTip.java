@@ -21,7 +21,8 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.function.Supplier;
 
@@ -83,7 +84,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     public LegacyTip tip(Component tip) {
-        ScreenUtil.applyFontOverrideIf(compactMode, LegacyIconHolder.MOJANGLES_11_FONT, b -> tipLabel.lineSpacing(b ? 8 : 12).withLines(tip, width - (b ? 10 : 26)));
+        LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> tipLabel.lineSpacing(b ? 8 : 12).withLines(tip, width - (b ? 10 : 26)));
         return disappearTime(tip.getString().length() * 80L);
     }
 
@@ -149,10 +150,10 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         if (canRemove.get() || l >= disappearTime) visibility = Visibility.HIDE;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(), getY(), 800);
-        ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
+        LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
         if (title != null)
-            ScreenUtil.applyFontOverrideIf(compactMode, LegacyIconHolder.MOJANGLES_11_FONT, b -> guiGraphics.drawString(minecraft.font, title, (centered ? (width() - minecraft.font.width(title)) / 2 : b ? 5 : 13), b ? 5 : 13, CommonColor.TIP_TITLE_TEXT.get()));
-        ScreenUtil.applyFontOverrideIf(compactMode, LegacyIconHolder.MOJANGLES_11_FONT, b -> tipLabel.centered(centered).withColor(CommonColor.TIP_TEXT.get()).withShadow(centered).withPos(b ? 5 : 13, title == null ? b ? 5 : 13 : b ? 13 : 25).render(guiGraphics, i, j, f));
+            LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> guiGraphics.drawString(minecraft.font, title, (centered ? (width() - minecraft.font.width(title)) / 2 : b ? 5 : 13), b ? 5 : 13, CommonColor.TIP_TITLE_TEXT.get()));
+        LegacyFontUtil.applyFontOverrideIf(compactMode, LegacyFontUtil.MOJANGLES_11_FONT, b -> tipLabel.centered(centered).withColor(CommonColor.TIP_TEXT.get()).withShadow(centered).withPos(b ? 5 : 13, title == null ? b ? 5 : 13 : b ? 13 : 25).render(guiGraphics, i, j, f));
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

@@ -16,7 +16,8 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.function.Consumer;
 
@@ -58,7 +59,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                 int k = this.getX() + 54;
                 int l = this.getX() + this.getWidth();
-                ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true));
+                LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true));
             }
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -69,7 +70,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     @Override

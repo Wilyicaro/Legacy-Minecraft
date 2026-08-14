@@ -51,7 +51,9 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -320,7 +322,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
-        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyIconHolder.MOJANGLES_11_FONT)),i));
+        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)),i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAlbum() : resourceById(defaultResourceAlbum.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip){
@@ -446,7 +448,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
             if (hasTooltip) return;
-            ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
+            LegacyRenderUtil.renderPointerPanel(graphics,x, y,width,height);
             if (getSelectedAlbum() != null){
                 boolean sd = LegacyOptions.getUIMode().isSD();
                 BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? sdLabelsCache : labelsCache;
@@ -489,7 +491,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (i == 263 || i == 262) {
                     if (selectedIndex == scrolledList.get() + (i == 263 ? 0 : getMaxPacks() - 1)) updateScroll(i == 263 ? - 1 : 1,true);
                     setSelectedIndex(selectedIndex + (i == 263 ? - 1 : 1));
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                     return true;
                 }
                 if (i == InputConstants.KEY_O){
@@ -643,7 +645,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             for (int index = 0; index < albums.size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
                 visibleCount++;
-                if (ScreenUtil.isMouseOver(d,e, getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
+                if (LegacyRenderUtil.isMouseOver(d,e, getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
                     setSelectedIndex(index + scrolledList.get());
                     savedAlbum = getSelectedAlbum();
                     userSelectedAlbum = true;
@@ -691,7 +693,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
-            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused()));
+            LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused()));
             guiGraphics.pose().popPose();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
@@ -710,7 +712,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 return;
             }
             if (RemoteResourceAlbums.isIconPending(album)) {
-                ScreenUtil.drawGenericLoading(graphics, x, y, (width - 2) / 3, 1);
+                LegacyRenderUtil.drawGenericLoading(graphics, x, y, (width - 2) / 3, 1);
                 return;
             }
             FactoryGuiGraphics.of(graphics).blit(displayPack != null ? getPackIcon(displayPack) : DEFAULT_ICON, x, y, 0.0f, 0.0f, width, height, width, height);

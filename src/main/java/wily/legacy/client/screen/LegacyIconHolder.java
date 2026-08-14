@@ -33,20 +33,12 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
-    public static final ResourceLocation ICON_HOLDER = Legacy4J.createModLocation("container/icon_holder");
-    public static final ResourceLocation SIZEABLE_ICON_HOLDER = Legacy4J.createModLocation("container/sizeable_icon_holder");
-    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = Legacy4J.createModLocation("container/select_icon_highlight");
-    public static final ResourceLocation SELECT_ICON_HIGHLIGHT_SMALL = Legacy4J.createModLocation("container/select_icon_highlight_small");
-    public static final ResourceLocation RED_ICON_HOLDER = Legacy4J.createModLocation("container/red_icon_holder");
-    public static final ResourceLocation GRAY_ICON_HOLDER = Legacy4J.createModLocation("container/gray_icon_holder");
-    public static final ResourceLocation WARNING_ICON = Legacy4J.createModLocation("container/icon_warning");
-    public static final ResourceLocation SLOT_HIGHLIGHT = Legacy4J.createModLocation("container/slot_highlight");
-
-    public static final ResourceLocation MOJANGLES_11_FONT = Legacy4J.createModLocation("default_11");
-    
     public Vec3 offset = Vec3.ZERO;
     public ResourceLocation iconSprite = null;
     public ArbitrarySupplier<ResourceLocation> iconHolderOverride = null;
@@ -185,12 +177,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         this.isWarning = warning;
     }
     public ResourceLocation getIconHolderSprite(){
-        return iconHolderOverride == null ? isWarning() ? RED_ICON_HOLDER : isSizeable() ? SIZEABLE_ICON_HOLDER : ICON_HOLDER : iconHolderOverride.get();
+        return iconHolderOverride == null ? isWarning() ? LegacySprites.RED_ICON_HOLDER : isSizeable() ? LegacySprites.SIZEABLE_ICON_HOLDER : LegacySprites.ICON_HOLDER : iconHolderOverride.get();
     }
 
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
+        isHovered = LegacyRenderUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
         ResourceLocation sprite = getIconHolderSprite();
         if (sprite != null)
             renderChild(graphics,getXCorner(),getYCorner(),()->FactoryGuiGraphics.of(graphics).blitSprite(sprite, 0, 0, getWidth(), getHeight()));
@@ -228,7 +220,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderChild(graphics,x,y,()->{
             FactoryGuiGraphics.of(graphics).disableDepthTest();
             graphics.pose().translate(0,0,z);
-            FactoryGuiGraphics.of(graphics).blitSprite(WARNING_ICON,0,0,8,8);
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.WARNING_ICON,0,0,8,8);
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         });
     }
@@ -247,17 +239,17 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             e.yHeadRotO = e.yHeadRot;
         }
         graphics.enableScissor(getX(),getY(),getX() + Math.round(getSelectableWidth()),getY() + Math.round(getSelectableHeight()));
-        ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
+        LegacyRenderUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
         graphics.disableScissor();
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20)
-            renderChild(graphics, getXCorner() - (21f - getWidth()) / 2, getYCorner() - (21f - getHeight()) / 2, () -> FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT_SMALL, 0, 0, 21, 21));
+            renderChild(graphics, getXCorner() - (21f - getWidth()) / 2, getYCorner() - (21f - getHeight()) / 2, () -> FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SELECT_ICON_HIGHLIGHT_SMALL, 0, 0, 21, 21));
         else
             renderChild(graphics,getXCorner() - 4.5f, getYCorner() - 4.5f,()-> {
                 graphics.pose().translate(0,0,332);
                 FactoryGuiGraphics.of(graphics).disableDepthTest();
-                FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
+                FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SELECT_ICON_HIGHLIGHT,0,0,36,36);
                 FactoryGuiGraphics.of(graphics).enableDepthTest();
             });
     }
@@ -290,7 +282,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void renderHighlight(GuiGraphics graphics){
         renderScaled(graphics,getX(),getY(),()-> {
             FactoryScreenUtil.enableBlend();
-            FactoryGuiGraphics.of(graphics).blitSprite(SLOT_HIGHLIGHT, 0, 0, 16, 16);
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SLOT_HIGHLIGHT, 0, 0, 16, 16);
             FactoryScreenUtil.disableBlend();
         });
     }
@@ -298,7 +290,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) ScreenUtil.applySmallerFont(MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
+        if (!stack.isEmpty()) LegacyFontUtil.applySmallerFont(LegacyFontUtil.MOJANGLES_11_FONT, b->graphics.renderTooltip(minecraft.font, stack, i, j));
     }
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();
@@ -324,7 +316,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return false;
     }
     public void playClickSound(){
-        if (!isFocused()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
+        if (!isFocused()) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F);
     }
     public void onClick(double d, double e){
         playClickSound();

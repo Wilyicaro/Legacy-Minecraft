@@ -24,7 +24,8 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +127,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             if (canCraft()){
                 craft();
                 updateRecipe();
-            } else ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
+            } else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
         }
     }
 
@@ -142,7 +143,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         int i = (int)Math.signum(g);
         if (isFocused() && !nextItem.isEmpty() && i > 0 || !previousItem.isEmpty() && i < 0 ){
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
             itemIcon = i > 0 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -169,7 +170,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     }
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
-        ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
+        LegacyRenderUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
     }
     public boolean canAddIngredient(){
         return hasItem(itemIcon) && addedIngredientsItems != null && canAddIngredient.test(this) && getIngredientsGrid().stream().anyMatch(Optional::isEmpty);
@@ -187,7 +188,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             return true;
         }
         if (!nextItem.isEmpty() && i == InputConstants.KEY_UP || !previousItem.isEmpty() && i == InputConstants.KEY_DOWN) {
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i == 265 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -201,7 +202,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         int matchSlot;
         if (!itemIcon.isEmpty() && hasItem(itemIcon) && minecraft.screen instanceof LegacyMenuAccess<?> a && (matchSlot = findInventoryMatchSlot()) > 0){
             Slot s = a.getMenu().getSlot(matchSlot);
-            ScreenUtil.iconHolderRenderer.slotBounds(a.getMenuRectangle().left(),a.getMenuRectangle().top(),s).renderHighlight(graphics);
+            LegacyRenderUtil.iconHolderRenderer.slotBounds(a.getMenuRectangle().left(),a.getMenuRectangle().top(),s).renderHighlight(graphics);
         }
         graphics.pose().pushPose();
         applyOffset(graphics);

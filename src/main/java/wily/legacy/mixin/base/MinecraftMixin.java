@@ -95,7 +95,9 @@ import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.network.ServerPlayerShieldPausePayload;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyGuiElements;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -574,9 +576,9 @@ public abstract class MinecraftMixin {
             setScreen(replacement);
             return;
         }
-        if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen())) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen())) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         if (screen == null && level != null) {
-            ScreenUtil.lastGui = Util.getMillis();
+            LegacyGuiElements.lastGui = Util.getMillis();
             ControlTooltip.Event.of(gui).setupControlTooltips();
             ControlTooltip.Renderer.GUI_EVENT.invoker.accept(gui,ControlTooltip.Event.of(gui).getControlTooltips());
         }
@@ -603,7 +605,7 @@ public abstract class MinecraftMixin {
     private Runnable addInitialScreens(Runnable run) {
         return ()-> {
             run.run();
-            if (screen != null) setScreen(ScreenUtil.getInitialScreen());
+            if (screen != null) setScreen(LegacyRenderUtil.getInitialScreen());
         };
     }
     //?} else {
@@ -611,7 +613,7 @@ public abstract class MinecraftMixin {
     private void addInitialScreens(RealmsClient realmsClient, ReloadInstance reloadInstance, GameConfig.QuickPlayData quickPlayData, CallbackInfo ci) {
         if (!quickPlayData.isEnabled()) {
                ci.cancel();
-               setScreen(ScreenUtil.getInitialScreen());
+               setScreen(LegacyRenderUtil.getInitialScreen());
         }
     }
     *///?}

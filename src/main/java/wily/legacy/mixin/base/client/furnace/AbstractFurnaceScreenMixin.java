@@ -33,7 +33,8 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(AbstractFurnaceScreen.class)
 public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
@@ -132,7 +133,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(sd -> {
+        LegacyFontUtil.applySDFont(sd -> {
             super.renderLabels(guiGraphics, i, j);
             Component ingredient = Component.translatable("legacy.container.ingredient");
             guiGraphics.drawString(this.font, ingredient, (sd ? 57 : 70) - font.width(ingredient), sd ? 19 : 32, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
@@ -148,7 +149,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         int guiScale = Math.max(1, (int) minecraft.getWindow().getGuiScale());
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + (sd ? 63 : ScreenUtil.hasHorizontalArtifacts() ? 75.4f : 75.5f), topPos + (sd ? 34 : 46.4f),0);
+        guiGraphics.pose().translate(leftPos + (sd ? 63 : LegacyRenderUtil.hasHorizontalArtifacts() ? 75.4f : 75.5f), topPos + (sd ? 34 : 46.4f),0);
         int flameSize = sd ? 14 : 21;
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT,0,0, flameSize, flameSize);
         if (menu.isLit()) {

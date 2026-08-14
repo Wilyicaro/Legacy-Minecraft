@@ -27,7 +27,7 @@ import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
 //?}
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +77,7 @@ public class RecipeBookComponentMixin {
         info.cancel();
         ItemStack itemStack = null;
         for (int m = 0; m < this.ghostRecipe.size(); ++m) {
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(((DisplayRecipe) ghostRecipe).ingredientSlots.get(m));
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(((DisplayRecipe) ghostRecipe).ingredientSlots.get(m));
             int n = holder.getX() + leftPos;
             int o = holder.getY() + topPos;
             if (k < n || l < o || k >= n + holder.getSelectableWidth() || l >= o + holder.getSelectableHeight()) continue;

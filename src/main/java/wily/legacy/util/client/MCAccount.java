@@ -1,4 +1,4 @@
-package wily.legacy.util;
+package wily.legacy.util.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;

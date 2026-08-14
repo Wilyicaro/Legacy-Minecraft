@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(LogoRenderer.class)
 public class LogoRendererMixin {
@@ -21,13 +21,13 @@ public class LogoRendererMixin {
     @Inject(method = "renderLogo(Lnet/minecraft/client/gui/GuiGraphics;IFI)V", at = @At("HEAD"), cancellable = true)
     public void renderLogo(GuiGraphics guiGraphics, int i, float f, int j, CallbackInfo ci) {
         int y = LegacyOptions.getUIMode().isSD() ? 5 : j;
-        if (ScreenUtil.hasLegacyLogo()){
+        if (LegacyRenderUtil.hasLegacyLogo()){
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, f, true);
-            ScreenUtil.renderLegacyLogo(guiGraphics, y);
+            LegacyRenderUtil.renderLegacyLogo(guiGraphics, y);
             FactoryGuiGraphics.of(guiGraphics).clearColor(true);
             ci.cancel();
-        } else if (ScreenUtil.getLogoScale() != 1.0f) {
-            float scale = ScreenUtil.getLogoScale();
+        } else if (LegacyRenderUtil.getLogoScale() != 1.0f) {
+            float scale = LegacyRenderUtil.getLogoScale();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(i / 2.0f - 256 * scale, y, 0);
             guiGraphics.pose().scale(scale, scale, 1.0f);
@@ -37,7 +37,7 @@ public class LogoRendererMixin {
 
     @Inject(method = "renderLogo(Lnet/minecraft/client/gui/GuiGraphics;IFI)V", at = @At("RETURN"))
     public void renderLogoReturn(GuiGraphics guiGraphics, int i, float f, int j, CallbackInfo ci) {
-        if (!ScreenUtil.hasLegacyLogo() && ScreenUtil.getLogoScale() != 1.0f) {
+        if (!LegacyRenderUtil.hasLegacyLogo() && LegacyRenderUtil.getLogoScale() != 1.0f) {
             guiGraphics.pose().popPose();
         }
     }

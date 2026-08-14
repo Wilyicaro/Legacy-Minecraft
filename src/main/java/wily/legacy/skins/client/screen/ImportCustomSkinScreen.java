@@ -19,6 +19,7 @@ import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.SkinPackFiles;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -255,7 +256,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         if (skinButton == null) return;
         int textX = fieldX();
-        Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             if (editing())
                 guiGraphics.drawString(font, EDIT_TITLE, textX, titleY(), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.drawString(font, NAME, textX, nameLabelY(), CommonColor.GRAY_TEXT.get(), false);

@@ -24,7 +24,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import static wily.legacy.util.LegacySprites.BREWING_FUEL_SLOT;
 
@@ -65,7 +66,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         imageHeight = sd ? 145 : 225;
         inventoryLabelX = sd ? 7 : 13;
         inventoryLabelY = sd ? 74 : 115;
-        ScreenUtil.applySDFont(ignored -> this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2);
+        LegacyFontUtil.applySDFont(ignored -> this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2);
         titleLabelY = sd ? 4 : 11;
         int slotsSize = sd ? 13 : 21;
         LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
@@ -118,7 +119,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     *///?}
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
         boolean sd = LegacyOptions.getUIMode().isSD();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_COIL_FLAME, sd ? 23 : 43, sd ? 25 : 42,sd ? 34 : 51, sd ? 22 : 33);
         int fuel = this.menu.getFuel();
@@ -127,7 +128,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         int n = Mth.clamp((fuelWidth * fuel + 20 - 1) / 20, 0, fuelWidth);
         if (n > 0) {
             guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(sd ? 38 : ScreenUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f,sd ? 41 : 66, 0f);
+            guiGraphics.pose().translate(sd ? 38 : LegacyRenderUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f,sd ? 41 : 66, 0f);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FUEL_LENGTH_SPRITE, fuelWidth, fuelHeight, 0, 0, 0, 0, 0, n, fuelHeight);
             guiGraphics.pose().popPose();
         }
@@ -139,7 +140,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         boolean sd = LegacyOptions.getUIMode().isSD();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + (sd ? 33 : ScreenUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f),topPos + (sd ? 12 : 22.4f), 0f);
+        guiGraphics.pose().translate(leftPos + (sd ? 33 : LegacyRenderUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f),topPos + (sd ? 12 : 22.4f), 0f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0,sd ? 64 : 96, sd ? 64 : 96);
         guiGraphics.pose().popPose();
         int o;
@@ -150,7 +151,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
             int p = (int) (brewHeight * (1.0f - (float) o / 400.0f));
             if (p > 0) {
                 guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(leftPos + (sd ? 75 : ScreenUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f),topPos + (sd ? 12 : 22.4f), 0f);
+                guiGraphics.pose().translate(leftPos + (sd ? 75 : LegacyRenderUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f),topPos + (sd ? 12 : 22.4f), 0f);
                 if (!sd) guiGraphics.pose().scale(1.5f,1.5f,1.5f);
                 guiGraphics.pose().scale(1f / guiScale, 1f / guiScale, 1f / guiScale);
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREW_PROGRESS_SPRITE, brewWidth, brewHeight, 0, 0, 0, 0, 0, brewWidth, p);

@@ -27,7 +27,8 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
 
@@ -181,7 +182,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.applySDFont(sd -> {
+        LegacyFontUtil.applySDFont(sd -> {
             int panelWidth = sd ? 75 : 120;
             guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, (sd ? 4 : 9) + (panelWidth - font.width(PRIMARY_EFFECT_LABEL)) /2, sd ? 7 : 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, (sd ? 80 : 133) + (panelWidth - font.width(SECONDARY_EFFECT_LABEL)) /2, sd ? 7 : 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);

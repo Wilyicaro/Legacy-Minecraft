@@ -17,7 +17,8 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerHostOptionsPayload;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,11 +66,7 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(
-                accessor.getInteger("renderableVList.x", panel.x + 8),
-                accessor.getInteger("renderableVList.y", panel.y + 27),
-                accessor.getInteger("renderableVList.width", panel.width - 16),
-                accessor.getInteger("renderableVList.height", panel.height - 16));
+        getRenderableVList().init(panel.x + 8, panel.y + 27, panel.width - 16, panel.height - 16);
     }
 
     @Override
@@ -92,6 +89,6 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         panel.render(guiGraphics, i, j, f);
         HostOptionsScreen.drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, panel.x + accessor.getInteger("playerIcon.x", 7), panel.y + accessor.getInteger("playerIcon.y", 5));
-        ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font, playerInfo.getProfile().getName(), panel.x + accessor.getInteger("playerName.x", 31), panel.y + accessor.getInteger("playerName.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font, playerInfo.getProfile().getName(), panel.x + accessor.getInteger("playerName.x", 31), panel.y + accessor.getInteger("playerName.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 }

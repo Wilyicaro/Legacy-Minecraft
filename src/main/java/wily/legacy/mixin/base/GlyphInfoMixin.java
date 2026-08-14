@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(GlyphInfo.class)
 public interface GlyphInfoMixin extends GlyphInfo {
@@ -14,7 +15,7 @@ public interface GlyphInfoMixin extends GlyphInfo {
      */
     @Overwrite
     default float getShadowOffset() {
-        return Legacy4JClient.getFontShadowOffset();
+        return LegacyFontUtil.getShadowOffset();
     }
     /**
      * @author Wilyicaro
@@ -22,6 +23,6 @@ public interface GlyphInfoMixin extends GlyphInfo {
      */
     @Overwrite
     default float getAdvance(boolean bl) {
-        return this.getAdvance() + (bl ? this.getBoldOffset() : 0.0f) - (Legacy4JClient.legacyFont && LegacyOptions.legacyFont.get() || !LegacyOptions.legacyFont.get() ? 0 : 0.5f);
+        return this.getAdvance() + (bl ? this.getBoldOffset() : 0.0f) - (LegacyFontUtil.hasLegacyFont() || !LegacyOptions.legacyFont.get() ? 0 : 0.5f);
     }
 }

@@ -34,7 +34,8 @@ import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.ReplaceableScreen;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import static wily.legacy.util.LegacySprites.SHIELD_SLOT;
 import static wily.legacy.util.LegacySprites.SMALL_ARROW;
@@ -91,7 +92,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         super.init();
         LegacySlotDisplay craftingDisplay = new LegacySlotDisplay() {
             public boolean isVisible() {
-                return ScreenUtil.hasClassicCrafting();
+                return LegacyRenderUtil.hasClassicCrafting();
             }
 
             @Override
@@ -118,7 +119,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
                         return s.getItem().isEmpty() ? EQUIPMENT_SLOT_SPRITES[index] : null;
                     }
                     public Vec3 getOffset() {
-                        return ScreenUtil.hasClassicCrafting() ? Vec3.ZERO : sd ? EQUIP_SLOT_OFFSET_SD : EQUIP_SLOT_OFFSET;
+                        return LegacyRenderUtil.hasClassicCrafting() ? Vec3.ZERO : sd ? EQUIP_SLOT_OFFSET_SD : EQUIP_SLOT_OFFSET;
                     }
                     public int getWidth() {
                         return slotsSize;
@@ -131,7 +132,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
             } else {
                 LegacySlotDisplay.override(s,sd ? 64 : 111, sd ? 48 : 77, new LegacySlotDisplay(){
                     public Vec3 getOffset() {
-                        return ScreenUtil.hasClassicCrafting() ? Vec3.ZERO : sd ? EQUIP_SLOT_OFFSET_SD : EQUIP_SLOT_OFFSET;
+                        return LegacyRenderUtil.hasClassicCrafting() ? Vec3.ZERO : sd ? EQUIP_SLOT_OFFSET_SD : EQUIP_SLOT_OFFSET;
                     }
                     public ResourceLocation getIconSprite() {
                         return s.getItem().isEmpty() ? SHIELD_SLOT : null;
@@ -145,7 +146,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         //? <1.21.2 {
             this.widthTooNarrow = this.width < 379;
         this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-        if (LegacyOptions.showVanillaRecipeBook.get() && ScreenUtil.hasClassicCrafting()) {
+        if (LegacyOptions.showVanillaRecipeBook.get() && LegacyRenderUtil.hasClassicCrafting()) {
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
             int buttonX = sd ? 90 : 180;
             int buttonY = sd ? 50 : 71;
@@ -170,7 +171,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        int playerPanelX = leftPos + (sd ? 23 : 40) + (ScreenUtil.hasClassicCrafting() ? 0 : sd ? 31 : 50);
+        int playerPanelX = leftPos + (sd ? 23 : 40) + (LegacyRenderUtil.hasClassicCrafting() ? 0 : sd ? 31 : 50);
         int playerPanelY = topPos + (sd ? 8 : 13);
         int playerPanelWidth = sd ? 39 : 63;
         int playerPanelHeight = sd ? 52 : 84;
@@ -178,10 +179,10 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         FactoryGuiGraphics.of(graphics).blitSprite(sd ? LegacySprites.SQUARE_ENTITY_PANEL : LegacySprites.ENTITY_PANEL,playerPanelX,playerPanelY,playerPanelWidth,playerPanelHeight);
         Pose pose = minecraft.player.getPose();
         minecraft.player.setPose(Pose.STANDING);
-        ScreenUtil.renderEntityInInventoryFollowsMouse(graphics,playerPanelX + 2,playerPanelY + 2,playerPanelX + playerPanelWidth - 2,playerPanelY + playerPanelHeight - 2,sd ? 20 : 35,0.0625f,i,j, minecraft.player);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,playerPanelX + 2,playerPanelY + 2,playerPanelX + playerPanelWidth - 2,playerPanelY + playerPanelHeight - 2,sd ? 20 : 35,0.0625f,i,j, minecraft.player);
         minecraft.player.setPose(pose);
-        if (ScreenUtil.hasClassicCrafting()) {
-            ScreenUtil.applySDFont(ignored -> graphics.drawString(this.font, this.title, leftPos + (sd ? 64 : 111), topPos + (sd ? 9 : 16), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        if (LegacyRenderUtil.hasClassicCrafting()) {
+            LegacyFontUtil.applySDFont(ignored -> graphics.drawString(this.font, this.title, leftPos + (sd ? 64 : 111), topPos + (sd ? 9 : 16), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             FactoryGuiGraphics.of(graphics).blitSprite(SMALL_ARROW,leftPos + (sd ? 92 : 158),topPos + (sd ? 24 : 42),16,14);
         }
         //? <1.21.2 {
@@ -191,7 +192,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 
     public boolean canReplace() {

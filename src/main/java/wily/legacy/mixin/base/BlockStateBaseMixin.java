@@ -31,8 +31,8 @@ public abstract class BlockStateBaseMixin {
     @Inject(method = "getLightBlock", at = @At("RETURN"), cancellable = true)
     private void legacy$waterLightBlock(
             //? if <1.21.3 {
-            /*BlockGetter level, BlockPos pos,
-            *///?}
+            BlockGetter level, BlockPos pos,
+            //?}
             CallbackInfoReturnable<Integer> cir) {
         if (asState().getFluidState().is(FluidTags.WATER)) cir.setReturnValue(Math.max(cir.getReturnValueI(), 2));
     }

@@ -10,7 +10,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class StoneCuttingGroupManager implements ResourceManagerReloadListener {
     @Override
     public void onResourceManagerReload(ResourceManager manager) {
         listing.clear();
-        JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(FactoryAPI.createLocation(name, STONECUTTING_GROUPS)).ifPresent(r->{
+        IOUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(FactoryAPI.createLocation(name, STONECUTTING_GROUPS)).ifPresent(r->{
             try (BufferedReader bufferedReader = r.openAsReader()) {
                 JsonElement element = JsonParser.parseReader(bufferedReader);
                 RecipeInfo.Filter.LISTING_CODEC.parse(JsonOps.INSTANCE,element).result().ifPresent(listing::putAll);

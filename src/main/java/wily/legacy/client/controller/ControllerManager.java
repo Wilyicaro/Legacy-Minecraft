@@ -32,7 +32,8 @@ import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.TabList;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -53,6 +54,7 @@ public class ControllerManager {
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
+    public boolean simulateShift = false;
     public int timeCursorPressed = 0;
     public Vector2d lastCursorDirection = new Vector2d();
     public Slot lastHoveredSlot;
@@ -268,19 +270,19 @@ public class ControllerManager {
                         if (state.pressed && state.canClick()) {
                             if (state.is(ControllerBinding.DPAD_UP)) {
                                 screen.movePointerToSlotIn(ScreenDirection.UP);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_DOWN)) {
                                 screen.movePointerToSlotIn(ScreenDirection.DOWN);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_RIGHT)) {
                                 screen.movePointerToSlotIn(ScreenDirection.RIGHT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_LEFT)) {
                                 screen.movePointerToSlotIn(ScreenDirection.LEFT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                         } else if (state.is(ControllerBinding.LEFT_STICK) && state.released && !LegacyOptions.legacyCursor.get())
                             screen.movePointerToSlot(screen.findSlotAt(getPointerX(), getPointerY()));
@@ -302,12 +304,12 @@ public class ControllerManager {
                                 ScreenDirection direction = null;
                                 int nextCursorTime = timeCursorPressed + getInputTicks();
                                 if ((timeCursorPressed == 0 || nextCursorTime >= 300 && timeCursorPressed / 100 < nextCursorTime / 100) && !state.isBlocked()) {
-                                    if (snapY && absY >= deadzoneY) direction = ScreenUtil.getScreenDirection(0, stick.y);
-                                    if (snapX && absX >= deadzone) direction = ScreenUtil.getScreenDirection(stick.x, 0);
+                                    if (snapY && absY >= deadzoneY) direction = LegacyRenderUtil.getScreenDirection(0, stick.y);
+                                    if (snapX && absX >= deadzone) direction = LegacyRenderUtil.getScreenDirection(stick.x, 0);
                                     lastHoveredSlot = screen.findSlotAt(getPointerX(), getPointerY());
                                 } else if (timeCursorPressed < 50 && nextCursorTime >= 50 && !snapX) {
-                                    if (xPressed && absX < pressLimitX) direction = ScreenUtil.getScreenDirection(stick.x, 0);
-                                    else if (!snapY && yPressed && absY < pressLimitY) direction = ScreenUtil.getScreenDirection(0, stick.y);
+                                    if (xPressed && absX < pressLimitX) direction = LegacyRenderUtil.getScreenDirection(stick.x, 0);
+                                    else if (!snapY && yPressed && absY < pressLimitY) direction = LegacyRenderUtil.getScreenDirection(0, stick.y);
                                 }
                                 if (direction != null) screen.movePointerToSlotIn(direction);
 
@@ -324,7 +326,7 @@ public class ControllerManager {
                                     boolean validBump = (!snapX && xPrecedence) || (!snapY && !xPrecedence);
                                     boolean bump = absLastX > releaseLimit || absLastY > releaseLimitY;
                                     if (validBump && bump) {
-                                        ScreenDirection direction = ScreenUtil.getScreenDirection(lastCursorDirection.x, lastCursorDirection.y);
+                                        ScreenDirection direction = LegacyRenderUtil.getScreenDirection(lastCursorDirection.x, lastCursorDirection.y);
                                         Slot hoveredSlot = screen.findSlotAt(getPointerX(), getPointerY());
                                         if (direction != null && hoveredSlot == lastHoveredSlot)
                                             screen.movePointerToSlotIn(direction);
@@ -354,7 +356,7 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
                         minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
                         minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
-                        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+                        LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
                     if (mouseClick != -1 && (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {

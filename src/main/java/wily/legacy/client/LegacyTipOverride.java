@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import wily.legacy.Legacy4J;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyTipBuilder;
 
 import java.io.BufferedReader;
@@ -88,7 +88,7 @@ public record LegacyTipOverride(BiPredicate<Item, /*? if <1.20.5 {*//*CompoundTa
         }
         
         protected LegacyTipOverride overrideFromJson(JsonObject o){
-            return new LegacyTipOverride(JsonUtil.registryMatchesItem(o), JsonUtil.registryMatches(BuiltInRegistries.BLOCK,o), JsonUtil.registryMatches(BuiltInRegistries.ENTITY_TYPE,o), LegacyTipBuilder.CODEC.parse(JsonOps.INSTANCE, o.get("tip")).result().orElse(new LegacyTipBuilder()));
+            return new LegacyTipOverride(IOUtil.registryMatchesItem(o), IOUtil.registryMatches(BuiltInRegistries.BLOCK,o), IOUtil.registryMatches(BuiltInRegistries.ENTITY_TYPE,o), LegacyTipBuilder.CODEC.parse(JsonOps.INSTANCE, o.get("tip")).result().orElse(new LegacyTipBuilder()));
         }
         @Override
         public String getName() {

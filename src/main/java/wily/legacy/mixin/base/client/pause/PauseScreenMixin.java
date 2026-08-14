@@ -19,7 +19,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +89,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);
     }
     //?}
 
@@ -97,7 +97,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         //? if <=1.20.1
-        /*ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);*/
+        /*LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);*/
         super.render(guiGraphics, i, j, f);
     }
 

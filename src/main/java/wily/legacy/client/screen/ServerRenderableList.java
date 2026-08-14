@@ -49,7 +49,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.compat.BisectModCompat;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -180,9 +181,9 @@ public class ServerRenderableList extends RenderableVList {
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         int messageX = getX() + accessor.getInteger(listName() + ".buttonMessage.xOffset", 35);
                         int messageY = getY() + (getHeight() < 20 ? (getHeight() - font.lineHeight) / 2 : 3);
-                        ScreenUtil.applySDFont(ignored -> {
+                        LegacyFontUtil.applySDFont(ignored -> {
                             if (getHeight() < 20) {
-                                ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), messageX, getY(), getX() + getWidth() - 2, getY() + getHeight(), j, false);
+                                LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), messageX, getY(), getX() + getWidth() - 2, getY() + getHeight(), j, false);
                                 return;
                             }
                             guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, messageX, messageY, 0xFFFFFF, false);
@@ -217,7 +218,7 @@ public class ServerRenderableList extends RenderableVList {
                     int blockSize = accessor.getInteger(name + ".loadingIcon.blockSize", accessor.getInteger("loadingIcon.blockSize", (width - 2) / 3));
                     int spacing = accessor.getInteger(name + ".loadingIcon.spacing", 1);
                     int size = blockSize * 3 + spacing * 2;
-                    ScreenUtil.drawGenericLoading(guiGraphics, getX() + x + (width - size) / 2, getY() + y + (height - size) / 2, blockSize, spacing);
+                    LegacyRenderUtil.drawGenericLoading(guiGraphics, getX() + x + (width - size) / 2, getY() + y + (height - size) / 2, blockSize, spacing);
                 }
 
                 @Override
@@ -306,7 +307,7 @@ public class ServerRenderableList extends RenderableVList {
         public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
             String name = listName();
             Component component = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
-            ScreenUtil.applySDFont(ignored -> {
+            LegacyFontUtil.applySDFont(ignored -> {
                 int q = minecraft.font.width(component);
                 int iconX = accessor.getInteger(name + ".statusIcon.x", getWidth() - 15);
                 int iconY = accessor.getInteger(name + ".statusIcon.y", 3);
@@ -352,20 +353,20 @@ public class ServerRenderableList extends RenderableVList {
         @Override
         public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
             super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
-            if (ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x + width / 2, getY() + y, width / 2, height)) {
+            if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x + width / 2, getY() + y, width / 2, height)) {
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED,  getX() + x, getY() + y, width, height);
             } else {
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN,  getX() + x, getY() + y, width, height);
             }
             if (serverIndex > 0) {
-                if (ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width / 2, height / 2)) {
+                if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width / 2, height / 2)) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED,  getX() + x, getY() + y, width, height);
                 } else {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP,  getX() + x, getY() + y, width, height);
                 }
             }
             if (serverIndex < getScreen(PlayGameScreen.class).getServers().size() - 1) {
-                if (ScreenUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y + height / 2, width / 2, height / 2)) {
+                if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y + height / 2, width / 2, height / 2)) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED,  getX() + x, getY() + y, width, height);
                 } else {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN,  getX() + x, getY() + y, width, height);
@@ -457,12 +458,12 @@ public class ServerRenderableList extends RenderableVList {
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int textY = getY() + (getHeight() < 20 ? (getHeight() - font.lineHeight) / 2 : 3);
             Component status = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
-            ScreenUtil.applySDFont(ignored -> {
+            LegacyFontUtil.applySDFont(ignored -> {
                 String name = listName();
                 int textX = getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35);
                 int textRight = getX() + accessor.getInteger(name + ".buttonMessage.right", getWidth() - 20);
                 if (!status.getString().isBlank()) textRight -= font.width(status) + 4;
-                ScreenUtil.renderScrollingString(guiGraphics, font, getMessage(), textX, getY(), Math.max(textX + 10, textRight), getY() + getHeight(), j, false);
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), textX, getY(), Math.max(textX + 10, textRight), getY() + getHeight(), j, false);
             });
             if (getHeight() < 30) return;
             guiGraphics.pose().pushPose();
@@ -474,9 +475,9 @@ public class ServerRenderableList extends RenderableVList {
             guiGraphics.pose().scale(textScale,textScale,textScale);
             int textWidth = Math.max(1, Math.round((textRight - textX) / textScale));
             List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(textWidth,minecraft.font.width(server.motd) / 2 + 20));
-            ScreenUtil.applySDFont(ignored -> {
+            LegacyFontUtil.applySDFont(ignored -> {
                 for (int p = 0; p < Math.min(2,list.size()); ++p) {
-                    ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0, minecraft.font.lineHeight * p, textWidth, 11 + minecraft.font.lineHeight * p, -8355712, false, Math.round(minecraft.font.width(list.get(p)) * textScale));
+                    LegacyRenderUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0, minecraft.font.lineHeight * p, textWidth, 11 + minecraft.font.lineHeight * p, -8355712, false, Math.round(minecraft.font.width(list.get(p)) * textScale));
                 }
             });
             guiGraphics.pose().popPose();
@@ -488,15 +489,15 @@ public class ServerRenderableList extends RenderableVList {
             int iconHeight = iconHeight();
             int iconX = iconX(iconWidth);
             int iconY = iconY(iconHeight);
-            if (serverIndex > 0 && ScreenUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY, iconWidth / 2, iconHeight / 2)) {
+            if (serverIndex > 0 && LegacyRenderUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY, iconWidth / 2, iconHeight / 2)) {
                 this.swap(serverIndex, serverIndex - 1);
                 return;
             }
-            if (serverIndex < servers.size() - 1 && ScreenUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY + iconHeight / 2, iconWidth / 2, iconHeight / 2)) {
+            if (serverIndex < servers.size() - 1 && LegacyRenderUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY + iconHeight / 2, iconWidth / 2, iconHeight / 2)) {
                 this.swap(serverIndex, serverIndex + 1);
                 return;
             }
-            if (ScreenUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY, iconWidth, iconHeight)) join(server);
+            if (LegacyRenderUtil.isMouseOver(d, e, getX() + iconX, getY() + iconY, iconWidth, iconHeight)) join(server);
             else super.onClick(d,e);
         }
 

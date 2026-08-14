@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -29,8 +30,11 @@ import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.SizeableAsset;
+import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,6 +44,9 @@ import java.util.function.Supplier;
 public class LegacyTabButton extends AbstractButton {
     public static final Vec3 DEFAULT_DESACTIVE_OFFSET = new Vec3(0,22,0);
     public static final Vec3 DEFAULT_UNSELECTED_OFFSET = new Vec3(0,4,0);
+    public static final ResourceLocation DEFAULT_ICON_TYPE_ID = FactoryAPI.createVanillaLocation("sprite");
+    public static final IconType<ResourceLocation> DEFAULT_ICON_TYPE = new IconType<>(ResourceLocation.CODEC, LegacyTabButton::iconOf);
+    public static final Codec<IconHolder<ResourceLocation>> DEFAULT_ICON_CODEC = ResourceLocation.CODEC.xmap(r -> new IconHolder<>(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE, r), IconHolder::content);
     public final Render icon;
     public Render spriteRender = ToggleableTabSprites.DEFAULT;
     private final Consumer<LegacyTabButton> onPress;
@@ -85,8 +92,12 @@ public class LegacyTabButton extends AbstractButton {
         return (t, guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
     }
 
-    public static Render iconOf(ModsScreen.SizedLocation sized){
+    public static Render iconOf(ModsScreen.SizedLocation sized) {
         return (t, guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blit(sized.location(), t.getX() + t.getWidth() / 2 - 12, t.getY() + t.getHeight() / 2 - 12, 0, 0, 24, sized.getScaledHeight(24), 24, sized.getScaledHeight(24));
+    }
+
+    public static Render sizeableIconOf(SizeableAsset<IconHolder<?>> sizeable) {
+        return (t, guiGraphics, i, j, f) -> sizeable.get().icon().render(t, guiGraphics, i, j, f);
     }
 
     public void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
@@ -94,7 +105,7 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     public void renderString(GuiGraphics guiGraphics, Font font, int x, int y, int i, boolean shadow){
-        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(textXPadding, (getWidth() - font.width(getMessage())) / 2), y + textYOffset, x + getWidth() - textXPadding, y + getHeight() - textBottomPadding, i,shadow));
+        LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(textXPadding, (getWidth() - font.width(getMessage())) / 2), y + textYOffset, x + getWidth() - textXPadding, y + getHeight() - textBottomPadding, i,shadow));
     }
 
     public  void renderIconSprite(ResourceLocation icon, GuiGraphics guiGraphics){
@@ -229,42 +240,43 @@ public class LegacyTabButton extends AbstractButton {
         }
     }
 
-    public record IconType<T>(Codec<T> contentCodec, Function<T,Render> createIcon){
-        public DataResult<IconHolder<T>> parse(ResourceLocation typeId, Dynamic<?> dynamic){
-            return contentCodec.parse(dynamic).map(c-> new IconHolder<>(typeId,this,c));
+    public record IconType<T>(Codec<T> contentCodec, Function<T, Render> createIcon) {
+        public DataResult<IconHolder<T>> parse(ResourceLocation typeId, Dynamic<?> dynamic) {
+            return contentCodec.parse(dynamic).map(c -> new IconHolder<>(typeId, this, c));
         }
     }
-    public static final ResourceLocation DEFAULT_ICON_TYPE_ID = FactoryAPI.createVanillaLocation("sprite");
-    public static final IconType<ResourceLocation> DEFAULT_ICON_TYPE = new IconType<>(ResourceLocation.CODEC,LegacyTabButton::iconOf);
-    public static final ListMap<ResourceLocation, IconType<?>> ICON_TYPES = new ListMap.Builder<ResourceLocation, IconType<?>>().put(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE).put(FactoryAPI.createVanillaLocation("item"), new IconType<>(DynamicUtil.ITEM_SUPPLIER_CODEC, LegacyTabButton::iconOf)).build();
-    public static final Codec<IconHolder<?>> ICON_HOLDER_CODEC = Codec.either(ResourceLocation.CODEC.xmap(r->new IconHolder<>(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE,r), h-> h.content), createIconHolderCodec("type","value")).xmap(c-> c.right().orElseGet(c.left()::get), Either::right);
 
-    public static Codec<IconHolder<?>> createIconHolderCodec(String typeField, String valueField){
+    public static Codec<IconHolder<?>> createIconHolderCodec(String typeField, String valueField) {
+        Codec<ResourceLocation> typeCodec = ResourceLocation.CODEC.fieldOf(typeField).codec();
         return new Codec<>() {
             @Override
             public <T> DataResult<Pair<IconHolder<?>, T>> decode(DynamicOps<T> ops, T input) {
-                Dynamic<T> dynamic = new Dynamic<>(ops,input);
-                DataResult<ResourceLocation> idResult = dynamic.get(typeField).flatMap(ResourceLocation.CODEC::parse);
+                Dynamic<T> dynamic = new Dynamic<>(ops, input);
+                DataResult<ResourceLocation> idResult = typeCodec.parse(dynamic);
                 if (idResult.result().isEmpty()) idResult = DataResult.success(DEFAULT_ICON_TYPE_ID);
-                return idResult.flatMap(f->dynamic.get(valueField).flatMap(d-> ICON_TYPES.get(f).parse(f,d).map(c-> Pair.of(c,input))));
+                return idResult.flatMap(f -> dynamic.get(valueField).flatMap(d -> ICON_TYPES.get(f).parse(f, d).map(c -> Pair.of(c, input))));
             }
 
             @Override
             public <T> DataResult<T> encode(IconHolder<?> input, DynamicOps<T> ops, T prefix) {
-                Dynamic<T> dynamic = new Dynamic<>(ops,prefix);
-                dynamic.set(typeField, dynamic.createString(input.type.toString()));
-                input.encodeContent(ops).result().ifPresent(d->dynamic.set(valueField,d));
-                return DataResult.success(prefix);
+                return typeCodec.encode(ICON_TYPES.getKey(input.type), ops, prefix).flatMap(r -> input.encodeContent(ops, ops.empty()).map(value -> ops.set(r, valueField, value)));
             }
         };
     }
 
-    public record IconHolder<T>(ResourceLocation typeId, IconType<T> type, T content, Render icon){
-        public IconHolder(ResourceLocation typeId, IconType<T> type, T content){
-            this(typeId,type,content,type.createIcon.apply(content));
+    public static final Codec<IconHolder<?>> ICON_HOLDER_CODEC = IOUtil.createFallbackCodec(createIconHolderCodec("type", "value"), DEFAULT_ICON_CODEC.xmap(Function.identity(), h -> (IconHolder<ResourceLocation>) h));
+
+    public record IconHolder<T>(ResourceLocation typeId, IconType<T> type, T content, Render icon) {
+        public IconHolder(ResourceLocation typeId, IconType<T> type, T content) {
+            this(typeId, type, content, type.createIcon.apply(content));
         }
-        public <C> DataResult<Dynamic<C>> encodeContent(DynamicOps<C> ops){
-            return type.contentCodec.encodeStart(ops,content).map(c-> new Dynamic<>(ops, c));
+
+        public <C> DataResult<C> encodeContent(DynamicOps<C> ops, C prefix) {
+            return type.contentCodec.encode(content, ops, prefix);
         }
     }
+
+    public static final Codec<SizeableAsset<IconHolder<?>>> ICON_SIZEABLE_CODEC = SizeableAsset.create(ICON_HOLDER_CODEC);
+
+    public static final ListMap<ResourceLocation, IconType<?>> ICON_TYPES = new ListMap.Builder<ResourceLocation, IconType<?>>().put(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE).put(FactoryAPI.createVanillaLocation("item"), new IconType<>(DynamicUtil.ITEM_SUPPLIER_CODEC, LegacyTabButton::iconOf)).put(FactoryAPI.createVanillaLocation("sizeable"), new IconType<>(ICON_SIZEABLE_CODEC, LegacyTabButton::sizeableIconOf)).build();
 }

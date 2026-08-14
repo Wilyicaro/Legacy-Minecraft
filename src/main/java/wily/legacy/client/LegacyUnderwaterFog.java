@@ -132,22 +132,22 @@ public final class LegacyUnderwaterFog {
         float distance = 0.0F;
         int count = 0;
         BlockPos.MutableBlockPos samplePos = new BlockPos.MutableBlockPos();
+
         for (int y = -1; y <= 1; y++) {
             for (int i = 0; i < X_OFFSETS.length; i++) {
                 samplePos.set(center.getX() + X_OFFSETS[i], center.getY() + y, center.getZ() + Z_OFFSETS[i]);
                 Holder<Biome> biome = level.getBiome(samplePos);
                 LegacyBiomeOverride override = LegacyBiomeOverride.getOrDefault(biome.unwrapKey());
-                Integer colorValue = override.waterFogColor();
-                if (colorValue == null) colorValue = override.waterColor();
-                int color = colorValue == null ? DEFAULT_FOG_COLOR : colorValue;
-                Float fogDistance = override.waterFogDistance();
+                int color = override.waterFogColor().or(() -> override.waterColor()).orElse(DEFAULT_FOG_COLOR);
+
                 red += color >> 16 & 0xFF;
                 green += color >> 8 & 0xFF;
                 blue += color & 0xFF;
-                distance += fogDistance == null ? DEFAULT_FOG_DISTANCE : fogDistance;
+                distance += override.waterFogDistance().orElse(DEFAULT_FOG_DISTANCE);
                 count++;
             }
         }
+
         return new Sample(red / count, green / count, blue / count, distance / count);
     }
 

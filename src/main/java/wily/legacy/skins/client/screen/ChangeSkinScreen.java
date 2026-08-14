@@ -21,7 +21,8 @@ import wily.legacy.skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.skins.skin.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float CAROUSEL_BASE_SCALE = 0.935f;
@@ -302,7 +303,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
             @Override
             public void render(GuiGraphics g, int i, int j, float f) {
-                ScreenUtil.renderPointerPanel(g, getX(), getY(), getWidth(), getHeight());
+                LegacyRenderUtil.renderPointerPanel(g, getX(), getY(), getWidth(), getHeight());
             }
         };
     }
@@ -535,14 +536,14 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics g, int mouseX, int mouseY, float pt) {
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
         Bounds frame = changeSkinFrameBounds();
         FrameFooterLayout footer = resolveFrameFooter(frame);
         renderFrame(g, frame);
         renderFrameFooter(g, footer);
         renderActionIcons(g, footer);
         updateCarouselClip();
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             renderSelectedSkinText(g, footer);
             renderPackText(g);
         });
@@ -550,7 +551,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private void renderFrame(GuiGraphics g, Bounds frame) {
         //? if <1.21.3 {
-        ScreenUtil.secureTranslucentRender(g, true, 1.0f, ignored -> renderFrameContents(g, frame));
+        LegacyRenderUtil.secureTranslucentRender(g, true, 1.0f, ignored -> renderFrameContents(g, frame));
         //?} else {
         /*renderFrameContents(g, frame);
         *///?}
@@ -662,7 +663,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 (int) ((tooltipBox.getWidth() - sc(THEME_TEXT_WIDTH_TRIM)) / textScale));
         String clippedName = PlayerSkinWidget.clipText(minecraft.font, name, maxTextWidth);
         drawScaledCentered(g, Component.literal(clippedName), textX, skinNameY,
-                ScreenUtil.getDefaultTextColor(true), textScale, true);
+                LegacyRenderUtil.getDefaultTextColor(true), textScale, true);
 
         if (!hasTheme) return;
 
@@ -671,7 +672,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int maxThemeY = panel.y + tooltipBox.getHeight() - sc(THEME_BOTTOM_INSET)
                 + SELECTED_SKIN_TEXT_Y_OFFSET;
         drawScaledCentered(g, Component.literal(clippedTheme), textX, Math.min(themeY, maxThemeY),
-                ScreenUtil.getDefaultTextColor(true), textScale, true);
+                LegacyRenderUtil.getDefaultTextColor(true), textScale, true);
     }
 
     private void renderPackText(GuiGraphics g) {
@@ -687,11 +688,11 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 (int) ((tooltipBox.getWidth() - sc(PACK_TEXT_WIDTH_TRIM)) / textScale));
         String packName = PlayerSkinWidget.clipText(minecraft.font, source.packName(pack), maxPackWidth);
         drawScaledCentered(g, Component.literal(packName), textX, packTitleY,
-                ScreenUtil.getDefaultTextColor(true), textScale, true);
+                LegacyRenderUtil.getDefaultTextColor(true), textScale, true);
         Component label = packLabel(pack);
         if (label != null)
             drawScaledCentered(g, label, textX, packMetaY,
-                    ScreenUtil.getDefaultTextColor(true), packTypeTextScale(), true);
+                    LegacyRenderUtil.getDefaultTextColor(true), packTypeTextScale(), true);
     }
 
     @Override

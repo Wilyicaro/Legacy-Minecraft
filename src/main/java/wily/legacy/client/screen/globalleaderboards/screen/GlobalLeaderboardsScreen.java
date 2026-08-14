@@ -34,7 +34,8 @@ import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.client.screen.globalleaderboards.board.GlobalLeaderboardBoardRegistry;
 import wily.legacy.client.screen.globalleaderboards.model.GlobalLeaderboardBoardSnapshot;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -147,9 +148,9 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON, getX(), getY(), getWidth(), getHeight());
-                    ScreenUtil.applySDFont(ignored -> {
-                        guiGraphics.drawString(font, rank, getX() + accessor.getInteger("renderableVList.buttonRank.x", 40) - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                        guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    LegacyFontUtil.applySDFont(ignored -> {
+                        guiGraphics.drawString(font, rank, getX() + accessor.getInteger("renderableVList.buttonRank.x", 40) - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                        guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger("renderableVList.buttonUsername.x", 120) - font.width(getMessage()) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                     });
 
                     int added = 0;
@@ -162,9 +163,9 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                         GlobalLeaderboardColumn column = columns.get(index);
                         Component value = column.format(row.columnValue(column.id()));
                         SimpleLayoutRenderable renderable = renderables.get(index);
-                        ScreenUtil.applySDFont(ignored -> {
+                        LegacyFontUtil.applySDFont(ignored -> {
                             int w = font.width(value);
-                            guiGraphics.drawString(font, value, renderable.getX() + (renderable.getWidth() - w) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+                            guiGraphics.drawString(font, value, renderable.getX() + (renderable.getWidth() - w) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
                         });
                         added++;
                     }
@@ -225,16 +226,16 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
             int boardTooltipX = panel.x + accessor.getInteger("boardTooltip.x", (panel.width - boardTooltipWidth) / 2);
             int entriesTooltipWidth = accessor.getInteger("entriesTooltip.width", 166);
             int entriesTooltipX = panel.x + panel.width - entriesTooltipWidth + accessor.getInteger("entriesTooltip.x", -8);
-            ScreenUtil.renderPointerPanel(graphics, filterTooltipX, topTooltipY, filterTooltipWidth, topTooltipHeight);
-            ScreenUtil.renderPointerPanel(graphics, boardTooltipX, topTooltipY, boardTooltipWidth, topTooltipHeight);
-            ScreenUtil.renderPointerPanel(graphics, entriesTooltipX, topTooltipY, entriesTooltipWidth, topTooltipHeight);
+            LegacyRenderUtil.renderPointerPanel(graphics, filterTooltipX, topTooltipY, filterTooltipWidth, topTooltipHeight);
+            LegacyRenderUtil.renderPointerPanel(graphics, boardTooltipX, topTooltipY, boardTooltipWidth, topTooltipHeight);
+            LegacyRenderUtil.renderPointerPanel(graphics, entriesTooltipX, topTooltipY, entriesTooltipWidth, topTooltipHeight);
 
             GlobalLeaderboardBoard board = selectedGlobalBoard();
             if (board == null) {
                 return;
             }
 
-            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyIconHolder.MOJANGLES_11_FONT, fontOverride -> {
+            LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, fontOverride -> {
                 float topTooltipScale = accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isFHD() ? 2 / 3f : 1.0f);
                 int topTextColor = CommonColor.ITEM_NAME_TEXT.get();
                 graphics.pose().pushPose();
@@ -270,7 +271,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 return;
             }
 
-            ScreenUtil.applySDFont(ignored -> {
+            LegacyFontUtil.applySDFont(ignored -> {
                 graphics.drawString(font, LeaderboardsScreen.RANK, panel.x + accessor.getInteger("rankText.x", 40), panel.y + accessor.getInteger("rankText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                 graphics.drawString(font, LeaderboardsScreen.USERNAME, panel.x + accessor.getInteger("usernameText.x", 108), panel.y + accessor.getInteger("usernameText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             });
@@ -295,15 +296,15 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
             graphics.pose().translate(boardTooltipX + accessor.getInteger("boardControlTooltip.x", 2), topTooltipY + accessor.getInteger("boardControlTooltip.y", 6), 0);
             float controlScale = accessor.getFloat("boardControlTooltip.scale", LegacyOptions.getUIMode().isSD() ? 1.2f : 0.6f);
             graphics.pose().scale(controlScale, controlScale, controlScale);
-            (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false, false);
+            (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
             graphics.pose().popPose();
 
-            ControlTooltip.Icon difficultyControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
+            ControlTooltip.Icon difficultyControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
             graphics.pose().pushPose();
             graphics.pose().translate(boardTooltipX + boardTooltipWidth + accessor.getInteger("boardPageTooltip.x", -4), topTooltipY + accessor.getInteger("boardControlTooltip.y", 6), 0);
             float pageControlScale = accessor.getFloat("boardPageTooltip.scale", LegacyOptions.getUIMode().isSD() ? 1.0f : 0.5f);
             graphics.pose().scale(pageControlScale, pageControlScale, pageControlScale);
-            difficultyControl.render(graphics, -difficultyControl.render(graphics, 0, 0, false, true), 0, false, false);
+            difficultyControl.render(graphics, -difficultyControl.getWidth(), 0, false);
             graphics.pose().popPose();
             FactoryScreenUtil.disableBlend();
 
@@ -339,7 +340,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     @Override

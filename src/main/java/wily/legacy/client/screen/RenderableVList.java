@@ -21,7 +21,8 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RenderableVListEntry;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.*;
 import java.util.function.Function;
@@ -336,7 +337,7 @@ public class RenderableVList {
     }
 
     public boolean isHovered(double x, double y){
-        return ScreenUtil.isMouseOver(x,y,leftPos,topPos,listWidth,listHeight == 0 ? getScreen().height : listHeight);
+        return LegacyRenderUtil.isMouseOver(x,y,leftPos,topPos,listWidth,listHeight == 0 ? getScreen().height : listHeight);
     }
 
     public boolean isInvalidFocus(ComponentPath path, boolean allowExternalListener){
@@ -480,7 +481,7 @@ public class RenderableVList {
 
         @Override
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(Minecraft.getInstance().font, text, getX() + 1, getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
+            LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(Minecraft.getInstance().font, text, getX() + 1, getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
         }
 
         @Override

@@ -9,12 +9,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CompoundControllerBinding extends ControllerBinding<BindingState> {
-    private static final Function<ControllerBinding<?>[],CompoundControllerBinding> CACHE = Util.memoize(CompoundControllerBinding::new);
+    private static final Function<ControllerBinding<?>[], CompoundControllerBinding> CACHE = Util.memoize(CompoundControllerBinding::new);
 
     private final ControllerBinding<?>[] bindings;
 
     public CompoundControllerBinding(ControllerBinding<?>[] bindings) {
-        super(Arrays.stream(bindings).map(ControllerBinding::getKey).sorted().collect(Collectors.joining(",")), binding-> new BindingState(binding) {
+        super(Arrays.stream(bindings).map(ControllerBinding::getKey).sorted().collect(Collectors.joining(",")), binding -> new BindingState(binding) {
             @Override
             public void update(Controller controller) {
                 boolean press = true;
@@ -25,6 +25,13 @@ public class CompoundControllerBinding extends ControllerBinding<BindingState> {
                     }
                 }
                 update(press);
+            }
+
+            @Override
+            public void nextUpdatePress() {
+                for (ControllerBinding<?> controllerBinding : bindings) {
+                    controllerBinding.state().nextUpdatePress();
+                }
             }
 
             @Override
@@ -40,11 +47,11 @@ public class CompoundControllerBinding extends ControllerBinding<BindingState> {
         this.bindings = bindings;
     }
 
-    public static CompoundControllerBinding getOrCreate(ControllerBinding<?>... bindings){
+    public static CompoundControllerBinding getOrCreate(ControllerBinding<?>... bindings) {
         return CACHE.apply(bindings);
     }
 
-    public static ControllerBinding<?> getOrCreateAndUpdate(Controller controller, ControllerBinding<?>... bindings){
+    public static ControllerBinding<?> getOrCreateAndUpdate(Controller controller, ControllerBinding<?>... bindings) {
         if (bindings.length == 1) return bindings[0];
         CompoundControllerBinding compoundControllerBinding = getOrCreate(bindings);
         if (!ControllerBinding.map.containsKey(compoundControllerBinding.getKey())) {
@@ -65,7 +72,7 @@ public class CompoundControllerBinding extends ControllerBinding<BindingState> {
             boolean isDelimiter = i % 2 != 0 && i < icons.length - 1;
             icons[i] = isDelimiter ? ControlTooltip.PLUS_ICON : bindings[i / 2].getIcon();
         }
-        return ControlTooltip.ComponentIcon.compoundOf(icons);
+        return ControlTooltip.CompoundComponentIcon.of(icons);
     }
 
     @Override

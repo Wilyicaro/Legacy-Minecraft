@@ -30,7 +30,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldTemplate;
 import wily.legacy.client.PackAlbum;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -201,7 +201,7 @@ public class CreationList extends RenderableVList {
                 if (icon != null) {
                     FactoryGuiGraphics.of(guiGraphics).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
                 } else if (pack.worldTemplateIconUrl().map(URI::toString).filter(pendingRemoteWorldIcons::contains).isPresent()) {
-                    ScreenUtil.drawGenericLoading(guiGraphics, getX() + x, getY() + y, (width - 2) / 3, 1);
+                    LegacyRenderUtil.drawGenericLoading(guiGraphics, getX() + x, getY() + y, (width - 2) / 3, 1);
                 } else {
                     icon = localTemplate.map(CreationList::getTemplateWorldIcon).orElse(null);
                     if (icon != null) {

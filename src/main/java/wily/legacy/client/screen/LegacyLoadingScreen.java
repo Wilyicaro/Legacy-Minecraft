@@ -13,7 +13,8 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +49,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderer.prepareRender(minecraft, UIAccessor.of(this));
         if (blackBackground) guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
-        else ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, true, true, false);
+        else LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, true, true, false);
     }
     //?}
     @Override
@@ -56,7 +57,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
         //? if <=1.20.1 {
         /*renderer.prepareRender(minecraft, UIAccessor.of(this));
         if (blackBackground) guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
-        else ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, true, true, false);
+        else LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, true, true, false);
         *///?}
        super.render(guiGraphics, i, j, f);
        renderer.renderForeground(guiGraphics, i, j, f);
@@ -141,7 +142,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
                     finalizingTicks--;
                 } else {
                     onClose();
-                    ScreenUtil.playBackSound();
+                    LegacySoundUtil.playBackSound();
                     if (controlsAutosaveIndicator) minecraft.gui.autosaveIndicatorValue = 1.0f;
                 }
             }

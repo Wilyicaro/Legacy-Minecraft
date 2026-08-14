@@ -11,7 +11,8 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.ScreenshotToast;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.function.Consumer;
 
@@ -24,7 +25,7 @@ public abstract class ScreenshotMixin {
                 String fileName = ((Component)((TranslatableContents)component.getContents()).getArgs()[0]).getString();
                 Minecraft.getInstance().execute(() -> {
                     Legacy4J.LOGGER.info("Saved screenshot as " + fileName);
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCREENSHOT.get(), 1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCREENSHOT.get(), 1.0f);
                     ScreenshotToast.newScreenshot(new ScreenshotToast(fileName));
                 });
             } else {

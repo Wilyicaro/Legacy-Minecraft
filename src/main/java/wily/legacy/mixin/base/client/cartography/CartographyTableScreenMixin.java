@@ -33,7 +33,8 @@ import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.inventory.RenameItemMenu;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(CartographyTableScreen.class)
 public abstract class CartographyTableScreenMixin extends AbstractContainerScreen<CartographyTableMenu> {
@@ -79,7 +80,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         imageHeight = sd ? 165 : 254;
         inventoryLabelX = sd ? 7 : 10;
         inventoryLabelY = sd ? 96 : 144;
-        ScreenUtil.applySDFont(ignored -> titleLabelX = (imageWidth - font.width(getTitle())) / 2);
+        LegacyFontUtil.applySDFont(ignored -> titleLabelX = (imageWidth - font.width(getTitle())) / 2);
         titleLabelY = sd ? 5 : 10;
         int slotsSize = sd ? 13 : 21;
         LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
@@ -169,7 +170,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     }
 
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(sd -> {
+        LegacyFontUtil.applySDFont(sd -> {
             super.renderLabels(guiGraphics, i, j);
             guiGraphics.drawString(font, LegacyComponents.MAP_NAME, inventoryLabelX, sd ? 18 : 27, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             Component cartographyAction = getCartographyAction();

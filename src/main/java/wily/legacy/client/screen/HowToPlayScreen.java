@@ -20,9 +20,10 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -83,7 +84,7 @@ public class HowToPlayScreen extends LegacyScreen {
         if ((next = i == InputConstants.KEY_RETURN) && hasNextPage() || i == InputConstants.KEY_X && hasPreviousPage()) {
             List<Section> sections = Section.getValid();
             int index = sections.indexOf(section);
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
             minecraft.setScreen(sections.get(index + (next ? 1 : -1)).build(parent));
             return true;
         }
@@ -104,7 +105,7 @@ public class HowToPlayScreen extends LegacyScreen {
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             Section.list.clear();
-            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name, HOW_TO_PLAY_SECTIONS)).ifPresent(((r) -> {
+            IOUtil.getOrderedNamespaces(resourceManager).forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name, HOW_TO_PLAY_SECTIONS)).ifPresent(((r) -> {
                 try (BufferedReader bufferedReader = r.openAsReader()) {
                     Section.LIST_CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(bufferedReader)).result().ifPresent(l-> l.stream()
                             .filter(Section::supportsCurrentVersion)

@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(/*? if <1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*EffectsInInventory*//*?}*/.class)
 public abstract class EffectRenderingInventoryScreenMixin /*? if <1.21.2 {*/extends AbstractContainerScreen/*?}*/ {
@@ -34,11 +34,11 @@ public abstract class EffectRenderingInventoryScreenMixin /*? if <1.21.2 {*/exte
         ci.cancel();
         //? if <1.21.2 {
         super.render(guiGraphics, i, j, f);
-        ScreenUtil.renderContainerEffects(guiGraphics, leftPos, topPos, imageWidth, imageHeight, i, j);
+        LegacyRenderUtil.renderContainerEffects(guiGraphics, leftPos, topPos, imageWidth, imageHeight, i, j);
         //?} else {
         /*if (screen instanceof LegacyMenuAccess<?> a) {
             ScreenRectangle rec = a.getMenuRectangle();
-            ScreenUtil.renderContainerEffects(guiGraphics, rec.left(), rec.top(), rec.width(), rec.height(), i, j);
+            LegacyRenderUtil.renderContainerEffects(guiGraphics, rec.left(), rec.top(), rec.width(), rec.height(), i, j);
         }
         *///?}
     }

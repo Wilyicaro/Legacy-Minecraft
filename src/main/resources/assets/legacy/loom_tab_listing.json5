@@ -1,6 +1,15 @@
 [
   {
-    "id": "stripes",
+    "id": "legacy:select_banner",
+    "icon": {
+      "type": "item",
+      "value": {
+        "item": "white_banner",
+      }
+    }
+  },
+  {
+    "id": "legacy:stripes",
     "name": {"translate": "legacy.container.tab.stripes"},
     "icon": {
       "type": "item",
@@ -16,7 +25,7 @@
     "listing": ["cross","small_stripes","straight_cross","stripe_bottom","stripe_center","stripe_downleft","stripe_downright","stripe_left","stripe_middle","stripe_right","stripe_top"]
   },
   {
-    "id": "halves",
+    "id": "legacy:halves",
     "name": {"translate": "legacy.container.tab.halves"},
     "icon": {
       "type": "item",
@@ -32,7 +41,7 @@
     "listing": ["diagonal_left","diagonal_right","diagonal_up_left","diagonal_up_right","half_horizontal","half_horizontal_bottom","half_vertical","half_vertical_right"]
   },
   {
-    "id": "shapes",
+    "id": "legacy:shapes",
     "name": {"translate": "legacy.container.tab.shapes"},
     "icon": {
       "type": "item",
@@ -48,7 +57,7 @@
     "listing": ["circle","rhombus","square_bottom_left","square_bottom_right","square_top_left","square_top_right","triangle_bottom","triangle_top","triangles_bottom","triangles_top"]
   },
   {
-    "id": "borders_backgrounds_and_gradients",
+    "id": "legacy:borders_backgrounds_and_gradients",
     "name": {"translate": "legacy.container.tab.borders_backgrounds_and_gradients"},
     "icon": {
       "type": "item",
@@ -64,7 +73,7 @@
     "listing": ["bricks","curly_border","border","gradient","gradient_up"]
   },
   {
-    "id": "symbols",
+    "id": "legacy:symbols",
     "name": {"translate": "legacy.container.tab.symbols"},
     "icon": {
       "type": "item",

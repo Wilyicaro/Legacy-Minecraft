@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 public class SaveInfoScreen extends ConfirmationScreen {
     public SaveInfoScreen(Screen parent) {
@@ -40,11 +40,11 @@ public class SaveInfoScreen extends ConfirmationScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics);
     }
 
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        ScreenUtil.drawAutoSavingIcon(guiGraphics, panel.x + (panel.width - 24) / 2, panel.y + (LegacyOptions.getUIMode().isSD() ? 28 : 36));
+        LegacyRenderUtil.drawAutoSavingIcon(guiGraphics, panel.x + (panel.width - 24) / 2, panel.y + (LegacyOptions.getUIMode().isSD() ? 28 : 36));
     }
 }

@@ -13,7 +13,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 public class JoinGameScreen extends PanelVListScreen{
     public static final Component JOIN_GAME = Component.translatable("legacy.menu.join_game");
@@ -36,7 +37,7 @@ public class JoinGameScreen extends PanelVListScreen{
 
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true));
+                    LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true));
                 }
 
                 @Override
@@ -69,7 +70,7 @@ public class JoinGameScreen extends PanelVListScreen{
     @Override
     public void renderableVListInit() {
         tooltipBox.init();
-        ScreenUtil.applySDFont(ignored -> label = MultiLineLabel.create(Minecraft.getInstance().font, data.motd, tooltipBox.getWidth() - 10));
+        LegacyFontUtil.applySDFont(ignored -> label = MultiLineLabel.create(Minecraft.getInstance().font, data.motd, tooltipBox.getWidth() - 10));
         super.renderableVListInit();
     }
 
@@ -81,6 +82,6 @@ public class JoinGameScreen extends PanelVListScreen{
         int visibleHeight = tooltipBox.getHeight() - (LegacyOptions.getUIMode().isSD() ? 20 : 44);
         scrollableRenderer.lineHeight = lineHeight;
         scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleHeight / lineHeight);
-        ScreenUtil.applySDFont(ignored -> scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, visibleHeight, ()-> label.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13, lineHeight, 0xFFFFFF)));
+        LegacyFontUtil.applySDFont(ignored -> scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, visibleHeight, ()-> label.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13, lineHeight, 0xFFFFFF)));
     }
 }

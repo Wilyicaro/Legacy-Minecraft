@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -12,7 +13,9 @@ import net.minecraft.util.Mth;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,14 +25,12 @@ import java.util.function.Supplier;
 
 public class LegacySliderButton<T> extends AbstractSliderButton {
     private final Function<LegacySliderButton<T>,Component> messageGetter;
-    public Supplier<ResourceLocation> fontOverrideSupplier = () -> LegacyOptions.getUIMode().isSD() ? LegacyIconHolder.MOJANGLES_11_FONT : null;
+    public Supplier<ResourceLocation> fontOverrideSupplier = () -> LegacyOptions.getUIMode().isSD() ? LegacyFontUtil.MOJANGLES_11_FONT : null;
 
     private final Function<LegacySliderButton<T>, T> valueGetter;
     private final Function<T, Double> valueSetter;
     private final Consumer<LegacySliderButton<T>> onChange;
     private final Function<LegacySliderButton<T>,Tooltip> tooltipSupplier;
-    protected boolean dragging = false;
-    protected boolean applyChangesOnRelease = false;
     private int slidingMul = 1;
     private int lastSliderInput = -1;
     private double rangeMul = 1;
@@ -124,27 +125,16 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         return false;
     }
 
+    @Override
+    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+        LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingString(guiGraphics, font, i, j));
+    }
+
     public boolean keyReleased(int i, int j, int k) {
         if (this.canChangeValue && (i == InputConstants.KEY_LEFT || i == InputConstants.KEY_RIGHT)) slidingMul = 1;
         return false;
     }
 
-    @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        dragging = active;
-        return super.mouseClicked(d, e, i);
-    }
-
-    @Override
-    public void onRelease(double d, double e) {
-        dragging = false;
-        if (applyChangesOnRelease) {
-            onChange.accept(this);
-            applyChangesOnRelease = false;
-            updateMessage();
-        }
-        super.onRelease(d, e);
-    }
 
     public void setObjectValue(T objectValue){
         this.objectValue = objectValue;
@@ -156,11 +146,8 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         T oldValue = objectValue;
         setObjectValue(valueGetter.apply(this));
         if (!oldValue.equals(objectValue)) {
-            ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(), 1.0f);
-            if (dragging)
-                applyChangesOnRelease = true;
-            else
-                onChange.accept(this);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(), 1.0f);
+            onChange.accept(this);
         }
     }
 

@@ -37,7 +37,8 @@ import wily.legacy.client.PackAlbum;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.io.IOException;
 import java.net.URI;
@@ -145,7 +146,7 @@ public class ModsScreen extends PanelVListScreen {
                     int iconHeight = accessor.getInteger(listName() + ".buttonIcon.size", 20);
                     int iconPos = (height - iconHeight) / 2;
                     int x = getX() + iconPos + accessor.getInteger(listName() + ".buttonMessage.xOffset", 10) + (logo == null ? iconHeight : logo.getScaledWidth(iconHeight));
-                    ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), getX() + getWidth() - i, this.getY() + this.getHeight(), j,true));
+                    LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), getX() + getWidth() - i, this.getY() + this.getHeight(), j,true));
                 }
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -157,7 +158,7 @@ public class ModsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         tooltipBox.render(guiGraphics,i,j,f);
         if (focusedMod != null) {
             AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod).withPos(panel.x + panel.width + 5, panel.y + 41);
@@ -167,9 +168,9 @@ public class ModsScreen extends PanelVListScreen {
             if (logo != null)
                 FactoryGuiGraphics.of(guiGraphics).blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
             if (logo == null || logo.getScaledWidth(28) < 120) {
-                ScreenUtil.applySDFont(ignored -> {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
+                LegacyFontUtil.applySDFont(ignored -> {
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
                 });
             }
             scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.render(guiGraphics, i, j + Math.round(scrollableRenderer.getYOffset()), f));
@@ -178,7 +179,7 @@ public class ModsScreen extends PanelVListScreen {
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
-        if (focusedMod != null && ScreenUtil.isMouseOver(d, e, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50)) {
+        if (focusedMod != null && LegacyRenderUtil.isMouseOver(d, e, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50)) {
             AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod);
             if (label.mouseClicked(d, e + scrollableRenderer.getYOffset(), i)) return true;
         }

@@ -1063,6 +1063,7 @@
   "legacy.action.quick_move": "Quick Move",
   "legacy.action.release": "Release",
   "legacy.action.remove": "Remove",
+  "legacy.action.remove_pattern": "Remove",
   "legacy.action.remove_favorite": "Remove Favorite",
   "legacy.action.repair": "Repair",
   "legacy.action.ride": "Ride",

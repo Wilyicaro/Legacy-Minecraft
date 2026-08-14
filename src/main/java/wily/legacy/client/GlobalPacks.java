@@ -38,7 +38,9 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -86,7 +88,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
-        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyIconHolder.MOJANGLES_11_FONT)),i));
+        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)),i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i,j,k,l, LegacyComponents.getGlobalResourcePacks(), LegacyComponents.getShowResourcePacks(), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
@@ -139,7 +141,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
             if (hasTooltip) return;
-            ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
+            LegacyRenderUtil.renderPointerPanel(graphics,x, y,width,height);
             if (selectedPack != null){
                 FactoryGuiGraphics.of(graphics).blit(PackAlbum.Selector.getPackIcon(selectedPack), x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 boolean sd = LegacyOptions.getUIMode().isSD();
@@ -179,11 +181,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 if (i == 263) {
                     if (selectedIndex == scrolledList.get()) updateScroll(-1,true);
                     setSelectedPack(selectedIndex - 1);
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 } else if (i == 262) {
                     if (selectedIndex == scrolledList.get() + getMaxPacks() - 1) updateScroll(1,true);
                     setSelectedPack(selectedIndex + 1);
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 }
             }
             return super.keyPressed(i, j, k);
@@ -299,7 +301,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f,0f);
-            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused()));
+            LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused()));
             guiGraphics.pose().popPose();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

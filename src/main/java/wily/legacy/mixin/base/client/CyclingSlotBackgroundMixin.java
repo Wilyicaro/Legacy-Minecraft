@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(CyclingSlotBackground.class)
 public class CyclingSlotBackgroundMixin {
@@ -21,7 +21,7 @@ public class CyclingSlotBackgroundMixin {
     private void renderIcon(Slot slot, ResourceLocation resourceLocation, float f, GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
 
-        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
+        LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
         holder.renderScaled(guiGraphics, i + slot.x, j + slot.y, () -> {
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f, f, true);
             //? if <1.21.4 {

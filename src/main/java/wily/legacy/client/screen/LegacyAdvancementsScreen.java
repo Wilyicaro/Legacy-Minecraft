@@ -30,6 +30,8 @@ import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ClientAdvancementsPayload;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -93,7 +95,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(page.get() * getMaxTabCount() + tabList.selectedTab);
+        return getRenderableVLists().get(page.get() * getMaxTabCount() + tabList.getIndex());
     }
 
     public static class AdvancementButton extends AbstractWidget {
@@ -171,14 +173,14 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         panelRecess.init("panelRecess");
         addRenderableOnly(tabList::renderSelected);
         addRenderableOnly(((guiGraphics, i, j, f) ->{
-            Component title = showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle();
-            ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,title,panel.x + (panel.width - font.width(title))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false));
+            Component title = showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle();
+            LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,title,panel.x + (panel.width - font.width(title))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false));
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.texturePath()*//*?}*/;
+                ResourceLocation background = displayInfos.get(tabList.getIndex()).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.texturePath()*//*?}*/;
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,panelRecess.width - 4,23,16,16);
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, panelRecess.width, 27);
-            if (getFocused() instanceof AdvancementButton a) ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF));
+            LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, panelRecess.width, 27);
+            if (getFocused() instanceof AdvancementButton a) LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF));
             FactoryScreenUtil.disableBlend();
         }));
         addRenderableOnly(panelRecess);
@@ -247,7 +249,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     public static /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/ getActualAdvancements(){

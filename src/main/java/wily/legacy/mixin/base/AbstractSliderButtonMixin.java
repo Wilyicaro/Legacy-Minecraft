@@ -22,7 +22,7 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacySliderButton;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractSliderButton.class)
 public abstract class AbstractSliderButtonMixin extends AbstractWidget implements ControlTooltip.ActionHolder {
@@ -47,10 +47,8 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         if (isHoveredOrFocused()) FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HIGHLIGHTED_SLIDER, this.getX() - 1, this.getY() - 1, this.getWidth() + 2, this.getHeight() + 2);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(isHovered() ? LegacySprites.SLIDER_HANDLE_HIGHLIGHTED : LegacySprites.SLIDER_HANDLE, this.getX() + (int)(this.value * (double)(this.width - 8)), this.getY(), 8, this.getHeight());
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        int k = ScreenUtil.getDefaultTextColor(!isHoveredOrFocused());
-        Object widget = this;
-        ResourceLocation fontOverride = widget instanceof LegacySliderButton<?> slider ? slider.fontOverrideSupplier.get() : null;
-        Legacy4JClient.applyFontOverrideIf(fontOverride != null, fontOverride, ignored -> this.renderScrollingString(guiGraphics, minecraft.font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24));
+        int k = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+        this.renderScrollingString(guiGraphics, minecraft.font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24);
     }
 
     @Override

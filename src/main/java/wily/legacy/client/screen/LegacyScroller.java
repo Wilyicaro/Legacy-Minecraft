@@ -8,7 +8,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
@@ -68,7 +68,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
 
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return ScreenUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
+        return LegacyRenderUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
     }
 
     public boolean mouseScrolled(double g){

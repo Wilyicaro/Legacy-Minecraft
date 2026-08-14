@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public abstract class RecipeToastMixin implements Toast {
 
     @Inject(method = "addOrUpdate", at = @At("HEAD"), cancellable = true)
     private static void addOrUpdate(CallbackInfo ci) {
-        if (!ScreenUtil.hasClassicCrafting()) ci.cancel();
+        if (!LegacyRenderUtil.hasClassicCrafting()) ci.cancel();
     }
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, /*? if <1.21.2 {*/ ToastComponent toastComponent/*?} else {*//*Font font *//*?}*/, long l, /*? if <1.21.2 {*/ CallbackInfoReturnable<Visibility> cir/*?} else {*//*CallbackInfo ci*//*?}*/) {
@@ -74,7 +74,7 @@ public abstract class RecipeToastMixin implements Toast {
             this.lastChanged = l;
             this.changed = false;
         }
-        if (this.recipes.isEmpty() || !ScreenUtil.hasClassicCrafting()){
+        if (this.recipes.isEmpty() || !LegacyRenderUtil.hasClassicCrafting()){
             cir.setReturnValue(Toast.Visibility.HIDE);
             return;
         }
@@ -83,7 +83,7 @@ public abstract class RecipeToastMixin implements Toast {
         /*ci.cancel();
         *///?}
 
-        ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
+        LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
@@ -93,7 +93,7 @@ public abstract class RecipeToastMixin implements Toast {
         ItemStack toastSymbol = /*? if <1.21.2 {*/recipeHolder/*? if >1.20.1 {*/.value()/*?}*/.getToastSymbol()/*?} else {*/ /*displayItems.get(displayedRecipeIndex).key()*//*?}*/;
         ItemStack resultItem = /*? if <1.21.2 {*/recipeHolder/*? if >1.20.1 {*/.value()/*?}*/.getResultItem(Minecraft.getInstance().level.registryAccess())/*?} else {*/ /*displayItems.get(displayedRecipeIndex).value()*//*?}*/;
 
-        ScreenUtil.iconHolderRenderer.itemHolder(8,(height() - 27) / 2,27,27,toastSymbol,false, Vec3.ZERO).renderItem(guiGraphics,0,0,0);
+        LegacyRenderUtil.iconHolderRenderer.itemHolder(8,(height() - 27) / 2,27,27,toastSymbol,false, Vec3.ZERO).renderItem(guiGraphics,0,0,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 36,(height() - 28) / 2,28,28);
         guiGraphics.renderItem(resultItem ,width() - 30, (height() - 16) / 2);
         //? if <1.21.2 {

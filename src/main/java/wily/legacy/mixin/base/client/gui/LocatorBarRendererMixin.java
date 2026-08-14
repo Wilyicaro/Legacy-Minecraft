@@ -6,13 +6,13 @@ import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(LocatorBarRenderer.class)
 public class LocatorBarRendererMixin {
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIIII)V"), index = 6)
     private int legacy$applyHudOpacity(int color) {
-        return ARGB.color((int) (ARGB.alpha(color) * ScreenUtil.getHUDOpacity()), ARGB.transparent(color));
+        return ARGB.color((int) (ARGB.alpha(color) * LegacyRenderUtil.getHUDOpacity()), ARGB.transparent(color));
     }
 }
 *//*?}*/

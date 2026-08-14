@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +97,7 @@ public class SubtitleOverlayMixin {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float)(guiGraphics.guiHeight() - 35), 0.0);
                 int height = list.size() * 12;
-                ScreenUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
+                LegacyRenderUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
                 guiGraphics.pose().translate( - (j / 2.0) - 2.0, 0 ,0);
                 for(SubtitleOverlay.Subtitle subtitle2 : list) {
                     Component component = subtitle2.getText();

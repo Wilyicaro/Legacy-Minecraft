@@ -26,7 +26,9 @@ import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
 import wily.legacy.skins.skin.*;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -239,15 +241,15 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected void playFocusSound() {
-        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f, true);
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f, true);
     }
 
     protected void playScrollSound() {
-        ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(), 1.0f);
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(), 1.0f);
     }
 
     protected void playPressSound() {
-        ScreenUtil.playSimpleUISound(LegacyRegistries.ACTION.get(), 1.0f);
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.ACTION.get(), 1.0f);
     }
 
     protected void playPackSelectionSound() {
@@ -1279,7 +1281,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         try {
             pose.translate(drawX, drawY, 0.0F);
             pose.scale(scaleX, scaleY, 1.0F);
-            Legacy4JClient.applyFontShadowScale(alignToFramebuffer ? scaleY : 1.0F,
+            LegacyFontUtil.applyShadowScale(alignToFramebuffer ? scaleY : 1.0F,
                     () -> g.drawString(minecraft.font, text, textX, 0, color, shadow));
         } finally {
             pose.popPose();

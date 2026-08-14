@@ -1,7 +1,10 @@
 package wily.legacy.client;
 
+import com.google.common.base.Charsets;
 import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
@@ -21,14 +24,20 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
+import wily.legacy.util.IOUtil;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
+    public static final boolean DEBUG = false;
     public static final ResourceLocation GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
     public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*//*"gamma" *//*?} else {*/"post_effect/gamma.json"/*?}*/);
@@ -80,73 +89,72 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             }
         });
 
-        ControlType.types.clear();
         CommonValue.COMMON_VALUES.forEach((s,c)->c.reset());
         CommonColor.COMMON_COLORS.forEach((s,c)->c.reset());
         resourceManager.getResource(DEFAULT_KEYBOARD_LAYOUT_LOCATION).ifPresent(LegacyResourceManager::setKeyboardLayout);
-        JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->{
-            resourceManager.getResource(FactoryAPI.createLocation(name, CONTROL_TYPES)).ifPresent(r->{
-                try {
-                    GsonHelper.parseArray(r.openAsReader()).forEach(e-> {
-                        ResourceLocation id;
-                        ControlType type;
-                        if (e instanceof JsonPrimitive p) {
-                            id = FactoryAPI.createLocation(p.getAsString());
-                            if (ControlType.types.containsKey(id.toString()) && ControlType.defaultTypes.contains(ControlType.types.get(id.toString()))) return;
-                            for (ControlType defaultType : ControlType.defaultTypes) {
-                                if (defaultType.getId().equals(id)){
-                                    ControlType.types.put(id.toString(), defaultType);
-                                    return;
-                                }
-                            }
-                            type = ControlType.create(id,null,false);
-                        } else {
-                            JsonObject o = e.getAsJsonObject();
-                            id = FactoryAPI.createLocation(GsonHelper.getAsString(o,"id"));
-                            type = ControlType.create(id,JsonUtil.getJsonStringOrNull(o,"displayName", Component::translatable),GsonHelper.getAsBoolean(o,"isKbm",false));
-                        }
-                        ControlType.types.put(id.toString(), type);
-                    });
-                } catch (IOException e) {
-                    Legacy4J.LOGGER.warn(e.getMessage());
-                }
-            });
-            resourceManager.getResource(FactoryAPI.createLocation(name, COMMON_COLORS)).ifPresent(r-> {
+        String langKey = minecraft.getLanguageManager().getLanguage(minecraft.getLanguageManager().getSelected()) != null ? minecraft.getLanguageManager().getSelected() : "en_us";
+        IOUtil.getOrderedNamespaces(resourceManager).forEach(name -> {
+            resourceManager.getResource(FactoryAPI.createLocation(name, COMMON_COLORS)).ifPresent(r -> {
                 try {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
-                    obj.asMap().forEach((s,e)-> {
+                    obj.asMap().forEach((s, e) -> {
                         ResourceLocation id = FactoryAPI.createLocation(s);
-                        if (CommonColor.COMMON_COLORS.containsKey(id)) CommonColor.COMMON_COLORS.get(id).parse(new Dynamic<>(JsonOps.INSTANCE,e));
+                        if (CommonColor.COMMON_COLORS.containsKey(id))
+                            CommonColor.COMMON_COLORS.get(id).parse(new Dynamic<>(JsonOps.INSTANCE, e));
                     });
                 } catch (IOException e) {
                     Legacy4J.LOGGER.warn(e.getMessage());
                 }
             });
-            resourceManager.getResource(FactoryAPI.createLocation(name, COMMON_VALUES)).ifPresent(r-> {
+            resourceManager.getResource(FactoryAPI.createLocation(name, COMMON_VALUES)).ifPresent(r -> {
                 try {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
-                    obj.asMap().forEach((s,e)-> {
+                    obj.asMap().forEach((s, e) -> {
                         ResourceLocation id = FactoryAPI.createLocation(s);
-                        if (CommonColor.COMMON_VALUES.containsKey(id)) CommonColor.COMMON_VALUES.get(id).parse(new Dynamic<>(JsonOps.INSTANCE,e));
+                        if (CommonColor.COMMON_VALUES.containsKey(id))
+                            CommonColor.COMMON_VALUES.get(id).parse(new Dynamic<>(JsonOps.INSTANCE, e));
                     });
                 } catch (IOException e) {
                     Legacy4J.LOGGER.warn(e.getMessage());
                 }
             });
-            addKbmIcons(resourceManager, FactoryAPI.createLocation(name,DEFAULT_KBM_ICONS),(s,b)->{
-                for (ControlType value : ControlType.types.values()) if (value.isKbm()) value.getIcons().put(s, b);
+            if (DEBUG) {
+                File gamePath = new File(Minecraft.getInstance().gameDirectory, "debug_resource_values");
+                gamePath.mkdirs();
+                try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Path.of(gamePath.getPath(), COMMON_COLORS), Charsets.UTF_8))) {
+                    w.setSerializeNulls(false);
+                    w.setIndent("  ");
+                    JsonObject obj = new JsonObject();
+                    CommonColor.COMMON_COLORS.forEach((id, value) -> obj.add(id.toString(), value.encode(JsonOps.INSTANCE)));
+                    GsonHelper.writeValue(w, obj, null);
+                } catch (IOException exception) {
+                    Legacy4J.LOGGER.warn(exception.getMessage());
+                }
+                try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Path.of(gamePath.getPath(), COMMON_VALUES), Charsets.UTF_8))) {
+                    w.setSerializeNulls(false);
+                    w.setIndent("  ");
+                    JsonObject obj = new JsonObject();
+                    CommonValue.COMMON_VALUES.forEach((id, value) -> obj.add(id.toString(), value.encode(JsonOps.INSTANCE)));
+                    GsonHelper.writeValue(w, obj, null);
+                } catch (IOException exception) {
+                    Legacy4J.LOGGER.warn(exception.getMessage());
+                }
+            }
+            addKbmIcons(resourceManager, FactoryAPI.createLocation(name, DEFAULT_KBM_ICONS), (s, b) -> {
+                for (ControlType value : Legacy4JClient.controlTypesManager.map().values())
+                    if (value.isKbm()) value.icons().put(s, b);
             });
-            addControllerIcons(resourceManager, FactoryAPI.createLocation(name, DEFAULT_CONTROLLER_ICONS),(s, b)->{
-                for (ControlType value : ControlType.types.values()) if (!value.isKbm()) value.getIcons().put(s, b);
+            addControllerIcons(resourceManager, FactoryAPI.createLocation(name, DEFAULT_CONTROLLER_ICONS), (s, b) -> {
+                for (ControlType value : Legacy4JClient.controlTypesManager.map().values())
+                    if (!value.isKbm()) value.icons().put(s, b);
             });
-            for (ControlType value : ControlType.types.values()) {
-                ResourceLocation location = FactoryAPI.createLocation(value.getId().getNamespace(),"control_tooltips/icons/%s.json".formatted(value.getId().getPath()));
-                if (value.isKbm()) addKbmIcons(resourceManager,location,value.getIcons()::put);
-                else addControllerIcons(resourceManager, location, value.getIcons()::put);
+            for (ControlType value : Legacy4JClient.controlTypesManager.map().values()) {
+                ResourceLocation location = FactoryAPI.createLocation(value.id().getNamespace(), "control_tooltips/icons/%s.json".formatted(value.id().getPath()));
+                if (value.isKbm()) addKbmIcons(resourceManager, location, value.icons()::put);
+                else addControllerIcons(resourceManager, location, value.icons()::put);
             }
 
-            String langKey = minecraft.getLanguageManager().getLanguage(minecraft.getLanguageManager().getSelected()) != null ? minecraft.getLanguageManager().getSelected() : "en_us";
-            resourceManager.getResource(FactoryAPI.createLocation(name,"keyboard_layout/%s.json".formatted(langKey))).ifPresent(LegacyResourceManager::setKeyboardLayout);
+            resourceManager.getResource(FactoryAPI.createLocation(name, "keyboard_layout/%s.json".formatted(langKey))).ifPresent(LegacyResourceManager::setKeyboardLayout);
         });
     }
 
@@ -157,7 +165,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             shiftBinding = obj.has("shiftBinding") ? ControllerBinding.map.get(obj.get("shiftBinding").getAsString()) : ControllerBinding.LEFT_STICK_BUTTON;
             obj.getAsJsonArray("layout").forEach(e->{
                 if (e instanceof JsonObject o){
-                    keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(GsonHelper.getAsInt(o,"width",25),GsonHelper.getAsString(o,"chars"),GsonHelper.getAsString(o,"shiftChars",null),JsonUtil.getJsonStringOrNull(o,"binding", ControllerBinding.map::get),JsonUtil.getJsonStringOrNull(o,"icon",FactoryAPI::createLocation),JsonUtil.getJsonStringOrNull(o,"soundEvent",s-> FactoryAPIPlatform.getRegistryValue(FactoryAPI.createLocation(s),BuiltInRegistries.SOUND_EVENT))));
+                    keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(GsonHelper.getAsInt(o,"width",25),GsonHelper.getAsString(o,"chars"),GsonHelper.getAsString(o,"shiftChars",null),IOUtil.getJsonStringOrNull(o,"binding", ControllerBinding.map::get),IOUtil.getJsonStringOrNull(o,"icon",FactoryAPI::createLocation),IOUtil.getJsonStringOrNull(o,"soundEvent",s-> FactoryAPIPlatform.getRegistryValue(FactoryAPI.createLocation(s),BuiltInRegistries.SOUND_EVENT))));
                 }else if (e instanceof JsonPrimitive p) keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(25,p.getAsString(),null,null,null,null));
             });
         } catch (IOException e) {
@@ -165,31 +173,26 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         }
     }
 
-    public static void addIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String,JsonObject> addIcon){
-        resourceManager.getResource(location).ifPresent(r->{
-            try {
-                GsonHelper.parse(r.openAsReader()).asMap().forEach((s,o)-> addIcon.accept(s,o.getAsJsonObject()));
+    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, ResourceLocation location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+        resourceManager.getResource(location).ifPresent(r -> {
+            try (BufferedReader reader = r.openAsReader()) {
+                codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", location, error)).ifPresent(charsIcons -> {
+                    for (ControlTooltip.CharsIcon charsIcon : charsIcons) {
+                        addIcon.accept(charsIcon.name(), charsIcon);
+                    }
+                });
             } catch (IOException e) {
                 Legacy4J.LOGGER.warn(e.getMessage());
             }
         });
     }
 
-    public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
-        addIcons(resourceManager,location,(s,o)->{
-            ControllerBinding<?> binding = ControllerBinding.map.get(s);
-            if (binding != null) addIcon.accept(s, ControlTooltip.LegacyIcon.create(()->binding.getMapped().state().pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)),()-> !binding.getMapped().state().isBlocked(), ControlType::getActiveControllerType, () -> {
-                if (Legacy4JClient.controllerManager.connectedController != null) binding.getMapped().state().nextUpdatePress();
-            }));
-        });
+    public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+        addIcons(resourceManager, location, ControlTooltip.ControllerIcon.LIST_CODEC, addIcon);
     }
 
-    public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
-        addIcons(resourceManager,location,(s,o)->{
-            InputConstants.Key key = InputConstants.getKey(s);
-            ControlTooltip.LegacyIcon icon = ControlTooltip.LegacyIcon.create(key, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)));
-            addIcon.accept(key.getName(), icon);
-        });
+    public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+        addIcons(resourceManager, location, ControlTooltip.KeyIcon.LIST_CODEC, addIcon);
     }
 
     public static void loadIntroLocations(ResourceManager resourceManager){

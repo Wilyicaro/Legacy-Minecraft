@@ -12,7 +12,7 @@ import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 public class RGBPreviewWidget extends AbstractButton {
     public RGBPreviewWidget(int x, int y, int width, int height) {
@@ -28,7 +28,7 @@ public class RGBPreviewWidget extends AbstractButton {
         alpha = active ? 1 : 0.8f;
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.RGB_PREVIEW, getX(), getY(), getWidth(), getHeight());
         guiGraphics.fill(getX() + 2, getY() + 2, getX() + getWidth() - 2, getY() + getHeight() - 2, ColorUtil.colorFromInt(LegacyOptions.controllerLedRed.get(), LegacyOptions.controllerLedGreen.get(), LegacyOptions.controllerLedBlue.get(), 255));
-        int color = ScreenUtil.getDefaultTextColor(!isHoveredOrFocused());
+        int color = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
         renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, color | Mth.ceil(alpha * 255.0f) << 24);
     }
 

@@ -27,7 +27,8 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ServerMenuCraftPayload;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +60,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
         if (!isValidIndex()) return;
-        ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, (u)->super.renderItem(graphics,i,j,f));
+        LegacyRenderUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, (u)->super.renderItem(graphics,i,j,f));
     }
 
     protected abstract boolean canCraft(RecipeInfo<R> rcp);
@@ -72,7 +73,13 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         else if (focusedRecipes == null) focusedRecipes = new ArrayList<>(getRecipes());
         return focusedRecipes == null ? getRecipes() : focusedRecipes;
     }
+
+    public void invalidateFocused() {
+        focusedRecipes = null;
+    }
+
     protected abstract List<RecipeInfo<R>> getRecipes();
+
     public abstract LegacyScrollRenderer getScrollRenderer();
     @Override
     public void setFocused(boolean bl) {
@@ -82,6 +89,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         }
         super.setFocused(bl);
     }
+
     @Override
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
         super.renderTooltip(minecraft, graphics, i, j);
@@ -90,10 +98,12 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         if (isHoveredTop) renderTooltip(minecraft,graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),i,j);
         if (isHoveredBottom) renderTooltip(minecraft,graphics, getFocusedRecipes().get(1).getResultItem(),i,j);
     }
+
     protected RecipeInfo<R> getFocusedRecipe(){
         if (selectionOffset > 0 && getFocusedRecipes().size() < 2 || selectionOffset < 0 && getFocusedRecipes().size() <= 2) selectionOffset = 0;
         return isValidIndex() ? getFocusedRecipes().get(getSelectionIndex()) : null;
     }
+
     protected ItemStack getFocusedResult(){
         return getFocusedRecipe() == null ? ItemStack.EMPTY : getFocusedRecipe().getResultItem() ;
     }
@@ -113,7 +123,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 renderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                 focusedRecipes = null;
             }
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         return false;
@@ -125,7 +135,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             selectionOffset = 0;
             toggleCraftableRecipes();
             updateRecipeDisplay();
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         int oldSelection = selectionOffset;
@@ -137,7 +147,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                     selectionOffset = Math.min(selectionOffset + 1, 1);
             }
             if (oldSelection != selectionOffset || canScroll()) {
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 if (oldSelection == selectionOffset && (compactMode || selectionOffset != 0))
                     Collections.rotate(getFocusedRecipes(), i == InputConstants.KEY_UP ? 1 : -1);
                 updateRecipeDisplay();
@@ -169,8 +179,8 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                     FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
                 graphics.pose().popPose();
                 if (getFocusedRecipes().size() >= 2){
-                    ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(),getX(),getY() + 27,false));
-                    if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),getX(),getY() - 27,false));
+                    LegacyRenderUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(),getX(),getY() + 27,false));
+                    if (getFocusedRecipes().size() >= 3) LegacyRenderUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),getX(),getY() - 27,false));
                 }
             }
             FactoryGuiGraphics.of(graphics).enableDepthTest();
@@ -199,7 +209,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         return false;
     }
     protected boolean isMouseOver(double d, double e, int selection){
-        return ScreenUtil.isMouseOver(d,e,getXCorner(),getYCorner() + selection * 27,getWidth(),getHeight());
+        return LegacyRenderUtil.isMouseOver(d,e,getXCorner(),getYCorner() + selection * 27,getWidth(),getHeight());
     }
 
     @Override
@@ -231,7 +241,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                     m.showedNotEnoughIngredientsHint = true;
                     LegacyTipManager.setActualTip(new LegacyTip(null,NOT_ENOUGH_INGREDIENTS));
                 }
-                ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
+                LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
             }
         }
     }

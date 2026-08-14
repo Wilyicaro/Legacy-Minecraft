@@ -31,7 +31,8 @@ import wily.legacy.client.PackAlbum;
 import wily.legacy.client.RemoteResourceAlbums;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -65,7 +66,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
-        super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
         LegacyOptions.resetAdvancedWorldOptions();
         this.isLocked = isLocked;
         this.parent = screen;
@@ -86,7 +87,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         });
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
-        (resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(accessor),getSelectedResourceAlbum(summary))).active = !this.isLocked;
+        (resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !LegacyRenderUtil.hasTooltipBoxes(accessor),getSelectedResourceAlbum(summary))).active = !this.isLocked;
     }
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource source) {
@@ -307,12 +308,12 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0,0.5f,0);
         FactoryGuiGraphics.of(guiGraphics).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(), iconX, iconY, 0,0, iconSize, iconSize, iconSize, iconSize);
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             guiGraphics.drawString(font, summary.getLevelName(), accessor.getInteger("nameText.x", panel.x + 48), accessor.getInteger("nameText.y", panel.y + 12), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.drawString(font, Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()), accessor.getInteger("creationText.x", panel.x + 48), accessor.getInteger("creationText.y", panel.y + 29), CommonColor.GRAY_TEXT.get(), false);
         });
         guiGraphics.pose().popPose();
-        if (!isLocked) ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font, Component.translatable("commands.seed.success",LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()), accessor.getInteger("seedText.x", panel.x + 13), accessor.getInteger("seedText.y", panel.y + 49), CommonColor.GRAY_TEXT.get(), false));
+        if (!isLocked) LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font, Component.translatable("commands.seed.success",LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()), accessor.getInteger("seedText.x", panel.x + 13), accessor.getInteger("seedText.y", panel.y + 49), CommonColor.GRAY_TEXT.get(), false));
     }
 
     @Override
@@ -321,7 +322,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         int iconSize = accessor.getInteger("saveIcon.size", 29);
         int iconX = accessor.getInteger("saveIcon.x", panel.x + 14);
         int iconY = accessor.getInteger("saveIcon.y", panel.y + 10);
-        if (ScreenUtil.isMouseOver(i,j, iconX, iconY, iconSize, iconSize)) guiGraphics.renderTooltip(font,Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
+        if (LegacyRenderUtil.isMouseOver(i,j, iconX, iconY, iconSize, iconSize)) guiGraphics.renderTooltip(font,Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, String levelId) {

@@ -36,7 +36,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected boolean expandedResetDimensionTooltip;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
-    protected final TabList tabList = new TabList(accessor).add(30, LegacyTabButton.Type.LEFT,Component.translatable("createWorld.tab.world.title"), t-> rebuildWidgets()).add(30, LegacyTabButton.Type.RIGHT,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
+    protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("createWorld.tab.world.title"), t -> rebuildWidgets()).add(LegacyTabButton.Type.RIGHT, Component.translatable("legacy.menu.game_options"), t -> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList(accessor);
 
@@ -66,7 +67,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()->tabList.selectedTab == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
+        renderer.addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()->tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
     }
 
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
@@ -284,8 +285,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
-        if (ScreenUtil.hasTooltipBoxes(accessor)) {
-            ScreenUtil.applySDFont(ignored -> tooltipBoxLabel = tooltip.toCharSequence(minecraft));
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
+            LegacyFontUtil.applySDFont(ignored -> tooltipBoxLabel = tooltip.toCharSequence(minecraft));
             expandedResetDimensionTooltip = !LegacyOptions.getUIMode().isSD() && tooltip instanceof ResetDimensionTooltip;
             int lineHeight = getTooltipLineHeight();
             int tooltipContentPadding = getTooltipContentPadding(expandedResetDimensionTooltip);
@@ -309,7 +310,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 Component.translatable("createWorld.tab.more.title"));
         advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent);
         renderableVLists.add(gameRenderables);
-        tabList.selectedTab = 1;
+        tabList.setSelected(1);
         GameRules gameRules = parent.summary.getSettings().gameRules();
         if (LegacyOptions.useLegacyWorldOptions()) initLegacyLoadSaveOptions(parent, gameRules);
         else initDefaultLoadSaveOptions(parent, gameRules);
@@ -388,7 +389,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private Tooltip tooltip(Component message) {
-        return ScreenUtil.hasTooltipBoxes(accessor) ? new MultilineTooltip(message, tooltipBox.getWidth() - 10) : Tooltip.create(message);
+        return LegacyRenderUtil.hasTooltipBoxes(accessor) ? new MultilineTooltip(message, tooltipBox.getWidth() - 10) : Tooltip.create(message);
     }
 
     private int getTooltipLineHeight() {
@@ -402,8 +403,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        if (ScreenUtil.hasTooltipBoxes(accessor)) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
             if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) {
                 tooltipBoxLabel = null;
                 expandedResetDimensionTooltip = false;
@@ -414,7 +415,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 int lineHeight = getTooltipLineHeight();
                 int tooltipContentPadding = getTooltipContentPadding(expandedResetDimensionTooltip);
                 scrollableRenderer.lineHeight = lineHeight;
-                ScreenUtil.applySDFont(ignored -> scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - tooltipContentPadding, ()-> {
+                LegacyFontUtil.applySDFont(ignored -> scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - tooltipContentPadding, ()-> {
                     for (int line = 0; line < tooltipBoxLabel.size(); line++) {
                         guiGraphics.drawString(font, tooltipBoxLabel.get(line), panel.x + panel.width + 3, panel.y + 13 + line * lineHeight, 0xFFFFFF);
                     }
@@ -441,7 +442,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public RenderableVList getRenderableVList() {
-        return renderableVLists.get(tabList.selectedTab);
+        return renderableVLists.get(tabList.getIndex());
     }
 
     @Override
@@ -454,7 +455,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public void renderableVListInit() {
-        if (ScreenUtil.hasTooltipBoxes(accessor)) tooltipBox.init();
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) tooltipBox.init();
         super.renderableVListInit();
     }
 

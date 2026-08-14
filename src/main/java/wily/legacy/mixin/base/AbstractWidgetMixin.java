@@ -18,7 +18,8 @@ import wily.legacy.client.CommonValue;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 @Mixin(AbstractWidget.class)
 public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder {
@@ -40,7 +41,7 @@ public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder
                 lastHovered = Util.getMillis();
             }
             if (!playedFocusSound && Util.getMillis() - lastHovered >= 10 && LegacyOptions.hoverFocusSound.get()) {
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
                 playedFocusSound = true;
             }
         } else {

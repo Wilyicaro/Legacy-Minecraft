@@ -24,7 +24,8 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
@@ -61,7 +62,7 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         imageHeight = sd ? 140 : 202;
         inventoryLabelX = sd ? 7 : 14;
         inventoryLabelY = sd ? 66 : 90;
-        ScreenUtil.applySDFont(ignored -> titleLabelX = (imageWidth - font.width(title)) / 2);
+        LegacyFontUtil.applySDFont(ignored -> titleLabelX = (imageWidth - font.width(title)) / 2);
         titleLabelY = sd ? 5 : 11;
         int slotsSize = sd ? 13 : 21;
         LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
@@ -113,7 +114,7 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        ScreenUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
+        LegacyFontUtil.applySDFont(ignored -> super.renderLabels(guiGraphics, i, j));
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)

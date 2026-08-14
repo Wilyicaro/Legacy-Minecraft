@@ -7,7 +7,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationThunk;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +47,7 @@ public class MultilineTooltip extends Tooltip {
 
     private static List<FormattedCharSequence> split(Component message, int width) {
         AtomicReference<List<FormattedCharSequence>> lines = new AtomicReference<>(List.of());
-        ScreenUtil.applySDFont(ignored -> lines.set(Minecraft.getInstance().font.split(message, width)));
+        LegacyFontUtil.applySDFont(ignored -> lines.set(Minecraft.getInstance().font.split(message, width)));
         return lines.get();
     }
 }

@@ -14,7 +14,8 @@ import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.Fluids;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.legacy.client.CommonColor;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.function.Consumer;
 
@@ -80,9 +81,9 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
         super.renderDefaultBackground(guiGraphics, i, j, f);
         int panelRecessY = accessor.getInteger("panelRecess.y", panel.y + 187);
         int panelRecessHeight = accessor.getInteger("panelRecess.height", 27);
-        ScreenUtil.renderPanelRecess(accessor, guiGraphics, "panelRecess", panel.x + 20, panelRecessY, 275, panelRecessHeight);
+        LegacyRenderUtil.renderPanelRecess(accessor, guiGraphics, "panelRecess", panel.x + 20, panelRecessY, 275, panelRecessHeight);
 
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             guiGraphics.drawString(this.font, this.title, panel.x + accessor.getInteger("title.x", (panel.width - font.width(title)) / 2), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false);
             Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", layerSlider.getObjectValue());
             int layerCountY = panelRecessY + accessor.getInteger("layerCount.y", (panelRecessHeight - font.lineHeight) / 2 + 1);

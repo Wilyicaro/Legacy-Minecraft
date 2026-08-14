@@ -44,7 +44,8 @@ import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerHostOptionsPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -156,7 +157,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             String listName = renderableVList.name == null ? "renderableVList" : renderableVList.name;
-            ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + accessor.getInteger(listName + ".buttonMessage.x", 68), this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true));
+            LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + accessor.getInteger(listName + ".buttonMessage.x", 68), this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true));
         }
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -258,7 +259,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         panel.render(guiGraphics,i,j,f);
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
-        ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,title,panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,title,panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 
     protected static float getDefaultOpacity() {

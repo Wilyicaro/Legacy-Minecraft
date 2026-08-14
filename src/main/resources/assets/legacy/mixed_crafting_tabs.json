@@ -1,0 +1,57 @@
+[
+  {
+    "id": "legacy:structures",
+    "name": {"translate": "legacy.container.tab.structures"},
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/structures",
+        "sd": "legacy:icon/structures_small"
+      }
+    }
+  },
+  {
+    "id": "legacy:mechanisms",
+    "name": {"translate": "legacy.container.tab.mechanisms"},
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/mechanisms",
+        "sd": "legacy:icon/mechanisms_small"
+      }
+    }
+  },
+  {
+    "id": "legacy:tools",
+    "name": {"translate": "legacy.container.tab.tools"},
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/tools",
+        "sd": "legacy:icon/tools_small"
+      }
+    }
+  },
+  {
+    "id": "legacy:misc",
+    "name": {"translate": "legacy.container.tab.misc"},
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/misc",
+        "sd": "legacy:icon/misc_small"
+      }
+    }
+  },
+  {
+    "id": "legacy:search",
+    "name": {"translate": "itemGroup.search"},
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/search",
+        "sd": "legacy:icon/search_small"
+      }
+    }
+  }
+]

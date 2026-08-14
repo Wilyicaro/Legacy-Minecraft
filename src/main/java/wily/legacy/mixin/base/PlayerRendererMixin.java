@@ -36,7 +36,7 @@ import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
@@ -77,7 +77,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     }
     @Inject(method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V", at = @At("TAIL"))
     private void extractRenderState(AbstractClientPlayer abstractClientPlayer, PlayerRenderState state, float f, CallbackInfo ci) {
-        if (!ScreenUtil.suppressInventoryElytraPose) return;
+        if (!LegacyRenderUtil.suppressInventoryElytraPose) return;
         state.isFallFlying = false;
         state.fallFlyingTimeInTicks = 0;
         state.shouldApplyFlyingYRot = false;

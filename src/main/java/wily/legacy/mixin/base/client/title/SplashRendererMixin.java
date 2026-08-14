@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 @Mixin(SplashRenderer.class)
 public class SplashRendererMixin {
@@ -22,7 +23,7 @@ public class SplashRendererMixin {
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
     public float renderTranslateY(float y) {
         float offset = LegacyOptions.getUIMode().isSD() ? -30 : 0;
-        if (ScreenUtil.hasMinecraftLogoResource()) offset += 8;
+        if (LegacyRenderUtil.hasMinecraftLogoResource()) offset += 8;
         return y + offset;
     }
 
@@ -38,10 +39,10 @@ public class SplashRendererMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     public void render(GuiGraphics guiGraphics, int i, Font font, int j, CallbackInfo ci) {
-        Legacy4JClient.legacyFont = false;
+        LegacyFontUtil.disableLegacyFont();
     }
     @Inject(method = "render", at = @At("RETURN"))
     public void renderReturn(GuiGraphics guiGraphics, int i, Font font, int j, CallbackInfo ci) {
-        Legacy4JClient.legacyFont = true;
+        LegacyFontUtil.enableLegacyFont();
     }
 }

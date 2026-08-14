@@ -39,7 +39,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
 import wily.legacy.client.RemoteResourceAlbums;
 import wily.legacy.client.screen.*;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,8 +81,8 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ /*CreateWorldCallback createWorldCallback, *//*?}*/ CallbackInfo ci){
         LegacyOptions.resetAdvancedWorldOptions();
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
-        panel = Panel.createPanel(this, p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
-        resourceAssortSelector = PackAlbum.Selector.creationResources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
+        panel = Panel.createPanel(this, p-> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
+        resourceAssortSelector = PackAlbum.Selector.creationResources(panel.x + 13, panel.y + 106, 220,45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
         legacyBiomeScale.set(WorldMoreOptionsScreen.getLegacyBiomeScalePreset(uiState.getWorldType().preset()));
     }
@@ -241,7 +242,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         if (onlineTickBox != null) onlineTickBox.updateValue();
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         resourceAssortSelector.renderTooltipBox(guiGraphics,panel);
         super.render(guiGraphics, i, j, f);
         UIAccessor accessor = UIAccessor.of(this);
@@ -264,7 +265,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Override
     public void onClose() {
-        ScreenUtil.playBackSound();
+        LegacySoundUtil.playBackSound();
         popScreen();
     }
 }

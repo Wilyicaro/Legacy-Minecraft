@@ -17,8 +17,8 @@ import wily.legacy.world.LegacyGeneratedChunks;
 @Mixin(ChunkMap.class)
 public class ChunkMapMixin {
     //? if <1.20.2 {
-    /*
-    @Inject(method = "isChunkInRange", at = @At("HEAD"), cancellable = true)
+    
+    /*@Inject(method = "isChunkInRange", at = @At("HEAD"), cancellable = true)
     private static void isWithinDistance(int i, int j, int k, int l, int m, CallbackInfoReturnable<Boolean> cir) {
         if (LegacyCommonOptions.squaredViewDistance.get()) cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(i, j, m, k, l, false));
     }

@@ -29,7 +29,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AdvancementToast.class)
 public abstract class AdvancementToastMixin implements Toast, AdvancementToastAccessor {
@@ -50,7 +50,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
         Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.getIcon()).getComponent());
         DisplayInfo displayInfo = this.advancement./*? if >1.20.1 {*/value().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
         width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3/2,font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
-        ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
+        LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
         if (displayInfo != null) {
             int i = displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/() == /*? if >1.20.1 {*/AdvancementType/*?} else {*//*FrameType*//*?}*/.CHALLENGE ? 0xFF88FF : 0xFFFF00;
 
@@ -69,7 +69,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
                 }
             }
             //?}
-            ScreenUtil.renderLocalPlayerAdvancementFace(guiGraphics,7, (height() - 32) / 2, 32);
+            LegacyRenderUtil.renderLocalPlayerAdvancementFace(guiGraphics,7, (height() - 32) / 2, 32);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
             //? if <1.21.2 {

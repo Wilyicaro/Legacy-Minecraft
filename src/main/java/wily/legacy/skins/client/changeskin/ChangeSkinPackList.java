@@ -10,7 +10,8 @@ import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -346,7 +347,7 @@ public final class ChangeSkinPackList {
 
         @Override
         public void renderString(GuiGraphics graphics, Font font, int color) {
-            ScreenUtil.applySDFont(ignored -> {
+            LegacyFontUtil.applySDFont(ignored -> {
                 String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
                 int centerX = getX() + getWidth() / 2;
                 int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;

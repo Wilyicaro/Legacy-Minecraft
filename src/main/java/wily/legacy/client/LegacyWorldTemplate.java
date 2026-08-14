@@ -22,7 +22,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.CreationList;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
 
 import java.io.*;
 import java.net.URI;
@@ -192,7 +192,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             list.clear();
-            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name-> resourceManager.getResource(FactoryAPI.createLocation(name, TEMPLATES)).ifPresent(r->{
+            IOUtil.getOrderedNamespaces(resourceManager).forEach(name-> resourceManager.getResource(FactoryAPI.createLocation(name, TEMPLATES)).ifPresent(r->{
                 try (BufferedReader bufferedReader = r.openAsReader()) {
                     JsonElement element = JsonParser.parseReader(bufferedReader);
                     if (element instanceof JsonObject obj) {

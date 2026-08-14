@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.FactoryAPI;
@@ -15,6 +16,7 @@ public class CommonValue<T> extends Stocker<T> {
 
     public final T defaultValue;
     public final Codec<T> codec;
+
     public CommonValue(T defaultValue, Codec<T> codec) {
         super(defaultValue);
         this.defaultValue = defaultValue;
@@ -32,13 +34,6 @@ public class CommonValue<T> extends Stocker<T> {
     public static final CommonValue<Float> LEGACY_FONT_DIM_FACTOR = registerCommonValue("legacy_font_dim_factor",0.0f, Codec.FLOAT);
     public static final CommonValue<Boolean> PS4_END_CRYSTAL_MODEL = registerCommonValue("ps4_end_crystal_model",false, Codec.BOOL);
     public static final CommonValue<Boolean> AUTOFOCUS_BUTTON_ANIMATION = registerCommonValue("autofocus_button_animation", false, Codec.BOOL);
-    public static final CommonValue<Double> SCALE_MULTIPLIER = registerCommonValue(FactoryAPI.createVanillaLocation("scale_multiplier"),new CommonValue<>(1.0d, Codec.DOUBLE){
-        @Override
-        public void set(Double obj) {
-            super.set(obj);
-            if (obj != 1) Minecraft.getInstance().execute(()->Minecraft.getInstance().resizeDisplay());
-        }
-    });
 
 
     public void parse(Dynamic<?> dynamic){
@@ -56,5 +51,9 @@ public class CommonValue<T> extends Stocker<T> {
     public static <T> CommonValue<T> registerCommonValue(ResourceLocation id, CommonValue<T> commonValue) {
         COMMON_VALUES.put(id, commonValue);
         return commonValue;
+    }
+
+    public <V> V encode(DynamicOps<V> ops) {
+        return codec.encodeStart(ops, get()).result().get();
     }
 }

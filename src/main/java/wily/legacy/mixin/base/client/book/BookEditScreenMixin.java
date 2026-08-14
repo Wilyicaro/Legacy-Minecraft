@@ -32,7 +32,8 @@ import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.function.Predicate;
 
@@ -155,7 +156,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     private Predicate<String> changeTextFieldHelperWidth(Predicate<String> predicate){
         return string -> {
             boolean[] allowed = {false};
-            ScreenUtil.applySDFont(ignored -> allowed[0] = string.length() < 2304 && this.font.wordWrapHeight(string, panel.splitWidth()) <= panel.editHeight());
+            LegacyFontUtil.applySDFont(ignored -> allowed[0] = string.length() < 2304 && this.font.wordWrapHeight(string, panel.splitWidth()) <= panel.editHeight());
             return allowed[0];
         };
     }
@@ -227,7 +228,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         super.render(guiGraphics, i, j, f);
-        ScreenUtil.applySDFont(ignored -> {
+        LegacyFontUtil.applySDFont(ignored -> {
             if (this.isSigning) {
                 boolean bl = this.frameTick / 6 % 2 == 0;
                 FormattedCharSequence formattedCharSequence = FormattedCharSequence.composite(FormattedCharSequence.forward(this.title, Style.EMPTY), bl ? BLACK_CURSOR : GRAY_CURSOR);

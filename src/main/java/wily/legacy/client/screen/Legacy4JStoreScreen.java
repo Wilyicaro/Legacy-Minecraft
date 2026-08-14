@@ -14,7 +14,8 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +107,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen {
             int y = accessor.getInteger("title.y", panelRecess.y + 8);
             int lineHeight = accessor.getInteger("title.lineHeight", LegacyOptions.getUIMode().isSD() ? 8 : 12);
             int titleWidth = accessor.getInteger("title.width", getRenderableVList().listWidth - 10);
-            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, sd -> {
+            LegacyFontUtil.applySDFont(sd -> {
                 int lineY = y;
                 for (FormattedCharSequence line : font.split(getTitle(), titleWidth)) {
                     guiGraphics.drawString(font, line, accessor.getInteger("title.x", panel.x + (panel.width - font.width(line)) / 2), lineY, CommonColor.GRAY_TEXT.get(), false);
@@ -119,8 +120,8 @@ public class Legacy4JStoreScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        ScreenUtil.renderLogo(guiGraphics);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderLogo(guiGraphics);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen {
             int size = blockSize * 3 + spacing * 2;
             int loadingX = accessor.getInteger("loadingIcon.x", panel.x + (panel.width - size) / 2);
             int loadingY = accessor.getInteger("loadingIcon.y", panel.y + 25 + (panel.height - 35 - size) / 2);
-            ScreenUtil.drawGenericLoading(guiGraphics, loadingX, loadingY, blockSize, spacing);
+            LegacyRenderUtil.drawGenericLoading(guiGraphics, loadingX, loadingY, blockSize, spacing);
         }
     }
 
@@ -156,7 +157,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen {
             int textY = getY() + list.accessor.getInteger(name + ".buttonMessage.yOffset", (getHeight() - font.lineHeight) / 2 + 1);
             int textRight = getX() + list.accessor.getInteger(name + ".buttonMessage.right", getWidth() - 12);
             int maxWidth = Math.max(0, textRight - textX);
-            Legacy4JClient.applyFontOverrideIf(LegacyOptions.getUIMode().isSD(), LegacyIconHolder.MOJANGLES_11_FONT, ignored -> {
+            LegacyFontUtil.applySDFont(ignored -> {
                 String text = getMessage() == null ? "" : getMessage().getString();
                 String clipped = font.width(text) <= maxWidth ? text : font.plainSubstrByWidth(text, Math.max(0, maxWidth - font.width("..."))) + "...";
                 guiGraphics.drawString(font, clipped, textX, textY, color, true);

@@ -30,7 +30,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,20 +46,21 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     public boolean isLoading = false;
-    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT, this::renderTabString,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE, this::renderTabString,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, this::renderJoinTabString,Component.translatable("legacy.menu.join"), b-> {
+    protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("legacy.menu.load"), b -> repositionElements()).add(LegacyTabButton.Type.MIDDLE, Component.translatable("legacy.menu.create"), b -> repositionElements()).add(LegacyTabButton.Type.RIGHT, this::renderJoinTabString, Component.translatable("legacy.menu.join"), b -> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
-        else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
-            @Override
-            protected void addButtons() {
-                renderableVList.addRenderable(Button.builder(SAFETY_CHECK, b-> {
-                    this.minecraft.options.skipMultiplayerWarning = true;
-                    this.minecraft.options.save();
-                    onClose();
-                }).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 52,200,20).build());
-                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"),b-> okAction.accept(this)).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
-            }
-        });
+        else
+            minecraft.setScreen(new ConfirmationScreen(this, SAFETY_TITLE, Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)) {
+                @Override
+                protected void addButtons() {
+                    renderableVList.addRenderable(Button.builder(SAFETY_CHECK, b -> {
+                        this.minecraft.options.skipMultiplayerWarning = true;
+                        this.minecraft.options.save();
+                        onClose();
+                    }).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 52, 200, 20).build());
+                    renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"), b -> okAction.accept(this)).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30, 200, 20).build());
+                }
+            });
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
     public final SaveRenderableList saveRenderableList = new SaveRenderableList(accessor);
@@ -70,13 +71,13 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
-        renderer.add(()-> tabList.selectedTab != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
+        renderer.add(()-> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
     }
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s-> Panel.createPanel(s, p-> p.appearance(300, Math.min(256, s.height - 52)), p-> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0))),Component.translatable("legacy.menu.play_game"));
         panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 18, panel.height - 18 - (hasStorageBar() ? 21 : 0)), p -> p.pos(panel.x + 9, panel.y + 9));
         this.parent = parent;
-        tabList.selectedTab = initialTab;
+        tabList.setSelected(initialTab);
         renderableVLists.clear();
         renderableVLists.add(saveRenderableList);
         renderableVLists.add(creationList);
@@ -88,7 +89,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     public boolean hasStorageBar() {
-        return tabList.selectedTab == 0 && accessor.getBoolean("storageBar.isVisible", LegacyOptions.getUIMode().isFHD());
+        return tabList.getIndex() == 0 && accessor.getBoolean("storageBar.isVisible", LegacyOptions.getUIMode().isFHD());
     }
 
     public PlayGameScreen(Screen parent) {
@@ -110,10 +111,6 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     protected boolean canNotifyOnlineFriends(){
         return serverRenderableList.hasOnlineFriends() && Util.getMillis() % 1000 < 500;
-    }
-
-    protected void renderTabString(LegacyTabButton tab, GuiGraphics guiGraphics, int i, int j, float f) {
-        tab.renderString(guiGraphics, font, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     protected void renderJoinTabString(LegacyTabButton tab, GuiGraphics guiGraphics, int i, int j, float f) {
@@ -143,7 +140,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void renderableVListInit() {
-        String listName = hasTabList() && tabList.selectedTab == 2 ? "serverRenderableVList" : "renderableVList";
+        String listName = hasTabList() && tabList.getIndex() == 2 ? "serverRenderableVList" : "renderableVList";
         getRenderableVList().init(listName, panel.x + 15,panel.y + 15,panel.width - 30, panel.height - 30 - (hasStorageBar() ? 21 : 0));
         if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,panel.width - 30, panel.height - 30 - (hasStorageBar() ? 21 : 0));
     }
@@ -161,7 +158,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         if (hasTabList()) tabList.render(guiGraphics,i,j,f);
         panel.render(guiGraphics,i,j,f);
         if (hasTabList()) tabList.renderSelected(guiGraphics,i,j,f);
@@ -185,19 +182,19 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                 guiGraphics.pose().popPose();
                 guiGraphics.disableScissor();
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
+            LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
         if (isLoading) {
             int blockSize = accessor.getInteger("loadingIcon.blockSize", LegacyOptions.getUIMode().isSD() ? 6 : 21);
             int spacing = accessor.getInteger("loadingIcon.spacing", LegacyOptions.getUIMode().isSD() ? 3 : 6);
             int size = blockSize * 3 + spacing * 2;
-            ScreenUtil.drawGenericLoading(guiGraphics, panelRecess.x + (panelRecess.width - size) / 2, panelRecess.y + (panelRecess.height - size) / 2, blockSize, spacing);
+            LegacyRenderUtil.drawGenericLoading(guiGraphics, panelRecess.x + (panelRecess.width - size) / 2, panelRecess.y + (panelRecess.height - size) / 2, blockSize, spacing);
         }
     }
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(hasTabList() ? tabList.selectedTab : 0);
+        return getRenderableVLists().get(hasTabList() ? tabList.getIndex() : 0);
     }
 
     @Override
@@ -238,16 +235,16 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             return true;
         }
         if (i == InputConstants.KEY_F5) {
-            if (tabList.selectedTab == 0) {
+            if (tabList.getIndex() == 0) {
                 saveRenderableList.reloadSaveList();
-            } else if (tabList.selectedTab == 2) {
+            } else if (tabList.getIndex() == 2) {
                 serverRenderableList.servers.load();
                 serverRenderableList.updateServers();
             }
             this.rebuildWidgets();
             return true;
         }
-        if (i == InputConstants.KEY_X && tabList.selectedTab == 2){
+        if (i == InputConstants.KEY_X && tabList.getIndex() == 2){
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
             minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 120, serverBox.getMessage(), Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
                 boolean released = false;
@@ -296,7 +293,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         return serverRenderableList.servers;
     }
     public void onFilesDrop(List<Path> list) {
-        if (tabList.selectedTab == 0) {
+        if (tabList.getIndex() == 0) {
             for (Path path : list) {
                 if (!path.getFileName().toString().endsWith(".mcsave") && !path.getFileName().toString().endsWith(".zip")) return;
             }

@@ -31,7 +31,8 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.*;
 
@@ -76,12 +77,12 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
     @Override
     protected void panelInit() {
         super.panelInit();
-        addRenderableOnly((guiGraphics, i, j, f) -> ScreenUtil.applySDFont(ignored -> guiGraphics.drawString(font,getTitle(),panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
+        addRenderableOnly((guiGraphics, i, j, f) -> LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(font,getTitle(),panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
     }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (minecraft.level == null) ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        if (minecraft.level == null) LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     protected void addFriendButtons(Runnable afterButtonsAdd){
@@ -113,7 +114,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                     }
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true));
+                        LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true));
                     }
                     @Override
                     public void onPress() {
@@ -218,7 +219,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.applySDFont(ignored -> ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true));
+            LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true));
         }
 
         @Override
