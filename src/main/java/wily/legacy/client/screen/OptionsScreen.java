@@ -619,6 +619,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.slowChunkLoading,
                                 LegacyOptions.fastLeavesWhenBlocked,
                                 LegacyOptions.fastLeavesCustomModels,
+                                LegacyOptions.legacyTorchModel,
                                 LegacyOptions.displayNameTagBorder,
                                 LegacyOptions.itemLightingInHand,
                                 LegacyOptions.enhancedItemTranslucency,
