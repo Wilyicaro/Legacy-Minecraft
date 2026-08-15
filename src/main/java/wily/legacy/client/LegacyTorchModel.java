@@ -194,8 +194,8 @@ public class LegacyTorchModel implements /*? if >=1.21.5 {*//*BlockModelPart*//*
         vertices[offset + 1] = Float.floatToRawIntBits(vertex.pos.y());
         vertices[offset + 2] = Float.floatToRawIntBits(vertex.pos.z());
         vertices[offset + 3] = -1;
-        vertices[offset + 4] = Float.floatToRawIntBits(particle.getU(/*? if >=1.21.3 {*//*vertex.u / 16.0F*//*?} else {*/vertex.u/*?}*/));
-        vertices[offset + 5] = Float.floatToRawIntBits(particle.getV(/*? if >=1.21.3 {*//*vertex.v / 16.0F*//*?} else {*/vertex.v/*?}*/));
+        vertices[offset + 4] = Float.floatToRawIntBits(particle.getU(/*? if >1.20.1 {*/vertex.u / 16.0F/*?} else {*//*vertex.u*//*?}*/));
+        vertices[offset + 5] = Float.floatToRawIntBits(particle.getV(/*? if >1.20.1 {*/vertex.v / 16.0F/*?} else {*//*vertex.v*//*?}*/));
     }
 
     private static Vertex p(double x, double y, double z, float u, float v) {

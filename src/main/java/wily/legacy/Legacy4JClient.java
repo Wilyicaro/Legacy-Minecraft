@@ -750,7 +750,7 @@ public class Legacy4JClient {
     }
 
     public static /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ getBlockModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ model){
-        /*? if >=1.21.5 {*//*BlockStateModel*//*?} else {*/BakedModel/*?}*/ torchModel = LegacyTorchModel.get(blockState, model);
+        /*? if >=1.21.5 {*//*BlockStateModel*//*?} else {*/BakedModel/*?}*/ torchModel = LegacyOptions.legacyTorchModel.get() ? LegacyTorchModel.get(blockState, model) : model;
         if (torchModel != model) return torchModel;
 
         boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
