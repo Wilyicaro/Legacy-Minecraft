@@ -95,6 +95,7 @@ public class LegacyRenderUtil {
     @Nullable
     public static Integer tooltipTextColorOverride;
     public static boolean tooltipTextColorOverrideForcesStyle;
+    public static boolean autoFocusedWidget;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
     public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
     public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
@@ -476,6 +477,10 @@ public class LegacyRenderUtil {
     public static boolean canDisplayHUD() {
         int hudDelay = LegacyOptions.hudDelay.get();
         return mc.screen == null && (hudDelay == 0 || Util.getMillis() - LegacyGuiElements.lastGui > hudDelay);
+    }
+
+    public static boolean hasAutoFocusButtonAnimation() {
+        return autoFocusedWidget && CommonValue.AUTOFOCUS_BUTTON_ANIMATION.get();
     }
 
     public static void renderContainerEffects(GuiGraphics guiGraphics, int leftPos, int topPos, int imageWidth, int imageHeight, int mouseX, int mouseY) {
