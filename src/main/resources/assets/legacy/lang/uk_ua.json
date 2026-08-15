@@ -2162,6 +2162,7 @@
   "legacy.options.legacySettingsMenus": "Старі налаштування меню",
   "legacy.options.legacySignScreen": "Legacy екран табличок",
   "legacy.options.legacySkyShape": "Legacy вигляд неба",
+  "legacy.options.legacyTorchModel": "Legacy Torch Model",
   "legacy.options.legacySmithingScreen": "Legacy екран ковальства",
   "legacy.options.legacySwordBlocking": "Legacy захист мечем",
   "legacy.options.legacyTitleScreen": "Legacy титульний екран",
