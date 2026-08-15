@@ -674,7 +674,7 @@ public class Legacy4JClient {
         BlockStateModel featureModel = LegacyChunkLoading.getFeatureModel(pos, blockState, model);
         if (featureModel != model) return featureModel;
 
-        BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
+        BlockStateModel torchModel = LegacyOptions.legacyTorchModel.get() ? LegacyTorchModel.get(blockState, model) : model;
         if (torchModel != model) return torchModel;
 
         boolean fastGraphics = !Minecraft.getInstance().options.cutoutLeaves().get();
