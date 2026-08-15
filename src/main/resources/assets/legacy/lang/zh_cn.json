@@ -2162,6 +2162,7 @@
   "legacy.options.legacySettingsMenus": "Legacy Settings Menus",
   "legacy.options.legacySignScreen": "Legacy Sign Screen",
   "legacy.options.legacySkyShape": "旧版天空形状",
+  "legacy.options.legacyTorchModel": "Legacy Torch Model",
   "legacy.options.legacySmithingScreen": "旧版锻造界面",
   "legacy.options.legacySwordBlocking": "旧版剑盾格挡",
   "legacy.options.legacyTitleScreen": "旧版标题界面",
