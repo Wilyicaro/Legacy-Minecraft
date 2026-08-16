@@ -113,6 +113,7 @@ import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
+import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
 import org.lwjgl.glfw.GLFW;
@@ -428,7 +429,10 @@ public class Legacy4JClient {
                 controllerManager.enableCursorAndScheduleReset();
             if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
-                if (path != null) path.applyFocus(true);
+                if (path != null) {
+                    path.applyFocus(true);
+                    LegacyRenderUtil.autoFocusedWidget = true;
+                }
             }
         }
         controllerManager.resetCursor();
@@ -668,7 +672,7 @@ public class Legacy4JClient {
         BlockStateModel featureModel = LegacyChunkLoading.getFeatureModel(pos, blockState, model);
         if (featureModel != model) return featureModel;
 
-        BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
+        BlockStateModel torchModel = LegacyOptions.legacyTorchModel.get() ? LegacyTorchModel.get(blockState, model) : model;
         if (torchModel != model) return torchModel;
 
         boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;

@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractButton.class)
@@ -42,9 +45,24 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         return LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
     }
 
+    @Unique
+    private void legacy$renderAutoFocusButtonBase(GuiGraphics guiGraphics) {
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0F, 1.0F, 1.0F, this.alpha);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BUTTON, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+        float timer = (Util.getMillis() % 1200) / 1200.0f;
+        alpha *= 0.5f + (timer >= 0.5f ? 1 - timer : timer);
+    }
+
     @Inject(method = "renderWidget", at = @At("HEAD"))
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         alpha = active ? 1 : 0.8f;
+        if (LegacyRenderUtil.hasAutoFocusButtonAnimation()) legacy$renderAutoFocusButtonBase(guiGraphics);
+    }
+
+    @Inject(method = "renderWidget", at = @At("RETURN"))
+    protected void renderWidgetReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        if (LegacyRenderUtil.hasAutoFocusButtonAnimation()) alpha = active ? 1 : 0.8f;
     }
 
     @Redirect(method = "renderWidget", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
