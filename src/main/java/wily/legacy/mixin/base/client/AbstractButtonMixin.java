@@ -1,24 +1,23 @@
 package wily.legacy.mixin.base.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Util;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.CommonValue;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractButton.class)
@@ -57,4 +56,18 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         return true;
     }
 
+    @Inject(method = "renderDefaultSprite", at = @At("HEAD"))
+    protected void renderDefaultSpriteHead(GuiGraphics graphics, CallbackInfo ci) {
+        if (LegacyRenderUtil.hasAutoFocusButtonAnimation()) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BUTTON, this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
+            float timer = (Util.getMillis() % 1200) / 1200.0f;
+            alpha *= 0.5f + (timer >= 0.5f ? 1 - timer : timer);
+        }
+    }
+
+    @Inject(method = "renderDefaultSprite", at = @At("RETURN"))
+    protected void renderDefaultSpriteReturn(GuiGraphics graphics, CallbackInfo ci) {
+        if (LegacyRenderUtil.hasAutoFocusButtonAnimation())
+            alpha = active ? 1 : 0.8f;
+    }
 }
