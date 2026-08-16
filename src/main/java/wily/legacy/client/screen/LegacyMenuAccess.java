@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -16,81 +15,135 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.Comparator;
 
 public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Event {
-    default void movePointerToSlotIn(ScreenDirection direction){
-        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || findHoveredSlot() == null) return;
+
+    default boolean movePointerToSlotIn(ScreenDirection direction) {
+        return movePointerToSlotIn(direction, false, false);
+    }
+
+    default boolean movePointerToSlotIn(ScreenDirection direction, boolean allowCyclic, boolean needsHovered) {
+        if (getMenu().slots.isEmpty() || findHoveredSlot() == null && needsHovered)
+            return false;
         double pointerX = Legacy4JClient.controllerManager.getPointerX();
         double pointerY = Legacy4JClient.controllerManager.getPointerY();
         int height = getRectangle().height();
         int width = getRectangle().width();
         boolean horizontal = direction.getAxis() == ScreenAxis.HORIZONTAL;
         boolean positive = direction.isPositive();
-        if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0),false)) return;
-        int part = getMenu().slots.stream().map(s->Math.round(LegacyRenderUtil.iconHolderRenderer.slotBounds(s).getMinSize() / 2f)).sorted().findFirst().orElse(9);
+        if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0), false)) return true;
+        int part = getMenu().slots.stream().map(s -> Math.round(LegacyRenderUtil.iconHolderRenderer.slotBounds(s).getMinSize() / 2f)).sorted().findFirst().orElse(9);
         double r = horizontal ? height - pointerY : width - pointerX;
         double l = (horizontal ? pointerY : pointerX);
-        for (int i = 0; i < Math.max(r,l); i+=part) {
-            if (i <= r && movePointerToSlotIn(positive, horizontal, horizontal ? width : height, i, (int) pointerX, (int) pointerY, part)) return;
-            if (i <= l && movePointerToSlotIn(positive, horizontal, horizontal ? width : height, -i, (int) pointerX, (int) pointerY, part)) return;
+        for (int i = 0; i < Math.max(r, l); i += part) {
+            if (i <= r && movePointerToSlotIn(positive, horizontal, horizontal ? width : height, i, (int) pointerX, (int) pointerY, part))
+                return true;
+            if (i <= l && movePointerToSlotIn(positive, horizontal, horizontal ? width : height, -i, (int) pointerX, (int) pointerY, part))
+                return true;
         }
-        for (int i = 0; i < Math.max(r,l); i+=part) {
-            if (i <= r && movePointerToSlotInReverse(positive, horizontal, horizontal ? width : height, i, (int) pointerX, (int) pointerY, part)) return;
-            if (i <= l && movePointerToSlotInReverse(positive, horizontal, horizontal ? width : height, -i, (int) pointerX, (int) pointerY, part)) return;
+        if (allowCyclic) {
+            for (int i = 0; i < Math.max(r, l); i += part) {
+                if (i <= r && movePointerToSlotInReverse(positive, horizontal, horizontal ? width : height, i, (int) pointerX, (int) pointerY, part))
+                    return true;
+                if (i <= l && movePointerToSlotInReverse(positive, horizontal, horizontal ? width : height, -i, (int) pointerX, (int) pointerY, part))
+                    return true;
+            }
         }
 
+        return false;
     }
-    default boolean movePointerToSlotIn(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
+
+    default boolean movePointerToSlotIn(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part) {
         if (positive) {
-            for (int j = part * 2; j < size - (horizontal ? pointerX : pointerY); j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
+            for (int j = part * 2; j < size - (horizontal ? pointerX : pointerY); j += part)
+                if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)), false))
+                    return true;
         } else {
-            for (int j = -part * 2; j >= -(horizontal ? pointerX : pointerY); j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
-        } return false;
+            for (int j = -part * 2; j >= -(horizontal ? pointerX : pointerY); j -= part)
+                if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)), false))
+                    return true;
+        }
+        return false;
     }
-    default boolean movePointerToSlotInReverse(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
+
+    default boolean movePointerToSlotInReverse(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part) {
         if (positive) {
-            for (int j = -(horizontal ? pointerX : pointerY) + part * 2; j < 0; j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
+            for (int j = -(horizontal ? pointerX : pointerY) + part * 2; j < 0; j += part)
+                if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)), false))
+                    return true;
         } else {
-            for (int j = size -(horizontal ? pointerX : pointerY) - part * 2; j >= 0; j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
-        } return false;
+            for (int j = size - (horizontal ? pointerX : pointerY) - part * 2; j >= 0; j -= part)
+                if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)), false))
+                    return true;
+        }
+        return false;
     }
-    default boolean movePointerToSlot(Slot s){
-        return movePointerToSlot(s,true);
+
+    default boolean movePointerToSlot(Slot s) {
+        return movePointerToSlot(s, true);
     }
-    default boolean movePointerToSlot(Slot s, boolean allowHovered){
-        if (s == null || (!allowHovered && s == findHoveredSlot()) || !LegacySlotDisplay.isVisibleAndActive(s)) return false;
-        Minecraft minecraft = Minecraft.getInstance();
+
+    default boolean movePointerToSlot(Slot s, boolean allowHovered) {
+        if (s == null || (!allowHovered && s == findHoveredSlot()) || !LegacySlotDisplay.isVisibleAndActive(s))
+            return false;
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
         Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX(), holder.getMiddleY());
         return true;
     }
-    default void movePointerToNextSlot(){
-        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null) return;
+
+    default void movePointerToNextSlot() {
+        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null)
+            return;
         double pointerX = Legacy4JClient.controllerManager.getPointerX();
         double pointerY = Legacy4JClient.controllerManager.getPointerY();
         if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0))) return;
-        getMenu().slots.stream().min(Comparator.comparingInt(s->{
-            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(),getMenuRectangle().top(),s);
+        getMenu().slots.stream().min(Comparator.comparingInt(s -> {
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
             double deltaX = pointerX - holder.getMiddleX();
             double deltaY = pointerY - holder.getMiddleY();
-            return (int) (deltaX *deltaX + deltaY * deltaY);
+            return (int) (deltaX * deltaX + deltaY * deltaY);
         })).ifPresent(this::movePointerToSlot);
     }
+
     ScreenRectangle getMenuRectangle();
+
+    ScreenRectangle getMenuRectangleLimit();
+
+    static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height) {
+        return createMenuRectangleLimit(menu, x, y, width, height, 20, 10);
+    }
+
+    static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height, int paddingH, int paddingV) {
+        if (menu instanceof TabList.Access tabList) {
+            x -= tabList.getTabXOffset();
+            width += tabList.getTabXOffset();
+            y -= tabList.getTabYOffset();
+            height += tabList.getTabYOffset();
+        }
+        return new ScreenRectangle(x - paddingH, y - paddingV, width + paddingH * 2, height + paddingV * 2);
+    }
+
     boolean isOutsideClick(int i);
+
     Slot getHoveredSlot();
-    default Slot findSlotAt(double d, double e){
+
+    default Slot findSlotAt(double d, double e) {
+        ScreenRectangle rectangle = getMenuRectangle();
         for (Slot slot : getMenu().slots)
-            if (LegacyRenderUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
+            if (LegacyRenderUtil.isHovering(slot, rectangle.left(), rectangle.top(), d, e)) return slot;
         return null;
     }
-    default Slot findHoveredSlot(){
-        return findSlotAt(Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY());
+
+    default Slot findHoveredSlot() {
+        return findSlotAt(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY());
     }
-    default int getTipXDiff(){
+
+    default int getTipXOffset() {
         return -132;
     }
-    default boolean allowItemPopping(){
+
+    default boolean allowItemPopping() {
         return false;
     }
+
     default boolean isMouseDragging() {
         return false;
     }

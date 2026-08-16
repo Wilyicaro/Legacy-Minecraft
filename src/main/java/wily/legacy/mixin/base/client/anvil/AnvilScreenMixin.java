@@ -133,14 +133,12 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
         this.name = new EditBox(this.font, leftPos + (sd ? 47 : 72), topPos + (sd ? 16 : 26), sd ? 70 : 120, sd ? 13 : 18, Component.translatable("container.repair"));
-        this.name.setCanLoseFocus(false);
         this.name.setTextColor(-1);
         this.name.setTextColorUneditable(-1);
         this.name.setMaxLength(50);
         this.name.setResponder(this::onNameChanged);
         this.name.setValue("");
         this.addWidget(this.name);
-        this.setInitialFocus(this.name);
         this.name.setEditable(this.menu.getSlot(0).hasItem());
     }
 

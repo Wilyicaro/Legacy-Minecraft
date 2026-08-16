@@ -821,7 +821,7 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.disableDepthTest();
             FactoryScreenUtil.enableBlend();
             graphics.pose().pushPose();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getVisualPointerY(), 4000);
+            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXOffset(), Legacy4JClient.controllerManager.getVisualPointerY(), 4000);
             FactoryGuiGraphics.of(graphics).blitSprite(mc.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             FactoryScreenUtil.disableBlend();

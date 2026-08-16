@@ -208,7 +208,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     }
 
     @Override
-    public int getTipXDiff() {
+    public int getTipXOffset() {
         return -186;
     }
 

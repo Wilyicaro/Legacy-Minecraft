@@ -490,11 +490,13 @@ public class Legacy4JClient {
             /*screen.setFocused(null);
             *///?}
         }
-        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.connectedController != null || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
+        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.isControllerTheLastInput() || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
             Controller.Event e = Controller.Event.of(screen);
-            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways()) controllerManager.disableCursor();
-            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways())) controllerManager.enableCursorAndScheduleReset();
-            if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
+            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways())
+                controllerManager.tryDisableCursor();
+            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways()))
+                controllerManager.enableCursorAndScheduleReset();
+            if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                 if (path != null) {
                     path.applyFocus(true);
