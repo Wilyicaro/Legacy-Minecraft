@@ -219,7 +219,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             unlocked = (a = getAdvancements().get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
             if (lastUnlocked == unlocked && ((AbstractWidgetAccessor) this).getTooltip().get() != null) return;
             Component progressText = p == null || p.getProgressText() == null ? null : p.getProgressText();
-            setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(), progressText.getVisualOrderText())));
+                    setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : Tooltip.create(info.getDescription().copy().append("\n").append(progressText)));
         }
 
         public boolean isUnlocked() {
