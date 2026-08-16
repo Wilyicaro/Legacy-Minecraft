@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
@@ -86,10 +87,10 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
         }
 
         public ItemStack nextItem() {
-            return nextItem(inventory, i-> i.getItem() instanceof BannerItem && Legacy4J.getItemPatternsCount(i) < 6);
+            return nextItem(inventory, i-> i.getItem() instanceof BannerItem && LegacyItemUtil.getPatternsCount(i) < 6);
         }
         public ItemStack previousItem() {
-            return previousItem(inventory, i-> i.getItem() instanceof BannerItem && Legacy4J.getItemPatternsCount(i) < 6);
+            return previousItem(inventory, i-> i.getItem() instanceof BannerItem && LegacyItemUtil.getPatternsCount(i) < 6);
         }
         public boolean applyNextItemIfAbsent() {
             return true;
@@ -389,7 +390,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
 
             protected boolean canCraft(RecipeInfo<BannerRecipe> rcp) {
                 if (rcp == null) return true;
-                return Legacy4J.getItemPatternsCount(previewStack) < 6 && LegacyLoomScreen.this.canCraft(rcp.get().displayIngredients(), isFocused() && getFocusedRecipe() == rcp) && LegacyLoomScreen.this.canCraft(rcp.get().previewIngredients, false);
+                return LegacyItemUtil.getPatternsCount(previewStack) < 6 && LegacyLoomScreen.this.canCraft(rcp.get().displayIngredients(), isFocused() && getFocusedRecipe() == rcp) && LegacyLoomScreen.this.canCraft(rcp.get().previewIngredients, false);
             }
 
             protected List<RecipeInfo<BannerRecipe>> getRecipes() {
@@ -549,11 +550,12 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
             int titleY = bottomPanelY + accessor.getInteger("craftingTitle.y", 11);
             LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             if (craftingTabList.getIndex() == 0){
-                List<Component> list = LegacyRenderUtil.getTooltip(resultStack);
                 int descriptionPanelWidth = accessor.getInteger("descriptionPanel.width", 163);
                 int descriptionPanelHeight = accessor.getInteger("descriptionPanel.height", 93);
                 int descriptionTextX = accessor.getInteger("descriptionText.x", 4);
                 int descriptionTextY = accessor.getInteger("descriptionText.y", 7);
+                int descriptionTextWidth = descriptionPanelWidth - descriptionTextX * 2;
+                List<FormattedCharSequence> list = LegacyRenderUtil.getTooltip(resultStack, descriptionTextWidth);
                 LegacyFontUtil.applySDFont(sdFont -> {
                     int lineSpacing = sdFont ? 8 : 12;
                     int lineAmount = (descriptionPanelHeight - descriptionTextY * 2 - 7) / lineSpacing;
@@ -561,7 +563,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
                     scrollableRenderer.scrolled.max = Math.max(0,list.size() - lineAmount);
                     scrollableRenderer.render(guiGraphics,leftPos + accessor.getInteger("descriptionPanel.x", 176) + descriptionTextX, topPos + accessor.getInteger("descriptionPanel.y", 8) + descriptionTextY, descriptionPanelWidth - descriptionTextX * 2, lineAmount * lineSpacing,()->{
                         for (int i1 = 0; i1 < list.size(); i1++) {
-                            guiGraphics.drawString(font, list.get(i1).copy().setStyle(Style.EMPTY), leftPos + accessor.getInteger("descriptionPanel.x", 176) + descriptionTextX, topPos + accessor.getInteger("descriptionPanel.y", 8) + descriptionTextY + i1 * lineSpacing, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                            FormattedCharSequence sequence = list.get(i1);
+                            guiGraphics.drawString(font, sink -> sequence.accept((i2, style, j1) -> sink.accept(i2, Style.EMPTY, j1)), leftPos + accessor.getInteger("descriptionPanel.x", 176) + descriptionTextX, topPos + accessor.getInteger("descriptionPanel.y", 8) + descriptionTextY + i1 * lineSpacing, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                         }
                     });
                 });

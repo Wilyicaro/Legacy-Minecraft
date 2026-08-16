@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4J;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin({Wolf.class, Cat.class})
 public class TamableAnimalCollarDyeMixin {
@@ -31,8 +32,8 @@ public class TamableAnimalCollarDyeMixin {
         TamableAnimal animal = (TamableAnimal) (Object) this;
         if (!animal.isTame() || !animal.isOwnedBy(player)) return;
         ItemStack item = player.getItemInHand(hand);
-        DyeColor color = Legacy4J.getDyeColorOrNull(item.getItem());
-        if (color == null || item.getItem() == Legacy4J.getDyeItem(color) || !legacy$canDyeCollar(color)) return;
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(item.getItem());
+        if (color == null || item.getItem() == LegacyItemUtil.getDyeItem(color) || !legacy$canDyeCollar(color)) return;
         animal.level().playSound(player, animal, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
         if (!animal.level().isClientSide()) {
             legacy$setCollarColor(color);

@@ -3,8 +3,7 @@ package wily.legacy.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import wily.legacy.mixin.base.MusicManagerAccessor;
-import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.mixin.base.client.MusicManagerAccessor;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.HashMap;

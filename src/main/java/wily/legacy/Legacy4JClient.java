@@ -124,6 +124,7 @@ import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.skins.SkinsClientBootstrap;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacyGuiElements;
@@ -490,11 +491,13 @@ public class Legacy4JClient {
             /*screen.setFocused(null);
             *///?}
         }
-        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.connectedController != null || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
+        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.isControllerTheLastInput() || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
             Controller.Event e = Controller.Event.of(screen);
-            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways()) controllerManager.disableCursor();
-            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways())) controllerManager.enableCursorAndScheduleReset();
-            if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
+            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways())
+                controllerManager.tryDisableCursor();
+            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways()))
+                controllerManager.enableCursorAndScheduleReset();
+            if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                 if (path != null) {
                     path.applyFocus(true);
@@ -548,12 +551,12 @@ public class Legacy4JClient {
             if (Minecraft.getInstance().getConnection() == null) return ItemStack.EMPTY;
             return Raid./*? >=1.21.2 {*/ /*getOminousBannerInstance*//*?} else {*/getLeaderBannerInstance/*?}*/(/*? if >=1.20.5 {*/Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN)/*?}*/);
         });
-        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_potion"), ()-> Legacy4J.createDecayPotion(Items.POTION));
-        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_splash_potion"), ()-> Legacy4J.createDecayPotion(Items.SPLASH_POTION));
-        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_lingering_potion"), ()-> Legacy4J.createDecayPotion(Items.LINGERING_POTION));
-        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_tipped_arrow"), Legacy4J::createDecayTippedArrow);
+        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_potion"), ()-> LegacyItemUtil.createDecayPotion(Items.POTION));
+        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_splash_potion"), ()-> LegacyItemUtil.createDecayPotion(Items.SPLASH_POTION));
+        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_lingering_potion"), ()-> LegacyItemUtil.createDecayPotion(Items.LINGERING_POTION));
+        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("decay_tipped_arrow"), LegacyItemUtil::createDecayTippedArrow);
         //? if <1.21.4 {
-        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("mushroom_pore"), Legacy4J::createMushroomPore);
+        DynamicUtil.COMMON_ITEMS.put(Legacy4J.createModLocation("mushroom_pore"), LegacyItemUtil::createMushroomPore);
         //?}
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyTipManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);

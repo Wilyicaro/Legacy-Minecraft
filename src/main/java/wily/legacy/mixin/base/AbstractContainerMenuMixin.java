@@ -17,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
 import wily.legacy.init.LegacyGameRules;
-
-import static wily.legacy.Legacy4J.canRepair;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class AbstractContainerMenuMixin {
@@ -38,17 +37,17 @@ public abstract class AbstractContainerMenuMixin {
         Slot slot;
         if (i >= 0 && i < slots.size()) {
             slot = slots.get(i);
-            if (clickType == ClickType.PICKUP && isLegacyOffhandSlot(slot, player) && !getCarried().isEmpty() && !Legacy4J.canGoInLceOffhand(getCarried())) {
+            if (clickType == ClickType.PICKUP && isLegacyOffhandSlot(slot, player) && !getCarried().isEmpty() && !LegacyItemUtil.canGoInLceOffhand(getCarried())) {
                 ci.cancel();
                 return;
             }
-            if (clickType == ClickType.SWAP && ((j == 40 && !Legacy4J.canGoInLceOffhand(slot.getItem()) && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS)) || (j >= 0 && j < 9 && isLegacyOffhandSlot(slot, player) && !Legacy4J.canGoInLceOffhand(player.getInventory().getItem(j))))) {
+            if (clickType == ClickType.SWAP && ((j == 40 && !LegacyItemUtil.canGoInLceOffhand(slot.getItem()) && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS)) || (j >= 0 && j < 9 && isLegacyOffhandSlot(slot, player) && !LegacyItemUtil.canGoInLceOffhand(player.getInventory().getItem(j))))) {
                 ci.cancel();
                 return;
             }
         }
         if ((clickType == ClickType.PICKUP || clickType == ClickType.QUICK_MOVE) && j == 1 && i >= 0 && i < slots.size() && (slot = slots.get(i)).hasItem() && !getCarried().isEmpty()){
-            if (canRepair(slot.getItem(),getCarried())) {
+            if (LegacyItemUtil.canRepair(slot.getItem(),getCarried())) {
                 ItemStack item = slot.getItem().getItem().getDefaultInstance();
                 item.setDamageValue(slot.getItem().getDamageValue() - (item.getMaxDamage() - getCarried().getDamageValue()));
                 slot.set(item);
@@ -56,9 +55,9 @@ public abstract class AbstractContainerMenuMixin {
                     setCarried(ItemStack.EMPTY);
                 ci.cancel();
             } else {
-                DyeColor color = Legacy4J.getDyeColorOrNull(getCarried().getItem());
-                if (Legacy4J.isDyeableItem(slot.getItem().getItemHolder()) && color != null) {
-                    Legacy4J.dyeItem(slot.getItem(), Legacy4J.getDyeColor(color));
+                DyeColor color = LegacyItemUtil.getDyeColorOrNull(getCarried().getItem());
+                if (LegacyItemUtil.isDyeableItem(slot.getItem().getItemHolder()) && color != null) {
+                    LegacyItemUtil.dyeItem(slot.getItem(), LegacyItemUtil.getDyeColor(color));
                     slot.setChanged();
                     if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
                         getCarried().shrink(1);

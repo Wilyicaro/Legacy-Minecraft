@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.network.chat.Component;
@@ -120,7 +121,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             unlocked = (a = getAdvancements()/*? if <=1.20.1 {*//*.getAdvancements()*//*?}*/.get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
             if (lastUnlocked == unlocked && getTooltip() != null) return;
             Component progressText = p == null || p .getProgressText() == null ? null : /*? if >1.20.1 {*/p.getProgressText()/*?} else {*//*Component.literal(p.getProgressText())*//*?}*/;
-            setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(),progressText.getVisualOrderText())));
+            setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : Tooltip.create(info.getDescription().copy().append("\n").append(progressText)));
         }
 
         public boolean isUnlocked(){
@@ -255,7 +256,13 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     public static /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/ getActualAdvancements(){
         return Legacy4JClient.hasModOnServer() ? ClientAdvancementsPayload.advancements : getAdvancements(). /*? if >1.20.1 {*/getTree/*?} else {*//*getAdvancements*//*?}*/();
     }
+
     public static ClientAdvancements getAdvancements(){
         return Minecraft.getInstance().getConnection().getAdvancements();
     }
+
+    public static Screen getActualAdvancementsScreenInstance(Screen parent) {
+        return LegacyOptions.legacyAdvancements.get() ? new LegacyAdvancementsScreen(parent) : new AdvancementsScreen(getAdvancements()/*? if >1.20.4 {*/, parent/*?}*/);
+    }
+
 }

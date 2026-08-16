@@ -2023,6 +2023,7 @@
   "legacy.weather_state.clear": "Clear",
   "legacy.weather_state.rain": "Rain",
   "legacy.weather_state.thunder": "Thunder",
+  "menu.shareToLan.description": "When enabled, the game will be shared with other players on your local network.",
   "stat.legacy.days_played": "Days Played",
   "legacy.skinpack.type.author": "Skin Pack by %s",
   "legacy.skinpack.type.community": "Community Skin Pack",

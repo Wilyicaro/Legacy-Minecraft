@@ -63,7 +63,6 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         };
     }
 
-
     public LegacyIconHolder(int leftPos, int topPos, Slot slot){
         slotBounds(leftPos, topPos, slot);
     }
@@ -85,11 +84,6 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void setPos(int x, int y){
         setX(x);
         setY(y);
-    }
-
-    @Override
-    public boolean isHovered(double mouseX, double mouseY) {
-        return isHovered;
     }
 
     public LegacyIconHolder slotBoundsWithItem(int leftPos, int topPos, Slot slot){
@@ -130,6 +124,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         this.offset = offset;
         return this;
     }
+
     public static LegacyIconHolder entityHolder(int x, int y, int width, int height, EntityType<?> entityType){
         return new LegacyIconHolder(x,y,width,height) {
             Entity entity;
@@ -142,27 +137,35 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             }
         };
     }
+
     public double getMiddleX(){
         return getXCorner() + offset.x() + getWidth() / 2f;
     }
+
     public double getMiddleY(){
         return getYCorner() + offset.y() + getHeight() / 2f;
     }
+
     public float getXCorner(){
         return getX() - (isSizeable() ?  1 : getWidth() / 20f);
     }
+
     public float getYCorner(){
         return getY() - (isSizeable() ?  1 : getHeight() / 20f);
     }
+
     public float getSelectableWidth(){
         return getWidth() - 2 * (isSizeable() ?  1 : getWidth() / 20f);
     }
+
     public float getSelectableHeight(){
         return getHeight() - 2 * (isSizeable() ?  1 : getHeight() / 20f);
     }
+
     public boolean isSizeable(){
         return Math.min(getWidth(),getHeight()) < 18 && LegacyOptions.getUIMode().isHDOrLower();
     }
+
     public boolean canSizeIcon(){
         return getMinSize() < 18 || getMinSize() > 21;
     }
@@ -170,19 +173,22 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void applyOffset(GuiGraphics graphics){
         if (!offset.equals(Vec3.ZERO)) graphics.pose().translate(offset.x,offset.y,offset.z);
     }
+
     public boolean isWarning(){
         return isWarning;
     }
+
     public void setWarning(boolean warning){
         this.isWarning = warning;
     }
+
     public ResourceLocation getIconHolderSprite(){
         return iconHolderOverride == null ? isWarning() ? LegacySprites.RED_ICON_HOLDER : isSizeable() ? LegacySprites.SIZEABLE_ICON_HOLDER : LegacySprites.ICON_HOLDER : iconHolderOverride.get();
     }
 
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        isHovered = LegacyRenderUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
+        isHovered = isHovered(i, j);
         ResourceLocation sprite = getIconHolderSprite();
         if (sprite != null)
             renderChild(graphics,getXCorner(),getYCorner(),()->FactoryGuiGraphics.of(graphics).blitSprite(sprite, 0, 0, getWidth(), getHeight()));
@@ -191,6 +197,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         }
         renderItem(graphics,i,j,f);
     }
+
     public void renderIcon(ResourceLocation location,GuiGraphics graphics, boolean scaled, int width, int height){
         renderChild(graphics,getX(),getY(),()->{
             FactoryGuiGraphics.of(graphics).disableDepthTest();
@@ -201,9 +208,11 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         });
     }
+
     public void renderItem(GuiGraphics graphics, int i, int j, float f){
         renderItem(graphics,itemIcon,getX(),getY(),isWarning());
     }
+
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning){
         if (!item.isEmpty()) renderItem(graphics,()->{
             graphics.renderFakeItem(item, 0,0);
@@ -211,6 +220,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item,0,0);
         },x,y,isWarning);
     }
+
     public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning){
         renderScaled(graphics,x,y,itemRender);
         if (isWarning) renderWarning(graphics);
@@ -242,6 +252,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         LegacyRenderUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
         graphics.disableScissor();
     }
+
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20)
             renderChild(graphics, getXCorner() - (21f - getWidth()) / 2, getYCorner() - (21f - getHeight()) / 2, () -> FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SELECT_ICON_HIGHLIGHT_SMALL, 0, 0, 21, 21));
@@ -253,6 +264,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
                 FactoryGuiGraphics.of(graphics).enableDepthTest();
             });
     }
+
     public void renderScroll(GuiGraphics graphics, LegacyScrollRenderer scrollRenderer) {
         if (LegacyOptions.getUIMode().isSD() && getMinSize() == 20) {
             renderChild(graphics, getXCorner() + (getWidth() - 7) / 2.0f, getYCorner() - 0.5f, () -> {
@@ -266,12 +278,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             });
         }
     }
+
     public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
         renderChild(graphics,x,y,()->{
             graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
             render.run();
         });
     }
+
     public void renderChild(GuiGraphics graphics, float x, float y, Runnable render){
         graphics.pose().pushPose();
         graphics.pose().translate(x,y,0);
@@ -279,6 +293,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         render.run();
         graphics.pose().popPose();
     }
+
     public void renderHighlight(GuiGraphics graphics){
         renderScaled(graphics,getX(),getY(),()-> {
             FactoryScreenUtil.enableBlend();
@@ -286,15 +301,29 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             FactoryScreenUtil.disableBlend();
         });
     }
+
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,int i, int j){
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
+
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
         if (!stack.isEmpty()) LegacyFontUtil.applySmallerFont(LegacyFontUtil.MOJANGLES_11_FONT, b->graphics.renderTooltip(minecraft.font, stack, i, j));
     }
-    public boolean isHoveredOrFocused(){
+
+    @Override
+    public boolean isHovered(double mouseX, double mouseY) {
+        return LegacyRenderUtil.isMouseOver(mouseX, mouseY, getXCorner() + offset.x, getYCorner() + offset.y, width, height);
+    }
+
+    public boolean isHoveredOrFocused() {
         return isHovered || isFocused();
     }
+
+    @Override
+    public boolean isMouseOver(double d, double e) {
+        return isHovered(d, e);
+    }
+
     @Override
     public void setFocused(boolean bl) {
         focused = bl;
@@ -315,6 +344,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         }
         return false;
     }
+
     public void playClickSound(){
         if (!isFocused()) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F);
     }
@@ -342,19 +372,16 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     @Override
-    public boolean isMouseOver(double d, double e) {
-        return isHovered;
-    }
-
-    @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
 
     }
+
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
         return !this.isFocused() ? ComponentPath.leaf(this) : null;
     }
+
     public ScreenRectangle getRectangle() {
-        return new ScreenRectangle((int)getXCorner(),(int)getYCorner(),getWidth(),getHeight());
+        return new ScreenRectangle((int) (offset.x + getXCorner()), (int) (offset.y + getYCorner()), getWidth(), getHeight());
     }
 
     public int getMinSize() {

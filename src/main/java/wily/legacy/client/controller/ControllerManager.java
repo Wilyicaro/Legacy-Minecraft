@@ -7,6 +7,7 @@ import net.minecraft.client.InputType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -26,12 +27,9 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
-import wily.legacy.client.screen.CreativeModeScreen;
-import wily.legacy.client.screen.LegacyCraftingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.client.screen.TabList;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.mixin.base.MouseHandlerAccessor;
+import wily.legacy.mixin.base.client.MouseHandlerAccessor;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -55,9 +53,6 @@ public class ControllerManager {
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
     public boolean simulateShift = false;
-    public int timeCursorPressed = 0;
-    public Vector2d lastCursorDirection = new Vector2d();
-    public Slot lastHoveredSlot;
     public boolean canChangeSlidersValue = true;
     protected Minecraft minecraft;
     public static final ListMap<String,Controller.Handler> handlers = ListMap.<String,Controller.Handler>builder().put("none",Controller.Handler.EMPTY).put("glfw", GLFWControllerHandler.getInstance()).put("sdl3", SDLControllerHandler.getInstance()).build();
@@ -212,7 +207,7 @@ public class ControllerManager {
                 /*minecraft.getFramerateLimitTracker().onInputReceived();*/
             }
 
-            if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) disableCursor();
+            if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) tryDisableCursor();
 
             updateControllerLed(controller);
 
@@ -266,78 +261,9 @@ public class ControllerManager {
                                 minecraft.mouseHandler.ypos() + moveY * getGuiScaleY());
                     }
 
-                    if (minecraft.screen instanceof LegacyMenuAccess<?> screen) {
-                        if (state.pressed && state.canClick()) {
-                            if (state.is(ControllerBinding.DPAD_UP)) {
-                                screen.movePointerToSlotIn(ScreenDirection.UP);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
-                            }
-                            else if (state.is(ControllerBinding.DPAD_DOWN)) {
-                                screen.movePointerToSlotIn(ScreenDirection.DOWN);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
-                            }
-                            else if (state.is(ControllerBinding.DPAD_RIGHT)) {
-                                screen.movePointerToSlotIn(ScreenDirection.RIGHT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
-                            }
-                            else if (state.is(ControllerBinding.DPAD_LEFT)) {
-                                screen.movePointerToSlotIn(ScreenDirection.LEFT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
-                            }
-                        } else if (state.is(ControllerBinding.LEFT_STICK) && state.released && !LegacyOptions.legacyCursor.get())
-                            screen.movePointerToSlot(screen.findSlotAt(getPointerX(), getPointerY()));
-
-                        if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && LegacyOptions.legacyCursor.get()) {
-                            double deadzone = stick.getDeadZone();
-                            double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 0.99, 0.35));
-                            boolean snapX = sensitivity < 0.01;
-                            boolean snapY = sensitivity < 0.4;
-
-                            double absX = Math.abs(stick.x);
-                            double absY = Math.abs(stick.y);
-                            boolean xPressed = absX > deadzone;
-                            boolean yPressed = absY > deadzoneY;
-                            if (xPressed || yPressed) {
-                                double pressLimitX = Math.min(deadzone + 0.035, 1);
-                                double pressLimitY = Math.min(deadzoneY + 0.035, 1);
-
-                                ScreenDirection direction = null;
-                                int nextCursorTime = timeCursorPressed + getInputTicks();
-                                if ((timeCursorPressed == 0 || nextCursorTime >= 300 && timeCursorPressed / 100 < nextCursorTime / 100) && !state.isBlocked()) {
-                                    if (snapY && absY >= deadzoneY) direction = LegacyRenderUtil.getScreenDirection(0, stick.y);
-                                    if (snapX && absX >= deadzone) direction = LegacyRenderUtil.getScreenDirection(stick.x, 0);
-                                    lastHoveredSlot = screen.findSlotAt(getPointerX(), getPointerY());
-                                } else if (timeCursorPressed < 50 && nextCursorTime >= 50 && !snapX) {
-                                    if (xPressed && absX < pressLimitX) direction = LegacyRenderUtil.getScreenDirection(stick.x, 0);
-                                    else if (!snapY && yPressed && absY < pressLimitY) direction = LegacyRenderUtil.getScreenDirection(0, stick.y);
-                                }
-                                if (direction != null) screen.movePointerToSlotIn(direction);
-
-                                timeCursorPressed = nextCursorTime;
-                                if (stick.getMagnitude() >= lastCursorDirection.length())
-                                    lastCursorDirection = new Vector2d(stick.x, stick.y);
-                            } else if (timeCursorPressed != 0) {
-                                if (timeCursorPressed <= 200) {
-                                    double releaseLimit = Math.min(deadzone + 0.2, 1);
-                                    double releaseLimitY = Math.min(deadzoneY + 0.2, 1);
-                                    double absLastX = Math.abs(lastCursorDirection.x);
-                                    double absLastY = Math.abs(lastCursorDirection.y);
-                                    boolean xPrecedence = absLastX > absLastY;
-                                    boolean validBump = (!snapX && xPrecedence) || (!snapY && !xPrecedence);
-                                    boolean bump = absLastX > releaseLimit || absLastY > releaseLimitY;
-                                    if (validBump && bump) {
-                                        ScreenDirection direction = LegacyRenderUtil.getScreenDirection(lastCursorDirection.x, lastCursorDirection.y);
-                                        Slot hoveredSlot = screen.findSlotAt(getPointerX(), getPointerY());
-                                        if (direction != null && hoveredSlot == lastHoveredSlot)
-                                            screen.movePointerToSlotIn(direction);
-                                    }
-                                }
-                                screen.movePointerToSlot(screen.findSlotAt(getPointerX(), getPointerY()));
-
-                                timeCursorPressed = 0;
-                                lastCursorDirection = new Vector2d();
-                            }
-                        }
+                    if (minecraft.screen instanceof LegacyMenuAccess<?> menu) {
+                        if (state.is(ControllerBinding.LEFT_STICK) && state.released)
+                            centerPointerOnHovered(menu);
                     }
 
                     if (state.is(ControllerBinding.LEFT_TRIGGER) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
@@ -374,17 +300,27 @@ public class ControllerManager {
                 Controller.Event.of(minecraft.screen).simulateKeyAction(this, state);
                 if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
                     minecraft.screen.mouseScrolled(getPointerX(), getPointerY()/*? if >1.20.1 {*/, 0/*?}*/, Math.signum(-stick.y));
-                Predicate<Predicate<BindingState.Axis>> isStickAnd = s -> state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick);
-                if (isCursorDisabled) {
-                    if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)) || state.is(ControllerBinding.DPAD_UP))
-                        simulateKeyAction(InputConstants.KEY_UP, state);
-                    if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)) || state.is(ControllerBinding.DPAD_DOWN))
-                        simulateKeyAction(InputConstants.KEY_DOWN, state);
-                    if (isStickAnd.test(s -> s.x > 0 && s.x > Math.abs(s.y)) || state.is(ControllerBinding.DPAD_RIGHT))
-                        simulateKeyAction(InputConstants.KEY_RIGHT, state);
-                    if (isStickAnd.test(s -> s.x < 0 && -s.x > Math.abs(s.y)) || state.is(ControllerBinding.DPAD_LEFT))
-                        simulateKeyAction(InputConstants.KEY_LEFT, state);
-                }
+
+                Predicate<Predicate<BindingState.Axis>> isStickAnd = s ->
+                        state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick) &&
+                                ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.crossedTime(state.getDefaultDelay() / 2) && isHoveringWidget());
+                if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)))
+                    simulateKeyAction(InputConstants.KEY_UP, state, !state.released, false);
+                else if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)))
+                    simulateKeyAction(InputConstants.KEY_DOWN, state, !state.released, false);
+                else if (isStickAnd.test(s -> s.x > 0 && s.x > Math.abs(s.y)))
+                    simulateKeyAction(InputConstants.KEY_RIGHT, state, !state.released, false);
+                else if (isStickAnd.test(s -> s.x < 0 && -s.x > Math.abs(s.y)))
+                    simulateKeyAction(InputConstants.KEY_LEFT, state, !state.released, false);
+
+                if (state.is(ControllerBinding.DPAD_UP))
+                    simulateKeyAction(InputConstants.KEY_UP, state);
+                else if (state.is(ControllerBinding.DPAD_DOWN))
+                    simulateKeyAction(InputConstants.KEY_DOWN, state);
+                else if (state.is(ControllerBinding.DPAD_RIGHT))
+                    simulateKeyAction(InputConstants.KEY_RIGHT, state);
+                else if (state.is(ControllerBinding.DPAD_LEFT))
+                    simulateKeyAction(InputConstants.KEY_LEFT, state);
             }
         }
 
@@ -415,6 +351,16 @@ public class ControllerManager {
         if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);
         if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().controllerTick(controller);
     }
+
+    public boolean isHoveringWidget() {
+        return (minecraft.screen instanceof LegacyMenuAccess<?> menu && menu.findHoveredSlot() != null) || minecraft.screen.getChildAt(getPointerX(), getPointerY()).isPresent();
+    }
+
+    public void centerPointerOnHovered(LegacyMenuAccess<?> menu) {
+        if (!menu.movePointerToSlot(menu.findHoveredSlot()))
+            minecraft.screen.getChildAt(getPointerX(), getPointerY()).ifPresent(listener -> ComponentPath.path(listener, minecraft.screen).applyFocus(true));
+    }
+
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state){
         simulateKeyAction(canSimulate, key, state, false);
@@ -468,6 +414,10 @@ public class ControllerManager {
         return minecraft.mouseHandler.ypos() / getGuiScaleY();
     }
 
+    public ScreenRectangle getPointerRectangle() {
+        return new ScreenRectangle(Math.round(getVisualPointerX() - 4), Math.round(getVisualPointerY() - 4), 8, 8);
+    }
+
     public float getVisualPointerX() {
         return Math.round(minecraft.mouseHandler.xpos()) / ((float) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth());
     }
@@ -497,8 +447,13 @@ public class ControllerManager {
         return (isControllerTheLastInput() && LegacyOptions.controllerCursorAtFirstInventorySlot.get()) || (!isControllerTheLastInput() && LegacyOptions.cursorAtFirstInventorySlot.get());
     }
 
-    public void disableCursor(){
-        if (getCursorMode().isAlways() || minecraft.screen == null || minecraft.screen instanceof Controller.Event e && !e.disableCursorOnInit()) return;
+    public void tryDisableCursor() {
+        if (getCursorMode().isAlways() || minecraft.screen == null || minecraft.screen instanceof Controller.Event e && !e.disableCursorOnInit())
+            return;
+        disableCursor();
+    }
+
+    public void disableCursor() {
         setCursorInputMode(true);
         isCursorDisabled = true;
     }
@@ -535,7 +490,7 @@ public class ControllerManager {
         switch (getCursorMode()){
             case ALWAYS -> enableCursor();
             case NEVER -> {
-                disableCursor();
+                tryDisableCursor();
                 if (minecraft.screen != null) minecraft.screen.repositionElements();
             }
         }

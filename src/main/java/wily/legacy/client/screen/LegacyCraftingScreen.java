@@ -264,7 +264,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"),i-> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b &&  b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ /*|| i.getItem() instanceof BundleItem*//*?}*/),dyeItemUpdateRecipe));
         dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes,dyeItemUpdateRecipe));
         if (!is2x2) bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c-> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(BannerBlock.byColor(c).asItem())))).toList()));
-        bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i-> i.getItem() instanceof BannerItem && Legacy4J.itemHasValidPatterns(i), h->{
+        bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i-> i.getItem() instanceof BannerItem && LegacyItemUtil.hasValidPatterns(i), h->{
             clearIngredients(ingredientsGrid);
             if (bannerButtons.isEmpty() || h.itemIcon.isEmpty()) return;
             LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid,List.of(Optional.empty(),Optional.empty(),Optional.of(StackIngredient.of(true,h.itemIcon.getItem().getDefaultInstance())), Optional.of(StackIngredient.of(true,h.itemIcon.copyWithCount(1)))),gridDimension, 2,2);
@@ -282,7 +282,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
             resultStack = decorateShieldButtons.get(0).itemIcon.isEmpty() ? inputStack : h.assembleCraftingResult(minecraft.level,container);
             canCraft(ingredientsGrid,true);
         };
-        decorateShieldButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_SHIELD, i-> i.getItem() instanceof ShieldItem && Legacy4J.getItemPatternsCount(i) == 0, decorateShieldUpdateRecipe));
+        decorateShieldButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_SHIELD, i-> i.getItem() instanceof ShieldItem && LegacyItemUtil.getPatternsCount(i) == 0, decorateShieldUpdateRecipe));
         decorateShieldButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_BANNER_TAB, i-> i.getItem() instanceof BannerItem, decorateShieldUpdateRecipe));
 
         decoratedPotButtons.add(craftingButtonByList(LegacyComponents.ADD_SHERD, DecoratedPotPatterns.ITEM_TO_POT_TEXTURE.keySet().stream().map(Item::getDefaultInstance).toList(), h->{
@@ -837,11 +837,12 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
             LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             if (description != null) LegacyFontUtil.applySDFont(ignored -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, description.copy().setStyle(Style.EMPTY), xDiff + 2 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, xDiff + panelWidth - 2, topPos + titleY + 23, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             if (typeTabList.getIndex() != 0){
-                List<Component> list = LegacyRenderUtil.getTooltip(resultStack);
                 int descriptionPanelWidth = accessor.getInteger("descriptionPanel.width", 163);
                 int descriptionPanelHeight = accessor.getInteger("descriptionPanel.height", 93);
                 int descriptionTextX = accessor.getInteger("descriptionText.x", 4);
                 int descriptionTextY = accessor.getInteger("descriptionText.y", 7);
+                int descriptionTextWidth = descriptionPanelWidth - descriptionTextX * 2;
+                List<FormattedCharSequence> list = LegacyRenderUtil.getTooltip(resultStack, descriptionTextWidth);
                 LegacyFontUtil.applySDFont(sdFont -> {
                     int lineSpacing = sdFont ? 8 : 12;
                     int lineAmount = (descriptionPanelHeight - descriptionTextY * 2 - 7) / lineSpacing;
@@ -849,7 +850,8 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                     scrollableRenderer.scrolled.max = Math.max(0,list.size() - lineAmount);
                     scrollableRenderer.render(guiGraphics,leftPos + accessor.getInteger("descriptionPanel.x", 176) + descriptionTextX, topPos + accessor.getInteger("descriptionPanel.y", 8) + descriptionTextY, descriptionPanelWidth - descriptionTextX * 2, lineAmount * lineSpacing,()->{
                         for (int i1 = 0; i1 < list.size(); i1++) {
-                            guiGraphics.drawString(font, list.get(i1).copy().setStyle(Style.EMPTY), leftPos + accessor.getInteger("descriptionPanel.x", 176) + descriptionTextX, topPos + accessor.getInteger("descriptionPanel.y", 8) + descriptionTextY + i1 * lineSpacing, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                            FormattedCharSequence sequence = list.get(i1);
+                            guiGraphics.drawString(font, sink -> sequence.accept((i2, style, j1) -> sink.accept(i2, Style.EMPTY, j1)), leftPos + accessor.getInteger("descriptionPanel.x", 176) + descriptionTextX, topPos + accessor.getInteger("descriptionPanel.y", 8) + descriptionTextY + i1 * lineSpacing, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                         }
                     });
                 });

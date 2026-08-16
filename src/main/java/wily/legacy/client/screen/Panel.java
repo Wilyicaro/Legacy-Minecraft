@@ -1,20 +1,29 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Panel extends SimpleLayoutRenderable {
+    // For tooltip boxes
+    public static final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
+    public static final BiFunction<Component, Integer, MultiLineLabel> sdLabelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
     protected final UIAccessor accessor;
     public ResourceLocation panelSprite = LegacySprites.SMALL_PANEL;
     public String name;

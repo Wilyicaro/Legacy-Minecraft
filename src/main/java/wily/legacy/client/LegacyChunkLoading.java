@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4JClient;
 //? if <1.20.2 {
-/*import wily.legacy.mixin.base.LevelRendererRenderChunkInfoAccessor;
+/*import wily.legacy.mixin.base.client.LevelRendererRenderChunkInfoAccessor;
 *///?}
 import wily.legacy.util.LegacyTags;
 

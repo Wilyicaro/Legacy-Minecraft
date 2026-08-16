@@ -59,7 +59,7 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
         ControlType type = !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() ||
                 LegacyOptions.lockControlTypeChange.get() &&
                 (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() ||
-                        !LegacyOptions.selectedControlType.get().orElse(get(KBM)).isKbm())
+                        !LegacyOptions.selectedControlType.get().orElse(getOrEmpty(KBM)).isKbm())
                 ? getActiveControllerType() : getKbmActiveType();
         return type == null ? ControlType.EMPTY : type;
     }

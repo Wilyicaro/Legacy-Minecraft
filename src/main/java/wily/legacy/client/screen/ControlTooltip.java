@@ -124,6 +124,7 @@ import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacyFontUtil;
 
@@ -255,8 +256,8 @@ public interface ControlTooltip {
                 if (isBundle(a.getHoveredSlot().getItem()) && BundleItem.getFullnessDisplay(a.getHoveredSlot().getItem()) > 0) return LegacyComponents.PICK_UP;
                 else if (a.getHoveredSlot().getItem().getCount() > 1) return LegacyComponents.TAKE_HALF;
             } else {
-                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && Legacy4J.canRepair(a.getHoveredSlot().getItem(),a.getMenu().getCarried())) return LegacyComponents.REPAIR;
-                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && Legacy4J.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && Legacy4J.getDyeColorOrNull(a.getMenu().getCarried().getItem()) != null) return LegacyComponents.DYE;
+                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.canRepair(a.getHoveredSlot().getItem(),a.getMenu().getCarried())) return LegacyComponents.REPAIR;
+                if (a.getHoveredSlot().hasItem() && Legacy4JClient.hasModOnServer() && LegacyItemUtil.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && LegacyItemUtil.getDyeColorOrNull(a.getMenu().getCarried().getItem()) != null) return LegacyComponents.DYE;
                 else if (isBundle(a.getMenu().getCarried()) && BundleItem.getFullnessDisplay(a.getMenu().getCarried()) > 0 && !a.getHoveredSlot().hasItem()) return LegacyComponents.RELEASE;
                 else if (a.getHoveredSlot().hasItem() && !a.getMenu().getCarried().isEmpty() && !FactoryItemUtil.equalItems(a.getMenu().getCarried(),a.getHoveredSlot().getItem()) && a.getHoveredSlot().mayPlace(a.getHoveredSlot().getItem())) return LegacyComponents.SWAP;
                 else if (!a.getHoveredSlot().hasItem() && a.getHoveredSlot().mayPlace(a.getHoveredSlot().getItem())) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.PLACE_ONE : LegacyComponents.PLACE;
@@ -935,12 +936,12 @@ public interface ControlTooltip {
 
             if (actualItem.isEmpty()) continue;
 
-            if (blockHit != null && Legacy4J.isDyeableItem(actualItem.getItemHolder()) && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
-                if (be.waterColor == null && Legacy4J.isDyedItem(actualItem)) return LegacyComponents.CLEAR;
-                else if (be.waterColor != null && !Legacy4J.isDyedItem(actualItem)) return LegacyComponents.DYE;
+            if (blockHit != null && LegacyItemUtil.isDyeableItem(actualItem.getItemHolder()) && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
+                if (be.waterColor == null && LegacyItemUtil.isDyedItem(actualItem)) return LegacyComponents.CLEAR;
+                else if (be.waterColor != null && !LegacyItemUtil.isDyedItem(actualItem)) return LegacyComponents.DYE;
             }
 
-            if (blockHit != null && Legacy4J.getDyeColorOrNull(actualItem.getItem()) != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity) return LegacyComponents.MIX;
+            if (blockHit != null && LegacyItemUtil.getDyeColorOrNull(actualItem.getItem()) != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity) return LegacyComponents.MIX;
 
 
             if (blockState != null && blockState.getBlock() instanceof BeehiveBlock && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5) {
@@ -949,8 +950,8 @@ public interface ControlTooltip {
             }
 
             if (actualItem.is(Items.ARROW) && blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be && !be.hasWater() && blockState.hasProperty(LayeredCauldronBlock.LEVEL) && blockState.getValue(LayeredCauldronBlock.LEVEL) > 0) return LegacyComponents.TIP_ARROW;
-            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.WATER_BUCKET) || actualItem.is(Items.LAVA_BUCKET) || (actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION))  && (blockState.is(Blocks.CAULDRON) || blockState.is(Blocks.WATER_CAULDRON) && !c.isFull(blockState)) && Legacy4J.getPotionContent(actualItem) != null)) return LegacyComponents.FILL;
-            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.BUCKET) && c.isFull(blockState) || actualItem.is(Items.POTION) && Legacy4J.getPotionContent(actualItem) == null)) return LegacyComponents.COLLECT;
+            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.WATER_BUCKET) || actualItem.is(Items.LAVA_BUCKET) || (actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION))  && (blockState.is(Blocks.CAULDRON) || blockState.is(Blocks.WATER_CAULDRON) && !c.isFull(blockState)) && LegacyItemUtil.getPotionContent(actualItem) != null)) return LegacyComponents.FILL;
+            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.BUCKET) && c.isFull(blockState) || actualItem.is(Items.POTION) && LegacyItemUtil.getPotionContent(actualItem) == null)) return LegacyComponents.COLLECT;
             if ((actualItem.is(Items.LILY_PAD) || actualItem.is(Items.FROGSPAWN)) && canPlaceOnWater(minecraft, actualItem)) return LegacyComponents.PLACE;
             //? if >=1.21 {
             if (canUnlockVault(blockState, actualItem)) return LegacyComponents.UNLOCK;
@@ -1164,14 +1165,14 @@ public interface ControlTooltip {
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem){
-        DyeColor color = Legacy4J.getDyeColorOrNull(usedItem.getItem());
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(usedItem.getItem());
         if (color == null || !(minecraft.hitResult instanceof EntityHitResult result) || minecraft.player == null) return false;
         Entity entity = result.getEntity();
         return entity instanceof Sheep sheep && sheep.getColor() != color || entity instanceof Shulker shulker && shulker.getColor() != color || canDyeCollar(entity, minecraft.player, color);
     }
 
     static boolean canDyeCollar(Minecraft minecraft, ItemStack usedItem) {
-        DyeColor color = Legacy4J.getDyeColorOrNull(usedItem.getItem());
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(usedItem.getItem());
         return color != null && minecraft.hitResult instanceof EntityHitResult result && minecraft.player != null && canDyeCollar(result.getEntity(), minecraft.player, color);
     }
 

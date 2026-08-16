@@ -1,9 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,17 +16,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyCreativeTabListing;
-import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -37,8 +30,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMenuAccess<AbstractContainerMenu> {
-    public static final Container layerSelectionGrid = new SimpleContainer(50);
+    public static final Container itemGrid = new SimpleContainer(50);
     public final List<ItemStack> layerItems = new ArrayList<>();
+    public final List<LegacySlotWidget> slotWidgets = new ArrayList<>();
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
 
     protected final AbstractContainerMenu menu;
@@ -59,8 +53,8 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
                 return false;
             }
         };
-        for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
-            Slot slot = new Slot(layerSelectionGrid, i, 23 + i % 10 * 27, 24 + i / 10 * 27);
+        for (int i = 0; i < itemGrid.getContainerSize(); i++) {
+            Slot slot = new Slot(itemGrid, i, 23 + i % 10 * 27, 24 + i / 10 * 27);
             menu.slots.add(LegacySlotDisplay.override(slot, new LegacySlotDisplay() {
                 public int getWidth() {
                     return accessor.getInteger("slots.size", 27);
@@ -71,8 +65,11 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
                 }
             }));
         }
+        for (Slot slot : menu.slots) {
+            slotWidgets.add(new LegacySlotWidget(slot));
+        }
         addLayerItems();
-        scrolledList.max = Math.max(0, (layerItems.size() - 1) / layerSelectionGrid.getContainerSize());
+        scrolledList.max = Math.max(0, (layerItems.size() - 1) / itemGrid.getContainerSize());
     }
 
     protected void addLayerItems() {
@@ -100,12 +97,15 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
         scroller.height = accessor.getInteger("scroller.height", scroller.height);
         scroller.offset(new Vec3(0.5f, 0, 0));
         fillLayerGrid();
+        for (LegacySlotWidget slotWidget : slotWidgets) {
+            addWidget(slotWidget);
+        }
     }
 
     public void fillLayerGrid() {
-        for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
+        for (int i = 0; i < itemGrid.getContainerSize(); i++) {
             int index = scrolledList.get() * 50 + i;
-            layerSelectionGrid.setItem(i, layerItems.size() > index ? layerItems.get(index) : ItemStack.EMPTY);
+            itemGrid.setItem(i, layerItems.size() > index ? layerItems.get(index) : ItemStack.EMPTY);
         }
     }
 
@@ -156,14 +156,12 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
         setHoveredSlot(null);
-        menu.slots.forEach(s -> {
-            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBoundsWithItem(panel.x, panel.y, s);
-            holder.render(guiGraphics, i, j, f);
-            if (holder.isHovered) {
-                if (s.isHighlightable()) holder.renderHighlight(guiGraphics);
-                setHoveredSlot(s);
-            }
-        });
+        for (LegacySlotWidget slotWidget : slotWidgets) {
+            slotWidget.slotBoundsWithItem(panel.x, panel.y, slotWidget.slot);
+            slotWidget.render(guiGraphics, i, j, f);
+            if (slotWidget.isHovered)
+                setHoveredSlot(slotWidget.slot);
+        }
         if (hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
             guiGraphics.renderTooltip(font, hoveredSlot.getItem(), i, j);
     }
@@ -190,6 +188,18 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
+    public ScreenRectangle getMenuRectangleLimit() {
+        Slot leftTopSlot = menu.slots.get(0);
+        Slot rightBottomSlot = menu.slots.get(itemGrid.getContainerSize() - 1);
+        return new ScreenRectangle(
+                panel.x + leftTopSlot.x,
+                panel.y + leftTopSlot.y,
+                rightBottomSlot.x - leftTopSlot.x + LegacySlotDisplay.of(rightBottomSlot).getWidth() - 2,
+                rightBottomSlot.y - leftTopSlot.y + LegacySlotDisplay.of(rightBottomSlot).getHeight() - 2);
+    }
+
+
+    @Override
     public boolean isOutsideClick(int i) {
         return false;
     }
@@ -200,7 +210,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
-    public int getTipXDiff() {
+    public int getTipXOffset() {
         return 0;
     }
 }

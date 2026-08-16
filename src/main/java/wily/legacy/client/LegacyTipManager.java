@@ -109,8 +109,8 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         return 0;
     }
 
-    public static float getTipXDiff() {
-        return LegacyOptions.hints.get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a && a.getTipXDiff() != 0 ? Math.min(0, Math.max(a.getTipXDiff(), 50 - a.getMenuRectangle().left()) * getTipOffsetPercentage()) : 0;
+    public static float getTipXOffset() {
+        return LegacyOptions.hints.get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a && a.getTipXOffset() != 0 ? Math.min(0, Math.max(a.getTipXOffset(), 50 - a.getMenuRectangle().left()) * getTipOffsetPercentage()) : 0;
     }
 
     public static void setActualTip(LegacyTip tip) {

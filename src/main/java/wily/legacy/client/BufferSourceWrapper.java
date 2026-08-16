@@ -6,8 +6,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
-import wily.legacy.mixin.base.BufferSourceAccessor;
-import wily.legacy.mixin.base.CompositeRenderTypeAccessor;
+import wily.legacy.mixin.base.client.BufferSourceAccessor;
+import wily.legacy.mixin.base.client.CompositeRenderTypeAccessor;
 
 public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
     public final MultiBufferSource.BufferSource source;

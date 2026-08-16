@@ -321,8 +321,6 @@ public record PackAlbum(String id, int version, Component displayName, Component
         private boolean userSelectedAlbum;
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
-        public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
-        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)),i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i,j,k,l, LegacyComponents.getResourceAlbums(), LegacyComponents.getShowResourcePacks(), resourceAlbums, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAlbum() : resourceById(defaultResourceAlbum.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip){
@@ -451,7 +449,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             LegacyRenderUtil.renderPointerPanel(graphics,x, y,width,height);
             if (getSelectedAlbum() != null){
                 boolean sd = LegacyOptions.getUIMode().isSD();
-                BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? sdLabelsCache : labelsCache;
+                BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? Panel.sdLabelsCache : Panel.labelsCache;
                 Pack displayPack = getSelectedAlbum().getDisplayPack(packRepository);
                 renderAlbumIcon(graphics, getSelectedAlbum(), displayPack, x + 7, y + 5, 32, 32);
                 int nameWidth = width - 53;
