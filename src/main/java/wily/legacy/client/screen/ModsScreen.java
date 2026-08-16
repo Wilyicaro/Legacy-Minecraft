@@ -86,8 +86,7 @@ public class ModsScreen extends PanelVListScreen {
             if (key.getLicense() != null && !key.getLicense().isEmpty())
                 components.add(Component.translatable("legacy.menu.mods.license", String.join(", ", key.getLicense())));
             components.add(Component.literal(key.getDescription()));
-            MultilineTooltip tooltip = new MultilineTooltip(components, tooltipBox.getWidth() - 16);
-            return new AdvancedTextWidget(accessor).withWidth(tooltipBox.getWidth() - 16).withLines(tooltip.toCharSequence(minecraft));
+            return new AdvancedTextWidget(accessor).withLines(LegacyRenderUtil.getAppendedComponent(components), tooltipBox.getWidth() - 16);
         }
     });
     public ModsScreen(Screen parent) {

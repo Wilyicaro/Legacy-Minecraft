@@ -3,6 +3,7 @@ package wily.legacy.mixin.base.client.packselection;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -275,7 +276,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                 }
             };
             packIds.put(button, e.getId());
-            if (!description.isEmpty()) button.setTooltip(new MultilineTooltip(description, 161));
+            if (!description.isEmpty()) button.setTooltip(Tooltip.create(LegacyRenderUtil.getAppendedComponent(description)));
             list.addRenderable(button);
         });
     }

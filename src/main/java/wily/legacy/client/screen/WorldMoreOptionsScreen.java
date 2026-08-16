@@ -117,7 +117,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 if (p.getPackSource() != PackSource.FEATURE) return;
                 String id = "dataPack." + p.getId() + ".name";
                 Component name = Language.getInstance().has(id) ? Component.translatable(id) : p.getTitle();
-                renderableVList.addRenderable(new TickBox(0, 0, selectedExperiments.contains(p.getId()), b -> name, b -> new MultilineTooltip(tooltipBox.getWidth() - 10, p.getDescription()), b -> {
+                renderableVList.addRenderable(new TickBox(0, 0, selectedExperiments.contains(p.getId()), b -> name, b -> Tooltip.create(p.getDescription()), b -> {
                     if (b.selected && !selectedExperiments.contains(p.getId())) selectedExperiments.add(p.getId());
                     else if (!b.selected) selectedExperiments.remove(p.getId());
                 }));
