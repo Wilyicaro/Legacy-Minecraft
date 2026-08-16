@@ -156,6 +156,11 @@ public abstract class MinecraftMixin {
         return (Minecraft)(Object)this;
     }
 
+    @Inject(method = "reloadResourcePacks", at = @At("HEAD"))
+    private void fadeMusicOnResourceReload(CallbackInfoReturnable<?> cir) {
+        if (MinecraftAccessor.getInstance().hasGameLoaded()) LegacyMusicFader.fadeOutBgMusic(true);
+    }
+
     @Unique
     private void legacy$pauseShield() {
         if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS)) {
