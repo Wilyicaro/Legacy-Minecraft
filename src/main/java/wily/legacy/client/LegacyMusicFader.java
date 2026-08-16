@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class LegacyMusicFader {
-    private static final long FADE_TICKS = 200;
+    private static final long FADE_TICKS = 70;
     private static long ticks = 0;
     private static final Minecraft mc = Minecraft.getInstance();
     private static final SoundManager soundManager = mc.getSoundManager();
