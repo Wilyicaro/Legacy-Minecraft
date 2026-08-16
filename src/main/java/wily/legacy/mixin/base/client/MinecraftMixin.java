@@ -79,6 +79,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
@@ -174,6 +175,11 @@ public abstract class MinecraftMixin {
 
     private Minecraft self() {
         return (Minecraft) (Object) this;
+    }
+
+    @Inject(method = "reloadResourcePacks", at = @At("HEAD"))
+    private void fadeMusicOnResourceReload(CallbackInfoReturnable<?> cir) {
+        if (MinecraftAccessor.getInstance().hasGameLoaded()) LegacyMusicFader.fadeOutBgMusic(true);
     }
 
     //? if forge {
