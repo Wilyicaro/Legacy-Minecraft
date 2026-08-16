@@ -74,7 +74,6 @@ import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.client.screen.MultilineTooltip;
 import wily.legacy.client.screen.SaveInfoScreen;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyItemUtil;
@@ -82,7 +81,6 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -538,6 +536,20 @@ public class LegacyRenderUtil {
         return mutableComponent;
     }
 
+    public static List<FormattedCharSequence> getTooltip(List<Component> tooltip, int width) {
+        return tooltip.stream().map(c -> mc.font.split(c, width)).flatMap(List::stream).toList();
+    }
+
+    public static MutableComponent getAppendedComponent(List<Component> tooltip) {
+        MutableComponent component = Component.empty();
+        for (int i = 0; i < tooltip.size(); i++) {
+            Component line = tooltip.get(i);
+            component.append(line);
+            if (i < tooltip.size() - 1) component.append("\n");
+        }
+        return component;
+    }
+
     public static List<Component> getTooltip(ItemStack stack) {
         return getTooltip(stack, false);
     }
@@ -549,7 +561,7 @@ public class LegacyRenderUtil {
     }
 
     public static List<FormattedCharSequence> getTooltip(ItemStack stack, int width) {
-        return new MultilineTooltip(getTooltip(stack), width).toCharSequence(mc);
+        return getTooltip(getTooltip(stack), width);
     }
 
     public static void renderHUDTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int shift) {
