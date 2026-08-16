@@ -7,6 +7,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
@@ -251,7 +252,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                 }
             };
             packIds.put(button, e.getId());
-            if (!description.isEmpty()) button.setTooltip(new MultilineTooltip(description,161));
+            if (!description.isEmpty()) button.setTooltip(Tooltip.create(LegacyRenderUtil.getAppendedComponent(description)));
             list.addRenderable(button);
         });
     }

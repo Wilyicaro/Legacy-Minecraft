@@ -31,6 +31,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4J;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.util.LegacyItemUtil;
 //? if <1.20.5 {
 /*import wily.legacy.util.ItemAccessor;
 *///?}
@@ -93,8 +94,8 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
 
     @Inject(method = "interactLivingEntity", at = @At("HEAD"), cancellable = true)
     public void interactLivingEntity(ItemStack itemStack, Player player, LivingEntity livingEntity, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
-        DyeColor color = Legacy4J.getDyeColorOrNull(itemStack.getItem());
-        if (color == null || itemStack.getItem() == Legacy4J.getDyeItem(color)) return;
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(itemStack.getItem());
+        if (color == null || itemStack.getItem() == LegacyItemUtil.getDyeItem(color)) return;
         if (livingEntity instanceof Sheep sheep && sheep.isAlive() && !sheep.isSheared() && sheep.getColor() != color) {
             sheep.level().playSound(player, sheep, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
             if (!player.level().isClientSide()) {

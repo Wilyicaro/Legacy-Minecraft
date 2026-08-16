@@ -38,6 +38,7 @@ import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.LegacySlotWidget;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -246,7 +247,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Inject(method = "onClose",at = @At("RETURN"))
     public void onClose(CallbackInfo ci) {
-        if (Legacy4J.anyArmorSlotMatch(minecraft.player.getInventory(), i-> !i.isEmpty())) {
+        if (LegacyItemUtil.anyArmorSlotMatch(minecraft.player.getInventory(), i-> !i.isEmpty())) {
             AnimatedCharacterRenderer.updateTime(1500);
         }
         menu.slots.forEach(s-> LegacySlotDisplay.override(s, LegacySlotDisplay.VANILLA));

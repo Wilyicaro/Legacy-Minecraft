@@ -77,10 +77,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.screen.ConfirmationScreen;
-import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.client.screen.LegacyScreen;
-import wily.legacy.client.screen.SaveInfoScreen;
+import wily.legacy.client.screen.*;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
@@ -89,6 +86,7 @@ import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPackLoader;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyGuiElements;
@@ -629,8 +627,32 @@ public class LegacyRenderUtil {
         return mutableComponent;
     }
 
+    public static List<FormattedCharSequence> getTooltip(List<Component> tooltip, int width) {
+        return tooltip.stream().map(c -> mc.font.split(c, width)).flatMap(List::stream).toList();
+    }
+
+    public static MutableComponent getAppendedComponent(List<Component> tooltip) {
+        MutableComponent component = Component.empty();
+        for (int i = 0; i < tooltip.size(); i++) {
+            Component line = tooltip.get(i);
+            component.append(line);
+            if (i < tooltip.size() - 1) component.append("\n");
+        }
+        return component;
+    }
+
     public static List<Component> getTooltip(ItemStack stack) {
-        return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        return getTooltip(stack, false);
+    }
+
+    public static List<Component> getTooltip(ItemStack stack, boolean removeBlankLines) {
+        List<Component> lines = stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        if (removeBlankLines) lines.removeIf(component -> component.getString().isBlank());
+        return LegacyItemUtil.sanitizeTooltip(stack, lines);
+    }
+
+    public static List<FormattedCharSequence> getTooltip(ItemStack stack, int width) {
+        return getTooltip(getTooltip(stack), width);
     }
 
     public static void renderHUDTooltip(GuiGraphics guiGraphics, int shift){
@@ -846,7 +868,7 @@ public class LegacyRenderUtil {
 
     public static void renderPotionLevel(GuiGraphics graphics, int x, int y, ItemStack stack) {
         if (!LegacyOptions.legacyPotionsBar.get()) return;
-        int potionLevel = Legacy4J.getPotionLevel(stack);
+        int potionLevel = Math.min(LegacyItemUtil.getPotionLevel(stack), 3);
         if (potionLevel <= 0) return;
         int barX = x + 3;
         int barY = y + 13;

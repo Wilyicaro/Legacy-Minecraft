@@ -16,6 +16,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.LegacySlot;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(Slot.class)
 public abstract class SlotMixin implements LegacySlot {
@@ -65,7 +66,7 @@ public abstract class SlotMixin implements LegacySlot {
 
     @ModifyReturnValue(method = "mayPlace", at = @At("RETURN"))
     private boolean mayPlace(boolean original, ItemStack stack) {
-        return original && (!(container instanceof Inventory inventory) || getContainerSlot() != 40 || !LegacyGameRules.getSidedBooleanGamerule(inventory.player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) || Legacy4J.canGoInLceOffhand(stack));
+        return original && (!(container instanceof Inventory inventory) || getContainerSlot() != 40 || !LegacyGameRules.getSidedBooleanGamerule(inventory.player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) || LegacyItemUtil.canGoInLceOffhand(stack));
     }
 
     @Override

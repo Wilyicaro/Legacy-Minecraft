@@ -87,8 +87,6 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         private final Minecraft minecraft;
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
-        public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
-        public final BiFunction<Component,Integer,MultiLineLabel> sdLabelsCache = Util.memoize((c, i)->MultiLineLabel.create(Minecraft.getInstance().font,c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)),i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i,j,k,l, LegacyComponents.getGlobalResourcePacks(), LegacyComponents.getShowResourcePacks(), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), globalResources, hasTooltip);
@@ -145,7 +143,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             if (selectedPack != null){
                 FactoryGuiGraphics.of(graphics).blit(PackAlbum.Selector.getPackIcon(selectedPack), x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 boolean sd = LegacyOptions.getUIMode().isSD();
-                BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? sdLabelsCache : labelsCache;
+                BiFunction<Component, Integer, MultiLineLabel> labelCache = sd ? Panel.sdLabelsCache : Panel.labelsCache;
                 Component title = DownloadedPackMetadata.getTitle(selectedPack);
                 Component description = DownloadedPackMetadata.getDescription(selectedPack);
                 int nameWidth = width - 53;

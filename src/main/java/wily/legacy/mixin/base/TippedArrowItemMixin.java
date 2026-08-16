@@ -8,12 +8,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(TippedArrowItem.class)
 public class TippedArrowItemMixin {
     @Inject(method = "getDescriptionId", at = @At("HEAD"), cancellable = true)
     private void getDescriptionId(ItemStack stack, CallbackInfoReturnable<String> cir) {
-        String descriptionId = Legacy4J.getDecayPotionDescriptionId(stack);
+        String descriptionId = LegacyItemUtil.getDecayPotionDescriptionId(stack);
         if (descriptionId != null) cir.setReturnValue(descriptionId);
     }
 }

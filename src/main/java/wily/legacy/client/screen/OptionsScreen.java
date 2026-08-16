@@ -453,7 +453,7 @@ public class OptionsScreen extends PanelVListScreen {
                         @Override
                         protected void panelInit() {
                             super.panelInit();
-                            panel.x-=Math.round(Math.min(10,getSelectorTooltipVisibility()) / 10f * 80);
+                            panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 20f * PackAlbum.Selector.getDefaultWidth());
                         }
 
                         private float getSelectorTooltipVisibility(){
@@ -464,8 +464,8 @@ public class OptionsScreen extends PanelVListScreen {
                         public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
                             super.renderDefaultBackground(guiGraphics, i, j, f);
                             if (selectorTooltipVisibility > 0){
-                                if (getFocused() != globalPackSelector) selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
-                                else globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
+                                if (getFocused() != globalPackSelector) selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
+                                else globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
                                 guiGraphics.pose().translate(0, 0, 0.03f);
                             }
                         }
@@ -626,6 +626,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("legacy.menu.in_game_settings"),
                                 LegacyOptions.invertedCrosshair,
                                 LegacyOptions.legacyCreativeTab,
+                                LegacyOptions.legacyAdvancements,
                                 LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
                                 LegacyOptions.legacyHearts,

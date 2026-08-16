@@ -94,9 +94,16 @@ import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.network.ServerPlayerShieldPausePayload;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacySoundUtil;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -204,7 +211,7 @@ public abstract class MinecraftMixin {
             legacy$pauseShield();
         }
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
-        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !Legacy4J.canGoInLceOffhand(player.getMainHandItem())) {
+        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !LegacyItemUtil.canGoInLceOffhand(player.getMainHandItem())) {
             while (options.keySwapOffhand.consumeClick()) {
             }
         }
@@ -364,7 +371,7 @@ public abstract class MinecraftMixin {
 
     @Unique
     private boolean legacy$suppressesEntityUseAnimation(Entity entity, ItemStack item) {
-        DyeColor color = Legacy4J.getDyeColorOrNull(item.getItem());
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(item.getItem());
         if (item.getItem() instanceof SpawnEggItem && entity instanceof Mob && entity.getType() == legacy$getSpawnEggType(item)) return true;
         if (entity instanceof Wolf wolf && !wolf.isTame() && item.is(Items.BONE)) return true;
         if (entity instanceof Sheep sheep) {
@@ -391,7 +398,7 @@ public abstract class MinecraftMixin {
 
     @Unique
     private boolean legacy$canDyeCollar(Entity entity, ItemStack item) {
-        DyeColor color = Legacy4J.getDyeColorOrNull(item.getItem());
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(item.getItem());
         if (color == null) return false;
         if (entity instanceof Wolf wolf) return wolf.getCollarColor() != color;
         return entity instanceof Cat cat && cat.getCollarColor() != color;

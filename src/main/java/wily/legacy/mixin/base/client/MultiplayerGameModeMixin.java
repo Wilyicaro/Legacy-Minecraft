@@ -22,6 +22,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyBlockProtection;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(MultiPlayerGameMode.class)
 public class MultiplayerGameModeMixin {
@@ -52,11 +53,11 @@ public class MultiplayerGameModeMixin {
         if (!LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS)) return;
         Slot slot = getSlot(player, j);
         if (slot == null) return;
-        if (clickType == ClickType.PICKUP && isOffhandSlot(slot) && !player.containerMenu.getCarried().isEmpty() && !Legacy4J.canGoInLceOffhand(player.containerMenu.getCarried())) {
+        if (clickType == ClickType.PICKUP && isOffhandSlot(slot) && !player.containerMenu.getCarried().isEmpty() && !LegacyItemUtil.canGoInLceOffhand(player.containerMenu.getCarried())) {
             ci.cancel();
             return;
         }
-        if (clickType == ClickType.SWAP && ((k == 40 && !Legacy4J.canGoInLceOffhand(slot.getItem())) || (k >= 0 && k < 9 && isOffhandSlot(slot) && !Legacy4J.canGoInLceOffhand(player.getInventory().getItem(k))))) {
+        if (clickType == ClickType.SWAP && ((k == 40 && !LegacyItemUtil.canGoInLceOffhand(slot.getItem())) || (k >= 0 && k < 9 && isOffhandSlot(slot) && !LegacyItemUtil.canGoInLceOffhand(player.getInventory().getItem(k))))) {
             ci.cancel();
         }
     }

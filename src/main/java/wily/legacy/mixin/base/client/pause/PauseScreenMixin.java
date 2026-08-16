@@ -70,7 +70,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
                     this.minecraft.mouseHandler.grabMouse();
                 }).build(),Button.builder(Component.translatable("menu.options"), button -> this.minecraft.setScreen(new HelpAndOptionsScreen(this))).build()
                 ,Button.builder(Component.translatable(LegacyOptions.legacyLeaderboards.get() ? "legacy.menu.leaderboards" : "gui.stats"), button -> this.minecraft.setScreen(LeaderboardsScreen.getActualLeaderboardsScreenInstance(this))).build()
-                ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(new LegacyAdvancementsScreen(this))).build()
+                ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(LegacyAdvancementsScreen.getActualAdvancementsScreenInstance(this))).build()
         );
         minecraft = Minecraft.getInstance();
         if (Legacy4JClient.hasSaveSystem(minecraft))

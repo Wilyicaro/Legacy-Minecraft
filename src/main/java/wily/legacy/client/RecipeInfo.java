@@ -34,6 +34,7 @@ import wily.factoryapi.base.RegisterListing;
 import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -156,8 +157,8 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
         Map<ResourceLocation, IdOverride> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> {
             BuiltInRegistries.POTION.asHolderIdMap().forEach(p -> {
                 if (p.value().getEffects().isEmpty() && !p./*? if <1.20.5 {*//*value().*//*?}*/equals(Potions.WATER)) return;
-                ItemStack potion = Legacy4J.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(),p);
-                ItemStack result = Legacy4J.setItemStackPotion(new ItemStack(Items.TIPPED_ARROW,8),p);
+                ItemStack potion = LegacyItemUtil.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(),p);
+                ItemStack result = LegacyItemUtil.setItemStackPotion(new ItemStack(Items.TIPPED_ARROW,8),p);
                 List<Optional<Ingredient>> ings = new ArrayList<>();
                 Optional<Ingredient> arrowOptional = Optional.of(Ingredient.of(Items.ARROW));
                 for (int i = 0; i < 8; i++) ings.add(arrowOptional);
@@ -165,7 +166,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
                 List<Component> description = new ArrayList<>();
                 recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, ()-> {
                     description.clear();
-                    Legacy4J.addPotionTooltip(p, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
+                    LegacyItemUtil.addPotionTooltip(p, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
                     return description.get(0);
                 }));
             });
@@ -185,9 +186,9 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             recipeAdder.accept(RecipeInfo.create(SUSPICIOUS_STEW,null,List.of(Optional.of(Ingredient.of(Items.BROWN_MUSHROOM)),Optional.of(Ingredient.of(Items.RED_MUSHROOM)),Optional.of(Ingredient.of(h.value())),Optional.of(Ingredient.of(Items.BOWL))),result));
         }))/*?}*/));
 
-        private static <T> void addDecayTippedArrowRecipe(Consumer<RecipeInfo<T>> recipeAdder) {
-            ItemStack potion = Legacy4J.createDecayPotion(Items.LINGERING_POTION);
-            ItemStack result = Legacy4J.createDecayTippedArrow(8);
+        private static void addDecayTippedArrowRecipe(Consumer<RecipeInfo> recipeAdder) {
+            ItemStack potion = LegacyItemUtil.createDecayPotion(Items.LINGERING_POTION);
+            ItemStack result = LegacyItemUtil.createDecayTippedArrow(8);
             List<Optional<Ingredient>> ings = new ArrayList<>();
             Optional<Ingredient> arrowOptional = Optional.of(Ingredient.of(Items.ARROW));
             for (int i = 0; i < 8; i++) ings.add(arrowOptional);
@@ -195,7 +196,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             List<Component> description = new ArrayList<>();
             recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, ()-> {
                 description.clear();
-                Legacy4J.addPotionTooltip(Legacy4J.createDecayEffects(), description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
+                LegacyItemUtil.addPotionTooltip(LegacyItemUtil.createDecayEffects(), description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
                 return description.get(0);
             }));
         }

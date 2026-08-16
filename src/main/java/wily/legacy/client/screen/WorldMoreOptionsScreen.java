@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
@@ -47,8 +48,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
-    protected List<FormattedCharSequence> tooltipBoxLabel;
-    protected boolean expandedResetDimensionTooltip;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
     protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("createWorld.tab.world.title"), t -> rebuildWidgets()).add(LegacyTabButton.Type.RIGHT, Component.translatable("legacy.menu.game_options"), t -> rebuildWidgets());
@@ -90,7 +89,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addCategory(SEED_INFO);
         renderableVList.addRenderable(new TickBox(0,0,parent.getUiState().isGenerateStructures(),b-> Component.translatable("selectWorld.mapFeatures"),b-> tooltip(Component.translatable("selectWorld.mapFeatures.info")),b->parent.getUiState().setGenerateStructures(b.selected)));
         renderableVList.addRenderable(new TickBox(0,0,parent.getUiState().isBonusChest(),b-> Component.translatable("selectWorld.bonusItems"),b-> tooltip(Component.translatable("legacy.menu.selectWorld.bonusItems.description")),b->parent.getUiState().setBonusChest(b.selected)));
-        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16, s -> s.getDefaultMessage(Component.translatable("selectWorld.mapType"), parent.getUiState().getWorldType().describePreset()), b -> parent.getUiState().getWorldType().isAmplified() ? tooltip(Component.translatable("generator.minecraft.amplified.info")) : null, parent.getUiState().getWorldType(), () -> hasAltDown() ? parent.getUiState().getAltPresetList() : parent.getUiState().getNormalPresetList(), b -> parent.getUiState().setWorldType(b.objectValue)));
+        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16, s -> parent.getUiState().getWorldType().describePreset(), b -> parent.getUiState().getWorldType().isAmplified() ? tooltip(Component.translatable("generator.minecraft.amplified.info")) : null, parent.getUiState().getWorldType(), () -> hasAltDown() ? parent.getUiState().getAltPresetList() : parent.getUiState().getNormalPresetList(), b -> parent.getUiState().setWorldType(b.objectValue)));
         renderableVList.addRenderable(createCustomizeButton(parent));
         renderableVList.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> {})));
         TickBox hostPrivileges = createHostPrivilegesTickBox(parent);
@@ -104,7 +103,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 if (p.getPackSource()!= PackSource.FEATURE) return;
                 String id = "dataPack." + p.getId() + ".name";
                 Component name = Language.getInstance().has(id) ? Component.translatable(id) : p.getTitle();
-                renderableVList.addRenderable(new TickBox(0,0,selectedExperiments.contains(p.getId()),b-> name,b->new MultilineTooltip(tooltipBox.getWidth() - 10,p.getDescription()),b->{
+                renderableVList.addRenderable(new TickBox(0,0,selectedExperiments.contains(p.getId()),b-> name,b -> Tooltip.create(p.getDescription()),b->{
                     if (b.selected && !selectedExperiments.contains(p.getId())) selectedExperiments.add(p.getId());
                     else if (!b.selected) selectedExperiments.remove(p.getId());
                 }));
@@ -242,9 +241,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 if (!allowGamerule.test(key)) return;
                 GameRules.BooleanValue value = gameRules.getRule(key);
                 GameRules.BooleanValue defaultValue = type.createRule();
-                Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
-                Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
-                list.addRenderable(new TickBox(0,0,gameRules.getRule(key).get(),b-> LegacyComponents.getMenuGameRuleName(key),b-> new MultilineTooltip(tooltipBox.width - 10, tooltip, valueTooltip), b->value.set(b.selected,null)));
+                Tooltip tooltip = Tooltip.create(Component.translatable(key.getDescriptionId() + ".description").append("\n").append(Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY)));
+                list.addRenderable(new TickBox(0,0,gameRules.getRule(key).get(),b-> LegacyComponents.getMenuGameRuleName(key),b -> tooltip, b -> value.set(b.selected,null)));
             }
 
             @Override
@@ -252,10 +250,9 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 if (!allowGamerule.test(key)) return;
                 GameRules.IntegerValue value = gameRules.getRule(key);
                 GameRules.IntegerValue defaultValue = type.createRule();
-                Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
-                Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
+                Tooltip tooltip = Tooltip.create(Component.translatable(key.getDescriptionId() + ".description").append("\n").append(Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY)));
                 EditBox integerEdit = new EditBox(Minecraft.getInstance().font,0, 0, 220,20,Component.translatable(key.getDescriptionId()));
-                integerEdit.setTooltip(new MultilineTooltip(tooltipBox.width - 10,tooltip,valueTooltip));
+                integerEdit.setTooltip(tooltip);
                 integerEdit.setValue(Integer.toString(value.get()));
                 integerEdit.setResponder(string -> {
                     if (value.tryDeserialize(string)){
@@ -281,23 +278,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         if (tooltipBox.isHovered(d,e) && scrollableRenderer.mouseScrolled(g)) return true;
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
-    }
-
-    @Override
-    public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
-        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
-            LegacyFontUtil.applySDFont(ignored -> tooltipBoxLabel = tooltip.toCharSequence(minecraft));
-            expandedResetDimensionTooltip = !LegacyOptions.getUIMode().isSD() && tooltip instanceof ResetDimensionTooltip;
-            int lineHeight = getTooltipLineHeight();
-            int tooltipContentPadding = getTooltipContentPadding(expandedResetDimensionTooltip);
-            scrollableRenderer.lineHeight = lineHeight;
-            if (expandedResetDimensionTooltip) {
-                scrollableRenderer.scrolled.max = 0;
-                scrollableRenderer.scrolled.set(0);
-            } else {
-                scrollableRenderer.scrolled.max = Math.max(0, tooltipBoxLabel.size() - (tooltipBox.getHeight() - tooltipContentPadding) / lineHeight);
-            }
-        }else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
     }
 
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
@@ -383,50 +363,63 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private Tooltip getResetDimensionTooltip(ResourceKey<Level> dimension) {
-        if (Level.NETHER.equals(dimension)) return new ResetDimensionTooltip(Component.translatable("legacy.menu.load_save.reset_nether.description"), tooltipBox.getWidth() - 10);
-        if (Level.END.equals(dimension)) return new ResetDimensionTooltip(Component.translatable("legacy.menu.load_save.reset_end.description"), tooltipBox.getWidth() - 10);
+        if (Level.NETHER.equals(dimension)) return tooltip(Component.translatable("legacy.menu.load_save.reset_nether.description"));
+        if (Level.END.equals(dimension)) return tooltip(Component.translatable("legacy.menu.load_save.reset_end.description"));
         return null;
     }
 
-    private Tooltip tooltip(Component message) {
-        return LegacyRenderUtil.hasTooltipBoxes(accessor) ? new MultilineTooltip(message, tooltipBox.getWidth() - 10) : Tooltip.create(message);
+    private boolean shouldUseExpandedResetDimensionTooltip(Component message) {
+        return message != null && LegacyOptions.useLegacyWorldOptions() && (message.equals(Component.translatable("legacy.menu.load_save.reset_nether.description")) || message.equals(Component.translatable("legacy.menu.load_save.reset_end.description")));
+    }
+
+    private static Tooltip tooltip(Component message) {
+        return Tooltip.create(message);
     }
 
     private int getTooltipLineHeight() {
         return LegacyOptions.getUIMode().isSD() ? 8 : 12;
     }
 
-    private int getTooltipContentPadding(boolean expandedResetDimensionTooltip) {
-        int padding = LegacyOptions.getUIMode().isSD() ? 20 : LegacyOptions.useLegacyWorldOptions() ? 36 : 44;
-        return expandedResetDimensionTooltip ? Math.max(24, padding - getTooltipLineHeight()) : padding;
-    }
-
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
-            if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) {
-                tooltipBoxLabel = null;
-                expandedResetDimensionTooltip = false;
-                scrollableRenderer.scrolled.set(0);
-            }
-            tooltipBox.render(guiGraphics,i,j,f);
-            if (tooltipBoxLabel != null) {
-                int lineHeight = getTooltipLineHeight();
-                int tooltipContentPadding = getTooltipContentPadding(expandedResetDimensionTooltip);
-                scrollableRenderer.lineHeight = lineHeight;
-                LegacyFontUtil.applySDFont(ignored -> scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - tooltipContentPadding, ()-> {
-                    for (int line = 0; line < tooltipBoxLabel.size(); line++) {
-                        guiGraphics.drawString(font, tooltipBoxLabel.get(line), panel.x + panel.width + 3, panel.y + 13 + line * lineHeight, 0xFFFFFF);
-                    }
-                }));
-            }
-        }
-    }
+            Optional<GuiEventListener> listener;
+            Component message = null;
+            if (getFocused() instanceof AbstractWidget widget && widget.getTooltip() != null && widget.getTooltip() != null)
+                message = widget.getTooltip().message;
+            else if ((listener = getChildAt(i, j)).isPresent() && listener.get() instanceof AbstractWidget widget && widget.getTooltip() != null && widget.getTooltip() != null)
+                message = widget.getTooltip().message;
 
-    private static class ResetDimensionTooltip extends MultilineTooltip {
-        public ResetDimensionTooltip(Component message, int width) {
-            super(message, width);
+            boolean sd = LegacyOptions.getUIMode().isSD();
+            boolean compactLegacyTooltip = LegacyOptions.useLegacyWorldOptions() && !sd;
+            int tooltipContentPadding = sd ? 20 : compactLegacyTooltip ? 36 : 44;
+
+            MultiLineLabel label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
+
+            int lineHeight = sd ? 8 : 12;
+            boolean expandedResetDimensionTooltip = !sd && message != null && shouldUseExpandedResetDimensionTooltip(message);
+            if (expandedResetDimensionTooltip) {
+                tooltipContentPadding = Math.max(24, tooltipContentPadding - lineHeight);
+            }
+
+            scrollableRenderer.lineHeight = lineHeight;
+
+            if (label == null)
+                scrollableRenderer.resetScrolled();
+            else if (expandedResetDimensionTooltip) {
+                scrollableRenderer.resetScrolled();
+                scrollableRenderer.scrolled.max = 0;
+            } else
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - (tooltipBox.getHeight() - tooltipContentPadding) / lineHeight);
+
+            tooltipBox.render(guiGraphics, i, j, f);
+            if (label != null) {
+                int tooltipX = panel.x + panel.width + 3;
+                int tooltipY = panel.y + 13;
+                int tooltipWidth = tooltipBox.width - 10;
+                scrollableRenderer.render(guiGraphics, tooltipX, tooltipY, tooltipWidth, tooltipBox.getHeight() - tooltipContentPadding, () -> label.renderLeftAligned(guiGraphics, tooltipX, tooltipY, lineHeight, 0xFFFFFFFF));
+            }
         }
     }
 
@@ -451,6 +444,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         super.init();
         addRenderableOnly(tabList::renderSelected);
         tabList.init(panel.x, panel.y - 24, panel.width, 30);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor))
+            deferredTooltipRendering = null;
     }
 
     @Override

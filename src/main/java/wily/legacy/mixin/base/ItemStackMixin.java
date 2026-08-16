@@ -60,6 +60,7 @@ import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4J;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -75,7 +76,7 @@ public abstract class ItemStackMixin {
             return;
         }
         ItemStack stack = (ItemStack) (Object) this;
-        DyeColor color = Legacy4J.getDyeColorOrNull(stack.getItem());
+        DyeColor color = LegacyItemUtil.getDyeColorOrNull(stack.getItem());
         if (color == null || !(entity instanceof Shulker shulker) || shulker.getColor() == color) return;
         shulker.level().playSound(player, shulker, SoundEvents.DYE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
         if (!player.level().isClientSide()) {
@@ -88,7 +89,7 @@ public abstract class ItemStackMixin {
     //? if <1.20.5 {
     /*@Inject(method = "getHoverName", at = @At("HEAD"), cancellable = true)
     private void getHoverName(CallbackInfoReturnable<Component> cir) {
-        if (Legacy4J.isMushroomPore((ItemStack)(Object)this)) cir.setReturnValue(Component.translatable(Legacy4J.MUSHROOM_PORE_NAME));
+        if (LegacyItemUtil.isMushroomPore((ItemStack)(Object)this)) cir.setReturnValue(Component.translatable(LegacyItemUtil.MUSHROOM_PORE_NAME));
     }
     *///?}
 
@@ -179,7 +180,7 @@ public abstract class ItemStackMixin {
 
     @ModifyExpressionValue(method = "addModifierTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;amount()D"))
     private double addModifierTooltip(double original, @Local(argsOnly = true) AttributeModifier modifier) {
-        return (modifier.is(Item.BASE_ATTACK_DAMAGE_ID) ? Legacy4J.getItemDamageModifier((ItemStack) (Object)this) : 0) + original;
+        return (modifier.is(Item.BASE_ATTACK_DAMAGE_ID) ? LegacyItemUtil.getItemDamageModifier((ItemStack) (Object)this) : 0) + original;
     }
 
     @Inject(method = "addModifierTooltip", at = @At("RETURN"))
@@ -222,7 +223,7 @@ public abstract class ItemStackMixin {
 
     @ModifyExpressionValue(method = "getTooltipLines", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;getAmount()D"))
     private double addModifierTooltip(double original, @Local(ordinal = 0) Map.Entry<Attribute, AttributeModifier> entry, @Local(ordinal = 0) List<Component> list) {
-        double d = (entry.getValue().getId().equals(BASE_ATTACK_DAMAGE_UUID) ? Legacy4J.getItemDamageModifier((ItemStack) (Object)this) : 0) + original;
+        double d = (entry.getValue().getId().equals(BASE_ATTACK_DAMAGE_UUID) ? LegacyItemUtil.getItemDamageModifier((ItemStack) (Object)this) : 0) + original;
         if (d == 0 && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)){
             list.add(Component.translatable("attribute.modifier.plus." + entry.getValue().getOperation().toValue(), getLegacyDecimalFormat(ATTRIBUTE_MODIFIER_FORMAT).format(d), Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.GRAY));
         }
