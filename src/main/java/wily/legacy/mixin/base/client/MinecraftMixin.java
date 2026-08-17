@@ -533,6 +533,10 @@ public abstract class MinecraftMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
         oldScreen = this.screen;
+        if (screen instanceof PauseScreen && player != null && player.isUsingItem()) {
+            if (gameMode != null) gameMode.releaseUsingItem(player);
+            else player.stopUsingItem();
+        }
         Screen replacement = Legacy4JClient.getReplacementScreen(screen);
         if (replacement != screen) {
             ci.cancel();
