@@ -60,7 +60,6 @@
 - The leaderboard now globally tracks stats of survival mode players across all difficulties
   - Due to this the mods button can now only be accessed from advanced game options
 - Added new How to Plays from 1.14 to 1.21.11
-- Added a new Tiny Take-over credits background art, thanks to Cjnator38
 
 ## Parity Changes
 

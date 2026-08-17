@@ -57,6 +57,9 @@ repositories {
 	strictMaven("https://api.modrinth.com/maven", "maven.modrinth") { name = "Modrinth" }
 	maven("https://raw.githubusercontent.com/Kyubion-Studios/Mod-Resources/main/maven/") { name = "Kyubion Mod Resources" }
 	maven("https://maven.isxander.dev/releases")
+	maven("https://maven.caffeinemc.net/releases") { name = "CaffeineMC" }
+	maven("https://maven.blamejared.com/") { name = "Jared's maven" }
+	maven("https://modmaven.dev") { name = "ModMaven" }
 }
 
 dependencies {
@@ -71,6 +74,14 @@ dependencies {
 	compileOnly("maven.modrinth:sodium:${prop("sodium_version")}")
 	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
+	compileOnly("mezz.jei:jei-${stonecutter.current.version}-neoforge-api:${prop("jei_version")}")
+	compileOnly("mezz.jei:jei-${stonecutter.current.version}-neoforge:${prop("jei_version")}")
+
+	api(jarJar("org.apache.httpcomponents:httpclient:4.5.14") {
+		exclude(group = "commons-codec", module = "commons-codec")
+	} as Any)
+	api(jarJar("org.apache.httpcomponents:httpcore:4.4.16") as Any)
+	api(jarJar("commons-logging:commons-logging:1.2") as Any)
 }
 
 tasks.withType<Javadoc> {
