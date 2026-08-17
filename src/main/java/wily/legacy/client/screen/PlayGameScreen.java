@@ -142,7 +142,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void added() {
         super.added();
-        preloadCreateWorld(minecraft, this);
+        preloadCreateWorld(Minecraft.getInstance(), this);
         serverRenderableList.added();
     }
 
