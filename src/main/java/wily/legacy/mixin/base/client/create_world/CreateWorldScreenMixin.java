@@ -1,8 +1,10 @@
 package wily.legacy.mixin.base.client.create_world;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
+import net.minecraft.CrashReport;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -13,8 +15,10 @@ import net.minecraft.client.gui.screens.worldselection.*;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.WorldLoader;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -29,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
@@ -47,6 +52,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Event{
@@ -69,11 +75,72 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private boolean legacy$preparingRemoteResourceAlbum;
     @Unique
     private boolean legacy$resourceAlbumPrepared;
+    @Unique
+    private static volatile CompletableFuture<WorldCreationContext> legacy$preloadedWorldCreation;
+    @Unique
+    private static volatile boolean legacy$openingWorldCreation;
 
     protected CreateWorldScreenMixin(Component component) {
         super(component);
     }
-    private CreateWorldScreen self(){
+
+    @Invoker(value = "<init>", remap = false)
+    private static CreateWorldScreen legacy$createWorldScreen(Minecraft minecraft, Screen parent, WorldCreationContext context, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed/*? if >=1.21.2 {*/ /*, CreateWorldCallback callback*//*?}*/) {
+        throw new AssertionError();
+    }
+
+    @Inject(method = /*? if >=1.21.2 {*/ /*"openCreateWorldScreen"*//*?} else {*/"openFresh"/*?}*/, at = @At("HEAD"), cancellable = true)
+    private static void legacy$usePreloadedWorldCreation(Minecraft minecraft, Screen parent,/*? if >=1.21.2 {*/ /*Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback,*//*?}*/ CallbackInfo ci) {
+        if (PlayGameScreen.isPreloadingCreateWorld()) {
+            if (legacy$preloadedWorldCreation != null) ci.cancel();
+            return;
+        }
+        if (legacy$openingWorldCreation) {
+            ci.cancel();
+            return;
+        }
+        CompletableFuture<WorldCreationContext> future = legacy$preloadedWorldCreation;
+        if (future == null) return;
+        legacy$preloadedWorldCreation = null;
+        legacy$openingWorldCreation = true;
+        ResourceKey<WorldPreset> targetPreset = /*? if >=1.21.2 {*/ /*preset*//*?} else {*/WorldPresets.NORMAL/*?}*/;
+        legacy$openWorldCreationWhenReady(minecraft, parent, targetPreset,/*? if >=1.21.2 {*/ /*callback,*//*?}*/ future);
+        ci.cancel();
+    }
+
+    @Redirect(method = /*? if >=1.21.2 {*/ /*"openCreateWorldScreen"*//*?} else {*/"openFresh"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;queueLoadScreen(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)V"))
+    private static void legacy$skipWorldPreparationScreen(Minecraft minecraft, Component component) {
+    }
+
+    @Inject(method = /*? if >=1.21.2 {*/ /*"openCreateWorldScreen"*//*?} else {*/"openFresh"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;managedBlock(Ljava/util/function/BooleanSupplier;)V"), cancellable = true)
+    private static void legacy$avoidBlockingWorldCreation(Minecraft minecraft, Screen parent,/*? if >=1.21.2 {*/ /*Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback,*//*?}*/ CallbackInfo ci, @Local CompletableFuture<WorldCreationContext> future) {
+        if (PlayGameScreen.isPreloadingCreateWorld()) {
+            legacy$preloadedWorldCreation = future;
+            future.exceptionally(throwable -> {
+                if (legacy$preloadedWorldCreation == future) legacy$preloadedWorldCreation = null;
+                return null;
+            });
+        } else {
+            legacy$openingWorldCreation = true;
+            ResourceKey<WorldPreset> targetPreset = /*? if >=1.21.2 {*/ /*preset*//*?} else {*/WorldPresets.NORMAL/*?}*/;
+            legacy$openWorldCreationWhenReady(minecraft, parent, targetPreset,/*? if >=1.21.2 {*/ /*callback,*//*?}*/ future);
+        }
+        ci.cancel();
+    }
+
+    @Unique
+    private static void legacy$openWorldCreationWhenReady(Minecraft minecraft, Screen parent, ResourceKey<WorldPreset> preset,/*? if >=1.21.2 {*/ /*CreateWorldCallback callback,*//*?}*/ CompletableFuture<WorldCreationContext> future) {
+        future.thenAcceptAsync(context -> {
+            legacy$openingWorldCreation = false;
+            minecraft.setScreen(legacy$createWorldScreen(minecraft, parent, context, Optional.of(preset), OptionalLong.empty()/*? if >=1.21.2 {*/ /*, callback*//*?}*/));
+        }, minecraft).exceptionally(throwable -> {
+            legacy$openingWorldCreation = false;
+            minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't prepare world creation"));
+            return null;
+        });
+    }
+
+    private CreateWorldScreen self() {
         return (CreateWorldScreen) (Object) this;
     }
 
