@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -64,7 +65,21 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             });
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
+    private static boolean preloadingCreateWorld;
     public boolean isLoading = false;
+
+    public static boolean isPreloadingCreateWorld() {
+        return preloadingCreateWorld;
+    }
+
+    private static void preloadCreateWorld(Minecraft minecraft) {
+        preloadingCreateWorld = true;
+        try {
+            CreateWorldScreen.openFresh(minecraft, () -> {});
+        } finally {
+            preloadingCreateWorld = false;
+        }
+    }
 
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s -> Panel.createPanel(s, p -> p.appearance(300, Math.min(256, s.height - 52)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList", true) ? 12 : 0))), Component.translatable("legacy.menu.play_game"));
@@ -116,6 +131,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void added() {
         super.added();
+        preloadCreateWorld(minecraft);
         serverRenderableList.added();
     }
 
