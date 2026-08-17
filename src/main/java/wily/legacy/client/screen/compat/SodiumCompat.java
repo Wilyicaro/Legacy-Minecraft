@@ -103,8 +103,7 @@ public class SodiumCompat {
     }
 
     public static <T> void resetSodiumOption(StatefulOption<T> option) {
-        Config parent = (Config) ReflectionUtil.getFieldValue(SODIUM_OPTION_FIELDS.get("state"), option);
-        option.modifyValue(option.getDefaultValue().get(parent));
+        option.resetToDefault();
     }
 }
 //?}
