@@ -4,7 +4,7 @@ import groovy.json.JsonParserType
 import groovy.json.JsonOutput
 plugins {
     id "dev.architectury.loom"
-    id "me.modmuss50.mod-publish-plugin" version "0.7.4"
+    id "me.modmuss50.mod-publish-plugin" version "2.2.0"
     id 'maven-publish'
 }
 
@@ -415,8 +415,8 @@ publishMods {
         minecraftVersions.addAll versions
         if (isJava21) javaVersions.add(JavaVersion.VERSION_21)
         else javaVersions.addAll(JavaVersion.VERSION_17,JavaVersion.VERSION_18)
-        clientRequired = true
-        serverRequired = true
+        client = true
+        server = true
         accessToken = project.findProperty("CURSE_API_KEY") ?: System.getenv("CURSE_API_KEY")
         projectId = curseforge_id
         requires("factory-api")
