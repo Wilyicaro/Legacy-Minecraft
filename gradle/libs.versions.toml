@@ -1,7 +1,7 @@
 [versions]
 stonecutter = "0.9"
 stonecutter-postprocess = "2.1-beta.8"
-mod-publish = "1.1.0"
+mod-publish = "2.0.0"
 dotenv-gradle = "4.0.0"
 fabric-loom = "1.16-SNAPSHOT"
 neoforge-moddev = "2.0.141"
