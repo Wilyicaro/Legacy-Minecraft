@@ -66,6 +66,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
     private static boolean preloadingCreateWorld;
+    private boolean createWorldPreloaded;
     public boolean isLoading = false;
 
     public static boolean isPreloadingCreateWorld() {
@@ -131,7 +132,10 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void added() {
         super.added();
-        preloadCreateWorld(minecraft);
+        if (!createWorldPreloaded) {
+            createWorldPreloaded = true;
+            preloadCreateWorld(minecraft);
+        }
         serverRenderableList.added();
     }
 

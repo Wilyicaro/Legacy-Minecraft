@@ -123,7 +123,6 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         }
         CompletableFuture<WorldCreationContext> future = legacy$preloadedWorldCreation;
         if (future == null) return;
-        legacy$preloadedWorldCreation = null;
         legacy$openingWorldCreation = true;
         legacy$openWorldCreationWhenReady(minecraft, runnable, preset, callback, future);
         ci.cancel();
