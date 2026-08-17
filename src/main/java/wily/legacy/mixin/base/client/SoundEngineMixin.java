@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.SoundEngineAccessor;
@@ -58,6 +60,11 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @Shadow
     protected abstract float calculateVolume(SoundInstance arg);
+
+    @Inject(method = "reload", at = @At("HEAD"), cancellable = true)
+    private void keepMusicDuringResourceReload(CallbackInfo ci) {
+        if (LegacyMusicFader.isResourceReloadActive()) ci.cancel();
+    }
 
     @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
     private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
