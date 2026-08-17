@@ -35,7 +35,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
@@ -112,11 +111,6 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Shadow
     protected abstract void onCreate();
 
-    @Invoker(value = "<init>", remap = false)
-    private static CreateWorldScreen legacy$createWorldScreen(Minecraft minecraft, Runnable runnable, WorldCreationContext context, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CreateWorldCallback callback) {
-        throw new AssertionError();
-    }
-
     @Inject(method = "openCreateWorldScreen", at = @At("HEAD"), cancellable = true)
     private static void legacy$usePreloadedWorldCreation(Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CallbackInfo ci) {
         if (PlayGameScreen.isPreloadingCreateWorld()) {
@@ -158,7 +152,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private static void legacy$openWorldCreationWhenReady(Minecraft minecraft, Runnable runnable, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CompletableFuture<WorldCreationContext> future) {
         future.thenAcceptAsync(context -> {
             legacy$openingWorldCreation = false;
-            minecraft.setScreen(legacy$createWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
+            minecraft.setScreen(new CreateWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
         }, minecraft).exceptionally(throwable -> {
             legacy$openingWorldCreation = false;
             minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't prepare world creation"));
