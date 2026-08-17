@@ -1207,6 +1207,7 @@
   "legacy.key.flyUp": "Fly Up",
   "legacy.key.host_options": "Host Options",
   "legacy.key.legacy4JSettings": "Legacy4J Settings",
+  "legacy.key.toggleCrafting": "Toggle Crafting Mode",
   "legacy.key.toggleCursor": "Toggle Cursor",
   "legacy.loadingTip.C418": "Music by C418!",
   "legacy.loadingTip.animalDespawn": "If an animal can't move more than 20 blocks in any direction, it won't despawn.",
