@@ -21,6 +21,7 @@ public class LegacyMusicFader {
     public static boolean musicManagerShouldTick = true;
     private static long ticks = 0;
     private static boolean resumeMusicManager;
+    private static boolean resourceReloadActive;
 
     public static SoundEngine.PlayResult fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundEngine.PlayResult result = SoundEngine.PlayResult.STARTED;
@@ -57,6 +58,22 @@ public class LegacyMusicFader {
             musicManagerAccessor.setCurrentMusic(null);
             mc.getToastManager().hideNowPlayingToast();
         }
+    }
+
+    public static boolean beginResourceReload() {
+        if (resourceReloadActive || musicManagerAccessor.getCurrentMusic() == null) return false;
+        resourceReloadActive = true;
+        return true;
+    }
+
+    public static boolean isResourceReloadActive() {
+        return resourceReloadActive;
+    }
+
+    public static void finishResourceReload(boolean successful) {
+        if (!resourceReloadActive) return;
+        resourceReloadActive = false;
+        if (successful) fadeOutBgMusic(true);
     }
 
     public static void tick() {
