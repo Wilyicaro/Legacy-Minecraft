@@ -112,7 +112,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Shadow
     protected abstract void onCreate();
 
-    @Invoker("<init>")
+    @Invoker(value = "<init>", remap = false)
     private static CreateWorldScreen legacy$createWorldScreen(Minecraft minecraft, Runnable runnable, WorldCreationContext context, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CreateWorldCallback callback) {
         throw new AssertionError();
     }
