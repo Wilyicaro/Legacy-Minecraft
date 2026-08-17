@@ -68,6 +68,8 @@ repositories {
 	maven("https://raw.githubusercontent.com/Kyubion-Studios/Mod-Resources/main/maven/") { name = "Kyubion Mod Resources" }
 	maven("https://maven.isxander.dev/releases")
 	maven("https://maven.caffeinemc.net/releases") { name = "CaffeineMC" }
+	maven("https://maven.blamejared.com/") { name = "Jared's maven" }
+	maven("https://modmaven.dev") { name = "ModMaven" }
 }
 
 dependencies {
@@ -88,6 +90,8 @@ dependencies {
 	modCompileOnly("net.caffeinemc:sodium-fabric:${prop("sodium_version")}")
 	modCompileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	modCompileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
+	modCompileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric-api:${prop("jei_version")}")
+	modCompileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric:${prop("jei_version")}")
 
 	implementation(libs.moulberry.mixinconstraints)
 	include(libs.moulberry.mixinconstraints)
