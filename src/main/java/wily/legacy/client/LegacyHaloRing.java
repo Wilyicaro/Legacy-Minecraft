@@ -32,7 +32,7 @@ import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.dimension.DimensionType;
 //?} else {
 /*import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
  *///?}
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
