@@ -81,6 +81,7 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
