@@ -111,8 +111,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
         int findInventoryMatchSlot() {
             for (int i = 0; i < menu.slots.size(); i++)
                 if (menu.slots.get(i).getItem() == itemIcon) return i;
-            itemIcon = nextItem;
-            return itemIcon.isEmpty() ? 0 : findInventoryMatchSlot();
+            return 0;
         }
 
         @Override
