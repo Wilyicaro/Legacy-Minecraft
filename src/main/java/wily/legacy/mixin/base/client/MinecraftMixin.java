@@ -97,6 +97,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -138,6 +139,8 @@ public abstract class MinecraftMixin {
     private boolean legacy$dropKeyDown = false;
     @Unique
     private InteractionHand legacy$suppressedUseAnimationHand;
+    @Unique
+    private boolean legacy$resourceReloadMusic;
     @Shadow
     private int rightClickDelay;
     @Shadow
@@ -177,9 +180,17 @@ public abstract class MinecraftMixin {
         return (Minecraft) (Object) this;
     }
 
-    @Inject(method = "reloadResourcePacks", at = @At("HEAD"))
-    private void fadeMusicOnResourceReload(CallbackInfoReturnable<?> cir) {
-        if (MinecraftAccessor.getInstance().hasGameLoaded()) LegacyMusicFader.fadeOutBgMusic(true);
+    @Inject(method = "reloadResourcePacks()Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"))
+    private void beginResourceReloadMusic(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        legacy$resourceReloadMusic = MinecraftAccessor.getInstance().hasGameLoaded() && LegacyMusicFader.beginResourceReload();
+    }
+
+    @Inject(method = "reloadResourcePacks()Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
+    private void finishResourceReloadMusic(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        if (legacy$resourceReloadMusic) {
+            legacy$resourceReloadMusic = false;
+            cir.getReturnValue().whenComplete((unused, throwable) -> self().execute(() -> LegacyMusicFader.finishResourceReload(throwable == null)));
+        }
     }
 
     //? if forge {
@@ -563,6 +574,10 @@ public abstract class MinecraftMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
         oldScreen = this.screen;
+        if (screen instanceof PauseScreen && player != null && player.isUsingItem()) {
+            if (gameMode != null) gameMode.releaseUsingItem(player);
+            else player.stopUsingItem();
+        }
         Screen replacement = Legacy4JClient.getReplacementScreen(screen);
         if (replacement != screen) {
             ci.cancel();
