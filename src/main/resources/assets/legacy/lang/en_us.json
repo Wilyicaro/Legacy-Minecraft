@@ -1784,6 +1784,7 @@
   "legacy.options.advancedOptionsMode.default": "Default",
   "legacy.options.advancedOptionsMode.hide": "Hide",
   "legacy.options.advancedOptionsMode.merge": "Merge",
+  "legacy.options.advancements": "Legacy Advancements Interface",
   "legacy.options.animatedCharacter": "Animated Character",
   "legacy.options.autoResolution": "Auto Resolution",
   "legacy.options.autoSaveCountdown": "Autosave Countdown",

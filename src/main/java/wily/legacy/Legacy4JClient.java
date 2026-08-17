@@ -199,23 +199,12 @@ public class Legacy4JClient {
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
-    //? if <1.21.2 {
-    public static PostChain gammaEffect;
-    //?}
 
     public static final RenderType GHAST_SHOOTING_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
     public static final RenderType DROWNED_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
 
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
         return getVisualPlayerColor(info.getIdentifierIndex() >= 0 ? info.getIdentifierIndex() : info.legacyMinecraft$getProfile().getId().hashCode());
-    }
-
-    public static PostChain getGammaEffect(){
-        //? if <1.21.2 {
-        return gammaEffect;
-        //?} else {
-        /*return Minecraft.getInstance().getShaderManager().getPostChain(LegacyResourceManager.GAMMA_LOCATION, LevelTargetBundle.MAIN_TARGETS);
-        *///?}
     }
 
     public static float[] getVisualPlayerColor(int i){

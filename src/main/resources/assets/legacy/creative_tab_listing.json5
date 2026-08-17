@@ -2,7 +2,13 @@
   {
     "id": "legacy:building_blocks",
     "name": {"translate": "legacy.container.tab.building_blocks"},
-    "icon": "legacy:icon/structures",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/structures",
+        "sd": "legacy:icon/structures_small"
+      }
+    },
     "listing": [
       "minecraft:stone", "minecraft:deepslate", "minecraft:basalt", "minecraft:blackstone", "minecraft:grass_block", "minecraft:dirt_path", "minecraft:dirt", "minecraft:farmland", "minecraft:cobblestone", "minecraft:cobbled_deepslate", "minecraft:smooth_stone",
       "minecraft:polished_deepslate", "minecraft:smooth_basalt", "minecraft:polished_basalt", "minecraft:polished_blackstone", "minecraft:sand", "minecraft:sandstone", "minecraft:smooth_sandstone", "minecraft:chiseled_sandstone", "minecraft:cut_sandstone", "minecraft:red_sand",
@@ -48,7 +54,13 @@
   {
     "id": "legacy:decoration",
     "name": {"translate": "legacy.container.tab.decoration"},
-    "icon": "legacy:icon/decoration",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/decoration",
+        "sd": "legacy:icon/decoration_small"
+      }
+    },
     "listing": [
       "minecraft:skeleton_skull", "minecraft:wither_skeleton_skull", "minecraft:zombie_head", "minecraft:player_head", "minecraft:creeper_head", "minecraft:piglin_head", "minecraft:dragon_head", "minecraft:sponge", "minecraft:wet_sponge", "minecraft:melon",
       "minecraft:pumpkin", "minecraft:carved_pumpkin", "minecraft:jack_o_lantern", "minecraft:bamboo", "minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling", "minecraft:jungle_sapling", "minecraft:acacia_sapling", "minecraft:dark_oak_sapling",
@@ -95,7 +107,13 @@
   {
     "id": "legacy:redstone_and_transport",
     "name": {"translate": "legacy.container.tab.redstone_and_transport"},
-    "icon": "legacy:icon/redstone_and_transport",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/redstone_and_transport",
+        "sd": "legacy:icon/redstone_and_transport_small"
+      }
+    },
     "listing": [
       "minecraft:rail", "minecraft:powered_rail", "minecraft:detector_rail", "minecraft:activator_rail", "minecraft:ladder", "minecraft:minecart", "minecraft:chest_minecart", "minecraft:furnace_minecart", "minecraft:hopper_minecart", "minecraft:tnt_minecart",
       "minecraft:elytra", "minecraft:saddle", "minecraft:oak_boat", "minecraft:spruce_boat", "minecraft:birch_boat",
@@ -111,7 +129,13 @@
   {
     "id": "legacy:materials",
     "name": {"translate": "legacy.container.tab.materials"},
-    "icon": "legacy:icon/materials",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/materials",
+        "sd": "legacy:icon/materials_small"
+      }
+    },
     "listing": [
       "minecraft:coal", "minecraft:charcoal", "minecraft:diamond", "minecraft:emerald", "minecraft:raw_copper", "minecraft:copper_ingot", "minecraft:raw_iron", "minecraft:iron_ingot", "minecraft:raw_gold", "minecraft:gold_ingot",
       "minecraft:netherite_scrap", "minecraft:netherite_ingot", "minecraft:quartz", "minecraft:amethyst_shard", "minecraft:disc_fragment_5", "minecraft:echo_shard", "minecraft:brick", "minecraft:nether_brick", "minecraft:resin_brick", "minecraft:stick", "minecraft:bowl",
@@ -127,7 +151,13 @@
   {
     "id": "legacy:food",
     "name": {"translate": "legacy.container.tab.food"},
-    "icon": "legacy:icon/food",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/food",
+        "sd": "legacy:icon/food_small"
+      }
+    },
     "listing": [
       "minecraft:apple", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:melon_slice", "minecraft:mushroom_stew", "minecraft:rabbit_stew", "minecraft:beetroot_soup", "minecraft:bread", "minecraft:cake", "minecraft:cookie",
       "minecraft:cooked_cod", "minecraft:cod", "minecraft:cooked_salmon", "minecraft:salmon", "minecraft:tropical_fish", "minecraft:pufferfish", "minecraft:cooked_porkchop", "minecraft:porkchop", "minecraft:cooked_beef", "minecraft:beef",
@@ -138,7 +168,13 @@
   {
     "id": "legacy:tools_and_armour",
     "name": {"translate": "legacy.container.tab.tools_and_armour"},
-    "icon": "legacy:icon/tools",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/tools",
+        "sd": "legacy:icon/tools_small"
+      }
+    },
     "listing": [
       "minecraft:compass", "minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:wooden_sword", "minecraft:wooden_shovel", "minecraft:wooden_pickaxe", "minecraft:wooden_axe", "minecraft:wooden_hoe",
       "minecraft:map", "minecraft:chainmail_helmet", "minecraft:chainmail_chestplate", "minecraft:chainmail_leggings", "minecraft:chainmail_boots", "minecraft:stone_sword", "minecraft:stone_shovel", "minecraft:stone_pickaxe", "minecraft:stone_axe", "minecraft:stone_hoe",
@@ -184,7 +220,13 @@
   {
     "id": "legacy:brewing",
     "name": {"translate": "legacy.container.tab.brewing"},
-    "icon": "legacy:icon/brewing",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/brewing",
+        "sd": "legacy:icon/brewing_small"
+      }
+    },
     "listing": [
       "minecraft:experience_bottle", "minecraft:dragon_breath", "minecraft:ghast_tear", "minecraft:fermented_spider_eye", "minecraft:blaze_powder", "minecraft:magma_cream", "minecraft:glistering_melon_slice", "minecraft:rabbit_foot", "minecraft:phantom_membrane", "minecraft:glass_bottle", "minecraft:ominous_bottle",
       //? if <1.20.5 {
@@ -221,7 +263,13 @@
   {
     "id": "legacy:misc",
     "name": {"translate": "legacy.container.tab.misc"},
-    "icon": "legacy:icon/misc",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/misc",
+        "sd": "legacy:icon/misc_small"
+      }
+    },
     "listing": [
       "minecraft:chest", "minecraft:ender_chest", "minecraft:crafting_table", "minecraft:furnace", "minecraft:brewing_stand", "minecraft:enchanting_table", "minecraft:beacon", "minecraft:conduit", "minecraft:barrel", "minecraft:cartography_table",
       "minecraft:loom", "minecraft:lectern", "minecraft:blast_furnace", "minecraft:smoker", "minecraft:campfire", "minecraft:soul_campfire", "minecraft:composter", "minecraft:grindstone", "minecraft:stonecutter", "minecraft:fletching_table",

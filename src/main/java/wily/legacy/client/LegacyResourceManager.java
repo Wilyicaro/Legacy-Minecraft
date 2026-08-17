@@ -67,12 +67,12 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         });
 
         //? if <1.21.2 {
-        if (Legacy4JClient.gammaEffect != null) {
-            Legacy4JClient.gammaEffect.close();
+        if (LegacyGamma.postEffect != null) {
+            LegacyGamma.postEffect.close();
         }
         try {
-            Legacy4JClient.gammaEffect = new PostChain(minecraft.getTextureManager(), resourceManager, minecraft.getMainRenderTarget(), GAMMA_LOCATION);
-            Legacy4JClient.gammaEffect.resize(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+            LegacyGamma.postEffect = new PostChain(minecraft.getTextureManager(), resourceManager, minecraft.getMainRenderTarget(), GAMMA_LOCATION);
+            LegacyGamma.postEffect.resize(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
         } catch (IOException iOException) {
             Legacy4J.LOGGER.warn("Failed to load gamma: {}", GAMMA_LOCATION, iOException);
         } catch (JsonSyntaxException jsonSyntaxException) {

@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyGamma;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.ScreenshotToast;
 import wily.legacy.entity.PlayerYBobbing;
@@ -164,7 +165,7 @@ public abstract class GameRendererMixin {
     //? if <1.21.2 {
     @Inject(method = "resize",at = @At("RETURN"))
     public void resize(int i, int j, CallbackInfo ci) {
-        if (Legacy4JClient.gammaEffect != null) Legacy4JClient.gammaEffect.resize(i,j);
+        if (LegacyGamma.postEffect != null) LegacyGamma.postEffect.resize(i,j);
     }
     //?}
 }

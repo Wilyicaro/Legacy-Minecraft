@@ -1,11 +1,141 @@
-## Changes
+## Additions
 
-- Enhanced tip horizontal offset
-- Now, `GUI Scale` will be functional and available again
-- Removed `Interface Resolution` and `Auto Resolution`
+- Added `UI Mode` slider to User Interface section, which allows to change between `Auto` (based on resolution, like before), `Full HD`, `HD` and `SD` (PSVita Edition / low resolution mode) UI modes
+- Added an accurate and built-in Change Skin screen, with a lot of customization options
+- Some of the Change Skin options:
+    - `TU3 Change Skin Screen`
+    - `Smooth Preview Scroll`
+    - `Hide Armor`
+    - `Custom Skin Animation`
+    - `Custom Pack Options`
+- Added Screenshot Toasts (enabled by the `Show Screenshot Toasts` option), thanks to RedRain0o0
+- Added Rosenfeld Patch built-in resource pack, for removing newer music, thanks to Cjnator38
+- Added some options to Game Options section:
+- `Force Legacy Flight`, thanks to Sowgro
+- `Force Legacy Swimming`, thanks to Sowgro
+- `Force Legacy Shield Controls`
+- `Force Legacy Offhand Limits`
+- `Legacy block protection`
+- `Legacy World Interactions`
+- `Legacy Mob interactions`
+- `Legacy Map Behavior`
+- `Legacy Loot Tables`
+- `Legacy Sound effects`
+- Added some options to Graphics section:
+- `Legacy Clouds` (with changes to the sky color)
+- `Legacy Clouds Height`
+- `Legacy Zombie Aggression Animation`
+- `Legacy Drowned Height`
+- `Slow Chunk Loading`(off by default)
+- `Legacy Entity Distance`
+- Added some options to User Interface section:
+    - `Display Realms Button`
+    - `Hide Sodium Settings`
+    - `Hide Experimental World Settings`
+    - `In-Game Online IDs`
+    - `Hide Advanced Options Tooltip`
+    - `Display Pack Management Tooltips`
+    - `Display Reinstall Content Button`
+    - `Legacy Advancements Interface`
+    - `Leaderboards Interface`
+    - `Fake Manual Save Screen`
+    - `Legacy Font`
+    - `Legacy Settings Menus`, a menu purist mode for accuracy with LE
+- Added some gamerules (all disabled by default):
+- `Legacy Shield Controls`
+- `Legacy Mobcap Limits`
+- `Falling Block Limit`
+- `Legacy Offhand Limits`
+- Added `Minecraft Store`, with texture and mash-up packs available through Remote Resource Albums and World Templates; remote content can be downloaded and applied during world loading, thanks to BrandonItaly
+- Added a `Reinstall Content` action for updating downloaded content
+- Added missing mob information tooltips
+- Added `Advanced Options` for the controller section
+- Added `Controller Polling Rate` to Advanced Controller Options
+- Added Controller LED RGB sliders with a preview
+- Added Decay potions and tipped arrows
+- Added all the missing SD UIs, including How To Play, More World Options, Book & quill, and Host Options interfaces
+- Added Mushroom Pore
+- Added SD Control Icons for Keyboard & Mouse, Steam, and PlayStation 4/5
+    - KBM by Cjnator38
+    - PS4/PS5 and initial Steam designs by NicSonic-_-
+- Added descriptions for entries in More World Options (Nabouna32)
+- Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
+- The leaderboard now globally tracks stats of survival mode players across all difficulties
+    - Due to this the mods button can now only be accessed from advanced game options
+- Added new How to Plays from 1.14 to 1.21.4
 
-## Fixes
+## Parity Changes
 
-- Fixed incompatibility with newer versions of NT
-- Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
-- Fixed resetting stats when dying
+- You can now dye the Shulker mob
+- Player body no longer renders in first person when sleeping
+- The legacy sleep animation will now play in first person
+- Carpets no longer raise the player 1/16th
+- Legacy drop item animation
+- Beacon beam will be visible from the inside
+- Trident killers will be possible
+- Tridents thrown by the player will not despawn
+- Tweaked elytra momentum
+- Elytra will have understeer
+- Flying into water with elytra will cancel it
+- The elytra glide sound will fade out upon landing
+- Trident sits higher up in the hand and slightly more pointed
+- Dispensers can fire tridents
+- Tweaked trident third person wind up animation
+- Players don't have fire animation with fire resistance effect applied
+- Ignited players or mobs will light campfires
+- Sand / Red sand can be blast smelted into glass
+- Cartography table can now turn paper into maps
+- Strongholds can now generate emeralds and ink sacs
+- Lapis, Squid ink, cocoa beans and bonemeal can directly be used as dye
+- Fish drops bones
+- Raiders drop arrows, iron armor and more emeralds scaling with difficultly level
+- Vindicators deal legacy damage values
+- ID in the Map name
+- Initial open map animation
+- Maps opened in the same area stack
+- Head layer items such as mob heads now receive damage tint
+- Host Options command outputs
+- Horses will show food particles and play the eating sound when fed
+- Campfires now have a sound when you place an food item onto them
+- Wandering traders can sell more trades
+- Wandering traders will preview trades like villagers
+- Wandering traders will have llamas when spawned with an egg
+- Adjusted hitbox of tall plants, kelp, bamboo and conduits
+- Drowned will now have the same height as the Husk
+- When picking up berries they will go straight into the inventory
+- In console aspects , adjusted the inventory model of walls to match PS4 edition
+- In console aspects , adjusted the model of end crystals to match PS4 edition
+- The interact animation will be suppressed on various actions
+- Music and Sound sliders are no longer linked
+- Experience orb and item pick up sound has been pitched up, thanks to Cjnator38
+- Skeleton horses can be ridden without a saddle
+- Spider Jockeys in the nether will become Wither Jockeys
+- Baby zombies have a 15% to become a jockey , they will seek out the nearest rideable mob
+- Added Legacy Console Edition underwater fog
+- The world-loading progress bar now loops like Legacy Console Edition
+- Music now fades out when changing dimensions, and fades out at legacy's 200 ticks
+- Shulker bullets now render at 50% opacity
+- Primed TNT and TNT minecarts now flash increasingly white as they approach detonation
+- Added Legacy Console Edition rain rendering, including its world-anchored animation, opacity fade, and intensity
+- Fish now use the Legacy Console Edition flopping animation out of water
+- Gamma now uses Legacy Console Edition's brightness curve
+
+## General Changes
+
+- Remastered Stadia Control Icons (NicSonic-_-)
+- Touched up PlayStation 5 Control Icons (NicSonic-_-)
+- Remastered Steam Control Icons (Cjnator38)
+- A sizable amount of new Control Tooltip actions and fixes (Nabouna32)
+- Biome overrides can now define grass and foliage colors
+- Biome overrides can now define Birch leaves individual color
+- Added a new common value, `minecraft:ps4_end_crystal_model`, to enable the use of PS4 end crystal model in resource packs
+- Added a new common value, `minecraft:autofocus_button_animation`, to enable the use of the autofocus button animation from older TUs in resource packs
+- Added additional common colors for use in resource packs
+- Added Mixed Crafting Tabs Manager, which just defines the icon and name of the tabs for now, limited to the vanilla tabs, and can be edited in `legacy:mixed_crafting_tabs.json`
+- Added Type Crating Tabs Manager, which defines the icon, name and the tabs (excluding the crafting tab listing), and can be edited in `legacy:type_crafting_tabs.json`
+
+## Fixed
+
+- Fixed the game freezing after resuming a device from sleep
+- Fixed GUI items in inventories having artifacts at certain resolutions
+- Fixed Legacy Gamma sometimes causing a black screen

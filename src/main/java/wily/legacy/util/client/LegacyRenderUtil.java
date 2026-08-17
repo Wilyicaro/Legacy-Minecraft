@@ -834,36 +834,23 @@ public class LegacyRenderUtil {
         }
 
         if (mc.options.showAutosaveIndicator().get() && canRenderElement && (mc.gui.autosaveIndicatorValue > 0 || mc.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(FactoryAPIClient.getPartialTick(), mc.gui.lastAutosaveIndicatorValue, mc.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02) {
-            FactoryScreenUtil.disableDepthTest();
+            FactoryGuiGraphics.of(graphics).disableDepthTest();
             drawAutoSavingIcon(graphics, graphics.guiWidth() - 66, 44);
-            FactoryScreenUtil.enableDepthTest();
+            FactoryGuiGraphics.of(graphics).enableDepthTest();
         }
 
         if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
-            FactoryScreenUtil.disableDepthTest();
+            FactoryGuiGraphics.of(graphics).disableDepthTest();
             FactoryScreenUtil.enableBlend();
             graphics.pose().pushPose();
             graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXOffset(), Legacy4JClient.controllerManager.getVisualPointerY(), 4000);
-            FactoryGuiGraphics.of(graphics).blitSprite(mc.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacyOptions.getUIMode().isFHD() ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             FactoryScreenUtil.disableBlend();
-            FactoryScreenUtil.enableDepthTest();
+            FactoryGuiGraphics.of(graphics).enableDepthTest();
         }
 
-        PostChain gammaEffect = Legacy4JClient.getGammaEffect();
-        if (gammaEffect != null && LegacyOptions.displayLegacyGamma.get()) {
-            float gamma = LegacyOptions.legacyGamma.get().floatValue();
-            graphics.flush();
-            FactoryScreenUtil.enableBlend();
-            FactoryScreenUtil.disableDepthTest();
-            float tweakedGamma = gamma * 1.5f + 0.5f;
-            //? if <1.21.5 {
-            gammaEffect.passes.forEach(p-> p./*? if <1.21.2 {*/getEffect/*?} else {*//*getShader*//*?}*/().safeGetUniform("gamma").set(tweakedGamma));
-            //?}
-            gammaEffect.process(/*? if <1.21.2 {*/partialTick/*?} else {*//*mc.getMainRenderTarget(), mc.gameRenderer.resourcePool*//*?}*//*? if >1.21.4 {*//*, pass-> pass.setUniform("gamma", tweakedGamma)*//*?}*/);
-            FactoryScreenUtil.enableDepthTest();
-            FactoryScreenUtil.disableBlend();
-        }
+        LegacyGamma.render(graphics, partialTick);
     }
 
     public static void renderPotionLevel(GuiGraphics graphics, int x, int y, ItemStack stack) {
