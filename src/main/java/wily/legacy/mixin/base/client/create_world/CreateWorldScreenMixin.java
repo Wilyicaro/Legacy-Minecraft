@@ -95,7 +95,6 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         }
         CompletableFuture<WorldCreationContext> future = legacy$preloadedWorldCreation;
         if (future == null) return;
-        legacy$preloadedWorldCreation = null;
         legacy$openingWorldCreation = true;
         ResourceKey<WorldPreset> targetPreset = /*? if >=1.21.2 {*/ /*preset*//*?} else {*/WorldPresets.NORMAL/*?}*/;
         legacy$openWorldCreationWhenReady(minecraft, parent, targetPreset,/*? if >=1.21.2 {*/ /*callback,*//*?}*/ future);
