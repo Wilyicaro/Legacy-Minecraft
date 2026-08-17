@@ -5,6 +5,10 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.mixin.LegacyMixinPlugin",
   "client": [
+    //? !forge {
+    "compat.jei.RecipesGuiMixin",
+    "compat.jei.VanillaPluginMixin",
+    //?}
     "client.GustParticleMixin",
     "client.PanoramaRendererMixin",
     "client.GhostSlotsMixin",
