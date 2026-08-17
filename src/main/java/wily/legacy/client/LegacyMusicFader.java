@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class LegacyMusicFader {
     private static final long FADE_TICKS = 70;
+    private static final long RESOURCE_RELOAD_MUSIC_DELAY_TICKS = 100;
     private static long ticks = 0;
     private static final Minecraft mc = Minecraft.getInstance();
     private static final SoundManager soundManager = mc.getSoundManager();
@@ -22,6 +23,8 @@ public class LegacyMusicFader {
     public static boolean musicManagerShouldTick = true;
     private static boolean resumeMusicManager;
     private static boolean resourceReloadActive;
+    private static boolean resourceReloadMusicDelayActive;
+    private static long resourceReloadMusicDelayTicks;
 
     public static void fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundInstance music;
@@ -68,7 +71,12 @@ public class LegacyMusicFader {
     public static void finishResourceReload(boolean successful) {
         if (!resourceReloadActive) return;
         resourceReloadActive = false;
-        if (successful) fadeOutBgMusic(true);
+        if (successful) {
+            musicManagerShouldTick = false;
+            resourceReloadMusicDelayActive = true;
+            resourceReloadMusicDelayTicks = 0;
+            fadeOutBgMusic(false);
+        }
     }
 
     public static void tick() {
@@ -85,11 +93,18 @@ public class LegacyMusicFader {
                 LegacySoundUtil.setSoundInstanceVolume(song, (songTick - ticks) / (float) FADE_TICKS);
             }
         }
-        if (fadingSongs.isEmpty() && queuedSong != null) {
+        if (fadingSongs.isEmpty() && resourceReloadMusicDelayActive) {
+            if (++resourceReloadMusicDelayTicks >= RESOURCE_RELOAD_MUSIC_DELAY_TICKS) {
+                resourceReloadMusicDelayActive = false;
+                musicManagerAccessor.setNextSongDelay(0);
+                musicManagerShouldTick = true;
+            }
+        }
+        if (fadingSongs.isEmpty() && !resourceReloadMusicDelayActive && queuedSong != null) {
             soundManager.play(queuedSong);
             queuedSong = null;
         }
-        if (fadingSongs.isEmpty() && resumeMusicManager) {
+        if (fadingSongs.isEmpty() && !resourceReloadMusicDelayActive && resumeMusicManager) {
             musicManagerAccessor.setNextSongDelay(0);
             musicManagerShouldTick = true;
             resumeMusicManager = false;
