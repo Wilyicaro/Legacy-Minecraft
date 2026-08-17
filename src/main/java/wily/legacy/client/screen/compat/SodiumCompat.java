@@ -97,7 +97,6 @@ public class SodiumCompat {
                 for (Page page : modOption.pages()) {
                     for (OptionGroup group : page.groups()) {
                         for (Option option : group.options()) {
-                            //Sodium doesn't have the 0.8.11 version available in the repo (with the reset to default method), so we're doing this for now
                             if (option instanceof StatefulOption<?> statefulOption)
                                 resetSodiumOption(statefulOption);
                         }
@@ -109,7 +108,7 @@ public class SodiumCompat {
     }
 
     public static <T> void resetSodiumOption(StatefulOption<T> statefulOption) {
-        statefulOption.modifyValue(statefulOption.getDefaultValue().get((Config) ReflectionUtil.getFieldValue(SODIUM_OPTION_FIELDS.get("state"), statefulOption)));
+        statefulOption.resetToDefault();
     }
 }
 //?}
