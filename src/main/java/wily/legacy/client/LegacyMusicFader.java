@@ -21,6 +21,7 @@ public class LegacyMusicFader {
     private static final Map<SoundInstance, Long> fadingSongs = new HashMap<>();
     public static boolean musicManagerShouldTick = true;
     private static boolean resumeMusicManager;
+    private static boolean resourceReloadActive;
 
     public static void fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundInstance music;
@@ -52,6 +53,22 @@ public class LegacyMusicFader {
         musicManagerAccessor.setCurrentMusic(null);
         musicManagerShouldTick = false;
         resumeMusicManager = true;
+    }
+
+    public static boolean beginResourceReload() {
+        if (resourceReloadActive || musicManagerAccessor.getCurrentMusic() == null) return false;
+        resourceReloadActive = true;
+        return true;
+    }
+
+    public static boolean isResourceReloadActive() {
+        return resourceReloadActive;
+    }
+
+    public static void finishResourceReload(boolean successful) {
+        if (!resourceReloadActive) return;
+        resourceReloadActive = false;
+        if (successful) fadeOutBgMusic(true);
     }
 
     public static void tick() {

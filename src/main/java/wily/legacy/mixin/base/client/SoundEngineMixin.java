@@ -54,6 +54,11 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @Shadow protected abstract float calculateVolume(SoundInstance arg);
 
+    @Inject(method = "reload", at = @At("HEAD"), cancellable = true)
+    private void keepMusicDuringResourceReload(CallbackInfo ci) {
+        if (LegacyMusicFader.isResourceReloadActive()) ci.cancel();
+    }
+
     @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
     private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
         return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && sound.getLocation().equals(SoundEvents.ITEM_PICKUP./*? if <1.21.2 {*/getLocation/*?} else {*//*location*//*?}*/()) ? 4.0f : max;
