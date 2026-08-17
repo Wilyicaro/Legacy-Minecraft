@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.factoryapi.base.config.FactoryConfig;
-import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.function.Consumer;
 

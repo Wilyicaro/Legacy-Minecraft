@@ -389,6 +389,10 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
         if (LegacyOptions.unfocusedInputs.get()) minecraft.setWindowActive(true);
+        while (keyToggleCrafting.consumeClick()) {
+            if (minecraft.player != null && minecraft.screen == null)
+                FactoryConfig.saveOptionAndConsume(LegacyOptions.classicCrafting, !LegacyOptions.classicCrafting.get(), v -> {});
+        }
         while (keyCrafting.consumeClick()){
             if (!consumeKeyboardToggleKeyPress(keyCrafting)) continue;
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
@@ -526,6 +530,7 @@ public class Legacy4JClient {
         });
         FactoryAPIClient.registerKeyMapping(registry->{
             registry.accept(keyCrafting);
+            registry.accept(keyToggleCrafting);
             registry.accept(keyHostOptions);
             registry.accept(keyLegacy4JSettings);
             registry.accept(keyCycleHeldLeft);
@@ -779,6 +784,7 @@ public class Legacy4JClient {
     }
 
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
+    public static final KeyMapping keyToggleCrafting = new KeyMapping("legacy.key.toggleCrafting", -1, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, "key.categories.misc");
