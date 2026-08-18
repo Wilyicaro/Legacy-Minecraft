@@ -166,8 +166,28 @@ public class KeyboardScreen extends OverlayPanelScreen {
         if (getFocused() instanceof CharButton c) c.renderTooltip(guiGraphics, i, j, f);
     }
 
+    private GuiEventListener returnToParent() {
+        if (parent == null) return null;
+        if (minecraft.screen == this) onClose();
+        GuiEventListener listener = listenerSupplier.get();
+        if (listener instanceof LayoutElement original && !parent.children().contains(listener)) {
+            for (GuiEventListener child : parent.children()) {
+                if (child.getClass() == listener.getClass() && child instanceof LayoutElement element && element.getX() == original.getX() && element.getY() == original.getY() && element.getWidth() == original.getWidth() && element.getHeight() == original.getHeight()) {
+                    listener = child;
+                    break;
+                }
+            }
+        }
+        if (listener != null) parent.setFocused(listener);
+        return listener;
+    }
+
     @Override
     public boolean charTyped(char c, int i) {
+        if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+            GuiEventListener listener = returnToParent();
+            return listener != null && listener.charTyped(c, i);
+        }
         for (Renderable renderable : renderableVList.renderables) {
             if (renderable instanceof CharButton b && b.matches(c)){
                 setFocused(b);
@@ -179,6 +199,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (!Legacy4JClient.controllerManager.isControllerSimulatingInput && i != InputConstants.KEY_ESCAPE) {
+            GuiEventListener listener = returnToParent();
+            return listener != null && (isOpenKey(i) || listener.keyPressed(i, j, k));
+        }
         if (renderableVList.keyPressed(i)) return true;
         return super.keyPressed(i, j, k);
     }
