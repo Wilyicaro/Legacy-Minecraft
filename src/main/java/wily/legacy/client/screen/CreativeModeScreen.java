@@ -285,6 +285,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
     @Override
     public boolean mouseReleased(double d, double e, int i) {
+        setDragging(false);
         scroller.mouseReleased(d, e, i);
         return super.mouseReleased(d, e, i);
     }
