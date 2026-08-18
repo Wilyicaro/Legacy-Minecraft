@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event, TabList.Access {
@@ -65,21 +66,29 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             });
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
-    private static boolean preloadingCreateWorld;
+    private static final ThreadLocal<Boolean> preloadingCreateWorld = ThreadLocal.withInitial(() -> false);
+    private static CompletableFuture<Void> createWorldPreload = CompletableFuture.completedFuture(null);
     private boolean createWorldPreloaded;
     public boolean isLoading = false;
 
     public static boolean isPreloadingCreateWorld() {
-        return preloadingCreateWorld;
+        return preloadingCreateWorld.get();
     }
 
-    private static void preloadCreateWorld(Minecraft minecraft) {
-        preloadingCreateWorld = true;
-        try {
-            CreateWorldScreen.openFresh(minecraft, () -> {});
-        } finally {
-            preloadingCreateWorld = false;
-        }
+    public static CompletableFuture<Void> getCreateWorldPreload() {
+        return createWorldPreload;
+    }
+
+    private static synchronized void preloadCreateWorld(Minecraft minecraft) {
+        if (!createWorldPreload.isDone()) return;
+        createWorldPreload = CompletableFuture.runAsync(() -> {
+            preloadingCreateWorld.set(true);
+            try {
+                CreateWorldScreen.openFresh(minecraft, () -> {});
+            } finally {
+                preloadingCreateWorld.remove();
+            }
+        }, Util.backgroundExecutor());
     }
 
     public PlayGameScreen(Screen parent, int initialTab) {
