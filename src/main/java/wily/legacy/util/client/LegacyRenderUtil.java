@@ -682,8 +682,8 @@ public class LegacyRenderUtil {
                     int backgroundX = (guiGraphics.guiWidth() - backgroundWidth) / 2;
                     FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f,l / 255f);
                     renderPointerPanel(guiGraphics, backgroundX, -4, backgroundWidth, height + 15);
-                    FactoryGuiGraphics.of(guiGraphics).clearColor();
                 }
+                FactoryGuiGraphics.of(guiGraphics).clearColor();
                 int[] line = {0};
                 tooltipLines.forEach((mutableComponent, width) -> {
                     int x = (guiGraphics.guiWidth() - width) / 2;
