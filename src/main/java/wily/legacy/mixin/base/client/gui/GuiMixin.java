@@ -44,8 +44,10 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryGuiElement;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.CommonColor;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
@@ -185,7 +187,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             boolean hd = LegacyOptions.getUIMode().isHDOrLower();
             guiGraphics.pose().translate(0,-36f,0);
             if (!hd && hudSize != 1) guiGraphics.pose().scale(7/8f,7/8f,7/8f);
-            LegacyRenderUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,8453920,0, hd && hudSize == 3 || !hd && hudSize == 2 || hudSize == 1 ? 1/2f : 2/3f);
+            LegacyRenderUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,ColorUtil.withAlpha(CommonColor.EXPERIENCE_TEXT.get(), LegacyRenderUtil.getHUDOpacity()),ColorUtil.withAlpha(0xFF000000, LegacyRenderUtil.getHUDOpacity()), hd && hudSize == 3 || !hd && hudSize == 2 || hudSize == 1 ? 1/2f : 2/3f);
             FactoryAPIClient.getProfiler().pop();
             //? if >1.20.5
             LegacyRenderUtil.finalizeHUDRender(guiGraphics);

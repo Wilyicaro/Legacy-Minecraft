@@ -107,7 +107,6 @@ public class LegacyRenderUtil {
     private static final Minecraft mc = Minecraft.getInstance();
     public static Integer tooltipTextColorOverride;
     public static boolean tooltipTextColorOverrideForcesStyle;
-    public static long lastHotbarSelectionChange = -1;
     public static boolean autoFocusedWidget;
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
     public static final PanoramaRenderer panoramaRenderer = /*? if <1.20.5 {*//*new PanoramaRenderer(TitleScreen.CUBE_MAP)*//*?} else {*/LegacyScreen.PANORAMA_RENDERER/*?}*/;
@@ -315,7 +314,7 @@ public class LegacyRenderUtil {
     }
 
     public static float getHUDOpacity(){
-        float f = (Util.getMillis() - lastHotbarSelectionChange)/ 1200f;
+        float f = (Util.getMillis() - LegacyGuiElements.lastHotbarSelectionChange)/ 1200f;
         return getInterfaceOpacity() <= 0.8f ?Math.min(0.8f,getInterfaceOpacity() + (1 -getInterfaceOpacity()) * (f >= 3f ? Math.max(4 - f,0) : 1)) : getInterfaceOpacity();
     }
 
