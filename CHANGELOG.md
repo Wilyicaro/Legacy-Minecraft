@@ -1,8 +1,8 @@
-## Additions
-- Added `Legacy Fireworks` option to Graphics section   
-
 
 ## Fixes
 
-- Fixed Book View and Book Edit screens UI Definitions not using id targets for vanilla classes
-- Fixed mixin crash on newer version of Forge 1.20.1
+- Fixed a remap issue causing villagers to not spawn/disappear 
+- Fixed the hotbar HUD opacity not briefly resetting when cycling 
+- Fixed item names being more transparent than they should be
+- Fixed settings buttons being misaligned from the pause screens
+- Fixed "What's This?" action disappearing after switching tabs in creative
