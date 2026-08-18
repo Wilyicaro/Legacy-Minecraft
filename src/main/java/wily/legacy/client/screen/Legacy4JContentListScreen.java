@@ -458,10 +458,13 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 int y = this.getY() + (this.height - size) / 2;
                 LegacyRenderUtil.drawGenericLoading(guiGraphics, x, y, 4, 2);
             } else if (installedPacks.getOrDefault(pack.id(), false)) {
-                int spriteSize = 18;
-                int sx = this.getX() + this.width - spriteSize - 7;
-                int sy = this.getY() + (this.height - spriteSize) / 2;
-                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
+                int guiScale = Math.max(1, Minecraft.getInstance().getWindow().getGuiScale());
+                int spriteSize = 28 * Math.max(1, Math.round(18.0f * guiScale / 28));
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(this.getX() + this.width - 16, this.getY() + this.height / 2);
+                guiGraphics.pose().scale(1.0f / guiScale, 1.0f / guiScale);
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+                guiGraphics.pose().popMatrix();
             }
         }
 
