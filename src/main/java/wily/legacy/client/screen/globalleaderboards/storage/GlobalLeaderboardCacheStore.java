@@ -94,6 +94,7 @@ public final class GlobalLeaderboardCacheStore {
       root.addProperty("fetchedAt", cache.fetchedAt());
       root.addProperty("aroundFetchedAt", cache.aroundFetchedAt());
       root.addProperty("topFetchedAt", cache.topFetchedAt());
+      root.addProperty("totalEntries", cache.totalEntries());
       root.add("aroundEntries", toJson(cache.aroundEntries()));
       root.add("topEntries", toJson(cache.topEntries()));
       return root;
@@ -132,6 +133,7 @@ public final class GlobalLeaderboardCacheStore {
       long fetchedAt = longValue(object, "fetchedAt");
       long aroundFetchedAt = longValue(object, "aroundFetchedAt", fetchedAt);
       long topFetchedAt = longValue(object, "topFetchedAt", fetchedAt);
+      int totalEntries = intValue(object, "totalEntries", -1);
       return new GlobalLeaderboardBoardCache(
          providerId,
          boardId,
@@ -140,7 +142,8 @@ public final class GlobalLeaderboardCacheStore {
          readEntries(object, "aroundEntries"),
          readEntries(object, "topEntries"),
          aroundFetchedAt,
-         topFetchedAt
+         topFetchedAt,
+         totalEntries
       );
    }
 
