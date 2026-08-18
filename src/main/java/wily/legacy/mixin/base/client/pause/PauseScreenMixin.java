@@ -130,7 +130,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
         int listWidth = accessor.getInteger("renderableVList.width", 225);
         renderableVList.init(
                 accessor.getInteger("renderableVList.x", width / 2 - listWidth / 2),
-                accessor.getInteger("renderableVList.y", this.height / 3 + 10),
+                accessor.getInteger("renderableVList.y", this.height / 3 + 5),
                 listWidth,
                 accessor.getInteger("renderableVList.height", 0));
     }
