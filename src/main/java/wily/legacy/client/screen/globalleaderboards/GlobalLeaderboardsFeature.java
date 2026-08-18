@@ -213,6 +213,17 @@ public final class GlobalLeaderboardsFeature {
         return viewMode == GlobalLeaderboardViewMode.TOP ? cache.topEntries() : cache.aroundEntries();
     }
 
+    public static int totalEntries(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, GlobalLeaderboardDifficulty difficulty) {
+        board = requestBoard(board, difficulty);
+        GlobalLeaderboardBoardCache cache = boardCache(board);
+        if (cache == null) {
+            return 0;
+        }
+
+        int loadedEntries = viewMode == GlobalLeaderboardViewMode.TOP ? cache.topEntries().size() : cache.aroundEntries().size();
+        return cache.totalEntries() < 0 ? loadedEntries : Math.max(cache.totalEntries(), loadedEntries);
+    }
+
     public static boolean hasEndpoint() {
         return GlobalLeaderboardsConfig.get().hasEndpoint();
     }
@@ -383,7 +394,7 @@ public final class GlobalLeaderboardsFeature {
                     if (err != null) {
                         Legacy4J.LOGGER.warn("Failed to fetch global leaderboard board {}", queryBoard.id(), err);
                     } else if (!isOptedOut() && page != null && page.successful() && requestPlayerKey.equals(playerKey())) {
-                        int added = mergeBoardCache(queryBoard, viewMode, page.rows(), !initial);
+                        int added = mergeBoardCache(queryBoard, viewMode, page.rows(), page.totalEntries(), !initial);
                         String paginationKey = requestKey(queryBoard, viewMode);
                         if (initial || !previous) {
                             if (!page.hasMore() || !initial && added == 0) {
@@ -567,7 +578,7 @@ public final class GlobalLeaderboardsFeature {
         return viewMode == GlobalLeaderboardViewMode.TOP ? cache.topFetchedAt() : cache.aroundFetchedAt();
     }
 
-    private static synchronized int mergeBoardCache(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, List<GlobalLeaderboardRow> entries, boolean append) {
+    private static synchronized int mergeBoardCache(GlobalLeaderboardBoard board, GlobalLeaderboardViewMode viewMode, List<GlobalLeaderboardRow> entries, int totalEntries, boolean append) {
         LinkedHashMap<String, GlobalLeaderboardBoardCache> merged = new LinkedHashMap<>(boardCaches);
         GlobalLeaderboardBoardCache existing = merged.get(board.key());
         if (existing == null) {
@@ -583,17 +594,19 @@ public final class GlobalLeaderboardsFeature {
             int previousSize = combined.size();
             entries.forEach(row -> combined.put(rowKey(row), row));
             added = combined.size() - previousSize;
-            if (added == 0) {
-                return 0;
-            }
             ArrayList<GlobalLeaderboardRow> sorted = new ArrayList<>(combined.values());
             sorted.sort(Comparator.comparingInt(GlobalLeaderboardRow::rank));
             updatedEntries = sorted;
         }
 
+        int updatedTotalEntries = totalEntries < 0 ? existing.totalEntries() : Math.max(totalEntries, updatedEntries.size());
+        if (append && added == 0 && updatedTotalEntries == existing.totalEntries()) {
+            return 0;
+        }
+
         GlobalLeaderboardBoardCache updated = viewMode == GlobalLeaderboardViewMode.TOP
-                ? existing.withTopEntries(updatedEntries, System.currentTimeMillis())
-                : existing.withAroundEntries(updatedEntries, System.currentTimeMillis());
+                ? existing.withTopEntries(updatedEntries, System.currentTimeMillis(), updatedTotalEntries)
+                : existing.withAroundEntries(updatedEntries, System.currentTimeMillis(), updatedTotalEntries);
         merged.put(board.key(), updated);
         boardCaches = Map.copyOf(merged);
         persistCache();

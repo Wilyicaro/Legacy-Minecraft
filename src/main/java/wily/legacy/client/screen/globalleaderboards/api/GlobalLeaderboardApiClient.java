@@ -135,7 +135,7 @@ public final class GlobalLeaderboardApiClient {
             int expectedRows = initialAroundPage ? boardRequest.aroundWindow() * 2 + 1 : boardRequest.topLimit();
             boolean hasMore = booleanValue(object, "hasMore", parsed.size() >= expectedRows);
             boolean hasPrevious = booleanValue(object, "hasPrevious", viewMode == GlobalLeaderboardViewMode.AROUND_ME && parsed.stream().mapToInt(GlobalLeaderboardRow::rank).filter(rank -> rank > 0).min().orElse(1) > 1);
-            return GlobalLeaderboardPage.successful(parsed, hasMore, stringValue(object, "nextCursor"), hasPrevious, stringValue(object, "previousCursor"));
+            return GlobalLeaderboardPage.successful(parsed, hasMore, stringValue(object, "nextCursor"), hasPrevious, stringValue(object, "previousCursor"), intValue(object, "totalEntries", -1));
         } catch (IOException | InterruptedException | RuntimeException err) {
             if (err instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -196,8 +196,12 @@ public final class GlobalLeaderboardApiClient {
     }
 
     private static int intValue(JsonObject object, String key) {
+        return intValue(object, key, 0);
+    }
+
+    private static int intValue(JsonObject object, String key, int fallback) {
         JsonElement element = object.get(key);
-        return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber() ? element.getAsInt() : 0;
+        return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber() ? element.getAsInt() : fallback;
     }
 
     private static long longValue(JsonObject object, String key) {

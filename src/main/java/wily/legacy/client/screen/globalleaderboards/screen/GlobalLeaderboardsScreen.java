@@ -257,7 +257,7 @@ public final class GlobalLeaderboardsScreen extends PanelVListScreen {
                 graphics.pose().popPose();
 
                 graphics.pose().pushPose();
-                Component entries = Component.translatable("legacy.menu.leaderboard.entries", rows.size());
+                Component entries = Component.translatable("legacy.menu.leaderboard.entries", Math.max(rows.size(), GlobalLeaderboardsFeature.totalEntries(board, viewMode, difficulty)));
                 graphics.pose().translate(entriesTooltipX + (entriesTooltipWidth - font.width(entries) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("entriesText.y", 6), 0);
                 if (!fontOverride) {
                     graphics.pose().scale(topTooltipScale, topTooltipScale, topTooltipScale);

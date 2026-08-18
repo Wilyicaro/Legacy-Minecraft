@@ -6,13 +6,17 @@ import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 
 import java.util.List;
 
-public record GlobalLeaderboardBoardCache(String providerId, String boardId, String displayNameKey, long fetchedAt, List<GlobalLeaderboardRow> aroundEntries, List<GlobalLeaderboardRow> topEntries, long aroundFetchedAt, long topFetchedAt) {
+public record GlobalLeaderboardBoardCache(String providerId, String boardId, String displayNameKey, long fetchedAt, List<GlobalLeaderboardRow> aroundEntries, List<GlobalLeaderboardRow> topEntries, long aroundFetchedAt, long topFetchedAt, int totalEntries) {
     public GlobalLeaderboardBoardCache(String providerId, String boardId, String displayNameKey, long fetchedAt, List<GlobalLeaderboardRow> aroundEntries, List<GlobalLeaderboardRow> topEntries) {
-        this(providerId, boardId, displayNameKey, fetchedAt, aroundEntries, topEntries, fetchedAt, fetchedAt);
+        this(providerId, boardId, displayNameKey, fetchedAt, aroundEntries, topEntries, fetchedAt, fetchedAt, -1);
     }
 
     public GlobalLeaderboardBoardCache(String boardId, String displayNameKey, long fetchedAt, List<GlobalLeaderboardRow> aroundEntries, List<GlobalLeaderboardRow> topEntries) {
-        this(LegacyLeaderboards.LEGACY_PROVIDER, boardId, displayNameKey, fetchedAt, aroundEntries, topEntries, fetchedAt, fetchedAt);
+        this(LegacyLeaderboards.LEGACY_PROVIDER, boardId, displayNameKey, fetchedAt, aroundEntries, topEntries, fetchedAt, fetchedAt, -1);
+    }
+
+    public GlobalLeaderboardBoardCache(String providerId, String boardId, String displayNameKey, long fetchedAt, List<GlobalLeaderboardRow> aroundEntries, List<GlobalLeaderboardRow> topEntries, long aroundFetchedAt, long topFetchedAt) {
+        this(providerId, boardId, displayNameKey, fetchedAt, aroundEntries, topEntries, aroundFetchedAt, topFetchedAt, -1);
     }
 
     public GlobalLeaderboardBoardCache {
@@ -20,6 +24,7 @@ public record GlobalLeaderboardBoardCache(String providerId, String boardId, Str
         displayNameKey = displayNameKey == null ? boardId : displayNameKey;
         aroundEntries = aroundEntries == null ? List.of() : List.copyOf(aroundEntries);
         topEntries = topEntries == null ? List.of() : List.copyOf(topEntries);
+        totalEntries = Math.max(-1, totalEntries);
     }
 
     public String key() {
@@ -27,10 +32,18 @@ public record GlobalLeaderboardBoardCache(String providerId, String boardId, Str
     }
 
     public GlobalLeaderboardBoardCache withAroundEntries(List<GlobalLeaderboardRow> entries, long timestamp) {
-        return new GlobalLeaderboardBoardCache(providerId, boardId, displayNameKey, timestamp, entries, topEntries, timestamp, topFetchedAt);
+        return withAroundEntries(entries, timestamp, totalEntries);
+    }
+
+    public GlobalLeaderboardBoardCache withAroundEntries(List<GlobalLeaderboardRow> entries, long timestamp, int totalEntries) {
+        return new GlobalLeaderboardBoardCache(providerId, boardId, displayNameKey, timestamp, entries, topEntries, timestamp, topFetchedAt, totalEntries);
     }
 
     public GlobalLeaderboardBoardCache withTopEntries(List<GlobalLeaderboardRow> entries, long timestamp) {
-        return new GlobalLeaderboardBoardCache(providerId, boardId, displayNameKey, timestamp, aroundEntries, entries, aroundFetchedAt, timestamp);
+        return withTopEntries(entries, timestamp, totalEntries);
+    }
+
+    public GlobalLeaderboardBoardCache withTopEntries(List<GlobalLeaderboardRow> entries, long timestamp, int totalEntries) {
+        return new GlobalLeaderboardBoardCache(providerId, boardId, displayNameKey, timestamp, aroundEntries, entries, aroundFetchedAt, timestamp, totalEntries);
     }
 }
