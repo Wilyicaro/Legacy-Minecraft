@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.factoryapi.FactoryAPI;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.Legacy4J;
 
 @Mixin(BambooStalkBlock.class)
 public abstract class BambooStalkBlockMixin {
@@ -33,6 +32,6 @@ public abstract class BambooStalkBlockMixin {
 
     @Unique
     private static boolean legacy$hasModOnServer() {
-        return !FactoryAPI.isClient() || Legacy4JClient.hasModOnServer();
+        return Legacy4J.hasModOnServer();
     }
 }

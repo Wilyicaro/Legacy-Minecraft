@@ -16,8 +16,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import wily.factoryapi.FactoryAPI;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.Legacy4J;
 
 @Mixin(DoublePlantBlock.class)
 public abstract class DoublePlantBlockMixin extends /*? if <1.21.5 {*/BushBlock/*?} else {*//*VegetationBlock*//*?}*/ {
@@ -45,6 +44,6 @@ public abstract class DoublePlantBlockMixin extends /*? if <1.21.5 {*/BushBlock/
 
     @Unique
     private static boolean legacy$hasModOnServer() {
-        return !FactoryAPI.isClient() || Legacy4JClient.hasModOnServer();
+        return Legacy4J.hasModOnServer();
     }
 }

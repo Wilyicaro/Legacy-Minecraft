@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryItemUtil;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.Legacy4J;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.inventory.RenameItemMenu;
 
@@ -142,7 +142,7 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
     }
 
     private boolean canUsePaperConversion(boolean clientSide) {
-        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior) && (!clientSide || Legacy4JClient.hasModOnServer());
+        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMapBehavior) && (!clientSide || Legacy4J.hasModOnServer());
     }
 
     private void resetNameIfInputChanged() {

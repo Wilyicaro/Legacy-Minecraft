@@ -20,11 +20,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.PlayerYBobbing;
@@ -125,7 +123,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @ModifyExpressionValue(method = /*? if (forge && >=1.21) || (neoforge && >=1.21.2) {*//*"getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)F"*//*?} else if forge || neoforge {*//*"getDigSpeed"*//*?} else {*/"getDestroySpeed"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
     protected boolean getDestroySpeed(boolean original) {
-        return !FactoryAPI.isClient() || original || Legacy4JClient.hasModOnServer();
+        return original || Legacy4J.hasModOnServer();
     }
 
     @ModifyExpressionValue(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;isEmpty()Z"))
@@ -148,7 +146,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Unique
     private void legacy$stopFallFlyingInWater() {
-        if ((!FactoryAPI.isClient() || Legacy4JClient.hasModOnServer()) && isFallFlying() && isInWater()) {
+        if (Legacy4J.hasModOnServer() && isFallFlying() && isInWater()) {
             //? if <1.21.5 {
             setSharedFlag(7, false);
             //?} else {

@@ -516,6 +516,7 @@ public class Legacy4JClient {
     }
 
     public static void init() {
+        Legacy4J.setClientModResolver(Legacy4JClient::hasModOnServer);
         SkinsClientBootstrap.init();
         GlobalLeaderboardsFeature.init();
         UIDefinitionManager.registerNamedUITarget("book_edit_screen", BookEditScreen.class);

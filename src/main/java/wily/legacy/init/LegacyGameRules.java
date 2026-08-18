@@ -5,15 +5,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.GameRules;
-import wily.factoryapi.FactoryAPIClient;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.network.PlayerInfoSync;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class LegacyGameRules {
-    private static Predicate<GameRules.Key<GameRules.BooleanValue>> clientRuleResolver = key -> Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules != null && Legacy4JClient.gameRules.getBoolean(key);
+    private static Predicate<GameRules.Key<GameRules.BooleanValue>> clientRuleResolver = key -> false;
 
     public static final GameRules.Key<GameRules.BooleanValue> GLOBAL_MAP_PLAYER_ICON = GameRules.register("globalMapPlayerIcon", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
     public static final GameRules.Key<GameRules.BooleanValue> DEFAULT_SHOW_ARMOR_STANDS_ARMS = GameRules.register("defaultShowArmorStandArms", GameRules.Category.MISC, GameRules.BooleanValue.create(true, (server, booleanValue) ->  PlayerInfoSync.All.syncGamerule(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS, booleanValue, server)));

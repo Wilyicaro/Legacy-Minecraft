@@ -104,6 +104,7 @@ public class Legacy4J {
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinToggles.COMMON_STORAGE, true);
 
     private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
+    private static BooleanSupplier clientModResolver = () -> false;
 
     public Legacy4J(){
         init();
@@ -111,6 +112,14 @@ public class Legacy4J {
         /*if (FMLEnvironment.dist == Dist.CLIENT)
             Legacy4JClient.init();
         *///?}
+    }
+
+    public static boolean hasModOnServer() {
+        return !FactoryAPI.isClient() || clientModResolver.getAsBoolean();
+    }
+
+    public static void setClientModResolver(BooleanSupplier resolver) {
+        clientModResolver = resolver == null ? () -> false : resolver;
     }
 
     public static List<Integer> getParsedVersion(String version){
