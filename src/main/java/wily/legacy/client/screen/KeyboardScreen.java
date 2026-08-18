@@ -169,8 +169,28 @@ public class KeyboardScreen extends OverlayPanelScreen {
         if (getFocused() instanceof CharButton c) c.renderTooltip(guiGraphics, i, j, f);
     }
 
+    private GuiEventListener returnToParent() {
+        if (parent == null) return null;
+        if (minecraft.screen == this) onClose();
+        GuiEventListener listener = listenerSupplier.get();
+        if (listener instanceof LayoutElement original && !parent.children().contains(listener)) {
+            for (GuiEventListener child : parent.children()) {
+                if (child.getClass() == listener.getClass() && child instanceof LayoutElement element && element.getX() == original.getX() && element.getY() == original.getY() && element.getWidth() == original.getWidth() && element.getHeight() == original.getHeight()) {
+                    listener = child;
+                    break;
+                }
+            }
+        }
+        if (listener != null) parent.setFocused(listener);
+        return listener;
+    }
+
     @Override
     public boolean charTyped(CharacterEvent characterEvent) {
+        if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+            GuiEventListener listener = returnToParent();
+            return listener != null && listener.charTyped(characterEvent);
+        }
         for (Renderable renderable : renderableVList.renderables) {
             if (renderable instanceof CharButton b && b.matches(characterEvent)) {
                 if (b.isFocused()) b.onRelease();
@@ -183,6 +203,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
+        if (!Legacy4JClient.controllerManager.isControllerSimulatingInput && keyEvent.key() != InputConstants.KEY_ESCAPE) {
+            GuiEventListener listener = returnToParent();
+            return listener != null && (isOpenKey(keyEvent.key()) || listener.keyPressed(keyEvent));
+        }
         if (keyEvent.key() == InputConstants.KEY_BACKSPACE) {
             if (backspaceButton.isFocused()) backspaceButton.onPress(keyEvent);
             else setFocused(backspaceButton);
