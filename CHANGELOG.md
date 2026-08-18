@@ -9,3 +9,4 @@
 - Fixed the frame hitch when opening the world list
 - Fixed using the physical keyboard while the virtual keyboard is open , it will now switch seamlessly
 - Fixed the install tick on installed packs in Download Content rendering incorrectly 
+- Fixed Auto Selected skin missing it's name
