@@ -375,7 +375,15 @@ public class Legacy4JContentListScreen extends PanelVListScreen {
             } else if (isInstalled(pack)) {
                 int size = list.accessor.getInteger(name + ".statusIcon.size", 18);
                 int rightPadding = list.accessor.getInteger(name + ".statusIcon.rightPadding", 7);
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, getX() + getWidth() - size - rightPadding, getY() + (getHeight() - size) / 2, size, size);
+                float guiScale = (float) Math.max(1.0, Minecraft.getInstance().getWindow().getGuiScale());
+                int spriteSize = 28 * Math.max(1, Math.round(size * guiScale / 28));
+                float centerX = Math.round((getX() + getWidth() - rightPadding - size / 2.0f) * guiScale) / guiScale;
+                float centerY = Math.round((getY() + getHeight() / 2.0f) * guiScale) / guiScale;
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(centerX, centerY, 0);
+                guiGraphics.pose().scale(1.0f / guiScale, 1.0f / guiScale, 1.0f);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+                guiGraphics.pose().popPose();
             }
         }
 
