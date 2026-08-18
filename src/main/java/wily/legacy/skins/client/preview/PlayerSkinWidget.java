@@ -160,7 +160,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     }
 
     private SkinEntry getCachedEntry(String id) {
-        if (SkinIdUtil.isBlankOrAutoSelect(id)) return null;
+        if (!SkinIdUtil.hasSkin(id)) return null;
         int version = source.version();
         if (id.equals(cachedEntryId) && cachedEntryVersion == version) return cachedEntry;
         cachedEntryId = id;
