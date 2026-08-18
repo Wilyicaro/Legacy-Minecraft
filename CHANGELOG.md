@@ -6,3 +6,4 @@
 - Fixed item names being more transparent than they should be
 - Fixed Help & Options buttons being misaligned from the pause screen
 - Fixed "What's This?" action disappearing after switching tabs in creative
+- Fixed the frame hitch when opening the world list

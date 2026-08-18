@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -30,6 +31,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -51,6 +53,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 
 @Mixin(CreateWorldScreen.class)
@@ -94,7 +97,18 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             return;
         }
         CompletableFuture<WorldCreationContext> future = legacy$preloadedWorldCreation;
-        if (future == null) return;
+        if (future == null) {
+            CompletableFuture<Void> preload = PlayGameScreen.getCreateWorldPreload();
+            if (!preload.isDone()) {
+                legacy$openingWorldCreation = true;
+                preload.whenCompleteAsync((unused, throwable) -> {
+                    legacy$openingWorldCreation = false;
+                    CreateWorldScreen.openFresh(minecraft, parent);
+                }, minecraft);
+                ci.cancel();
+            }
+            return;
+        }
         legacy$openingWorldCreation = true;
         ResourceKey<WorldPreset> targetPreset = /*? if >=1.21.2 {*/ /*preset*//*?} else {*/WorldPresets.NORMAL/*?}*/;
         legacy$openWorldCreationWhenReady(minecraft, parent, targetPreset,/*? if >=1.21.2 {*/ /*callback,*//*?}*/ future);
@@ -103,6 +117,11 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Redirect(method = /*? if >=1.21.2 {*/ /*"openCreateWorldScreen"*//*?} else {*/"openFresh"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;queueLoadScreen(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)V"))
     private static void legacy$skipWorldPreparationScreen(Minecraft minecraft, Component component) {
+    }
+
+    @ModifyArg(method = /*? if >=1.21.2 {*/ /*"openCreateWorldScreen"*//*?} else {*/"openFresh"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/WorldLoader;load(Lnet/minecraft/server/WorldLoader$InitConfig;Lnet/minecraft/server/WorldLoader$WorldDataSupplier;Lnet/minecraft/server/WorldLoader$ResultFactory;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"), index = 4)
+    private static Executor legacy$runPreloadApplyOffThread(Executor executor) {
+        return PlayGameScreen.isPreloadingCreateWorld() ? Util.backgroundExecutor() : executor;
     }
 
     @Inject(method = /*? if >=1.21.2 {*/ /*"openCreateWorldScreen"*//*?} else {*/"openFresh"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;managedBlock(Ljava/util/function/BooleanSupplier;)V"), cancellable = true)
