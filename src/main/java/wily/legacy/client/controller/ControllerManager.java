@@ -134,6 +134,7 @@ public class ControllerManager {
         if (!getHandler().isValidController(LegacyOptions.selectedController.get())) {
             if (connectedController != null) {
                 connectedController.disconnect(ControllerManager.this);
+                safeDisconnect();
             }
             return;
         }
@@ -187,6 +188,38 @@ public class ControllerManager {
         }
         if (!onlyVirtual) {
             GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+        }
+    }
+
+    public void safeDisconnect() {
+        if (connectedController == null) return;
+        setControllerTheLastInput(false);
+        if (isCursorDisabled && !getCursorMode().isNever()) enableCursor();
+        updateBindings(Controller.EMPTY);
+        connectedController = null;
+    }
+
+    public void connectTo(int jid) {
+        if (connectedController != null) connectedController.disconnect(this);
+        if (getHandler().isValidController(jid)) {
+            Controller controller = getHandler().getController(jid);
+            if (controller != null) {
+                connectedController = controller;
+                controller.connect(this);
+                if (controller.hasLED()) {
+                    controller.setLED(
+                            LegacyOptions.controllerLedRed.get().byteValue(),
+                            LegacyOptions.controllerLedGreen.get().byteValue(),
+                            LegacyOptions.controllerLedBlue.get().byteValue()
+                    );
+                }
+            } else safeDisconnect();
+        }
+    }
+
+    public void updateHandler(Controller.Handler handler) {
+        if (connectedController != null && connectedController.getHandler() != handler) {
+            connectTo(LegacyOptions.selectedController.get());
         }
     }
 

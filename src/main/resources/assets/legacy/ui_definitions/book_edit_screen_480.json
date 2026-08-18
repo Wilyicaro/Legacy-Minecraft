@@ -1,6 +1,5 @@
 {
-  "targetUI": "net.minecraft.client.gui.screens.inventory.BookEditScreen",
-  "targetType": "class",
+  "targetUI": "minecraft:book_edit_screen",
   "applyCondition": {
     "reference": "uiMode.sd"
   },

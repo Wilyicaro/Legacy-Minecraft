@@ -181,11 +181,11 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             LegacyRenderUtil.applyHUDScale(guiGraphics);
             FactoryAPIClient.getProfiler().push("expLevel");
             String exp = "" + i;
-            int hudScale = LegacyOptions.hudScale.get();
-            boolean is720p = minecraft.getWindow().getHeight() % 720 == 0;
+            int hudSize = LegacyOptions.hudSize.get();
+            boolean hd = LegacyOptions.getUIMode().isHDOrLower();
             guiGraphics.pose().translate(0,-36f,0);
-            if (!is720p && hudScale != 1) guiGraphics.pose().scale(7/8f,7/8f,7/8f);
-            LegacyRenderUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,8453920,0,is720p && hudScale == 3 || !is720p && hudScale == 2 || hudScale == 1 ? 1/2f : 2/3f);
+            if (!hd && hudSize != 1) guiGraphics.pose().scale(7/8f,7/8f,7/8f);
+            LegacyRenderUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,8453920,0, hd && hudSize == 3 || !hd && hudSize == 2 || hudSize == 1 ? 1/2f : 2/3f);
             FactoryAPIClient.getProfiler().pop();
             //? if >1.20.5
             LegacyRenderUtil.finalizeHUDRender(guiGraphics);

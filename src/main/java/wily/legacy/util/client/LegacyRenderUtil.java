@@ -299,7 +299,7 @@ public class LegacyRenderUtil {
     }
 
     public static float getHUDScale(){
-        return switch (LegacyOptions.hudScale.get()) {
+        return switch (LegacyOptions.hudSize.get()) {
             case 2 -> LegacyOptions.getUIMode().isFHD() ? 1.474f : LegacyOptions.getUIMode().isSD() ? 1.0f : 1.5f;
             case 3 -> LegacyOptions.getUIMode().isSD() ? 1.324f : 2.0f;
             default -> LegacyOptions.getUIMode().isSD() ? 0.8f : 1.0f;

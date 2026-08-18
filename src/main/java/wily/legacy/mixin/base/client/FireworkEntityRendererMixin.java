@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends /*? if >=1.21.2 {*//*EntityRenderer<FireworkRocketEntity, FireworkRocketRenderState>*//*?} else {*/EntityRenderer<FireworkRocketEntity>/*?}*/ {
@@ -44,6 +45,7 @@ public abstract class FireworkEntityRendererMixin extends /*? if >=1.21.2 {*//*E
 
     @Inject(method = "render(Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",at = @At("HEAD"), cancellable = true)
     public void render(FireworkRocketEntity entity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
+        if (!LegacyOptions.legacyFireworks.get()) return;
         ci.cancel();
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(g, entity.yRotO, entity.getYRot()) - 90.0f));
@@ -95,6 +97,8 @@ public abstract class FireworkEntityRendererMixin extends /*? if >=1.21.2 {*//*E
     }
     @Inject(method = "render(Lnet/minecraft/client/renderer/entity/state/FireworkRocketRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",at = @At("HEAD"), cancellable = true)
     public void render(FireworkRocketRenderState fireworkRocketRenderState, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
+        if (!LegacyOptions.legacyFireworks.get()) return;
+
         ci.cancel();
         LegacyFireworkRenderState renderState = FactoryRenderStateExtension.Accessor.of(fireworkRocketRenderState).getExtension(LegacyFireworkRenderState.class);
         poseStack.pushPose();

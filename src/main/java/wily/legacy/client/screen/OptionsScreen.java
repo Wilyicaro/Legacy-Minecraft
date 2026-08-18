@@ -530,6 +530,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.loyaltyLines,
                                 LegacyOptions.merchantTradingIndicator,
                                 LegacyOptions.legacyBabyVillagerHead,
+                                LegacyOptions.legacyFireworks,
                                 LegacyOptions.legacyEvokerFangs,
                                 LegacyOptions.legacyDrownedHeight,
                                 LegacyOptions.legacyDrownedAnimation,
@@ -570,7 +571,7 @@ public class OptionsScreen extends PanelVListScreen {
                                     LegacyOptions.showVanillaRecipeBook,
                                     LegacyOptions.tooltipBoxes,
                                     LegacyOptions.of(mc.options.attackIndicator()),
-                                    LegacyOptions.hudScale,
+                                    LegacyOptions.hudSize,
                                     LegacyOptions.hudOpacity,
                                     LegacyOptions.hudDistance);
                             if (!useLegacySettingsMenusOptions()) {
@@ -583,7 +584,7 @@ public class OptionsScreen extends PanelVListScreen {
                             if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.inGameOnlineIds,
                                     LegacyOptions.classicCrafting,
-                                    LegacyOptions.hudScale,
+                                    LegacyOptions.hudSize,
                                     LegacyOptions.uiMode);
                             else {
                                 o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(LegacyOptions.create(mc.options.guiScale()), i -> {

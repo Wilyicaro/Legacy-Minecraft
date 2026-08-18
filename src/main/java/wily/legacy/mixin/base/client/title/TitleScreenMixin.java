@@ -190,15 +190,15 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     //? if forge || neoforge && <=1.20.4 {
-    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if forge {^/"Lnet/minecraftforge/client/gui/TitleScreenModUpdateIndicator;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"/^?} else {^//^"Lnet/neoforged/neoforge/client/gui/TitleScreenModUpdateIndicator;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"^//^?}^/, remap = false))
+    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if forge {^//^"Lnet/minecraftforge/client/gui/TitleScreenModUpdateIndicator;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"^//^?} else {^/"Lnet/neoforged/neoforge/client/gui/TitleScreenModUpdateIndicator;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"/^?}^/))
     public boolean legacy$renderModUpdateNotification(TitleScreenModUpdateIndicator instance, GuiGraphics guiGraphics, int i, int j, float f) {
         return instance != null;
     }
     *///?}
 
     //? if forge || neoforge {
-    /*
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
+    
+    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
     public boolean wrapVersionText(boolean includeMC, boolean reverse, /^? if forge && >=1.20.5 {^//^ObjIntConsumer<String>^//^?} else {^/BiConsumer<Integer, String>/^?}^/ lineConsumerr) {
         return LegacyOptions.titleScreenVersionText.get();
     }

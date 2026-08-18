@@ -37,6 +37,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.*;
 import wily.legacy.network.PlayerInfoSync;
+import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -171,63 +172,52 @@ public class LegacyOptions {
     }
 
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue) {
-        return createBoolean(key, defaultValue, b-> {});
+        return createBoolean(key, defaultValue, b -> {});
+    }
+
+    public static FactoryConfig<Boolean> createBooleanWithTooltip(String key, boolean defaultValue) {
+        Component tooltip = Component.translatable("legacy.options." + key + ".tooltip");
+        return createBoolean(key, b -> tooltip, defaultValue);
     }
 
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue, Consumer<Boolean> consumer) {
-        return createBoolean(key, b->null, defaultValue, consumer);
+        return createBoolean(key, b -> null, defaultValue, consumer);
     }
 
     public static FactoryConfig<Boolean> createBoolean(String key, Function<Boolean,Component> tooltipFunction, boolean defaultValue) {
-        return createBoolean(key, tooltipFunction, defaultValue, b->{});
+        return createBoolean(key, tooltipFunction, defaultValue, b -> {});
     }
 
     public static FactoryConfig<Boolean> createBoolean(String key, Function<Boolean,Component> tooltipFunction, boolean defaultValue, Consumer<Boolean> consumer) {
-        return FactoryConfig.createBoolean(key, new FactoryConfigDisplay.Instance<>(optionName(key), tooltipFunction, (c, v) -> c), defaultValue, consumer, CLIENT_STORAGE);
+        return FactoryConfig.createBoolean(key, FactoryConfigDisplay.createToggle(optionName(key), tooltipFunction), defaultValue, consumer, CLIENT_STORAGE);
     }
 
-    public static FactoryConfig<Integer> createInteger(String key, BiFunction<Component,Integer,Component> captionFunction, int min, IntSupplier max, int defaultValue) {
-        return createInteger(key, captionFunction, min, max, defaultValue, v-> {});
+    public static FactoryConfig<Integer> createInteger(String key, Function<FactoryConfigDisplay.Builder<Integer>, FactoryConfigDisplay.Builder<Integer>> display, int min, IntSupplier max, int defaultValue) {
+        return createInteger(key, display, min, max, defaultValue, i -> {});
     }
 
-    public static FactoryConfig<Integer> createInteger(String key, BiFunction<Component,Integer,Component> captionFunction, int min, IntSupplier max, int defaultValue, Consumer<Integer> consumer) {
-        return createInteger(key, v-> null, captionFunction, min, max, defaultValue, consumer);
+    public static FactoryConfig<Integer> createInteger(String key, Function<FactoryConfigDisplay.Builder<Integer>, FactoryConfigDisplay.Builder<Integer>> display, int min, IntSupplier max, int defaultValue, Consumer<Integer> consumer) {
+        return createInteger(key, display, min, max, defaultValue, consumer, CLIENT_STORAGE);
     }
 
-    public static FactoryConfig<Integer> createInteger(String key, Function<Integer,Component> tooltipFunction, BiFunction<Component,Integer,Component> captionFunction, int min, IntSupplier max, int defaultValue, Consumer<Integer> consumer) {
-        return createInteger(key, tooltipFunction, captionFunction, min, max, defaultValue, consumer, CLIENT_STORAGE);
+    public static FactoryConfig<Integer> createInteger(String key, Function<FactoryConfigDisplay.Builder<Integer>, FactoryConfigDisplay.Builder<Integer>> display, int min, IntSupplier max, int defaultValue, Consumer<Integer> consumer, FactoryConfig.StorageAccess access) {
+        return FactoryConfig.createInteger(key, display.apply(FactoryConfigDisplay.intBuilder()).build(optionName(key)), new FactoryConfigControl.Int(min, max, Integer.MAX_VALUE), defaultValue, consumer, access);
     }
 
-    public static FactoryConfig<Integer> createInteger(String key, Function<Integer,Component> tooltipFunction, BiFunction<Component,Integer,Component> captionFunction, int min, IntSupplier max, int defaultValue, Consumer<Integer> consumer, FactoryConfig.StorageAccess access) {
-        return FactoryConfig.createInteger(key, new FactoryConfigDisplay.Instance<>(optionName(key), tooltipFunction, captionFunction), new FactoryConfigControl.Int(min, max, Integer.MAX_VALUE), defaultValue, consumer, access);
+    public static <T> FactoryConfig<T> create(String key, Function<FactoryConfigDisplay.Builder<T>, FactoryConfigDisplay.Builder<T>> builderFunction, Function<Integer,T> valueGetter, Function<T, Integer> valueSetter, Supplier<Integer> valuesSize, Codec<T> codec, T defaultValue, Consumer<T> consumer, FactoryConfig.StorageAccess access) {
+        return FactoryConfig.create(key, builderFunction.apply(FactoryConfigDisplay.builder()).build(optionName(key)), new FactoryConfigControl.FromInt<>(IOUtil.createFallbackCodec(codec, Codec.INT.xmap(valueGetter, valueSetter)), valueGetter, valueSetter, valuesSize), defaultValue, consumer, access);
     }
 
-    public static <T> FactoryConfig<T> create(String key, BiFunction<Component,T,Component> captionFunction, Function<Integer,T> valueGetter, Function<T, Integer> valueSetter, Supplier<Integer> valuesSize, T defaultValue, Consumer<T> consumer, FactoryConfig.StorageAccess access) {
-        return FactoryConfig.create(key, new FactoryConfigDisplay.Instance<>(optionName(key), captionFunction), new FactoryConfigControl.FromInt<>(valueGetter, valueSetter, valuesSize), defaultValue, consumer, access);
+    public static <T> FactoryConfig<T> create(String key, Function<FactoryConfigDisplay.Builder<T>, FactoryConfigDisplay.Builder<T>> builderFunction, Supplier<List<T>> listSupplier, T defaultValue, Consumer<T> consumer) {
+        return FactoryConfig.create(key, builderFunction.apply(FactoryConfigDisplay.builder()).build(optionName(key)), new FactoryConfigControl.FromInt<>(i -> listSupplier.get().get(i), v-> listSupplier.get().indexOf(v), ()-> listSupplier.get().size()), defaultValue, consumer, CLIENT_STORAGE);
     }
 
-    public static <T> FactoryConfig<T> create(String key, BiFunction<Component,T,Component> captionFunction, Supplier<List<T>> listSupplier, T defaultValue, Consumer<T> consumer) {
-        return create(key, v-> null, captionFunction, listSupplier, defaultValue, consumer);
+    public static FactoryConfig<Double> createDouble(String key, Function<FactoryConfigDisplay.Builder<Double>, FactoryConfigDisplay.Builder<Double>> builderFunction, double defaultValue) {
+        return createDouble(key, builderFunction, defaultValue, b -> {});
     }
 
-    public static <T> FactoryConfig<T> create(String key, Function<T,Component> tooltipFunction, BiFunction<Component,T,Component> captionFunction, Supplier<List<T>> listSupplier, T defaultValue, Consumer<T> consumer) {
-        return FactoryConfig.create(key, new FactoryConfigDisplay.Instance<>(optionName(key), tooltipFunction, captionFunction), new FactoryConfigControl.FromInt<>(i->listSupplier.get().get(i), v-> listSupplier.get().indexOf(v), ()-> listSupplier.get().size()), defaultValue, consumer, CLIENT_STORAGE);
-    }
-
-    public static FactoryConfig<Double> createDouble(String key, BiFunction<Component,Double,Component> captionFunction, double defaultValue) {
-        return createDouble(key, captionFunction, defaultValue, b->{});
-    }
-
-    public static FactoryConfig<Double> createDouble(String key, BiFunction<Component,Double,Component> captionFunction, double defaultValue, Consumer<Double> consumer) {
-        return createDouble(key, v-> null, captionFunction, defaultValue, consumer);
-    }
-
-    public static FactoryConfig<Double> createDouble(String key, Function<Double,Component> tooltipFunction, BiFunction<Component,Double,Component> captionFunction, double defaultValue) {
-        return createDouble(key, tooltipFunction, captionFunction, defaultValue, b->{});
-    }
-
-    public static FactoryConfig<Double> createDouble(String key, Function<Double,Component> tooltipFunction, BiFunction<Component,Double,Component> captionFunction, double defaultValue, Consumer<Double> consumer) {
-        return FactoryConfig.create(key, new FactoryConfigDisplay.Instance<>(optionName(key), tooltipFunction, captionFunction), FactoryConfigControl.createDouble(), defaultValue, consumer, CLIENT_STORAGE);
+    public static FactoryConfig<Double> createDouble(String key, Function<FactoryConfigDisplay.Builder<Double>, FactoryConfigDisplay.Builder<Double>> builderFunction, double defaultValue, Consumer<Double> consumer) {
+        return FactoryConfig.create(key, builderFunction.apply(FactoryConfigDisplay.percentBuilder()).build(optionName(key)), FactoryConfigControl.createDouble(), defaultValue, consumer, CLIENT_STORAGE);
     }
 
     public static Component percentValueLabel(Component component, double d) {
@@ -257,7 +247,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
     public static final FactoryConfig<Boolean> modCraftingTabs = CLIENT_STORAGE.register(createBoolean("modCraftingTabs",false));
     public static final FactoryConfig<Boolean> displayLegacyGamma = CLIENT_STORAGE.register(createBoolean("displayGamma", true));
-    public static final FactoryConfig<Double> legacyGamma = CLIENT_STORAGE.register(createDouble("gamma", LegacyOptions::percentValueLabel, 0.5));
+    public static final FactoryConfig<Double> legacyGamma = CLIENT_STORAGE.register(createDouble("gamma", Function.identity(), 0.5));
     public static final FactoryConfig<Boolean> displayHUD = CLIENT_STORAGE.register(createBoolean("displayHUD",true));
     public static final FactoryConfig<Boolean> displayHand = CLIENT_STORAGE.register(createBoolean("displayHand",true));
     public static final FactoryConfig<Boolean> legacyCreativeTab = CLIENT_STORAGE.register(createBoolean("creativeTab", true));
@@ -275,7 +265,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> globalLeaderboardsConnectTimeoutSeconds = FactoryConfig.<Integer>builder().key("globalLeaderboardsConnectTimeoutSeconds").control(FactoryConfigControl.of(Codec.INT)).defaultValue(10).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Integer> globalLeaderboardsReadTimeoutSeconds = FactoryConfig.<Integer>builder().key("globalLeaderboardsReadTimeoutSeconds").control(FactoryConfigControl.of(Codec.INT)).defaultValue(20).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> searchCreativeTab = CLIENT_STORAGE.register(createBoolean("searchCreativeTab", false));
-    public static final FactoryConfig<Integer> autoSaveInterval = CLIENT_STORAGE.register(createInteger("autoSaveInterval",(c,i)-> i == 0 ? Options.genericValueLabel(c,Component.translatable("options.off")) : Component.translatable( "legacy.options.mins_value",c, i * 5),0, ()-> 24,1, i->{/*? if >1.20.1 {*/if (Minecraft.getInstance().hasSingleplayerServer()) Minecraft.getInstance().getSingleplayerServer().onTickRateChanged();/*?}*/}));
+    public static final FactoryConfig<Integer> autoSaveInterval = CLIENT_STORAGE.register(createInteger("autoSaveInterval", builder -> builder.messageFunction((display, value) -> value == 0 ? CommonComponents.optionNameValue(display.name(), CommonComponents.OPTION_OFF) : Component.translatable("legacy.options.mins_value", display.name(), value * 5)),0, ()-> 24,1, i -> {/*? if >1.20.1 {*/if (Minecraft.getInstance().hasSingleplayerServer()) Minecraft.getInstance().getSingleplayerServer().onTickRateChanged();/*?}*/}));
     public static final FactoryConfig<Boolean> autoSaveWhenPaused = CLIENT_STORAGE.register(createBoolean("autoSaveWhenPaused",false));
     public static final FactoryConfig<Boolean> inGameTooltips = CLIENT_STORAGE.register(createBoolean("gameTooltips", true));
     public static final FactoryConfig<Boolean> tooltipBoxes = CLIENT_STORAGE.register(createBoolean("tooltipBoxes", true));
@@ -302,28 +292,24 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
     public static final FactoryConfig<Boolean> invertControllerButtons = CLIENT_STORAGE.register(createBoolean("invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.state().block(2)));
-    public static final FactoryConfig<Integer> controllerLedRed = CLIENT_STORAGE.register(createInteger("controllerLedRed", (c, i) -> Component.translatable("options.generic_value", c, Component.literal(String.valueOf(i)).withStyle(s -> s.withColor(0xFF0000 | (i << 16)))), 0, () -> 255, 255, i -> Legacy4JClient.controllerManager.updateControllerLed()));
-    public static final FactoryConfig<Integer> controllerLedGreen = CLIENT_STORAGE.register(createInteger("controllerLedGreen", (c, i) -> Component.translatable("options.generic_value", c, Component.literal(String.valueOf(i)).withStyle(s -> s.withColor(0x00FF00 | (i << 8)))), 0, () -> 255, 255, i -> Legacy4JClient.controllerManager.updateControllerLed()));
-    public static final FactoryConfig<Integer> controllerLedBlue = CLIENT_STORAGE.register(createInteger("controllerLedBlue", (c, i) -> Component.translatable("options.generic_value", c, Component.literal(String.valueOf(i)).withStyle(s -> s.withColor(0x0000FF | i))), 0, () -> 255, 255, i -> Legacy4JClient.controllerManager.updateControllerLed()));
-    public static final FactoryConfig<Integer> selectedController = CLIENT_STORAGE.register(createInteger("selectedController", (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  0, ()->15, 0, d -> { if (Legacy4JClient.controllerManager.connectedController!= null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);}));
-    public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", (c, h)-> Component.translatable("options.generic_value",c,h.getName()), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), d-> {
-        ControllerBinding.LEFT_STICK.state().block(2);
-        if (Legacy4JClient.controllerManager.connectedController != null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);
-    }));
-    public static final FactoryConfig<Integer> controllerPollingRate = CLIENT_STORAGE.register(createInteger("controllerPollingRate", i -> Component.translatable("legacy.options.controllerPollingRate.tooltip"), (c, i) -> CommonComponents.optionNameValue(c, Component.literal(i + " ms")), 1, () -> 16, 8, i -> Legacy4JClient.controllerManager.restartPoller()));
+    public static final FactoryConfig<Integer> controllerLedRed = CLIENT_STORAGE.register(createInteger("controllerLedRed", builder -> builder.valueToComponent(i -> Component.literal(String.valueOf(i)).withStyle(s -> s.withColor(0xFF0000 | (i << 16)))), 0, () -> 255, 255));
+    public static final FactoryConfig<Integer> controllerLedGreen = CLIENT_STORAGE.register(createInteger("controllerLedGreen", builder -> builder.valueToComponent(i -> Component.literal(String.valueOf(i)).withStyle(s -> s.withColor(0x00FF00 | (i << 8)))), 0, () -> 255, 255));
+    public static final FactoryConfig<Integer> controllerLedBlue = CLIENT_STORAGE.register(createInteger("controllerLedBlue", builder -> builder.valueToComponent(i -> Component.literal(String.valueOf(i)).withStyle(s -> s.withColor(0x0000FF | i))), 0, () -> 255, 255));
+    public static final FactoryConfig<Integer> selectedController = CLIENT_STORAGE.register(createInteger("selectedController", builder -> builder.valueToComponent(i -> Component.literal(i + 1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))), 0, () -> 15, 0, Legacy4JClient.controllerManager::connectTo));
+    public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", builder -> builder.valueToComponent(Controller.Handler::getName), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), Legacy4JClient.controllerManager::updateHandler));
+    public static final FactoryConfig<Integer> controllerPollingRate = CLIENT_STORAGE.register(createInteger("controllerPollingRate", builder -> builder.tooltip(v -> Component.translatable("legacy.options.controllerPollingRate.tooltip")).messageFunction((display, value) -> CommonComponents.optionNameValue(display.name(), Component.literal(value + " ms"))), 1, () -> 16, 8, i -> Legacy4JClient.controllerManager.restartPoller()));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b-> {}));
-    public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
-    public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBoolean("unfocusedInputs", false));
-    public static final FactoryConfig<Double> leftStickDeadZone = CLIENT_STORAGE.register(createDouble("leftStickDeadZone", LegacyOptions::percentValueLabel, 0.25));
-    public static final FactoryConfig<Double> rightStickDeadZone = CLIENT_STORAGE.register(createDouble("rightStickDeadZone", LegacyOptions::percentValueLabel, 0.34));
-    public static final FactoryConfig<Double> leftTriggerDeadZone = CLIENT_STORAGE.register(createDouble("leftTriggerDeadZone", LegacyOptions::percentValueLabel, 0.2));
-    public static final FactoryConfig<Double> rightTriggerDeadZone = CLIENT_STORAGE.register(createDouble("rightTriggerDeadZone", LegacyOptions::percentValueLabel, 0.2));
-    public static final FactoryConfig<Integer> hudScale = CLIENT_STORAGE.register(createInteger("hudScale", Options::genericValueLabel, 1, ()->3, 2));
-    public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay), CLIENT_STORAGE));
-    public static final FactoryConfig<Double> hudOpacity = CLIENT_STORAGE.register(createDouble("hudOpacity", LegacyOptions::percentValueLabel, 0.8));
-    public static final FactoryConfig<Double> hudDistance = CLIENT_STORAGE.register(createDouble("hudDistance", LegacyOptions::percentValueLabel, 1.0));
-    public static final FactoryConfig<Double> interfaceSensitivity = CLIENT_STORAGE.register(createDouble("interfaceSensitivity", (c, d)-> percentValueLabel(c, d*2), 0.5, d -> {}));
-    public static final FactoryConfig<Double> controllerSensitivity = CLIENT_STORAGE.register(FactoryConfig.create("controllerSensitivity", new FactoryConfigDisplay.Instance<>(Component.translatable("options.sensitivity"), (c, d)-> percentValueLabel(c, d*2)), FactoryConfigControl.createDouble(), 0.5, d -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", builder -> builder.valueToComponent(v -> v.displayName), i -> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.CODEC, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBooleanWithTooltip("unfocusedInputs",  false));
+    public static final FactoryConfig<Double> leftStickDeadZone = CLIENT_STORAGE.register(createDouble("leftStickDeadZone", Function.identity(), 0.25));
+    public static final FactoryConfig<Double> rightStickDeadZone = CLIENT_STORAGE.register(createDouble("rightStickDeadZone", Function.identity(), 0.34));
+    public static final FactoryConfig<Double> leftTriggerDeadZone = CLIENT_STORAGE.register(createDouble("leftTriggerDeadZone", Function.identity(), 0.2));
+    public static final FactoryConfig<Double> rightTriggerDeadZone = CLIENT_STORAGE.register(createDouble("rightTriggerDeadZone", Function.identity(), 0.2));
+    public static final FactoryConfig<Integer> hudSize = CLIENT_STORAGE.register(createInteger("hudScale", Function.identity(), 1, () -> 3, 2));
+    public static final FactoryConfig<Double> hudOpacity = CLIENT_STORAGE.register(createDouble("hudOpacity", Function.identity(), 0.8));
+    public static final FactoryConfig<Double> hudDistance = CLIENT_STORAGE.register(createDouble("hudDistance", Function.identity(), 1.0));
+    public static final FactoryConfig<Double> interfaceSensitivity = CLIENT_STORAGE.register(createDouble("interfaceSensitivity", builder -> builder.valueToComponent(d -> Component.literal(String.valueOf((int)(d * 200)))), 0.5, d -> {}));
+    public static final FactoryConfig<Double> controllerSensitivity = CLIENT_STORAGE.register(FactoryConfig.create("controllerSensitivity", FactoryConfigDisplay.percentBuilder().valueToComponent(d -> Component.literal(String.valueOf((int)(d * 200)))).build(Component.translatable("options.sensitivity")), FactoryConfigControl.createDouble(), 0.5, d -> {}, CLIENT_STORAGE));
     public static FactoryConfig<Double> combinedLookSensitivity() {
         FactoryConfig<Double> mouseSensitivity = of(Minecraft.getInstance().options.sensitivity());
         return FactoryConfig.create(
@@ -342,11 +328,11 @@ public class LegacyOptions {
                 });
     }
     public static final FactoryConfig<Boolean> overrideTerrainFogStart = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogStart", true));
-    public static final FactoryConfig<Integer> terrainFogStart = CLIENT_STORAGE.register(createInteger("terrainFogStart", (c,i)-> CommonComponents.optionNameValue(c, Component.translatable("options.chunks", getTerrainFogStart())), 2, ()-> Minecraft.getInstance().options.renderDistance().get(), 4, d -> {}));
+    public static final FactoryConfig<Integer> terrainFogStart = CLIENT_STORAGE.register(createInteger("terrainFogStart", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", Math.min(i, Minecraft.getInstance().options.renderDistance().get()))), 2, ()-> Minecraft.getInstance().options.renderDistance().get(), 4, d -> {}));
     public static final FactoryConfig<Boolean> overrideTerrainFogEnd = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogEnd", true));
-    public static final FactoryConfig<Integer> terrainFogEnd = CLIENT_STORAGE.register(createInteger("terrainFogEnd", (c,i)-> CommonComponents.optionNameValue(c, Component.translatable("options.chunks", i)), 2, ()-> 32, 16, d -> {}));
+    public static final FactoryConfig<Integer> terrainFogEnd = CLIENT_STORAGE.register(createInteger("terrainFogEnd", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", i)), 2, () -> 32, 16, d -> {}));
     public static final FactoryConfig<OptionHolder<ControlType>> selectedControlType = CLIENT_STORAGE.register(FactoryConfig.create("controlType", FactoryConfigDisplay.<OptionHolder<ControlType>>builder().valueToComponent(i -> i.isAuto() ? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().nameOrEmpty()) : i.get().nameOrEmpty()).build(optionName("controlType")), new FactoryConfigControl.FromInt<>(ControlType.OPTION_CODEC, i -> i == 0 || Legacy4JClient.controlTypesManager.map().size() < i ? OptionHolder.auto() : OptionHolder.of(Legacy4JClient.controlTypesManager.map().getByIndex(i - 1)), s1-> 1 + Legacy4JClient.controlTypesManager.map().indexOf(s1.get()), ()-> Legacy4JClient.controlTypesManager.map().size() + 1), OptionHolder.auto(), v-> {}, CLIENT_STORAGE));
-    public static final FactoryConfig<Difficulty> createWorldDifficulty = CLIENT_STORAGE.register(FactoryConfig.create("createWorldDifficulty", new FactoryConfigDisplay.Instance<>(Component.translatable("options.difficulty"), Difficulty::getInfo, (c, d)-> CommonComponents.optionNameValue(c, d.getDisplayName())), new FactoryConfigControl.FromInt<>(Difficulty::byId, Difficulty::getId, ()->Difficulty.values().length), Difficulty.NORMAL, d -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Difficulty> createWorldDifficulty = CLIENT_STORAGE.register(FactoryConfig.create("createWorldDifficulty", FactoryConfigDisplay.<Difficulty>builder().tooltip(Difficulty::getInfo).valueToComponent(Difficulty::getDisplayName).build(Component.translatable("options.difficulty")), new FactoryConfigControl.FromInt<>(Difficulty::byId, Difficulty::getId, ()->Difficulty.values().length), Difficulty.NORMAL, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> smoothMovement = CLIENT_STORAGE.register(createBoolean("smoothMovement",true));
     public static final FactoryConfig<Boolean> forceSmoothMovement = CLIENT_STORAGE.register(createBoolean("forceSmoothMovement", b-> LegacyComponents.MAY_BE_A_CHEAT,false));
     public static final FactoryConfig<Boolean> forceLegacyFlight = CLIENT_STORAGE.register(createBoolean("forceLegacyFlight", b-> LegacyComponents.MAY_BE_A_CHEAT,false));
@@ -363,13 +349,13 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));
     public static final FactoryConfig<Boolean> itemLightingInHand = CLIENT_STORAGE.register(createBoolean("itemLightingInHand",true));
     public static final FactoryConfig<Boolean> loyaltyLines = CLIENT_STORAGE.register(createBoolean("loyaltyLines",true));
-    public static final FactoryConfig<Boolean> controllerToggleCrouch = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleCrouch", new FactoryConfigDisplay.Instance<>(Component.translatable("options.key.toggleSneak")),true, b->{}, CLIENT_STORAGE));;
-    public static final FactoryConfig<Boolean> controllerToggleSprint = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleSprint", new FactoryConfigDisplay.Instance<>(Component.translatable("options.key.toggleSprint")),false, b-> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> controllerToggleCrouch = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleCrouch", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleSneak")), true, b -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> controllerToggleSprint = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleSprint", FactoryConfigDisplay.createToggle(Component.translatable("options.key.toggleSprint")), false, b -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> lockControlTypeChange = CLIENT_STORAGE.register(createBoolean("lockControlTypeChange",false));
-    public static final FactoryConfig<Integer> selectedItemTooltipLines = CLIENT_STORAGE.register(createInteger("selectedItemTooltipLines", Options::genericValueLabel, 0,()->6, 4));
+    public static final FactoryConfig<Integer> selectedItemTooltipLines = CLIENT_STORAGE.register(createInteger("selectedItemTooltipLines", Function.identity(), 0, () -> 6, 4));
     public static final FactoryConfig<Boolean> itemTooltipEllipsis = CLIENT_STORAGE.register(createBoolean("itemTooltipEllipsis",true));
-    public static final FactoryConfig<Integer> selectedItemTooltipSpacing = CLIENT_STORAGE.register(createInteger("selectedItemTooltipSpacing", Options::genericValueLabel, 8,()->12, 12));
-    public static final FactoryConfig<VehicleCameraRotation> vehicleCameraRotation = CLIENT_STORAGE.register(create("vehicleCameraRotation", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal, ()->VehicleCameraRotation.values().length, VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Integer> selectedItemTooltipSpacing = CLIENT_STORAGE.register(createInteger("selectedItemTooltipSpacing", Function.identity(), 8, () -> 12, 12));
+    public static final FactoryConfig<VehicleCameraRotation> vehicleCameraRotation = CLIENT_STORAGE.register(create("vehicleCameraRotation", builder -> builder.valueToComponent(v -> v.displayName), i -> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal, ()->VehicleCameraRotation.values().length, VehicleCameraRotation.CODEC, VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> defaultParticlePhysics = CLIENT_STORAGE.register(createBoolean("defaultParticlePhysics", true));
     public static final FactoryConfig<Boolean> linearCameraMovement = CLIENT_STORAGE.register(createBoolean("linearCameraMovement", false));
     public static final FactoryConfig<Boolean> legacyOverstackedItems = CLIENT_STORAGE.register(createBoolean("legacyOverstackedItems", true));
@@ -377,7 +363,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> enhancedPistonMovingRenderer = CLIENT_STORAGE.register(createBoolean("enhancedPistonMovingRenderer", true));
     public static final FactoryConfig<Boolean> legacyEntityFireTint = CLIENT_STORAGE.register(createBoolean("legacyEntityFireTint", true));
     public static final FactoryConfig<Boolean> advancedHeldItemTooltip = CLIENT_STORAGE.register(createBoolean("advancedHeldItemTooltip", false));
-    public static final FactoryConfig<AdvancedOptionsMode> advancedOptionsMode = CLIENT_STORAGE.register(create("advancedOptionsMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> AdvancedOptionsMode.values()[i], AdvancedOptionsMode::ordinal, ()->AdvancedOptionsMode.values().length, AdvancedOptionsMode.DEFAULT, d -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<AdvancedOptionsMode> advancedOptionsMode = CLIENT_STORAGE.register(create("advancedOptionsMode", builder -> builder.valueToComponent(v -> v.displayName), i -> AdvancedOptionsMode.values()[i], AdvancedOptionsMode::ordinal, () -> AdvancedOptionsMode.values().length, AdvancedOptionsMode.CODEC, AdvancedOptionsMode.DEFAULT, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> saveCache = CLIENT_STORAGE.register(createBoolean("saveCache", true));
     public static final FactoryConfig<Boolean> alwaysClearSaveCache = CLIENT_STORAGE.register(createBoolean("alwaysClearSaveCache", false));
     public static final FactoryConfig<Boolean> autoSaveCountdown = CLIENT_STORAGE.register(createBoolean("autoSaveCountdown", true));
@@ -479,11 +465,11 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
     public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerCursorAtFirstInventorySlot", new FactoryConfigDisplay.Instance<>(Component.translatable("legacy.options.cursorAtFirstInventorySlot")),true, b->{}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> systemCursor = CLIENT_STORAGE.register(createBoolean("systemCursor", false, b-> Legacy4JClient.controllerManager.updateCursorInputMode()));
-    public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, ()->ControlTooltipDisplay.values().length, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", builder -> builder.valueToComponent(v -> v.displayName), i -> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, () -> ControlTooltipDisplay.values().length, ControlTooltipDisplay.CODEC, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> legacyLoadingAndConnecting = CLIENT_STORAGE.register(createBoolean("legacyLoadingAndConnecting", true));
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
     public static final FactoryConfig<Boolean> unbindConflictingButtons = CLIENT_STORAGE.register(createBoolean("unbindConflictingButtons", true));
-    public static final FactoryConfig<Integer> hudDelay = CLIENT_STORAGE.register(createInteger("hudDelay", (c, i)-> i == 0 ? Options.genericValueLabel(c,Component.translatable("options.off")) : percentValueLabel(c, i / 100d), 0, ()-> 200, 100));
+    public static final FactoryConfig<Integer> hudDelay = CLIENT_STORAGE.register(createInteger("hudDelay", builder -> builder.messageFunction((display, value) -> value == 0 ? CommonComponents.optionNameValue(display.name(), CommonComponents.OPTION_OFF) : Component.translatable("options.percent_value", display.name(), value)), 0, () -> 200, 100));
     public static final FactoryConfig<Boolean> legacyBabyVillagerHead = CLIENT_STORAGE.register(createBoolean("legacyBabyVillagerHead", true));
     public static final FactoryConfig<Boolean> bubblesOutsideWater = CLIENT_STORAGE.register(createBoolean("bubblesOutsideWater", true));
     public static final FactoryConfig<Boolean> legacyItemPickup = CLIENT_STORAGE.register(createBoolean("legacyItemPickup", true));
@@ -494,6 +480,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
+    public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
+    public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", builder -> builder.valueToComponent(v -> v.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay), CLIENT_STORAGE));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());
