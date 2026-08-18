@@ -130,7 +130,6 @@
 - Biome overrides can now define grass and foliage colors
 - Biome overrides can now define Birch leaves individual color
 - Added a new common value, `minecraft:ps4_end_crystal_model`, to enable the use of PS4 end crystal model in resource packs
-- Added a new common value, `minecraft:halo_ring`, to enable the use of the Halo Sky ring in resource packs
 - Added a new common value, `minecraft:autofocus_button_animation`, to enable the use of the autofocus button animation from older TUs in resource packs
 - Added additional common colors for use in resource packs
 - Added Mixed Crafting Tabs Manager, which just defines the icon and name of the tabs for now, limited to the vanilla tabs, and can be edited in `legacy:mixed_crafting_tabs.json`
