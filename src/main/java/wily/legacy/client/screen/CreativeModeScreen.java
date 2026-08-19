@@ -299,10 +299,10 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (tabList.controlTab(keyEvent.key())) return true;
+        if (tabList.controlTab(keyEvent)) return true;
         if (!keyEvent.isEscape() && searchBox.isFocused()) return searchBox.keyPressed(keyEvent);
 
-        if (keyEvent.hasShiftDown() && tabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight()))
+        if (tabList.controlPage(page, keyEvent))
             repositionElements();
         if (keyEvent.key() == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {

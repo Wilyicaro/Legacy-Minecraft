@@ -15,6 +15,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.NavigationElement;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -165,8 +166,16 @@ public class TabList implements Renderable, GuiEventListener, NarratableEntry, N
         return controlTab(i, InputConstants.KEY_LBRACKET, InputConstants.KEY_RBRACKET);
     }
 
+    public boolean controlTab(KeyEvent keyEvent) {
+        return controlTab(Legacy4JClient.keyMenuTabLeft.matches(keyEvent), Legacy4JClient.keyMenuTabRight.matches(keyEvent));
+    }
+
     public boolean directionalControlTab(int i) {
         return controlTab(i, InputConstants.KEY_LEFT, InputConstants.KEY_RIGHT);
+    }
+
+    public boolean directionalControlTab(KeyEvent keyEvent) {
+        return controlTab(keyEvent.isLeft(), keyEvent.isRight());
     }
 
     public boolean controlTab(int i, int leftButton, int rightButton) {
@@ -199,6 +208,10 @@ public class TabList implements Renderable, GuiEventListener, NarratableEntry, N
             }
         }
         return false;
+    }
+
+    public boolean controlPage(Stocker.Sizeable page, KeyEvent keyEvent) {
+        return keyEvent.hasShiftDown() && controlPage(page, Legacy4JClient.keyMenuPageLeft.matches(keyEvent), Legacy4JClient.keyMenuPageRight.matches(keyEvent));
     }
 
     public void numberControlTab(int i) {

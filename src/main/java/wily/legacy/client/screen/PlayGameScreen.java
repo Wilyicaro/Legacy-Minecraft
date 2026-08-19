@@ -244,7 +244,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (hasTabList() && (tabList.controlTab(keyEvent.key()) || tabList.directionalControlTab(keyEvent.key())))
+        if (hasTabList() && (tabList.controlTab(keyEvent) || tabList.directionalControlTab(keyEvent)))
             return true;
         if (super.keyPressed(keyEvent)) {
             return true;

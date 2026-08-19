@@ -513,9 +513,9 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.hasShiftDown() && !isSelectionTab() && craftingTabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight()))
+        if (!isSelectionTab() && craftingTabList.controlPage(page, keyEvent))
             return true;
-        if (craftingTabList.controlTab(keyEvent.key())) return true;
+        if (craftingTabList.controlTab(keyEvent)) return true;
         return super.keyPressed(keyEvent);
     }
 
