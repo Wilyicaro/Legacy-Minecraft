@@ -429,7 +429,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             minecraft.setScreen(advancedOptionsScreen.get());
             return true;
         }
-        tabList.controlTab(i);
+        tabList.controlTab(i, j);
         return super.keyPressed(i, j, k);
     }
 

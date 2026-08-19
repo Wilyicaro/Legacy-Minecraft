@@ -20,6 +20,7 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
@@ -71,13 +72,26 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         }))).size(240,20).build());
         renderableVList.addOptions(LegacyOptions.unbindConflictingKeys,LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()));
         for (KeyMapping keyMapping : keyMappings) {
+            if (Legacy4JClient.isMenuNavigationKey(keyMapping)) continue;
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
                 renderableVList.addCategory(Component.translatable(category));
             lastCategory = keyMapping.getCategory();
-            renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
+            addMappingButton(keyMapping);
+        }
+        renderableVList.addCategory(Component.translatable("legacy.key.categories.menuNavigation"));
+        addMappingButton(Legacy4JClient.keyMenuTabLeft);
+        addMappingButton(Legacy4JClient.keyMenuTabRight);
+        addMappingButton(Legacy4JClient.keyMenuPageLeft);
+        addMappingButton(Legacy4JClient.keyMenuPageRight);
+    }
+
+    protected void addMappingButton(KeyMapping keyMapping) {
+        renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
                 public ControlTooltip.ComponentIcon getIcon() {
+                    if (keyMapping == Legacy4JClient.keyMenuPageLeft || keyMapping == Legacy4JClient.keyMenuPageRight)
+                        return ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(mapping.getKey().getValue()));
                     return ControlTooltip.getKeyIcon(mapping.getKey().getValue());
                 }
 
@@ -97,9 +111,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
                     }
                 }
             });
-        }
     }
-
     public abstract class MappingButton extends AbstractButton {
         public final LegacyKeyMapping mapping;
 

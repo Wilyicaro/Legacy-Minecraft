@@ -789,9 +789,9 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (hasTypeTabList() && hasShiftDown() && typeTabList.controlTab(i)) return true;
-        getTabList().controlTab(i);
-        if (hasShiftDown() && controlPage(i == 263, i == 262)) return true;
+        if (hasTypeTabList() && hasShiftDown() && typeTabList.controlTab(i, j)) return true;
+        getTabList().controlTab(i, j);
+        if (hasShiftDown() && controlPage(Legacy4JClient.keyMenuPageLeft.matches(i, j), Legacy4JClient.keyMenuPageRight.matches(i, j))) return true;
         return super.keyPressed(i, j, k);
     }
     protected boolean controlPage(boolean left, boolean right){

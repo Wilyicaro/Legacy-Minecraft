@@ -320,10 +320,10 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (tabList.controlTab(i)) return true;
+        if (tabList.controlTab(i, j)) return true;
         if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
 
-        if (hasShiftDown() && tabList.controlPage(page,i == 263 , i == 262)) repositionElements();
+        if (hasShiftDown() && tabList.controlPage(page, i, j)) repositionElements();
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
                 //? if >=1.21.2

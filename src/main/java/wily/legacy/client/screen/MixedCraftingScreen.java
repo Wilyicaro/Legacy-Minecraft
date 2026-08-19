@@ -652,7 +652,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             disableSearchMode();
             return true;
         }
-        if (getTabList().controlTab(i)) return true;
+        if (getTabList().controlTab(i, j)) return true;
         if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
         return super.keyPressed(i, j, k);
     }
