@@ -371,7 +371,7 @@
   "block.minecraft.nether_gold_ore.tip": "ツルハシで掘れる。金塊が採れる",
   "block.minecraft.nether_quartz_ore.tip": "ツルハシで掘ることができ、暗黒石英が採れる",
   "block.minecraft.nether_sprouts.tip": "Found in Warped Forests. Can be harvested with shears and be used as decoration.",
-  "block.minecraft.nether_stem.tip": "Chopped using an axe, and can be crafted into planks.",
+  "block.minecraft.nether_stem.tip": "Chopped using an axe. Can be crafted into planks, or stripped with an axe.",
   "block.minecraft.nether_wart.tip": "暗黒砦で手に入る。壊すと暗黒茸を落とす",
   "block.minecraft.nether_wart_block.tip": "暗黒茸から作成できる装飾用ブロック",
   "block.minecraft.netherite_block.tip": "ネザライトを省スペースに保管できる",
