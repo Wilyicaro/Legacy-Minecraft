@@ -294,7 +294,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             graphics.text(this.font, boardTitle, 0, 0, topTextColor);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
-            Component entries = Component.translatable("legacy.menu.leaderboard.entries", this.rows.size());
+            Component entries = Component.translatable("legacy.menu.leaderboard.entries", Math.max(this.rows.size(), GlobalLeaderboardsFeature.totalEntries(board, this.viewMode, this.difficulty)));
             graphics.pose().translate(entriesTooltipX + (entriesTooltipWidth - this.font.width(entries) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("entriesText.y", 6));
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);

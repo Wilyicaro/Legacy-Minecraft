@@ -85,12 +85,10 @@ public abstract class GuiGraphicsExtractorMixin {
         float g = (float) itemStack.getPopTime() - FactoryAPIClient.getGamePartialTick(true);
         if (g > 0.0F && (minecraft.screen == null || minecraft.screen instanceof LegacyMenuAccess<?> m && m.allowItemPopping())) {
             float h = 1.0F + g / 5.0F;
-            self().pose().pushMatrix();
-            self().pose().translate((float) (i + 8), (float) (j + 12));
-            self().pose().scale(1.0F / h, (h + 1.0F) / 2.0F);
-            self().pose().translate((float) (-(i + 8)), (float) (-(j + 12)));
+            arg.pose().translate((float) (i + 8), (float) (j + 12));
+            arg.pose().scale(1.0F / h, (h + 1.0F) / 2.0F);
+            arg.pose().translate((float) (-(i + 8)), (float) (-(j + 12)));
             original.call(instance, arg);
-            self().pose().popMatrix();
             if (minecraft.player != null && !minecraft.player.getInventory().getNonEquipmentItems().contains(itemStack))
                 itemStack.setPopTime(itemStack.getPopTime() - 1);
         } else original.call(instance, arg);

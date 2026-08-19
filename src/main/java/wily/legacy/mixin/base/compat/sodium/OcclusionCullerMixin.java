@@ -2,53 +2,57 @@
 package wily.legacy.mixin.base.compat.sodium;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
-import net.caffeinemc.mods.sodium.client.render.chunk.lists.RenderSectionVisitor;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.CameraTransform;
 import net.caffeinemc.mods.sodium.client.render.viewport.Viewport;
 import net.minecraft.core.SectionPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import wily.legacy.client.LegacyChunkLoading;
 import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(value = OcclusionCuller.class, remap = false)
 public abstract class OcclusionCullerMixin {
     @Shadow
-    private static int nearestToZero(int min, int max) {
-        return 0;
+    private Viewport viewport;
+
+    @WrapOperation(method = "visitNode", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/occlusion/OcclusionCuller;testDistance(FFF)Z"), require = 0)
+    private boolean testDistance(float xzThreshold, float yThreshold, float maxDistance, Operation<Boolean> original, @Local(ordinal = 0) float dx, @Local(ordinal = 2) float dz) {
+        if (!LegacyCommonOptions.squaredViewDistance.get()) return original.call(xzThreshold, yThreshold, maxDistance);
+        return Math.abs(dx) < maxDistance && Math.abs(dz) < maxDistance && yThreshold < maxDistance;
     }
 
-    @Inject(method = "isWithinRenderDistance", at = @At("HEAD"), cancellable = true)
-    private static void isWithinRenderDistance(CameraTransform camera, RenderSection section, float maxDistance, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyCommonOptions.squaredViewDistance.get()) {
-            int oy = section.getOriginY() - camera.intY;
-            cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(camera.intX, camera.intZ, Math.round(maxDistance), section.getOriginX(), section.getOriginZ(), false) && Math.abs(nearestToZero(oy, oy + 16) - camera.fracY) < maxDistance);
-        }
-    }
-
-    @WrapWithCondition(method = "processQueue", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/lists/RenderSectionVisitor;visit(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;)V"))
-    private static boolean processQueue(RenderSectionVisitor visitor, RenderSection section, @Local(argsOnly = true) Viewport viewport) {
+    @WrapWithCondition(method = {"processQueue", "visitAll"}, at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/occlusion/OcclusionCuller$GraphOcclusionVisitor;visit(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;Z)V"), require = 0)
+    private boolean visit(@Coerce Object visitor, RenderSection section, boolean localVisible) {
         return isSlowChunkVisible(section, viewport);
     }
 
-    @WrapWithCondition(method = "addNearbySections", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/lists/RenderSectionVisitor;visit(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;)V"))
-    private boolean addNearbySections(RenderSectionVisitor visitor, RenderSection section, @Local(argsOnly = true) Viewport viewport) {
+    @WrapWithCondition(method = "visitAll", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/occlusion/OcclusionCuller$VisibilityTestingVisitor;visit(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;Z)V"), require = 0)
+    private boolean visitLocal(@Coerce Object visitor, RenderSection section, boolean localVisible) {
         return isSlowChunkVisible(section, viewport);
     }
 
-    @WrapWithCondition(method = "initWithinWorld", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/lists/RenderSectionVisitor;visit(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;)V"))
-    private boolean initWithinWorld(RenderSectionVisitor visitor, RenderSection section, @Local(argsOnly = true) Viewport viewport) {
+    @WrapOperation(method = "processQueue", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/occlusion/OcclusionCuller$VisibilityTestingVisitor;visitTestVisible(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;)Z"), require = 0)
+    private boolean visitTestVisible(@Coerce Object visitor, RenderSection section, Operation<Boolean> original) {
+        if (!isSlowChunkVisible(section, viewport)) return false;
+        return original.call(visitor, section);
+    }
+
+    @WrapWithCondition(method = {"addNearbySections", "initWithinWorld"}, at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/occlusion/OcclusionCuller;visitAll(Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;)V"), require = 0)
+    private boolean visitAll(OcclusionCuller culler, RenderSection section) {
         return isSlowChunkVisible(section, viewport);
     }
 
+    @Unique
     private static boolean isSlowChunkVisible(RenderSection section, Viewport viewport) {
+        if (viewport == null) return true;
         CameraTransform camera = viewport.getTransform();
         return LegacyChunkLoading.filterSection(SectionPos.asLong(section.getChunkX(), section.getChunkY(), section.getChunkZ()), section.getOriginX(), section.getOriginY(), section.getOriginZ(), camera.x, camera.y, camera.z);
     }

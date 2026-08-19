@@ -171,7 +171,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     @Override
     public void renderDefaultBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
         oldAlpha = alpha;
-        alpha = Mth.lerp(f * 0.1f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
+        alpha = Mth.lerp(f * 0.18f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
         shouldFade = false;
         FactoryGuiGraphics.of(GuiGraphicsExtractor).setBlitColor(1.0f, 1.0f, 1.0f, alpha);
         FactoryScreenUtil.enableBlend();

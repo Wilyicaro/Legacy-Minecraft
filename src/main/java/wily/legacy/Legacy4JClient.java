@@ -173,6 +173,7 @@ public class Legacy4JClient {
         return new LegacyFlatWorldScreen(createWorldScreen, createWorldScreen.getUiState(), biomeGetter, structureGetter, flatLevelGeneratorSettings -> createWorldScreen.getUiState().updateDimensions(PresetEditor.flatWorldConfigurator(flatLevelGeneratorSettings)), chunkGenerator instanceof FlatLevelSource ? ((FlatLevelSource) chunkGenerator).settings() : FlatLevelGeneratorSettings.getDefault(biomeGetter, structureGetter, placeFeatureGetter));
     }, Optional.of(WorldPresets.SINGLE_BIOME_SURFACE), (createWorldScreen, settings) -> new LegacyBuffetWorldScreen(createWorldScreen, settings.worldgenLoadContext().lookupOrThrow(Registries.BIOME), holder -> createWorldScreen.getUiState().updateDimensions(PresetEditor.fixedBiomeConfigurator(holder)))));
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, KeyMapping.Category.INVENTORY);
+    public static final KeyMapping keyToggleCrafting = new KeyMapping("legacy.key.toggleCrafting", -1, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, KeyMapping.Category.MISC);
@@ -344,6 +345,10 @@ public class Legacy4JClient {
 
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
+        while (keyToggleCrafting.consumeClick()) {
+            if (minecraft.player != null && minecraft.screen == null)
+                FactoryConfig.saveOptionAndConsume(LegacyOptions.classicCrafting, !LegacyOptions.classicCrafting.get(), v -> {});
+        }
         while (keyCrafting.consumeClick()) {
             if (!consumeKeyboardToggleKeyPress(keyCrafting)) continue;
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
@@ -481,6 +486,7 @@ public class Legacy4JClient {
         });
         FactoryAPIClient.registerKeyMapping(registry -> {
             registry.accept(keyCrafting);
+            registry.accept(keyToggleCrafting);
             registry.accept(keyHostOptions);
             registry.accept(keyLegacy4JSettings);
             registry.accept(keyCycleHeldLeft);
@@ -713,7 +719,7 @@ public class Legacy4JClient {
         BlockStateModel featureModel = LegacyChunkLoading.getFeatureModel(pos, blockState, model);
         if (featureModel != model) return featureModel;
 
-        BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
+        BlockStateModel torchModel = LegacyOptions.legacyTorchModel.get() ? LegacyTorchModel.get(blockState, model) : model;
         if (torchModel != model) return torchModel;
 
         boolean fastGraphics = !Minecraft.getInstance().options.cutoutLeaves().get();
