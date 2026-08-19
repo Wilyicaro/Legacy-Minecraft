@@ -780,11 +780,11 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (hasTypeTabList() && keyEvent.hasShiftDown() && typeTabList.controlTab(keyEvent.key())) {
+        if (hasTypeTabList() && keyEvent.hasShiftDown() && typeTabList.controlTab(keyEvent)) {
             return true;
         }
-        getTabList().controlTab(keyEvent.key());
-        if (keyEvent.hasShiftDown() && typeTabList.getIndex() == 0 && craftingTabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight()))
+        getTabList().controlTab(keyEvent);
+        if (typeTabList.getIndex() == 0 && craftingTabList.controlPage(page, keyEvent))
             return true;
         return super.keyPressed(keyEvent);
     }

@@ -616,7 +616,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
             disableSearchMode();
             return true;
         }
-        if (getTabList().controlTab(keyEvent.key())) return true;
+        if (getTabList().controlTab(keyEvent)) return true;
         if (keyEvent.key() != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(keyEvent);
         return super.keyPressed(keyEvent);
     }
