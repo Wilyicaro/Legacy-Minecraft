@@ -20,3 +20,4 @@ classes/
 /src/main/resources/assets/legacy/lang/.vs
 *.lnk
 /src/main/java/wily/legacy/.vs
+/src/main/.vs
