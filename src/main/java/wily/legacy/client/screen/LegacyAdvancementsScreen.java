@@ -151,8 +151,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             showDescription = !showDescription;
             return true;
         }
-        if (tabList.controlTab(keyEvent.key())) return true;
-        if (keyEvent.hasShiftDown()) tabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight());
+        if (tabList.controlTab(keyEvent)) return true;
+        tabList.controlPage(page, keyEvent);
         return super.keyPressed(keyEvent);
     }
 
