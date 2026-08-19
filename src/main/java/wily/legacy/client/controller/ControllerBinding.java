@@ -90,8 +90,12 @@ public class ControllerBinding<T extends BindingState> {
         return keys.length == 1 ? map.get(key) : register(CompoundControllerBinding.getOrCreate(Arrays.stream(keys).map(map::get).toArray(ControllerBinding[]::new)));
     }
 
-    public static final ControllerBinding<BindingState.Button> DOWN_BUTTON = registerWithDefaults(createButton("down_button", () -> LegacyOptions.invertControllerButtons.get() ? Button.RIGHT : Button.DOWN), o -> List.of(o.keyJump));
-    public static final ControllerBinding<BindingState.Button> RIGHT_BUTTON = registerWithDefaults(createButton("right_button",  () -> LegacyOptions.invertControllerButtons.get() ? Button.DOWN : Button.RIGHT), o -> List.of(o.keyDrop));
+    private static boolean invertControllerButtons() {
+        return LegacyOptions.invertControllerButtons.get() != ControlType.getActiveControllerType().id().equals(ControlType.SWITCH);
+    }
+
+    public static final ControllerBinding<BindingState.Button> DOWN_BUTTON = registerWithDefaults(createButton("down_button", () -> invertControllerButtons() ? Button.RIGHT : Button.DOWN), o -> List.of(o.keyJump));
+    public static final ControllerBinding<BindingState.Button> RIGHT_BUTTON = registerWithDefaults(createButton("right_button",  () -> invertControllerButtons() ? Button.DOWN : Button.RIGHT), o -> List.of(o.keyDrop));
     public static final ControllerBinding<BindingState.Button> LEFT_BUTTON = registerWithDefaults(createButton("left_button", Button.LEFT), o -> List.of(Legacy4JClient.keyCrafting));
     public static final ControllerBinding<BindingState.Button> UP_BUTTON = registerWithDefaults(createButton("up_button", Button.UP), o -> List.of(o.keyInventory));
     public static final ControllerBinding<BindingState.Button> BACK = registerWithDefaults(createButton("back", Button.BACK), o -> List.of(Legacy4JClient.keyHostOptions));
