@@ -49,6 +49,10 @@ public class LegacyTabButton extends AbstractButton {
     public boolean selected;
     public Type type;
     public Offset offset = StateOffset.DEFAULT;
+    public Vec2 iconOffset = Vec2.ZERO;
+    public float spriteScale = 1;
+    public int spriteWidth;
+    public int spriteHeight;
 
     public LegacyTabButton(int i, int j, int width, int height, Type type, Render icon, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
@@ -131,7 +135,10 @@ public class LegacyTabButton extends AbstractButton {
         if (active) {
             if (icon == null)
                 this.renderString(guiGraphics, minecraft.font, CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
-            else icon.render(this, guiGraphics, i, j, f);
+            else {
+                guiGraphics.pose().translate(iconOffset.x, iconOffset.y);
+                icon.render(this, guiGraphics, i, j, f);
+            }
         }
         guiGraphics.pose().popMatrix();
     }
@@ -174,7 +181,14 @@ public class LegacyTabButton extends AbstractButton {
 
         @Override
         default void render(LegacyTabButton button, GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+            if (button.spriteScale == 1) FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+            else {
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(button.getX(), button.getY());
+                guiGraphics.pose().scale(button.spriteScale, button.spriteScale);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), 0, 0, button.spriteWidth, button.spriteHeight);
+                guiGraphics.pose().popMatrix();
+            }
         }
     }
 
