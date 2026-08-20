@@ -97,7 +97,7 @@ public class LegacyLoadingRenderer implements Renderable {
         }
 
         if (loadingHeader != null) {
-            LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
+            LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(LegacyFontUtil.HIRES_FONT), b -> {
                 guiGraphics.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
                 guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(loadingHeader) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
