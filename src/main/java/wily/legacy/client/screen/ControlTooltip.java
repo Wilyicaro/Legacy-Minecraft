@@ -810,7 +810,7 @@ public interface ControlTooltip {
             }
             if (isBundle(actualItem) && BundleItem.getFullnessDisplay(actualItem) > 0) return LegacyComponents.RELEASE;
             // 10-Consumables (food, potions) - at the very end
-            if ((isEdible(actualItem) && minecraft.player.canEat(false)) || actualItem.getItem() instanceof PotionItem || actualItem.is(Items.MILK_BUCKET))
+            if ((isEdible(actualItem) && minecraft.player.canEat(false)) || actualItem.getItem() instanceof PotionItem || actualItem.is(Items.MILK_BUCKET) || actualItem.is(Items.HONEY_BOTTLE) || actualItem.is(Items.OMINOUS_BOTTLE))
                 return actualItem.getUseAnimation() == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.DRINK || actualItem.is(Items.MILK_BUCKET) ? LegacyComponents.DRINK : LegacyComponents.EAT;
         }
        return null;

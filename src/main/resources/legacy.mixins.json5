@@ -96,6 +96,7 @@
     "client.GameRendererMixin",
     "client.SectionCompilerMixin",
     "client.GlyphInfoMixin",
+    "client.TrueTypeGlyphMixin",
     "client.grindstone.GrindstoneScreenMixin",
     "client.GuiGameRendererMixin",
     "client.GuiGraphicsExtractorMixin",

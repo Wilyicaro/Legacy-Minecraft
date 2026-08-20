@@ -48,6 +48,10 @@ public class LegacyTabButton extends AbstractButton {
     public boolean selected;
     public Type type;
     public Offset offset = StateOffset.DEFAULT;
+    public Vec2 iconOffset = Vec2.ZERO;
+    public float spriteScale = 1;
+    public int spriteWidth;
+    public int spriteHeight;
 
     public LegacyTabButton(int i, int j, int width, int height, Type type, Render icon, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
@@ -127,7 +131,11 @@ public class LegacyTabButton extends AbstractButton {
         if (active) {
             if (icon == null)
                 this.renderString(GuiGraphicsExtractor, minecraft.font, CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
-            else icon.render(this, GuiGraphicsExtractor, i, j, f);
+            else {
+                float guiScale = (float) minecraft.getWindow().getGuiScale();
+                GuiGraphicsExtractor.pose().translate(Math.round((translate.x + iconOffset.x) * guiScale) / guiScale - translate.x, Math.round((translate.y + iconOffset.y) * guiScale) / guiScale - translate.y);
+                icon.render(this, GuiGraphicsExtractor, i, j, f);
+            }
         }
         GuiGraphicsExtractor.pose().popMatrix();
     }
@@ -169,7 +177,14 @@ public class LegacyTabButton extends AbstractButton {
 
         @Override
         default void render(LegacyTabButton button, GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
-            FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+            if (button.spriteScale == 1) FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+            else {
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(button.getX(), button.getY());
+                GuiGraphicsExtractor.pose().scale(button.spriteScale, button.spriteScale);
+                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(getSprite(button), 0, 0, button.spriteWidth, button.spriteHeight);
+                GuiGraphicsExtractor.pose().popMatrix();
+            }
         }
     }
 
