@@ -139,6 +139,13 @@
     /*"client.SectionCompilerMixin",
     *///?}
     "client.GlyphInfoMixin",
+    "client.NativeImageAccessor",
+    //? if <=1.20.4 {
+    /*"client.TrueTypeGlyphBearingMixin",
+    "client.TrueTypeGlyphProviderAccessor",
+    "client.TrueTypeGlyphProviderMixin",
+    *///?}
+    "client.TrueTypeGlyphMixin",
     "client.grindstone.GrindstoneScreenMixin",
     "client.GuiGameRendererMixin",
     "client.GuiGraphicsMixin",

@@ -6,16 +6,24 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonValue;
 import wily.legacy.client.LegacyOptions;
 
+//? if <=1.20.4 {
+/*import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+*///?}
 import java.util.function.Consumer;
 
 public class LegacyFontUtil {
     public static final ResourceLocation MOJANGLES_11_FONT = Legacy4J.createModLocation("default_11");
+    public static final ResourceLocation HIRES_FONT = Legacy4J.createModLocation("hires");
     public static final Style MOJANGLES_11_STYLE = Style.EMPTY.withFont(MOJANGLES_11_FONT);
     public static final Style DEFAULT_FONT_STYLE = Style.EMPTY.withFont(Style.DEFAULT_FONT);
     private static boolean legacyFont = true;
     private static float shadowScale = 1.0f;
     public static boolean forceVanillaFontShadowColor = false;
     public static ResourceLocation defaultFontOverride = null;
+    //? if <=1.20.4 {
+    /*private static final Set<Long> LEGACY_FONTS = ConcurrentHashMap.newKeySet();
+    *///?}
 
 
     public static void applyFontOverrideIf(boolean b, ResourceLocation override, Consumer<Boolean> fontRender) {
@@ -23,6 +31,20 @@ public class LegacyFontUtil {
         fontRender.accept(b);
         if (b) defaultFontOverride = null;
     }
+
+    //? if <=1.20.4 {
+    /*public static void registerLegacyFont(long address) {
+        LEGACY_FONTS.add(address);
+    }
+
+    public static void unregisterLegacyFont(long address) {
+        LEGACY_FONTS.remove(address);
+    }
+
+    public static boolean isLegacyFont(long address) {
+        return LEGACY_FONTS.contains(address);
+    }
+    *///?}
 
     public static void applyFontOverride(ResourceLocation override, Consumer<Boolean> fontRender) {
         applyFontOverrideIf(override != null, override, fontRender);
