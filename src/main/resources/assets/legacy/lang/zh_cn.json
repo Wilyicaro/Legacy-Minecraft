@@ -2119,6 +2119,7 @@
   "legacy.options.legacyBlockProtection": "Legacy Block Protection",
   "legacy.options.legacyBookScreen": "经典书本界面",
   "legacy.options.legacyBossHealth": "经典 Boss 生命值",
+  "legacy.options.legacyBossBars": "Legacy Boss Bars",
   "legacy.options.legacyBrewingStandScreen": "经典酿造台界面",
   "legacy.options.legacyCartographyScreen": "经典制图台界面",
   "legacy.options.legacyCauldrons": "经典熔炉",
