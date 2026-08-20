@@ -74,7 +74,11 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
     protected void causeFallDamage(/*? if <1.21.5 {*/float/*?} else {*//*double*//*?}*/ distance, float multiplier, net.minecraft.world.damagesource.DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        if (!getAbilities().mayfly || isSpectator()) return;
+        if (!getAbilities().instabuild) {
+            if (!getAbilities().mayfly || isSpectator()) return;
+            cir.setReturnValue(super.causeFallDamage(distance, multiplier, source));
+            return;
+        }
         int damage = calculateFallDamage((float) distance, multiplier);
         if (damage > 0) {
             var sounds = getFallSounds();

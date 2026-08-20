@@ -96,6 +96,7 @@ public class LegacyComponents {
     public static final Component PLANT = Component.translatable("legacy.action.plant");
     public static final Component PLAY = Component.translatable("legacy.action.play");
     public static final Component PRESETS = Component.translatable("legacy.action.presets");
+    public static final Component PRIVILEGES = Component.translatable("legacy.action.privileges");
     public static final Component PREVIOUS_PAGE = Component.translatable("legacy.action.previous_page");
     public static final Component QUICK_MOVE = Component.translatable("legacy.action.quick_move");
     public static final Component RELEASE = Component.translatable("legacy.action.release");

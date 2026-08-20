@@ -137,7 +137,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         return super.keyPressed(i, j, k);
     }
 
-    protected abstract class PlayerButton extends AbstractButton {
+    protected abstract class PlayerButton extends AbstractButton implements ControlTooltip.ActionHolder {
         public final PlayerInfo playerInfo;
 
         public PlayerButton(int x, int y, int width, int height, PlayerInfo playerInfo) {
@@ -162,6 +162,11 @@ public class HostOptionsScreen extends PanelVListScreen {
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
             defaultButtonNarrationText(narrationElementOutput);
+        }
+
+        @Override
+        public Component getAction(ControlTooltip.ActionHolder.Context context) {
+            return context.actionOfContext(ControlTooltip.ActionHolder.KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isHovered() ? LegacyComponents.PRIVILEGES : ControlTooltip.getSelectAction(this, c));
         }
     }
 
