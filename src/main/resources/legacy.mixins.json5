@@ -276,6 +276,7 @@
     "client.bosshealth.WitherBossMixin",
     "client.chat.ChatFormattingMixin",
     "client.bosshealth.EndDragonFightMixin",
+    "client.bosshealth.RaidMixin",
     "client.ComponentPathMixin"
   ],
   "mixins": [
