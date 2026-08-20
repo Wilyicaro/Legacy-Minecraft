@@ -249,8 +249,8 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         button.selected = false;
         Vec2 translate = button.offset.apply(button);
         button.selected = selected;
-        graphics.pose().translate(translate.x, translate.y - 1);
-        graphics.pose().translate(button.iconOffset.x, button.iconOffset.y);
+        float guiScale = (float) minecraft.getWindow().getGuiScale();
+        graphics.pose().translate(Math.round((translate.x + button.iconOffset.x) * guiScale) / guiScale, Math.round((translate.y - 1 + button.iconOffset.y) * guiScale) / guiScale);
         button.icon.render(button, graphics, i, j, f);
         graphics.pose().popMatrix();
     }

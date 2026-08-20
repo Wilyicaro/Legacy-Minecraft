@@ -132,7 +132,8 @@ public class LegacyTabButton extends AbstractButton {
             if (icon == null)
                 this.renderString(GuiGraphicsExtractor, minecraft.font, CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
             else {
-                GuiGraphicsExtractor.pose().translate(iconOffset.x, iconOffset.y);
+                float guiScale = (float) minecraft.getWindow().getGuiScale();
+                GuiGraphicsExtractor.pose().translate(Math.round((translate.x + iconOffset.x) * guiScale) / guiScale - translate.x, Math.round((translate.y + iconOffset.y) * guiScale) / guiScale - translate.y);
                 icon.render(this, GuiGraphicsExtractor, i, j, f);
             }
         }
