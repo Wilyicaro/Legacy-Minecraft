@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 public class LegacyFontUtil {
     public static final FontDescription MOJANGLES_11_FONT = new FontDescription.Resource(Legacy4J.createModLocation("default_11"));
+    public static final FontDescription.Resource HIRES_FONT = new FontDescription.Resource(Legacy4J.createModLocation("hires"));
     public static final Style MOJANGLES_11_STYLE = Style.EMPTY.withFont(MOJANGLES_11_FONT);
     public static final Style DEFAULT_FONT_STYLE = Style.EMPTY.withFont(FontDescription.DEFAULT);
     private static boolean legacyFont = true;
