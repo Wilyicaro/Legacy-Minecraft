@@ -185,6 +185,11 @@ public abstract class MinecraftMixin {
             cir.getReturnValue().whenComplete((unused, throwable) -> self().execute(() -> LegacyMusicFader.finishResourceReload(throwable == null)));
         }
     }
+
+    @Inject(method = "rollbackResourcePacks", at = @At("HEAD"))
+    private void failResourceReloadMusic(CallbackInfo ci) {
+        LegacyMusicFader.finishResourceReload(false);
+    }
     //? if forge {
     /*@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/loading/ImmediateWindowHandler;loadingOverlay(Ljava/util/function/Supplier;Ljava/util/function/Supplier;Ljava/util/function/Consumer;Z)Ljava/util/function/Supplier;", remap = false))
     private Supplier<Overlay> init(Supplier<Minecraft> mc, Supplier<ReloadInstance> ri, Consumer<Optional<Throwable>> ex, boolean fade) {
