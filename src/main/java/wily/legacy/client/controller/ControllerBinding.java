@@ -89,7 +89,7 @@ public class ControllerBinding<T extends BindingState> {
     }
 
     private static boolean invertControllerButtons() {
-        return LegacyOptions.invertControllerButtons.get() != ControlType.getActiveControllerType().id().equals(ControlType.SWITCH);
+        return LegacyOptions.invertControllerButtons.get() != (ControlType.getActiveControllerType().id().equals(ControlType.SWITCH) || ControlType.getActiveControllerType().id().equals(ControlType.WII_U));
     }
 
     public static final ControllerBinding<BindingState.Button> DOWN_BUTTON = registerWithDefaults(createButton("down_button", () -> invertControllerButtons() ? Button.RIGHT : Button.DOWN), o -> List.of(o.keyJump));
