@@ -15,6 +15,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
 import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
@@ -57,6 +58,8 @@ public class ControllerManager {
     private static final int MAX_INPUT_TICKS = 32;
     private static final long MAX_QUEUED_UPDATE_TIME = 1000L;
     public Controller connectedController = null;
+    private final Map<Integer, String> controllerNames = new HashMap<>();
+    private int activeControllerSlot = -1;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
     public boolean simulateShift = false;
@@ -77,6 +80,15 @@ public class ControllerManager {
 
     public static Controller.Handler getHandler() {
         return LegacyOptions.selectedControllerHandler.get();
+    }
+
+    public Component getControllerDisplayName(int jid) {
+        String name = controllerNames.get(jid);
+        if (activeControllerSlot == jid && connectedController != null) name = connectedController.getName();
+        if (name == null) return Component.literal(String.valueOf(jid + 1));
+        MutableComponent display = Component.literal(jid + 1 + " - " + name);
+        if (activeControllerSlot != jid && !getHandler().isValidController(jid)) display.append(" (").append(CONTROLLER_DISCONNECTED).append(")");
+        return display;
     }
 
     public static void updatePlayerCamera(BindingState.Axis stick, Controller controller) {
@@ -157,8 +169,11 @@ public class ControllerManager {
             }
             return;
         }
-        if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null)
+        if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null) {
+            activeControllerSlot = LegacyOptions.selectedController.get();
+            controllerNames.put(activeControllerSlot, connectedController.getName());
             connectedController.connect(ControllerManager.this);
+        }
         if (connectedController != null) getHandler().setup(ControllerManager.this);
     }
 
@@ -214,6 +229,9 @@ public class ControllerManager {
         if (isCursorDisabled && !getCursorMode().isNever()) enableCursor();
         updateBindings(Controller.EMPTY);
         connectedController = null;
+        activeControllerSlot = -1;
+        Screen screen = minecraft.screen;
+        if (!isCursorDisabled && screen != null) minecraft.execute(() -> UIAccessor.of(screen).reloadUI());
     }
 
     public void connectTo(int jid) {
@@ -223,6 +241,8 @@ public class ControllerManager {
             Controller controller = getHandler().getController(jid);
             if (controller != null) {
                 connectedController = controller;
+                activeControllerSlot = jid;
+                controllerNames.put(jid, controller.getName());
                 controller.connect(this);
 			    if (controller.hasLED()) {
                     controller.setLED(
@@ -232,7 +252,7 @@ public class ControllerManager {
                     );
                 }
             } else safeDisconnect();
-        }
+        } else safeDisconnect();
     }
 
     public void updateHandler(Controller.Handler handler) {

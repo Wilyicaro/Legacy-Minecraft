@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(EnderDragonFight.class)
 public class EndDragonFightMixin {
-    @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Ljava/util/UUID;Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"))
+    @ModifyArg(method = "init", at = @At(value = "INVOKE", target = /*? if >=26.1 {*/"Lnet/minecraft/server/level/ServerBossEvent;<init>(Ljava/util/UUID;Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"/*?} else {*//*"Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"*//*?}*/))
     private Component init(Component component) {
         return component.copy().withStyle(ChatFormatting.DARK_PURPLE);
     }
