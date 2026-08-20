@@ -1854,7 +1854,7 @@
   "legacy.menu.legacy_settings_menus_warning": "Abilitare i Menu Impostazioni Legacy?",
   "legacy.menu.legacy_settings_menus_warning.message": "Questo nasconderà le impostazioni extra in diversi menu e nasconderà la richiesta delle opzioni avanzate. Il pulsante delle opzioni avanzate continuerà a funzionare, e puoi disattivare questa opzione in qualsiasi momento.",
   "legacy.menu.load": "Carica",
-  "legacy.menu.load_save.created_in": "Creato in %s",
+  "legacy.menu.load_save.created_in": "Created in %s Mode",
   "legacy.menu.load_save.load": "Carica",
   "legacy.menu.load_save.reset": "Ripristina %s",
   "legacy.menu.load_save.reset_cancel": "Non Ripristinare %s",
