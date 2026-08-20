@@ -632,6 +632,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyDrownedAnimation,
                                 LegacyOptions.legacyZombieAggressionAnimation,
                                 LegacyOptions.legacyEntityFireTint,
+                                LegacyOptions.legacyBossBars,
                                 LegacyOptions.legacyItemPickup,
                                 LegacyOptions.enhancedPistonMovingRenderer,
                                 LegacyOptions.legacyPotionsBar,
