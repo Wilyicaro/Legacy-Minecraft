@@ -253,8 +253,8 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         button.selected = false;
         Vec3 translate = button.offset.apply(button);
         button.selected = selected;
-        graphics.pose().translate(translate.x, translate.y - 1, translate.z);
-        graphics.pose().translate(button.iconOffset.x, button.iconOffset.y, button.iconOffset.z);
+        double guiScale = minecraft.getWindow().getGuiScale();
+        graphics.pose().translate(Math.round((translate.x + button.iconOffset.x) * guiScale) / guiScale, Math.round((translate.y - 1 + button.iconOffset.y) * guiScale) / guiScale, translate.z + button.iconOffset.z);
         button.icon.render(button, graphics, i, j, f);
         graphics.pose().popPose();
     }
