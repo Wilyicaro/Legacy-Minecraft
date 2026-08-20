@@ -202,6 +202,7 @@
     "client.GuiEntityRendererMixin",
     "client.GuiRendererMixin",
     "client.bosshealth.EndDragonFightMixin",
+    "client.bosshealth.RaidMixin",
     "client.bosshealth.WitherBossMixin",
     "client.GuiItemRenderStateMixin",
     "client.chat.ChatFormattingMixin",
