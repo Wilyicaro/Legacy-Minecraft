@@ -2119,6 +2119,7 @@
   "legacy.options.legacyBlockProtection": "Legacy Block Protection",
   "legacy.options.legacyBookScreen": "Perinteinen Kirjanäyttö",
   "legacy.options.legacyBossHealth": "Perinteinen Bossin Terveys",
+  "legacy.options.legacyBossBars": "Legacy Boss Bars",
   "legacy.options.legacyBrewingStandScreen": "Perinteinen Patonäyttö",
   "legacy.options.legacyCartographyScreen": "Perinteinen Kartografianäyttö",
   "legacy.options.legacyCauldrons": "Perinteiset Kattilat",
