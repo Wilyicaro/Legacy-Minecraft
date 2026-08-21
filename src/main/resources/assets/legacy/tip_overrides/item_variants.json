@@ -18,7 +18,7 @@
     },
     {
     "blocks": ["sandstone","smooth_sandstone","chiseled_sandstone","cut_sandstone"],
-    "tip": {"translate": "block.minecraft.quartz_block.tip"}
+    "tip": {"translate": "block.minecraft.sandstone.tip"}
     },
     {
     "block": "#stone_bricks",
