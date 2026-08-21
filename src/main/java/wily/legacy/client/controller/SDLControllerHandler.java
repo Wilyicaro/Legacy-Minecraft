@@ -183,7 +183,7 @@ public class SDLControllerHandler implements Controller.Handler {
             public void onClose() {
                 super.onClose();
                 init = false;
-                if (minecraft.screen instanceof OptionsScreen opts) opts.repositionElements();
+//                if (minecraft.screen instanceof OptionsScreen opts) opts.updateWidgets(false);
             }
         });
     }
