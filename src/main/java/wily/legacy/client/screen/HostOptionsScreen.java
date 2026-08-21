@@ -27,6 +27,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -181,7 +182,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, title, panel.x + accessor.getInteger("title.x", 11), panel.y + accessor.getInteger("title.y", 8), CommonColor.GRAY_TEXT.get(), false));
     }
 
-    protected abstract class PlayerButton extends ListButton implements RenderableVListEntry {
+    protected abstract class PlayerButton extends ListButton implements RenderableVListEntry, ControlTooltip.ActionHolder {
         public final PlayerInfo playerInfo;
 
         public PlayerButton(int x, int y, int width, int height, PlayerInfo playerInfo) {
@@ -209,6 +210,11 @@ public class HostOptionsScreen extends PanelVListScreen {
         public void initRenderable(RenderableVList list) {
             this.list = list;
             setHeight(list.accessor.getInteger("buttonsHeight", 30));
+        }
+
+        @Override
+        public Component getAction(ControlTooltip.ActionHolder.Context context) {
+            return context.actionOfContext(ControlTooltip.ActionHolder.KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isHovered() ? LegacyComponents.PRIVILEGES : ControlTooltip.getSelectAction(this, c));
         }
     }
 

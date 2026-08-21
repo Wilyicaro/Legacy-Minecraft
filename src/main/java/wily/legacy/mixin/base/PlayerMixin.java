@@ -57,7 +57,11 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
 
     @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
     protected void causeFallDamage(double d, float f, net.minecraft.world.damagesource.DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
-        if (!getAbilities().mayfly || isSpectator()) return;
+        if (!getAbilities().instabuild) {
+            if (!getAbilities().mayfly || isSpectator()) return;
+            cir.setReturnValue(super.causeFallDamage(d, f, damageSource));
+            return;
+        }
         int damage = calculateFallDamage(d, f);
         if (damage > 0) {
             var sounds = getFallSounds();
