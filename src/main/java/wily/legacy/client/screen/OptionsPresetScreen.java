@@ -59,8 +59,7 @@ public class OptionsPresetScreen extends ConfirmationScreen {
             return;
         }
         if (parent instanceof OptionsScreen optionsScreen) {
-            optionsScreen.updateWidgets(true);
-            optionsScreen.updateWidgetMessages();
+            optionsScreen.updateWidgets(false);
         }
         onClose();
     }
