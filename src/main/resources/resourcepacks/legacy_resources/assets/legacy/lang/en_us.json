@@ -10,7 +10,7 @@
   "argument.entity.options.type.invalid": "Entity type '%s' is invalid",
   "argument.gamemode.invalid": "Game mode '%1$s' is invalid",
   "argument.float.big": "The number you have entered (%2$s) is too big, it must be at most %1$s",
-  "argument.float.low": "The number you have entered (%2$s) is too big, it must be at most %1$s",
+  "argument.float.low": "The number you have entered (%2$s) is too small, it must be at least %1$s",
   "argument.integer.big": "The number you have entered (%2$s) is too big, it must be at most %1$s",
   "argument.integer.low": "The number you have entered (%2$s) is too small, it must be at least %1$s",
   "argument.long.big": "The number you have entered (%2$s) is too big, it must be at most %1$s",
