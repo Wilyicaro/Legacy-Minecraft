@@ -42,7 +42,7 @@ public abstract class BossHealthOverlayMixin {
             if (CommonColor.BOSS_TEXT.isOverridden()) {
                 graphics.drawString(font, bossNameText(component), 0, 0, CommonColor.BOSS_TEXT.get(), false);
             } else {
-                graphics.drawString(font, component, 0, 0, k);
+                graphics.drawString(font, component, 0, 0, LegacyOptions.legacyBossBars.get() ? CommonColor.DARK_PURPLE.get() : k);
             }
             graphics.pose().popMatrix();
             LegacyFontUtil.forceVanillaFontShadowColor = false;
