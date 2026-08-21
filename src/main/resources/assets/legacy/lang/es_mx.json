@@ -2034,6 +2034,7 @@
   "legacy.options.controlType.steam": "Edición Steam de cloud54",
   "legacy.options.controlType.switch": "Edición Switch",
   "legacy.options.controlType.wii_u": "Edición Wii U",
+  "legacy.options.controlType.wii_u_pro": "Wii U Pro Controller",
   "legacy.options.controlType.xbox_360": "Edición Xbox 360",
   "legacy.options.controlType.xbox_one": "Edición Xbox One",
   "legacy.options.controllerDoubleClick": "Double-Click In Inventory",
