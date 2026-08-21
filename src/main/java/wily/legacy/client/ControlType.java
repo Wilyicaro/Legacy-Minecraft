@@ -29,6 +29,7 @@ public record ControlType(Identifier id, Optional<Component> name, boolean isKbm
     public static final Identifier PS3 = Legacy4J.createModLocation("playstation_3");
     public static final Identifier PS4 = Legacy4J.createModLocation("playstation_4");
     public static final Identifier WII_U = Legacy4J.createModLocation("wii_u");
+    public static final Identifier WII_U_EDITION = Legacy4J.createModLocation("wii_u_edition");
     public static final Identifier SWITCH = Legacy4J.createModLocation("switch");
     public static final Identifier STEAM = Legacy4J.createModLocation("steam");
     public static final Identifier STADIA = Legacy4J.createModLocation("stadia");

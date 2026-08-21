@@ -31,6 +31,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -814,7 +815,7 @@ public class LegacyRenderUtil {
 
     public static void renderPotionLevel(GuiGraphicsExtractor graphics, int i, int j, ItemStack itemStack) {
         if (!LegacyOptions.legacyPotionsBar.get()) return;
-        int potionLevel = LegacyItemUtil.getPotionLevel(itemStack);
+        int potionLevel = Math.min(LegacyItemUtil.getPotionLevel(itemStack), 4);
         if (potionLevel > 0) {
             int x = i + 3;
             int y = j + 13;
@@ -844,6 +845,18 @@ public class LegacyRenderUtil {
         else if (y < 0)
             return ScreenDirection.UP;
         return null;
+    }
+
+    public static int getBossBarTextColor(BossEvent.BossBarColor color) {
+        return (switch (color) {
+            case PINK -> CommonColor.DARK_PURPLE;
+            case BLUE -> CommonColor.DARK_BLUE;
+            case RED -> CommonColor.DARK_RED;
+            case GREEN -> CommonColor.GREEN;
+            case YELLOW -> CommonColor.YELLOW;
+            case PURPLE -> CommonColor.LIGHT_PURPLE;
+            case WHITE -> CommonColor.WHITE;
+        }).get();
     }
 
     public static boolean hasHorizontalArtifacts() {

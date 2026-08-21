@@ -15,7 +15,6 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundSource;
@@ -36,7 +35,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.ControlTooltip.getKeyIcon;
@@ -629,7 +627,6 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyDrownedAnimation,
                                 LegacyOptions.legacyZombieAggressionAnimation,
                                 LegacyOptions.legacyEntityFireTint,
-                                LegacyOptions.legacyBossBars,
                                 LegacyOptions.legacyItemPickup,
                                 LegacyOptions.enhancedPistonMovingRenderer,
                                 LegacyOptions.legacyPotionsBar,
@@ -729,7 +726,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
                                 LegacyOptions.legacyHearts,
-                                LegacyOptions.legacyFont),
+                                LegacyOptions.legacyFont,
+                                LegacyOptions.legacyPinkBossBars),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.screenshotToasts,
