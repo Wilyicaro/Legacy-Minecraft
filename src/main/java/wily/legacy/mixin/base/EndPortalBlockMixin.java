@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -18,4 +19,11 @@ public class EndPortalBlockMixin {
         if (entity instanceof EntityAccessor accessor) accessor.setPortalEntrancePos(blockPos);
     }
     *///?}
+
+    //? if >=1.21.1 {
+    @ModifyExpressionValue(method = "entityInside", at = @At(value = "FIELD", target = "Lnet/minecraft/server/level/ServerPlayer;seenCredits:Z"))
+    private boolean showEndPoem(boolean value) {
+        return false;
+    }
+    //?}
 }
