@@ -2034,6 +2034,7 @@
   "legacy.options.controlType.steam": "cloud54 的 Steam 版",
   "legacy.options.controlType.switch": "Switch 版",
   "legacy.options.controlType.wii_u": "Wii U 版",
+  "legacy.options.controlType.wii_u_pro": "Wii U Pro Controller",
   "legacy.options.controlType.xbox_360": "Xbox 360 版",
   "legacy.options.controlType.xbox_one": "Xbox One 版",
   "legacy.options.controllerDoubleClick": "Double-Click In Inventory",
