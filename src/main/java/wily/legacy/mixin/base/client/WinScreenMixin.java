@@ -17,6 +17,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.Music;
 import net.minecraft.util.FormattedCharSequence;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -24,8 +25,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -34,7 +37,10 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.controller.BindingState;
+import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -43,7 +49,7 @@ import java.io.Reader;
 import java.util.List;
 
 @Mixin(WinScreen.class)
-public abstract class WinScreenMixin extends Screen implements ControlTooltip.Event {
+public abstract class WinScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
 
     @Unique
     Identifier POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
@@ -70,6 +76,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     private List<FormattedCharSequence> lines;
     @Shadow
     private boolean speedupActive;
+    @Shadow
+    private int direction;
 
     protected WinScreenMixin(Component component) {
         super(component);
@@ -87,6 +95,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         this.scroll = Math.max(0.0F, this.scroll + f * this.scrollSpeed * (poem ? 1.0f : 4f));
+        if (poem) this.scroll = Math.min(this.scroll, totalScrollLength + height / 2f - 18);
         float g = -this.scroll;
         int m = height;
         if (poem) {
@@ -171,10 +180,25 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
         return 24;
     }
 
+    @ModifyConstant(method = "calculateScrollSpeed", constant = @Constant(floatValue = 5.0F))
+    private float useLegacyPoemScrollSpeed(float speed) {
+        return poem ? 3.0F : speed;
+    }
+
+    @Override
+    public void simulateKeyAction(ControllerManager manager, BindingState state) {
+        Controller.Event.super.simulateKeyAction(manager, state);
+        if (poem) {
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_UP), InputConstants.KEY_UP, state, true);
+            manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_DOWN), InputConstants.KEY_DOWN, state, true);
+        }
+    }
+
     @Inject(method = "keyPressed", at = @At("HEAD"))
     public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (keyEvent.isUp() || keyEvent.isDown()) {
             speedupActive = true;
+            if (poem) direction = keyEvent.isUp() ? -1 : 1;
         }
     }
 
@@ -207,6 +231,21 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     private /*? if <1.20.5 {*//*String*//*?} else {*/Identifier/*?}*/ addPoemFile(/*? if <1.20.5 {*//*String*//*?} else {*/Identifier/*?}*/ arg) {
         Identifier langLocation = Legacy4J.createModLocation("end_poem/" + minecraft.getLanguageManager().getSelected() + ".txt");
         return minecraft.getResourceManager().getResource(langLocation).isPresent() ? langLocation/*? if <1.20.5 {*//*.toString()*//*?}*/ : arg;
+    }
+
+    @Inject(method = "addPoemFile", at = @At("HEAD"), cancellable = true)
+    private void skipPostCredits(Reader reader, CallbackInfo ci) {
+        if (poem && !lines.isEmpty()) ci.cancel();
+    }
+
+    @Inject(method = "addCreditsFile", at = @At("HEAD"), cancellable = true)
+    private void skipCredits(Reader reader, CallbackInfo ci) {
+        if (poem) ci.cancel();
+    }
+
+    @Inject(method = "getBackgroundMusic", at = @At("HEAD"), cancellable = true)
+    private void useLevelMusic(CallbackInfoReturnable<Music> cir) {
+        if (poem) cir.setReturnValue(null);
     }
 
     @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 0))
