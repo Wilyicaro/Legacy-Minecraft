@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -12,6 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EndPortalBlock.class)
 public class EndPortalBlockMixin {
+    //? if >=1.21.1 {
+    @ModifyExpressionValue(method = "entityInside", at = @At(value = "FIELD", target = "Lnet/minecraft/server/level/ServerPlayer;seenCredits:Z"))
+    private boolean showEndPoemEveryTime(boolean value) {
+        return false;
+    }
+    //?}
+
     //? if <1.21.1 {
     /*@Inject(method = "entityInside", at = @At("HEAD"))
     public void entityInside(BlockState blockState, Level level, BlockPos blockPos, Entity entity, CallbackInfo ci) {

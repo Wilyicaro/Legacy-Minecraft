@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -61,6 +62,13 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     public abstract ServerLevel level();
 
     @Shadow @Final private MinecraftServer server;
+
+    //? if <1.21.1 {
+    /*@ModifyArg(method = "changeDimension", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ClientboundGameEventPacket;<init>(Lnet/minecraft/network/protocol/game/ClientboundGameEventPacket$Type;F)V"), index = 1)
+    private float showEndPoemEveryTime(float value) {
+        return 1.0F;
+    }
+    *///?}
 
     @Override
     public GameProfile legacyMinecraft$getProfile() {
