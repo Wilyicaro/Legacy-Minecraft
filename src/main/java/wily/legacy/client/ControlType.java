@@ -30,6 +30,7 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
     public static final ResourceLocation PS3 = Legacy4J.createModLocation("playstation_3");
     public static final ResourceLocation PS4 = Legacy4J.createModLocation("playstation_4");
     public static final ResourceLocation WII_U = Legacy4J.createModLocation("wii_u");
+    public static final ResourceLocation WII_U_EDITION = Legacy4J.createModLocation("wii_u_edition");
     public static final ResourceLocation SWITCH = Legacy4J.createModLocation("switch");
     public static final ResourceLocation STEAM = Legacy4J.createModLocation("steam");
     public static final ResourceLocation STADIA = Legacy4J.createModLocation("stadia");
