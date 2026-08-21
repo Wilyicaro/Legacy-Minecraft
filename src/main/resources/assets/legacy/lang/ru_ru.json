@@ -2034,6 +2034,7 @@
   "legacy.options.controlType.steam": "Издание Steam от cloud54",
   "legacy.options.controlType.switch": "Издание для Nintendo Switch",
   "legacy.options.controlType.wii_u": "Издание для Wii U",
+  "legacy.options.controlType.wii_u_pro": "Wii U Pro Controller",
   "legacy.options.controlType.xbox_360": "Издание для Xbox 360",
   "legacy.options.controlType.xbox_one": "Издание для Xbox One",
   "legacy.options.controllerDoubleClick": "Double-Click In Inventory",
