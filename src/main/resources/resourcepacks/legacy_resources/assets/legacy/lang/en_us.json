@@ -55,7 +55,7 @@
   "commands.forceload.toobig": "Too many chunks in the specified area (%2$s > %1$s)",
   "commands.gamerule.query": "%s = %s",
   "commands.gamerule.set": "Game rule %s has been updated to %s",
-  "commands.give.success.single": "Gave %2$s * %$1s to %3$s",
+  "commands.give.success.single": "Gave %2$s * %1$s to %3$s",
   "commands.item.source.not_a_container": "Block at %s, %s, %s is not a container",
   "commands.item.target.not_a_container": "Block at %s, %s, %s is not a container",
   "commands.kick.success": "Kicked %s: '%s'",
