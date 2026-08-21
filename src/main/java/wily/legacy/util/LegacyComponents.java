@@ -57,6 +57,7 @@ public class LegacyComponents {
     public static final Component FOLLOW_ME = Component.translatable("legacy.action.follow_me");
     public static final Component FUEL = Component.translatable("legacy.action.fuel");
     public static final Component CHANGE_GROUP = Component.translatable("legacy.action.group");
+    public static final Component GROUP = Component.translatable("legacy.action.group");
     public static final Component GROW = Component.translatable("legacy.action.grow");
     public static final Component HANG = Component.translatable("legacy.action.hang");
     public static final Component HARVEST = Component.translatable("legacy.action.harvest");
