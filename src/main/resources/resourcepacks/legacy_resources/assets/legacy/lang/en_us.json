@@ -77,6 +77,7 @@
   "death.attack.trident": "%1$s was speared by %2$s",
   "death.attack.trident.item": "%1$s was speared by %2$s using %3$s",
   "disconnect.quitting": "Exiting the game",
+  "event.minecraft.raid.raiders_remaining": "Mobs remaining: %s",
   "gameMode.adventure": "Adventure",
   "gameMode.creative": "Creative",
   "gameMode.hardcore": "Hardcore!",
