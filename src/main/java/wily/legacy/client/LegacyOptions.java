@@ -291,7 +291,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> displayMultipleControlsFromAction = CLIENT_STORAGE.register(createBoolean("displayMultipleControlsFromAction", false));
     public static final FactoryConfig<Boolean> enhancedPistonMovingRenderer = CLIENT_STORAGE.register(createBoolean("enhancedPistonMovingRenderer", true));
     public static final FactoryConfig<Boolean> legacyEntityFireTint = CLIENT_STORAGE.register(createBoolean("legacyEntityFireTint", true));
-    public static final FactoryConfig<Boolean> legacyBossBars = CLIENT_STORAGE.register(createBoolean("legacyBossBars", true));
+    public static final FactoryConfig<Boolean> legacyPinkBossBars = CLIENT_STORAGE.register(createBoolean("legacyPinkBossBars", true));
     public static final FactoryConfig<Boolean> advancedHeldItemTooltip = CLIENT_STORAGE.register(createBoolean("advancedHeldItemTooltip", false));
     public static final FactoryConfig<AdvancedOptionsMode> advancedOptionsMode = CLIENT_STORAGE.register(create("advancedOptionsMode", builder -> builder.valueToComponent(v -> v.displayName), i -> AdvancedOptionsMode.values()[i], AdvancedOptionsMode::ordinal, () -> AdvancedOptionsMode.values().length, AdvancedOptionsMode.CODEC, AdvancedOptionsMode.DEFAULT, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> saveCache = CLIENT_STORAGE.register(createBoolean("saveCache", true));
