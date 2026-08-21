@@ -194,6 +194,7 @@
     "client.gui.SubtitleOverlayMixin",
     "client.ItemPickupParticleMixin",
     "client.SdlGamepadMixin",
+    "client.gui.ContextualBarRendererMixin",
     "client.gui.ExperienceBarRendererMixin",
     "client.book.BookSignScreenMixin",
     "client.AbstractWidgetAccessor",
@@ -202,8 +203,6 @@
     "client.GuiEntityRendererMixin",
     "client.GuiRendererMixin",
     "client.bosshealth.EndDragonFightMixin",
-    "client.bosshealth.RaidMixin",
-    "client.bosshealth.WitherBossMixin",
     "client.GuiItemRenderStateMixin",
     "client.chat.ChatFormattingMixin",
     "client.StyleMixin",
@@ -247,7 +246,8 @@
     "client.RenderSetupAccessor",
     "client.ClientBiomeMixin",
     "client.EnvironmentAttributeMapMixin",
-    "client.chat.ChatComponentDrawingMixin"
+    "client.chat.ChatComponentDrawingMixin",
+    "client.gui.JumpableVehicleBarRendererMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
