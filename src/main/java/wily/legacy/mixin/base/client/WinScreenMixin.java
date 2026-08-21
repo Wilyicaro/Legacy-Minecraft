@@ -218,6 +218,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
     @Inject(method = "init", at = @At("TAIL"))
     private void updateTotalScrollLength(CallbackInfo ci) {
         if (poem) {
+            while (!lines.isEmpty() && lines.get(lines.size() - 1) == FormattedCharSequence.EMPTY) lines.remove(lines.size() - 1);
             totalScrollLength = 0;
             for (int i = 0; i < lines.size(); i++) {
                 totalScrollLength += getPoemLineAdvance(i);
