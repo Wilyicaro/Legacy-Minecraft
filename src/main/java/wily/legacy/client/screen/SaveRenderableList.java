@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -10,6 +11,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -79,46 +81,21 @@ public class SaveRenderableList extends RenderableVList {
             return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getBaseDir().resolve(key.getLevelId()).toFile());
         }
     });
-    public static LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
-        @Override
-        public FaviconTexture load(LevelSummary key) {
-            Path iconFile = key.getIcon();
-            try {
-                BasicFileAttributes basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-                if (basicFileAttributes.isSymbolicLink()) {
-                    List<ForbiddenSymlinkInfo> list = /*? if >1.20.2 {*/Minecraft.getInstance().directoryValidator().validateSymlink(iconFile)/*?} else {*//*new ArrayList<>()*//*?}*/;
-                    //? if <=1.20.2
-                    /*Minecraft.getInstance().getLevelSource().getWorldDirValidator().validateSymlink(iconFile,list);*/
-                    if (!list.isEmpty()) {
-                        Legacy4J.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
-                        iconFile = null;
-                    } else {
-                        basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class);
-                    }
+    private static final LoadingCache<WorldIcon, FaviconTexture> iconCache = CacheBuilder.<WorldIcon, FaviconTexture>newBuilder()
+            .maximumSize(128)
+            .removalListener((RemovalNotification<WorldIcon, FaviconTexture> notification) -> {
+                FaviconTexture icon = notification.getValue();
+                if (icon != null) Minecraft.getInstance().execute(icon::close);
+            })
+            .build(new CacheLoader<>() {
+                @Override
+                public FaviconTexture load(WorldIcon key) {
+                    Minecraft minecraft = Minecraft.getInstance();
+                    FaviconTexture icon = FaviconTexture.forWorld(minecraft.getTextureManager(), key.levelId());
+                    CompletableFuture.runAsync(() -> loadIcon(minecraft, key, icon), Util.nonCriticalIoPool());
+                    return icon;
                 }
-                if (!basicFileAttributes.isRegularFile()) {
-                    iconFile = null;
-                }
-            } catch (NoSuchFileException noSuchFileException) {
-                iconFile = null;
-            } catch (IOException iOException) {
-                Legacy4J.LOGGER.error("could not validate symlink", iOException);
-                iconFile = null;
-            }
-            FaviconTexture icon = FaviconTexture.forWorld(Minecraft.getInstance().getTextureManager(), key.getLevelId());
-            boolean bl = iconFile != null && Files.isRegularFile(iconFile);
-            if (bl) {
-                try (InputStream inputStream = Files.newInputStream(iconFile)) {
-                    icon.upload(NativeImage.read(inputStream));
-                } catch (Throwable throwable) {
-                    Legacy4J.LOGGER.error("Invalid icon for world {}", key.getLevelId(), throwable);
-                }
-            } else {
-                icon.clear();
-            }
-            return icon;
-        }
-    });
+            });
     @Nullable
     public List<LevelSummary> currentlyDisplayedLevels;
     public boolean firstLoad = true;
@@ -135,8 +112,63 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     public static void resetIconCache() {
-        SaveRenderableList.iconCache.asMap().forEach((s, i) -> i.close());
-        SaveRenderableList.iconCache.invalidateAll();
+        iconCache.invalidateAll();
+    }
+
+    public static FaviconTexture getIcon(LevelSummary summary) {
+        return iconCache.getUnchecked(new WorldIcon(summary.getLevelId(), summary.getIcon()));
+    }
+
+    private static void loadIcon(Minecraft minecraft, WorldIcon key, FaviconTexture icon) {
+        Path iconFile = validateIcon(minecraft, key.path());
+        if (iconFile == null) {
+            minecraft.execute(() -> {
+                if (iconCache.getIfPresent(key) == icon) icon.clear();
+            });
+            return;
+        }
+        try (InputStream inputStream = Files.newInputStream(iconFile)) {
+            NativeImage image = NativeImage.read(inputStream);
+            minecraft.execute(() -> {
+                if (iconCache.getIfPresent(key) != icon) {
+                    image.close();
+                    return;
+                }
+                try {
+                    icon.upload(image);
+                } catch (Throwable throwable) {
+                    Legacy4J.LOGGER.error("Invalid icon for world {}", key.levelId(), throwable);
+                }
+            });
+        } catch (Throwable throwable) {
+            Legacy4J.LOGGER.error("Invalid icon for world {}", key.levelId(), throwable);
+        }
+    }
+
+    private record WorldIcon(String levelId, Path path) {
+    }
+
+    @Nullable
+    private static Path validateIcon(Minecraft minecraft, Path iconFile) {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(iconFile, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+            if (attributes.isSymbolicLink()) {
+                List<ForbiddenSymlinkInfo> links = /*? if >1.20.2 {*/minecraft.directoryValidator().validateSymlink(iconFile)/*?} else {*//*new ArrayList<>()*//*?}*/;
+                //? if <=1.20.2
+                /*minecraft.getLevelSource().getWorldDirValidator().validateSymlink(iconFile,links);*/
+                if (!links.isEmpty()) {
+                    Legacy4J.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, links));
+                    return null;
+                }
+                attributes = Files.readAttributes(iconFile, BasicFileAttributes.class);
+            }
+            return attributes.isRegularFile() ? iconFile : null;
+        } catch (NoSuchFileException noSuchFileException) {
+            return null;
+        } catch (IOException iOException) {
+            Legacy4J.LOGGER.error("could not validate symlink", iOException);
+            return null;
+        }
     }
 
     public static void handleLevelLoadFailure(Minecraft minecraft, Component component) {
@@ -169,27 +201,37 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     private CompletableFuture<List<LevelSummary>> loadLevels() {
-        LevelStorageSource.LevelCandidates levelCandidates;
-        try {
-            levelCandidates = this.minecraft.getLevelSource().findLevelCandidates();
-        } catch (LevelStorageException levelStorageException) {
-            Legacy4J.LOGGER.error("Couldn't load level list", levelStorageException);
-            handleLevelLoadFailure(minecraft, levelStorageException.getMessageComponent());
-            return CompletableFuture.completedFuture(List.of());
-        }
-
-        if (levelCandidates.isEmpty()) {
-            return CompletableFuture.completedFuture(List.of());
-        }
-
         if (currentlyDisplayedLevels == null || currentlyDisplayedLevels.isEmpty())
             getScreen(PlayGameScreen.class).isLoading = true;
-        CompletableFuture<List<LevelSummary>> completableFuture = this.minecraft.getLevelSource().loadLevelSummaries(levelCandidates);
-        completableFuture.thenAcceptAsync(l -> l.forEach(s -> sizeCache.refresh(s)));
-        return completableFuture.exceptionally(throwable -> {
-            this.minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't load level list"));
+        LevelStorageSource levelSource = minecraft.getLevelSource();
+        Path saves = levelSource.getBaseDir();
+        CompletableFuture<List<LevelSummary>> levels = CompletableFuture.supplyAsync(() -> {
+            try {
+                return levelSource.findLevelCandidates();
+            } catch (LevelStorageException exception) {
+                throw new CompletionException(exception);
+            }
+        }, Util.nonCriticalIoPool()).thenComposeAsync(candidates -> candidates.isEmpty()
+                ? CompletableFuture.<List<LevelSummary>>completedFuture(List.of())
+                : levelSource.loadLevelSummaries(candidates), Util.nonCriticalIoPool());
+        levels.thenAcceptAsync(summaries -> refreshSizes(saves, summaries), Util.nonCriticalIoPool());
+        return levels.handleAsync((summaries, throwable) -> {
+            if (throwable == null) return summaries;
+            Throwable cause = throwable instanceof CompletionException && throwable.getCause() != null ? throwable.getCause() : throwable;
+            if (cause instanceof LevelStorageException exception) {
+                Legacy4J.LOGGER.error("Couldn't load level list", exception);
+                handleLevelLoadFailure(minecraft, exception.getMessageComponent());
+                return List.of();
+            }
+            minecraft.delayCrash(CrashReport.forThrowable(cause, "Couldn't load level list"));
             return List.of();
-        });
+        }, minecraft);
+    }
+
+    private static void refreshSizes(Path saves, List<LevelSummary> summaries) {
+        for (LevelSummary summary : summaries) {
+            sizeCache.put(summary, FileUtils.sizeOfDirectory(saves.resolve(summary.getLevelId()).toFile()));
+        }
     }
 
     public void addCreationButtons() {
@@ -322,7 +364,7 @@ public class SaveRenderableList extends RenderableVList {
 
         @Override
         public void renderIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, int x, int y, int width, int height) {
-            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + x, getY() + y, 0, 0, width, height, width, height);
+            FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(getIcon(summary).textureLocation(), getX() + x, getY() + y, 0, 0, width, height, width, height);
         }
 
         @Override

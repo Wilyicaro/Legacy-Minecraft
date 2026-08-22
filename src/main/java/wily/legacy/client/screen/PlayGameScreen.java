@@ -20,9 +20,11 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyMixinOptions;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
@@ -45,6 +47,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_TITLE = Component.translatable("multiplayerWarning.header").withStyle(ChatFormatting.BOLD);
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
+    private static final CompletableFuture<Long> STORAGE_CAPACITY = CompletableFuture.supplyAsync(() -> new File("/").getTotalSpace(), Util.nonCriticalIoPool());
     public final SaveRenderableList saveRenderableList = new SaveRenderableList(accessor);
     public final CreationList creationList = new CreationList(accessor);
     protected final Panel panelRecess;
@@ -67,28 +70,38 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
     private static final ThreadLocal<Boolean> preloadingCreateWorld = ThreadLocal.withInitial(() -> false);
-    private static CompletableFuture<Void> createWorldPreload = CompletableFuture.completedFuture(null);
-    private boolean createWorldPreloaded;
+    private static volatile CompletableFuture<?> createWorldPreload;
     public boolean isLoading = false;
 
     public static boolean isPreloadingCreateWorld() {
         return preloadingCreateWorld.get();
     }
 
-    public static CompletableFuture<Void> getCreateWorldPreload() {
-        return createWorldPreload;
+    public static synchronized void preloadCreateWorld(Minecraft minecraft) {
+        if (minecraft.isDemo() || !LegacyMixinOptions.legacyCreateWorldScreen.get()) return;
+        CompletableFuture<?> preload = createWorldPreload;
+        if (preload != null && !preload.isCancelled() && !preload.isCompletedExceptionally()) return;
+        createWorldPreload = null;
+        preloadingCreateWorld.set(true);
+        try {
+            CreateWorldScreen.openFresh(minecraft, () -> {});
+            if (createWorldPreload == null) createWorldPreload = CompletableFuture.failedFuture(new IllegalStateException("World creation preload did not start"));
+        } catch (RuntimeException exception) {
+            createWorldPreload = CompletableFuture.failedFuture(exception);
+            Legacy4J.LOGGER.warn("Couldn't preload world creation", exception);
+        } finally {
+            preloadingCreateWorld.remove();
+        }
     }
 
-    private static synchronized void preloadCreateWorld(Minecraft minecraft) {
-        if (!createWorldPreload.isDone()) return;
-        createWorldPreload = CompletableFuture.runAsync(() -> {
-            preloadingCreateWorld.set(true);
-            try {
-                CreateWorldScreen.openFresh(minecraft, () -> {});
-            } finally {
-                preloadingCreateWorld.remove();
-            }
-        }, Util.backgroundExecutor());
+    public static void setCreateWorldPreload(CompletableFuture<?> preload) {
+        createWorldPreload = preload;
+    }
+
+    public static boolean isCreateWorldPreloadReady(Minecraft minecraft) {
+        if (minecraft.isDemo() || !LegacyMixinOptions.legacyCreateWorldScreen.get()) return true;
+        CompletableFuture<?> preload = createWorldPreload;
+        return preload != null && preload.isDone();
     }
 
     public PlayGameScreen(Screen parent, int initialTab) {
@@ -107,13 +120,14 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     public static Screen createAndCheckNewerVersions(Screen parent) {
-        PlayGameScreen screen = new PlayGameScreen(parent);
+        Screen screen = new PlayGameScreen(parent);
+        if (Legacy4JClient.isNewerMinecraftVersion) {
+            Legacy4JClient.isNewerMinecraftVersion = false;
+            screen = PatchNotesScreen.createNewerMinecraftVersion(screen);
+        }
         if (Legacy4JClient.isNewerVersion) {
             Legacy4JClient.isNewerVersion = false;
-            return PatchNotesScreen.createNewerVersion(createAndCheckNewerVersions(parent));
-        } else if (Legacy4JClient.isNewerMinecraftVersion) {
-            Legacy4JClient.isNewerMinecraftVersion = false;
-            return PatchNotesScreen.createNewerMinecraftVersion(createAndCheckNewerVersions(parent));
+            screen = PatchNotesScreen.createNewerVersion(screen);
         }
         return screen;
     }
@@ -141,10 +155,6 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void added() {
         super.added();
-        if (!createWorldPreloaded) {
-            createWorldPreloaded = true;
-            preloadCreateWorld(Minecraft.getInstance());
-        }
         serverRenderableList.added();
     }
 
@@ -185,7 +195,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             if (saveRenderableList.currentlyDisplayedLevels != null) {
                 GuiGraphicsExtractor.pose().pushMatrix();
                 GuiGraphicsExtractor.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75f);
-                long storage = new File("/").getTotalSpace();
+                long storage = Math.max(1, STORAGE_CAPACITY.getNow(1L));
                 FactoryGuiGraphics.of(GuiGraphicsExtractor).enableScissor(0, 0, panel.width - 24, panel.height - 10);
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
                     Long size;
@@ -213,9 +223,6 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void removed() {
-        if (this.saveRenderableList != null) {
-            SaveRenderableList.resetIconCache();
-        }
         serverRenderableList.removed();
         this.pinger.removeAll();
     }
@@ -253,8 +260,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             if (tabList.getIndex() == 0) {
                 saveRenderableList.reloadSaveList();
             } else if (tabList.getIndex() == 2) {
-                serverRenderableList.servers.load();
-                serverRenderableList.updateServers();
+                serverRenderableList.reloadServers();
             }
             this.rebuildWidgets();
             return true;
