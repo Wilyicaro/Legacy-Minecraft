@@ -123,6 +123,7 @@ public class Legacy4J {
             r.register(true, ServerPlayerMissHitPayload.ID);
             r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);
+            r.register(false, TipCommand.PersistentPayload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
             r.register(true, SkinSync.SetSkinC2S.ID);

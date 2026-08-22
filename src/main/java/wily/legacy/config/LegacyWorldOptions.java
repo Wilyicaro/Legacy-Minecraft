@@ -25,6 +25,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyTipBuilder;
+import wily.legacy.world.MusicDiscHunt;
 
 import java.util.*;
 import java.util.function.Function;
@@ -33,6 +34,7 @@ public class LegacyWorldOptions {
     public static final FactoryConfig.StorageHandler WORLD_STORAGE = new FactoryConfig.StorageHandler();
     public static final FactoryConfig<Map<String, LegacyTipBuilder>> customTips = WORLD_STORAGE.register(FactoryConfig.create("customTips", null, () -> LegacyTipBuilder.MAP_CODEC, new HashMap<>(), v -> {}, WORLD_STORAGE));
     public static final FactoryConfig<List<InitialItem>> initialItems = WORLD_STORAGE.register(FactoryConfig.create("initialItems", null, () -> InitialItem.LIST_CODEC, List.of(new InitialItem(createStartingMap(), LegacyGameRules.PLAYER_STARTING_MAP.get()), new InitialItem(Items.BUNDLE.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_BUNDLE.get())), v -> {}, WORLD_STORAGE));
+    public static final FactoryConfig<List<MusicDiscHunt>> musicDiscHunts = WORLD_STORAGE.register(FactoryConfig.create("musicDiscHunts", null, () -> MusicDiscHunt.LIST_CODEC, List.of(), v -> {}, WORLD_STORAGE));
     public static final FactoryConfig<List<UsedEndPortalPos>> usedEndPortalPositions = WORLD_STORAGE.register(FactoryConfig.create("usedEndPortalPositions", null, () -> UsedEndPortalPos.LIST_CODEC, new ArrayList<>(), v -> {}, WORLD_STORAGE));
 
     
