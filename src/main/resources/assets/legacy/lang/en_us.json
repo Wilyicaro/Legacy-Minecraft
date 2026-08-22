@@ -1471,7 +1471,7 @@
   "legacy.menu.albums.resource.minecraft": "Minecraft Resource Album",
   "legacy.menu.albums.resource.minecraft.description": "Default Minecraft Textures",
   "legacy.menu.albums.resource.minecraft_classic": "Minecraft Classic Resource Album",
-  "legacy.menu.albums.resource.minecraft_classic.description": "The classic Minecraft look you know and love! We recently updated the game with new and stylish textures, but if you prefer more of a retro flavour to your Minecraft, this is the album for you! Why not try both albums and compare both yourself?",
+  "legacy.menu.albums.resource.minecraft_classic.description": "The classic Minecraft look you know and love! We recently updated the game with new and stylish textures, but if you prefer more of a retro flavor to your Minecraft, this is the album for you! Why not try both albums and compare both yourself?",
   "legacy.menu.albums.resource.template": "Resource Album %s",
   "legacy.menu.albums.resource.template.description": "An album saved with the resource packs that were selected in the Resource Packs Screen! You can edit it in the resource_assorts.json file in the game directory.",
   "legacy.menu.albums.texture.template": "Texture Pack Album %s",
