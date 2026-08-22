@@ -166,8 +166,8 @@
     ]
   },
   {
-    "id": "legacy:tools_and_armour",
-    "name": {"translate": "legacy.container.tab.tools_and_armour"},
+    "id": "legacy:tools_and_armor",
+    "name": {"translate": "legacy.container.tab.tools_and_armor"},
     "icon": {
       "type": "sizeable",
       "value": {
