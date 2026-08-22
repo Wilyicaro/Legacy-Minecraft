@@ -147,6 +147,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
+        PlayGameScreen.preloadCreateWorld(minecraft);
         if (LegacyOptions.legacySettingsMenus.get())
             ControlTooltip.Renderer.of(this).add(ControlTooltip.PRESS::get, () -> LegacyComponents.SELECT);
         else

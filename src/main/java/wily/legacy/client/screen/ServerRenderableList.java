@@ -52,6 +52,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -82,9 +83,10 @@ public class ServerRenderableList extends RenderableVList {
     private static final Identifier ICON_MISSING = FactoryAPI.createVanillaLocation("textures/misc/unknown_server.png");
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
-    public final ServerList servers;
+    public ServerList servers;
     public final LanServerDetection.LanServerList lanServerList;
     protected final Minecraft minecraft;
+    private CompletableFuture<ServerList> pendingServers;
     protected boolean lastDisplayRealmsButton = LegacyOptions.displayRealmsButton.get();
     @Nullable
     public LanServerDetection.LanServerDetector lanServerDetector;
@@ -95,9 +97,24 @@ public class ServerRenderableList extends RenderableVList {
         layoutSpacing(l -> 0);
         minecraft = Minecraft.getInstance();
         servers = new ServerList(minecraft);
-        servers.load();
         lanServerList = new LanServerDetection.LanServerList();
         updateServers();
+        reloadServers();
+    }
+
+    public void reloadServers() {
+        CompletableFuture<ServerList> load = CompletableFuture.supplyAsync(() -> {
+            ServerList servers = new ServerList(minecraft);
+            servers.load();
+            return servers;
+        }, Util.nonCriticalIoPool());
+        pendingServers = load;
+        load.thenAcceptAsync(servers -> {
+            if (pendingServers != load) return;
+            this.servers = servers;
+            updateServers();
+            if (minecraft.screen == getScreen()) accessor.reloadUI();
+        }, minecraft);
     }
 
     public static void drawIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y, int width, int height, Identifier resourceLocation) {
