@@ -1,8 +1,8 @@
 package wily.legacy.mixin.base;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyItemUtil;
+import wily.legacy.world.MusicDiscHuntManager;
 
 import static wily.legacy.util.LegacyItemUtil.canRepair;
 
@@ -68,5 +69,10 @@ public abstract class AbstractContainerMenuMixin {
                 ci.cancel();
             }
         }
+    }
+
+    @Inject(method = "clicked", at = @At("RETURN"))
+    private void collectCarriedDisc(int slot, int button, ContainerInput input, Player player, CallbackInfo ci) {
+        MusicDiscHuntManager.collect(player, getCarried());
     }
 }

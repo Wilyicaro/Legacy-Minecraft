@@ -262,6 +262,7 @@
     "OldMinecartBehaviorMixin",
     "ServerExplosionMixin",
     "ItemMixin",
+    "InventoryMixin",
     "AbstractContainerMenuMixin",
     "IngredientMixin",
     "CauldronInteractionDispatcherAccessor",

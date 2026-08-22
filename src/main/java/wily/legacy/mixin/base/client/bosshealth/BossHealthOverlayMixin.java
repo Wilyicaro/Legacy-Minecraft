@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -103,6 +104,20 @@ public abstract class BossHealthOverlayMixin {
     @ModifyExpressionValue(method = "extractBar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/Identifier;[Lnet/minecraft/resources/Identifier;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;getColor()Lnet/minecraft/world/BossEvent$BossBarColor;"))
     private BossEvent.BossBarColor drawBarColor(BossEvent.BossBarColor original) {
         return LegacyOptions.legacyPinkBossBars.get() ? BossEvent.BossBarColor.PINK : original;
+    }
+
+    @ModifyExpressionValue(method = "extractBar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/Identifier;[Lnet/minecraft/resources/Identifier;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;getOverlay()Lnet/minecraft/world/BossEvent$BossBarOverlay;"))
+    private BossEvent.BossBarOverlay drawBarOverlay(BossEvent.BossBarOverlay original, @Local(argsOnly = true) BossEvent event) {
+        if (LegacyOptions.legacyPinkBossBars.get() && isRaidBar(event)) {
+            return BossEvent.BossBarOverlay.PROGRESS;
+        }
+        return original;
+    }
+
+    private static boolean isRaidBar(BossEvent event) {
+        if (!(event.getName().getContents() instanceof TranslatableContents contents)) return false;
+        String key = contents.getKey();
+        return key.equals("event.minecraft.raid") || key.startsWith("event.minecraft.raid.");
     }
     //?} else {
     /*@Unique

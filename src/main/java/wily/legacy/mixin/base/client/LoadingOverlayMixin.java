@@ -64,8 +64,6 @@ public abstract class LoadingOverlayMixin extends Overlay {
             float timer = LegacyIntro.getTimer(initTime, LegacyResourceManager.intro);
             if (!finishedIntro && LegacyIntro.canSkip(timer, LegacyResourceManager.intro) && reload.isDone()) {
                 finishedIntro = true;
-                minecraft.setOverlay(null);
-                return;
             }
 
             if (!finishedIntro) {
