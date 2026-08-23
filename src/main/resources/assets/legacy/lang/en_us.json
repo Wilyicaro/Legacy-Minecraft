@@ -539,6 +539,8 @@
   "block.minecraft.tall_grass.tip": "Double tall grass that can sometimes drop seeds.",
   "block.minecraft.target.tip": "Emits a Redstone signal when shot with an arrow.",
   "block.minecraft.terracotta.tip": "Created by smelting Clay in a furnace.",
+  "block.minecraft.test_block.tip": "",
+  "block.minecraft.test_instance_block.tip": "",
   "block.minecraft.tinted_glass.tip": "A type of glass that does not let light through it.",
   "block.minecraft.tnt.tip": "Used to cause explosions. Activated after placing by igniting with Flint and Steel item, or with an electrical charge.",
   "block.minecraft.torch.tip": "Used to create light. Torches also melt snow and ice.",
