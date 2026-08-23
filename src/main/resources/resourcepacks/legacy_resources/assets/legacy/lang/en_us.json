@@ -18,6 +18,8 @@
   "createWorld.tab.world.title": "World Options",
   "death.attack.trident": "%1$s was speared by %2$s",
   "death.attack.trident.item": "%1$s was speared by %2$s using %3$s",
+  "demo.day.1": "This demo will last five game days, do your best!",
+  "demo.day.6": "You have passed your fifth day, use %s to save a screenshot of your creation",
   "demo.reminder": "The demo time has expired, buy the game to continue or start a new world!",
   "disconnect.quitting": "Exiting the game",
   "event.minecraft.raid.raiders_remaining": "Mobs remaining: %s",
