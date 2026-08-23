@@ -13,4 +13,8 @@ public interface LegacyShieldPlayer {
     void pauseShield(int ticks);
 
     boolean isShieldPaused();
+
+    default boolean isAutoShielding() {
+        return false;
+    }
 }

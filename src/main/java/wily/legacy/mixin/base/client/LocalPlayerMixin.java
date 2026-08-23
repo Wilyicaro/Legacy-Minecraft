@@ -421,13 +421,17 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
                 legacyAutoShielding = false;
                 return;
             }
+            legacyAutoShielding = true;
             if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
                 if (isUsingItem()) stopUsingItem();
                 startUsingItem(hand);
+                if (minecraft.gameMode != null) minecraft.gameMode.useItem((LocalPlayer) (Object) this, hand);
             }
-            legacyAutoShielding = true;
         } else {
-            if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
+            if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) {
+                if (minecraft.gameMode != null) minecraft.gameMode.releaseUsingItem((LocalPlayer) (Object) this);
+                else stopUsingItem();
+            }
             legacyAutoShielding = false;
         }
     }
@@ -435,5 +439,9 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private InteractionHand legacy$getShieldHand() {
         if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
         return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
+    }
+
+    public boolean isAutoShielding() {
+        return legacyAutoShielding;
     }
 }

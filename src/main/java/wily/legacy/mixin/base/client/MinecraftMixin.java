@@ -229,6 +229,11 @@ public abstract class MinecraftMixin {
         }
     }
 
+    @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V"))
+    private boolean releaseUsingItem(MultiPlayerGameMode instance, Player player) {
+        return !((LegacyShieldPlayer) player).isAutoShielding();
+    }
+
     @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean handleDropSwing(LocalPlayer player, InteractionHand hand) {
         return false;
