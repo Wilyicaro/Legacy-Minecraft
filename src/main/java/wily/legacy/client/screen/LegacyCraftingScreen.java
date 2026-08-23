@@ -300,10 +300,10 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     public void addControlTooltips(Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.
-                add(EXTRA::get, () -> typeTabList.getIndex() == 0 ? LegacyComponents.craftingInfoAction(infoType.get()) : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
+                add(EXTRA::get, () -> typeTabList.getIndex() == 0 ? LegacyComponents.INFO : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
                 add(OPTION::get, () -> typeTabList.getIndex() == 0 ? onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES : ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
                 add(CONTROL_TYPE::get, () -> hasTypeTabList() ? LegacyComponents.TYPE : null).
-                add(CONTROL_TAB::get, () -> LegacyComponents.CHANGE_GROUP).
+                add(CONTROL_TAB::get, () -> LegacyComponents.GROUP).
                 add(CONTROL_PAGE::get, () -> page.max > 0 && typeTabList.getIndex() == 0 ? LegacyComponents.PAGE : null);
     }
 
@@ -789,9 +789,9 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (hasTypeTabList() && hasShiftDown() && typeTabList.controlTab(i)) return true;
-        getTabList().controlTab(i);
-        if (hasShiftDown() && controlPage(i == 263, i == 262)) return true;
+        if (hasTypeTabList() && hasShiftDown() && typeTabList.controlTab(i, j)) return true;
+        getTabList().controlTab(i, j);
+        if (hasShiftDown() && controlPage(Legacy4JClient.keyMenuPageLeft.matches(i, j), Legacy4JClient.keyMenuPageRight.matches(i, j))) return true;
         return super.keyPressed(i, j, k);
     }
     protected boolean controlPage(boolean left, boolean right){

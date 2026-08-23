@@ -208,8 +208,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             showDescription = !showDescription;
             return true;
         }
-        if (tabList.controlTab(i)) return true;
-        if (hasShiftDown()) tabList.controlPage(page,i == 263 , i == 262);
+        if (tabList.controlTab(i, j)) return true;
+        if (hasShiftDown()) tabList.controlPage(page, i, j);
         return super.keyPressed(i, j, k);
     }
 

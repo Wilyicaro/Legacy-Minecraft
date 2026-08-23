@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.WidgetAccessor;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -163,14 +164,18 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     }
 
     public boolean controlTab(int i){
-        return controlTab(i,InputConstants.KEY_LBRACKET,InputConstants.KEY_RBRACKET);
+        return controlTab(i, 0);
     }
 
     public boolean directionalControlTab(int i){
         return controlTab(i,InputConstants.KEY_LEFT,InputConstants.KEY_RIGHT);
     }
 
-    public boolean controlTab(int i, int leftButton, int rightButton){
+    public boolean controlTab(int i, int j) {
+        return controlTab(Legacy4JClient.keyMenuTabLeft.matches(i, j), Legacy4JClient.keyMenuTabRight.matches(i, j));
+    }
+
+    public boolean controlTab(int i, int leftButton, int rightButton) {
         return controlTab(i == leftButton, i == rightButton);
     }
 
@@ -199,6 +204,10 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
                 return true;
             }
         }return false;
+    }
+
+    public boolean controlPage(Stocker.Sizeable page, int i, int j) {
+        return controlPage(page, Legacy4JClient.keyMenuPageLeft.matches(i, j), Legacy4JClient.keyMenuPageRight.matches(i, j));
     }
 
     public void numberControlTab(int i){

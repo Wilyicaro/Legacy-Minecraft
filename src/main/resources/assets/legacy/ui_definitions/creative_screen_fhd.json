@@ -1,0 +1,119 @@
+{
+  "targetUI": "wily.legacy.client.screen.CreativeModeScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.fhd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:creative/creative_panel_8_fhd"
+    },
+    "panel.top": {
+      "type": "put_number",
+      "value": 33
+    },
+    "panel.scale": {
+      "type": "put_number",
+      "value": 0.33333334
+    },
+    "panel.renderWidth": {
+      "type": "put_number",
+      "value": 965
+    },
+    "panel.renderHeight": {
+      "type": "put_number",
+      "value": 735
+    },
+    "panel.offset.y": {
+      "type": "put_number",
+      "value": -0.33333334
+    },
+    "panel.width": {
+      "type": "put_number",
+      "value": 322
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 212
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:creative/tab_creative8_fhd_l",
+          "middle": "legacy:creative/tab_creative8_fhd_m",
+          "right": "legacy:creative/tab_creative8_fhd_r"
+        },
+        "down": "legacy:container/empty"
+      }
+    },
+    "tabList.buttonWidth": {
+      "type": "put_number",
+      "value": 42
+    },
+    "tabList.buttonOverlap": {
+      "type": "put_number",
+      "value": 2
+    },
+    "tabList.height": {
+      "type": "put_number",
+      "value": 39
+    },
+    "tabList.y": {
+      "type": "put_number",
+      "value": "${panel.y}-35"
+    },
+    "tabList.offset": {
+      "type": "put_tab_state_offset",
+      "value": {
+        "selected": [0, 0],
+        "unselected": [0, 2.6666667]
+      }
+    },
+    "tabList.spriteScale": {
+      "type": "put_number",
+      "value": 0.33333334
+    },
+    "tabList.spriteWidth": {
+      "type": "put_number",
+      "value": 125
+    },
+    "tabList.rightSpriteWidth": {
+      "type": "put_number",
+      "value": 124
+    },
+    "tabList.spriteHeight": {
+      "type": "put_number",
+      "value": 117
+    },
+    "tabList.iconOffset.x": {
+      "type": "put_number",
+      "value": -0.6666667
+    },
+    "tabList.iconOffset.y": {
+      "type": "put_number",
+      "value": 1.6666667
+    },
+    "title.y": {
+      "type": "put_number",
+      "value": 14
+    },
+    "creative_menu": {
+      "type": "put_legacy_slot",
+      "range": "[0,49]",
+      "x": "18+(${creative_menu.index}%10)*27",
+      "y": "29+(${creative_menu.index}/10)*27",
+      "width": 27,
+      "height": 27
+    },
+    "quick_select": {
+      "type": "put_legacy_slot",
+      "range": "[50,59]",
+      "x": "32+(${quick_select.index}%9)*27",
+      "y": 174,
+      "width": 27,
+      "height": 27
+    }
+  }
+}

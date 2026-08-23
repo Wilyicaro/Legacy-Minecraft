@@ -540,6 +540,10 @@ public class Legacy4JClient {
             registry.accept(keyLegacy4JSettings);
             registry.accept(keyCycleHeldLeft);
             registry.accept(keyCycleHeldRight);
+            registry.accept(keyMenuTabLeft);
+            registry.accept(keyMenuTabRight);
+            registry.accept(keyMenuPageLeft);
+            registry.accept(keyMenuPageRight);
             registry.accept(keyToggleCursor);
             registry.accept(keyFlyUp);
             registry.accept(keyFlyDown);
@@ -792,6 +796,10 @@ public class Legacy4JClient {
     public static final KeyMapping keyToggleCrafting = new KeyMapping("legacy.key.toggleCrafting", -1, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
+    public static final KeyMapping keyMenuTabLeft = new KeyMapping(MOD_ID + ".key.menuTabLeft", InputConstants.KEY_LBRACKET, "key.categories.misc");
+    public static final KeyMapping keyMenuTabRight = new KeyMapping(MOD_ID + ".key.menuTabRight", InputConstants.KEY_RBRACKET, "key.categories.misc");
+    public static final KeyMapping keyMenuPageLeft = new KeyMapping(MOD_ID + ".key.menuPageLeft", InputConstants.KEY_LEFT, "key.categories.misc");
+    public static final KeyMapping keyMenuPageRight = new KeyMapping(MOD_ID + ".key.menuPageRight", InputConstants.KEY_RIGHT, "key.categories.misc");
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, "key.categories.misc");
     public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
     public static KeyMapping keyLegacy4JSettings = new KeyMapping( MOD_ID +".key.legacy4JSettings", InputConstants.KEY_Y, "key.categories.misc");
@@ -813,6 +821,10 @@ public class Legacy4JClient {
         LegacyCommonOptions.COMMON_STORAGE.save();
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         minecraft.options.save();
+    }
+
+    public static boolean isMenuNavigationKey(KeyMapping keyMapping) {
+        return keyMapping == keyMenuTabLeft || keyMapping == keyMenuTabRight || keyMapping == keyMenuPageLeft || keyMapping == keyMenuPageRight;
     }
 
     public static String manageAvailableSaveDirName(Consumer<File> copy,Predicate<String> exists, LevelStorageSource source, String levelId){

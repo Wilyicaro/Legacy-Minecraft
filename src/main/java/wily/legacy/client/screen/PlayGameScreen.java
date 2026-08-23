@@ -260,7 +260,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (hasTabList() && (tabList.controlTab(i) || tabList.directionalControlTab(i))) return true;
+        if (hasTabList() && (tabList.controlTab(i, j) || tabList.directionalControlTab(i))) return true;
         if (super.keyPressed(i, j, k)) {
             return true;
         }

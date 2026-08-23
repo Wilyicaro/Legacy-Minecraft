@@ -33,7 +33,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -66,6 +65,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page, this::getMaxTabCount));
     protected final Panel panel;
     public static final Container creativeModeGrid = new SimpleContainer(50);
+    public static final LegacyTabButton.StateOffset TAB_OFFSET = new LegacyTabButton.StateOffset(Vec3.ZERO, new Vec3(0, 1.4f, 0), Vec3.ZERO);
     public static final LegacySlotDisplay DEFAULT_SLOT_DISPLAY = new LegacySlotDisplay() {
         @Override
         public int getWidth() {
@@ -184,15 +184,27 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
             return;
         }
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
-            LegacySlotDisplay.override(menu.getSlot(i), 21 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
+            LegacySlotDisplay.override(menu.getSlot(i), 20 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
         }
         for (int i = 0; i < 9; i++) {
-            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 35 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
+            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 34 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
         }
-        addRenderableWidget(tabList);
-        addRenderableOnly(panel);
-        addRenderableOnly(tabList::renderSelected);
         panel.init();
+        int panelTop = accessor.getInteger("panel.top", 0);
+        float panelScale = accessor.getFloat("panel.scale", 1);
+        int panelRenderWidth = accessor.getInteger("panel.renderWidth", panel.width);
+        int panelRenderHeight = accessor.getInteger("panel.renderHeight", panel.height + panelTop);
+        if (panelTop == 0 && panelScale == 1) addRenderableOnly(panel);
+        else addRenderableOnly((graphics, i, j, f) -> {
+            graphics.pose().pushPose();
+            graphics.pose().translate(panel.x + accessor.getFloat("panel.offset.x", 0), panel.y - panelTop + accessor.getFloat("panel.offset.y", 0), 0);
+            graphics.pose().scale(panelScale, panelScale, 1);
+            FactoryGuiGraphics.of(graphics).blitSprite(panel.panelSprite, 0, 0, panelRenderWidth, panelRenderHeight);
+            graphics.pose().popPose();
+        });
+        addRenderableWidget(tabList);
+        addRenderableOnly(this::renderSelectedIconUnderlay);
+        addRenderableOnly(tabList::renderSelected);
         imageWidth = panel.width;
         imageHeight = panel.height;
         leftPos = panel.x;
@@ -221,14 +233,30 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         tabList.init(panel.x,panel.y - 33, panel.width, 39, (t,i)->{
             int index = tabList.tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
-            t.offset = (b)-> {
-                if (!t.selected) return new Vec3(0,1.4,0);
-                return Vec3.ZERO;
-            };
+            t.offset = accessor.getElementValue("tabList.offset", TAB_OFFSET, LegacyTabButton.StateOffset.class);
+            t.iconOffset = new Vec3(accessor.getFloat("tabList.iconOffset.x", 0), accessor.getFloat("tabList.iconOffset.y", 0), 0);
             t.setWidth(accessor.getInteger("tabList.buttonWidth", 41));
-            t.setX(t.getX() - tabList.tabButtons.indexOf(t));
+            t.spriteScale = accessor.getFloat("tabList.spriteScale", 1);
+            int spriteWidth = accessor.getInteger("tabList.spriteWidth", t.getWidth());
+            t.spriteWidth = t.type == LegacyTabButton.Type.RIGHT ? accessor.getInteger("tabList.rightSpriteWidth", spriteWidth) : spriteWidth;
+            t.spriteHeight = accessor.getInteger("tabList.spriteHeight", t.getHeight());
+            t.setX(t.getX() - index * accessor.getInteger("tabList.buttonOverlap", 1));
         });
         fillCreativeGrid();
+    }
+
+    protected void renderSelectedIconUnderlay(GuiGraphics graphics, int i, int j, float f) {
+        LegacyTabButton button = tabList.selected;
+        if (button == null || !button.active || button.icon == null) return;
+        graphics.pose().pushPose();
+        boolean selected = button.selected;
+        button.selected = false;
+        Vec3 translate = button.offset.apply(button);
+        button.selected = selected;
+        double guiScale = minecraft.getWindow().getGuiScale();
+        graphics.pose().translate(Math.round((translate.x + button.iconOffset.x) * guiScale) / guiScale, Math.round((translate.y - 1 + button.iconOffset.y) * guiScale) / guiScale, translate.z + button.iconOffset.z);
+        button.icon.render(button, graphics, i, j, f);
+        graphics.pose().popPose();
     }
 
     protected int getMaxTabCount() {
@@ -275,7 +303,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         if (arrangement.get() == 2) return;
         Component tabTitle = tabList.tabButtons.get(tabList.getIndex()).getMessage();
-        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(ignored -> guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 11), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 
     @Override
@@ -320,10 +348,10 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (tabList.controlTab(i)) return true;
+        if (tabList.controlTab(i, j)) return true;
         if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
 
-        if (hasShiftDown() && tabList.controlPage(page,i == 263 , i == 262)) repositionElements();
+        if (hasShiftDown() && tabList.controlPage(page, i, j)) repositionElements();
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
                 //? if >=1.21.2

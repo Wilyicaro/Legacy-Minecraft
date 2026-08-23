@@ -142,10 +142,10 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     public void addControlTooltips(Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.
-                add(EXTRA::get, () -> LegacyComponents.craftingInfoAction(infoType.get())).
+                add(EXTRA::get, () -> LegacyComponents.INFO).
                 add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
                 add(() -> searchMode ? VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
-                add(CONTROL_TAB::get, () -> LegacyComponents.CHANGE_GROUP);
+                add(CONTROL_TAB::get, () -> LegacyComponents.GROUP);
     }
 
     public void resetElements() {
@@ -652,7 +652,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             disableSearchMode();
             return true;
         }
-        if (getTabList().controlTab(i)) return true;
+        if (getTabList().controlTab(i, j)) return true;
         if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
         return super.keyPressed(i, j, k);
     }

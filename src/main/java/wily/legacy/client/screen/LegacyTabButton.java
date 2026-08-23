@@ -20,7 +20,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -61,6 +60,10 @@ public class LegacyTabButton extends AbstractButton {
         if (!t.selected) return DEFAULT_UNSELECTED_OFFSET;
         return Vec3.ZERO;
     };
+    public Vec3 iconOffset = Vec3.ZERO;
+    public float spriteScale = 1;
+    public int spriteWidth;
+    public int spriteHeight;
 
     public LegacyTabButton(int i, int j, int width, int height, Type type, Render icon, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
@@ -138,7 +141,11 @@ public class LegacyTabButton extends AbstractButton {
         if (!selected) guiGraphics.pose().translate(0,-1,0);
         if (active) {
             if (icon == null) this.renderString(guiGraphics, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
-            else icon.render(this, guiGraphics,i,j,f);
+            else {
+                double guiScale = minecraft.getWindow().getGuiScale();
+                guiGraphics.pose().translate(Math.round((translate.x + iconOffset.x) * guiScale) / guiScale - translate.x, Math.round((translate.y + iconOffset.y) * guiScale) / guiScale - translate.y, iconOffset.z);
+                icon.render(this, guiGraphics, i, j, f);
+            }
         }
         guiGraphics.pose().popPose();
     }
@@ -176,7 +183,14 @@ public class LegacyTabButton extends AbstractButton {
         ResourceLocation getSprite(LegacyTabButton button);
         @Override
         default void render(LegacyTabButton button, GuiGraphics guiGraphics, int i, int j, float f) {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+            if (button.spriteScale == 1) FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+            else {
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(button.getX(), button.getY(), 0);
+                guiGraphics.pose().scale(button.spriteScale, button.spriteScale, 1);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), 0, 0, button.spriteWidth, button.spriteHeight);
+                guiGraphics.pose().popPose();
+            }
         }
     }
 

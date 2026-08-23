@@ -498,8 +498,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (hasShiftDown() && controlPage(i == 263, i == 262)) return true;
-        if (craftingTabList.controlTab(i)) return true;
+        if (hasShiftDown() && controlPage(Legacy4JClient.keyMenuPageLeft.matches(i, j), Legacy4JClient.keyMenuPageRight.matches(i, j))) return true;
+        if (craftingTabList.controlTab(i, j)) return true;
         return super.keyPressed(i, j, k);
     }
     

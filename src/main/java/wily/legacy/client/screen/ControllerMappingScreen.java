@@ -70,6 +70,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.controllerCursorAtFirstInventorySlot);
 
         for (KeyMapping keyMapping : keyMappings) {
+            if (Legacy4JClient.isMenuNavigationKey(keyMapping)) continue;
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
                 renderableVList.addCategory(Component.translatable(category));

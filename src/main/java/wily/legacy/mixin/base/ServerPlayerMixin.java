@@ -25,6 +25,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+//? if <1.21.1 {
+/*import org.spongepowered.asm.mixin.injection.ModifyArg;
+*///?}
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -186,4 +189,11 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_PICKUP, this.getSoundSource(),1.0f,1.0f);
         }
     }
+
+    //? if <1.21.1 {
+    /*@ModifyArg(method = "changeDimension", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ClientboundGameEventPacket;<init>(Lnet/minecraft/network/protocol/game/ClientboundGameEventPacket$Type;F)V"), index = 1)
+    private float showEndPoem(float value) {
+        return 1.0F;
+    }
+    *///?}
 }
