@@ -338,7 +338,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         GuiGraphicsExtractor.pose().popMatrix();
         GuiGraphicsExtractor.pose().pushMatrix();
         GuiGraphicsExtractor.pose().translate(0, 0.6f);
-        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(), iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(SaveRenderableList.getIcon(summary).textureLocation(), iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
         LegacyFontUtil.applySDFont(b -> {
             GuiGraphicsExtractor.text(font, summary.getLevelName(), accessor.getInteger("nameText.x", panel.x + 48), accessor.getInteger("nameText.y", panel.y + 12), CommonColor.GRAY_TEXT.get(), false);
             GuiGraphicsExtractor.text(font, Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()), accessor.getInteger("creationText.x", panel.x + 48), accessor.getInteger("creationText.y", panel.y + 29), CommonColor.GRAY_TEXT.get(), false);

@@ -13,11 +13,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.client.LegacyIntro;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyResourceManager;
+import wily.legacy.client.screen.PlayGameScreen;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Optional;
@@ -50,10 +52,13 @@ public abstract class LoadingOverlayMixin extends Overlay {
     private long fadeInStart;
     @Unique
     private long initTime;
+    @Unique
+    private boolean worldCreationPreloaded;
 
 
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
+        preloadWorldCreation();
         if (LegacyOptions.legacyIntroAndReloading.get()) {
             ci.cancel();
             if (!loadIntroLocation) {
@@ -64,8 +69,6 @@ public abstract class LoadingOverlayMixin extends Overlay {
             float timer = LegacyIntro.getTimer(initTime, LegacyResourceManager.intro);
             if (!finishedIntro && LegacyIntro.canSkip(timer, LegacyResourceManager.intro) && reload.isDone()) {
                 finishedIntro = true;
-                minecraft.setOverlay(null);
-                return;
             }
 
             if (!finishedIntro) {
@@ -81,19 +84,19 @@ public abstract class LoadingOverlayMixin extends Overlay {
             h = this.fadeInStart > -1L ? (float) (m - this.fadeInStart) / 500.0f : -1.0f;
 
             if (finishedIntro) {
-                if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null) {
+                if ((MinecraftAccessor.getInstance().hasGameLoaded() && isStartupReady()) && minecraft.screen != null) {
                     this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(GuiGraphicsExtractor, 0, 0, f);
                 } else {
                     FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
                 }
-                if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())
+                if (g < 1.0f && !isStartupReady())
                     LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, (GuiGraphicsExtractor.guiWidth() - 75) / 2, (GuiGraphicsExtractor.guiHeight() - 75) / 2);
 
                 if (g >= 2.0f)
                     this.minecraft.setOverlay(null);
             }
 
-            if (this.fadeOutStart == -1L && this.reload.isDone() && (!this.fadeIn || h >= 2.0f)) {
+            if (this.fadeOutStart == -1L && isStartupReady() && (!this.fadeIn || h >= 2.0f)) {
                 try {
                     this.reload.checkExceptions();
                     this.onFinish.accept(Optional.empty());
@@ -106,5 +109,22 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 }
             }
         }
+    }
+
+    @Inject(method = "isReadyToFadeOut", at = @At("RETURN"), cancellable = true)
+    private void waitForWorldCreation(CallbackInfoReturnable<Boolean> cir) {
+        if (!isStartupReady()) cir.setReturnValue(false);
+    }
+
+    @Unique
+    private void preloadWorldCreation() {
+        if (worldCreationPreloaded || !reload.isDone() || reload.done().isCompletedExceptionally() || MinecraftAccessor.getInstance().hasGameLoaded()) return;
+        worldCreationPreloaded = true;
+        PlayGameScreen.preloadCreateWorld(minecraft);
+    }
+
+    @Unique
+    private boolean isStartupReady() {
+        return reload.isDone() && (MinecraftAccessor.getInstance().hasGameLoaded() || PlayGameScreen.isCreateWorldPreloadReady(minecraft));
     }
 }

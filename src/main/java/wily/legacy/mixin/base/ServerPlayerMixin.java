@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -34,6 +35,9 @@ import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, LegacyPlayerInfo {
     @Shadow
@@ -47,6 +51,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
     boolean visible = true;
+    final Set<String> musicDiscHuntProgress = new HashSet<>();
 
     public ServerPlayerMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
@@ -164,11 +169,17 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         this.visible = visible;
     }
 
+    @Override
+    public Set<String> getMusicDiscHuntProgress() {
+        return musicDiscHuntProgress;
+    }
+
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
         valueOutput.putBoolean("DisableExhaustion", isExhaustionDisabled());
         valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
         valueOutput.putBoolean("HostInvisible", !isVisible());
+        valueOutput.store("LegacyMusicDiscHunts", Codec.STRING.listOf(), musicDiscHuntProgress.stream().sorted().toList());
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
@@ -176,6 +187,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
         setMayFlySurvival(input.getBooleanOr("MayFlySurvival", false));
         setVisibility(!input.getBooleanOr("HostInvisible", false));
+        musicDiscHuntProgress.clear();
+        input.read("LegacyMusicDiscHunts", Codec.STRING.listOf()).ifPresent(musicDiscHuntProgress::addAll);
     }
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)

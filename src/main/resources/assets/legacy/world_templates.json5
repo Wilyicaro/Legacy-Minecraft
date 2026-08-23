@@ -3,16 +3,16 @@
     "buttonMessage": {"translate": "legacy.menu.play_tutorial"},
     "icon": "legacy:creation_list/tutorial",
     //? if >=26.1 {
-    "templateLocation": "world_templates/tutorial26.mcsave",
+    "templateLocation": "world_templates/tutorial26_music_disc_hunt.mcsave",
     //?} else {
-    /*"templateLocation": "world_templates/tutorial.mcsave",
+    /*"templateLocation": "world_templates/tutorial_music_disc_hunt.mcsave",
     *///?}
     "folderName": "Tutorial",
     "isGamePath": true,
     //? if >=26.1 {
-    "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial26.mcsave?checksum=b802b32e731b4c34faabebdae81dd504",
+    "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial26_music_disc_hunt.mcsave?checksum=400cba51073fd9a42d7dda3e7cd983db",
     //?} else {
-    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial.mcsave?checksum=f7ac417c99ec18675bafceff68baf0e1",
+    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial_music_disc_hunt.mcsave?checksum=9502f940e97f61987773d5c646a2d579",
     *///?}
     "directJoin": true,
     "preDownload": true
