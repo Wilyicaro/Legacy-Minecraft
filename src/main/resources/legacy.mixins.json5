@@ -294,6 +294,7 @@
     "mobcaps.ArmorStandItemMixin",
     "mobcaps.BoatItemMixin",
     "mobcaps.CarvedPumpkinBlockMixin",
+    "mobcaps.EndCrystalItemMixin",
     "mobcaps.HangingEntityItemMixin",
     "mobcaps.ItemFrameItemMixin",
     "mobcaps.NaturalSpawnerMixin",

@@ -298,6 +298,11 @@ public class LegacyItemUtil {
         if (tooltip.stream().anyMatch(LegacyItemUtil::isPeacefulSpawnEggTip)) {
             tooltip = tooltip.stream().filter(component -> !isPeacefulSpawnEggTip(component)).toList();
         }
+        if (stack.has(DataComponents.JUKEBOX_PLAYABLE) && tooltip.size() > 1) {
+            tooltip = new ArrayList<>(tooltip);
+            Component name = tooltip.get(0);
+            tooltip.set(1, tooltip.get(1).copy().withStyle(style -> style.withColor(name.getStyle().getColor())));
+        }
         return tooltip;
     }
 

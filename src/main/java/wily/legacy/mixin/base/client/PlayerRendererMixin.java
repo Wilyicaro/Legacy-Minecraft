@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.skins.client.render.boxloader.AttachSlot;
 import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
@@ -21,6 +23,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Pose;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,6 +54,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
 
         AvatarRenderState state = createRenderState();
         state.swimAmount = mc.player.getSwimAmount(mc.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+        if (!LegacyOptions.legacySwimmingAnimation.get() && LegacyGameRules.getSidedBooleanGamerule(mc.player, LegacyGameRules.LEGACY_SWIMMING)) state.swimAmount = 0.0F;
         if (hasSkin && state instanceof RenderStateSkinIdAccess access) {
             access.consoleskins$setSkinId(skinId);
             access.consoleskins$setEntityUuid(mc.player.getUUID());
@@ -110,6 +114,14 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     @Redirect(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;isFallFlying:Z"))
     private boolean render(AvatarRenderState instance) {
         return instance.isFallFlying && instance.hasPose(Pose.FALL_FLYING);
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V", at = @At("TAIL"))
+    private void extractRenderState(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
+        if (!LegacyOptions.legacySwimmingAnimation.get() && LegacyGameRules.getSidedBooleanGamerule(avatar, LegacyGameRules.LEGACY_SWIMMING)) {
+            state.swimAmount = 0.0F;
+            state.isVisuallySwimming = false;
+        }
     }
 
     private static ModelPart snapshotPart(ModelPart part) {
