@@ -29,10 +29,6 @@ vec3 notGamma(vec3 color) {
     return color * (maxScaled / maxComponent);
 }
 
-float parabolicMixFactor(float level) {
-    return (2.0 * level - 1.0) * (2.0 * level - 1.0);
-}
-
 void main() {
     float block_level = floor(texCoord.x * 16) / 15;
     float sky_level = floor(texCoord.y * 16) / 15;
@@ -45,9 +41,13 @@ void main() {
 
     color += lightmapInfo.SkyLightColor * sky_brightness;
 
-    vec3 BlockLightColor = mix(lightmapInfo.BlockLightTint, vec3(1.0), 0.9 * parabolicMixFactor(block_level));
-    BlockLightColor = mix(BlockLightColor, vec3(1.0), lightmapInfo.NightVisionFactor);
-    color += BlockLightColor * block_brightness;
+    vec3 block_light = vec3(
+        block_brightness,
+        block_brightness * ((block_brightness * 0.6 + 0.4) * 0.6 + 0.4),
+        block_brightness * (block_brightness * block_brightness * 0.6 + 0.4)
+    ) * lightmapInfo.BlockLightTint;
+    block_light = mix(block_light, vec3(block_brightness), lightmapInfo.NightVisionFactor);
+    color += block_light;
 
     if (lightmapInfo.UnderwaterVisionFactor > 0.0) {
         float max_component = max(color.r, max(color.g, color.b));
