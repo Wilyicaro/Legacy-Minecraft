@@ -590,7 +590,7 @@ public interface ControlTooltip {
         Component potAction = getDecoratedPotAction(minecraft, blockHit, blockState);
         if (potAction != null)
             return potAction;
-        if (blockState != null && (DoorBlock.isWoodenDoor(blockState) || blockState.is(BlockTags.WOODEN_TRAPDOORS) || blockState.getBlock() instanceof FenceGateBlock))
+        if (blockState != null && (DoorBlock.isWoodenDoor(blockState) || blockState.getBlock() instanceof TrapDoorBlock && blockState.getBlock() != Blocks.IRON_TRAPDOOR || blockState.getBlock() instanceof FenceGateBlock))
             return blockState.getValue(BlockStateProperties.OPEN) ? LegacyComponents.CLOSE : LegacyComponents.OPEN;
         if (blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof EnderChestBlock || blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))
             return (blockState.getBlock() instanceof AbstractChestBlock || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
