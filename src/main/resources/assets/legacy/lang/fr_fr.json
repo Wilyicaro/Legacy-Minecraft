@@ -2178,6 +2178,7 @@
   "legacy.options.legacyTorchModel": "Legacy Torch Model",
   "legacy.options.legacySmithingScreen": "Écran de forge legacy",
   "legacy.options.legacySwordBlocking": "Blocage d'épée legacy",
+  "legacy.options.legacySwimmingAnimation": "Legacy Swimming Animation",
   "legacy.options.legacyTitleScreen": "Écran titre legacy",
   "legacy.options.legacyWitches": "Sorcières legacy",
   "legacy.options.legacyWorldInteractions": "Legacy World Interactions",
