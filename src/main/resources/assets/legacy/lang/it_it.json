@@ -2178,6 +2178,7 @@
   "legacy.options.legacyTorchModel": "Legacy Torch Model",
   "legacy.options.legacySmithingScreen": "Schermata Forgiatura Legacy",
   "legacy.options.legacySwordBlocking": "Parata con la Spada Legacy",
+  "legacy.options.legacySwimmingAnimation": "Legacy Swimming Animation",
   "legacy.options.legacyTitleScreen": "Schermata del Titolo Legacy",
   "legacy.options.legacyWitches": "Streghe Legacy",
   "legacy.options.legacyWorldInteractions": "Legacy World Interactions",
