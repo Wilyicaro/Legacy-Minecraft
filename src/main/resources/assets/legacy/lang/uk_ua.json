@@ -2178,6 +2178,7 @@
   "legacy.options.legacyTorchModel": "Legacy Torch Model",
   "legacy.options.legacySmithingScreen": "Legacy екран ковальства",
   "legacy.options.legacySwordBlocking": "Legacy захист мечем",
+  "legacy.options.legacySwimmingAnimation": "Legacy Swimming Animation",
   "legacy.options.legacyTitleScreen": "Legacy титульний екран",
   "legacy.options.legacyWitches": "Legacy відьми",
   "legacy.options.legacyWorldInteractions": "Старі взаємодії світом",
