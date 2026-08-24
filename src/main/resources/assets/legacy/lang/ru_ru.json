@@ -2140,6 +2140,7 @@
   "legacy.options.legacyContainerLikeScreen": "Legacy Container-like Screen",
   "legacy.options.legacyCrafterScreen": "Legacy Crafter Screen",
   "legacy.options.legacyCreateWorldScreen": "Legacy Create World Screen",
+  "legacy.options.legacyCreditsScreen": "Legacy Credits Screen",
   "legacy.options.legacyCreativeBlockPlacing": "Классическое размещение блоков в творческом режиме",
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "Legacy Drowned",
