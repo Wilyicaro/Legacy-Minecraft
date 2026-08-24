@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "Legacy Intro and Loading",
   "legacy.options.legacyInventoryScreen": "Legacy Inventory Screen",
   "legacy.options.legacyItemPickup": "Legacy Item Pickup",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "レガシーのアイテムのヒントの大きさ",
   "legacy.options.legacyItemTooltipsScaling": "Legacy Item Tooltips Scaling",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
