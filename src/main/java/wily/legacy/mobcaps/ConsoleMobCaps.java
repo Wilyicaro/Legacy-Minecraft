@@ -212,32 +212,6 @@ public final class ConsoleMobCaps {
         WorldMobCapTracker tracker = LegacyMobCaps.tracker(level);
         TrackedMobCap bucket = bucketForType(type);
 
-        if (bucket == TrackedMobCap.CHICKENS && tracker.count(TrackedMobCap.CHICKENS) >= TrackedMobCap.CHICKENS.manualLimit()) {
-            return MAX_CHICKENS_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.WOLVES && tracker.count(TrackedMobCap.WOLVES) >= TrackedMobCap.WOLVES.manualLimit()) {
-            return MAX_WOLVES_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.MOOSHROOMS && tracker.count(TrackedMobCap.MOOSHROOMS) >= TrackedMobCap.MOOSHROOMS.manualLimit()) {
-            return MAX_MOOSHROOMS_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.SQUIDS && tracker.count(TrackedMobCap.SQUIDS) >= TrackedMobCap.SQUIDS.manualLimit()) {
-            return MAX_FISH_AND_SQUID;
-        }
-        if (bucket == TrackedMobCap.AMBIENT && tracker.count(TrackedMobCap.AMBIENT) >= TrackedMobCap.AMBIENT.manualLimit()) {
-            return MAX_BATS_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.VILLAGERS && tracker.count(TrackedMobCap.VILLAGERS) >= TrackedMobCap.VILLAGERS.manualLimit()) {
-            return MAX_VILLAGERS_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.PHANTOMS && tracker.count(bucket) >= bucket.manualLimit()) {
-            return MAX_ENEMIES_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.MONSTERS && tracker.count(TrackedMobCap.MONSTERS) >= TrackedMobCap.MONSTERS.manualLimit()) {
-            return MAX_ENEMIES_SPAWNED;
-        }
-        if (bucket == TrackedMobCap.GENERAL_ANIMALS && tracker.count(TrackedMobCap.GENERAL_ANIMALS) >= TrackedMobCap.GENERAL_ANIMALS.manualLimit()) {
-            return MAX_GENERAL_ANIMALS_SPAWNED;
         if (bucket == null || tracker.count(bucket) < bucket.manualLimit()) {
             return null;
         }
@@ -245,7 +219,7 @@ public final class ConsoleMobCaps {
             case CHICKENS -> MAX_CHICKENS_SPAWNED;
             case WOLVES -> MAX_WOLVES_SPAWNED;
             case MOOSHROOMS -> MAX_MOOSHROOMS_SPAWNED;
-            case WATER_ANIMALS, SQUIDS -> MAX_SQUID_SPAWNED;
+            case WATER_ANIMALS, SQUIDS -> MAX_FISH_AND_SQUID;
             case DOLPHINS -> MAX_DOLPHINS_SPAWNED;
             case AMBIENT -> MAX_BATS_SPAWNED;
             case VILLAGERS -> MAX_VILLAGERS_SPAWNED;
