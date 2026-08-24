@@ -2,12 +2,8 @@
 	"type": "minecraft:crafting_shaped",
 	"category": "equipment",
 	"key": {
-		"A": {
-			"item": "minecraft:mangrove_planks"
-		},
-		"B": {
-			"item": "minecraft:wooden_shovel"
-		}
+		"A": "minecraft:mangrove_planks",
+		"B": "minecraft:wooden_shovel"
 	},
 	"pattern": [
 		"   ",

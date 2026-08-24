@@ -2,12 +2,8 @@
 	"type": "minecraft:crafting_shaped",
 	"category": "equipment",
 	"key": {
-		"A": {
-			"item": "minecraft:acacia_planks"
-		},
-		"B": {
-			"item": "minecraft:wooden_shovel"
-		}
+		"A": "minecraft:acacia_planks",
+		"B": "minecraft:wooden_shovel"
 	},
 	"pattern": [
 		"   ",
