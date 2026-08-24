@@ -10,6 +10,7 @@
     "compat.jei.VanillaPluginMixin",
     //?}
     "client.GustParticleMixin",
+    "client.ItemStackClientMixin",
     "client.PanoramaRendererMixin",
     "client.GhostSlotsMixin",
     "client.MapDecorationRenderStateMixin",
