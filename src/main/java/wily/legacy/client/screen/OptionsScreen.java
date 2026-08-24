@@ -749,6 +749,7 @@ public class OptionsScreen extends PanelVListScreen {
                             o.renderableVList.addOptions(
                                     LegacyOptions.titleScreenFade,
                                     LegacyOptions.titleScreenVersionText,
+                                    LegacyOptions.legacyCreditsScreen,
                                     LegacyOptions.menusWithBackground,
                                     LegacyOptions.legacyIntroAndReloading,
                                     LegacyOptions.legacyLoadingAndConnecting,

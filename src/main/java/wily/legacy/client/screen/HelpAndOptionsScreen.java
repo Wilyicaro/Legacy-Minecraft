@@ -58,12 +58,16 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                 Button.builder(Component.translatable("legacy.options.selectedController"), button -> Minecraft.getInstance().setScreen(new ControllerMappingScreen(r.getScreen()))).build()));
     }
 
+    private static WinScreen createCredits(Runnable onFinished) {
+        return LegacyOptions.legacyCreditsScreen.get() ? new LegacyCreditsScreen(onFinished) : new WinScreen(false, onFinished);
+    }
+
     private static Screen createCreditsScreen(Screen parent) {
         if (LegacyOptions.legacySettingsMenus.get()) {
-            return new WinScreen(false, () -> Minecraft.getInstance().setScreen(parent));
+            return createCredits(() -> Minecraft.getInstance().setScreen(parent));
         }
         return new RenderableVListScreen(parent, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(
-                openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new WinScreen(false, () -> Minecraft.getInstance().setScreen(r.getScreen()))).build(),
+                openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCredits(() -> Minecraft.getInstance().setScreen(r.getScreen()))).build(),
                 Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),
                 Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()));
     }

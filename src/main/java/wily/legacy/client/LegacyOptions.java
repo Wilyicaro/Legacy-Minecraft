@@ -218,6 +218,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> hideAdvancedOptionsTooltip = CLIENT_STORAGE.register(createBoolean("hideAdvancedOptionsTooltip", false));
     public static final FactoryConfig<Boolean> displayPackManagementTooltips = CLIENT_STORAGE.register(createBoolean("displayPackManagementTooltips", true));
     public static final FactoryConfig<Boolean> legacySettingsMenus = CLIENT_STORAGE.register(createBoolean("legacySettingsMenus", false));
+    public static final FactoryConfig<Boolean> legacyCreditsScreen = CLIENT_STORAGE.register(createBoolean("legacyCreditsScreen", true));
     public static final FactoryConfig<Boolean> displayGameMessages = CLIENT_STORAGE.register(createBoolean("displayGameMessages", true));
     public static final FactoryConfig<Boolean> announceAdvancements = CLIENT_STORAGE.register(createBoolean("announceAdvancements", false));
     public static final FactoryConfig<Boolean> deathMessages = CLIENT_STORAGE.register(createBoolean("deathMessages", true));
