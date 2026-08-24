@@ -2140,6 +2140,7 @@
   "legacy.options.legacyContainerLikeScreen": "Legacy інтерфейс контейнерного типу",
   "legacy.options.legacyCrafterScreen": "Legacy інтерфейс крафтера",
   "legacy.options.legacyCreateWorldScreen": "Legacy інтерфейс створення світу",
+  "legacy.options.legacyCreditsScreen": "Legacy Credits Screen",
   "legacy.options.legacyCreativeBlockPlacing": "Старе розміщення блоків в режимі творчости",
   "legacy.options.legacyCursor": "Legacy рух курсора",
   "legacy.options.legacyDrowned": "Legacy утопленик",
