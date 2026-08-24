@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "Legacy Intro and Loading",
   "legacy.options.legacyInventoryScreen": "旧版物品栏界面",
   "legacy.options.legacyItemPickup": "Legacy Item Pickup",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "旧版物品提示",
   "legacy.options.legacyItemTooltipsScaling": "旧版物品提示缩放",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
