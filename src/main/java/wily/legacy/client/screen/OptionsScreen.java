@@ -625,6 +625,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyEvokerFangs,
                                 LegacyOptions.legacyDrownedHeight,
                                 LegacyOptions.legacyDrownedAnimation,
+                                LegacyOptions.legacySwimmingAnimation,
                                 LegacyOptions.legacyZombieAggressionAnimation,
                                 LegacyOptions.legacyEntityFireTint,
                                 LegacyOptions.legacyItemPickup,
@@ -694,6 +695,7 @@ public class OptionsScreen extends PanelVListScreen {
                                         LegacyOptions.legacyItemTooltips,
                                         FactoryConfig::get,
                                         LegacyOptions.legacyItemTooltipScaling);
+                                o.renderableVList.addOptions(LegacyOptions.legacyItemRarity);
                             }
                         },
                         o -> {

@@ -233,6 +233,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
     public static final FactoryConfig<Boolean> displayChatIndicators = CLIENT_STORAGE.register(createBoolean("displayChatIndicators", false));
+    public static final FactoryConfig<Boolean> legacyItemRarity = CLIENT_STORAGE.register(createBoolean("legacyItemRarity", true));
     public static final FactoryConfig<Boolean> legacyItemTooltips = CLIENT_STORAGE.register(createBoolean("legacyItemTooltips", true));
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
@@ -277,6 +278,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> invertedCrosshair = CLIENT_STORAGE.register(createBoolean("invertedCrosshair",false));
     public static final FactoryConfig<Boolean> legacyDrownedHeight = CLIENT_STORAGE.register(createBoolean("legacyDrownedHeight",true));
     public static final FactoryConfig<Boolean> legacyDrownedAnimation = CLIENT_STORAGE.register(createBoolean("legacyDrownedAnimation",true));
+    public static final FactoryConfig<Boolean> legacySwimmingAnimation = CLIENT_STORAGE.register(createBoolean("legacySwimmingAnimation",true));
     public static final FactoryConfig<Boolean> legacyZombieAggressionAnimation = CLIENT_STORAGE.register(createBooleanWithTooltip("legacyZombieAggressionAnimation", false));
     public static final FactoryConfig<Boolean> merchantTradingIndicator = CLIENT_STORAGE.register(createBoolean("merchantTradingIndicator",true));
     public static final FactoryConfig<Boolean> itemLightingInHand = CLIENT_STORAGE.register(createBoolean("itemLightingInHand",true));

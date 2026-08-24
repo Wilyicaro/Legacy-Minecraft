@@ -10,6 +10,7 @@
     "compat.jei.VanillaPluginMixin",
     //?}
     "client.GustParticleMixin",
+    "client.ItemStackClientMixin",
     "client.PanoramaRendererMixin",
     "client.GhostSlotsMixin",
     "client.MapDecorationRenderStateMixin",
@@ -294,6 +295,7 @@
     "mobcaps.ArmorStandItemMixin",
     "mobcaps.BoatItemMixin",
     "mobcaps.CarvedPumpkinBlockMixin",
+    "mobcaps.EndCrystalItemMixin",
     "mobcaps.HangingEntityItemMixin",
     "mobcaps.ItemFrameItemMixin",
     "mobcaps.NaturalSpawnerMixin",

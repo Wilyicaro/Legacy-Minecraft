@@ -34,6 +34,10 @@ public final class WorldMobCapTracker {
 
         updateTypeCount(entity.getType(), delta);
         updateBucketCount(bucket, delta);
+        TrackedMobCap parentBucket = ConsoleMobCaps.parentBucketForType(entity.getType());
+        if (parentBucket != null) {
+            updateBucketCount(parentBucket, delta);
+        }
     }
 
     int count(TrackedMobCap cap) {
