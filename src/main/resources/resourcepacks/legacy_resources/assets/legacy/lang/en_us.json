@@ -184,6 +184,7 @@
   "options.sensitivity": "Game Sensitivity",
   "selectServer.delete": "Delete Server",
   "selectWorld.delete": "Delete Save",
+  "selectWorld.enterSeed": "Seed for the World Generator",
   "selectWorld.mapFeatures.info": "When enabled, structures such as Villages and Strongholds will generate in the world.",
   "sign.edit": "Edit sign message:",
   "soundCategory.master": "Sound"
