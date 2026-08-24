@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "Intro e Carregamento Legacy",
   "legacy.options.legacyInventoryScreen": "Tela de Inventário Legacy",
   "legacy.options.legacyItemPickup": "Retirada de Itens Legacy",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Dicas de Itens Legacy",
   "legacy.options.legacyItemTooltipsScaling": "Escalonamento de Dicas de Itens Legacy",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
