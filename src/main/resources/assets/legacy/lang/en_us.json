@@ -1577,6 +1577,7 @@
   "legacy.menu.create_flat_world.unsupported.incorrect_biome.shipwrecks": "You have Shipwrecks enabled, but they cannot be generated as the biome is not an Ocean or Beach.",
   "legacy.menu.create_flat_world.unsupported.incorrect_biome.villages": "You have Villages enabled, but they cannot be generated as the biome is not Plains, Desert, Savanna, Taiga, Snowy Plains, or Snowy Taiga.",
   "legacy.menu.create_flat_world.unsupported.incorrect_biome.woodland_mansions": "You have Woodland Mansions enabled, but they cannot be generated as the biome is not a Dark Forest.",
+  "legacy.menu.create_flat_world.unsupported.bad_lake_blocks": "You have Lakes or Lava Lakes enabled, but they cannot be generated as the blocks at the top of the world are inappropriate.",
   "legacy.menu.create_world": "Create New World",
   "legacy.menu.custom_skin_name": "Skin Name",
   "legacy.menu.custom_skin_pack_name": "Enter the name of your Skinpack",
