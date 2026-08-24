@@ -1,7 +1,9 @@
 package wily.legacy.client;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -12,6 +14,17 @@ import wily.legacy.Legacy4J;
 
 public class LegacyRenderPipelines {
     public static final RenderPipeline LEGACY_SKY = RenderPipelinesAccessor.register(RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET).withLocation(Legacy4J.createModLocation("pipeline/sky")).withVertexShader("core/sky").withFragmentShader("core/sky").withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS).build());
+    public static final RenderPipeline LEGACY_HURT_FLASH = RenderPipelinesAccessor.register(
+            RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+                    .withLocation(Legacy4J.createModLocation("pipeline/hurt_flash"))
+                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+                    .withShaderDefine("NO_OVERLAY")
+                    .withShaderDefine("PER_FACE_LIGHTING")
+                    .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+                    .withDepthStencilState(new DepthStencilState(CompareOp.EQUAL, false))
+                    .withCull(false)
+                    .build()
+    );
     public static final RenderPipeline LEGACY_FLAT_CLOUDS = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.CLOUDS_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/flat_clouds"))
