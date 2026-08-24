@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "Intro et rechargement legacy",
   "legacy.options.legacyInventoryScreen": "Écran d'inventaire legacy",
   "legacy.options.legacyItemPickup": "Ramassage d'objets legacy",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Info-bulles d'objets legacy",
   "legacy.options.legacyItemTooltipsScaling": "Mise à l'échelle des info-bulles d'objets legacy",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
