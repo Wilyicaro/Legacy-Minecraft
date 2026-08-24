@@ -6,7 +6,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import wily.legacy.client.LegacyOptions;
@@ -19,7 +18,7 @@ public abstract class ItemStackClientMixin {
         if (!LegacyOptions.legacyItemRarity.get() || !BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("minecraft")) return original;
         if (stack.is(Items.ENCHANTED_GOLDEN_APPLE)) return Rarity.EPIC;
         if (stack.is(Items.GOLDEN_APPLE) || stack.has(DataComponents.JUKEBOX_PLAYABLE)) return Rarity.RARE;
-        if (stack.is(Items.ENCHANTED_BOOK)) return stack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY).isEmpty() ? Rarity.UNCOMMON : Rarity.RARE;
+        if (stack.is(Items.ENCHANTED_BOOK)) return Rarity.UNCOMMON;
         return stack.isEnchanted() ? Rarity.RARE : Rarity.COMMON;
     }
 }
