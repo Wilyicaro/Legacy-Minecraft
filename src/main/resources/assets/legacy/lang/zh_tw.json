@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "舊版的開場動畫與加載畫面",
   "legacy.options.legacyInventoryScreen": "舊版物品欄介面",
   "legacy.options.legacyItemPickup": "Legacy Item Pickup",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Legacy Item Tooltips",
   "legacy.options.legacyItemTooltipsScaling": "Legacy Item Tooltips Scaling",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
