@@ -48,9 +48,9 @@ public final class GlobalLeaderboardBoardRegistry {
    private static final String FARMING_BOARD = "legacy.menu.leaderboard.farming";
    private static final String MINING_BOARD = "legacy.menu.leaderboard.mining_blocks";
    private static final String KILLS_BOARD = "legacy.menu.leaderboard.kills";
-   private static final String TRAVELING_BOARD = "legacy.menu.leaderboard.traveling";
+   private static final String TRAVELLING_BOARD = "legacy.menu.leaderboard.travelling";
    private static final String GENERAL_BOARD = "stat.generalButton";
-   private static final List<String> TRACKED_BOARD_IDS = List.of(FARMING_BOARD, MINING_BOARD, KILLS_BOARD, TRAVELING_BOARD, GENERAL_BOARD);
+   private static final List<String> TRACKED_BOARD_IDS = List.of(FARMING_BOARD, MINING_BOARD, KILLS_BOARD, TRAVELLING_BOARD, GENERAL_BOARD);
    private static final Set<String> TRACKED_BOARDS = Set.copyOf(TRACKED_BOARD_IDS);
    private static final List<String> FARMING_ITEMS = List.of("egg", "wheat", "brown_mushroom", "red_mushroom", "sugar_cane", "milk_bucket", "pumpkin");
    private static final List<String> MINING_BLOCKS = List.of("dirt", "cobblestone", "sand", "stone", "gravel", "clay", "obsidian");
@@ -80,11 +80,11 @@ public final class GlobalLeaderboardBoardRegistry {
    }
 
    public static int defaultBoardIndex() {
-      return TRACKED_BOARD_IDS.indexOf(TRAVELING_BOARD);
+      return TRACKED_BOARD_IDS.indexOf(TRAVELLING_BOARD);
    }
 
    public static String defaultBoardId() {
-      return TRAVELING_BOARD;
+      return TRAVELLING_BOARD;
    }
 
    public static List<LeaderboardsScreen.StatsBoard> statsBoards() {
@@ -281,7 +281,7 @@ public final class GlobalLeaderboardBoardRegistry {
          case FARMING_BOARD -> stat -> hasValuePath(stat, FARMING_ITEMS);
          case MINING_BOARD -> stat -> hasValuePath(stat, MINING_BLOCKS);
          case KILLS_BOARD -> stat -> hasValuePath(stat, KILL_ENTITIES);
-         case TRAVELING_BOARD -> stat -> hasValuePath(stat, TRAVEL_STATS);
+         case TRAVELLING_BOARD -> stat -> hasValuePath(stat, TRAVEL_STATS);
          case GENERAL_BOARD -> stat -> hasValuePath(stat, GENERAL_STATS);
          default -> stat -> false;
       };
@@ -341,7 +341,7 @@ public final class GlobalLeaderboardBoardRegistry {
          case FARMING_BOARD -> FARMING_ITEMS;
          case MINING_BOARD -> MINING_BLOCKS;
          case KILLS_BOARD -> KILL_ENTITIES;
-         case TRAVELING_BOARD -> TRAVEL_STATS;
+         case TRAVELLING_BOARD -> TRAVEL_STATS;
          case GENERAL_BOARD -> GENERAL_STATS;
          default -> List.of();
       };
@@ -371,7 +371,7 @@ public final class GlobalLeaderboardBoardRegistry {
          return;
       }
 
-      if (TRAVELING_BOARD.equals(boardId)) {
+      if (TRAVELLING_BOARD.equals(boardId)) {
          addSpriteOverride(board, "walk_one_cm", lceSprite("travel/walk_one_cm"));
          addSpriteOverride(board, "fall_one_cm", lceSprite("travel/fall_one_cm"));
          addItemOverride(board, "minecart_one_cm", Items.MINECART);
