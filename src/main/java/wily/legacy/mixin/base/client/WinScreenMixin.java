@@ -42,6 +42,7 @@ import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.LegacyCreditsScreen;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -57,6 +58,8 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
     Identifier CREDITS_BACKGROUND = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_121.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
     @Unique
     Identifier CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_fade_121.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
+    @Unique
+    Identifier LEGACY_CREDITS = Legacy4J.createModLocation("texts/credits.json");
     @Shadow
     @Final
     private boolean poem;
@@ -78,15 +81,26 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
     private boolean speedupActive;
     @Shadow
     private int direction;
+    @Shadow
+    private void addCreditsFile(Reader reader) {
+    }
+    @Shadow
+    private void addCreditsLine(Component component, boolean centered, boolean narrated) {
+    }
 
     protected WinScreenMixin(Component component) {
         super(component);
     }
 
+    @Unique
+    private boolean isLegacyCredits() {
+        return (Object) this instanceof LegacyCreditsScreen;
+    }
+
     @Override
     public void added() {
         super.added();
-        ControlTooltip.Renderer.of(this).clear().add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(), () -> poem ? CommonComponents.GUI_CONTINUE : CommonComponents.GUI_BACK);
+        if (poem || isLegacyCredits()) ControlTooltip.Renderer.of(this).clear().add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(), () -> poem ? CommonComponents.GUI_CONTINUE : CommonComponents.GUI_BACK);
     }
 
     @Shadow
@@ -94,7 +108,8 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
 
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
-        this.scroll = Math.max(0.0F, this.scroll + f * this.scrollSpeed * (poem ? 1.0f : 4f));
+        if (!poem && !isLegacyCredits()) return;
+        this.scroll = Math.max(0.0F, this.scroll + f * this.scrollSpeed * (poem ? 1.0f : 2f));
         if (poem) this.scroll = Math.min(this.scroll, totalScrollLength + height / 2f - 18);
         float g = -this.scroll;
         int m = height;
@@ -187,6 +202,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
 
     @Override
     public void simulateKeyAction(ControllerManager manager, BindingState state) {
+        if (!poem && !isLegacyCredits()) return;
         Controller.Event.super.simulateKeyAction(manager, state);
         if (poem) {
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_UP), InputConstants.KEY_UP, state, true);
@@ -196,7 +212,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
 
     @Inject(method = "keyPressed", at = @At("HEAD"))
     public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (keyEvent.isUp() || keyEvent.isDown()) {
+        if ((poem || isLegacyCredits()) && (keyEvent.isUp() || keyEvent.isDown())) {
             speedupActive = true;
             if (poem) direction = keyEvent.isUp() ? -1 : 1;
         }
@@ -204,15 +220,17 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
 
     @Inject(method = "keyReleased", at = @At("HEAD"))
     public void keyReleased(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (keyEvent.isUp() || keyEvent.isDown()) {
+        if ((poem || isLegacyCredits()) && (keyEvent.isUp() || keyEvent.isDown())) {
             speedupActive = false;
         }
     }
 
     @Inject(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/WinScreen;lines:Ljava/util/List;", opcode = Opcodes.PUTFIELD))
     private void initLineSets(CallbackInfo ci) {
-        this.titleLines = new IntOpenHashSet();
-        this.nameLines = new IntOpenHashSet();
+        if (isLegacyCredits()) {
+            this.titleLines = new IntOpenHashSet();
+            this.nameLines = new IntOpenHashSet();
+        }
     }
 
     @Inject(method = "init", at = @At("TAIL"))
@@ -223,9 +241,28 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
             for (int i = 0; i < lines.size(); i++) {
                 totalScrollLength += getPoemLineAdvance(i);
             }
-        } else {
+        } else if (isLegacyCredits()) {
             totalScrollLength = lines.size() * 18;
         }
+    }
+
+    @Inject(method = "init", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Ljava/lang/String;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"*//*?} else {*/"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"/*?}*/, ordinal = 1))
+    private void addLegacyCredits(CallbackInfo ci) {
+        if (!isLegacyCredits()) return;
+        minecraft.getResourceManager().getResource(LEGACY_CREDITS).ifPresent(resource -> {
+            try (Reader reader = resource.openAsReader()) {
+                addCreditsFile(reader);
+            } catch (Exception exception) {
+                Legacy4J.LOGGER.error("Couldn't load Legacy4J credits from {}", LEGACY_CREDITS, exception);
+            }
+        });
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;respawn()V"), cancellable = true)
+    private void loopLegacyCredits(CallbackInfo ci) {
+        if (!isLegacyCredits()) return;
+        scroll = 0;
+        ci.cancel();
     }
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Ljava/lang/String;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"*//*?} else {*/"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"/*?}*/, ordinal = 0))
@@ -246,50 +283,52 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
 
     @Inject(method = "getBackgroundMusic", at = @At("HEAD"), cancellable = true)
     private void useLevelMusic(CallbackInfoReturnable<Music> cir) {
-        if (poem) cir.setReturnValue(null);
+        if (poem || isLegacyCredits()) cir.setReturnValue(null);
     }
 
     @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 0))
     private void addCreditsFileHeading(WinScreen instance, Component arg, boolean bl, boolean bl2) {
+        if (!isLegacyCredits()) addCreditsLine(arg, bl, bl2);
     }
 
     @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 2))
     private void addCreditsFileSecondHeading(WinScreen instance, Component arg, boolean bl, boolean bl2) {
+        if (!isLegacyCredits()) addCreditsLine(arg, bl, bl2);
     }
 
     @ModifyArg(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 0))
     private String addCreditsFileSectionToUppercase(String string) {
-        return string.toUpperCase();
+        return isLegacyCredits() ? string.toUpperCase() : string;
     }
 
     @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;"))
     private MutableComponent addCreditsFileSectionStyle(MutableComponent instance, ChatFormatting arg) {
-        return instance;
+        return isLegacyCredits() ? instance : instance.withStyle(arg);
     }
 
     @Inject(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 1))
     private void addCreditsFileSectionTitle(Reader reader, CallbackInfo ci) {
-        titleLines.add(lines.size());
+        if (isLegacyCredits()) titleLines.add(lines.size());
     }
 
     @Inject(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 3))
     private void addCreditsFileDisciplineTitle(Reader reader, CallbackInfo ci) {
-        titleLines.add(lines.size());
+        if (isLegacyCredits()) titleLines.add(lines.size());
     }
 
     @Inject(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 5))
     private void addCreditsFileNames(Reader reader, CallbackInfo ci) {
-        nameLines.add(lines.size());
+        if (isLegacyCredits()) nameLines.add(lines.size());
     }
 
     @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 3))
     private MutableComponent addCreditsFileRemoveNameSpacing(String string) {
-        return Component.empty();
+        return isLegacyCredits() ? Component.empty() : Component.literal(string);
     }
 
     @ModifyArg(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 3))
-    private ChatFormatting addCreditsFile(ChatFormatting arg) {
-        return ChatFormatting.YELLOW;
+    private ChatFormatting addCreditsFileNameStyle(ChatFormatting arg) {
+        return isLegacyCredits() ? ChatFormatting.YELLOW : arg;
     }
 
 }
