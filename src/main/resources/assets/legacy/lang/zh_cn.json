@@ -2140,6 +2140,7 @@
   "legacy.options.legacyContainerLikeScreen": "旧版容器类界面",
   "legacy.options.legacyCrafterScreen": "旧版制作台界面",
   "legacy.options.legacyCreateWorldScreen": "旧版创建世界界面",
+  "legacy.options.legacyCreditsScreen": "Legacy Credits Screen",
   "legacy.options.legacyCreativeBlockPlacing": "旧版创造模式方块放置",
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "旧版溺尸",
