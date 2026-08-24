@@ -695,6 +695,7 @@ public class OptionsScreen extends PanelVListScreen {
                                         LegacyOptions.legacyItemTooltips,
                                         FactoryConfig::get,
                                         LegacyOptions.legacyItemTooltipScaling);
+                                o.renderableVList.addOptions(LegacyOptions.legacyItemRarity);
                             }
                         },
                         o -> {

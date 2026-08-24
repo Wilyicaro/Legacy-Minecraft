@@ -233,6 +233,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
     public static final FactoryConfig<Boolean> displayChatIndicators = CLIENT_STORAGE.register(createBoolean("displayChatIndicators", false));
+    public static final FactoryConfig<Boolean> legacyItemRarity = CLIENT_STORAGE.register(createBoolean("legacyItemRarity", true));
     public static final FactoryConfig<Boolean> legacyItemTooltips = CLIENT_STORAGE.register(createBoolean("legacyItemTooltips", true));
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
