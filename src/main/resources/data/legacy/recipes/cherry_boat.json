@@ -1,0 +1,21 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "equipment",
+	"key": {
+		"A": {
+			"item": "minecraft:cherry_planks"
+		},
+		"B": {
+			"item": "minecraft:wooden_shovel"
+		}
+	},
+	"pattern": [
+		"   ",
+		"ABA",
+		"AAA"
+	],
+	"result": {
+		"count": 1,
+		"id": "minecraft:cherry_boat"
+	}
+}
