@@ -1340,7 +1340,7 @@
   "legacy.container.tab.structures": "建物",
   "legacy.container.tab.symbols": "シンボル",
   "legacy.container.tab.tools": "道具と武器",
-  "legacy.container.tab.tools_and_armor": "道具、武器、防具",
+  "legacy.container.tab.tools_and_armour": "道具、武器、防具",
   "legacy.container.tab.transport": "乗り物",
   "legacy.container.zoomMap": "縮小と解除",
   "legacy.controller.detected": "Controller Detected",
