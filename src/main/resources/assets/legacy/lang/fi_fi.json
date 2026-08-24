@@ -2140,6 +2140,7 @@
   "legacy.options.legacyContainerLikeScreen": "Perinteinen Säiliömäinen Näyttö",
   "legacy.options.legacyCrafterScreen": "Perinteinen Valmistijanäyttö",
   "legacy.options.legacyCreateWorldScreen": "Perinteinen Maailmanluontinäyttö",
+  "legacy.options.legacyCreditsScreen": "Legacy Credits Screen",
   "legacy.options.legacyCreativeBlockPlacing": "Perinteinen Luova Lohkon Asettelu",
   "legacy.options.legacyCursor": "Legacy Cursor Movement",
   "legacy.options.legacyDrowned": "Perinteiset Hukkuneet",
