@@ -126,7 +126,7 @@
   "gamerule.minecraft.spawn_phantoms.description": "When disabled, Phantoms will not spawn near insomniac players.",
   "gamerule.minecraft.spawn_wandering_traders.description": "When disabled, Wandering Traders will not spawn naturally.",
   "gamerule.minecraft.spawn_wardens.description": "When disabled, Wardens will not spawn from Sculk Shriekers.",
-  "gamerule.minecraft.spawner_blocks_enabled.description": "When enabled, spawner blocks will be able to summon mobs.",
+  "gamerule.minecraft.spawner_blocks_work.description": "When enabled, spawner blocks will be able to summon mobs.",
   "gamerule.minecraft.spectators_generate_chunks.description": "When disabled, players in Spectator Mode will not be able to see unexplored terrain.",
   "gamerule.minecraft.tnt_explodes.description": "When enabled, TNT will explode when activated.",
   "gamerule.mobExplosionDropDecay": "Mob Explosion Drop Decay",
