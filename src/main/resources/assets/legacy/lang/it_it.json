@@ -2140,6 +2140,7 @@
   "legacy.options.legacyContainerLikeScreen": "Schermata tipo Contenitore Legacy",
   "legacy.options.legacyCrafterScreen": "Schermata fabbricatore Legacy",
   "legacy.options.legacyCreateWorldScreen": "Schermata Crea Mondo Legacy",
+  "legacy.options.legacyCreditsScreen": "Legacy Credits Screen",
   "legacy.options.legacyCreativeBlockPlacing": "Piazzamento Blocchi Creativa Legacy",
   "legacy.options.legacyCursor": "Movimento Cursore Legacy",
   "legacy.options.legacyDrowned": "Annegato Legacy",
