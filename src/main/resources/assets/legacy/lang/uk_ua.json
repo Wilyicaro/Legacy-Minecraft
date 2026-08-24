@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "Legacy Intro and Loading",
   "legacy.options.legacyInventoryScreen": "Legacy інтерфейс інвентарю",
   "legacy.options.legacyItemPickup": "Legacy підбір предметів",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Класичні підказки предметів",
   "legacy.options.legacyItemTooltipsScaling": "Класичне масштабування підказок предметів",
   "legacy.options.legacyLootTables": "Стара таблиця зі здобиччю",
