@@ -2159,6 +2159,7 @@
   "legacy.options.legacyIntroAndReloading": "Perinteinen Intro ja Lataus",
   "legacy.options.legacyInventoryScreen": "Perinteinen Inventaarionäyttö",
   "legacy.options.legacyItemPickup": "Legacy Item Pickup",
+  "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Perinteiset Esineen Työkaluvihjeet",
   "legacy.options.legacyItemTooltipsScaling": "Perinteinen Esineen Työkaluvihjeiden Skaalaus",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
