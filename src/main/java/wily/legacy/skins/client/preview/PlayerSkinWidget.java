@@ -29,6 +29,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private static volatile Identifier CENTER_SELECTED_BADGE_SPRITE = Identifier.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
     private static volatile String CENTER_NAME_PLATE_DISPLAY_ID, CENTER_NAME_PLATE_PENDING_ID;
     private static volatile boolean CENTER_NAME_PLATE_WAITING;
+    private static volatile float CENTER_NAME_PLATE_TEXT_SCALE = 1f;
     public final Supplier<String> skinId;
     private final wily.legacy.skins.client.screen.ChangeSkinScreenSource source;
     private final int originalWidth, originalHeight;
@@ -61,12 +62,13 @@ public class PlayerSkinWidget extends AbstractWidget {
         this.skinId = () -> skinIdValue;
     }
 
-    public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY) {
+    public static void setCenterNamePlate(boolean enabled, int width, int height, int padY, int fixedY, float textScale) {
         CENTER_NAME_PLATE = enabled;
         CENTER_NAME_PLATE_W = Math.max(1, width);
         CENTER_NAME_PLATE_H = Math.max(1, height);
         CENTER_NAME_PLATE_PAD_Y = Math.max(0, padY);
         CENTER_NAME_PLATE_Y = fixedY;
+        CENTER_NAME_PLATE_TEXT_SCALE = textScale <= 0f ? 1f : textScale;
         if (!enabled) {
             CENTER_NAME_PLATE_DISPLAY_ID = null;
             CENTER_NAME_PLATE_PENDING_ID = null;
@@ -495,15 +497,24 @@ public class PlayerSkinWidget extends AbstractWidget {
         if (CENTER_NAME_PLATE_HIGHLIGHT) renderNamePlateHighlight(GuiGraphicsExtractor, plateX, plateY, plateW, plateH);
         GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_NAME_PLATE_SPRITE, plateX, plateY, plateW, plateH);
         var font = Minecraft.getInstance().font;
-        int maxPx = Math.max(1, plateW - 8);
+        float textScale = CENTER_NAME_PLATE_TEXT_SCALE;
+        int maxPx = Math.max(1, Math.round((plateW - 8) / textScale));
         String theme = themeLabel(displayId, label);
         String showName = clipText(font, label, maxPx);
-        if (theme == null)
-            GuiGraphicsExtractor.centeredText(font, Component.literal(showName), plateX + plateW / 2, plateY + (plateH - font.lineHeight) / 2, 0xFFFFFFFF);
-        else {
-            int baseY = plateY + (plateH - font.lineHeight * 2) / 2;
-            GuiGraphicsExtractor.centeredText(font, Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
-            GuiGraphicsExtractor.centeredText(font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
+        if (textScale == 1f) {
+            if (theme == null)
+                GuiGraphicsExtractor.centeredText(font, Component.literal(showName), plateX + plateW / 2, plateY + (plateH - font.lineHeight) / 2, 0xFFFFFFFF);
+            else {
+                int baseY = plateY + (plateH - font.lineHeight * 2) / 2;
+                GuiGraphicsExtractor.centeredText(font, Component.literal(showName), plateX + plateW / 2, baseY, 0xFFFFFFFF);
+                GuiGraphicsExtractor.centeredText(font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + font.lineHeight, 0xFFFFFFFF);
+            }
+        } else {
+            int lineHeight = Math.max(1, Math.round(font.lineHeight * textScale));
+            int baseY = plateY + (plateH - lineHeight * (theme == null ? 1 : 2)) / 2;
+            centeredScaledText(GuiGraphicsExtractor, font, Component.literal(showName), plateX + plateW / 2, baseY, textScale);
+            if (theme != null)
+                centeredScaledText(GuiGraphicsExtractor, font, Component.literal(clipText(font, theme, maxPx)), plateX + plateW / 2, baseY + lineHeight, textScale);
         }
         if (!CENTER_SELECTED_BADGE || !CENTER_NAME_PLATE_READY || !isCurrentSkinSelected(displayId)) return;
         int badgeW = CENTER_SELECTED_BADGE_W;
@@ -512,7 +523,21 @@ public class PlayerSkinWidget extends AbstractWidget {
         int badgeY = plateY - CENTER_SELECTED_BADGE_GAP - badgeH;
         if (CLIP_ENABLED) badgeY = Math.max(CLIP_Y1, Math.min(badgeY, CLIP_Y2 - badgeH - 1));
         GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, CENTER_SELECTED_BADGE_SPRITE, badgeX, badgeY, badgeW, badgeH);
-        GuiGraphicsExtractor.centeredText(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2 + 2, 0xFFFFFFFF);
+        if (textScale == 1f)
+            GuiGraphicsExtractor.centeredText(font, Component.literal("Selected"), badgeX + badgeW / 2, badgeY + (badgeH - font.lineHeight) / 2 + 2, 0xFFFFFFFF);
+        else {
+            int lineHeight = Math.max(1, Math.round(font.lineHeight * textScale));
+            centeredScaledText(GuiGraphicsExtractor, font, Component.literal("Selected"), badgeX + badgeW / 2,
+                    badgeY + (badgeH - lineHeight) / 2 + Math.round(2 * textScale), textScale);
+        }
+    }
+
+    private static void centeredScaledText(GuiGraphicsExtractor graphics, Font font, Component text, int centerX, int y, float scale) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(centerX, y);
+        graphics.pose().scale(scale, scale);
+        graphics.centeredText(font, text, 0, 0, 0xFFFFFFFF);
+        graphics.pose().popMatrix();
     }
 
     private void renderNamePlateHighlight(GuiGraphicsExtractor GuiGraphicsExtractor, int plateX, int plateY, int plateW, int plateH) {
