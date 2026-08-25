@@ -565,7 +565,8 @@ public class OptionsScreen extends PanelVListScreen {
                     super.tick();
                 }
             };
-            screen.renderableVList.addRenderables(globalPackSelector, selector);
+            if (LegacyOptions.legacySettingsMenus.get()) screen.renderableVList.addRenderables(0, globalPackSelector, selector);
+            else screen.renderableVList.addRenderables(globalPackSelector, selector);
             return screen;
         }));
         public static final Section ADVANCED_GRAPHICS = new Section(
@@ -748,6 +749,7 @@ public class OptionsScreen extends PanelVListScreen {
                             o.renderableVList.addOptions(
                                     LegacyOptions.titleScreenFade,
                                     LegacyOptions.titleScreenVersionText,
+                                    LegacyOptions.legacyCreditsScreen,
                                     LegacyOptions.menusWithBackground,
                                     LegacyOptions.legacyIntroAndReloading,
                                     LegacyOptions.legacyLoadingAndConnecting,
