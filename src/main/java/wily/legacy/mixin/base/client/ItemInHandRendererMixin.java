@@ -28,6 +28,7 @@ import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.client.LegacyItemInHandRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.util.client.LegacyHeadRenderState;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin implements LegacyItemInHandRenderer {
