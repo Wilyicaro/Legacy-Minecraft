@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
@@ -29,6 +30,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float DOLL_SCALE_BUMP = 1.05f;
     private static final float COMPACT_DOLL_SCALE_MULTIPLIER = 0.85f;
     private static final float COMPACT_CAROUSEL_SPACING_MULTIPLIER = 0.78f;
+    private static final float FHD_DOLL_SCALE_MULTIPLIER = 1.050662f;
+    private static final float FHD_CAROUSEL_SPACING_MULTIPLIER = 1.102480f;
     private static final float COMPACT_TEXT_REFERENCE_UI_SCALE = 0.92f * 0.93f * 1.10f;
     private static final float COMPACT_TEXT_MIN_SCALE = 0.52f;
     private static final int PACK_LIST_VISIBLE_ROWS = 6;
@@ -43,8 +46,17 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             1.485f, 0.65f, 1.045f, 0.60f,
             ChangeSkinLayoutMetrics.DEFAULT
     );
+    private static final ChangeSkinScreenLayout FHD_LAYOUT = new ChangeSkinScreenLayout(
+            false, 232, 314, 398,
+            26, 123, 37, 22, 8,
+            10, 6, 6, 6, 20, 11,
+            1.485f, 0.65f, 1.045f, 0.60f,
+            ChangeSkinLayoutMetrics.FHD
+    );
     private static final int SKIN_TICK_SOURCE_SIZE = 21;
     private static final int SKIN_TICK_FULL_FRAMEBUFFER_SIZE = SKIN_TICK_SOURCE_SIZE * 2;
+    private static final int FHD_SKIN_TICK_SOURCE_SIZE = 28;
+    private static final int FHD_SKIN_TICK_FULL_FRAMEBUFFER_SIZE = FHD_SKIN_TICK_SOURCE_SIZE * 2;
     private static final int PADLOCK_TEXTURE_SIZE = 32;
     private static final int HEART_TEXTURE_SIZE = 9;
     private static final int PACK_BUTTON_BASE_HEIGHT = 20;
@@ -61,6 +73,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int DETAILS_PANEL_WIDTH = 1026;
     private static final int DETAILS_PANEL_HEIGHT = 151;
     private static final int ACTION_HOLDER_SIZE = 60;
+    private static final int FHD_ACTION_HOLDER_SIZE = 72;
     private static final int ACTION_HOLDER_GAP = 7;
     private static final int ACTION_HOLDER_RIGHT_INSET = 28;
 
@@ -124,7 +137,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     @Override
     protected ChangeSkinScreenLayout resolveRuntimeLayout() {
-        return isCompact480() ? ChangeSkinScreenLayout.DEFAULT : HD_LAYOUT;
+        if (isCompact480()) return ChangeSkinScreenLayout.DEFAULT;
+        return isFHD() ? FHD_LAYOUT : HD_LAYOUT;
     }
 
     private void applyScreenScaleAdjustment() {
@@ -138,15 +152,19 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private void applyCarouselTuning(boolean relayout) {
         if (playerSkinWidgetList == null) return;
+        boolean fhd = isFHD();
         float scaleMultiplier = getLayoutMetrics().centerScale() / CAROUSEL_BASE_SCALE;
         float spacingMultiplier = getLayoutMetrics().carouselOffset() / CAROUSEL_BASE_SPACING;
         if (scaleMultiplier <= 0f) scaleMultiplier = 1f;
         if (spacingMultiplier <= 0f) spacingMultiplier = 1f;
         scaleMultiplier *= 1.10f * DOLL_SCALE_BUMP;
+        if (fhd) scaleMultiplier *= FHD_DOLL_SCALE_MULTIPLIER;
         if (isCompact480()) scaleMultiplier *= COMPACT_DOLL_SCALE_MULTIPLIER;
         spacingMultiplier *= 1.16f;
+        if (fhd) spacingMultiplier *= FHD_CAROUSEL_SPACING_MULTIPLIER;
         if (isCompact480()) spacingMultiplier *= COMPACT_CAROUSEL_SPACING_MULTIPLIER;
         playerSkinWidgetList.setRenderRadius(2);
+        playerSkinWidgetList.setFhdCarousel(fhd);
         playerSkinWidgetList.setCarouselTuning(scaleMultiplier, spacingMultiplier);
         if (relayout) playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index, true);
     }
@@ -187,11 +205,15 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         return isCompact480() ? sc(8) : 0;
     }
 
+    private boolean isFHD() {
+        return LegacyOptions.getUIMode().isFHD();
+    }
+
     private Bounds changeSkinFrameBounds() {
         int compactInset = compactFrameInset();
         int yInset = sc(FRAME_TOP) - FRAME_TOP_LIFT;
         return new Bounds(
-                tooltipBox.x - sc(FRAME_INSET_X) - compactInset,
+                tooltipBox.x - (isFHD() ? 0 : sc(FRAME_INSET_X)) - compactInset,
                 panel.y + yInset,
                 Math.max(1, tooltipBox.getWidth() + compactInset),
                 Math.max(1, panel.height - yInset - sc(3) - FRAME_BOTTOM_LIFT)
@@ -206,21 +228,22 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int detailsX = frame.x() + LAYOUT_REFERENCE_SIZE.scaleX(DETAILS_PANEL_X_OFFSET, frame.width());
         int detailsWidth = Math.max(1, LAYOUT_REFERENCE_SIZE.scaleX(DETAILS_PANEL_WIDTH, frame.width()));
         int scaledDetailsHeight = Math.max(1, LAYOUT_REFERENCE_SIZE.scaleY(DETAILS_PANEL_HEIGHT, frame.height()));
-        int detailsHeight = Math.max(1,
-                Math.min(footerHeight, scaledDetailsHeight) - DETAILS_PANEL_VERTICAL_INSET * 2);
-        int detailsY = footerTop + (footerHeight - detailsHeight) / 2;
 
         int scaledActionGap = Math.max(0, LAYOUT_REFERENCE_SIZE.scaleY(ACTION_HOLDER_GAP, frame.height()));
         int actionGap = Math.min(scaledActionGap, Math.max(0, footerHeight - 2));
         int maxActionSize = Math.max(1, (footerHeight - actionGap) / 2);
-        int actionWidth = LAYOUT_REFERENCE_SIZE.scaleX(ACTION_HOLDER_SIZE, frame.width());
-        int actionHeight = LAYOUT_REFERENCE_SIZE.scaleY(ACTION_HOLDER_SIZE, frame.height());
+        int actionHolderSize = isFHD() ? FHD_ACTION_HOLDER_SIZE : ACTION_HOLDER_SIZE;
+        int actionWidth = LAYOUT_REFERENCE_SIZE.scaleX(actionHolderSize, frame.width());
+        int actionHeight = LAYOUT_REFERENCE_SIZE.scaleY(actionHolderSize, frame.height());
         int actionSize = Math.max(1, Math.min(Math.min(actionWidth, actionHeight), maxActionSize));
         int actionGroupHeight = actionSize * 2 + actionGap;
         int primaryActionY = footerTop + Math.max(0, (footerHeight - actionGroupHeight) / 2);
+        int detailsHeight = isFHD() ? actionGroupHeight : Math.max(1,
+                Math.min(footerHeight, scaledDetailsHeight) - DETAILS_PANEL_VERTICAL_INSET * 2);
+        int detailsY = isFHD() ? primaryActionY : footerTop + (footerHeight - detailsHeight) / 2;
         int actionX = frame.right()
                 - LAYOUT_REFERENCE_SIZE.scaleX(ACTION_HOLDER_RIGHT_INSET, frame.width())
-                - actionSize - ACTION_HOLDER_EXTRA_RIGHT_INSET;
+                - actionSize - (isFHD() ? 0 : ACTION_HOLDER_EXTRA_RIGHT_INSET);
 
         return new FrameFooterLayout(
                 new Bounds(detailsX, detailsY, detailsWidth, detailsHeight),
@@ -700,9 +723,12 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private void drawTick(GuiGraphicsExtractor guiGraphics, Bounds holder) {
         int guiScale = Math.max(1, minecraft.getWindow().getGuiScale());
         int holderFramebufferSize = Math.min(holder.width(), holder.height()) * guiScale;
+        int actionHolderSize = isFHD() ? FHD_ACTION_HOLDER_SIZE : ACTION_HOLDER_SIZE;
+        int fullFramebufferSize = isFHD() ? FHD_SKIN_TICK_FULL_FRAMEBUFFER_SIZE : SKIN_TICK_FULL_FRAMEBUFFER_SIZE;
+        int sourceSize = isFHD() ? FHD_SKIN_TICK_SOURCE_SIZE : SKIN_TICK_SOURCE_SIZE;
         int fittedFramebufferSize = Math.max(1, Math.round(holderFramebufferSize
-                * (SKIN_TICK_FULL_FRAMEBUFFER_SIZE / (float) ACTION_HOLDER_SIZE)));
-        int framebufferSize = snapTickFramebufferSize(fittedFramebufferSize);
+                * (fullFramebufferSize / (float) actionHolderSize)));
+        int framebufferSize = snapTickFramebufferSize(fittedFramebufferSize, sourceSize, fullFramebufferSize);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(holder.centerX(), holder.centerY());
         guiGraphics.pose().scale(1.0f / guiScale, 1.0f / guiScale);
@@ -711,9 +737,9 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         guiGraphics.pose().popMatrix();
     }
 
-    private static int snapTickFramebufferSize(int fittedSize) {
-        if (fittedSize >= SKIN_TICK_FULL_FRAMEBUFFER_SIZE) return SKIN_TICK_FULL_FRAMEBUFFER_SIZE;
-        if (fittedSize >= SKIN_TICK_SOURCE_SIZE) return SKIN_TICK_SOURCE_SIZE;
+    private static int snapTickFramebufferSize(int fittedSize, int sourceSize, int fullSize) {
+        if (fittedSize >= fullSize) return fullSize;
+        if (fittedSize >= sourceSize) return sourceSize;
         return fittedSize;
     }
 
@@ -733,7 +759,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void drawFavoriteHeart(GuiGraphicsExtractor guiGraphics, Bounds holder) {
-        float heartSize = Math.max(1f, holder.width() - 8f);
+        float heartSize = Math.max(1f, holder.width() - (isFHD() ? 6f : 8f));
         float heartScaleX = heartSize / HEART_TEXTURE_SIZE;
         float heartScaleY = (heartSize + 1.0f) / HEART_TEXTURE_SIZE;
         float centerX = holder.centerX() + holder.width() * HEART_HOLDER_OFFSET_X;
