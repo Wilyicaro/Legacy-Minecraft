@@ -66,7 +66,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen {
     protected void panelInit() {
         super.panelInit();
         panelRecess.init("panelRecess");
-        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panel.y + (sd ? 5 : 9), CommonColor.GRAY_TEXT.get(), false))));
+        addRenderableOnly(((GuiGraphicsExtractor, i, j, f) -> LegacyFontUtil.applySDFont(sd -> GuiGraphicsExtractor.text(font, getTitle(), panel.x + (panel.width - font.width(getTitle())) / 2, panel.y + (sd ? 5 : 9), CommonColor.HTML_COLOR_BLACK.get(), false))));
         addRenderableOnly(panelRecess);
     }
 
