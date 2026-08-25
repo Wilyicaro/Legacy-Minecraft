@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyItemUtil;
+import wily.legacy.world.MusicDiscHuntManager;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class AbstractContainerMenuMixin {
@@ -65,5 +66,10 @@ public abstract class AbstractContainerMenuMixin {
                 }
             }
         }
+    }
+
+    @Inject(method = "clicked", at = @At("RETURN"))
+    private void collectCarriedDisc(int slot, int button, ClickType input, Player player, CallbackInfo ci) {
+        MusicDiscHuntManager.collect(player, getCarried());
     }
 }

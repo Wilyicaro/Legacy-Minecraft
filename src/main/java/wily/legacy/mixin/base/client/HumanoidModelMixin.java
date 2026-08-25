@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -9,6 +10,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 //? if <1.21.2 {
 import net.minecraft.world.item.UseAnim;
@@ -28,6 +30,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.init.LegacyGameRules;
 
 @Mixin(HumanoidModel.class)
 public abstract class HumanoidModelMixin {
@@ -40,6 +44,11 @@ public abstract class HumanoidModelMixin {
     @Shadow @Final public ModelPart leftArm;
 
     //? if <1.21.2 {
+    @ModifyExpressionValue(method = "prepareMobModel(Lnet/minecraft/world/entity/LivingEntity;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getSwimAmount(F)F"))
+    private float prepareMobModel(float original, LivingEntity livingEntity, float limbSwing, float limbSwingAmount, float partialTick) {
+        return livingEntity instanceof Player && !LegacyOptions.legacySwimmingAnimation.get() && LegacyGameRules.getSidedBooleanGamerule(livingEntity, LegacyGameRules.LEGACY_SWIMMING) ? 0.0F : original;
+    }
+
     @Shadow public HumanoidModel.ArmPose rightArmPose;
 
     @Shadow public HumanoidModel.ArmPose leftArmPose;

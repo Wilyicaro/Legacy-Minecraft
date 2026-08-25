@@ -28,7 +28,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
+import wily.legacy.init.LegacyGameRules;
 import wily.legacy.skins.client.render.boxloader.AttachSlot;
 import wily.legacy.skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.skins.pose.SkinPoseRegistry;
@@ -50,7 +52,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     //? if <1.21.2 {
     @Redirect(method = "renderHand", at = @At(value = "FIELD", target = "Lnet/minecraft/client/model/PlayerModel;swimAmount:F", opcode = Opcodes.PUTFIELD))
     private void renderHand(PlayerModel instance, float value, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, AbstractClientPlayer abstractClientPlayer) {
-        instance.swimAmount = abstractClientPlayer.getSwimAmount(FactoryAPIClient.getGamePartialTick(false));
+        instance.swimAmount = !LegacyOptions.legacySwimmingAnimation.get() && LegacyGameRules.getSidedBooleanGamerule(abstractClientPlayer, LegacyGameRules.LEGACY_SWIMMING) ? 0.0F : abstractClientPlayer.getSwimAmount(FactoryAPIClient.getGamePartialTick(false));
         ((PlayerModel)getModel()).rightArmPose = HumanoidModel.ArmPose.EMPTY;
         ((PlayerModel)getModel()).leftArmPose = HumanoidModel.ArmPose.EMPTY;
     }
@@ -67,7 +69,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V"), cancellable = true, require = 0)
     private void renderHand(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {
         PlayerRenderState state = createRenderState();
-        state.swimAmount = Minecraft.getInstance().player.getSwimAmount(FactoryAPIClient.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+        state.swimAmount = !LegacyOptions.legacySwimmingAnimation.get() && LegacyGameRules.getSidedBooleanGamerule(Minecraft.getInstance().player, LegacyGameRules.LEGACY_SWIMMING) ? 0.0F : Minecraft.getInstance().player.getSwimAmount(FactoryAPIClient.getDeltaTracker().getGameTimeDeltaPartialTick(true));
         getModel().setupAnim(state);
         consoleskins$renderSkinHand(poseStack, multiBufferSource, i, Minecraft.getInstance().player, resourceLocation, modelPart, ci);
     }
@@ -77,6 +79,10 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
     }
     @Inject(method = "extractRenderState(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/renderer/entity/state/PlayerRenderState;F)V", at = @At("TAIL"))
     private void extractRenderState(AbstractClientPlayer abstractClientPlayer, PlayerRenderState state, float f, CallbackInfo ci) {
+        if (!LegacyOptions.legacySwimmingAnimation.get() && LegacyGameRules.getSidedBooleanGamerule(abstractClientPlayer, LegacyGameRules.LEGACY_SWIMMING)) {
+            state.swimAmount = 0.0F;
+            state.isVisuallySwimming = false;
+        }
         if (!LegacyRenderUtil.suppressInventoryElytraPose) return;
         state.isFallFlying = false;
         state.fallFlyingTimeInTicks = 0;

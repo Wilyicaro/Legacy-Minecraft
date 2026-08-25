@@ -84,6 +84,7 @@ public class LegacyComponents {
     public static final Component NAME = Component.translatable("legacy.action.name");
     public static final Component NEXT_PAGE = Component.translatable("legacy.action.next_page");
     public static final Component OPEN = Component.translatable("legacy.action.open");
+    public static final Component CLOSE = Component.translatable("legacy.action.close");
     public static final Component OPEN_DIRECTORY = Component.translatable("legacy.action.open_directory");
     public static final Component PAGE = Component.translatable("legacy.action.page");
     public static final Component PAGE_DOWN = Component.translatable("legacy.action.page_down");

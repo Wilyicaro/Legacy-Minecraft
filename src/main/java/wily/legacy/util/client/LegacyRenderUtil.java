@@ -38,6 +38,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -888,6 +889,18 @@ public class LegacyRenderUtil {
         else if (y < 0)
             return ScreenDirection.UP;
         return null;
+    }
+
+    public static int getBossBarTextColor(BossEvent.BossBarColor color) {
+        return (switch (color) {
+            case PINK -> CommonColor.DARK_PURPLE;
+            case BLUE -> CommonColor.DARK_BLUE;
+            case RED -> CommonColor.DARK_RED;
+            case GREEN -> CommonColor.GREEN;
+            case YELLOW -> CommonColor.YELLOW;
+            case PURPLE -> CommonColor.LIGHT_PURPLE;
+            case WHITE -> CommonColor.WHITE;
+        }).get();
     }
 
     public static boolean hasHorizontalArtifacts() {

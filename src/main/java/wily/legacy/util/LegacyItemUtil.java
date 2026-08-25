@@ -421,6 +421,11 @@ public class LegacyItemUtil {
         if (tooltip.stream().anyMatch(LegacyItemUtil::isPeacefulSpawnEggTip)) {
             tooltip = tooltip.stream().filter(component -> !isPeacefulSpawnEggTip(component)).toList();
         }
+        if (/*? if <1.20.5 {*//*stack.getItem() instanceof RecordItem*//*?} else {*/stack.has(DataComponents.JUKEBOX_PLAYABLE)/*?}*/ && tooltip.size() > 1) {
+            tooltip = new ArrayList<>(tooltip);
+            Component name = tooltip.get(0);
+            tooltip.set(1, tooltip.get(1).copy().withStyle(style -> style.withColor(name.getStyle().getColor())));
+        }
         return tooltip;
     }
 

@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.CreativeModeScreen;
+import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.LegacyItemUtil;
@@ -36,7 +37,7 @@ public class MultiplayerGameModeMixin {
 
     @Inject(method = "useItem", at = @At("HEAD"), cancellable = true)
     private void useItem(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && player.getItemInHand(hand).getItem() instanceof ShieldItem) {
+        if (LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && player.getItemInHand(hand).getItem() instanceof ShieldItem && (!((LegacyShieldPlayer) player).isAutoShielding() || ((LegacyShieldPlayer) player).isShieldPaused())) {
             cir.setReturnValue(InteractionResult.PASS);
         }
     }

@@ -52,6 +52,8 @@ import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 *///?}
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -136,6 +138,8 @@ public abstract class MinecraftMixin {
     private boolean legacy$dropKeyDown = false;
     @Unique
     private InteractionHand legacy$suppressedUseAnimationHand;
+    @Unique
+    private InteractionHand legacy$quickUseAnimationHand;
     @Unique
     private boolean legacy$resourceReloadMusic;
 
@@ -238,6 +242,11 @@ public abstract class MinecraftMixin {
         }
     }
 
+    @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V"))
+    private boolean releaseUsingItem(MultiPlayerGameMode instance, Player player) {
+        return !((LegacyShieldPlayer) player).isAutoShielding();
+    }
+
     @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean handleDropSwing(LocalPlayer player, InteractionHand hand) {
         return false;
@@ -277,19 +286,24 @@ public abstract class MinecraftMixin {
 
     @WrapWithCondition(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean startUseItemSwing(LocalPlayer player, InteractionHand hand) {
-        return !legacy$suppressedUseAnimation(hand);
+        return legacy$quickUseAnimationHand != hand && !legacy$suppressedUseAnimation(hand);
     }
 
     @WrapWithCondition(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;itemUsed(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean startUseItemItemUsed(ItemInHandRenderer renderer, InteractionHand hand) {
-        return !legacy$suppressedUseAnimation(hand);
+        return legacy$quickUseAnimationHand == hand || !legacy$suppressedUseAnimation(hand);
     }
 
     @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult startUseItemInteractAt(MultiPlayerGameMode gameMode, Player player, Entity entity, EntityHitResult hit, InteractionHand hand, Operation<InteractionResult> original) {
-        boolean suppress = legacy$suppressesUseAnimation(hand);
+        boolean itemFrame = entity instanceof ItemFrame;
+        ItemStack item = itemFrame ? player.getItemInHand(hand).copy() : ItemStack.EMPTY;
+        boolean suppress = itemFrame || legacy$suppressesUseAnimation(hand);
         if (suppress) legacy$suppressedUseAnimationHand = hand;
         InteractionResult result = original.call(gameMode, player, entity, hit, hand);
+        if (itemFrame && legacy$resultIsSuccess(result) && !ItemStack.matches(item, player.getItemInHand(hand))) {
+            ((LegacyItemInHandRenderer) self().gameRenderer.itemInHandRenderer).legacy$setRenderedItem(hand, item);
+        }
         legacy$rememberServerUseAnimation(hand, suppress, result);
         return result;
     }
@@ -312,6 +326,16 @@ public abstract class MinecraftMixin {
         InteractionResult result = original.call(gameMode, player, hand, hit);
         legacy$rememberServerUseAnimation(hand, suppress, result);
         legacy$playMissingUseAnimation(player, hand, item, state, result, suppress);
+        return result;
+    }
+
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItem(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult startUseItemUseItem(MultiPlayerGameMode gameMode, Player player, InteractionHand hand, Operation<InteractionResult> original) {
+        InteractionResult result = original.call(gameMode, player, hand);
+        if (legacy$resultIsSuccess(result)) {
+            legacy$quickUseAnimationHand = hand;
+            legacy$rememberServerUseAnimation(hand, true, result);
+        }
         return result;
     }
 
@@ -440,6 +464,7 @@ public abstract class MinecraftMixin {
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
     private void startUseItem(CallbackInfo ci){
         legacy$suppressedUseAnimationHand = null;
+        legacy$quickUseAnimationHand = null;
         legacy$pauseShield();
         if (player != null && player.isSleeping()){
             ClientPacketListener clientPacketListener = player.connection;
@@ -456,6 +481,7 @@ public abstract class MinecraftMixin {
     private void startUseItemReturn(CallbackInfo ci){
         if (player.getAbilities().flying && player.isSprinting()) rightClickDelay = -1;
         legacy$suppressedUseAnimationHand = null;
+        legacy$quickUseAnimationHand = null;
     }
 
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))

@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.util.LegacyTipBuilder;
@@ -122,6 +123,32 @@ public class TipCommand {
             return ID;
         }
     }
+    public record PersistentPayload(LegacyTipBuilder builder) implements CommonNetwork.Payload {
+        public static final CommonNetwork.Identifier<PersistentPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_persistent_tip"), PersistentPayload::new);
+
+        public PersistentPayload(CommonNetwork.PlayBuf buf) {
+            this(LegacyTipBuilder.decode(buf));
+        }
+
+        @Override
+        public void encode(CommonNetwork.PlayBuf buf) {
+            builder.encode(buf);
+        }
+
+        @Override
+        public void apply(Context context) {
+            if (context.player().level().isClientSide) {
+                Supplier<LegacyTip> tip = LegacyTipManager.getTip(builder.getItem(), builder);
+                if (tip != null) LegacyTipManager.setTip(() -> tip.get().canRemove(() -> false));
+            }
+        }
+
+        @Override
+        public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
+            return ID;
+        }
+    }
+
     public record EntityPayload(EntityType<?> entityType, boolean force) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<EntityPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_entity_tip"),EntityPayload::new);
 

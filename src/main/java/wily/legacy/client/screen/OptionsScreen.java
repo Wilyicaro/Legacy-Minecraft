@@ -484,7 +484,8 @@ public class OptionsScreen extends PanelVListScreen {
                             super.tick();
                         }
                     };
-                    screen.renderableVList.addRenderables(globalPackSelector, selector);
+                    if (LegacyOptions.legacySettingsMenus.get()) screen.renderableVList.addRenderables(0, globalPackSelector, selector);
+                    else screen.renderableVList.addRenderables(globalPackSelector, selector);
                     return screen;
                 }));
         public static final Section ADVANCED_GRAPHICS = new Section(
@@ -534,9 +535,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyEvokerFangs,
                                 LegacyOptions.legacyDrownedHeight,
                                 LegacyOptions.legacyDrownedAnimation,
+                                LegacyOptions.legacySwimmingAnimation,
                                 LegacyOptions.legacyZombieAggressionAnimation,
                                 LegacyOptions.legacyEntityFireTint,
-                                LegacyOptions.legacyBossBars,
                                 LegacyOptions.legacyItemPickup,
                                 LegacyOptions.enhancedPistonMovingRenderer,
                                 LegacyOptions.legacyPotionsBar,
@@ -597,10 +598,13 @@ public class OptionsScreen extends PanelVListScreen {
                             }
                         },
                         o -> {
-                            if (!useLegacySettingsMenusOptions()) o.getRenderableVList().addLinkedOptions(
-                                    LegacyOptions.legacyItemTooltips,
-                                    FactoryConfig::get,
-                                    LegacyOptions.legacyItemTooltipScaling);
+                            if (!useLegacySettingsMenusOptions()) {
+                                o.getRenderableVList().addLinkedOptions(
+                                        LegacyOptions.legacyItemTooltips,
+                                        FactoryConfig::get,
+                                        LegacyOptions.legacyItemTooltipScaling);
+                                o.renderableVList.addOptions(LegacyOptions.legacyItemRarity);
+                            }
                         },
                         o -> {
                             if (!useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
@@ -632,7 +636,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
                                 LegacyOptions.legacyHearts,
-                                LegacyOptions.legacyFont),
+                                LegacyOptions.legacyFont,
+                                LegacyOptions.legacyPinkBossBars),
                         o-> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),
                         o-> o.renderableVList.addOptions(
                                 LegacyOptions.screenshotToasts,
@@ -649,6 +654,7 @@ public class OptionsScreen extends PanelVListScreen {
                             o.renderableVList.addOptions(
                                     LegacyOptions.titleScreenFade,
                                     LegacyOptions.titleScreenVersionText,
+                                    LegacyOptions.legacyCreditsScreen,
                                     LegacyOptions.menusWithBackground,
                                     LegacyOptions.legacyIntroAndReloading,
                                     LegacyOptions.legacyLoadingAndConnecting,
@@ -666,6 +672,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o-> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.chat.title"),
                                 LegacyOptions.of(mc.options.reducedDebugInfo()),
+                                LegacyOptions.announceAdvancements,
                                 LegacyOptions.displayChatIndicators,
                                 LegacyOptions.of(mc.options.chatVisibility()),
                                 LegacyOptions.of(mc.options.chatOpacity()),

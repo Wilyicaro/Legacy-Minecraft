@@ -164,6 +164,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         resourceAssortSelector = PackAlbum.Selector.creationResources(panel.x + 13, panel.y + 106, 220,45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
         legacyBiomeScale.set(WorldMoreOptionsScreen.getLegacyBiomeScalePreset(uiState.getWorldType().preset()));
+        if (uiState.getSeed().isBlank()) uiState.setSeed("");
     }
 
     @Override

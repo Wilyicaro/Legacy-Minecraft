@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Listener;
 import net.minecraft.client.Options;
+import net.minecraft.client.resources.sounds.ElytraOnPlayerSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
@@ -62,6 +63,16 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
     @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
     private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
         return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && sound.getLocation().equals(SoundEvents.ITEM_PICKUP./*? if <1.21.2 {*/getLocation/*?} else {*//*location*//*?}*/()) ? 4.0f : max;
+    }
+
+    @WrapOperation(method = "tickNonPaused", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundEngine;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    private void finishElytraLoop(SoundEngine instance, SoundInstance soundInstance, Operation<Void> operation) {
+        ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);
+        if (soundInstance instanceof ElytraOnPlayerSoundInstance && channelHandle != null && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio)) {
+            channelHandle.execute(channel -> channel.setLooping(false));
+        } else {
+            operation.call(instance, soundInstance);
+        }
     }
 
     @Override

@@ -26,21 +26,18 @@ vec3 notGamma(vec3 x) {
     return 1.0 - nx * nx * nx * nx;
 }
 
+float parabolicMixFactor(float level) {
+    return (2.0 * level - 1.0) * (2.0 * level - 1.0);
+}
+
 void main() {
-    float block_brightness = get_brightness(floor(texCoord.x * 16) / 15) * BlockFactor;
-    float sky_brightness = get_brightness(floor(texCoord.y * 16) / 15) * SkyFactor;
-
-    // cubic nonsense, dips to yellowish in the middle, white when fully saturated
-    vec3 color = vec3(
-        block_brightness,
-        block_brightness * ((block_brightness * 0.6 + 0.4) * 0.6 + 0.4),
-        block_brightness * (block_brightness * block_brightness * 0.6 + 0.4)
-    );
-
-    if (floor(texCoord.x * 16) < 15) {
-        vec3 blockLightColor = mix(BlockLightColor, vec3(1.0), NightVisionFactor);
-        color = color * blockLightColor;
-    }
+    float block_level = floor(texCoord.x * 16) / 15;
+    float sky_level = floor(texCoord.y * 16) / 15;
+    float block_brightness = get_brightness(block_level) * BlockFactor;
+    float sky_brightness = get_brightness(sky_level) * SkyFactor;
+    vec3 blockLightColor = mix(BlockLightColor, vec3(1.0), 0.9 * parabolicMixFactor(block_level));
+    blockLightColor = mix(blockLightColor, vec3(1.0), NightVisionFactor);
+    vec3 color = blockLightColor * block_brightness;
 
     if (UseBrightLightmap != 0) {
         color = mix(color, vec3(0.99, 1.12, 1.0), 0.25);

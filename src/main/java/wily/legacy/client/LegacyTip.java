@@ -59,7 +59,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     public LegacyTip(Component title, Component tip) {
         this(tip, LegacyOptions.getUIMode().isSD() ? 136 : 250, 0);
         title(title);
-        height = (title == null ? LegacyOptions.getUIMode().isSD() ? 14 : 26 : LegacyOptions.getUIMode().isSD() ? 22 : 38) + tipLabel.getHeight();
+        height = (this.title == null ? LegacyOptions.getUIMode().isSD() ? 14 : 26 : LegacyOptions.getUIMode().isSD() ? 22 : 38) + tipLabel.getHeight();
         setY(25);
         canRemove(() -> initScreen != minecraft.screen);
     }

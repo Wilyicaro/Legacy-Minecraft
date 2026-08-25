@@ -162,6 +162,10 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
             ci.cancel();
             return;
         }
+        if (!LegacyOptions.announceAdvancements.get() && isAdvancementAnnouncement(clientboundSystemChatPacket.content())) {
+            ci.cancel();
+            return;
+        }
         if (!LegacyOptions.displayGameMessages.get()) {
             ci.cancel();
             return;
@@ -181,5 +185,9 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
 
     private static boolean isDeathMessage(Component component) {
         return component.getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("death.");
+    }
+
+    private static boolean isAdvancementAnnouncement(Component component) {
+        return component.getContents() instanceof TranslatableContents contents && contents.getKey().startsWith("chat.type.advancement.");
     }
 }

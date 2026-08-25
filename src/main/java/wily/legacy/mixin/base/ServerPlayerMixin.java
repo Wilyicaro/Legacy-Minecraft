@@ -31,9 +31,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.factoryapi.util.CompoundTagUtil;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, LegacyPlayerInfo {
@@ -53,6 +58,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
     @Unique boolean legacy$visible = true;
+    @Unique final Set<String> musicDiscHuntProgress = new HashSet<>();
 
 
     public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
@@ -160,16 +166,23 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         super.setInvisible(!visible);
     }
 
+    @Override
+    public Set<String> getMusicDiscHuntProgress() {
+        return musicDiscHuntProgress;
+    }
+
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
         compoundTag.putBoolean("DisableExhaustion", isExhaustionDisabled());
         compoundTag.putBoolean("MayFlySurvival", mayFlySurvival());
-
+        compoundTag.putString("LegacyMusicDiscHunts", String.join("\n", musicDiscHuntProgress.stream().sorted().toList()));
     }
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     public void readAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
         setDisableExhaustion(compoundTag.getBoolean("DisableExhaustion")/*? if >=1.21.5 {*//*.orElse(false)*//*?}*/);
         setMayFlySurvival(compoundTag.getBoolean("MayFlySurvival")/*? if >=1.21.5 {*//*.orElse(false)*//*?}*/);
+        musicDiscHuntProgress.clear();
+        CompoundTagUtil.getString(compoundTag, "LegacyMusicDiscHunts").filter(s -> !s.isEmpty()).ifPresent(s -> musicDiscHuntProgress.addAll(Arrays.asList(s.split("\n"))));
     }
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)

@@ -44,6 +44,19 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         }
     }));
 
+    private static WinScreen createCredits(Runnable onFinished) {
+        return LegacyOptions.legacyCreditsScreen.get() ? new LegacyCreditsScreen(onFinished) : new WinScreen(false, onFinished);
+    }
+
+    private static Screen createCreditsScreen(Screen parent) {
+        if (LegacyOptions.legacySettingsMenus.get()) {
+            return createCredits(() -> Minecraft.getInstance().setScreen(parent));
+        }
+        return new RenderableVListScreen(parent, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(
+                openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCredits(() -> Minecraft.getInstance().setScreen(r.getScreen()))).build(),
+                Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),
+                Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()));
+    }
     public HelpAndOptionsScreen(Screen parent) {
         super(parent,Component.translatable("options.title"), r-> {});
         renderableVList.addRenderable(CHANGE_SKIN.createButtonBuilder(this).build());
@@ -65,7 +78,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                                 LegacyOptions.of(minecraft.options.touchscreen())
                         ))))))).build(),Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(r.getScreen()))).build(),Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(r.getScreen()))).build()))).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"),()->new SettingsScreen(this)).build());
-        renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"),()->new RenderableVListScreen(this,Component.translatable("credits_and_attribution.screen.title"),r-> r.addRenderables(openScreenButton(Component.translatable("credits_and_attribution.button.credits"),()->new WinScreen(false, () -> this.minecraft.setScreen(r.getScreen()))).build(),Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b-> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b-> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()))).build());
+        renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"),()->createCreditsScreen(this)).build());
         if (LegacyOptions.displayReinstallContentButton.get()) {
             renderableVList.addRenderable(Button.builder(REINSTALL_CONTENT, this::reinstallContent).build());
         }

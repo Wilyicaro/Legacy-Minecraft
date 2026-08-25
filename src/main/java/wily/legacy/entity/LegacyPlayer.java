@@ -1,5 +1,7 @@
 package wily.legacy.entity;
 
+import java.util.Set;
+
 public interface LegacyPlayer {
 
     boolean hasClassicCrafting();
@@ -18,11 +20,15 @@ public interface LegacyPlayer {
 
     void setLoom(boolean classic);
 
+    Set<String> getMusicDiscHuntProgress();
+
     default void copyFrom(LegacyPlayer player){
         setCrafting(player.hasClassicCrafting());
         setTrading(player.hasClassicTrading());
         setStonecutting(player.hasClassicStonecutting());
         setLoom(player.hasClassicLoom());
+        getMusicDiscHuntProgress().clear();
+        getMusicDiscHuntProgress().addAll(player.getMusicDiscHuntProgress());
     }
 
 }

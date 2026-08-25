@@ -29,16 +29,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
+import wily.legacy.client.LegacyItemInHandRenderer;
 import wily.legacy.client.LegacyMapFillAnimation;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.client.LegacyHeadRenderState;
 
 @Mixin(ItemInHandRenderer.class)
-public abstract class ItemInHandRendererMixin {
+public abstract class ItemInHandRendererMixin implements LegacyItemInHandRenderer {
     @Shadow
     @Final
     private Minecraft minecraft;
+
+    @Shadow
+    private ItemStack mainHandItem;
+
+    @Shadow
+    private ItemStack offHandItem;
 
     @Shadow
     protected abstract void renderPlayerArm(PoseStack arg, MultiBufferSource arg2, int i, float g, float h, HumanoidArm arg3);
@@ -54,6 +61,12 @@ public abstract class ItemInHandRendererMixin {
 
     @Unique
     private boolean legacy$offHandWasEmptyMap;
+
+    @Override
+    public void legacy$setRenderedItem(InteractionHand hand, ItemStack item) {
+        if (hand == InteractionHand.MAIN_HAND) mainHandItem = item;
+        else offHandItem = item;
+    }
 
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {

@@ -23,6 +23,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
+import wily.legacy.client.screen.OptionsScreen;
 import wily.legacy.client.screen.OverlayPanelScreen;
 
 import java.io.BufferedReader;
@@ -44,6 +45,7 @@ public class SDLControllerHandler implements Controller.Handler {
     public NativesStatus natives;
     private SDL_JoystickID[] actualIds = new SDL_JoystickID[0];
     private boolean init = false;
+    private boolean loaded = false;
 
     public static SDLControllerHandler getInstance() {
         return INSTANCE;
@@ -129,7 +131,7 @@ public class SDLControllerHandler implements Controller.Handler {
                 return;
             }
             tryDownloadAndApplyNewMappings();
-            init = true;
+            loaded = init = true;
         }
     }
 
@@ -181,13 +183,14 @@ public class SDLControllerHandler implements Controller.Handler {
             public void onClose() {
                 super.onClose();
                 init = false;
+                if (minecraft.screen instanceof OptionsScreen opts) opts.repositionElements();
             }
         });
     }
 
     @Override
     public boolean update() {
-        if (!init) return false;
+        if (!loaded) return false;
         SdlGamepad.SDL_UpdateGamepads();
         SdlJoystick.SDL_UpdateJoysticks();
         actualIds = SdlGamepad.SDL_GetGamepads();
