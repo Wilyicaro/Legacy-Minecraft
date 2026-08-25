@@ -18,4 +18,3 @@ classes/
 .settings
 *.launch
 **/META-INF/accesstransformer.cfg
-/src/main/.vs
