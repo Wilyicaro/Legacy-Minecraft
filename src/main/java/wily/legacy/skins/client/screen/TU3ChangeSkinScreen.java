@@ -49,7 +49,34 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void refreshTu3Layout() {
-        tu3Layout = isCompact480() ? Tu3LayoutMetrics.SD_480 : Tu3LayoutMetrics.DEFAULT;
+        Tu3LayoutMetrics fallback = Tu3LayoutMetrics.DEFAULT;
+        tu3Layout = new Tu3LayoutMetrics(
+                accessor.getFloat("tu3.topStripScale", fallback.topStripScale()),
+                accessor.getInteger("tu3.bottomStripBaseHeight", fallback.bottomStripBaseHeight()),
+                accessor.getFloat("tu3.greyHeightRatio", fallback.greyHeightRatio()),
+                accessor.getInteger("tu3.menuYOffset", fallback.menuYOffset()),
+                accessor.getInteger("tu3.tabInsetNumerator", fallback.tabInsetNumerator()),
+                accessor.getInteger("tu3.midExtra", fallback.midExtra()),
+                accessor.getInteger("tu3.activeTabLift", fallback.activeTabLift()),
+                accessor.getFloat("tu3.carouselScale", fallback.carouselScale()),
+                accessor.getFloat("tu3.carouselSpacing", fallback.carouselSpacing()),
+                accessor.getInteger("tu3.panelTopOffset", fallback.panelTopOffset()),
+                accessor.getInteger("tu3.tooltipWidthOverscan", fallback.tooltipWidthOverscan()),
+                accessor.getInteger("tu3.tooltipBottomOverscan", fallback.tooltipBottomOverscan()),
+                accessor.getInteger("tu3.carouselPad", fallback.carouselPad()),
+                accessor.getInteger("tu3.namePlateBaseHeight", fallback.namePlateBaseHeight()),
+                accessor.getInteger("tu3.namePlateTopMargin", fallback.namePlateTopMargin()),
+                accessor.getInteger("tu3.namePlateBottomMargin", fallback.namePlateBottomMargin()),
+                accessor.getFloat("tu3.badgeWidthRatio", fallback.badgeWidthRatio()),
+                accessor.getInteger("tu3.badgeBaseHeight", fallback.badgeBaseHeight()),
+                accessor.getInteger("tu3.badgeYOffset", fallback.badgeYOffset()),
+                accessor.getFloat("tu3.badgeScale", fallback.badgeScale()),
+                accessor.getInteger("tu3.tabLabelWidthTrim", fallback.tabLabelWidthTrim()),
+                accessor.getInteger("tu3.centerOriginYOffset", fallback.centerOriginYOffset()),
+                accessor.getInteger("tu3.spawnerExtraMin", fallback.spawnerExtraMin()),
+                accessor.getFloat("tu3.spawnerExtraFactor", fallback.spawnerExtraFactor()),
+                accessor.getFloat("tu3.textScale", fallback.textScale())
+        );
     }
 
     private boolean carouselNavActive() {
@@ -157,7 +184,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (maxGrey < 1) maxGrey = 1;
         int shrunkGrey = Math.max(1, Math.round(maxGrey * tu3Layout.greyHeightRatio()));
         int blockH = tu3StripH + shrunkGrey + tu3BottomStripH;
-        tu3StripY = Math.max(0, (height - blockH) / 2);
+        tu3StripY = Math.max(0, (height - blockH) / 2 + sc(tu3Layout.menuYOffset()));
         tu3TabH = Math.max(1, Math.round((50f / 62f) * tu3StripH));
         tu3TabY = tu3StripY + Math.round((2f / 62f) * tu3StripH);
         int tabMaxH = (tu3StripY + tu3StripH) - tu3TabY;
@@ -223,13 +250,22 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void renderTu3TabLabel(GuiGraphicsExtractor g, int x, int w, int y, String label, int color) {
-        int maxPx = Math.max(1, w - sc(tu3Layout.tabLabelWidthTrim()));
+        float textScale = tu3Layout.textScale();
+        int maxPx = Math.max(1, Math.round((w - sc(tu3Layout.tabLabelWidthTrim())) / textScale));
         String text = PlayerSkinWidget.clipText(minecraft.font, label, maxPx);
-        int drawX = x + (Math.max(1, w) - minecraft.font.width(text)) / 2;
         LegacyFontUtil.applySDFont(b -> {
             g.pose().pushMatrix();
-            g.pose().translate(0.4f, 0.4f);
-            g.text(minecraft.font, Component.literal(text), drawX, y, color, false);
+            if (textScale == 1f) {
+                int drawX = x + (Math.max(1, w) - minecraft.font.width(text)) / 2;
+                g.pose().translate(0.4f, 0.4f);
+                g.text(minecraft.font, Component.literal(text), drawX, y, color, false);
+            } else {
+                int lineHeight = Math.max(1, Math.round(minecraft.font.lineHeight * textScale));
+                g.pose().translate(x + Math.max(1, w) / 2f + 0.4f,
+                        y + (minecraft.font.lineHeight - lineHeight) / 2f + 0.4f);
+                g.pose().scale(textScale, textScale);
+                g.text(minecraft.font, Component.literal(text), -minecraft.font.width(text) / 2, 0, color, false);
+            }
             g.pose().popMatrix();
         });
     }
@@ -420,7 +456,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         int plateH = Math.max(1, Math.round(tu3Layout.namePlateBaseHeight() * uiScale) * 2);
         int plateY = Math.max(tu3StripY + tu3StripH + Math.max(1, sc(tu3Layout.namePlateTopMargin())), tu3BottomStripY - Math.max(1, sc(tu3Layout.namePlateBottomMargin())) - plateH);
         PlayerSkinWidget.setCenterNamePlateReady(!carouselAnimating());
-        PlayerSkinWidget.setCenterNamePlate(true, tu3TabMidW, plateH, 0, plateY);
+        PlayerSkinWidget.setCenterNamePlate(true, tu3TabMidW, plateH, 0, plateY, tu3Layout.textScale());
         PlayerSkinWidget.setCenterNamePlateCenterX(width / 2);
         PlayerSkinWidget.setCenterNamePlateSprite(LegacySprites.SQUARE_RECESSED_PANEL);
         PlayerSkinWidget.setCenterNamePlateHighlight(carouselNavActive(), 1, 1, TU3_NAME_PLATE_HIGHLIGHT);
@@ -441,7 +477,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public void removed() {
         stopHoldingTu3Horizontal();
-        PlayerSkinWidget.setCenterNamePlate(false, 1, 1, 0, -1);
+        PlayerSkinWidget.setCenterNamePlate(false, 1, 1, 0, -1, 1f);
         PlayerSkinWidget.setCenterNamePlateReady(true);
         PlayerSkinWidget.setCenterNamePlateCenterX(-1);
         PlayerSkinWidget.setCenterNamePlateHighlight(false, 0, 1, TU3_NAME_PLATE_HIGHLIGHT);
@@ -452,16 +488,15 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     private enum Tu3NavZone {CAROUSEL, PACKS}
 
     private record Tu3LayoutMetrics(
-            float topStripScale, int bottomStripBaseHeight, float greyHeightRatio, int tabInsetNumerator, int midExtra,
+            float topStripScale, int bottomStripBaseHeight, float greyHeightRatio, int menuYOffset, int tabInsetNumerator, int midExtra,
             int activeTabLift,
             float carouselScale, float carouselSpacing, int panelTopOffset, int tooltipWidthOverscan,
             int tooltipBottomOverscan, int carouselPad,
             int namePlateBaseHeight, int namePlateTopMargin, int namePlateBottomMargin, float badgeWidthRatio,
             int badgeBaseHeight, int badgeYOffset,
             float badgeScale, int tabLabelWidthTrim, int centerOriginYOffset, int spawnerExtraMin,
-            float spawnerExtraFactor
+            float spawnerExtraFactor, float textScale
     ) {
-        static final Tu3LayoutMetrics DEFAULT = new Tu3LayoutMetrics(0.60f, 20, 0.67f, 105, 11, 2, 1.4175f, 1.1f, 45, 23, 90, 6, 16, 4, 8, 0.52f, 12, 4, 0.75f, 16, 32, 10, 0.35f);
-        static final Tu3LayoutMetrics SD_480 = new Tu3LayoutMetrics(0.48f, 14, 0.60f, 84, 8, 1, 1.2096f, 0.95f, 34, 18, 72, 4, 14, 3, 6, 0.48f, 10, 3, 0.70f, 12, 24, 8, 0.25f);
+        static final Tu3LayoutMetrics DEFAULT = new Tu3LayoutMetrics(0.60f, 20, 0.67f, 0, 105, 11, 2, 1.4175f, 1.1f, 45, 23, 90, 6, 16, 4, 8, 0.52f, 12, 4, 0.75f, 16, 32, 10, 0.35f, 1f);
     }
 }

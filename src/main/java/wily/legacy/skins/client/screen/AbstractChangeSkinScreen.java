@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.ControlType;
@@ -75,9 +76,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     protected AbstractChangeSkinScreen(Screen parent, ChangeSkinScreenSource source, boolean showSkinMegaBundlePack) {
         super(parent, s -> {
-            ChangeSkinScreenLayout layout = LegacyOptions.getUIMode().isSD()
-                    ? ChangeSkinScreenLayout.SD_480
-                    : ChangeSkinScreenLayout.DEFAULT;
+            ChangeSkinScreenLayout layout = ChangeSkinScreenLayout.DEFAULT;
             float scale = computeScale(s.width, s.height, layout);
             return Panel.centered(s,
                     () -> Math.max(1, Math.round(layout.basePanelWidth() * scale)),
@@ -463,7 +462,46 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     protected ChangeSkinScreenLayout resolveRuntimeLayout() {
-        return sdMode ? ChangeSkinScreenLayout.SD_480 : ChangeSkinScreenLayout.DEFAULT;
+        ChangeSkinScreenLayout fallback = ChangeSkinScreenLayout.DEFAULT;
+        ChangeSkinLayoutMetrics metrics = fallback.widgetMetrics();
+        return new ChangeSkinScreenLayout(
+                accessor.getBoolean("layout.compact480", fallback.compact480()),
+                accessor.getInteger("layout.panel.width", fallback.basePanelWidth()),
+                accessor.getInteger("layout.panel.height", fallback.basePanelHeight()),
+                accessor.getInteger("layout.tooltip.width", fallback.baseTooltipWidth()),
+                accessor.getInteger("layout.preview.minSize", fallback.previewBoxMinSize()),
+                accessor.getInteger("layout.preview.baseSize", fallback.previewBoxBaseSize()),
+                accessor.getInteger("layout.preview.xOffset", fallback.previewBoxXOffset()),
+                accessor.getInteger("layout.preview.maxInset", fallback.previewBoxMaxInset()),
+                accessor.getInteger("layout.preview.rightInset", fallback.previewBoxRightInset()),
+                accessor.getInteger("layout.preview.yOffset", fallback.previewBoxYOffset()),
+                accessor.getInteger("layout.preview.topInset", fallback.previewBoxTopInset()),
+                accessor.getInteger("layout.preview.bottomInset", fallback.previewBoxBottomInset()),
+                accessor.getInteger("layout.tooltip.groupMargin", fallback.tooltipGroupMargin()),
+                accessor.getInteger("layout.tooltip.yOffset", fallback.tooltipYOffset()),
+                accessor.getInteger("layout.tooltip.heightInset", fallback.tooltipHeightInset()),
+                accessor.getFloat("layout.text.bigScale", fallback.bigTextScale()),
+                accessor.getFloat("layout.text.bigMinScale", fallback.bigTextMinScale()),
+                accessor.getFloat("layout.text.smallScale", fallback.smallTextScale()),
+                accessor.getFloat("layout.text.smallMinScale", fallback.smallTextMinScale()),
+                new ChangeSkinLayoutMetrics(
+                        accessor.getInteger("layout.carousel.tooltipTopOffset", metrics.tooltipTopOffset()),
+                        accessor.getInteger("layout.carousel.tooltipWidthTrim", metrics.tooltipWidthTrim()),
+                        accessor.getInteger("layout.carousel.tooltipHeightTrim", metrics.tooltipHeightTrim()),
+                        accessor.getInteger("layout.carousel.tooltipFooterHeight", metrics.tooltipFooterHeight()),
+                        accessor.getInteger("layout.carousel.tooltipHeightRecover", metrics.tooltipHeightRecover()),
+                        accessor.getInteger("layout.carousel.clipInset", metrics.carouselClipInset()),
+                        accessor.getInteger("layout.carousel.clipBottomTrim", metrics.carouselClipBottomTrim()),
+                        accessor.getFloat("layout.carousel.centerScale", metrics.centerScale()),
+                        accessor.getFloat("layout.carousel.rightCardScale", metrics.rightCardScale()),
+                        accessor.getInteger("layout.carousel.originPadX", metrics.originPadX()),
+                        accessor.getInteger("layout.carousel.originPadY", metrics.originPadY()),
+                        accessor.getInteger("layout.carousel.panelMarginX", metrics.panelMarginX()),
+                        accessor.getInteger("layout.carousel.offset", metrics.carouselOffset()),
+                        accessor.getInteger("layout.carousel.minLeftClearance", metrics.minLeftClearance()),
+                        accessor.getInteger("layout.carousel.rightCardPadding", metrics.rightCardPadding())
+                )
+        );
     }
 
     protected void refreshSharedLayout() {
@@ -1295,8 +1333,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             int minLeftClearance, int rightCardPadding
     ) {
         static final ChangeSkinLayoutMetrics DEFAULT = new ChangeSkinLayoutMetrics(45, 23, 80, 50, 40, 2, 24, 0.935f, 0.44f, 8, 20, 6, 80, 88, 6);
-        static final ChangeSkinLayoutMetrics FHD = new ChangeSkinLayoutMetrics(45, 23, 80, 50, 40, 2, 24, 0.935f, 0.44f, 11, 20, 6, 80, 88, 6);
-        static final ChangeSkinLayoutMetrics SD_480 = new ChangeSkinLayoutMetrics(34, 18, 64, 40, 30, 2, 18, 0.76f, 0.36f, 6, 12, 5, 58, 62, 4);
     }
 
     protected record ChangeSkinScreenLayout(
@@ -1309,7 +1345,6 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             float smallTextMinScale, ChangeSkinLayoutMetrics widgetMetrics
     ) {
         static final ChangeSkinScreenLayout DEFAULT = new ChangeSkinScreenLayout(false, 166, 262, 360, 22, 104, 30, 18, 6, 8, 4, 4, 6, 16, 9, 1.42f, 0.65f, 1.00f, 0.60f, ChangeSkinLayoutMetrics.DEFAULT);
-        static final ChangeSkinScreenLayout SD_480 = new ChangeSkinScreenLayout(true, 150, 198, 286, 18, 72, 22, 14, 6, 6, 4, 4, 4, 12, 8, 1.14f, 0.56f, 0.88f, 0.52f, ChangeSkinLayoutMetrics.SD_480);
     }
 
     protected static final class HoldRepeat {
