@@ -175,7 +175,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
                     GuiGraphicsExtractor.pose().pushMatrix();
                     GuiGraphicsExtractor.pose().translate(k - font.width(formattedCharSequence) * (title ? 1.5f : 1) / 2, m);
                     if (title) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
-                    LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, font, formattedCharSequence, 0, 0, (nameLines.contains(n) ? CommonColor.YELLOW : CommonColor.WHITE).get(), 0xFF000000, 0.4f);
+                    LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, font, formattedCharSequence, 0, 0, (nameLines.contains(n) ? CommonColor.YELLOW : CommonColor.WHITE).get(), 0xFF000000, 0xFF000000, 0.4f);
                     GuiGraphicsExtractor.pose().popMatrix();
                 }
 

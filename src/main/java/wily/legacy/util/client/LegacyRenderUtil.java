@@ -205,27 +205,37 @@ public class LegacyRenderUtil {
         FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() * GuiGraphicsExtractor.guiHeight() / 360 / 66.32f, 1, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight() + 2, GuiGraphicsExtractor.guiHeight() * 820 / 144, GuiGraphicsExtractor.guiHeight() + 2);
     }
 
-    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
-        drawOutlinedString(graphics, font, component.getVisualOrderText(), x, y, color, outlineColor, outline);
+    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, Component component, int x, int y, int color, int outlineColor, int outlineDownColor, float outline) {
+        drawOutlinedString(graphics, font, component.getVisualOrderText(), x, y, color, outlineColor, outlineDownColor, outline);
     }
 
-    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color, int outlineColor, float outline) {
-        drawStringOutline(graphics, font, formattedCharSequence, x, y, outlineColor, outline);
+    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color, int outlineColor, int outlineDownColor, float outline) {
+        drawStringOutline(graphics, font, formattedCharSequence, x, y, outlineColor, outlineDownColor, outline);
         graphics.text(font, formattedCharSequence, x, y, color, false);
     }
 
-    public static void drawStringOutline(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int outlineColor, float outline) {
-        float[] translations = new float[]{0, outline, -outline};
-        for (float t : translations) {
-            for (float t1 : translations) {
-                if (t != 0 || t1 != 0) {
-                    graphics.pose().pushMatrix();
-                    graphics.pose().translate(t, t1);
-                    graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
-                    graphics.pose().popMatrix();
-                }
-            }
-        }
+    public static void drawStringOutline(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int outlineColor, int outlineDownColor, float outline) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(-outline, -outline);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().translate(outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().translate(outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().popMatrix();
+
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(0, outline);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(-outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(-outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(0, -outline);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().popMatrix();
     }
 
     public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height) {

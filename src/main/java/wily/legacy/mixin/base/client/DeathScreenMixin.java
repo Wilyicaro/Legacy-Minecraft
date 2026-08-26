@@ -91,7 +91,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(this.width / 2 - this.font.width(this.title), this.height / 4 + 20);
         guiGraphics.pose().scale(2.0f);
-        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), CommonColor.TITLE_TEXT_OUTLINE_DOWN.orNotOverridden(CommonColor.TITLE_TEXT_OUTLINE).get(), 0.5f);
         guiGraphics.pose().popMatrix();
     }
 

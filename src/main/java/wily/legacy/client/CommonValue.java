@@ -54,6 +54,10 @@ public class CommonValue<T> extends Stocker<T> {
         return overridden;
     }
 
+    public CommonValue<T> orNotOverridden(CommonValue<T> other) {
+        return isOverridden() ? this : other;
+    }
+
     public <V> V encode(DynamicOps<V> ops) {
         return codec.encodeStart(ops, get()).result().get();
     }
