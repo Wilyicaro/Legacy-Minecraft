@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "Находятся в деревнях. Крестьяне могут предложить игроку товары на продажу, соответствующие их профессии.",
   "entity.minecraft.vindicator.tip": "Поборники – это враждебные мобы, вооружённые топорами.",
   "entity.minecraft.wandering_trader.tip": "Особый торговец, который собирает и продаёт редкие и экзотические предметы, странствуя по миру.",
-  "entity.minecraft.warden.tip": "Чрезвычайно мощный. Появляется, когда срабатывают скалковые катализаторы. Не видит ничего, может обнаруживать сущности только по звуку.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Находятся на Болотах. Атакуют, кидаясь зельями, и роняют зелья при смерти.",
   "entity.minecraft.wither.tip": "Создаётся из черепов визер-скелета и песка душ. Кидает в вас взрывающиеся черепа.",
   "entity.minecraft.wither_skeleton.tip": "Вооружён мечом. Может воздействовать на вас иссушением, высасывая здоровье.",
