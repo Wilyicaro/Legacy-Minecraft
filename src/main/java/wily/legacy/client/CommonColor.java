@@ -30,9 +30,11 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor CHAT_TEXT = registerCommonColor("chat_text", 0xFFFFFFFF);
     public static final CommonColor GRAY_TEXT = registerCommonColor("inventory_gray_text", 0xFF323232);
     public static final CommonColor WIDGET_TEXT = registerCommonColor("widget_text", 0xFFFFFFFF);
+    public static final CommonColor WIDGET_TEXT_SHADOW = registerCommonColor("widget_text_shadow", 0xFF000000);
     public static final CommonColor HIGHLIGHTED_WIDGET_TEXT = registerCommonColor("highlighted_widget_text", 0xFFFFFF00);
     public static final CommonColor TITLE_TEXT = registerCommonColor("title_text", 0xFFFFFFFF);
     public static final CommonColor TITLE_TEXT_OUTLINE = registerCommonColor("title_text_outline", 0xFF000000);
+    public static final CommonColor TITLE_TEXT_OUTLINE_DOWN = registerCommonColor("title_text_outline_down", 0xFF000000);
     public static final CommonColor STAGE_TEXT = registerCommonColor("stage_text", 0xFFFFFFFF);
     public static final CommonColor TIP_TITLE_TEXT = registerCommonColor("tip_title_text", 0xFFFFFFFF);
     public static final CommonColor TIP_TEXT = registerCommonColor("tip_text", 0xFFFFFFFF);
