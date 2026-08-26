@@ -77,7 +77,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
                 Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(LegacyAdvancementsScreen.getActualAdvancementsScreenInstance(this))).build()
         );
         if (LegacySaveCache.hasSaveSystem(minecraft))
-            renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b -> {
+            renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this, LegacyOptions.autoSaveInterval.get() > 0 ? Component.translatable("legacy.menu.disable_autosave_title") : LegacyComponents.SAVE_GAME, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b -> {
                 if (LegacyOptions.autoSaveInterval.get() > 0) {
                     setAutoSave(0, button);
                     minecraft.setScreen(PauseScreenMixin.this);
