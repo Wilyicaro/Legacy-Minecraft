@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "Encontrados em vilarejos, aldeões oferecerão vender itens ao jogador dependendo de sua profissão.",
   "entity.minecraft.vindicator.tip": "Vingadores são hostis e armados com um machado.",
   "entity.minecraft.wandering_trader.tip": "Um comerciante especial que percorre o mundo coletando e vendendo itens raros e exóticos.",
-  "entity.minecraft.warden.tip": "Extremamente poderoso, aparece quando os Emissores de sculk são acionados. Não pode ver nada; só pode localizar entidades através do som.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Encontrada em pântanos. Ataca lançando poções e larga poções quando morta.",
   "entity.minecraft.wither.tip": "Pode ser criado usando Crânios de esqueleto wither e Areia da alma. Dispara caveiras explosivas em você.",
   "entity.minecraft.wither_skeleton.tip": "Armado com uma espada. Pode te afligir com Murcha, drenando sua saúde.",
