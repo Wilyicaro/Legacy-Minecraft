@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "Se encuentran en las aldeas, los aldeanos ofrecerán vender objetos al jugador dependiendo de su profesión.",
   "entity.minecraft.vindicator.tip": "Los Vindicadores son hostiles y están armados con un Hacha.",
   "entity.minecraft.wandering_trader.tip": "Un comerciante especial que recorre el mundo recolectando y vendiendo objetos raros y exóticos.",
-  "entity.minecraft.warden.tip": "Extremadamente poderoso, aparece cuando se activan los Catalizadores de Sculk. No puede ver nada; sólo puede localizar entidades a través del sonido.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Se encuentran en los pantanos. Ataca lanzando Pociones, y suelta Pociones cuando se mata.",
   "entity.minecraft.wither.tip": "Se puede crear utilizando Calaveras de Wither y Arena de Almas. Dispara calaveras explosivas a ti.",
   "entity.minecraft.wither_skeleton.tip": "Armado con una espada. Puede afligirte con Wither, que drena tu salud.",
