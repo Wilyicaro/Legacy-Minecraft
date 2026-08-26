@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "在村庄中找到，村民会根据他们的职业向玩家出售物品。",
   "entity.minecraft.vindicator.tip": "敌对生物，手持斧头。",
   "entity.minecraft.wandering_trader.tip": "一位特殊的商人，会在世界中游荡，收集并出售稀有和奇特的物品。",
-  "entity.minecraft.warden.tip": "极其强大，由菌丝催化剂触发生成。它无法看见任何东西；只能通过声音定位实体。",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "在沼泽中找到。通过投掷药水攻击，并在被击杀时掉落药水。",
   "entity.minecraft.wither.tip": "可以用凋零骷髅头和灵魂沙制作。向你发射爆炸头骨。",
   "entity.minecraft.wither_skeleton.tip": "手持剑。可以对你施加凋零效果，这会消耗你的生命值。",
