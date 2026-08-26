@@ -10,13 +10,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -146,24 +144,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
                     return description.get(0);
                 }));
             });
-            addDecayTippedArrowRecipe(recipeAdder);
         }));
-
-        private static <T> void addDecayTippedArrowRecipe(Consumer<RecipeInfo<T>> recipeAdder) {
-            ItemStack potion = LegacyItemUtil.createDecayPotion(Items.LINGERING_POTION);
-            ItemStack result = LegacyItemUtil.createDecayTippedArrow();
-            PotionContents potionContents = potion.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-            List<Optional<Ingredient>> ings = new ArrayList<>();
-            Optional<Ingredient> arrowOptional = Optional.of(Ingredient.of(Items.ARROW));
-            for (int i = 0; i < 8; i++) ings.add(arrowOptional);
-            ings.add(4, Optional.of(StackIngredient.of(true, potion)));
-            List<Component> description = new ArrayList<>();
-            recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, () -> {
-                description.clear();
-                LegacyItemUtil.addPotionTooltip(potionContents, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
-                return description.get(0);
-            }));
-        }
 
         static Filter parse(String s) {
             if (s.startsWith("#"))
