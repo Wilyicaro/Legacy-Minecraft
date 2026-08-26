@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "Trouvés dans les villages, les villageois offriront de vendre des objets au joueur selon leur profession.",
   "entity.minecraft.vindicator.tip": "Les vindicateurs sont hostiles et armés d'une hache.",
   "entity.minecraft.wandering_trader.tip": "Un commerçant spécial qui parcourt le monde en collectant et vendant des objets rares et exotiques.",
-  "entity.minecraft.warden.tip": "Extrêmement puissant, apparaît lorsque les catalyseurs de sculk sont déclenchés. Ne peut rien voir ; ne peut localiser les entités que via le son.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Trouvée dans les marais. Attaque en lançant des potions, et lâche des potions lorsqu'elle est tuée.",
   "entity.minecraft.wither.tip": "Peut être créé en utilisant des crânes de wither et du sable des âmes. Tire des crânes explosifs sur vous.",
   "entity.minecraft.wither_skeleton.tip": "Armé d'une épée. Peut vous affliger de flétrissement, qui draine votre santé.",
