@@ -12,6 +12,7 @@
         {
           "name": "title",
           "type": "draw_multiline_string",
+          "color": "${commonColor.htp_green}",
           "component": {
             "translate": "legacy.menu.how_to_play.whats_new_message"
           },
