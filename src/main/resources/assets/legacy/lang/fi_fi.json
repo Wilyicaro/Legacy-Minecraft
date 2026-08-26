@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "Kylissä löytyvät kyläläiset tarjoavat esineiden myymistä pelaajalle ammatistaan riippuen.",
   "entity.minecraft.vindicator.tip": "Vindikaaattorit ovat vihamielisiä ja aseistettuja Kirveellä.",
   "entity.minecraft.wandering_trader.tip": "Erityinen kauppias, joka vaeltaa maailmassa kerätessään ja myyessään harvinaisia ja eksoottisia esineitä.",
-  "entity.minecraft.warden.tip": "Erittäin tehokas, ilmestyy kun Sculk-katalyyttejä aktivoidaan. Ei näe mitään; pystyy paikantamaan entiteettejä vain äänen avulla.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Löytyy soilta. Hyökkää heittämällä Juomia ja pudottaa Juomia tapettaessa.",
   "entity.minecraft.wither.tip": "Voidaan luoda käyttämällä Witherin Kalloja ja Sielunhiekkaa. Ampuu räjähtäviä kalloja sinuun.",
   "entity.minecraft.wither_skeleton.tip": "Aseistettu miekalla. Voi aiheuttaa sinulle Witherin, joka kuluttaa terveyttäsi.",
