@@ -713,7 +713,7 @@
   "entity.minecraft.villager.tip": "Found in villages, villagers will offer to sell items to the player depending on their profession.",
   "entity.minecraft.vindicator.tip": "Vindicators are hostile and armed with an Axe.",
   "entity.minecraft.wandering_trader.tip": "A special trader who roams the world collecting and selling rare and exotic items.",
-  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Catalysts are triggered. Cannot see anything; can only locate entities via sound.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Found in swamps. Attacks by throwing Potions, and drops Potions when killed.",
   "entity.minecraft.wither.tip": "Can be creating using Wither Skulls and Soul Sand. Fires exploding skulls at you.",
   "entity.minecraft.wither_skeleton.tip": "Armed with a sword. Can afflict you with Wither, which drains your health.",

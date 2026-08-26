@@ -18,6 +18,7 @@
     "client.crafter.CrafterScreenMixin",
     //? fabric || neoforge {
     "compat.sodium.FluidRendererFactoryMixin",
+    "compat.sodium.DefaultFluidRendererMixin",
     "compat.sodium.BlockRendererMixin",
     "compat.sodium.OcclusionCullerMixin",
     "compat.sodium.LevelSliceMixin",
