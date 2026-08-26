@@ -1545,8 +1545,6 @@
   "legacy.menu.create_flat_world.biomes": "Biomes",
   "legacy.menu.create_flat_world.delete_layer": "Delete Layer",
   "legacy.menu.create_flat_world.edit_layer": "Edit Layer",
-  "legacy.menu.create_flat_world.max_height": "Height Limit Reached",
-  "legacy.menu.create_flat_world.max_height_message": "You cannot add a new layer as you have reached the maximum height of a world.",
   "legacy.menu.create_flat_world.layer_count": "%sx",
   "legacy.menu.create_flat_world.layer_height": "Layer Height",
   "legacy.menu.create_flat_world.layer_message": "Add, edit or delete a layer.",
