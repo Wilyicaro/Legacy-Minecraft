@@ -700,7 +700,7 @@
   "entity.minecraft.villager.tip": "Trovati nei villaggi, i villici offriranno di vendere oggetti al giocatore a seconda della loro professione.",
   "entity.minecraft.vindicator.tip": "I Vendicatori sono ostili e armati di un'Ascia.",
   "entity.minecraft.wandering_trader.tip": "Un mercante speciale che vaga per il mondo raccogliendo e vendendo oggetti rari ed esotici.",
-  "entity.minecraft.warden.tip": "Estremamente potente, si genera quando vengono innescati i Catalizzatori di sculk. Non può vedere nulla; può localizzare entità solo tramite il suono.",
+  "entity.minecraft.warden.tip": "Extremely powerful, spawning when Sculk Shriekers are triggered. Cannot see anything; can only locate entities via sound.",
   "entity.minecraft.witch.tip": "Si trova nelle paludi. Attacca lanciando Pozioni e lascia cadere Pozioni quando uccisa.",
   "entity.minecraft.wither.tip": "Può essere creato usando Teschi di Wither e sabbia delle anime. Ti spara teschi esplosivi.",
   "entity.minecraft.wither_skeleton.tip": "Armato con una spada. Può infliggerti l'effetto Wither, che prosciuga la tua salute.",
