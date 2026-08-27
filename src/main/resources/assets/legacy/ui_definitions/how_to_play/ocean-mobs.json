@@ -27,6 +27,7 @@
         },
         "fish1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_fish"
           },
@@ -42,6 +43,7 @@
         },
         "squid1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_squid"
           },
@@ -57,6 +59,7 @@
         },
         "dolphins1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins"
           },
@@ -72,6 +75,7 @@
         },
         "sea-turtles1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles"
           },
@@ -87,6 +91,7 @@
         },
         "nautilus1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus"
           },
@@ -102,6 +107,7 @@
         },
         "zombie-nautilus1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus"
           },
@@ -117,6 +123,7 @@
         },
         "drowned1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_drowned"
           },
@@ -132,6 +139,7 @@
         },
         "guardians1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_guardians"
           },
@@ -175,6 +183,7 @@
         },
         "fish1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_fish",
             "font": "legacy:default_11"
@@ -194,6 +203,7 @@
         },
         "squid1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_squid",
             "font": "legacy:default_11"
@@ -213,6 +223,7 @@
         },
         "dolphins1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins",
             "font": "legacy:default_11"
@@ -232,6 +243,7 @@
         },
         "sea-turtles1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles",
             "font": "legacy:default_11"
@@ -251,6 +263,7 @@
         },
         "nautilus1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus",
             "font": "legacy:default_11"
@@ -270,6 +283,7 @@
         },
         "zombie-nautilus1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus",
             "font": "legacy:default_11"
@@ -289,6 +303,7 @@
         },
         "drowned1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_drowned",
             "font": "legacy:default_11"
@@ -308,6 +323,7 @@
         },
         "guardians1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_guardians",
             "font": "legacy:default_11"
