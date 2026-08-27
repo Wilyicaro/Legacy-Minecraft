@@ -23,6 +23,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bundle_message"
               },
@@ -30,6 +31,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bundle_message_1",
                 "allowVariables": true,
@@ -42,6 +44,7 @@
             },
             "text3": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bundle_message_2",
                 "allowVariables": true,
@@ -353,6 +356,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bundle_message",
                 "font": "legacy:default_11"
@@ -362,6 +366,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bundle_message_1",
                 "font": "legacy:default_11",
@@ -376,6 +381,7 @@
             },
             "text3": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bundle_message_2",
                 "font": "legacy:default_11",
