@@ -1913,7 +1913,7 @@
   "legacy.menu.how_to_play.trading": "Trading",
   "legacy.menu.how_to_play.trading_title": "HOW TO PLAY : TRADING§f\n",
   "legacy.menu.how_to_play.trading_message": "It is possible to trade items with villagers. Each villager has a profession; they can be Farmers, Butchers, Blacksmiths, Librarians, or Priests, and this affects the type of items they might trade. You can find a list of all the trades a villager is offering in the trading menu. A villager may modify or add to its trades whenever a player trades with it, although a trade might become temporarily disabled if it is used too frequently.\nTrades usually involve buying or selling a number of items for emeralds.\nIf you do not have the items required for a trade, the items are shown in red.",
-  "legacy.menu.how_to_play.whats_new": "What's New",
+  "legacy.menu.how_to_play.whats_new": "What's New"\n,
   "legacy.menu.how_to_play.whats_new_message": "Changes and Additions",
   "legacy.menu.import_custom_skin": "Import Custom Skin",
   "legacy.menu.import_custom_skin_message": "Choose a skin PNG and enter the details for your new skin.",
