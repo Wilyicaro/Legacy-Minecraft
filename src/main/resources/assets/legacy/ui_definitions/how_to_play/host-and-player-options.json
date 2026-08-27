@@ -1,0 +1,1321 @@
+{
+  "elements": [
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 456,
+      "height": 222,
+      "elements": {
+        "title": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_message"
+          },
+          "width": 433
+        },
+		"game-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-options_title"
+          },
+          "width": 433
+        },
+        "game-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-options"
+          },
+          "width": 433
+        },
+		"player-vs-player": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player_title"
+          },
+          "width": 433
+        },
+        "player-vs-player1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player"
+          },
+          "width": 433
+        },
+		"trust-players": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_trust-players_title"
+          },
+          "width": 433
+        },
+        "trust-players1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_trust-players"
+          },
+          "width": 433
+        },
+		"fire-spreads": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads_title"
+          },
+          "width": 433
+        },
+        "fire-spreads1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads"
+          },
+          "width": 433
+        },
+		"tnt-explodes": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes_title"
+          },
+          "width": 433
+        },
+        "tnt-explodes1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes"
+          },
+          "width": 433
+        },
+		"host-privileges": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges_title"
+          },
+          "width": 433
+        },
+        "host-privileges1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges"
+          },
+          "width": 433
+        },
+		"daylight-cycle": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle_title"
+          },
+          "width": 433
+        },
+        "daylight-cycle1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle"
+          },
+          "width": 433
+        },
+		"weather-cycle": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle_title"
+          },
+          "width": 433
+        },
+        "weather-cycle1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle"
+          },
+          "width": 433
+        },
+		"keep-inventory": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory_title"
+          },
+          "width": 433
+        },
+        "keep-inventory1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory"
+          },
+          "width": 433
+        },
+		"mob-spawning": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning_title"
+          },
+          "width": 433
+        },
+        "mob-spawning1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning"
+          },
+          "width": 433
+        },
+		"mob-griefing": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing_title"
+          },
+          "width": 433
+        },
+        "mob-griefing1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing"
+          },
+          "width": 433
+        },
+		"mob-loot": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot_title"
+          },
+          "width": 433
+        },
+        "mob-loot1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot"
+          },
+          "width": 433
+        },
+		"tile-drops": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops_title"
+          },
+          "width": 433
+        },
+        "tile-drops1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops"
+          },
+          "width": 433
+        },
+		"natural-regeneration": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration_title"
+          },
+          "width": 433
+        },
+        "natural-regeneration1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration"
+          },
+          "width": 433
+        },
+		"world-generation-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options_title"
+          },
+          "width": 433
+        },
+        "world-generation-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options"
+          },
+          "width": 433
+        },
+		"generate-structures": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures_title"
+          },
+          "width": 433
+        },
+        "generate-structures1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures"
+          },
+          "width": 433
+        },
+		"superflat-world": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world_title"
+          },
+          "width": 433
+        },
+        "superflat-world1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world"
+          },
+          "width": 433
+        },
+		"bonus-chest": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest_title"
+          },
+          "width": 433
+        },
+        "bonus-chest1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest"
+          },
+          "width": 433
+        },
+		"reset-nether": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether_title"
+          },
+          "width": 433
+        },
+        "reset-nether1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether"
+          },
+          "width": 433
+        },
+		"reset-end": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-end_title"
+          },
+          "width": 433
+        },
+        "reset-end1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-end"
+          },
+          "width": 433
+        },
+		"ingame-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options_title"
+          },
+          "width": 433
+        },
+        "ingame-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.legacy.key.host_options"
+            ]
+          },
+          "width": 433
+        },
+		"host-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-options_title"
+          },
+          "width": 433
+        },
+        "host-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-options"
+          },
+          "width": 433
+        },
+		"player-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-options_title",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.press"
+            ]
+          },
+          "width": 433
+        },
+        "player-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-options",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.press"
+            ]
+          },
+          "width": 433
+        },
+		"can-build-and-mine": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine_title"
+          },
+          "width": 433
+        },
+        "can-build-and-mine1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine"
+          },
+          "width": 433
+        },
+		"can-use-doors-and-switches": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches_title"
+          },
+          "width": 433
+        },
+        "can-use-doors-and-switches1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches"
+          },
+          "width": 433
+        },
+		"can-open-containers": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers_title"
+          },
+          "width": 433
+        },
+        "can-open-containers1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers"
+          },
+          "width": 433
+        },
+		"can-attack-players": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players_title"
+          },
+          "width": 433
+        },
+        "can-attack-players1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players"
+          },
+          "width": 433
+        },
+		"can-attack-animals": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals_title"
+          },
+          "width": 433
+        },
+        "can-attack-animals1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals"
+          },
+          "width": 433
+        },
+		"moderator": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_moderator_title"
+          },
+          "width": 433
+        },
+        "moderator1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_moderator"
+          },
+          "width": 433
+        },
+        "can-teleport": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport"
+          },
+          "width": 433
+        },
+		"game-mode": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-mode_title"
+          },
+          "width": 433
+        },
+        "game-mode1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-mode"
+          },
+          "width": 433
+        },
+		"set-player-spawn-point": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point_title"
+          },
+          "width": 433
+        },
+        "set-player-spawn-point1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point"
+          },
+          "width": 433
+        },
+		"kick-player": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_kick-player_title"
+          },
+          "width": 433
+        },
+        "kick-player1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_kick-player"
+          },
+          "width": 433
+        },
+		"host-player-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options_title"
+          },
+          "width": 433
+        },
+        "host-player-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.press"
+            ]
+          },
+          "width": 433
+        },
+		"can-fly": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-fly_title"
+          },
+          "width": 433
+        },
+        "can-fly1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-fly"
+          },
+          "width": 433
+        },
+		"disable-exhaustion": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion_title"
+          },
+          "width": 433
+        },
+        "disable-exhaustion1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion"
+          },
+          "width": 433
+        },
+		"invisible": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_invisible_title"
+          },
+          "width": 433
+        },
+        "invisible1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_invisible"
+          },
+          "width": 433
+        }
+      }
+    },
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+      "contentX": 10,
+      "contentY": 8,
+      "width": 288,
+      "height": 137,
+      "lineHeight": 8,
+      "elements": {
+        "title": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_message",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"game-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-options_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "game-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-options",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"player-vs-player": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "player-vs-player1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"trust-players": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_trust-players_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "trust-players1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_trust-players",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"fire-spreads": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "fire-spreads1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"tnt-explodes": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "tnt-explodes1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"host-privileges": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "host-privileges1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"daylight-cycle": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "daylight-cycle1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"weather-cycle": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "weather-cycle1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"keep-inventory": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "keep-inventory1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"mob-spawning": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "mob-spawning1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"mob-griefing": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "mob-griefing1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"mob-loot": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "mob-loot1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"tile-drops": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "tile-drops1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"natural-regeneration": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "natural-regeneration1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"world-generation-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "world-generation-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"generate-structures": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "generate-structures1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"superflat-world": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "superflat-world1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"bonus-chest": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "bonus-chest1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"reset-nether": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "reset-nether1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"reset-end": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-end_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "reset-end1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_reset-end",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"ingame-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "ingame-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options",
+                "font": "legacy:default_11",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.legacy.key.host_options"
+            ]
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"host-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-options_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "host-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-options",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"player-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-options_title",
+                "font": "legacy:default_11",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.press"
+            ]
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "player-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_player-options",
+                "font": "legacy:default_11",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.press"
+            ]
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"can-build-and-mine": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-build-and-mine1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"can-use-doors-and-switches": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-use-doors-and-switches1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"can-open-containers": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-open-containers1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"can-attack-players": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-attack-players1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"can-attack-animals": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-attack-animals1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"moderator": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_moderator_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "moderator1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_moderator",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-teleport": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"game-mode": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-mode_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "game-mode1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_game-mode",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"set-player-spawn-point": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "set-player-spawn-point1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"kick-player": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_kick-player_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "kick-player1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_kick-player",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"host-player-options": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_red}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "host-player-options1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options",
+                "font": "legacy:default_11",
+            "allowVariables": true,
+            "args": [
+              "controlIcon.press"
+            ]
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"can-fly": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-fly_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-fly1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-fly",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"disable-exhaustion": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "disable-exhaustion1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+		"invisible": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_invisible_title",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "invisible1": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_invisible",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        }
+      }
+    }
+  ]
+}
