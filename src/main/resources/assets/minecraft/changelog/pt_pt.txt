@@ -1,18 +1,18 @@
-- Adicionados novos sons de filhotes para Lobo, Gato, Porco, Cavalo e Galinha
-- Adicionado o Dente-de-leão Dourado, um novo tipo de flor que pode ser usado para impedir que filhotes de criaturas envelheçam
+- Adicionados novos sons de filhotes para Lobo, Gato, Porco, Cavalo e Galinha.
+- Adicionado o Dente-de-leão Dourado, um novo tipo de flor que pode ser usado para impedir que filhotes de criaturas envelheçam.
 - Adicionadas variantes de sons adultos para os seguintes animais:
- - Gatos possuem uma nova variante de som
- - Porcos possuem duas novas variantes de som
- - Vacas possuem uma nova variante de som
- - Galinhas possuem uma nova variante de som
- - Os sons originais de cada animal são usados na variante chamada "classic"
- - Cada um desses animais receberá aleatoriamente uma variante de som entre as novas e a original
-- Adicionado instrumento de trompete no Bloco de Nota quando colocado sobre um Bloco de Cobre
- - O som muda de acordo com o nível de oxidação do Bloco de Cobre
-- Reformulados os visuais da maioria dos filhotes de criaturas
-- Etiquetas agora podem ser craftadas com 1 Papel e 1 de qualquer Pepita de Metal
-- Removidas Etiquetas dos baús de loot em Cidades Ancestrais e Mansões da Floresta
-- Ardósia agora pode ser transformada diretamente em suas variantes entulhada, polida, de tijolos e de azulejos no Cortador de Pedra
-- Pedra agora pode ser transformada diretamente em variantes entulhadas no Cortador de Pedra
-- O algoritmo que mapeia os níveis de luz de blocos e do céu para o brilho na tela foi completamente reescrito
-- Removido o Herobrine bebê
+ - Gatos possuem uma nova variante de som.
+ - Porcos possuem duas novas variantes de som.
+ - Vacas possuem uma nova variante de som.
+ - Galinhas possuem uma nova variante de som.
+ - Os sons originais de cada animal são usados na variante chamada "classic".
+ - Cada um desses animais receberá aleatoriamente uma variante de som entre as novas e a original.
+- Adicionado instrumento de trompete no Bloco de Nota quando colocado sobre um Bloco de Cobre.
+ - O som muda de acordo com o nível de oxidação do Bloco de Cobre.
+- Reformulados os visuais da maioria dos filhotes de criaturas.
+- Etiquetas agora podem ser craftadas com 1 Papel e 1 de qualquer Pepita de Metal.
+- Removidas Etiquetas dos baús de loot em Cidades Ancestrais e Mansões da Floresta.
+- Ardósia agora pode ser transformada diretamente em suas variantes entulhada, polida, de tijolos e de azulejos no Cortador de Pedra.
+- Pedra agora pode ser transformada diretamente em variantes entulhadas no Cortador de Pedra.
+- O algoritmo que mapeia os níveis de luz de blocos e do céu para o brilho na tela foi completamente reescrito.
+- Removido o Herobrine bebê.

@@ -20,7 +20,7 @@ public final class ConsoleMobCaps {
     private static final String MAX_MOOSHROOMS_SPAWNED = "legacy.message.mobcap.max_mooshrooms_spawned";
     private static final String MAX_WOLVES_SPAWNED = "legacy.message.mobcap.max_wolves_spawned";
     private static final String MAX_CHICKENS_SPAWNED = "legacy.message.mobcap.max_chickens_spawned";
-    private static final String MAX_SQUID_SPAWNED = "legacy.message.mobcap.max_squid_spawned";
+    private static final String MAX_FISH_AND_SQUID = "legacy.message.mobcap.max_fish_and_squid";
     private static final String MAX_DOLPHINS_SPAWNED = "legacy.message.mobcap.max_dolphins_spawned";
     private static final String MAX_BATS_SPAWNED = "legacy.message.mobcap.max_bats_spawned";
     private static final String MAX_ENEMIES_SPAWNED = "legacy.message.mobcap.max_enemies_spawned";
@@ -219,7 +219,7 @@ public final class ConsoleMobCaps {
             case CHICKENS -> MAX_CHICKENS_SPAWNED;
             case WOLVES -> MAX_WOLVES_SPAWNED;
             case MOOSHROOMS -> MAX_MOOSHROOMS_SPAWNED;
-            case WATER_ANIMALS, SQUIDS -> MAX_SQUID_SPAWNED;
+            case WATER_ANIMALS, SQUIDS -> MAX_FISH_AND_SQUID;
             case DOLPHINS -> MAX_DOLPHINS_SPAWNED;
             case AMBIENT -> MAX_BATS_SPAWNED;
             case VILLAGERS -> MAX_VILLAGERS_SPAWNED;
