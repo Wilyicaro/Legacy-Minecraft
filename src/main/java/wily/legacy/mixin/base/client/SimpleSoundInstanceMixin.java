@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +12,6 @@ import wily.legacy.config.LegacyCommonOptions;
 public class SimpleSoundInstanceMixin {
     @ModifyArg(method = "forUI(Lnet/minecraft/sounds/SoundEvent;F)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forUI(Lnet/minecraft/sounds/SoundEvent;FF)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"),index = 2)
     private static float forUI(float f) {
-        return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) ? 1.0f : f;
+        return (Minecraft.getInstance().level == null || FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio)) ? 1.0f : f;
     }
 }
