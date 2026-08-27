@@ -27,6 +27,7 @@
         },
         "game-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_game-options"
           },
@@ -42,6 +43,7 @@
         },
         "player-vs-player1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player"
           },
@@ -57,6 +59,7 @@
         },
         "trust-players1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_trust-players"
           },
@@ -72,6 +75,7 @@
         },
         "fire-spreads1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads"
           },
@@ -87,6 +91,7 @@
         },
         "tnt-explodes1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes"
           },
@@ -102,6 +107,7 @@
         },
         "host-privileges1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges"
           },
@@ -117,6 +123,7 @@
         },
         "daylight-cycle1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle"
           },
@@ -132,6 +139,7 @@
         },
         "weather-cycle1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle"
           },
@@ -147,6 +155,7 @@
         },
         "keep-inventory1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory"
           },
@@ -162,6 +171,7 @@
         },
         "mob-spawning1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning"
           },
@@ -177,6 +187,7 @@
         },
         "mob-griefing1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing"
           },
@@ -192,6 +203,7 @@
         },
         "mob-loot1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot"
           },
@@ -207,6 +219,7 @@
         },
         "tile-drops1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops"
           },
@@ -222,6 +235,7 @@
         },
         "natural-regeneration1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration"
           },
@@ -237,6 +251,7 @@
         },
         "world-generation-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options"
           },
@@ -252,6 +267,7 @@
         },
         "generate-structures1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures"
           },
@@ -267,6 +283,7 @@
         },
         "superflat-world1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world"
           },
@@ -282,6 +299,7 @@
         },
         "bonus-chest1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest"
           },
@@ -297,6 +315,7 @@
         },
         "reset-nether1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether"
           },
@@ -312,6 +331,7 @@
         },
         "reset-end1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_reset-end"
           },
@@ -327,6 +347,7 @@
         },
         "ingame-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options",
             "allowVariables": true,
@@ -346,6 +367,7 @@
         },
         "host-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_host-options"
           },
@@ -365,6 +387,7 @@
         },
         "player-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_player-options",
             "allowVariables": true,
@@ -384,6 +407,7 @@
         },
         "can-build-and-mine1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine"
           },
@@ -399,6 +423,7 @@
         },
         "can-use-doors-and-switches1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches"
           },
@@ -414,6 +439,7 @@
         },
         "can-open-containers1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers"
           },
@@ -429,6 +455,7 @@
         },
         "can-attack-players1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players"
           },
@@ -444,6 +471,7 @@
         },
         "can-attack-animals1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals"
           },
@@ -459,13 +487,23 @@
         },
         "moderator1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_moderator"
           },
           "width": 433
         },
-        "can-teleport": {
+		"can-teleport": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport_title"
+          },
+          "width": 433
+        },
+        "can-teleport1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport"
           },
@@ -481,6 +519,7 @@
         },
         "game-mode1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_game-mode"
           },
@@ -496,6 +535,7 @@
         },
         "set-player-spawn-point1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point"
           },
@@ -511,6 +551,7 @@
         },
         "kick-player1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_kick-player"
           },
@@ -526,6 +567,7 @@
         },
         "host-player-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options",
             "allowVariables": true,
@@ -545,6 +587,7 @@
         },
         "can-fly1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-fly"
           },
@@ -560,6 +603,7 @@
         },
         "disable-exhaustion1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion"
           },
@@ -575,6 +619,7 @@
         },
         "invisible1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_invisible"
           },
@@ -618,6 +663,7 @@
         },
         "game-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_game-options",
                 "font": "legacy:default_11"
@@ -637,6 +683,7 @@
         },
         "player-vs-player1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player",
                 "font": "legacy:default_11"
@@ -656,6 +703,7 @@
         },
         "trust-players1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_trust-players",
                 "font": "legacy:default_11"
@@ -675,6 +723,7 @@
         },
         "fire-spreads1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads",
                 "font": "legacy:default_11"
@@ -694,6 +743,7 @@
         },
         "tnt-explodes1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes",
                 "font": "legacy:default_11"
@@ -713,6 +763,7 @@
         },
         "host-privileges1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges",
                 "font": "legacy:default_11"
@@ -732,6 +783,7 @@
         },
         "daylight-cycle1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle",
                 "font": "legacy:default_11"
@@ -751,6 +803,7 @@
         },
         "weather-cycle1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle",
                 "font": "legacy:default_11"
@@ -770,6 +823,7 @@
         },
         "keep-inventory1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory",
                 "font": "legacy:default_11"
@@ -789,6 +843,7 @@
         },
         "mob-spawning1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning",
                 "font": "legacy:default_11"
@@ -808,6 +863,7 @@
         },
         "mob-griefing1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing",
                 "font": "legacy:default_11"
@@ -827,6 +883,7 @@
         },
         "mob-loot1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot",
                 "font": "legacy:default_11"
@@ -846,6 +903,7 @@
         },
         "tile-drops1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops",
                 "font": "legacy:default_11"
@@ -865,6 +923,7 @@
         },
         "natural-regeneration1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration",
                 "font": "legacy:default_11"
@@ -884,6 +943,7 @@
         },
         "world-generation-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options",
                 "font": "legacy:default_11"
@@ -903,6 +963,7 @@
         },
         "generate-structures1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures",
                 "font": "legacy:default_11"
@@ -922,6 +983,7 @@
         },
         "superflat-world1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world",
                 "font": "legacy:default_11"
@@ -941,6 +1003,7 @@
         },
         "bonus-chest1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest",
                 "font": "legacy:default_11"
@@ -960,6 +1023,7 @@
         },
         "reset-nether1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether",
                 "font": "legacy:default_11"
@@ -979,6 +1043,7 @@
         },
         "reset-end1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_reset-end",
                 "font": "legacy:default_11"
@@ -998,6 +1063,7 @@
         },
         "ingame-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options",
                 "font": "legacy:default_11",
@@ -1021,6 +1087,7 @@
         },
         "host-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_host-options",
                 "font": "legacy:default_11"
@@ -1044,6 +1111,7 @@
         },
         "player-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_player-options",
                 "font": "legacy:default_11",
@@ -1067,6 +1135,7 @@
         },
         "can-build-and-mine1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine",
                 "font": "legacy:default_11"
@@ -1086,6 +1155,7 @@
         },
         "can-use-doors-and-switches1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches",
                 "font": "legacy:default_11"
@@ -1105,6 +1175,7 @@
         },
         "can-open-containers1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers",
                 "font": "legacy:default_11"
@@ -1124,6 +1195,7 @@
         },
         "can-attack-players1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players",
                 "font": "legacy:default_11"
@@ -1143,6 +1215,7 @@
         },
         "can-attack-animals1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals",
                 "font": "legacy:default_11"
@@ -1162,6 +1235,7 @@
         },
         "moderator1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_moderator",
                 "font": "legacy:default_11"
@@ -1169,8 +1243,19 @@
           "width": 433,
               "lineSpacing": 8
         },
-        "can-teleport": {
+		"can-teleport": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport",
+                "font": "legacy:default_11"
+          },
+          "width": 433,
+              "lineSpacing": 8
+        },
+        "can-teleport1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport",
                 "font": "legacy:default_11"
@@ -1190,6 +1275,7 @@
         },
         "game-mode1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_game-mode",
                 "font": "legacy:default_11"
@@ -1209,6 +1295,7 @@
         },
         "set-player-spawn-point1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point",
                 "font": "legacy:default_11"
@@ -1228,6 +1315,7 @@
         },
         "kick-player1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_kick-player",
                 "font": "legacy:default_11"
@@ -1247,6 +1335,7 @@
         },
         "host-player-options1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options",
                 "font": "legacy:default_11",
@@ -1270,6 +1359,7 @@
         },
         "can-fly1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_can-fly",
                 "font": "legacy:default_11"
@@ -1289,6 +1379,7 @@
         },
         "disable-exhaustion1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion",
                 "font": "legacy:default_11"
@@ -1308,6 +1399,7 @@
         },
         "invisible1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.host-and-player-options_invisible",
                 "font": "legacy:default_11"
