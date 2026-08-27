@@ -22,7 +22,7 @@
               "width": 176
             },
             "text1": {
-              "type": "draw_multiline_string",,
+              "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bees_message"
@@ -30,7 +30,7 @@
               "width": 176
             },
             "text2": {
-              "type": "draw_multiline_string",,
+              "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bees_message_1"
@@ -94,7 +94,7 @@
               "lineSpacing": 8
             },
             "text1": {
-              "type": "draw_multiline_string",,
+              "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bees_message",
@@ -104,7 +104,7 @@
               "lineSpacing": 8
             },
             "text2": {
-              "type": "draw_multiline_string",,
+              "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.bees_message_1",
