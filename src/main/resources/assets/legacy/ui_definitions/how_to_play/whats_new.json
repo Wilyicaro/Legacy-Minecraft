@@ -21,6 +21,7 @@
         {
           "name": "changelog",
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "baseDir": "minecraft:changelog"
           },
@@ -56,6 +57,7 @@
         {
           "name": "changelog",
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "text": "",
             "baseDir": "minecraft:changelog",
