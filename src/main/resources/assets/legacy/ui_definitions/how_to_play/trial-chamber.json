@@ -31,6 +31,7 @@
             },
             "chambers1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_chambers"
               },
@@ -46,6 +47,7 @@
             },
 			"spawners1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_spawners"
               },
@@ -61,6 +63,7 @@
             },
 			"breezes1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_breezes"
               },
@@ -76,6 +79,7 @@
             },
 			"vaults1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_vaults"
               },
@@ -91,6 +95,7 @@
             },
 			"ominous-trials1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_ominous-trials"
               },
@@ -166,6 +171,7 @@
             },
             "chambers1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_chambers",
                 "font": "legacy:default_11"
@@ -185,6 +191,7 @@
             },
 			"spawners1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_spawners",
                 "font": "legacy:default_11"
@@ -204,6 +211,7 @@
             },
 			"breezes1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_breezes",
                 "font": "legacy:default_11"
@@ -223,6 +231,7 @@
             },
 			"vaults1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_vaults",
                 "font": "legacy:default_11"
@@ -242,6 +251,7 @@
             },
 			"ominous-trials1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.trial-chamber_ominous-trials",
                 "font": "legacy:default_11"
