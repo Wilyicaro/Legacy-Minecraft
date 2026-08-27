@@ -39,7 +39,6 @@
 			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message_1"
-			    "color": "${commonColor.tip_text}",
               },
               "width": 176
             }

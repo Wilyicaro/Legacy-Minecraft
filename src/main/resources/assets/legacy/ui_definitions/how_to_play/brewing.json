@@ -37,11 +37,235 @@
               },
               "width": 176
             },
-            "text3": {
+            "bullet": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_ingredients"
+              },
+              "width": 176
+            },
+			"bullet": {
               "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.brewing_ingredients"
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"nether-wart": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_nether-wart"
+              },
+              "width": 176
+            },
+			"bullet1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"spider-eye": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_spider-eye"
+              },
+              "width": 176
+            },
+			"bullet2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"sugar": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_sugar"
+              },
+              "width": 176
+            },
+			"bullet3": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"ghast-tear": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_ghast-tear"
+              },
+              "width": 176
+            },
+			"bullet4": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"blaze-powder": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_blaze-powder"
+              },
+              "width": 176
+            },
+			"bullet5": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"magma-cream": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_magma-cream"
+              },
+              "width": 176
+            },
+			"bullet6": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"glistering-melon": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_glistering-melon"
+              },
+              "width": 176
+            },
+			"bullet7": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"redstone-dust": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_redstone-dust"
+              },
+              "width": 176
+            },
+			"bullet8": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"glowstone-dust": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_glowstone-dust"
+              },
+              "width": 176
+            },
+			"bullet9": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"fermented-spider-eye": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_fermented-spider-eye"
+              },
+              "width": 176
+            },
+			"bullet10": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"pufferfish": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_pufferfish"
+              },
+              "width": 176
+            },
+			"bullet11": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"golden-carrot": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_golden-carrot"
+              },
+              "width": 176
+            },
+			"bullet12": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"rabbits-foot": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_rabbits-foot"
+              },
+              "width": 176
+            },
+			"bullet13": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint"
+              },
+              "width": 176
+            },
+			"dragons-breath": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_dragons-breath"
               },
               "width": 176
             },
@@ -400,17 +624,296 @@
               "width": 120,
               "lineSpacing": 8
             },
-            "ingredients": {
+            "bullet": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_ingredients"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet": {
               "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.brewing_ingredients",
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
                 "font": "legacy:default_11"
               },
-              "width": 120,
+              "width": 176,
               "lineSpacing": 8
             },
-            "text3": {
+			"nether-wart": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_nether-wart",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"spider-eye": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_spider-eye",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"sugar": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_sugar",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet3": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"ghast-tear": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_ghast-tear",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet4": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"blaze-powder": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_blaze-powder",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet5": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"magma-cream": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_magma-cream",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet6": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"glistering-melon": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_glistering-melon",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet7": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"redstone-dust": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_redstone-dust",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet8": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"glowstone-dust": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_glowstone-dust",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet9": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"fermented-spider-eye": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_fermented-spider-eye",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet10": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"pufferfish": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_pufferfish",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet11": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"golden-carrot": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_golden-carrot",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet12": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"rabbits-foot": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_rabbits-foot",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"bullet13": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_bulletpoint",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"dragons-breath": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.brewing_dragons-breath",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+            "text4": {
               "type": "draw_multiline_string",
 			  "color": "${commonColor.tip_text}",
               "component": {
@@ -419,7 +922,7 @@
               },
               "width": 120,
               "lineSpacing": 8
-            }
+            }}
         },
         "panel": {
           "type": "blit_sprite",
