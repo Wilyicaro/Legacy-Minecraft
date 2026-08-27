@@ -31,6 +31,7 @@
             },
 			"brushing1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.archaeology_brushing"
               },
@@ -46,6 +47,7 @@
             },
 			"decorated-pots1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.archaeology_decorated-pots"
               },
@@ -61,6 +63,7 @@
             },
 			"sniffer-eggs1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.archaeology_sniffer-eggs"
               },
@@ -134,6 +137,7 @@
             },
 			"brushing1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.archaeology_brushing",
                 "font": "legacy:default_11"
@@ -153,6 +157,7 @@
             },
 			"decorated-pots1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.archaeology_decorated-pots",
                 "font": "legacy:default_11"
@@ -172,6 +177,7 @@
             },
 			"sniffer-eggs1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.archaeology_sniffer-eggs",
                 "font": "legacy:default_11"
