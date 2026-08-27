@@ -5,9 +5,9 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.mixin.LegacyMixinPlugin",
   "client": [
+    "client.ItemStackClientMixin",
     //? if >=1.20.5 {
     "client.GustParticleMixin",
-    "client.ItemStackClientMixin",
     "client.PanoramaRendererMixin",
     //?}
     //? if <1.21.2 {
