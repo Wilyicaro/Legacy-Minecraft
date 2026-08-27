@@ -21,6 +21,7 @@
           "type": "draw_multiline_string",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message",
+			  "color": "${commonColor.tip_text}",
             "allowVariables": true,
             "args": [
               "controlIcon.option",
@@ -33,6 +34,7 @@
           "type": "draw_multiline_string",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message_1",
+			  "color": "${commonColor.tip_text}",
             "allowVariables": true,
             "args": [
               "controlIcon.left_tab",
@@ -73,6 +75,7 @@
           "type": "draw_multiline_string",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message",
+			  "color": "${commonColor.tip_text}",
             "font": "legacy:default_11",
             "allowVariables": true,
             "args": [
@@ -87,6 +90,7 @@
           "type": "draw_multiline_string",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message_1",
+			  "color": "${commonColor.tip_text}",
             "font": "legacy:default_11",
             "allowVariables": true,
             "args": [
