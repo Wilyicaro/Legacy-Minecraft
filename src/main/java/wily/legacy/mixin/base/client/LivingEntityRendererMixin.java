@@ -2,7 +2,6 @@ package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -13,7 +12,6 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ARGB;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -98,12 +96,7 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
 
     @Redirect(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
     private <S> void legacy$renderHurtFlash(SubmitNodeCollector collector, Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlay, int color, TextureAtlasSprite sprite, int outlineColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
-        if (!(state instanceof LivingEntityRenderState renderState) || !renderState.hasRedOverlay || renderType.isOutline() || renderType.format() != DefaultVertexFormat.ENTITY || ARGB.alpha(color) != 255) {
-            collector.submitModel(model, state, poseStack, renderType, light, overlay, color, sprite, outlineColor, crumblingOverlay);
-            return;
-        }
-        collector.submitModel(model, state, poseStack, renderType, light, OverlayTexture.NO_OVERLAY, color, sprite, outlineColor, crumblingOverlay);
-        collector.submitModel(model, state, poseStack, LegacyHurtFlash.renderType(), light, OverlayTexture.NO_OVERLAY, ARGB.multiply(color, 0x4DFF0000), null, 0, null);
+        LegacyHurtFlash.submitModel(collector, model, state, poseStack, renderType, light, overlay, color, sprite, outlineColor, crumblingOverlay, false);
     }
 
     @ModifyReturnValue(method = "getModelTint", at = @At(value = "RETURN"))
