@@ -25,6 +25,7 @@
               "type": "draw_multiline_string",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message",
+			    "color": "${commonColor.tip_text}",
                 "allowVariables": true,
                 "args": [
                   "controlIcon.key.use"
@@ -36,6 +37,7 @@
               "type": "draw_multiline_string",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message_1"
+			    "color": "${commonColor.tip_text}",
               },
               "width": 176
             }
@@ -278,6 +280,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message",
                 "font": "legacy:default_11",
@@ -291,6 +294,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message_1",
                 "font": "legacy:default_11"
