@@ -419,7 +419,7 @@
               },
               "width": 120,
               "lineSpacing": 8
-            }}
+            }
         },
         "panel": {
           "type": "blit_sprite",
