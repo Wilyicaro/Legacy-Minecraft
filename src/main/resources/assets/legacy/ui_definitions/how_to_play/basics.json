@@ -19,9 +19,9 @@
         },
         "text1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.basics_message",
-			  "color": "${commonColor.tip_text}",
             "allowVariables": true,
             "args": [
               "controlIcon.camera_movement",
@@ -33,9 +33,9 @@
         },
         "text2": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.basics_message_1",
-			  "color": "${commonColor.tip_text}",
             "allowVariables": true,
             "args": [
               "controlIcon.key.forward",
@@ -75,9 +75,9 @@
         },
         "text1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.basics_message",
-			  "color": "${commonColor.tip_text}",
             "font": "legacy:default_11",
             "allowVariables": true,
             "args": [
@@ -91,9 +91,9 @@
         },
         "text2": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.basics_message_1",
-			  "color": "${commonColor.tip_text}",
             "font": "legacy:default_11",
             "allowVariables": true,
             "args": [
