@@ -23,6 +23,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message"
               },
@@ -30,6 +31,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_1"
               },
@@ -37,6 +39,7 @@
             },
             "text3": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_calibrations"
               },
@@ -44,6 +47,7 @@
             },
             "text4": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_2"
               },
@@ -109,6 +113,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message",
                 "font": "legacy:default_11"
@@ -118,6 +123,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_1",
                 "font": "legacy:default_11"
@@ -127,6 +133,7 @@
             },
             "calibrations": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_calibrations",
                 "font": "legacy:default_11"
@@ -136,6 +143,7 @@
             },
             "text3": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_2",
                 "font": "legacy:default_11"
