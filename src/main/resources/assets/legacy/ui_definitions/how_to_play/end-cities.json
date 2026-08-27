@@ -19,7 +19,7 @@
         },
         "text1": {
           "type": "draw_multiline_string",
-			  "color": "${commonColor.tip_text}",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.end-cities_message"
           },
@@ -53,7 +53,7 @@
         },
         "text1": {
           "type": "draw_multiline_string",
-			  "color": "${commonColor.tip_text}",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.end-cities_message",
             "font": "legacy:default_11"
