@@ -23,6 +23,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message",
 			    "color": "${commonColor.tip_text}",
@@ -35,6 +36,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.autocrafter_message_1"
 			    "color": "${commonColor.tip_text}",
