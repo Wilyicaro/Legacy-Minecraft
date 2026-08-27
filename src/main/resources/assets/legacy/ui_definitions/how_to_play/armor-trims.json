@@ -23,6 +23,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.armor-trims_message"
               },
@@ -30,6 +31,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.armor-trims_message_1"
               },
@@ -279,6 +281,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.armor-trims_message",
                 "font": "legacy:default_11"
@@ -288,6 +291,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.armor-trims_message_1",
                 "font": "legacy:default_11"
