@@ -23,6 +23,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.inventory_message",
                 "allowVariables": true,
@@ -37,6 +38,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.inventory_message_1",
                 "allowVariables": true,
@@ -282,6 +284,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.inventory_message",
                 "font": "legacy:default_11",
@@ -298,6 +301,7 @@
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.inventory_message_1",
                 "font": "legacy:default_11",
