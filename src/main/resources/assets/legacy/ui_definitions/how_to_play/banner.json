@@ -19,9 +19,9 @@
         },
         "text1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message",
-			  "color": "${commonColor.tip_text}",
             "allowVariables": true,
             "args": [
               "controlIcon.option",
@@ -32,9 +32,9 @@
         },
         "text2": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message_1",
-			  "color": "${commonColor.tip_text}",
             "allowVariables": true,
             "args": [
               "controlIcon.left_tab",
@@ -73,9 +73,9 @@
         },
         "text1": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message",
-			  "color": "${commonColor.tip_text}",
             "font": "legacy:default_11",
             "allowVariables": true,
             "args": [
@@ -88,9 +88,9 @@
         },
         "text2": {
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.banner_message_1",
-			  "color": "${commonColor.tip_text}",
             "font": "legacy:default_11",
             "allowVariables": true,
             "args": [
