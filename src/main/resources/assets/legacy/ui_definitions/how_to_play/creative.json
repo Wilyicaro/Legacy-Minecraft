@@ -49,31 +49,21 @@
             }
           }
         },
-        "low_tabs": {
-          "type": "blit_sprite",
-          "sprite": "legacy:tiles/low_tab",
-          "width": 33,
-          "height": 32,
-          "x": "${panel.x}+32+32*${low_tabs.index}",
-          "y": "${panel.y}-26",
-          "amount": 7,
-          "translateY": 1.5
-        },
         "panel": {
           "type": "blit_sprite",
-          "sprite": "legacy:tiles/creative_panel",
+          "sprite": "legacy:creative/creative_panel_8",
           "width": 257,
-          "height": 170,
+          "height": 195,
           "x": "${width}/2",
-          "y": "${scrollable_renderer.y}+40"
+          "y": "${scrollable_renderer.y}+15"
         },
         "high_tab": {
           "type": "blit_sprite",
-          "sprite": "legacy:tiles/high_tab_left",
-          "width": 33,
+          "sprite": "legacy:creative/tab_creative8_l",
+          "width": 34,
           "height": 32,
           "x": "${panel.x}",
-          "y": "${panel.y}-26"
+          "y": "${panel.y}-2"
         },
         "tab_icons": {
           "type": "children",
@@ -159,7 +149,7 @@
           "width": 9,
           "height": 105,
           "x": "${panel.x}+${panel.width}-22",
-          "y": "${panel.y}+22"
+          "y": "${panel.y}+47"
         },
         "scroller": {
           "type": "blit_sprite",
@@ -185,7 +175,7 @@
           "color": "${commonColor.inventory_gray_text}",
           "shadow": false,
           "x": "${panel.x}+(${panel.width}-${tab_label.component.width})/2",
-          "y": "${panel.y}+9"
+          "y": "${panel.y}+34"
         },
         "creative_menu": {
           "type": "put_legacy_slot",
@@ -244,7 +234,7 @@
             "bricks"
           ],
           "x": "${panel.x}+17+(${creative_menu.index}%10)*21",
-          "y": "${panel.y}+23+(${creative_menu.index}/10)*21"
+          "y": "${panel.y}+48+(${creative_menu.index}/10)*21"
         },
         "quick_select": {
           "type": "put_legacy_slot",
@@ -281,7 +271,7 @@
             "compass"
           ],
           "x": "${panel.x}+27+(${quick_select.index}%9)*21",
-          "y": "${panel.y}+139"
+          "y": "${panel.y}+164"
         }
       }
     },
@@ -345,30 +335,21 @@
             }
           }
         },
-        "low_tabs": {
-          "type": "blit_sprite",
-          "sprite": "legacy:tiles/big_low_tab",
-          "width": 20,
-          "height": 20,
-          "x": "${panel.x}+19+19*${low_tabs.index}",
-          "y": "${panel.y}-13",
-          "amount": 7
-        },
         "panel": {
           "type": "blit_sprite",
-          "sprite": "legacy:tiles/panel",
+          "sprite": "legacy:creative/creative_panel_8_small",
           "width": 153,
-          "height": 88,
+          "height": 109,
           "x": "${width}/2",
-          "y": "${scrollable_renderer.y}+40"
+          "y": "${scrollable_renderer.y}+20"
         },
         "high_tab": {
           "type": "blit_sprite",
-          "sprite": "legacy:tiles/big_high_tab_left",
+          "sprite": "legacy:creative/tab_creative8_small_l",
           "width": 20,
-          "height": 20,
+          "height": 21,
           "x": "${panel.x}",
-          "y": "${panel.y}-14"
+          "y": "${panel.y}-1"
         },
         "tab_icons": {
           "type": "children",
@@ -380,7 +361,7 @@
               "width": 12,
               "height": 12,
               "x": "${high_tab.x}+4",
-              "y": "${high_tab.y}+3"
+              "y": "${high_tab.y}+5"
             },
             "decorations": {
               "type": "blit_sprite",
@@ -446,7 +427,7 @@
           "width": 9,
           "height": 57,
           "x": "${panel.x}+${panel.width}-18",
-          "y": "${panel.y}+10"
+          "y": "${panel.y}+29"
         },
         "scroller": {
           "type": "blit_sprite",
@@ -472,10 +453,10 @@
           },
           "color": "${commonColor.inventory_gray_text}",
           "shadow": false,
-          "translateX": "${panel.x}+(${panel.width}-${tab_label.component.width}/2)/2",
-          "translateY": "${panel.y}+4",
-          "scaleX": 0.5,
-          "scaleY": 0.5
+          "translateX": "(${panel.x}+(${panel.width}-${tab_label.component.width}/2)/2)-6",
+          "translateY": "${panel.y}+21",
+          "scaleX": 0.75,
+          "scaleY": 0.75
         },
         "creative_menu": {
           "type": "put_legacy_slot",
@@ -535,7 +516,7 @@
             "bricks"
           ],
           "x": "${panel.x}+8+(${creative_menu.index}%10)*12",
-          "y": "${panel.y}+10+(${creative_menu.index}/10)*12"
+          "y": "${panel.y}+29+(${creative_menu.index}/10)*12"
         },
         "quick_select": {
           "type": "put_legacy_slot",
@@ -573,7 +554,7 @@
             "compass"
           ],
           "x": "${panel.x}+14+(${quick_select.index}%9)*12",
-          "y": "${panel.y}+72"
+          "y": "${panel.y}+91"
         }
       }
     }
