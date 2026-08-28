@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
@@ -741,12 +742,18 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int sourceSize = isFHD() ? FHD_SKIN_TICK_SOURCE_SIZE : SKIN_TICK_SOURCE_SIZE;
         int fittedFramebufferSize = Math.max(1, Math.round(holderFramebufferSize
                 * (fullFramebufferSize / (float) actionHolderSize)));
-        int framebufferSize = snapTickFramebufferSize(fittedFramebufferSize, sourceSize, fullFramebufferSize);
+        int framebufferSize = isFHD()
+                ? sourceSize * Math.max(1, Math.round(fittedFramebufferSize / (float) sourceSize))
+                : snapTickFramebufferSize(fittedFramebufferSize, sourceSize, fullFramebufferSize);
+        float centerX = Math.round(holder.centerX() * guiScale) / guiScale;
+        float centerY = Math.round(holder.centerY() * guiScale) / guiScale;
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(holder.centerX(), holder.centerY(), 0);
+        guiGraphics.pose().translate(centerX, centerY, 0);
         guiGraphics.pose().scale(1.0f / guiScale, 1.0f / guiScale, 1.0f);
-        blitSprite(guiGraphics, LegacySprites.SKIN_TICK,
+        FactoryScreenUtil.enableBlend();
+        blitSprite(guiGraphics, isFHD() ? LegacySprites.BEACON_CONFIRM : LegacySprites.SKIN_TICK,
                 -framebufferSize / 2, -framebufferSize / 2, framebufferSize, framebufferSize);
+        FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popPose();
     }
 
