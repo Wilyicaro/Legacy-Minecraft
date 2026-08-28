@@ -192,7 +192,7 @@ public class ControllerManager {
     public void setRawPointerPos(double x, double y, boolean onlyVirtual) {
         Window window = minecraft.getWindow();
         if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
-            ScreenRectangle rect = a.getMenuRectangle();
+            ScreenRectangle rect = a.getMenuRectangleLimit();
             double scaleX = getGuiScaleX();
             double scaleY = getGuiScaleY();
             minecraft.mouseHandler.xpos = Mth.clamp(x, rect.left() * scaleX,rect.right() * scaleX);

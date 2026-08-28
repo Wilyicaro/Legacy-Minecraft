@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -14,6 +15,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.NavigationElement;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -25,7 +27,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class TabList implements Renderable,GuiEventListener, NarratableEntry {
+public class TabList implements Renderable,GuiEventListener, NarratableEntry, NavigationElement {
     protected final UIAccessor accessor;
     public final List<LegacyTabButton> tabButtons;
     public LegacyTabButton selected = null;
@@ -45,6 +47,10 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         tabButtons.add(button);
         if (selected == null) selected = button;
         return button;
+    }
+
+    @Override
+    public void applyFocus(ComponentPath.Path path, boolean apply) {
     }
 
     public LegacyTabButton addTabButton(int x, int y, int width, int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {

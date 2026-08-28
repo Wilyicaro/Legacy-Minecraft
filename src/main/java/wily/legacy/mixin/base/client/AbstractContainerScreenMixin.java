@@ -270,7 +270,12 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Override
     public ScreenRectangle getMenuRectangle() {
-        return new ScreenRectangle(leftPos,topPos,imageWidth,imageHeight);
+        return new ScreenRectangle(leftPos, topPos, imageWidth, imageHeight);
+    }
+
+    @Override
+    public ScreenRectangle getMenuRectangleLimit() {
+        return LegacyMenuAccess.createMenuRectangleLimit(this, leftPos, topPos, imageWidth, imageHeight);
     }
 
     @Redirect(method = "renderTooltip",at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))

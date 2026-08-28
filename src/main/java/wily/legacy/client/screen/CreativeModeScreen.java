@@ -162,15 +162,18 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     public boolean canClearQuickSelect(){
         return ControlType.getActiveType().isKbm() || hoveredSlot == null || hoveredSlot.container == minecraft.player.getInventory() && hoveredSlot.getItem().getCount() <= 1;
     }
+
     public static AbstractContainerScreen<?> getActualCreativeScreenInstance(Minecraft minecraft){
         return LegacyOptions.legacyCreativeTab.get() ? new CreativeModeScreen(minecraft.player) : new CreativeModeInventoryScreen(minecraft.player, minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get());
     }
+
     public void removed() {
         super.removed();
         if (this.minecraft.player != null) {
             this.minecraft.player.inventoryMenu.removeSlotListener(this.listener);
         }
     }
+
     public static boolean canDisplayVanillaCreativeTab(CreativeModeTab c){
         ResourceLocation location = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(c);
         return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (LegacyOptions.vanillaTabs.get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.location()));
