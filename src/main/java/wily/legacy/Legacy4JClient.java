@@ -529,6 +529,7 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            controllerManager.afterConfigLoad();
             LegacyRenderDistance.initDefault();
             FactoryAPIClient.registerRenderType(ChunkSectionLayer.TRANSLUCENT, Blocks.WATER);
             //? if fabric
