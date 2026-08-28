@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ResetProfession.class)
 public class ResetProfessionMixin {
-    //? if fabric {
+    //? if fabric || <=1.20.1 {
     @ModifyExpressionValue(method = "method_47038", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;getVillagerXp()I"))
     //?} else {
     /*@ModifyExpressionValue(method = "lambda$create$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;getVillagerXp()I"))
