@@ -17,7 +17,7 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackClientMixin {
-    @ModifyExpressionValue(method = "getDisplayName", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getRarity()Lnet/minecraft/world/item/Rarity;"))
+    @ModifyExpressionValue(method = /*? if >=1.21 {*/"getDisplayName"/*?} else {*//*"getStyledHoverName"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getRarity()Lnet/minecraft/world/item/Rarity;"))
     private Rarity getLegacyItemRarity(Rarity original) {
         ItemStack stack = (ItemStack) (Object) this;
         if (!LegacyOptions.legacyItemRarity.get() || !BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("minecraft")) return original;
