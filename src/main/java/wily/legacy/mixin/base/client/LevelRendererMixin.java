@@ -168,7 +168,7 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
         return (float) randomSource.nextDouble();
     }
 
-    //? if >=1.20.2 {
+    //? if >=1.21.2 {
     @ModifyVariable(method = "renderSnowAndRain", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/LevelRenderer;RAIN_LOCATION:Lnet/minecraft/resources/ResourceLocation;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/LevelRenderer;SNOW_LOCATION:Lnet/minecraft/resources/ResourceLocation;")), at = @At("STORE"), index = 37)
     private float legacy$rainAnimation(float animation, @Local(ordinal = 5) int z, @Local(ordinal = 6) int x, @Local(ordinal = 3) float speed, @Local(argsOnly = true, ordinal = 0) float partialTick) {
         int phase = ticks + x * x * 3121 + x * 45238971 + z * z * 418711 + z * 13761;
