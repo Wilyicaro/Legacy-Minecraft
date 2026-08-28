@@ -102,6 +102,9 @@ public class ControllerManager {
     public void setup(Minecraft minecraft){
         this.minecraft = minecraft;
         this.orderedKeyMappings = minecraft.options.keyMappings.clone();
+    }
+
+    public void afterConfigLoad() {
         updateCursorInputMode();
         restartPoller();
     }

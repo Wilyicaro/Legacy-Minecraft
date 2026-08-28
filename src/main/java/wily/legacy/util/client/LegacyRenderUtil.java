@@ -472,7 +472,7 @@ public class LegacyRenderUtil {
     public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
         float n = (float)(i + k) / 2.0f;
         float o = (float)(j + l) / 2.0f;
-        FactoryGuiGraphics.of(guiGraphics).enableScissor(i, j, k, l);
+        FactoryGuiGraphics.of(guiGraphics).enableScissor(i, j, k, l/*? if forge && 1.20.1 {*//*, false*//*?}*/);
         float p = (float)Math.atan((n - g) / 40.0f);
         float q = (float)Math.atan((o - h) / 40.0f);
         Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);
