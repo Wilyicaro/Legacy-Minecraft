@@ -1296,6 +1296,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             int minLeftClearance, int rightCardPadding
     ) {
         static final ChangeSkinLayoutMetrics DEFAULT = new ChangeSkinLayoutMetrics(45, 23, 80, 50, 40, 2, 24, 0.935f, 0.44f, 8, 20, 6, 80, 88, 6);
+        static final ChangeSkinLayoutMetrics FHD = new ChangeSkinLayoutMetrics(45, 23, 80, 50, 40, 2, 24, 0.935f, 0.44f, 11, 20, 6, 80, 88, 6);
         static final ChangeSkinLayoutMetrics SD_480 = new ChangeSkinLayoutMetrics(34, 18, 64, 40, 30, 2, 18, 0.76f, 0.36f, 6, 12, 5, 58, 62, 4);
     }
 
