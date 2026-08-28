@@ -12,7 +12,7 @@
     //? if >=26.1 {
     "downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial26_music_disc_hunt.mcsave?checksum=800cd8d7a6b3a626f9d1d14e465d1b71",
     //?} else {
-    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial_music_disc_hunt.mcsave?checksum=e3a82fbc937b2f86011c9a01a5d99445",
+    /*"downloadURI": "https://github.com/Wilyicaro/Legacy-Minecraft/raw/refs/heads/main/world_templates/tutorial_music_disc_hunt.mcsave?checksum=8317eb1ecacc7577fa50dc8cbdcb2b2e",
     *///?}
     "directJoin": true,
     "preDownload": true
