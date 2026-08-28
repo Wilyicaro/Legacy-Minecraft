@@ -686,11 +686,16 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int sourceSize = accessor.getInteger("footer.tick.sourceSize", 21);
         int fittedFramebufferSize = Math.max(1, Math.round(holderFramebufferSize
                 * (fullFramebufferSize / (float) actionHolderSize)));
-        int framebufferSize = snapTickFramebufferSize(fittedFramebufferSize, sourceSize, fullFramebufferSize);
+        boolean fhdTick = sourceSize == 28;
+        int framebufferSize = fhdTick
+                ? sourceSize * Math.max(1, Math.round(fittedFramebufferSize / (float) sourceSize))
+                : snapTickFramebufferSize(fittedFramebufferSize, sourceSize, fullFramebufferSize);
+        float centerX = Math.round(holder.centerX() * guiScale) / (float) guiScale;
+        float centerY = Math.round(holder.centerY() * guiScale) / (float) guiScale;
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(holder.centerX(), holder.centerY());
+        guiGraphics.pose().translate(centerX, centerY);
         guiGraphics.pose().scale(1.0f / guiScale, 1.0f / guiScale);
-        blitSprite(guiGraphics, LegacySprites.SKIN_TICK,
+        blitSprite(guiGraphics, fhdTick ? LegacySprites.BEACON_CONFIRM : LegacySprites.SKIN_TICK,
                 -framebufferSize / 2, -framebufferSize / 2, framebufferSize, framebufferSize);
         guiGraphics.pose().popMatrix();
     }
