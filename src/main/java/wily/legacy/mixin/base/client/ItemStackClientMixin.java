@@ -1,10 +1,12 @@
 package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 //? if >=1.21 {
 import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
@@ -14,6 +16,9 @@ import net.minecraft.world.item.Rarity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.LegacyItemUtil;
+
+import java.util.List;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackClientMixin {
@@ -25,5 +30,10 @@ public abstract class ItemStackClientMixin {
         if (stack.is(Items.GOLDEN_APPLE) || /*? if <1.21 {*//*stack.getItem() instanceof RecordItem*//*?} else {*/stack.has(DataComponents.JUKEBOX_PLAYABLE)/*?}*/) return Rarity.RARE;
         if (stack.is(Items.ENCHANTED_BOOK)) return Rarity.UNCOMMON;
         return stack.isEnchanted() ? Rarity.RARE : Rarity.COMMON;
+    }
+
+    @ModifyReturnValue(method = "getTooltipLines", at = @At("RETURN"))
+    private List<Component> sanitizeTooltip(List<Component> original) {
+        return LegacyItemUtil.sanitizeTooltip((ItemStack) (Object) this, original);
     }
 }
