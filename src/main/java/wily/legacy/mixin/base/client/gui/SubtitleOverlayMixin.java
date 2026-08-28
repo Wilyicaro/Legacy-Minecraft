@@ -124,7 +124,7 @@ public class SubtitleOverlayMixin {
                         FactoryGuiGraphics.of(guiGraphics).clearColor(true);
                     }
                     guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, r);
-                    guiGraphics.pose().translate(0, -(lineHeight + 1), 0);
+                    guiGraphics.pose().translate(0, -lineHeight, 0);
                 }
                 guiGraphics.pose().popPose();
             }
