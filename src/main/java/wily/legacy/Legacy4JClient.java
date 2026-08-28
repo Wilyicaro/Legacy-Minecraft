@@ -588,6 +588,7 @@ public class Legacy4JClient {
             currentWorldSource = LevelStorageSource.createDefault(m.gameDirectory.toPath().resolve("current-world"));
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            controllerManager.afterConfigLoad();
             LegacyRenderDistance.initDefault();
             GlobalLeaderboardsFeature.onClientStarted(m);
             HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {

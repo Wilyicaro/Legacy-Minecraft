@@ -214,15 +214,15 @@ public class SDLControllerHandler implements Controller.Handler {
             public ControlType getType() {
                 int type = SdlGamepad.SDL_GetGamepadType(controller);
                 return switch (type) {
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS3 -> ControlType.get(ControlType.PS3);
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS4 -> ControlType.get(ControlType.PS4);
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS5 -> ControlType.get(ControlType.PS5);
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOX360 -> ControlType.get(ControlType.x360);
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOXONE -> ControlType.get(ControlType.xONE);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS3 -> ControlType.getOrEmpty(ControlType.PS3);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS4 -> ControlType.getOrEmpty(ControlType.PS4);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS5 -> ControlType.getOrEmpty(ControlType.PS5);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOX360 -> ControlType.getOrEmpty(ControlType.x360);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOXONE -> ControlType.getOrEmpty(ControlType.xONE);
                     case SDL_GamepadType.SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO,
                          SDL_GamepadType.SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR ->
-                            ControlType.get(ControlType.SWITCH);
-                    default -> ControlType.get(ControlType.STEAM);
+                            ControlType.getOrEmpty(ControlType.SWITCH);
+                    default -> ControlType.getOrEmpty(ControlType.STEAM);
                 };
             }
 

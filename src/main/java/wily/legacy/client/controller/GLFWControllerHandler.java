@@ -63,7 +63,7 @@ public class GLFWControllerHandler implements Controller.Handler {
                     else if (name.contains("Nintendo Switch")) id = ControlType.SWITCH;
                     else if (name.contains("Wii U")) id = ControlType.WII_U;
                 }
-                return ControlType.get(id);
+                return ControlType.getOrEmpty(id);
             }
 
             @Override
