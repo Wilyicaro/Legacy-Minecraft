@@ -1,7 +1,7 @@
 ## Additions
 
 - Added the ability to remap shift shortcuts in KBM settings
-- Added the Legacy Boss Bars option
+- Added the Legacy Pink Boss Bars option to User Interface section
 - Added the Music Disc hunt to the tutorial world
 
 ## Changes
