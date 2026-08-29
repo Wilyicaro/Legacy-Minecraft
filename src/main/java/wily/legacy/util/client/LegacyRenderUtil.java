@@ -815,7 +815,7 @@ public class LegacyRenderUtil {
 
     public static void renderPotionLevel(GuiGraphics graphics, int i, int j, ItemStack itemStack) {
         if (!LegacyOptions.legacyPotionsBar.get()) return;
-        int potionLevel = LegacyItemUtil.getPotionLevel(itemStack);
+        int potionLevel = Math.min(LegacyItemUtil.getPotionLevel(itemStack), 4);
         if (potionLevel > 0) {
             int x = i + 3;
             int y = j + 13;
