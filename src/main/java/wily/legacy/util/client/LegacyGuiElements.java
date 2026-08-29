@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.*;
@@ -17,9 +18,30 @@ import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 public class LegacyGuiElements {
+    private static final FactoryGuiElement MODDED_HUD = new FactoryGuiElement("modded_hud");
     public static long lastHotbarSelectionChange = -1;
     public static int lastHotbarSelection = -1;
     public static long lastGui = -1;
+
+    public static boolean prepareModdedHud(GuiGraphics graphics) {
+        UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
+        if (!MODDED_HUD.isVisible(accessor)) return false;
+        MODDED_HUD.prepareRender(graphics, accessor);
+        return true;
+    }
+
+    public static void finalizeModdedHud(GuiGraphics graphics) {
+        MODDED_HUD.finalizeRender(graphics, FactoryScreenUtil.getGuiAccessor());
+    }
+
+    public static void renderModdedHud(GuiGraphics graphics, Runnable render) {
+        if (!prepareModdedHud(graphics)) return;
+        try {
+            render.run();
+        } finally {
+            finalizeModdedHud(graphics);
+        }
+    }
 
     public static void setup(Minecraft minecraft) {
         FactoryGuiElement[] nonScaledElements = new FactoryGuiElement[]{FactoryGuiElement.SELECTED_ITEM_NAME, FactoryGuiElement.OVERLAY_MESSAGE, FactoryGuiElement.SPECTATOR_TOOLTIP};

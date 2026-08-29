@@ -152,6 +152,13 @@
     "client.GuiGameRendererMixin",
     "client.GuiGraphicsMixin",
     "client.gui.GuiMixin",
+    //? if forge && <1.20.5 {
+    /*"client.gui.ForgeModdedGuiLayerMixin",
+    *///?} else if neoforge && <1.21 {
+    /*"client.gui.NeoForgeModdedGuiLayerMixin",
+    *///?} else if neoforge {
+    /*"client.gui.ModdedGuiLayerMixin",
+    *///?}
     //? if >=1.21.10 {
     /*"client.gui.LocatorBarRendererMixin",
     *///?}
