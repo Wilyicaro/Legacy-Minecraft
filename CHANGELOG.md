@@ -15,3 +15,4 @@
 - Fixed Switch and Wii U face buttons not being inverted
 - Fixed Japanese font not being accurate to LCE, thanks to Hikamari221
 - Fixed SDL Controller Handler could try to load the SDL3 library even if it failed before
+- Fixed compatibility with Sodium
