@@ -5,9 +5,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.client.gui.screens.inventory.SignEditScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.PlainSignBlock;
+import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
@@ -19,14 +20,14 @@ public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
         super(signBlockEntity, bl, bl2);
     }
 
-    @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/StandingSignRenderer;createSignModel(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/world/level/block/state/properties/WoodType;Lnet/minecraft/world/level/block/PlainSignBlock$Attachment;)Lnet/minecraft/client/model/Model$Simple;"), index = 2)
-    private PlainSignBlock.Attachment useStandingSign(PlainSignBlock.Attachment original) {
-        return PlainSignBlock.Attachment.GROUND;
+    @Unique
+    private int getYOffset() {
+        return this.sign.getBlockState().getBlock() instanceof StandingSignBlock ? -42 : 0;
     }
 
     @ModifyReturnValue(method = "getSignYOffset", at = @At("RETURN"))
     private float offsetSign(float original) {
-        return height / 2f - 26.5f;
+        return height / 2f + 15.5f + getYOffset();
     }
 
     @ModifyArg(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;sign(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"))
@@ -46,11 +47,11 @@ public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
 
     @ModifyArg(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;sign(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"), index = 4)
     private int changeSignY0(int original) {
-        return height / 2 - 82;
+        return height / 2 - 40 + getYOffset();
     }
 
     @ModifyArg(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;sign(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"), index = 6)
     private int changeSignY1(int original) {
-        return height / 2 + 78;
+        return height / 2 + 120 + getYOffset();
     }
 }
