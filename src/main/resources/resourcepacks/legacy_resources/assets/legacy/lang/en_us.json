@@ -23,6 +23,7 @@
   "death.attack.trident": "%1$s was speared by %2$s",
   "death.attack.trident.item": "%1$s was speared by %2$s using %3$s",
   "death.fell.accident.water": "%1$s fell out of the water",
+  "disconnect.lost": "Connection lost",
   "disconnect.quitting": "Exiting the game",
   "event.minecraft.raid.raiders_remaining": "Mobs remaining: %s",
   "gameMode.adventure": "Adventure",
