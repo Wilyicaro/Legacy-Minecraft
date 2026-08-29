@@ -19,9 +19,9 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChunkStatusTasks.class)
 public class ChunkStatusTasksMixin {
-    @Inject(method = "full", at = @At("HEAD"))
+    @Inject(method = "generateFeatures", at = @At("HEAD"))
     private static void legacy$markFreshChunk(WorldGenContext context, ChunkStep step, StaticCache2D<GenerationChunkHolder> cache, ChunkAccess chunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> cir) {
-        if (chunk instanceof ProtoChunk && !(chunk instanceof ImposterProtoChunk) && chunk.getPersistedStatus().isBefore(ChunkStatus.FULL)) {
+        if (chunk instanceof ProtoChunk && !(chunk instanceof ImposterProtoChunk) && chunk.getPersistedStatus().isBefore(ChunkStatus.FEATURES)) {
             LegacyGeneratedChunks.mark(context.level(), chunk.getPos());
         }
     }
