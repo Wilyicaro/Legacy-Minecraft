@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.nimbusds.oauth2.sdk.id.Identifier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,7 +12,6 @@ import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
@@ -61,11 +59,6 @@ public abstract class BossHealthOverlayMixin {
         return sink -> component.getVisualOrderText().accept((index, style, codePoint) -> sink.accept(index, style.withColor(color), codePoint));
     }
 
-    //? if >1.20.1 {
-    @Shadow
-    protected abstract void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2);
-
-    //?}
     @ModifyVariable(method = "render", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
     public int render(int i) {
         return (int) (12 + 16 * LegacyOptions.hudDistance.get());
@@ -102,7 +95,7 @@ public abstract class BossHealthOverlayMixin {
         FactoryGuiGraphics.of(instance).blitSprite(arg, o <= 400 ? 400 : 406, j * 3, k, l, m, n, 0, o, p * 3);
     }
 
-    @ModifyExpressionValue(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;getColor()Lnet/minecraft/world/BossEvent$BossBarColor;"))
+    @ModifyExpressionValue(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/Identifier;[Lnet/minecraft/resources/Identifier;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;getColor()Lnet/minecraft/world/BossEvent$BossBarColor;"))
     private BossEvent.BossBarColor drawBarColor(BossEvent.BossBarColor original) {
         return LegacyOptions.legacyPinkBossBars.get() ? BossEvent.BossBarColor.PINK : original;
     }
