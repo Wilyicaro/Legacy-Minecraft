@@ -86,6 +86,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
                 }
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
+        /*? if fabric && >=26.1 {*/wily.legacy.client.screen.compat.FlashbackCompat.addBelowRecordingButtons(renderableVList, this);/*?}*/
     }
 
     //? if >1.20.1 {
@@ -116,6 +117,8 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
 
         if (leaderboardsButton != null)
             leaderboardsButton.setMessage(LegacyOptions.legacyLeaderboards.get() ? Component.translatable("legacy.menu.leaderboards") : Component.translatable("gui.stats"));
+
+        /*? if fabric && >=26.1 {*/wily.legacy.client.screen.compat.FlashbackCompat.createSideRecordingButtons(this, renderables).forEach(this::addRenderableWidget);/*?}*/
     }
 
     @Override

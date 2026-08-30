@@ -126,6 +126,12 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         rebuildMenuButtons();
         super.init();
         renderableVListInit();
+        //? if fabric && >=26.1 {
+        if (!renderableVList.renderables.isEmpty() && renderableVList.renderables.getLast() instanceof AbstractWidget anchor) {
+            AbstractWidget replayButton = wily.legacy.client.screen.compat.FlashbackCompat.createReplayButton(this, anchor);
+            if (replayButton != null) addRenderableWidget(replayButton);
+        }
+        //?}
         legacy$restoreFocusedButton();
     }
 

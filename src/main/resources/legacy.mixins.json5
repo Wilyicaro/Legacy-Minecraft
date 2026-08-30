@@ -9,6 +9,7 @@
     "compat.jei.RecipesGuiMixin",
     "compat.jei.VanillaPluginMixin",
     //?}
+    "compat.replaymod.VideoRendererMixin",
     "client.GustParticleMixin",
     "client.ItemStackClientMixin",
     "client.PanoramaRendererMixin",
