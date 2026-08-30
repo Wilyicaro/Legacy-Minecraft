@@ -205,7 +205,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
     public record All(Map<UUID, LegacyPlayerInfo> players, Map<Identifier, Integer> gameRules, GameType defaultGameType,
                       CommonNetwork.Identifier<All> identifier) implements CommonNetwork.Payload {
-        public static final List<Identifier> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.FIRE_DAMAGE.getIdentifier(), LegacyGameRules.getTntExplodes().getIdentifier(), GameRules.MOB_DROPS.getIdentifier(), GameRules.BLOCK_DROPS.getIdentifier(), GameRules.NATURAL_HEALTH_REGENERATION.getIdentifier(), LegacyGameRules.GLOBAL_MAP_PLAYER_ICON.getId(), LegacyGameRules.LEGACY_SWIMMING.getId(), GameRules.IMMEDIATE_RESPAWN.getIdentifier()));
+        public static final List<Identifier> NON_OP_GAMERULES = new ArrayList<>(List.of(LegacyGameRules.FIRE_SPREADS.getId(), LegacyGameRules.getTntExplodes().getIdentifier(), GameRules.MOB_DROPS.getIdentifier(), GameRules.BLOCK_DROPS.getIdentifier(), GameRules.NATURAL_HEALTH_REGENERATION.getIdentifier(), LegacyGameRules.GLOBAL_MAP_PLAYER_ICON.getId(), LegacyGameRules.LEGACY_SWIMMING.getId(), GameRules.IMMEDIATE_RESPAWN.getIdentifier()));
         public static final CommonNetwork.Identifier<All> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_c2s"), b -> new All(b, All.ID_C2S));
         public static final CommonNetwork.Identifier<All> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_s2c"), b -> new All(b, All.ID_S2C));
 

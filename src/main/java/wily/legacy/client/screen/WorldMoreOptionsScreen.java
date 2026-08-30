@@ -192,7 +192,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
 
         GameRules gameRules = parent.getUiState().getGameRules();
-        addBooleanGameRuleOption(renderableVList, gameRules, GameRules.FIRE_DAMAGE);
+        addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.FIRE_SPREADS.get());
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
         gameRenderables.addRenderable(new TickBox(0, 0, 200, onlineGame.get(), b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), b -> onlineGame.set(b.selected), onlineGame::get));
@@ -417,7 +417,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             else parent.dimensionsToReset.remove(d);
         })));
         renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> parent.trustPlayers = t.selected));
-        addBooleanGameRuleOption(renderableVList, gameRules, GameRules.FIRE_DAMAGE);
+        addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.FIRE_SPREADS.get());
         addBooleanGameRuleOption(renderableVList, gameRules, LegacyGameRules.getTntExplodes());
 
         gameRenderables.addRenderable(new TickBox(0, 0, 200, parent.publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), b -> {
