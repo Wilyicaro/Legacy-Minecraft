@@ -725,6 +725,8 @@
   "gamerule.legacy.default_show_armor_stand_arms.description": "When enabled, the armor stand will show arms when placed.",
   "gamerule.legacy.falling_block_limit": "Falling Block Limit",
   "gamerule.legacy.falling_block_limit.description": "How many falling blocks can be active in the local area at the same time. 0 disables the limit.",
+  "gamerule.legacy.fire_spreads": "Fire Spreads",
+  "gamerule.legacy.fire_spreads.description": "Controls whether fire can spread and burn away blocks.",
   "gamerule.legacy.global_map_player_icon": "全局地图玩家图标",
   "gamerule.legacy.global_map_player_icon.description": "允许玩家图标在所有创建的地图上可见。",
   "gamerule.legacy.legacy_flight": "Legacy Flight",
