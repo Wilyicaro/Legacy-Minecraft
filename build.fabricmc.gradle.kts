@@ -80,6 +80,7 @@ dependencies {
 	compileOnly("net.caffeinemc:sodium-fabric:${prop("sodium_version")}")
 	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
 	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
+	compileOnly("maven.modrinth:flashback:${prop("flashback_version")}")
 	compileOnly("maven.modrinth:bisect-mod:z62iwoR1")
 	compileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric-api:${prop("jei_version")}")
 	compileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric:${prop("jei_version")}")
