@@ -536,6 +536,7 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            controllerManager.afterConfigLoad();
             LegacyRenderDistance.initDefault();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();

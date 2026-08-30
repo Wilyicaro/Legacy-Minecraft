@@ -9,6 +9,7 @@
     "compat.jei.RecipesGuiMixin",
     "compat.jei.VanillaPluginMixin",
     //?}
+    "compat.replaymod.VideoRendererMixin",
     "client.GustParticleMixin",
     "client.ItemStackClientMixin",
     "client.PanoramaRendererMixin",
@@ -103,6 +104,9 @@
     "client.GuiGameRendererMixin",
     "client.GuiGraphicsExtractorMixin",
     "client.gui.GuiMixin",
+    //? if >=26.1 && (forge || neoforge) {
+    /*"client.gui.ModdedGuiLayerMixin",
+    *///?}
     //? if >=26.1 {
     "client.gui.LocatorBarRendererMixin",
     //?}

@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.*;
@@ -16,9 +17,21 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.network.TopMessage;
 
 public class LegacyGuiElements {
+    private static final FactoryGuiElement MODDED_HUD = new FactoryGuiElement("modded_hud");
     public static long lastHotbarSelectionChange = -1;
     public static int lastHotbarSelection = -1;
     public static long lastGui = -1;
+
+    public static void renderModdedHud(GuiGraphicsExtractor graphics, Runnable render) {
+        UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
+        if (!MODDED_HUD.isVisible(accessor)) return;
+        MODDED_HUD.prepareRender(graphics, accessor);
+        try {
+            render.run();
+        } finally {
+            MODDED_HUD.finalizeRender(graphics, accessor);
+        }
+    }
 
     public static void setup(Minecraft minecraft) {
         FactoryGuiElement[] nonScaledElements = new FactoryGuiElement[]{FactoryGuiElement.SELECTED_ITEM_NAME, FactoryGuiElement.OVERLAY_MESSAGE, FactoryGuiElement.SPECTATOR_TOOLTIP};

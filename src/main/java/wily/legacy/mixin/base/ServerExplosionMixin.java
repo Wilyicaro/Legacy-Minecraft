@@ -57,12 +57,12 @@ public abstract class ServerExplosionMixin implements Explosion {
         return positions;
     }
 
-    @WrapOperation(method = "hurtEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
+    @WrapOperation(method = /*? if neoforge {*//*"hurtEntities(Ljava/util/List;)V"*//*?} else {*/"hurtEntities"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     private boolean legacy$hurtEntity(Entity entity, ServerLevel level, DamageSource source, float amount, Operation<Boolean> original) {
         return legacy$intersectsBlast(entity) && original.call(entity, level, source, amount);
     }
 
-    @ModifyArg(method = "hurtEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0)
+    @ModifyArg(method = /*? if neoforge {*//*"hurtEntities(Ljava/util/List;)V"*//*?} else {*/"hurtEntities"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0)
     private double legacy$getKnockbackPower(double power, @Local Entity entity) {
         if (legacy$intersectsBlast(entity)) return power;
         double doubleRadius = radius * 2.0F;
