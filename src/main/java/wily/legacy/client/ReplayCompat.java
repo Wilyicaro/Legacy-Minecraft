@@ -1,13 +1,12 @@
 package wily.legacy.client;
 
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.screen.compat.FlashbackCompat;
 
 public final class ReplayCompat {
     private static volatile boolean rendering;
 
     public static boolean isRendering() {
-        return rendering || FlashbackCompat.isExporting();
+        return rendering/*? if fabric && (1.21.1 || >=1.21.4) {*/ || wily.legacy.client.screen.compat.FlashbackCompat.isExporting()/*?}*/;
     }
 
     public static void setRendering(boolean rendering) {

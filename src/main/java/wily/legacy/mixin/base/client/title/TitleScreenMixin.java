@@ -36,7 +36,6 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
-import wily.legacy.client.screen.compat.FlashbackCompat;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.util.LegacyComponents;
@@ -126,10 +125,12 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         rebuildMenuButtons();
         super.init();
         renderableVListInit();
+        //? if fabric && (1.21.1 || >=1.21.4) {
         if (!renderableVList.renderables.isEmpty() && renderableVList.renderables.get(renderableVList.renderables.size() - 1) instanceof AbstractWidget anchor) {
-            AbstractWidget replayButton = FlashbackCompat.createReplayButton(this, anchor);
+            AbstractWidget replayButton = wily.legacy.client.screen.compat.FlashbackCompat.createReplayButton(this, anchor);
             if (replayButton != null) addRenderableWidget(replayButton);
         }
+        //?}
         legacy$restoreFocusedButton();
     }
 
