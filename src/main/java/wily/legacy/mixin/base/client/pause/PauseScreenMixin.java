@@ -18,6 +18,7 @@ import wily.factoryapi.base.client.WidgetAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.*;
+import wily.legacy.client.screen.compat.FlashbackCompat;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -83,6 +84,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
                 }
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
+        FlashbackCompat.addBelowRecordingButtons(renderableVList, this);
     }
 
     //? if >1.20.1 {
@@ -110,6 +112,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
             else if (Legacy4JClient.hasSaveSystem(minecraft))
                 setAutoSave(LegacyOptions.autoSaveInterval.get(), saveButton);
         }
+        FlashbackCompat.createSideRecordingButtons(this, renderables).forEach(this::addRenderableWidget);
 
     }
 

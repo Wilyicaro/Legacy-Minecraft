@@ -29,6 +29,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.ReplayCompat;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
@@ -570,7 +571,7 @@ public class ControllerManager {
     }
 
     public void updateCursorInputMode(){
-        if (!minecraft.mouseHandler.isMouseGrabbed()) setCursorInputMode(!LegacyOptions.hasSystemCursor());
+        if (!minecraft.mouseHandler.isMouseGrabbed()) setCursorInputMode(!ReplayCompat.isRendering() && !LegacyOptions.hasSystemCursor());
     }
 
     public void setControllerTheLastInput(boolean controllerTheLastInput) {

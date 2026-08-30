@@ -840,7 +840,7 @@ public class LegacyRenderUtil {
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         }
 
-        if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
+        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             FactoryGuiGraphics.of(graphics).disableDepthTest();
             FactoryScreenUtil.enableBlend();
             graphics.pose().pushPose();

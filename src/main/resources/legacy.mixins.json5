@@ -42,6 +42,7 @@
     "compat.jei.VanillaPluginMixin",
     "compat.jei.RecipesGuiMixin",
     //?}
+    "compat.replaymod.VideoRendererMixin",
     //? if fabric {
     "client.TerrainRenderContextMixin",
     //?}

@@ -33,6 +33,7 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
             if (mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
         } else if (mixinClassName.contains("compat.nostalgic.")) return false;
         if (!FactoryAPI.isLoadingMod("sodium") && mixinClassName.contains("compat.sodium.")) return false;
+        if (mixinClassName.contains("compat.replaymod.") && !FactoryAPI.isLoadingMod("replaymod")) return false;
         if (!FactoryAPI.isLoadingMod("jei") && mixinClassName.contains("compat.jei.")) return false;
 
         boolean hasVivecraft = FactoryAPI.isLoadingMod("vivecraft");
