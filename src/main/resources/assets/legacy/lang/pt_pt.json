@@ -725,6 +725,8 @@
   "gamerule.legacy.default_show_armor_stand_arms.description": "Quando habilitado, os suporte de armaduras apresentarão braços quando colocados.",
   "gamerule.legacy.falling_block_limit": "Limite de Blocos Caindo",
   "gamerule.legacy.falling_block_limit.description": "Quantos blocos caindo podem estar ativos na mesma área local no mesmo tempo. O valor 0 desabilita o limite.",
+  "gamerule.legacy.fire_spreads": "Fogo espalha",
+  "gamerule.legacy.fire_spreads.description": "Controls whether fire can spread and burn away blocks.",
   "gamerule.legacy.global_map_player_icon": "Ícone de Jogador em Mapa Global",
   "gamerule.legacy.global_map_player_icon.description": "Permite ícones de jogadores aparecerem em todos os mapas criados.",
   "gamerule.legacy.legacy_flight": "Voo Legacy",
