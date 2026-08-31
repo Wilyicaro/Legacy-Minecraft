@@ -2277,6 +2277,7 @@
   "legacy.weather_state.clear": "Clear",
   "legacy.weather_state.rain": "Rain",
   "legacy.weather_state.thunder": "Thunder",
+  "menu.shareToLan": "Open to LAN",
   "menu.shareToLan.description": "When enabled, the game will be shared with other players on your local network.",
   "structure.minecraft.ancient_cities": "Ancient Cities",
   "stat.legacy.days_played": "Days Played",
