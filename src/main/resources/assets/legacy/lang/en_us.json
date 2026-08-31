@@ -611,7 +611,7 @@
   "block.minecraft.weathered_copper_bars.tip": "Used as a barrier, similar to fences.",
   "block.minecraft.weathered_copper_bulb.tip": "Emits light when powered, and gets dimmer the more it oxidizes.",
   "block.minecraft.weathered_copper_chain.tip": "Crafted from copper. Used as decoration.",
-  "block.minecraft.weathered_copper_golem_statue.tip": "A decorative statue obtained when a Copper Golem fully oxidizes. Can be scraped back into a normal Copper Golem. Preserved by wax.",
+  "block.minecraft.weathered_copper_golem_statue.tip": "A decorative statue obtained when a Copper Golem fully oxidizes. Can be scraped back into a normal Copper Golem.",
   "block.minecraft.weathered_copper_grate.tip": "Similar to a Copper Block, but can be seen through.",
   "block.minecraft.weathered_copper_lantern.tip": "Lanterns can be placed either hanging under a block or on top of a block. It gives slightly more light than the torch.",
   "block.minecraft.weathered_cut_copper.tip": "Crafted from Copper. Can be used as decoration and construction.",
