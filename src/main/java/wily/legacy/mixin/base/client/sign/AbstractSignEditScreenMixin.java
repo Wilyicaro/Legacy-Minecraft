@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.client.screen.WidgetPanel;
 import wily.legacy.util.client.LegacySoundUtil;
 
 @Mixin(AbstractSignEditScreen.class)
-public abstract class AbstractSignEditScreenMixin extends Screen implements ControlTooltip.Event {
+public abstract class AbstractSignEditScreenMixin extends Screen implements ControlTooltip.Listener {
 
     @Shadow
     @Final

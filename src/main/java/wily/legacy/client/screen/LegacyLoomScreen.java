@@ -33,10 +33,12 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.LoomTabListing;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
@@ -48,7 +50,7 @@ import wily.legacy.util.client.LegacySoundUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 import static wily.legacy.client.screen.LegacyCraftingScreen.clearIngredients;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
@@ -148,9 +150,9 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.
                 add(OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
                 add(ControlTooltip.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE_PATTERN : null).
                 add(CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.CHANGE_GROUP).

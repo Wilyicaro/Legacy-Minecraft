@@ -12,8 +12,11 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.controller.LegacyKeyMapping;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.LegacyKeyMapping;
+import wily.legacy.client.control.tooltip.ComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.network.TopMessage;
 
 public class LegacyGuiElements {
@@ -47,7 +50,7 @@ public class LegacyGuiElements {
         });
         FactoryGuiElement.HOTBAR.post().register(GuiGraphicsExtractor -> {
             if (minecraft.player != null)
-                ControlTooltip.Renderer.of(minecraft.gui).extractRenderState(GuiGraphicsExtractor, 0, 0, FactoryAPIClient.getPartialTick());
+                ControlTooltipRenderer.of(minecraft.gui).extractRenderState(GuiGraphicsExtractor, 0, 0, FactoryAPIClient.getPartialTick());
             LegacyRenderUtil.renderTopText(GuiGraphicsExtractor, TopMessage.small, 21, 1.0f, TopMessage.smallTicks);
             LegacyRenderUtil.renderTopText(GuiGraphicsExtractor, TopMessage.medium, 37, 1.5f, TopMessage.mediumTicks);
         });
@@ -93,7 +96,7 @@ public class LegacyGuiElements {
             CommonValue.COMMON_VALUES.forEach((s, c) -> a.getElements().put("commonValue." + (s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".") + s.getPath(), c));
             CommonColor.COMMON_COLORS.forEach((s, c) -> a.getElements().put("commonColor." + (s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".") + s.getPath(), c));
             ControlTooltip.commonIcons.forEach((s, i) -> {
-                a.getElements().put("controlIcon." + s, i.map(ControlTooltip.ComponentIcon::getComponent));
+                a.getElements().put("controlIcon." + s, i.map(ComponentIcon::getComponent));
             });
             for (KeyMapping keyMapping : minecraft.options.keyMappings) {
                 a.getElements().put("controlIcon." + keyMapping.getName(), () -> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));

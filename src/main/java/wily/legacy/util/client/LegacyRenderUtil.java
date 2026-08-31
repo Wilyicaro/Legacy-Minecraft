@@ -68,6 +68,7 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
@@ -87,7 +88,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.screen.ControlTooltip.MORE;
+import static wily.legacy.client.control.tooltip.ControlTooltip.MORE;
 
 public class LegacyRenderUtil {
     public static final boolean isNvidia;

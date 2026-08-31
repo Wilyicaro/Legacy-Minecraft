@@ -21,9 +21,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.AdvancementToastAccessor;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 

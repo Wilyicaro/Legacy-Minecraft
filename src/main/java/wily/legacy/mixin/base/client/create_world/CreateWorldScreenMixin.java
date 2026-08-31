@@ -42,6 +42,10 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -57,7 +61,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 @Mixin(CreateWorldScreen.class)
-public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Event {
+public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Listener {
     @Shadow
     @Final
     private static Component GAME_MODEL_LABEL;
@@ -203,9 +207,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Override
-    public void added() {
-        super.added();
-        OptionsScreen.setupSelectorControlTooltips(ControlTooltip.Renderer.of(this), this);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        OptionsScreen.setupSelectorControlTooltips(list, this);
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)

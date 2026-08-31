@@ -27,7 +27,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.ScrollableRenderer;

@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
 
 @Mixin(KeyboardInput.class)
 public class KeyboardControllerInputMixin extends ClientInput {

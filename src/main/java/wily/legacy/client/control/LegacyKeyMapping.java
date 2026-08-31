@@ -1,11 +1,11 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 
 public interface LegacyKeyMapping {
     static LegacyKeyMapping of(KeyMapping key) {

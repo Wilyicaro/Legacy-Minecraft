@@ -13,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +21,11 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
+import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -32,7 +35,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import static wily.legacy.util.LegacySprites.BREWING_FUEL_SLOT;
 
 @Mixin(BrewingStandScreen.class)
-public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
+public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> implements ControlTooltip.Listener {
     private static final Vec2 BREWING_SLOT_OFFSET = new Vec2(0, 0.5f);
     @Shadow
     @Final
@@ -42,10 +45,11 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         super(abstractContainerMenu, inventory, component);
     }
 
+
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this).replace(3, i -> i, this::getQuickMoveLabel);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultContainerScreen(list, (LegacyMenuAccess<?>) this);
+        list.replace(3, i -> i, this::getQuickMoveLabel);
     }
 
     private Component getQuickMoveLabel(Component fallback) {

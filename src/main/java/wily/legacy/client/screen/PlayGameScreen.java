@@ -23,12 +23,14 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyMixinOptions;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -42,7 +44,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event, TabList.Access {
+public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Listener, TabList.Access {
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     private static final Component SAFETY_TITLE = Component.translatable("multiplayerWarning.header").withStyle(ChatFormatting.BOLD);
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
@@ -133,10 +135,10 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
-        renderer.add(() -> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_CONNECTION);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
+        list.add(() -> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_CONNECTION);
     }
 
     public boolean hasTabList() {

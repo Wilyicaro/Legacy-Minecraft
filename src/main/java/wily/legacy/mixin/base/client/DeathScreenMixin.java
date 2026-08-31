@@ -20,14 +20,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
 @Mixin(DeathScreen.class)
-public abstract class DeathScreenMixin extends Screen implements ControlTooltip.Event {
+public abstract class DeathScreenMixin extends Screen implements ControlTooltip.Listener {
 
     @Shadow
     @Final

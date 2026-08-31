@@ -13,9 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,7 +21,10 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -32,16 +32,16 @@ import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractFurnaceScreen.class)
-public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
+public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> implements ControlTooltip.Listener {
 
 public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this).replace(3, i -> i, c -> hoveredSlot == null || hoveredSlot.getItem().isEmpty() || hoveredSlot.container != minecraft.player.getInventory() ? c : menu.canSmelt(hoveredSlot.getItem()) ? LegacyComponents.MOVE_INGREDIENT : /*? if <1.21.2 {*//*AbstractFurnaceBlockEntity.isFuel*//*?} else {*/minecraft.level.fuelValues().isFuel/*?}*/(hoveredSlot.getItem()) ? LegacyComponents.MOVE_FUEL : c);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        list.replace(3, i -> i, c -> hoveredSlot == null || hoveredSlot.getItem().isEmpty() || hoveredSlot.container != minecraft.player.getInventory() ? c : menu.canSmelt(hoveredSlot.getItem()) ? LegacyComponents.MOVE_INGREDIENT : /*? if <1.21.2 {*//*AbstractFurnaceBlockEntity.isFuel*//*?} else {*/minecraft.level.fuelValues().isFuel/*?}*/(hoveredSlot.getItem()) ? LegacyComponents.MOVE_FUEL : c);
     }
 
     @Override
