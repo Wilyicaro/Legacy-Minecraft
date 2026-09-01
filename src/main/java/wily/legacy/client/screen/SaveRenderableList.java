@@ -13,7 +13,6 @@ import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
@@ -40,6 +39,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 

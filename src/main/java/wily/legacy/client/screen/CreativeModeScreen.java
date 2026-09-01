@@ -34,7 +34,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -43,11 +42,13 @@ import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -55,9 +56,9 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
-public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, Controller.Event, ControlTooltip.Event {
+public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, Controller.Listener, Listener {
     public static final Container creativeModeGrid = new SimpleContainer(50);
     public static final LegacyTabButton.StateOffset TAB_OFFSET = new LegacyTabButton.StateOffset(Vec2.ZERO, new Vec2(0, 1.4f), Vec2.ZERO);
     public static final LegacySlotDisplay DEFAULT_SLOT_DISPLAY = new LegacySlotDisplay() {
@@ -156,9 +157,9 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        Event.super.addControlTooltips(renderer);
-        renderer.
+    public void addControlTooltips(ControlTooltipList list) {
+        Listener.super.addControlTooltips(list);
+        list.
                 replace(2, i -> i, a -> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3, i -> i, a -> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
                 add(() -> page.max > 0 ? CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
@@ -326,7 +327,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
 
     @Override
     public int getBindingMouseClick(BindingState state) {
-        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : Controller.Event.super.getBindingMouseClick(state);
+        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : Controller.Listener.super.getBindingMouseClick(state);
     }
 
     @Override

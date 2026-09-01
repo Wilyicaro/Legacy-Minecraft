@@ -32,8 +32,8 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.LegacySlotWidget;
 import wily.legacy.client.screen.RecipesScreen;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Set;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class AbstractContainerScreenMixin extends Screen implements LegacyMenuAccess, ControlTooltip.Event {
+public abstract class AbstractContainerScreenMixin extends Screen implements LegacyMenuAccess, ControlTooltip.Listener {
     @Shadow
     protected int leftPos;
 

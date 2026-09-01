@@ -1,11 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
@@ -29,13 +27,14 @@ import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyResourceManager;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -142,9 +141,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.RIGHT_STICK.getIcon(), () -> LegacyComponents.MOVE_KEYBOARD);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.RIGHT_STICK.getIcon(), () -> LegacyComponents.MOVE_KEYBOARD);
     }
 
     @Override

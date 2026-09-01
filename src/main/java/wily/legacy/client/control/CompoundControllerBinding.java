@@ -1,7 +1,9 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import net.minecraft.util.Util;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ComponentIcon;
+import wily.legacy.client.control.tooltip.CompoundComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -66,13 +68,13 @@ public class CompoundControllerBinding extends ControllerBinding<BindingState> {
     }
 
     @Override
-    public ControlTooltip.ComponentIcon getIcon() {
-        ControlTooltip.ComponentIcon[] icons = new ControlTooltip.ComponentIcon[bindings.length * 2 - 1];
+    public ComponentIcon getIcon() {
+        ComponentIcon[] icons = new ComponentIcon[bindings.length * 2 - 1];
         for (int i = 0; i < icons.length; i++) {
             boolean isDelimiter = i % 2 != 0 && i < icons.length - 1;
             icons[i] = isDelimiter ? ControlTooltip.PLUS_ICON : bindings[i / 2].getIcon();
         }
-        return ControlTooltip.CompoundComponentIcon.of(icons);
+        return CompoundComponentIcon.of(icons);
     }
 
     @Override

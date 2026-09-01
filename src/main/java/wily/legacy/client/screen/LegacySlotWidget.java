@@ -4,14 +4,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.NavigationElement;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -69,7 +68,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
 
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        return isVisible && !isHovered && (!Controller.Event.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
+        return isVisible && !isHovered && (!Controller.Listener.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
     }
 
     @Override

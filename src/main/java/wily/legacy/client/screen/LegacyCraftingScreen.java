@@ -23,7 +23,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
-import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.phys.Vec2;
@@ -42,13 +41,15 @@ import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.ImpossibleIngredient;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -62,7 +63,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
 public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIconHolder<CraftingRecipe>> implements TabList.Access {
@@ -318,9 +319,9 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.
                 add(EXTRA::get, () -> typeTabList.getIndex() == 0 ? LegacyComponents.INFO : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
                 add(OPTION::get, () -> typeTabList.getIndex() == 0 ? onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES : ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
                 add(CONTROL_TYPE::get, () -> hasTypeTabList() ? LegacyComponents.TYPE : null).

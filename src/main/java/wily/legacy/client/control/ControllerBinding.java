@@ -1,17 +1,14 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import com.mojang.serialization.Codec;
-import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import wily.factoryapi.base.ArbitrarySupplier;
-import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ComponentIcon;
 
 import java.util.*;
 import java.util.function.Function;
@@ -50,7 +47,7 @@ public class ControllerBinding<T extends BindingState> {
         return this;
     }
 
-    public ControlTooltip.ComponentIcon getIcon() {
+    public ComponentIcon getIcon() {
         return ControlType.getActiveControllerType().icons().get(getMapped().getKey());
     }
 

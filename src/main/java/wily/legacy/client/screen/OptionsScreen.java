@@ -27,6 +27,11 @@ import wily.factoryapi.base.client.FactoryOptions;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.tooltip.CompoundComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyComponents;
@@ -36,8 +41,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
-import static wily.legacy.client.screen.ControlTooltip.getKeyIcon;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.getKeyIcon;
 
 public class OptionsScreen extends PanelVListScreen {
     private static boolean buildingMergedLegacyAdvancedOptions = false;
@@ -81,10 +86,10 @@ public class OptionsScreen extends PanelVListScreen {
         return LegacyOptions.legacySettingsMenus.get() && !buildingMergedLegacyAdvancedOptions;
     }
 
-    public static void setupSelectorControlTooltips(ControlTooltip.Renderer renderer, Screen screen) {
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
-        renderer.add(ControlTooltip.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
-        renderer.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
+    public static void setupSelectorControlTooltips(ControlTooltipList list, Screen screen) {
+        list.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
+        list.add(ControlTooltip.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
+        list.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
     }
 
     public OptionsScreen withAdvancedOptions(Function<OptionsScreen, Screen> advancedOptionsFunction) {
@@ -107,11 +112,11 @@ public class OptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        if (shouldAddSelectorControlTooltips()) setupSelectorControlTooltips(renderer, this);
-        if (renderer.tooltips.size() > 6) {
-            renderer.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        if (shouldAddSelectorControlTooltips()) setupSelectorControlTooltips(list, this);
+        if (list.tooltips.size() > 6) {
+            list.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
         }
     }
 

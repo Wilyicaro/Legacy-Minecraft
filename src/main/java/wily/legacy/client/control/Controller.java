@@ -1,15 +1,13 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.screen.LegacyMenuAccess;
@@ -19,13 +17,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 
-import static wily.legacy.client.controller.ControllerManager.CONTROLLER_DETECTED;
-import static wily.legacy.client.controller.ControllerManager.CONTROLLER_DISCONNECTED;
+import static wily.legacy.client.control.ControllerManager.CONTROLLER_DETECTED;
+import static wily.legacy.client.control.ControllerManager.CONTROLLER_DISCONNECTED;
 
 public interface Controller {
 
     /**
-     * Empty controller, used when disconnecting or while the window isn't focused
+     * Empty control, used when disconnecting or while the window isn't focused
      */
     Controller EMPTY = new Controller() {
         public String getName() {
@@ -73,7 +71,7 @@ public interface Controller {
     String getName();
 
     /**
-     * @return ControlType corresponding to the Controller Handler's controller type, this is based on the controller name if the handler does not provide this information, as in GLFW
+     * @return ControlType corresponding to the Controller Handler's control type, this is based on the control name if the handler does not provide this information, as in GLFW
      */
     ControlType getType();
 
@@ -90,7 +88,7 @@ public interface Controller {
     float axisValue(int i);
 
     /**
-     * @return If this controller has LED
+     * @return If this control has LED
      * This always returns true on SDL3 and false on GLFW
      */
     default boolean hasLED() {
@@ -135,13 +133,13 @@ public interface Controller {
 
     /**
      * @param button {@link ControllerBinding.Button}
-     * @return If this controller contains this button
+     * @return If this control contains this button
      */
     boolean hasButton(ControllerBinding.Button button);
 
     /**
      * @param axis {@link ControllerBinding.Axis}
-     * @return If this controller contains this axis
+     * @return If this control contains this axis
      */
     boolean hasAxis(ControllerBinding.Axis axis);
 
@@ -161,7 +159,7 @@ public interface Controller {
     }
 
     /**
-     * @return {@link Controller.Handler} used by this controller
+     * @return {@link Controller.Handler} used by this control
      */
     Handler getHandler();
 
@@ -230,7 +228,7 @@ public interface Controller {
         boolean update();
 
         /**
-         * Manages the connected controller bindings
+         * Manages the connected control bindings
          *
          * @param manager Controller Manager instance
          */
@@ -240,13 +238,13 @@ public interface Controller {
 
         /**
          * @param jid Controller ID, generally based on the connection order
-         * @return The controller corresponding to this ID, or null if it's invalid
+         * @return The control corresponding to this ID, or null if it's invalid
          */
         Controller getController(int jid);
 
         /**
          * @param jid Controller ID, generally based on the connection order
-         * @return If this ID corresponds to a valid controller
+         * @return If this ID corresponds to a valid control
          */
         boolean isValidController(int jid);
 
@@ -273,12 +271,12 @@ public interface Controller {
         }
     }
 
-    interface Event {
-        Event EMPTY = new Event() {
+    interface Listener {
+        Listener EMPTY = new Listener() {
         };
 
-        static Event of(Object o) {
-            return o instanceof Event e ? e : EMPTY;
+        static Listener of(Object o) {
+            return o instanceof Listener e ? e : EMPTY;
         }
 
         default void controllerTick(Controller controller) {

@@ -28,6 +28,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -42,8 +43,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-
-import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final Component GAME_MODEL_LABEL = Component.translatable("selectWorld.gameMode");
@@ -174,9 +173,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        OptionsScreen.setupSelectorControlTooltips(renderer, this);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        OptionsScreen.setupSelectorControlTooltips(list, this);
     }
 
     @Override

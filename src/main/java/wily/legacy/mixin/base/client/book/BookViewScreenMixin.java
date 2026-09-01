@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,18 +16,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.BookPanel;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
-import java.util.List;
-
 @Mixin(BookViewScreen.class)
-public abstract class BookViewScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
+public abstract class BookViewScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
 
     @Shadow
     private PageButton forwardButton;
@@ -56,9 +56,9 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     protected abstract int getNumPages();
 
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this)
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        list
                 .add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
                 .add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : null);
     }
