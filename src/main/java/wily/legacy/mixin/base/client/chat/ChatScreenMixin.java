@@ -15,17 +15,20 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 
 @Mixin(ChatScreen.class)
-public abstract class ChatScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
+public abstract class ChatScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
     @Shadow
     protected EditBox input;
     @Shadow
@@ -41,9 +44,9 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
     public abstract /*? if >1.20.5 {*/void/*?} else {*//*boolean*//*?}*/ handleChatInput(String par1, boolean par2);
 
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this).replace(1, i -> i, c -> ControlType.getActiveType().isKbm() ? input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE : c).add(() -> !ControlType.getActiveType().isKbm() ? ControllerBinding.START.getIcon() : null, () -> /*? if >1.20.1 {*/commandSuggestions.isVisible()/*?} else {*//*commandSuggestions.suggestions != null*//*?}*/ ? LegacyComponents.USE_SUGGESTION : input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        list.replace(1, i -> i, c -> ControlType.getActiveType().isKbm() ? input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE : c).add(() -> !ControlType.getActiveType().isKbm() ? ControllerBinding.START.getIcon() : null, () -> /*? if >1.20.1 {*/commandSuggestions.isVisible()/*?} else {*//*commandSuggestions.suggestions != null*//*?}*/ ? LegacyComponents.USE_SUGGESTION : input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE);
     }
 
     @Inject(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/ChatScreen;input:Lnet/minecraft/client/gui/components/EditBox;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))

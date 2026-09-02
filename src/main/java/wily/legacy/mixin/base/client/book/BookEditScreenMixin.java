@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.book;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -27,21 +26,21 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.LegacyKeyMapping;
+import wily.legacy.client.control.tooltip.*;
 import wily.legacy.client.screen.BookPanel;
 import wily.legacy.client.screen.ConfirmationScreen;
-import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.List;
 import java.util.Objects;
 
 @Mixin(BookEditScreen.class)
-public abstract class BookEditScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
+public abstract class BookEditScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
 
     private static final Component EXIT_BOOK = Component.translatable("legacy.menu.exit_book");
     private static final Component EXIT_BOOK_MESSAGE = Component.translatable("legacy.menu.exit_book_message");
@@ -99,11 +98,11 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
 
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this)
-                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(LegacyKeyMapping.of(Legacy4JClient.keyMenuPageLeft).getKey().getValue())) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
-                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(LegacyKeyMapping.of(Legacy4JClient.keyMenuPageRight).getKey().getValue())) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        list
+                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(LegacyKeyMapping.of(Legacy4JClient.keyMenuPageLeft).getKey().getValue())) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
+                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(LegacyKeyMapping.of(Legacy4JClient.keyMenuPageRight).getKey().getValue())) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
     }
 
     @Override

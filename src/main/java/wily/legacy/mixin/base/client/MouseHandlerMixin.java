@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
@@ -41,25 +41,25 @@ public class MouseHandlerMixin {
     //? if forge {
     /*@WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseClicked(Lnet/minecraft/client/gui/screens/Screen;DDLnet/minecraft/client/input/MouseButtonEvent;Z)Z", remap = false))
     private boolean onPress(Screen screen, double mouseX, double mouseY, MouseButtonEvent event, boolean repeate, Operation<Boolean> original) {
-        ControlTooltip.Renderer.of(screen).press(event, true);
+        ControlTooltipRenderer.of(screen).press(event, true);
         return original.call(screen, mouseX, mouseY, event, repeate);
     }
 
     @WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseReleased(Lnet/minecraft/client/gui/screens/Screen;DDLnet/minecraft/client/input/MouseButtonEvent;)Z", remap = false))
     private boolean onRelease(Screen screen, double mouseX, double mouseY, MouseButtonEvent event, Operation<Boolean> original) {
-        ControlTooltip.Renderer.of(screen).press(event, false);
+        ControlTooltipRenderer.of(screen).press(event, false);
         return original.call(screen, mouseX, mouseY, event);
     }
     *///?} else {
     @WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
     private boolean onPress(Screen instance, MouseButtonEvent event, boolean b, Operation<Boolean> original) {
-        ControlTooltip.Renderer.of(instance).press(event, true);
+        ControlTooltipRenderer.of(instance).press(event, true);
         return original.call(instance, event, b);
     }
 
     @WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseReleased(Lnet/minecraft/client/input/MouseButtonEvent;)Z"))
     private boolean onRelease(Screen instance, MouseButtonEvent event, Operation<Boolean> original) {
-        ControlTooltip.Renderer.of(instance).press(event, false);
+        ControlTooltipRenderer.of(instance).press(event, false);
         return original.call(instance, event);
     }
     //?}

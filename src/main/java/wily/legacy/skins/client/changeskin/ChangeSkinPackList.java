@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.skins.skin.SkinIdUtil;

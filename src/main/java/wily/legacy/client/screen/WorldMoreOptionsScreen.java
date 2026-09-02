@@ -45,6 +45,8 @@ import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.GameRuleCategoryAccessor;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
@@ -63,7 +65,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
+public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Listener, DatapackRepositoryAccessor {
     public static final Component ENTER_SEED = Component.translatable("selectWorld.enterSeed");
     public static final Component SEED_INFO = Component.translatable("selectWorld.seedInfo");
     public static final Component ENTER_SEED_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.enterSeed.description");
@@ -478,9 +480,9 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(ControlTooltip.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(ControlTooltip.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
     }
 
     public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRule<?>> allowGamerule) {

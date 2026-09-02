@@ -1,11 +1,11 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ComponentIcon;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -52,7 +52,7 @@ public abstract class BindingState {
         nextUpdatePress = true;
     }
 
-    public ControlTooltip.ComponentIcon getIcon() {
+    public ComponentIcon getIcon() {
         return binding.getIcon();
     }
 

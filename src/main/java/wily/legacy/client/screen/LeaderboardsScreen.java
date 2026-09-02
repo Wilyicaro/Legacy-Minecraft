@@ -39,9 +39,10 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.*;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
@@ -216,12 +217,12 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(this::filterControlIcon, this::filterControlTooltip);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(this::filterControlIcon, this::filterControlTooltip);
     }
 
-    protected ControlTooltip.Icon filterControlIcon() {
+    protected Icon filterControlIcon() {
         return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(filterKey()) : ControllerBinding.LEFT_BUTTON.getIcon();
     }
 
@@ -445,10 +446,10 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 GuiGraphicsExtractor.pose().translate(boardTooltipX + accessor.getInteger("boardControlTooltip.x", 2), boardControlTooltipY);
                 if (!LegacyOptions.getUIMode().isSD())
                     GuiGraphicsExtractor.pose().scale(0.5f, 0.5f);
-                (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(GuiGraphicsExtractor, 4, 0, false);
+                (ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(GuiGraphicsExtractor, 4, 0, false);
                 GuiGraphicsExtractor.pose().popMatrix();
                 if (statsInScreen < board.renderables.size()) {
-                    ControlTooltip.Icon pageControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
+                    Icon pageControl = CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
                     GuiGraphicsExtractor.pose().pushMatrix();
                     GuiGraphicsExtractor.pose().translate(boardTooltipX + boardTooltipWidth + accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
                     if (!LegacyOptions.getUIMode().isSD())

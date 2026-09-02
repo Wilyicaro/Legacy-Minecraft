@@ -21,9 +21,11 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -38,7 +40,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Legacy4JContentListScreen extends PanelVListScreen implements ControlTooltip.Event {
+public class Legacy4JContentListScreen extends PanelVListScreen implements ControlTooltip.Listener {
     private static final int PANEL_WIDTH = 257;
     private static final int PANEL_HEIGHT = 226;
     private static final int TOOLTIP_WIDTH = 240;
@@ -268,11 +270,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+    public void addControlTooltips(ControlTooltipList list) {
         boolean isKbm = ControlType.getActiveType().isKbm();
 
         // Contextual Install/Delete Select
-        renderer.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> {
+        list.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> {
             if (hoveredPack != null && isDownloading(hoveredPack)) {
                 return Component.translatable("legacy.menu.install");
             }
@@ -283,7 +285,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         });
 
         // Cancel
-        renderer.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.back"));
+        list.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.back"));
     }
 
     @Override

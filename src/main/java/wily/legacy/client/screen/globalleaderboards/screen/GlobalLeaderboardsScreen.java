@@ -23,10 +23,12 @@ import wily.legacy.api.client.leaderboards.GlobalLeaderboardRow;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardViewMode;
 import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.CompoundComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.Icon;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.client.screen.globalleaderboards.board.GlobalLeaderboardBoardRegistry;
@@ -56,7 +58,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
    }
 
    @Override
-   protected ControlTooltip.Icon filterControlIcon() {
+   protected Icon filterControlIcon() {
       return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon();
    }
 
@@ -333,9 +335,9 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          graphics.pose().pushMatrix();
          graphics.pose().translate(boardTooltipX + this.accessor.getInteger("boardControlTooltip.x", 2), boardControlTooltipY);
          graphics.pose().scale(LegacyOptions.getUIMode().isSD() ? 1.2f : 0.6f);
-         (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
+         (ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
          graphics.pose().popMatrix();
-         ControlTooltip.Icon difficultyControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
+         Icon difficultyControl = CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
          graphics.pose().pushMatrix();
          graphics.pose().translate(boardTooltipX + boardTooltipWidth + this.accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
          if (!LegacyOptions.getUIMode().isSD()) {

@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -18,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
-public class LegacyLoadingScreen extends Screen implements LegacyLoading, ControlTooltip.Event {
+public class LegacyLoadingScreen extends Screen implements LegacyLoading, ControlTooltip.Listener {
     private final LegacyLoadingRenderer renderer = new LegacyLoadingRenderer();
     private boolean blackBackground;
 

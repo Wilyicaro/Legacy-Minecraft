@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.pause;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin(PauseScreen.class)
-public class PauseScreenMixin extends Screen implements ControlTooltip.Event, RenderableVList.Access {
+public class PauseScreenMixin extends Screen implements ControlTooltip.Listener, RenderableVList.Access {
     @Unique
     protected RenderableVList renderableVList;
     @Unique

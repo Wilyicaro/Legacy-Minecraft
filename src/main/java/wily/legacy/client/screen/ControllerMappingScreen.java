@@ -11,9 +11,11 @@ import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.*;
+import wily.legacy.client.control.*;
+import wily.legacy.client.control.tooltip.ComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.Arrays;
@@ -89,7 +91,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0, 0, 240, 20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
-                public ControlTooltip.ComponentIcon getIcon() {
+                public ComponentIcon getIcon() {
                     return mapping.getBinding().getIcon();
                 }
 
