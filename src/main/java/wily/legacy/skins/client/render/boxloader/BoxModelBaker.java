@@ -166,7 +166,7 @@ final class BoxModelBaker {
     private static void flipUpV(ModelPart.Cube cube) {
         for (int i = 0; i < cube.polygons.length; i++) {
             ModelPart.Polygon polygon = cube.polygons[i];
-            if (polygon == null || polygon.normal().y() < 0.5F) continue;
+            if (polygon == null || polygon.normal().z() < 0.5F) continue;
             ModelPart.Vertex[] vertices = polygon.vertices();
             float minV = Float.POSITIVE_INFINITY;
             float maxV = Float.NEGATIVE_INFINITY;
