@@ -66,8 +66,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     private final boolean[] warningSlots = new boolean[9];
     protected final List<CustomRecipeIconHolder> selectBannerButton = Collections.singletonList(new CustomRecipeIconHolder() {
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_O && isFocused() && hasItem() ? LegacyComponents.SELECT : null);
+        public @Nullable Component getAction(Object context) {
+            return context instanceof KeyContext c ? c.key() == InputConstants.KEY_O && isFocused() && hasItem() ? LegacyComponents.SELECT : null : null;
         }
 
         public Component getDisplayName() {
@@ -348,8 +348,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     protected RecipeIconHolder<BannerRecipe> createRecipeButton(int index) {
         RecipeIconHolder<BannerRecipe> h = new RecipeIconHolder<>(leftPos + 13 + index * 27, topPos + 38) {
             @Override
-            public @Nullable Component getAction(Context context) {
-                return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isFocused() && LegacyLoomScreen.this.canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canCraft() ? LegacyComponents.ADD_PATTERN : null);
+            public @Nullable Component getAction(Object context) {
+                return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && isFocused() && LegacyLoomScreen.this.canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canCraft() ? LegacyComponents.ADD_PATTERN : null : null;
             }
 
             @Override

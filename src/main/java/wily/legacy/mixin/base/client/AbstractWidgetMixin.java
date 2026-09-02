@@ -52,7 +52,7 @@ public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return ControlTooltip.getSelectAction((GuiEventListener) this, context);
     }
 }

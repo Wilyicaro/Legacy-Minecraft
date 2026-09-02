@@ -48,7 +48,7 @@ public class WidgetPanel extends Panel implements GuiEventListener, NarratableEn
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return null;
     }
 }

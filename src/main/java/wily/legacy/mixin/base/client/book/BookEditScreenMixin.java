@@ -65,8 +65,8 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.L
     @Unique
     private final BookPanel panel = new BookPanel(this) {
         @Override
-        public @Nullable Component getAction(Context context) {
-            return page.isFocused() ? context.actionOfContext(KeyContext.class, ControlTooltip::getKeyboardAction) : null;
+        public @Nullable Component getAction(Object context) {
+            return page.isFocused() ? context instanceof KeyContext k ? ControlTooltip.getKeyboardAction(k) : null : null;
         }
     };
 

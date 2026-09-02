@@ -383,8 +383,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         }
 
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN ? movingLayer != null ? LegacyComponents.PLACE : LegacyComponents.LAYER_OPTIONS : null);
+        public @Nullable Component getAction(Object context) {
+            return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN ? movingLayer != null ? LegacyComponents.PLACE : LegacyComponents.LAYER_OPTIONS : null : null;
         }
     }
 

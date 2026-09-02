@@ -122,8 +122,16 @@ public class LegacyItemUtil {
         return itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElse(null);
     }
 
+    public static boolean isWaterBottle(ItemStack itemStack) {
+        return getNonNullPotionContents(itemStack).is(Potions.WATER);
+    }
+
+    public static PotionContents getNonNullPotionContents(ItemStack itemStack) {
+        return itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+    }
+
     public static PotionContents getPotionContents(ItemStack itemStack) {
-        PotionContents contents = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        PotionContents contents = getNonNullPotionContents(itemStack);
         return contents.potion().isPresent() || contents.hasEffects() ? contents : null;
     }
 
