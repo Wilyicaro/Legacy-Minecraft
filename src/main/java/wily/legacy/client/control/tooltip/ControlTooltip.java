@@ -400,7 +400,7 @@ public interface ControlTooltip {
         return holder;
     }
 
-    static ActionHolder registerOptionalBlockUse(String id, Function<BlockUse, ResultAction> function) {
+    static ActionHolder registerResultBlockUse(String id, Function<BlockUse, ResultAction> function) {
         ResultActionHolder holder = ctx -> ctx instanceof BlockUse blockUse ? function.apply(blockUse) : null;
         BLOCK_USE_ACTIONS.put(id, holder);
         return holder;
@@ -416,7 +416,7 @@ public interface ControlTooltip {
         return holder;
     }
 
-    static ActionHolder registerOptionalBlockUseItemOn(String id, Function<BlockUseItemOn, ResultAction> function) {
+    static ActionHolder registerResultBlockUseItemOn(String id, Function<BlockUseItemOn, ResultAction> function) {
         ResultActionHolder holder = ctx -> ctx instanceof BlockUseItemOn blockUseItemOn ? function.apply(blockUseItemOn) : null;
         BLOCK_USE_ITEM_ON_ACTIONS.put(id, holder);
         return holder;
@@ -562,7 +562,7 @@ public interface ControlTooltip {
                 return LegacyComponents.ATTACH;
         return null;
     });
-    ActionHolder SLEEP = registerOptionalBlockUse("sleep", ctx -> ctx.state.getBlock() instanceof BedBlock ? canSleep(ctx) ? ResultAction.of(LegacyComponents.SLEEP) : ResultAction.cancel() : ResultAction.pass());
+    ActionHolder SLEEP = registerResultBlockUse("sleep", ctx -> ctx.state.getBlock() instanceof BedBlock ? canSleep(ctx) ? ResultAction.of(LegacyComponents.SLEEP) : ResultAction.cancel() : ResultAction.pass());
     ActionHolder CHANGE_PITCH = registerBlockUse("change_pitch", ctx -> ctx.state.getBlock() instanceof NoteBlock, LegacyComponents.CHANGE_PITCH);
     ActionHolder REDSTONE_ORE_USE = registerBlockUse("redstone_ore_use", ctx -> ctx.state.getBlock() instanceof RedStoneOreBlock, LegacyComponents.USE);
     ActionHolder MECHANISMS_USE = registerBlockUse("mechanisms_use", ctx -> ctx.state.getBlock() instanceof RepeaterBlock || ctx.state.getBlock() instanceof ComparatorBlock || ctx.state.getBlock() instanceof RedStoneWireBlock, LegacyComponents.USE);
