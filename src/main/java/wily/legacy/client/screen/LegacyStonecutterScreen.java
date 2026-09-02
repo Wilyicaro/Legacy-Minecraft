@@ -17,6 +17,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.*;
 import wily.legacy.inventory.LegacyCraftingMenu;
@@ -29,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
 
 public class LegacyStonecutterScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIconHolder<StonecutterRecipe>> {
@@ -54,9 +55,9 @@ public class LegacyStonecutterScreen extends RecipesScreen<LegacyCraftingMenu, R
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
     }
 
     @Override

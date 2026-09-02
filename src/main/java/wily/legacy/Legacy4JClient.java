@@ -26,7 +26,6 @@ import net.minecraft.client.renderer.*;
  *///?} else {
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 //?}
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.*;
@@ -69,7 +68,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 //? if >=1.20.5 {
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 //?} else {
 /*import net.minecraft.world.item.alchemy.PotionUtils;
@@ -91,7 +89,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.client.controller.*;
+import wily.legacy.client.control.*;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
@@ -442,7 +441,7 @@ public class Legacy4JClient {
             screen.clearFocus();
         }
         if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.isControllerTheLastInput() || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
-            Controller.Event e = Controller.Event.of(screen);
+            Controller.Listener e = Controller.Listener.of(screen);
             if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways())
                 controllerManager.tryDisableCursor();
             if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways()))

@@ -8,10 +8,11 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.skins.client.changeskin.ChangeSkinPackList;
@@ -664,7 +665,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer r) {
+    public void addControlTooltips(ControlTooltipList r) {
         addCommonControlTooltips(
                 r,
                 ControlTooltip.POINTER_MOVEMENT::get,

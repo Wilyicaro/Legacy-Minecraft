@@ -1,10 +1,9 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
-import wily.legacy.client.ControlType;
 
 import java.io.BufferedReader;
 import java.io.IOException;

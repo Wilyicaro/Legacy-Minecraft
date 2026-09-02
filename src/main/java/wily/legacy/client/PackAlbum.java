@@ -43,6 +43,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.*;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.init.LegacyRegistries;
@@ -60,7 +61,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
 
 public record PackAlbum(String id, int version, Component displayName, Component description,

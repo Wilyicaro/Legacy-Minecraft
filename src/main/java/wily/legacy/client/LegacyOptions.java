@@ -21,7 +21,7 @@ import wily.factoryapi.base.config.FactoryConfigDisplay;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.*;
+import wily.legacy.client.control.*;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;

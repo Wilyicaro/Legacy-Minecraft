@@ -3,15 +3,11 @@ package wily.legacy.client;
 import com.google.common.base.Charsets;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -19,12 +15,12 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.ControllerManager;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.tooltip.*;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.IOUtil;
 
@@ -47,7 +43,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final String COMMON_COLORS = "common_colors.json";
     public static final String COMMON_VALUES = "common_values.json";
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
-    public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
+    public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/control.json";
     public static final Identifier DEFAULT_CHANGELOG_PATH = Legacy4J.createModLocation("changelog");
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static LegacyIntro intro = LegacyIntro.EMPTY;
@@ -69,11 +65,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         }
     }
 
-    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, Identifier location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static <T extends CharsIcon> void addIcons(ResourceManager resourceManager, Identifier location, Codec<List<T>> codec, BiConsumer<String, LegacyIcon> addIcon) {
         resourceManager.getResource(location).ifPresent(r -> {
             try (BufferedReader reader = r.openAsReader()) {
                 codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", location, error)).ifPresent(charsIcons -> {
-                    for (ControlTooltip.CharsIcon charsIcon : charsIcons) {
+                    for (CharsIcon charsIcon : charsIcons) {
                         addIcon.accept(charsIcon.name(), charsIcon);
                     }
                 });
@@ -83,12 +79,12 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         });
     }
 
-    public static void addControllerIcons(ResourceManager resourceManager, Identifier location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
-        addIcons(resourceManager, location, ControlTooltip.ControllerIcon.LIST_CODEC, addIcon);
+    public static void addControllerIcons(ResourceManager resourceManager, Identifier location, BiConsumer<String, LegacyIcon> addIcon) {
+        addIcons(resourceManager, location, ControllerIcon.LIST_CODEC, addIcon);
     }
 
-    public static void addKbmIcons(ResourceManager resourceManager, Identifier location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
-        addIcons(resourceManager, location, ControlTooltip.KeyIcon.LIST_CODEC, addIcon);
+    public static void addKbmIcons(ResourceManager resourceManager, Identifier location, BiConsumer<String, LegacyIcon> addIcon) {
+        addIcons(resourceManager, location, KeyIcon.LIST_CODEC, addIcon);
     }
 
     public static void loadIntroLocations(ResourceManager resourceManager) {
