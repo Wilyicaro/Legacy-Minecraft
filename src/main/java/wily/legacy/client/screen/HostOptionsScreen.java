@@ -215,8 +215,8 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
 
         @Override
-        public Component getAction(ControlTooltip.ActionHolder.Context context) {
-            return context.actionOfContext(ControlTooltip.ActionHolder.KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isHovered() ? LegacyComponents.PRIVILEGES : ControlTooltip.getSelectAction(this, c));
+        public Component getAction(Object context) {
+            return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && isHovered() ? LegacyComponents.PRIVILEGES : ControlTooltip.getSelectAction(this, c) : null;
         }
     }
 

@@ -79,8 +79,8 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
         LegacyIconHolder h = new LegacyIconHolder(27, 27) {
 
             @Override
-            public @Nullable Component getAction(Context context) {
-                return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && !displaySlotsWarning[2] && isValidIndex() && isFocused() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(getIndex()).isOutOfStock() ? LegacyComponents.TRADE : null);
+            public @Nullable Component getAction(Object context) {
+                return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && !displaySlotsWarning[2] && isValidIndex() && isFocused() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(getIndex()).isOutOfStock() ? LegacyComponents.TRADE : null : null;
             }
 
             @Override

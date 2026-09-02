@@ -107,7 +107,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
-        return isFocused() ? context.actionOfContext(KeyContext.class, ControlTooltip::getKeyboardAction) : null;
+    public @Nullable Component getAction(Object context) {
+        return isFocused() ? context instanceof KeyContext k ? ControlTooltip.getKeyboardAction(k) : null : null;
     }
 }

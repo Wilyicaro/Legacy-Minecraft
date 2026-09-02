@@ -243,7 +243,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
-        return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isFocused() && canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canAddIngredient() ? LegacyComponents.ADD : null);
+    public @Nullable Component getAction(Object context) {
+        return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && isFocused() && canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canAddIngredient() ? LegacyComponents.ADD : null : null;
     }
 }

@@ -419,7 +419,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return ControlTooltip.getSelectAction(this, context);
     }
 }

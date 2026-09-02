@@ -415,8 +415,8 @@ public class SaveRenderableList extends RenderableVList {
         }
 
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_O && isFocused() ? LegacyComponents.SAVE_OPTIONS : ControlTooltip.getSelectAction(this, c));
+        public @Nullable Component getAction(Object context) {
+            return context instanceof KeyContext c ? c.key() == InputConstants.KEY_O && isFocused() ? LegacyComponents.SAVE_OPTIONS : ControlTooltip.getSelectAction(this, c) : null;
         }
     }
 
