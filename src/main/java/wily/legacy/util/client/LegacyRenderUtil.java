@@ -610,7 +610,7 @@ public class LegacyRenderUtil {
                 tooltipLines.forEach((mutableComponent, width) -> {
                     int x = (GuiGraphicsExtractor.guiWidth() - width) / 2;
                     boolean itemNameLine = line[0]++ == 0;
-                    boolean useItemNameColor = itemNameLine && overrideItemNameColor;
+                    boolean useItemNameColor = itemNameLine && overrideItemNameColor && (mutableComponent.getStyle().getColor() == null || mutableComponent.getStyle().getColor().getValue() == 0xFFFFFF);
                     boolean useItemTooltipColor = !itemNameLine && overrideItemTooltipColor;
                     Component text = mutableComponent;
                     int color = defaultColor;
