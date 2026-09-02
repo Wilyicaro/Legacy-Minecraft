@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.PlayerSkin;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import wily.legacy.skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.skins.pose.SkinPoseRegistry;
 import wily.legacy.skins.skin.ClientSkinAssets;
 
 public final class GuiDollRender {
@@ -35,7 +36,7 @@ public final class GuiDollRender {
 
     public static void renderDollInRect(GuiGraphicsExtractor gui, String selectionId, PlayerSkin skin, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
         if (gui == null || skin == null) return;
-        submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, null, null, null, null, BASE_BBOX_HEIGHT, BASE_BBOX_WIDTH, yawOffset, crouching, attackTime, false));
+        submit(gui, left, right, buildLayout(crouching, selectionId, top, bottom, sizeCap), buildState(skin, selectionId, null, null, null, null, BASE_BBOX_HEIGHT, BASE_BBOX_WIDTH, yawOffset, crouching, attackTime, false));
     }
 
     public static void renderDollInRect(GuiGraphicsExtractor gui, String selectionId, Identifier skinTexture, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
@@ -58,7 +59,7 @@ public final class GuiDollRender {
         Identifier resolvedTexture = resolved != null && resolved.texture() != null ? resolved.texture() : skinTexture;
         Identifier resolvedBoxTexture = resolved != null && resolved.boxTexture() != null ? resolved.boxTexture() : resolvedTexture;
         PlayerSkin skin = PlayerSkin.insecure(body, cape, body, ClientSkinAssets.resolveModelType(selectionId, resolved));
-        submit(gui, left, right, buildLayout(crouching, top, bottom, sizeCap), buildState(skin, selectionId, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, yawOffset, crouching, attackTime, showCape));
+        submit(gui, left, right, buildLayout(crouching, selectionId, top, bottom, sizeCap), buildState(skin, selectionId, resolvedTexture, resolvedBoxTexture, resolved == null ? null : resolved.modelId(), built, bboxHeight, bboxWidth, yawOffset, crouching, attackTime, showCape));
     }
 
     private static void submit(GuiGraphicsExtractor gui, int left, int right, PreviewLayout layout, AvatarRenderState state) {
@@ -103,13 +104,14 @@ public final class GuiDollRender {
         return state;
     }
 
-    private static PreviewLayout buildLayout(boolean crouching, int top, int bottom, int sizeCap) {
+    private static PreviewLayout buildLayout(boolean crouching, String selectionId, int top, int bottom, int sizeCap) {
         int baseHeight = bottom - top;
         int size = Math.min((int) (baseHeight / SCALE_DIVISOR), sizeCap);
         size = Math.max(size, MIN_RENDER_SIZE);
+        float crouchOffset = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.BACKWARDS_CROUCH, selectionId) ? -0.175F : CROUCH_Y_OFFSET;
         return new PreviewLayout(
                 size,
-                new Vector3f(0.0F, BASE_TRANSLATE_Y + (crouching ? CROUCH_Y_OFFSET : 0.0F), 0.0F),
+                new Vector3f(0.0F, BASE_TRANSLATE_Y + (crouching ? crouchOffset : 0.0F), 0.0F),
                 new Quaternionf().rotationZ((float) Math.PI),
                 new Quaternionf(),
                 top - baseHeight,
