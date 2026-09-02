@@ -5,7 +5,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.Controller;
+import wily.legacy.client.control.Controller;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -17,12 +17,12 @@ public interface NavigationElement {
     }
 
     default void playFocusSound(ComponentPath.Path path) {
-        if (Legacy4JClient.controllerManager.isCursorDisabled || Controller.Event.of(path.component()).disableCursorOnWidgets())
+        if (Legacy4JClient.controllerManager.isCursorDisabled || Controller.Listener.of(path.component()).disableCursorOnWidgets())
             LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
     }
 
     default void applyFocus(ComponentPath.Path path, boolean apply) {
-        boolean disableCursor = Controller.Event.of(path.component()).disableCursorOnWidgets() && !Legacy4JClient.controllerManager.getCursorMode().isAlways();
+        boolean disableCursor = Controller.Listener.of(path.component()).disableCursorOnWidgets() && !Legacy4JClient.controllerManager.getCursorMode().isAlways();
         if (Legacy4JClient.controllerManager.isCursorDisabled || disableCursor) {
             if (!apply) {
                 path.component().setFocused(null);

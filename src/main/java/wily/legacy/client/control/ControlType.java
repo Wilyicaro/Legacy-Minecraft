@@ -1,4 +1,4 @@
-package wily.legacy.client;
+package wily.legacy.client.control;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -10,7 +10,11 @@ import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.IdValueInfo;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.OptionHolder;
+import wily.legacy.client.SizeableAsset;
+import wily.legacy.client.control.tooltip.LegacyIcon;
 import wily.legacy.util.IOUtil;
 
 import java.util.*;
@@ -18,7 +22,7 @@ import java.util.*;
 public record ControlType(Identifier id, Optional<Component> name, boolean isKbm,
                           Optional<SizeableAsset<ControlFont>> font, Optional<Identifier> minecraftLogo,
                           Optional<SizeableAsset<Style>> style,
-                          Map<String, ControlTooltip.LegacyIcon> icons) implements IdValueInfo<ControlType> {
+                          Map<String, LegacyIcon> icons) implements IdValueInfo<ControlType> {
     public static final SizeableAsset<Style> EMPTY_STYLE_ASSET = new SizeableAsset<>(Style.EMPTY);
     public static final Codec<ControlType> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(ControlType::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(ControlType::name), Codec.BOOL.optionalFieldOf("isKbm", false).forGetter(ControlType::isKbm), SizeableAsset.createWithFallback(ControlFont.CODEC).optionalFieldOf("font").forGetter(ControlType::font), Identifier.CODEC.optionalFieldOf("minecraftLogo").forGetter(ControlType::minecraftLogo)).apply(i, ControlType::new));
     public static final Codec<ControlType> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, Identifier.CODEC.xmap(ControlType::new, ControlType::id));

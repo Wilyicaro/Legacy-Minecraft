@@ -71,7 +71,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -85,6 +84,8 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.*;
 import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -570,8 +571,8 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
     private void addedScreen(Screen screen, CallbackInfo ci) {
-        ControlTooltip.Event.of(screen).setupControlTooltips();
-        ControlTooltip.Renderer.SCREEN_EVENT.invoker.accept(screen, ControlTooltip.Event.of(screen).getControlTooltips());
+        ControlTooltip.Listener.of(screen).setupControlTooltips();
+        ControlTooltipRenderer.SCREEN_EVENT.invoker.accept(screen, ControlTooltip.Listener.of(screen).getControlTooltips());
         LegacyTipManager.resetTipOffset(true);
     }
 
@@ -618,8 +619,8 @@ public abstract class MinecraftMixin {
             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
         if (screen == null && level != null) {
             LegacyGuiElements.lastGui = Util.getMillis();
-            ControlTooltip.Event.of(gui).setupControlTooltips();
-            ControlTooltip.Renderer.GUI_EVENT.invoker.accept(gui, ControlTooltip.Event.of(gui).getControlTooltips());
+            ControlTooltip.Listener.of(gui).setupControlTooltips();
+            ControlTooltipRenderer.GUI_EVENT.invoker.accept(gui, ControlTooltip.Listener.of(gui).getControlTooltips());
         }
     }
 

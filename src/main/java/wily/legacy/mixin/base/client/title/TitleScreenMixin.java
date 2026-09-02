@@ -26,10 +26,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
@@ -41,7 +45,7 @@ import java.util.function.BiConsumer;
 import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
-public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event, RenderableVList.Access {
+public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Listener, RenderableVList.Access {
     @Shadow
     @Nullable
     private SplashRenderer splash;
@@ -154,13 +158,18 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
         PlayGameScreen.preloadCreateWorld(minecraft);
-        if (LegacyOptions.legacySettingsMenus.get())
-            ControlTooltip.Renderer.of(this).add(ControlTooltip.PRESS::get, () -> LegacyComponents.SELECT);
-        else
-            ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
-        if (PublishScreen.hasWorldHost())
-            ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        if (LegacyOptions.legacySettingsMenus.get())
+            list.add(ControlTooltip.PRESS::get, () -> LegacyComponents.SELECT);
+        else
+            list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
+        if (PublishScreen.hasWorldHost())
+            list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> WorldHostFriendsScreen.FRIENDS);
     }
 
     @Inject(method = "removed", at = @At("RETURN"))

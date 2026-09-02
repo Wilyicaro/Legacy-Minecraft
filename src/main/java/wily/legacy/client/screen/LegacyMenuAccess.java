@@ -8,13 +8,13 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.Controller;
+import wily.legacy.client.control.Controller;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Comparator;
 
-public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Event {
+public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Listener {
 
     default boolean movePointerToSlotIn(ScreenDirection direction) {
         return movePointerToSlotIn(direction, false, false);

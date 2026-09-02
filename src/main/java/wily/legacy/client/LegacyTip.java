@@ -17,14 +17,14 @@ import net.minecraft.world.item.ItemStack;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.controller.Controller;
+import wily.legacy.client.control.Controller;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
-public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controller.Event {
+public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controller.Listener {
 
     protected final AdvancedTextWidget tipLabel = new AdvancedTextWidget(FactoryScreenUtil.getGuiAccessor());
     public Visibility visibility = Visibility.SHOW;

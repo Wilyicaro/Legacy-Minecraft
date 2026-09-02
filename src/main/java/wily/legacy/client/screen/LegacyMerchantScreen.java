@@ -27,7 +27,7 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.inventory.LegacyMerchantMenu;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.network.ServerMenuCraftPayload;

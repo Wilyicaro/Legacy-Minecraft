@@ -36,12 +36,15 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.ControllerManager;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.LegacyCreditsScreen;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -50,7 +53,7 @@ import java.io.Reader;
 import java.util.List;
 
 @Mixin(WinScreen.class)
-public abstract class WinScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
+public abstract class WinScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
 
     @Unique
     Identifier POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
@@ -97,10 +100,11 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
         return (Object) this instanceof LegacyCreditsScreen;
     }
 
+
     @Override
-    public void added() {
-        super.added();
-        if (poem || isLegacyCredits()) ControlTooltip.Renderer.of(this).clear().add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(), () -> poem ? CommonComponents.GUI_CONTINUE : CommonComponents.GUI_BACK);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        if (poem || isLegacyCredits()) list.clear().add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(), () -> poem ? CommonComponents.GUI_CONTINUE : CommonComponents.GUI_BACK);
     }
 
     @Shadow
@@ -203,7 +207,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Event,
     @Override
     public void simulateKeyAction(ControllerManager manager, BindingState state) {
         if (!poem && !isLegacyCredits()) return;
-        Controller.Event.super.simulateKeyAction(manager, state);
+        Controller.Listener.super.simulateKeyAction(manager, state);
         if (poem) {
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_UP), InputConstants.KEY_UP, state, true);
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_DOWN), InputConstants.KEY_DOWN, state, true);

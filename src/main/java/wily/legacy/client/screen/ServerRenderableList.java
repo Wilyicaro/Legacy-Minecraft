@@ -43,6 +43,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.compat.BisectModCompat;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;

@@ -1,4 +1,4 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.FloatByReference;
@@ -19,7 +19,6 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;

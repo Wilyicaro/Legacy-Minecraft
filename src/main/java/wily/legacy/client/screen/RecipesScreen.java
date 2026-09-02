@@ -8,16 +8,17 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static wily.legacy.client.screen.ControlTooltip.Renderer;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 
-public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements Controller.Event, ControlTooltip.Event {
+public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements Controller.Listener, ControlTooltip.Listener {
     protected final UIAccessor accessor = UIAccessor.of(this);
 
     protected final List<H> recipeButtons = new ArrayList<>();
@@ -40,9 +41,9 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        ControlTooltip.setupDefaultButtons(renderer, this);
-        ControlTooltip.Event.super.addControlTooltips(renderer);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultButtons(list, this);
+        ControlTooltip.Listener.super.addControlTooltips(list);
     }
 
     @Override
@@ -52,7 +53,7 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
 
     @Override
     public boolean onceClickBindings(BindingState state) {
-        return !state.is(ControllerBinding.DOWN_BUTTON) && Controller.Event.super.onceClickBindings(state);
+        return !state.is(ControllerBinding.DOWN_BUTTON) && Controller.Listener.super.onceClickBindings(state);
     }
 
     protected abstract void updateRecipes();

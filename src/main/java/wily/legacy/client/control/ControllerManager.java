@@ -1,4 +1,4 @@
-package wily.legacy.client.controller;
+package wily.legacy.client.control;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
@@ -32,7 +32,6 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.ReplayCompat;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -302,7 +301,7 @@ public class ControllerManager {
                     minecraft.setLastInputType(InputType.KEYBOARD_ARROW);
                     minecraft.screen.afterKeyboardAction();
                 }
-                Controller.Event.of(minecraft.screen).bindingStateTick(state);
+                Controller.Listener.of(minecraft.screen).bindingStateTick(state);
                 if (minecraft.screen == null) break s;
 
                 if (!isCursorDisabled) {
@@ -366,7 +365,7 @@ public class ControllerManager {
                         minecraft.screen.mouseDragged(getMouseEvent(0), 0, 0);
                         LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
-                    int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
+                    int mouseClick = Controller.Listener.of(minecraft.screen).getBindingMouseClick(state);
                     if (mouseClick != -1 &&
                             (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
                         isControllerSimulatingInput = true;
@@ -380,7 +379,7 @@ public class ControllerManager {
 
                 ControllerBinding<?> cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorBinding != null && state.is(cursorBinding) && state.canClick()) toggleCursor();
-                Controller.Event.of(minecraft.screen).simulateKeyAction(this, state);
+                Controller.Listener.of(minecraft.screen).simulateKeyAction(this, state);
                 if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
                     minecraft.screen.mouseScrolled(getPointerX(), getPointerY()/*? if >1.20.1 {*/, 0/*?}*/, Math.signum(-stick.y));
 
@@ -434,7 +433,7 @@ public class ControllerManager {
             Screenshot.grab(this.minecraft.gameDirectory, this.minecraft.getMainRenderTarget(), component -> this.minecraft.execute(() -> this.minecraft.gui.getChat().addClientSystemMessage(component)));
         }
 
-        if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);
+        if (minecraft.screen != null) Controller.Listener.of(minecraft.screen).controllerTick(controller);
         if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().controllerTick(controller);
     }
 
@@ -495,7 +494,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen) {
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.released || state.onceClick(true))) {
+        if (canSimulate.test(state) && (!Controller.Listener.of(minecraft.screen).onceClickBindings(state) || state.released || state.onceClick(true))) {
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }
@@ -567,7 +566,7 @@ public class ControllerManager {
     }
 
     public void tryDisableCursor() {
-        if (getCursorMode().isAlways() || minecraft.screen == null || minecraft.screen instanceof Controller.Event e && !e.disableCursorOnInit())
+        if (getCursorMode().isAlways() || minecraft.screen == null || minecraft.screen instanceof Controller.Listener e && !e.disableCursorOnInit())
             return;
         disableCursor();
     }
