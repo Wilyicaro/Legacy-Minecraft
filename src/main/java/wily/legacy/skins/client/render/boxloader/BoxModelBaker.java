@@ -8,6 +8,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.core.Direction;
+import wily.legacy.mixin.base.skins.client.ModelPartAccessor;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -36,6 +37,19 @@ final class BoxModelBaker {
             addPart(root, builds, build, texelScale, new LinkedHashSet<>());
         }
         ModelPart bakedRoot = LayerDefinition.create(mesh, texW, texH).bakeRoot();
+        Map<BoneKey, ModelPart> bakedParts = new LinkedHashMap<>();
+        for (int pass = 0; pass < builds.size(); pass++) {
+            for (BoneBuild build : builds.values()) {
+                if (bakedParts.containsKey(build.key)) continue;
+                BoneBuild parent = parent(builds, build);
+                if (parent != null && !bakedParts.containsKey(parent.key)) continue;
+                ModelPart owner = parent == null ? bakedRoot : bakedParts.get(parent.key);
+                ModelPart part = getChild(owner, build.childName);
+                if (part == null) continue;
+                bakedParts.put(build.key, part);
+                applyFaceTransforms(part, build.flipUpV);
+            }
+        }
         EnumMap<AttachSlot, List<ModelPart>> parts = new EnumMap<>(AttachSlot.class);
         IdentityHashMap<ModelPart, Integer> armorMasks = new IdentityHashMap<>();
         for (BoneBuild build : builds.values()) {
@@ -94,6 +108,8 @@ final class BoxModelBaker {
                 int[] uv = uv(cube.uv());
                 builder = builder.texOffs(uv[0], uv[1]);
                 builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
+                float inflate = cube.inflate();
+                if (inflate == 0.0F && isOuterSlot(build.key.slot())) inflate = 0.01F;
                 builder = builder.addBox(
                         (origin[0] - pivot[0]) * texelScale,
                         (origin[1] - pivot[1]) * texelScale,
@@ -101,8 +117,9 @@ final class BoxModelBaker {
                         size[0] * texelScale,
                         size[1] * texelScale,
                         size[2] * texelScale,
-                        new CubeDeformation(cube.inflate() * texelScale)
+                        new CubeDeformation(inflate * texelScale)
                 );
+                build.flipUpV.add(cube.flipUpV());
                 bounds.add(origin, size);
                 coreSlotBounds.merge(build.key.slot(), Bounds.of(origin, size), Bounds::larger);
             }
@@ -125,11 +142,45 @@ final class BoxModelBaker {
                         size[2] * texelScale,
                         EnumSet.of(face)
                 );
+                build.flipUpV.add(false);
                 bounds.add(origin, size);
                 coreSlotBounds.merge(build.key.slot(), Bounds.of(origin, size), Bounds::larger);
             }
         }
         build.builder = builder;
+    }
+
+    private static void applyFaceTransforms(ModelPart part, List<Boolean> flipUpV) {
+        List<ModelPart.Cube> cubes = ((ModelPartAccessor) (Object) part).consoleskins$getCubes();
+        int count = Math.min(cubes.size(), flipUpV.size());
+        for (int i = 0; i < count; i++) {
+            if (flipUpV.get(i)) flipUpV(cubes.get(i));
+        }
+    }
+
+    private static boolean isOuterSlot(AttachSlot slot) {
+        return slot == AttachSlot.JACKET || slot == AttachSlot.RIGHT_SLEEVE || slot == AttachSlot.LEFT_SLEEVE
+                || slot == AttachSlot.RIGHT_PANTS || slot == AttachSlot.LEFT_PANTS;
+    }
+
+    private static void flipUpV(ModelPart.Cube cube) {
+        for (int i = 0; i < cube.polygons.length; i++) {
+            ModelPart.Polygon polygon = cube.polygons[i];
+            if (polygon == null || polygon.normal().y() < 0.5F) continue;
+            ModelPart.Vertex[] vertices = polygon.vertices();
+            float minV = Float.POSITIVE_INFINITY;
+            float maxV = Float.NEGATIVE_INFINITY;
+            for (ModelPart.Vertex vertex : vertices) {
+                minV = Math.min(minV, vertex.v());
+                maxV = Math.max(maxV, vertex.v());
+            }
+            ModelPart.Vertex[] flipped = new ModelPart.Vertex[vertices.length];
+            for (int vertexIndex = 0; vertexIndex < vertices.length; vertexIndex++) {
+                ModelPart.Vertex vertex = vertices[vertexIndex];
+                flipped[vertexIndex] = vertex.remap(vertex.u(), minV + maxV - vertex.v());
+            }
+            cube.polygons[i] = new ModelPart.Polygon(flipped, polygon.normal());
+        }
     }
 
     private static EnumMap<AttachSlot, float[]> slotSizes(EnumMap<AttachSlot, Bounds> bounds) {
@@ -235,6 +286,7 @@ final class BoxModelBaker {
         final BoneKey key;
         final BoneDef bone;
         final String childName;
+        final List<Boolean> flipUpV = new ArrayList<>();
         CubeListBuilder builder = CubeListBuilder.create();
         PartDefinition part;
         boolean added;
