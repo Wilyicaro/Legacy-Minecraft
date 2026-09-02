@@ -1975,7 +1975,7 @@
   "legacy.menu.selectWorld.mapType.single_biome_surface.description": "Generate a world consisting entirely of a single Biome. The Biome you choose will define how you will survive, so choose wisely!",
   "legacy.menu.selectWorld.superflat_world": "Superflat World",
   "legacy.menu.selectWorld.trust_players": "Trust Players",
-  "legacy.menu.selectWorld.trust_players.description": "When disabled, players joining the game cannot build or mine until authorised.",
+  "legacy.menu.selectWorld.trust_players.description": "When disabled, players joining the game cannot build or mine until authorized.",
   "legacy.menu.server_exit_message": "Are you sure you want to exit to the main menu?",
   "legacy.menu.server_options": "Server Options",
   "legacy.menu.server_options_message": "What would you like to do with this server?",
