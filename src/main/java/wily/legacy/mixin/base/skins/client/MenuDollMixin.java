@@ -236,6 +236,9 @@ public abstract class MenuDollMixin {
         if (noIdleSway && !zombieArms && state.id != GuiDollRender.MENU_DOLL_ID) {
             consoleskins$removeIdleSway(self, state);
         }
+        if (BackwardsCrouchPose.shouldApply(state)) {
+            BackwardsCrouchPose.apply(self);
+        }
         consoleskins$applyBoxPivotAnimations(self, state, access);
     }
 }
