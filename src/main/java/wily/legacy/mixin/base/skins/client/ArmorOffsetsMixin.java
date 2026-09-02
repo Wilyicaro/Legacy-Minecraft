@@ -160,6 +160,16 @@ public abstract class ArmorOffsetsMixin {
     }
 
     @Unique
+    private static void consoleskins$applyOffsetOverrides(EquipmentSlot slot, float[][] offsets, EnumMap<AttachSlot, float[]> overrides) {
+        if (slot == null || offsets == null || overrides == null) return;
+        for (ArmorPart part : consoleskins$parts(slot)) {
+            if (!overrides.containsKey(part.base())) continue;
+            float[] offset = overrides.get(part.base());
+            offsets[part.index()] = consoleskins$isZero(offset) ? null : offset;
+        }
+    }
+
+    @Unique
     private static float consoleskins$clampScale(float scale) {
         if (scale < 0.5F) return 0.5F;
         return Math.min(scale, 3.0F);
@@ -264,6 +274,8 @@ public abstract class ArmorOffsetsMixin {
         }
         EnumMap<ArmorSlot, float[]> armorOffsets = BoxModelManager.getArmorOffsets(modelId);
         float[][] renderOffsets = consoleskins$renderOffsets(slot, armorOffsets == null ? null : armorOffsets.get(armorSlot));
+        EnumMap<ArmorSlot, EnumMap<AttachSlot, float[]>> armorPartOffsets = BoxModelManager.getArmorPartOffsets(modelId);
+        consoleskins$applyOffsetOverrides(slot, renderOffsets, armorPartOffsets == null ? null : armorPartOffsets.get(armorSlot));
         float[][] scales = Boolean.TRUE.equals(BoxModelManager.getArmorStretch(modelId)) ? consoleskins$autoScales(slot, boxModel) : new float[6][];
         consoleskins$applyScaleOverrides(slot, scales, BoxModelManager.getArmorScales(modelId));
         if (!consoleskins$hasOffsets(renderOffsets) && !consoleskins$hasScales(scales)) return;
