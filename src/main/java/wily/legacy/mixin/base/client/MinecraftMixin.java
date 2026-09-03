@@ -86,6 +86,7 @@ import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.UsePrediction;
 import wily.legacy.client.screen.*;
 import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -456,7 +457,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private void startUseItemCreativeBlockPlacing(CallbackInfo ci, @Local InteractionHand hand, @Local BlockHitResult hit) {
-        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(new ControlTooltip.BlockUseItemOn(player, hand, hit))) {
+        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && UsePrediction.canPlace(new UsePrediction.BlockUseItemOn(player, hand, hit))) {
             if (lastPlayerBlockUsePos == null) lastPlayerBlockUsePos = player.position();
             rightClickDelay = 0;
         }

@@ -5,6 +5,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
+/**
+ * A control icon that can be easily represented as a text component
+ */
 public interface ComponentIcon extends Icon {
     static ComponentIcon of(Component component) {
         return new ComponentIcon() {
