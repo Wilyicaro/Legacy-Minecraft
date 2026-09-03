@@ -94,6 +94,10 @@ final class BoxModelJsonSupport {
         return parseMap(el, ArmorSlot.class, ArmorSlot::fromString, BoxModelJsonSupport::parseVec3);
     }
 
+    static EnumMap<ArmorSlot, EnumMap<AttachSlot, float[]>> parseArmorPartOffsets(JsonElement el) {
+        return parseMap(el, ArmorSlot.class, ArmorSlot::fromString, BoxModelJsonSupport::parseOffsets);
+    }
+
     static EnumSet<ArmorSlot> parseArmorHideSlots(JsonElement el) {
         return parseEnumFlags(el, ArmorSlot.class, BoxModelJsonSupport::addArmorHideToken);
     }

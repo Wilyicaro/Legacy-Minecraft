@@ -108,8 +108,6 @@ final class BoxModelBaker {
                 int[] uv = uv(cube.uv());
                 builder = builder.texOffs(uv[0], uv[1]);
                 builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
-                float inflate = cube.inflate();
-                if (inflate == 0.0F && isOuterSlot(build.key.slot())) inflate = 0.01F;
                 builder = builder.addBox(
                         (origin[0] - pivot[0]) * texelScale,
                         (origin[1] - pivot[1]) * texelScale,
@@ -117,7 +115,7 @@ final class BoxModelBaker {
                         size[0] * texelScale,
                         size[1] * texelScale,
                         size[2] * texelScale,
-                        new CubeDeformation(inflate * texelScale)
+                        new CubeDeformation(cube.inflate() * texelScale)
                 );
                 build.flipUpV.add(cube.flipUpV());
                 bounds.add(origin, size);
@@ -158,15 +156,10 @@ final class BoxModelBaker {
         }
     }
 
-    private static boolean isOuterSlot(AttachSlot slot) {
-        return slot == AttachSlot.JACKET || slot == AttachSlot.RIGHT_SLEEVE || slot == AttachSlot.LEFT_SLEEVE
-                || slot == AttachSlot.RIGHT_PANTS || slot == AttachSlot.LEFT_PANTS;
-    }
-
     private static void flipUpV(ModelPart.Cube cube) {
         for (int i = 0; i < cube.polygons.length; i++) {
             ModelPart.Polygon polygon = cube.polygons[i];
-            if (polygon == null || polygon.normal().y() < 0.5F) continue;
+            if (polygon == null || polygon.normal().z() < 0.5F) continue;
             ModelPart.Vertex[] vertices = polygon.vertices();
             float minV = Float.POSITIVE_INFINITY;
             float maxV = Float.NEGATIVE_INFINITY;
