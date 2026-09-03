@@ -29,7 +29,7 @@ public final class BoxModelManager {
     private static final Map<String, Identifier> KEY_INDEX = new ConcurrentHashMap<>();
     private static final Set<Identifier> LOADED = ConcurrentHashMap.newKeySet();
     private static final Map<Identifier, Object> LOAD_LOCKS = new ConcurrentHashMap<>();
-    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static final BoxData EMPTY = new BoxData(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static volatile boolean initialized;
 
     private BoxModelManager() {
@@ -86,6 +86,10 @@ public final class BoxModelManager {
 
     public static EnumMap<ArmorSlot, float[]> getArmorOffsets(Identifier id) {
         return getValue(id, BoxData::armorOffsets);
+    }
+
+    public static EnumMap<ArmorSlot, EnumMap<AttachSlot, float[]>> getArmorPartOffsets(Identifier id) {
+        return getValue(id, BoxData::armorPartOffsets);
     }
 
     public static EnumMap<AttachSlot, float[]> getArmorScales(Identifier id) {
@@ -332,6 +336,7 @@ public final class BoxModelManager {
                 nonEmpty(BoxModelJsonSupport.parseOffsets(getAny(root, "animationOffsets", "animation_offsets", "rotationOffsets", "rotation_offsets"))),
                 nonEmpty(BoxModelJsonSupport.parsePivotAnimations(getAny(root, "pivotAnimations", "pivot_animations", "partAnimations", "part_animations"))),
                 nonEmpty(BoxModelJsonSupport.parseArmorOffsets(getAny(root, "armor_offsets", "armorOffsets"))),
+                nonEmpty(BoxModelJsonSupport.parseArmorPartOffsets(getAny(root, "armor_part_offsets", "armorPartOffsets"))),
                 nonEmpty(BoxModelJsonSupport.parseScales(getAny(root, "armor_scales", "armorScales"))),
                 readBoolean(root, "armor_stretch", "armorStretch", "auto_armor_scale", "autoArmorScale", "armor_auto_scale", "armorAutoScale"),
                 nonEmpty(BoxModelJsonSupport.parseArmorHideSlots(getAny(root, "hidearmour", "hideArmour", "hide_armor"))),
@@ -469,12 +474,13 @@ public final class BoxModelManager {
                            EnumMap<AttachSlot, float[]> animationOffsets,
                            EnumMap<AttachSlot, PivotAnimation> pivotAnimations,
                            EnumMap<ArmorSlot, float[]> armorOffsets,
+                           EnumMap<ArmorSlot, EnumMap<AttachSlot, float[]>> armorPartOffsets,
                            EnumMap<AttachSlot, float[]> armorScales,
                            Boolean armorStretch,
                            EnumSet<ArmorSlot> armorHide,
                            Boolean slim) {
         boolean isEmpty() {
-            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && toolOffsets == null && scales == null && animationScales == null && animationOffsets == null && pivotAnimations == null && armorOffsets == null && armorScales == null && armorStretch == null && armorHide == null && slim == null;
+            return model == null && texture == null && themeName == null && themeKey == null && offsets == null && toolOffsets == null && scales == null && animationScales == null && animationOffsets == null && pivotAnimations == null && armorOffsets == null && armorPartOffsets == null && armorScales == null && armorStretch == null && armorHide == null && slim == null;
         }
     }
 
