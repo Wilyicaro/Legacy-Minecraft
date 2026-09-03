@@ -798,8 +798,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, k -> {
+        public @Nullable Component getAction(Object context) {
+            if (context instanceof KeyContext k) {
                 if (LegacyOptions.displayPackManagementTooltips.get() && k.key() == InputConstants.KEY_O && isFocused()) {
                     return LegacyComponents.ALBUM_OPTIONS;
                 }
@@ -807,7 +807,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     return screenComponent;
                 }
                 return ControlTooltip.getSelectAction(this, context);
-            });
+            }
+            return null;
         }
     }
 }

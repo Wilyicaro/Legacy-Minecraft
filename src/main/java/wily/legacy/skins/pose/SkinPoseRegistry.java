@@ -166,9 +166,11 @@ public final class SkinPoseRegistry {
         STIFF_LEGS("stiff_legs"),
         SYNC_LEGS("sync_legs"),
         SYNC_ARMS("sync_arms"),
+        BACKWARDS_CROUCH("backwards_crouch"),
         UPSIDE_DOWN("upside_down"),
         STATUE_OF_LIBERTY("statue_of_liberty"),
         DISABLE_VIEW_BOBBING("disable_view_bobbing"),
+        FORCE_CUSTOM_ANIMATION("force_custom_animation"),
         HIDE_HEAD_LAYER("hide_head_layer"),
         HIDE_HAND("hide_hand"),
         NO_IDLE_SWAY("no_idle_sway");

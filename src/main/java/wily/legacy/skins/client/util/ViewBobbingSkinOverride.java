@@ -35,10 +35,11 @@ public final class ViewBobbingSkinOverride {
     }
 
     private static boolean shouldForceOff(Minecraft minecraft) {
-        if (minecraft.level == null || !LegacyOptions.customSkinAnimation.get()) return false;
+        if (minecraft.level == null) return false;
         Player player = minecraft.player;
         if (player == null) return false;
         String skinId = ClientSkinCache.get(player.getUUID());
+        if (!LegacyOptions.customSkinAnimation.get() && !SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.FORCE_CUSTOM_ANIMATION, skinId)) return false;
         return SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.DISABLE_VIEW_BOBBING, skinId)
                 || SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
     }

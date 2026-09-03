@@ -58,7 +58,7 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return isFocused() && context instanceof KeyContext c && c.key() == InputConstants.KEY_RETURN ? canChangeValue ? LegacyComponents.LOCK : LegacyComponents.UNLOCK : null;
     }
 }

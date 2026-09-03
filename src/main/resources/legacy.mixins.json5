@@ -368,7 +368,8 @@
     "FallingBlockAccessor",
     "FallingBlockMixin",
     "MinecraftServerMixin",
-    "GameRuleCategoryAccessor"
+    "GameRuleCategoryAccessor",
+    "ArmorStandAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
