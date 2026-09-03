@@ -850,6 +850,12 @@ public interface ControlTooltip {
 
                 if (!BLOCK_USE_ACTIONS.isEmpty() && !suppressUsingBlock) {
                     BlockUse blockUse = new BlockUse(minecraft.level.getBlockState(hitResult.getBlockPos()), minecraft.level, hitResult.getBlockPos(), minecraft.player, hitResult);
+
+                    if (blockUse.state.getBlock() instanceof ActionHolder value) {
+                        ResultAction action = value.getResultAction(blockUse);
+                        if (action.canReturn()) return action.action;
+                    }
+
                     for (ActionHolder value : BLOCK_USE_ACTIONS.values()) {
                         ResultAction action = value.getResultAction(blockUse);
                         if (action.canReturn()) return action.action;
@@ -860,6 +866,11 @@ public interface ControlTooltip {
                     BlockUseItemOn blockUse = new BlockUseItemOn(actualItem, minecraft.level.getBlockState(hitResult.getBlockPos()), minecraft.level, hitResult.getBlockPos(), minecraft.player, hand, hitResult);
 
                     if (!suppressUsingBlock) {
+                        if (blockUse.state.getBlock() instanceof ActionHolder value) {
+                            ResultAction action = value.getResultAction(blockUse);
+                            if (action.canReturn()) return action.action;
+                        }
+
                         for (ActionHolder value : BLOCK_USE_ITEM_ON_ACTIONS.values()) {
                             ResultAction action = value.getResultAction(blockUse);
                             if (action.canReturn()) return action.action;
@@ -867,6 +878,11 @@ public interface ControlTooltip {
                     }
 
                     if (!actualItem.isEmpty() && !minecraft.player.getCooldowns().isOnCooldown(actualItem)) {
+                        if (actualItem.getItem() instanceof ActionHolder value) {
+                            ResultAction action = value.getResultAction(blockUse);
+                            if (action.canReturn()) return action.action;
+                        }
+
                         for (ActionHolder value : ITEM_USE_ON_ACTIONS.values()) {
                             ResultAction action = value.getResultAction(blockUse);
                             if (action.canReturn()) return action.action;
@@ -877,6 +893,12 @@ public interface ControlTooltip {
 
             if (!ITEM_USE_ACTIONS.isEmpty() && !actualItem.isEmpty() && !minecraft.player.getCooldowns().isOnCooldown(actualItem)) {
                 UseItem useItem = new UseItem(actualItem, minecraft.level, minecraft.player, hand);
+
+                if (actualItem.getItem() instanceof ActionHolder value) {
+                    ResultAction action = value.getResultAction(useItem);
+                    if (action.canReturn()) return action.action;
+                }
+
                 for (ActionHolder value : ITEM_USE_ACTIONS.values()) {
                     ResultAction action = value.getResultAction(useItem);
                     if (action.canReturn()) return action.action;
