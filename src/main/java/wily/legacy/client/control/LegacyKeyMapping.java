@@ -3,9 +3,12 @@ package wily.legacy.client.control;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.tooltip.ComponentIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.Icon;
 
 public interface LegacyKeyMapping {
     static LegacyKeyMapping of(KeyMapping key) {
@@ -39,4 +42,12 @@ public interface LegacyKeyMapping {
     Component getDisplayName();
 
     InputConstants.Key getKey();
+
+    default Icon getIcon() {
+        return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(getKey().getValue()) : getBinding() == null ? null : getBinding().getIcon();
+    }
+
+    default Component getIconComponent() {
+        return getIcon() instanceof ComponentIcon c ? c.getComponent() : CommonComponents.EMPTY;
+    }
 }
