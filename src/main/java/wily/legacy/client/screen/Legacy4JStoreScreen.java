@@ -60,7 +60,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
                 future.thenAccept(packs -> {
                     minecraft.execute(() -> {
                         this.isLoading = false;
-                        minecraft.setScreen(new Legacy4JContentListScreen(this, category, packs));
+                        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new Legacy4JContentListScreen(this, category, packs));
                     });
                 }).exceptionally(ex -> {
                     minecraft.execute(() -> this.isLoading = false);
@@ -79,7 +79,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         super.tick();
 
         if (warnNoContent) {
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, TITLE_LABEL, Component.translatable("legacy.menu.store_no_content_message")));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, TITLE_LABEL, Component.translatable("legacy.menu.store_no_content_message")));
             warnNoContent = false;
         }
     }

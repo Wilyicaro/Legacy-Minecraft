@@ -28,8 +28,8 @@ public abstract class OptionInstanceMixin implements OptionInstanceAccessor {
     @Shadow
     public abstract void set(Object object);
 
-    @Inject(method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
-    public void init(String string, OptionInstance.TooltipSupplier tooltipSupplier, OptionInstance.CaptionBasedToString captionBasedToString, OptionInstance.ValueSet valueSet, Codec codec, Object object, Consumer consumer, CallbackInfo ci) {
+    @Inject(method = /*? if >=26.2 {*/"<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Lnet/minecraft/client/OptionInstance$ValueUpdateListener;)V"/*?} else {*//*"<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V"*//*?}*/, at = @At("RETURN"))
+    public void init(String string, OptionInstance.TooltipSupplier tooltipSupplier, OptionInstance.CaptionBasedToString captionBasedToString, OptionInstance.ValueSet valueSet, Codec codec, Object object, /*? if >=26.2 {*/OptionInstance.ValueUpdateListener valueUpdateListener/*?} else {*//*Consumer consumer*//*?}*/, CallbackInfo ci) {
         Legacy4JClient.whenResetOptions.add(() -> set(object));
         OptionsPreset.VANILLA_OPTIONS_MAP.put(string, (OptionInstance<?>) (Object) this);
         defaultValue = object;

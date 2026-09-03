@@ -66,7 +66,7 @@ public abstract class PlayerTabOverlayMixin {
 
                 if (objective.getRenderType() != ObjectiveCriteria.RenderType.HEARTS) {
                     NumberFormat numberFormat = objective.numberFormatOrDefault(StyledFormat.PLAYER_LIST_DEFAULT);
-                    n = this.minecraft.font.width(ReadOnlyScoreInfo.safeFormatValue(readOnlyScoreInfo, numberFormat));
+                    n = this.minecraft.font.width(/*? if >=26.2 {*/readOnlyScoreInfo == null ? Component.empty() : readOnlyScoreInfo.formatValue(numberFormat)/*?} else {*//*ReadOnlyScoreInfo.safeFormatValue(readOnlyScoreInfo, numberFormat)*//*?}*/);
                     l = Math.max(l, n > 0 ? j + n : 0);
                 }
             }
@@ -80,7 +80,7 @@ public abstract class PlayerTabOverlayMixin {
             ++q;
         }
 
-        boolean bl = this.minecraft.isLocalServer() || this.minecraft.getConnection().getConnection().isEncrypted();
+        boolean bl = this.minecraft.isLocalServer() || this.minecraft.getConnection()./*? if >=26.2 {*/onlineMode()/*?} else {*//*getConnection().isEncrypted()*//*?}*/;
         int r;
         if (objective != null) {
             if (objective.getRenderType() == ObjectiveCriteria.RenderType.HEARTS) {

@@ -11,6 +11,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 
 @Mixin(SignEditScreen.class)
 public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
@@ -30,7 +33,13 @@ public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
         return height / 2f + 15.5f + getYOffset();
     }
 
-    @ModifyArg(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;sign(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"))
+    //? if >=26.2 {
+    @Redirect(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    private Matrix3x2f renderSignBackground(Matrix3x2fStack instance, float x, float y) {
+        return instance.scale(x * 144 / 93, y * 144 / 93);
+    }
+    //?} else {
+    /*@ModifyArg(method = "extractSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;sign(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"))
     private float renderSignBackground(float original) {
         return original * 144 / 93;
     }
@@ -54,4 +63,5 @@ public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
     private int changeSignY1(int original) {
         return height / 2 + 120 + getYOffset();
     }
+    *///?}
 }

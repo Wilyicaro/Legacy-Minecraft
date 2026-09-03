@@ -32,23 +32,23 @@ public class SaveOptionsScreen extends ConfirmationScreen {
 
     @Override
     protected void addButtons() {
-        renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96, 200, 20).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96, 200, 20).build());
         EditBox renameBox = new EditBox(font, width / 2 - 100, 0, 200, 20, Component.translatable("selectWorld.enterName"));
         renameBox.setValue(summary.getLevelName());
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.rename_save"), b -> minecraft.setScreen(new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 121, Component.translatable("legacy.menu.rename_save_title"), Component.translatable("legacy.menu.rename_save_message"), p -> {
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.rename_save"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 121, Component.translatable("legacy.menu.rename_save_title"), Component.translatable("legacy.menu.rename_save_message"), p -> {
             String id = summary.getLevelId();
             try {
                 LevelStorageSource.LevelStorageAccess levelStorageAccess = minecraft.getLevelSource().validateAndCreateAccess(id);
                 levelStorageAccess.renameLevel(renameBox.getValue());
                 levelStorageAccess.close();
                 parent.saveRenderableList.reloadSaveList();
-                minecraft.setScreen(parent);
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
             } catch (IOException iOException) {
                 SystemToast.onWorldAccessFailure(minecraft, id);
                 parent.saveRenderableList.reloadSaveList();
             } catch (ContentValidationException contentValidationException) {
                 Legacy4J.LOGGER.warn("{}", contentValidationException.getMessage());
-                minecraft.setScreen(/*? if >1.20.2 {*/NoticeWithLinkScreen.createWorldSymlinkWarningScreen(() -> minecraft.setScreen(parent))/*?} else {*//*new SymlinkWarningScreen(parent)*//*?}*/);
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(/*? if >1.20.2 {*/NoticeWithLinkScreen.createWorldSymlinkWarningScreen(() -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent))/*?} else {*//*new SymlinkWarningScreen(parent)*//*?}*/);
             }
         }) {
 
@@ -62,13 +62,13 @@ public class SaveOptionsScreen extends ConfirmationScreen {
                 addRenderableWidget(renameBox);
             }
         })).bounds(panel.x + 15, panel.getRectangle().bottom() - 74, 200, 20).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.delete"), b -> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1 -> parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.delete"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(parent, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1 -> parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
 
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.copySave"), b -> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1 -> {
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.copySave"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(parent, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1 -> {
             String id = summary.getLevelId();
             LegacySaveCache.copySaveFile(minecraft.getLevelSource().getBaseDir().resolve(id), minecraft.getLevelSource(), id);
             parent.saveRenderableList.reloadSaveList();
-            minecraft.setScreen(parent);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
 
         }))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30, 200, 20).build());
     }

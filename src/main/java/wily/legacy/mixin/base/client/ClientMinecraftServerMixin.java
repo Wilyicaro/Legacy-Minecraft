@@ -47,7 +47,7 @@ public abstract class ClientMinecraftServerMixin {
     private int ticksUntilAutosave;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Optional<GameRules> gameRules, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, boolean bl, CallbackInfo ci) {
+    private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Optional<GameRules> gameRules, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, boolean bl, /*? if >=26.2 {*/net.minecraft.server.notifications.NotificationManager legacy$notifications, /*?}*/CallbackInfo ci) {
         ticksUntilAutosave *= Math.max(1, LegacyOptions.autoSaveInterval.get());
     }
 
@@ -71,7 +71,7 @@ public abstract class ClientMinecraftServerMixin {
 
         if (ticksUntilAutosave <= 0) {
             Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.screen == null) minecraft.execute(LegacyLoadingScreen::startFakeAutoSave);
+            if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null) minecraft.execute(LegacyLoadingScreen::startFakeAutoSave);
             else ticksUntilAutosave++;
         }
     }

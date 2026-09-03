@@ -352,7 +352,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
             }
             if (importedAction != null) {
                 importedAction.accept(savedSkinId);
-                minecraft.setScreen(parent);
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
                 return;
             }
             CustomSkinPackStore.enableResourcePack(minecraft);
@@ -365,7 +365,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
     private void openPoseScreen() {
         if (minecraft == null) return;
         LinkedHashSet<String> selected = new LinkedHashSet<>(poseKeys);
-        minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, ImportCustomSkinScreen::posePanelHeight, CHARACTER_ANIMATIONS, Component.empty(), screen -> {
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, ImportCustomSkinScreen::posePanelHeight, CHARACTER_ANIMATIONS, Component.empty(), screen -> {
         }) {
             @Override
             protected void addButtons() {
@@ -383,7 +383,7 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
                         if (!SLIM.equals(poseKey)) poseKeys.add(poseKey);
                     }
                     if (poseButton != null) poseButton.setMessage(CHARACTER_ANIMATIONS);
-                    if (minecraft != null) minecraft.setScreen(parent);
+                    if (minecraft != null) minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
                 }).build());
             }
 
@@ -409,6 +409,6 @@ public class ImportCustomSkinScreen extends ConfirmationScreen {
 
     private void showError(Exception ex) {
         if (minecraft == null) return;
-        minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, editing() ? EDIT_TITLE : title, Component.literal(errorText(ex))));
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, editing() ? EDIT_TITLE : title, Component.literal(errorText(ex))));
     }
 }

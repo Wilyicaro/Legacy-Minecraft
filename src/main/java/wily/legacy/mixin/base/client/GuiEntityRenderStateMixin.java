@@ -14,7 +14,7 @@ import wily.legacy.client.MutablePIPRenderState;
 @Mixin({GuiEntityRenderState.class, GuiBookModelRenderState.class, GuiBannerResultRenderState.class})
 public abstract class GuiEntityRenderStateMixin implements PictureInPictureRenderState, MutablePIPRenderState {
     @Unique
-    Matrix3x2f pose = IDENTITY_POSE;
+    Matrix3x2f pose = /*? if >=26.2 {*/new Matrix3x2f(IDENTITY_POSE)/*?} else {*//*IDENTITY_POSE*//*?}*/;
 
     @Unique
     Float scale = null;

@@ -112,17 +112,17 @@ public final class FlashbackCompat {
             Minecraft minecraft = Minecraft.getInstance();
             List<String> incompatibleMods = minecraft.hasShiftDown() ? List.of() : Flashback.getReplayIncompatibleMods();
             if (incompatibleMods.isEmpty()) {
-                minecraft.setScreen(new SelectReplayScreen(parent));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new SelectReplayScreen(parent));
                 return;
             }
             Component description = Component.translatable("flashback.incompatible_with_viewing_description").append(Component.literal(String.join(", ", incompatibleMods)).withStyle(ChatFormatting.RED));
-            minecraft.setScreen(new AlertScreen(() -> minecraft.setScreen(parent), Component.translatable("flashback.incompatible_with_viewing"), description));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new AlertScreen(() -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent), Component.translatable("flashback.incompatible_with_viewing"), description));
         }
 
         private static void confirmCancel(Screen parent) {
-            Minecraft.getInstance().setScreen(new ConfirmScreen(value -> {
+            Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmScreen(value -> {
                 if (value) runAndClose(Flashback::cancelRecordingReplay);
-                else Minecraft.getInstance().setScreen(parent);
+                else Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
             }, Component.translatable("flashback.confirm_cancel_recording"), Component.translatable("flashback.confirm_cancel_recording_description")));
         }
 
@@ -132,7 +132,7 @@ public final class FlashbackCompat {
 
         private static void runAndClose(Runnable action) {
             action.run();
-            Minecraft.getInstance().setScreen(null);
+            Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(null);
         }
     }
 }

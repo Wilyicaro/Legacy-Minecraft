@@ -13,7 +13,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(Panorama.class)
 public class PanoramaRendererMixin {
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
-    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, boolean bl, CallbackInfo ci) {
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, /*? if <26.2 {*//*boolean bl, *//*?}*/CallbackInfo ci) {
         if (LegacyOptions.legacyPanorama.get()) {
             LegacyRenderUtil.renderLegacyPanorama(GuiGraphicsExtractor);
             ci.cancel();

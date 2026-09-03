@@ -69,12 +69,12 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         KeyMapping[] keyMappings = ArrayUtils.clone(Minecraft.getInstance().options.keyMappings);
         Arrays.sort(keyMappings);
         KeyMapping.Category lastCategory = null;
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"), button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"), Component.translatable("legacy.menu.reset_keyBinds_message"), b -> {
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"), button -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"), Component.translatable("legacy.menu.reset_keyBinds_message"), b -> {
             for (KeyMapping keyMapping : keyMappings)
                 keyMapping.setKey(keyMapping.getDefaultKey());
             KeyMapping.resetMapping();
             Minecraft.getInstance().options.save();
-            minecraft.setScreen(this);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this);
         }))).size(240, 20).build());
         renderableVList.addOptions(LegacyOptions.unbindConflictingKeys, LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()), LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()), LegacyOptions.of(Minecraft.getInstance().options.toggleUse()), LegacyOptions.of(Minecraft.getInstance().options.toggleAttack()));
         for (KeyMapping keyMapping : keyMappings) {

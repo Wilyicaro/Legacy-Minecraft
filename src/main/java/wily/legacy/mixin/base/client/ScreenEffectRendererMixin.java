@@ -6,7 +6,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.MultiBufferSource;
+//? if <26.2 {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -27,6 +29,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.util.ColorUtil;
@@ -46,7 +50,8 @@ public abstract class ScreenEffectRendererMixin {
     @Final
     private Minecraft minecraft;
 
-    @Shadow
+    //? if <26.2 {
+    /*@Shadow
     @Final
     private MultiBufferSource bufferSource;
 
@@ -56,10 +61,10 @@ public abstract class ScreenEffectRendererMixin {
     }
 
     @ModifyArg(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
-    private TextureAtlasSprite renderScreenEffect(TextureAtlasSprite f, PoseStack i, MultiBufferSource f1, @Local /*? if neoforge {*//*Pair<BlockState, BlockPos> pair*//*?} else {*/BlockState state/*?}*/) {
+    private TextureAtlasSprite renderScreenEffect(TextureAtlasSprite f, PoseStack i, MultiBufferSource f1, @Local /^? if neoforge {^//^Pair<BlockState, BlockPos> pair^//^?} else {^/BlockState state/^?}^/) {
         //? if neoforge {
-        /*BlockState state = pair.getLeft();
-         *///?}
+        /^BlockState state = pair.getLeft();
+        ^///?}
         List<BakedQuad> quads = Collections.emptyList();
         List<BlockStateModelPart> parts = new java.util.ArrayList<>();
         minecraft.getModelManager().getBlockStateModelSet().get(state).collectParts(minecraft.player.getRandom(), parts);
@@ -73,7 +78,9 @@ public abstract class ScreenEffectRendererMixin {
         return f;
     }
 
-    @Redirect(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isOnFire()Z"))
+    *///?}
+
+    @Redirect(method = /*? if >=26.2 {*/"submit"/*?} else {*//*"renderScreenEffect"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isOnFire()Z"))
     private boolean renderScreenEffect(LocalPlayer player) {
         return player.isOnFire() && !player.hasEffect(MobEffects.FIRE_RESISTANCE);
     }
@@ -88,7 +95,7 @@ public abstract class ScreenEffectRendererMixin {
     private void renderItemActivationAnimation(PoseStack poseStack, float f, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         if (LegacyActivationAnim.itemActivationRenderReplacement != null) {
             ci.cancel();
-            LegacyActivationAnim.itemActivationRenderReplacement.render(poseStack, f, bufferSource);
+            LegacyActivationAnim.itemActivationRenderReplacement.render(poseStack, f, /*? if >=26.2 {*/submitNodeCollector/*?} else {*//*bufferSource*//*?}*/);
             poseStack.popPose();
         }
     }

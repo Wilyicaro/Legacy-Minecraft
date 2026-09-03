@@ -117,9 +117,11 @@ public abstract class MinecraftMixin {
     @Shadow
     @Final
     public Font font;
-    @Shadow
+    //? if <26.2 {
+    /*@Shadow
     @Nullable
     public Screen screen;
+    *///?}
     @Shadow
     @Nullable
     public HitResult hitResult;
@@ -134,8 +136,10 @@ public abstract class MinecraftMixin {
     @Unique
     public long lastMillis;
     Vec3 lastPlayerBlockUsePos = null;
-    @Unique
+    //? if <26.2 {
+    /*@Unique
     Screen oldScreen;
+    *///?}
     private boolean inventoryKeyLastPressed = false;
     private int inventoryKeyHold = 0;
     private int legacy$shieldPauseSyncCooldown = 0;
@@ -152,8 +156,10 @@ public abstract class MinecraftMixin {
     @Final
     private SoundManager soundManager;
 
-    @Shadow
+    //? if <26.2 {
+    /*@Shadow
     public abstract void setScreen(@Nullable Screen screen);
+    *///?}
 
     @Shadow
     public abstract Window getWindow();
@@ -224,7 +230,7 @@ public abstract class MinecraftMixin {
     private void handleKeybinds(CallbackInfo ci) {
         if (legacy$shieldPauseSyncCooldown > 0) legacy$shieldPauseSyncCooldown--;
         legacy$handleDropKey();
-        if (player != null && screen == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
+        if (player != null && /*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
             legacy$pauseShield();
         }
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
@@ -239,7 +245,7 @@ public abstract class MinecraftMixin {
         return !((LegacyShieldPlayer) player).isAutoShielding();
     }
 
-    @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
+    @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = /*? if >=26.2 {*/"Lnet/minecraft/client/Options;keyUse:Lnet/minecraft/client/KeyMapping;"/*?} else {*//*"Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;"*//*?}*/)), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean handleDropSwing(LocalPlayer player, InteractionHand hand) {
         return false;
     }
@@ -303,7 +309,7 @@ public abstract class MinecraftMixin {
 
     @Unique
     private boolean legacy$triesInvalidPainting(ItemStack item, InteractionResult result) {
-        return item.getItem() instanceof HangingEntityItemAccessor hanging && hanging.getType() == EntityType.PAINTING && (result instanceof InteractionResult.Fail || result instanceof InteractionResult.Success);
+        return item.getItem() instanceof HangingEntityItemAccessor hanging && hanging.getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.PAINTING && (result instanceof InteractionResult.Fail || result instanceof InteractionResult.Success);
     }
 
     @Unique
@@ -387,7 +393,7 @@ public abstract class MinecraftMixin {
         while (options.keyDrop.consumeClick()) {
             clicked = true;
         }
-        if (screen == null && !player.isSpectator() && !down && (legacy$dropKeyDown || clicked)) {
+        if (/*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null && !player.isSpectator() && !down && (legacy$dropKeyDown || clicked)) {
             player.drop(hasControlDown());
         }
         legacy$dropKeyDown = down;
@@ -505,13 +511,13 @@ public abstract class MinecraftMixin {
         return LegacyMusicFader.musicManagerShouldTick;
     }
 
-    @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
+    @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V"/*?}*/, at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/client/gui/Hud;onDisconnected()V"/*?} else {*//*"Lnet/minecraft/client/gui/Gui;onDisconnected()V"*//*?}*/))
     private void disconnectFadeMusic(Screen disconnectScreen, boolean retainDownloadedResourcePacks, boolean updateLevelInEngines, CallbackInfo ci) {
         ConduitRotationCache.clear();
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
 
-    @Redirect(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyInventory:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyAdvancements:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"))
+    @Redirect(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyInventory:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = /*? if >=26.2 {*/"Lnet/minecraft/client/Options;keyQuickActions:Lnet/minecraft/client/KeyMapping;"/*?} else {*//*"Lnet/minecraft/client/Options;keyAdvancements:Lnet/minecraft/client/KeyMapping;"*//*?}*/)), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"))
     private boolean handleKeybindsInventoryKey(KeyMapping instance) {
         boolean clicked = instance.consumeClick();
         if (clicked && !Legacy4JClient.consumeKeyboardToggleKeyPress(instance)) clicked = false;
@@ -550,34 +556,41 @@ public abstract class MinecraftMixin {
     private void openToastAdvancement(AdvancementToast toast) {
         FactoryAPIClient.getToasts().clear();
         LegacyAdvancementsScreen screen = new LegacyAdvancementsScreen(null);
-        setScreen(screen);
+        /*? if >=26.2 {*/gui.setScreen(screen)/*?} else {*//*setScreen(screen)*//*?}*/;
         screen.focusRenderable(r -> r instanceof LegacyAdvancementsScreen.AdvancementButton b && b.id.equals(AdvancementToastAccessor.of(toast).getAdvancementId()), i -> screen.getTabList().tabButtons.get(i).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0)));
     }
 
-    @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1))
-    private boolean handleKeybinds(Minecraft instance, Screen screen) {
+    @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/client/gui/Gui;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 0/*?} else {*//*"Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1*//*?}*/))
+    private boolean handleKeybinds(/*? if >=26.2 {*/Gui/*?} else {*//*Minecraft*//*?}*/ instance, Screen screen) {
         if (screen instanceof ReplaceableScreen s) s.setCanReplace(false);
         return true;
     }
 
-    @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
+    //? if <26.2 {
+    /*@ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
     private Screen handleKeybinds(Screen arg) {
         return LegacyOptions.legacyAdvancements.get() ? new LegacyAdvancementsScreen(null) : arg;
     }
+    *///?}
 
-    @WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V"))
+    //? if <26.2 {
+    /*@WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V"))
     private boolean removedScreen(Screen instance, Screen newScreen) {
         return !(newScreen instanceof OverlayPanelScreen s) || s.parent != instance;
     }
+    *///?}
 
-    @Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
+    //? if <26.2 {
+    /*@Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
     private void addedScreen(Screen screen, CallbackInfo ci) {
         ControlTooltip.Listener.of(screen).setupControlTooltips();
         ControlTooltipRenderer.SCREEN_EVENT.invoker.accept(screen, ControlTooltip.Listener.of(screen).getControlTooltips());
         LegacyTipManager.resetTipOffset(true);
     }
+    *///?}
 
-    @WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(II)V"))
+    //? if <26.2 {
+    /*@WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(II)V"))
     private boolean initScreen(Screen instance, int i, int j) {
         if (oldScreen instanceof OverlayPanelScreen s && s.parent == instance) {
             instance.resize(i, j);
@@ -585,12 +598,13 @@ public abstract class MinecraftMixin {
         }
         return true;
     }
+    *///?}
 
     @Inject(method = "resizeGui", at = @At("RETURN"))
     private void resizeDisplay(CallbackInfo ci) {
         LegacyTipManager.rebuildActual();
         LegacyTipManager.rebuildActualLoading();
-        gui.getChat().rescaleChat();
+        gui./*? if >=26.2 {*/hud./*?}*/getChat().rescaleChat();
     }
 
     @ModifyArg(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreenAndShow(Lnet/minecraft/client/gui/screens/Screen;)V"))
@@ -598,12 +612,13 @@ public abstract class MinecraftMixin {
         return disconnectScreen instanceof LegacyLoadingScreen ? disconnectScreen : arg;
     }
 
-    @ModifyArg(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
+    @ModifyArg(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/client/gui/Gui;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"/*?} else {*//*"Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?}*/))
     private Screen changeSavingScreen(Screen arg, @Local(argsOnly = true) Screen disconnectScreen) {
         return disconnectScreen instanceof LegacyLoadingScreen ? disconnectScreen : arg;
     }
 
-    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    //? if <26.2 {
+    /*@Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
         oldScreen = this.screen;
         if (screen instanceof PauseScreen && player != null && player.isUsingItem()) {
@@ -624,6 +639,7 @@ public abstract class MinecraftMixin {
             ControlTooltipRenderer.GUI_EVENT.invoker.accept(gui, ControlTooltip.Listener.of(gui).getControlTooltips());
         }
     }
+    *///?}
 
     @WrapWithCondition(method = "runTick(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;pauseAllExcept([Lnet/minecraft/sounds/SoundSource;)V"))
     public boolean pauseGame(SoundManager instance, SoundSource[] soundSources) {
@@ -636,11 +652,13 @@ public abstract class MinecraftMixin {
         return false;
     }
 
-    @ModifyVariable(method = "buildInitialScreens", at = @At(value = "STORE"))
+    //? if <26.2 {
+    /*@ModifyVariable(method = "buildInitialScreens", at = @At(value = "STORE"))
     private Runnable addInitialScreens(Runnable run) {
         return () -> {
             run.run();
             if (screen != null) setScreen(LegacyRenderUtil.getInitialScreen());
         };
     }
+    *///?}
 }

@@ -23,7 +23,7 @@ import wily.legacy.client.LegacyBiomeOverride;
 public class LiquidBlockRendererMixin {
     @Inject(method = "getLightCoords", at = @At("HEAD"), cancellable = true)
     private void legacy$useWaterBlockLight(BlockAndTintGetter getter, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
-        if (getter.getFluidState(pos).is(FluidTags.WATER)) cir.setReturnValue(LevelRenderer.getLightCoords(getter, pos));
+        if (getter.getFluidState(pos).is(FluidTags.WATER)) cir.setReturnValue(/*? if >=26.2 {*/net.minecraft.util.LightCoordsUtil/*?} else {*//*LevelRenderer*//*?}*/.getLightCoords(getter, pos));
     }
 
     //? if <1.20.5 {

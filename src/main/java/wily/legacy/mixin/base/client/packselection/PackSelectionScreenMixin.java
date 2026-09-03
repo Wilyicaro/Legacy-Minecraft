@@ -167,7 +167,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     FactoryScreenUtil.enableBlend();
                     FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
                     FactoryScreenUtil.disableBlend();
-                    if ((minecraft.options.touchscreen().get().booleanValue() || isHovered) && showHoverOverlay()) {
+                    if ((/*? if <26.2 {*//*minecraft.options.touchscreen().get().booleanValue() || *//*?}*/isHovered) && showHoverOverlay()) {
                         GuiGraphicsExtractor.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                         int p = mouseX - getX();
                         int q = mouseY - getY();
@@ -245,9 +245,9 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     if (e.getCompatibility().isCompatible()) {
                         e.select();
                     } else
-                        minecraft.setScreen(new ConfirmationScreen(self(), INCOMPATIBLE_CONFIRM_TITLE, e.getCompatibility().getConfirmation(), (b) -> {
+                        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(self(), INCOMPATIBLE_CONFIRM_TITLE, e.getCompatibility().getConfirmation(), (b) -> {
                             e.select();
-                            if (minecraft.screen != null) minecraft.screen.onClose();
+                            if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null) minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/.onClose();
                         }));
                 }
 

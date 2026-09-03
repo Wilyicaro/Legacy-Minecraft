@@ -7,11 +7,17 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.textures.TextureFormat;
+//? if >=26.2 {
+import com.mojang.blaze3d.GpuFormat;
+//?} else {
+/*import com.mojang.blaze3d.textures.TextureFormat;
+*///?}
+import org.joml.Vector4f;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.pip.OversizedItemRenderer;
 import net.minecraft.client.renderer.state.gui.BlitRenderState;
@@ -38,7 +44,7 @@ import java.util.function.Consumer;
 
 public class LegacyGuiItemRenderer implements AutoCloseable {
     public static final Logger LOGGER = LogManager.getLogger("legacy_gui_item_renderer");
-    private static final int MAXIMUM_ITEM_ATLAS_SIZE = RenderSystem.getDevice().getMaxTextureSize();
+    private static final int MAXIMUM_ITEM_ATLAS_SIZE = /*? if >=26.2 {*/RenderSystem.getDevice().getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM)/*?} else {*//*RenderSystem.getDevice().getMaxTextureSize()*//*?}*/;
     private static final int ITEM_ATLAS_GUTTER = 1;
     public static float OPACITY = 1;
     private final int size;
@@ -47,6 +53,9 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     private final Map<Object, OversizedItemRenderer> oversizedItemRenderers = new Object2ObjectOpenHashMap<>();
     private final ProjectionMatrixBuffer itemsProjectionMatrixBuffer = new ProjectionMatrixBuffer("items");
     private final Projection itemsProjection = new Projection();
+    //? if >=26.2 {
+    private final SubmitNodeStorage submitNodeStorage = new SubmitNodeStorage();
+    //?}
     @Nullable
     private GpuTexture itemsAtlas;
     @Nullable
@@ -102,14 +111,14 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
 
     private void createAtlasTextures(int i) {
         GpuDevice gpuDevice = RenderSystem.getDevice();
-        this.itemsAtlas = gpuDevice.createTexture("UI items atlas", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_RENDER_ATTACHMENT, TextureFormat.RGBA8, i, i, 1, 1);
+        this.itemsAtlas = gpuDevice.createTexture("UI items atlas", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_RENDER_ATTACHMENT, /*? if >=26.2 {*/GpuFormat.RGBA8_UNORM/*?} else {*//*TextureFormat.RGBA8*//*?}*/, i, i, 1, 1);
         this.itemsAtlasView = gpuDevice.createTextureView(this.itemsAtlas);
-        this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_RENDER_ATTACHMENT, TextureFormat.DEPTH32, i, i, 1, 1);
+        this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_RENDER_ATTACHMENT, /*? if >=26.2 {*/GpuFormat.D32_FLOAT/*?} else {*//*TextureFormat.DEPTH32*//*?}*/, i, i, 1, 1);
         this.itemsAtlasDepthView = gpuDevice.createTextureView(this.itemsAtlasDepth);
-        gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0);
+        gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, /*? if >=26.2 {*/new Vector4f(0.0F)/*?} else {*//*0*//*?}*/, this.itemsAtlasDepth, /*? if >=26.2 {*/0.0/*?} else {*//*1.0*//*?}*/);
     }
 
-    public void prepareItemElements(FeatureRenderDispatcher dispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {
+    public void prepareItemElements(FeatureRenderDispatcher dispatcher, /*? if <26.2 {*//*SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource,*//*?}*/ GuiRenderState renderState, int frameNumber) {
         if (!renderState.getItemModelIdentities().isEmpty()) {
             int i = this.getGuiScaleInvalidatingItemAtlasIfChanged();
             int j = size * i;
@@ -124,7 +133,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
             itemsProjection.setSize(k, k);
             itemsProjection.setupOrtho(-1000.0F, 1000.0F, k, k, true);
             RenderSystem.setProjectionMatrix(this.itemsProjectionMatrixBuffer.getBuffer(itemsProjection), ProjectionType.ORTHOGRAPHIC);
-            Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
+            Minecraft.getInstance().gameRenderer./*? if >=26.2 {*/lighting()/*?} else {*//*getLighting()*//*?}*/.setupFor(Lighting.Entry.ITEMS_3D);
             PoseStack poseStack = new PoseStack();
             MutableBoolean mutableBoolean = new MutableBoolean(false);
             MutableBoolean mutableBoolean2 = new MutableBoolean(false);
@@ -155,12 +164,12 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                             int kx = bl ? atlasPosition.x : this.itemAtlasX;
                                             int l = bl ? atlasPosition.y : this.itemAtlasY;
                                             if (bl) {
-                                                RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0, kx, k - l - slotSize, slotSize, slotSize);
+                                                RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, /*? if >=26.2 {*/new Vector4f(0.0F)/*?} else {*//*0*//*?}*/, this.itemsAtlasDepth, /*? if >=26.2 {*/0.0/*?} else {*//*1.0*//*?}*/, kx, k - l - slotSize, slotSize, slotSize);
                                             }
 
                                             int itemX = kx + ITEM_ATLAS_GUTTER;
                                             int itemY = l + ITEM_ATLAS_GUTTER;
-                                            this.renderItemToAtlas(dispatcher, submitNodeCollector, bufferSource, trackingItemStackRenderState, poseStack, itemX, itemY, j);
+                                            this.renderItemToAtlas(dispatcher, /*? if <26.2 {*//*submitNodeCollector, bufferSource,*//*?}*/ trackingItemStackRenderState, poseStack, itemX, itemY, j);
                                             float f = (float) itemX / k;
                                             float g = (float) (k - itemY) / k;
                                             this.submitBlitFromItemAtlas(renderState, guiItemRenderState, f, g, j, k);
@@ -193,12 +202,12 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                     if (guiItemRenderState.oversizedItemBounds() != null) {
                                         TrackingItemStackRenderState trackingItemStackRenderState = guiItemRenderState.itemStackRenderState();
                                         OversizedItemRenderer oversizedItemRenderer = oversizedItemRenderers
-                                                .computeIfAbsent(trackingItemStackRenderState.getModelIdentity(), object -> new OversizedItemRenderer(bufferSource));
+                                                .computeIfAbsent(trackingItemStackRenderState.getModelIdentity(), object -> new OversizedItemRenderer(/*? if <26.2 {*//*bufferSource*//*?}*/));
                                         ScreenRectangle screenRectangle = guiItemRenderState.oversizedItemBounds();
                                         OversizedItemRenderState oversizedItemRenderState = new OversizedItemRenderState(
                                                 guiItemRenderState, screenRectangle.left(), screenRectangle.top(), screenRectangle.right(), screenRectangle.bottom()
                                         );
-                                        oversizedItemRenderer.prepare(oversizedItemRenderState, renderState, i);
+                                        oversizedItemRenderer.prepare(oversizedItemRenderState, renderState, /*? if >=26.2 {*/dispatcher, /*?}*/i);
                                     }
                                 }
                         );
@@ -236,7 +245,33 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                 );
     }
 
-    private void renderItemToAtlas(FeatureRenderDispatcher featureRenderDispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int x, int y, int k) {
+    //? if >=26.2 {
+    private void renderItemToAtlas(FeatureRenderDispatcher featureRenderDispatcher, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int x, int y, int k) {
+        poseStack.pushPose();
+        poseStack.translate(x + k / 2.0F, y + k / 2.0F, 0.0F);
+        poseStack.scale(k, -k, k);
+        boolean bl = !trackingItemStackRenderState.usesBlockLight();
+        if (bl) {
+            Minecraft.getInstance().gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_FLAT);
+        } else {
+            Minecraft.getInstance().gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_3D);
+        }
+        // pre-26.2 this swapped FeatureRenderDispatcher's buffer source for a translucent wrapper;
+        // 26.2 has no buffer source, so the same remap is applied via RenderTypeFeatureRendererMixin.
+        boolean translucent = opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get();
+        if (translucent) LegacyItemTranslucency.push(opacity);
+        RenderSystem.enableScissorForRenderTypeDraws(x, this.itemsAtlas.getHeight(0) - y - k, k, k);
+        try {
+            trackingItemStackRenderState.submit(poseStack, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0);
+            featureRenderDispatcher.renderAllFeatures(submitNodeStorage);
+        } finally {
+            if (translucent) LegacyItemTranslucency.pop();
+        }
+        RenderSystem.disableScissorForRenderTypeDraws();
+        poseStack.popPose();
+    }
+    //?} else {
+    /*private void renderItemToAtlas(FeatureRenderDispatcher featureRenderDispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int x, int y, int k) {
         poseStack.pushPose();
         poseStack.translate(x + k / 2.0F, y + k / 2.0F, 0.0F);
         poseStack.scale(k, -k, k);
@@ -256,6 +291,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         RenderSystem.disableScissorForRenderTypeDraws();
         poseStack.popPose();
     }
+    *///?}
 
     private int calculateAtlasSizeInPixels(GuiRenderState renderState, int i) {
         Set<Object> set = renderState.getItemModelIdentities();

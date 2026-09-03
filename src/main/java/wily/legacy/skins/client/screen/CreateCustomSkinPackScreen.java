@@ -100,7 +100,7 @@ public class CreateCustomSkinPackScreen extends ConfirmationScreen {
             iconPath = selected;
         } catch (Exception ex) {
             if (minecraft != null)
-                minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, title, Component.literal(errorText(ex))));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, title, Component.literal(errorText(ex))));
         }
     }
 
@@ -112,7 +112,7 @@ public class CreateCustomSkinPackScreen extends ConfirmationScreen {
             CustomSkinPackStore.enableResourcePack(minecraft);
             SkinsClientBootstrap.reloadChangeSkinScreen(minecraft, rootParent == null ? parent : rootParent, targetPackId, null, reorder);
         } catch (IOException ex) {
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, reorder ? EDIT_TITLE : title, Component.literal(errorText(ex))));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, reorder ? EDIT_TITLE : title, Component.literal(errorText(ex))));
         }
     }
 

@@ -247,7 +247,7 @@ public interface ControlTooltip {
     }
 
     static float getAlpha() {
-        return Math.max(Minecraft.getInstance().screen == null ? 0.0f : 0.2f, LegacyRenderUtil.getHUDOpacity());
+        return Math.max(Minecraft.getInstance()./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null ? 0.0f : 0.2f, LegacyRenderUtil.getHUDOpacity());
     }
 
     static ComponentIcon getKbmIcon(String key) {
@@ -332,7 +332,8 @@ public interface ControlTooltip {
         }
 
         default void addControlTooltips(ControlTooltipList list) {
-            if (this instanceof Gui) setupGui(list, Minecraft.getInstance());
+            // 26.2 split Gui: the HUD half (which GuiMixin implements this interface on) is now Hud.
+            if (this instanceof /*? if >=26.2 {*/net.minecraft.client.gui.Hud/*?} else {*//*Gui*//*?}*/) setupGui(list, Minecraft.getInstance());
             if (this instanceof Screen s) {
                 if (this instanceof LegacyMenuAccess<?> a) setupDefaultContainerScreen(list, a);
                 else setupDefaultScreen(list, s);

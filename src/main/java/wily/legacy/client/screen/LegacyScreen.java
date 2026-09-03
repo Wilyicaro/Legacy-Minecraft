@@ -34,6 +34,6 @@ public class LegacyScreen extends Screen implements Controller.Listener, Control
     @Override
     public void onClose() {
         LegacySoundUtil.playBackSound();
-        this.minecraft.setScreen(parent);
+        this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
     }
 }

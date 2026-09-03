@@ -57,9 +57,9 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Listener,
             LegacyLoadingScreen.openFakeManualSaveScreen(PauseScreenMixin.this);
             return;
         }
-        minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this, LegacyComponents.ENABLE_AUTO_SAVE, LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE, b1 -> {
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(PauseScreenMixin.this, LegacyComponents.ENABLE_AUTO_SAVE, LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE, b1 -> {
             setAutoSave(1, button);
-            minecraft.setScreen(PauseScreenMixin.this);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(PauseScreenMixin.this);
         }));
     }
 
@@ -69,23 +69,23 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Listener,
         renderableVLists = Collections.singletonList(renderableVList);
         renderableVList.addRenderables(
                 Button.builder(Component.translatable("menu.returnToGame"), button -> {
-                    this.minecraft.setScreen(null);
+                    this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(null);
                     this.minecraft.mouseHandler.grabMouse();
                 }).build(),
-                Button.builder(Component.translatable("menu.options"), button -> this.minecraft.setScreen(new HelpAndOptionsScreen(this))).build(),
-                leaderboardsButton = Button.builder(Component.empty(), button -> this.minecraft.setScreen(LeaderboardsScreen.getActualLeaderboardsScreenInstance(this))).build(),
-                Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(LegacyAdvancementsScreen.getActualAdvancementsScreenInstance(this))).build()
+                Button.builder(Component.translatable("menu.options"), button -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new HelpAndOptionsScreen(this))).build(),
+                leaderboardsButton = Button.builder(Component.empty(), button -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(LeaderboardsScreen.getActualLeaderboardsScreenInstance(this))).build(),
+                Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(LegacyAdvancementsScreen.getActualAdvancementsScreenInstance(this))).build()
         );
         if (LegacySaveCache.hasSaveSystem(minecraft))
-            renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this, LegacyOptions.autoSaveInterval.get() > 0 ? Component.translatable("legacy.menu.disable_autosave_title") : LegacyComponents.SAVE_GAME, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b -> {
+            renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, LegacyOptions.autoSaveInterval.get() > 0 ? Component.translatable("legacy.menu.disable_autosave_title") : LegacyComponents.SAVE_GAME, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b -> {
                 if (LegacyOptions.autoSaveInterval.get() > 0) {
                     setAutoSave(0, button);
-                    minecraft.setScreen(PauseScreenMixin.this);
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(PauseScreenMixin.this);
                 } else {
                     startManualSaveFlow(button);
                 }
             }))).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ExitConfirmationScreen(this))).build());
         /*? if fabric && >=26.1 {*/wily.legacy.client.screen.compat.FlashbackCompat.addBelowRecordingButtons(renderableVList, this);/*?}*/
     }
 

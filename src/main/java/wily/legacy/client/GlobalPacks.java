@@ -228,14 +228,14 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public void openPackSelectionScreen() {
-            if (minecraft.screen != null) {
-                Screen screen = minecraft.screen;
+            if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null) {
+                Screen screen = minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/;
                 Collection<String> packs = packRepository.getSelectedIds();
                 packRepository.setSelected(CustomSkinPackStore.preserveSelection(packRepository, DownloadedSkinPackStore.preserveSelection(packRepository, getSelectedIds())));
-                minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new PackSelectionScreen(packRepository, p -> {
                     updateModel();
                     packRepository.setSelected(packs);
-                    minecraft.setScreen(screen);
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
                 }, packPath, getMessage()));
             }
         }

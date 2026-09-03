@@ -21,7 +21,7 @@ public class ServerChunkCacheMixin {
     @Final
     private ServerLevel level;
 
-    @ModifyExpressionValue(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/NaturalSpawner;getFilteredSpawningCategories(Lnet/minecraft/world/level/NaturalSpawner$SpawnState;ZZZ)Ljava/util/List;"))
+    @ModifyExpressionValue(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;J)V", at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/world/level/NaturalSpawner;getFilteredSpawningCategories(Lnet/minecraft/world/level/NaturalSpawner$SpawnState;ZZ)Ljava/util/List;"/*?} else {*//*"Lnet/minecraft/world/level/NaturalSpawner;getFilteredSpawningCategories(Lnet/minecraft/world/level/NaturalSpawner$SpawnState;ZZZ)Ljava/util/List;"*//*?}*/))
     private List<MobCategory> getFilteredSpawningCategories(List<MobCategory> categories) {
         if (!LegacyMobCaps.isEnabled(level) || !Level.OVERWORLD.equals(level.dimension()) || categories.contains(MobCategory.CREATURE)) {
             return categories;

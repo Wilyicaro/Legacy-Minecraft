@@ -205,11 +205,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
             optionsScreen.onClose = screen -> {
                 if (LegacyOptions.tu3ChangeSkinScreen.get() != wasTu3) {
                     source.requestFocus(packId, skinId);
-                    minecraft.setScreen(source.create(rootParent));
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(source.create(rootParent));
                 }
             };
         }
-        minecraft.setScreen(built);
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(built);
     }
 
     boolean isEditingCustomPack(String packId) {
@@ -263,7 +263,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     protected void openImportSkinScreen(String packId, Consumer<String> importedAction) {
         if (minecraft == null || packId == null || packId.isBlank()) return;
         Screen rootParent = parent != null ? parent : this;
-        minecraft.setScreen(new ImportCustomSkinScreen(this, rootParent, packId, importedAction));
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ImportCustomSkinScreen(this, rootParent, packId, importedAction));
         playPressSound();
     }
 
@@ -277,7 +277,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
 
     void showError(Component title, Exception ex) {
         if (minecraft != null)
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, title, Component.literal(errorText(ex))));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, title, Component.literal(errorText(ex))));
     }
 
     String errorText(Exception ex) {
@@ -770,11 +770,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         ContentManager.fetchIndex(category).whenComplete((packs, err) -> minecraft.execute(() -> {
             openingSkinMegaBundle = false;
             if (err != null || packs == null) {
-                minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(err == null ? "" : err.getMessage())));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(err == null ? "" : err.getMessage())));
                 return;
             }
             restoreDefaultSkinPackFocus();
-            minecraft.setScreen(new Legacy4JContentListScreen(this, category, packs));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new Legacy4JContentListScreen(this, category, packs));
         }));
     }
 

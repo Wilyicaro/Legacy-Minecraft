@@ -32,7 +32,7 @@ final class CustomSkinPackFlow {
         Screen rootParent = screen.rootParentScreen();
         String customPackId = isReordering() ? reorderingPackId : focusedCustomPackId();
         String downloadedPackId = customPackId == null ? focusedDownloadedPackId() : null;
-        screen.minecraft.setScreen(new ConfirmationScreen(screen, ConfirmationScreen::getPanelWidth,
+        screen.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(screen, ConfirmationScreen::getPanelWidth,
                 () -> optionsHeight(customPackId, downloadedPackId),
                 LegacyComponents.CUSTOM_SKIN_PACK_OPTIONS,
                 Component.translatable("legacy.menu.custom_skin_pack_options_message"),
@@ -205,7 +205,7 @@ final class CustomSkinPackFlow {
         Boolean slim = skin.modelId() == null ? null : BoxModelManager.getSlimFlag(skin.modelId());
         if (slim == null && skin.slimArms()) slim = true;
         if (Boolean.TRUE.equals(slim) && !poses.contains("slim")) poses.add(0, "slim");
-        screen.minecraft.setScreen(ImportCustomSkinScreen.edit(screen, screen.rootParentScreen(), packId, skin.id(), skin.name(), theme, poses, skin.cape() != null, savedSkinId -> queueRefresh(packId, savedSkinId)));
+        screen.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ImportCustomSkinScreen.edit(screen, screen.rootParentScreen(), packId, skin.id(), skin.name(), theme, poses, skin.cape() != null, savedSkinId -> queueRefresh(packId, savedSkinId)));
         screen.playPressSound();
     }
 
@@ -248,20 +248,20 @@ final class CustomSkinPackFlow {
     }
 
     private void openCreateScreen(Screen rootParent) {
-        if (screen.minecraft != null) screen.minecraft.setScreen(CreateCustomSkinPackScreen.create(screen, rootParent));
+        if (screen.minecraft != null) screen.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(CreateCustomSkinPackScreen.create(screen, rootParent));
     }
 
     private void openEditScreen(Screen rootParent, String packId) {
         if (screen.minecraft == null || packId == null) return;
         SkinPack pack = focusedPack();
         if (pack == null || !packId.equals(pack.id())) pack = SkinPackLoader.getPacks().get(packId);
-        screen.minecraft.setScreen(CreateCustomSkinPackScreen.edit(screen, rootParent, packId, pack == null ? packId : pack.name()));
+        screen.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(CreateCustomSkinPackScreen.edit(screen, rootParent, packId, pack == null ? packId : pack.name()));
     }
 
     private void toggleEditMode(String packId) {
         if (screen.minecraft == null) return;
         setEditing(isEditing() ? null : packId);
-        screen.minecraft.setScreen(screen);
+        screen.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
     }
 
     private void openPackRemoveScreen(Screen rootParent, String customPackId, String downloadedPackId) {
@@ -349,7 +349,7 @@ final class CustomSkinPackFlow {
 
     private void openRemoveScreen(Component title, Component message, Runnable action) {
         if (screen.minecraft == null) return;
-        screen.minecraft.setScreen(new ConfirmationScreen(screen, ConfirmationScreen::getPanelWidth, ConfirmationScreen::getBaseHeight, title, message, s -> action.run()) {
+        screen.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(screen, ConfirmationScreen::getPanelWidth, ConfirmationScreen::getBaseHeight, title, message, s -> action.run()) {
             @Override
             protected void addButtons() {
                 renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), button -> onClose()).build());

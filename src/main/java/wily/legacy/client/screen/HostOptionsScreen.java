@@ -109,13 +109,13 @@ public class HostOptionsScreen extends PanelVListScreen {
             return true;
         }
         if (keyEvent.key() == InputConstants.KEY_O) {
-            minecraft.setScreen(new ChatScreen("", false));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ChatScreen("", false));
             return true;
         }
         if (keyEvent.key() == InputConstants.KEY_X && minecraft.hasSingleplayerServer()) {
             if (!minecraft.getSingleplayerServer().isPublished())
-                minecraft.setScreen(new PublishScreen(this, minecraft.getSingleplayerServer().getDefaultGameType(), s -> s.publish(minecraft.getSingleplayerServer())));
-            else if (PublishScreen.hasWorldHost()) minecraft.setScreen(new WorldHostFriendsScreen(this));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new PublishScreen(this, minecraft.getSingleplayerServer().getDefaultGameType(), s -> s.publish(minecraft.getSingleplayerServer())));
+            else if (PublishScreen.hasWorldHost()) minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new WorldHostFriendsScreen(this));
             return true;
         }
         return super.keyPressed(keyEvent);
@@ -124,7 +124,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     protected void addPlayerButtons() {
         addPlayerButtons(true, (playerInfo, b) -> {
             if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
-            minecraft.setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
         });
     }
 
@@ -164,7 +164,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void pressHostOptionsButton(Button b) {
-        minecraft.setScreen(new GameHostOptionsScreen(this, minecraft));
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new GameHostOptionsScreen(this, minecraft));
     }
 
     public boolean isPauseScreen() {

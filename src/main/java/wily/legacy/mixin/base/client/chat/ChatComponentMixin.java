@@ -49,7 +49,7 @@ public abstract class ChatComponentMixin {
     //? if >=1.21.11 {
     @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void renderWithFont(CallbackInfo ci) {
-        if (minecraft.screen != null && !isChatFocused()) {
+        if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null && !isChatFocused()) {
             ci.cancel();
             return;
         }
@@ -170,7 +170,7 @@ public abstract class ChatComponentMixin {
 
     @Inject(method = "isChatFocused", at = @At(value = "HEAD"), cancellable = true)
     private void isChatFocused(CallbackInfoReturnable<Boolean> cir) {
-        if (minecraft.screen instanceof OverlayPanelScreen s && s.parent instanceof ChatScreen)
+        if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof OverlayPanelScreen s && s.parent instanceof ChatScreen)
             cir.setReturnValue(true);
     }
 }

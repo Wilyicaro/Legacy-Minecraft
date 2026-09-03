@@ -1,6 +1,9 @@
 package wily.legacy.client;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
+//? if >=26.2 {
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+//?}
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.CommandEncoder;
@@ -14,6 +17,7 @@ import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
@@ -29,22 +33,30 @@ public class LegacyGamma implements AutoCloseable {
     public void render() {
         float value = LegacyOptions.legacyGamma.get().floatValue();
         CommandEncoder commandEncoder = RenderSystem.getDevice().createCommandEncoder();
-        try (GpuBuffer.MappedView mappedView = commandEncoder.mapBuffer(this.ubo.currentBuffer(), false, true)) {
+        //? if >=26.2 {
+        try (GpuBufferSlice.MappedView mappedView = this.ubo.currentBuffer().map(false, true)) {
+        //?} else {
+        /*try (GpuBuffer.MappedView mappedView = commandEncoder.mapBuffer(this.ubo.currentBuffer(), false, true)) {
+        *///?}
             Std140Builder.intoBuffer(mappedView.data()).putFloat(value * 1.5f + 0.5f);
         }
 
-        RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
+        RenderTarget target = /*? if >=26.2 {*/Minecraft.getInstance().gameRenderer.mainRenderTarget()/*?} else {*//*Minecraft.getInstance().getMainRenderTarget()*//*?}*/;
         resizeInput(target);
         commandEncoder.copyTextureToTexture(target.getColorTexture(), inputTexture, 0, 0, 0, 0, 0, target.width, target.height);
-        commandEncoder.clearDepthTexture(target.getDepthTexture(), 1.0);
+        commandEncoder.clearDepthTexture(target.getDepthTexture(), /*? if >=26.2 {*/RenderSystem.DEFAULT_DEPTH_CLEAR_VALUE/*?} else {*//*1.0*//*?}*/);
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("legacyGamma");
-        try (RenderPass renderPass = commandEncoder.createRenderPass(() -> "Display Legacy Gamma", target.getColorTextureView(), OptionalInt.empty(), target.useDepth ? target.getDepthTextureView() : null, OptionalDouble.empty())) {
+        try (RenderPass renderPass = commandEncoder.createRenderPass(() -> "Display Legacy Gamma", target.getColorTextureView(), /*? if >=26.2 {*/Optional.empty()/*?} else {*//*OptionalInt.empty()*//*?}*/, target.useDepth ? target.getDepthTextureView() : null, OptionalDouble.empty())) {
             renderPass.setPipeline(LegacyRenderPipelines.GAMMA);
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.bindTexture("InSampler", inputView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
             renderPass.setUniform("GammaInfo", this.ubo.currentBuffer());
-            renderPass.draw(0, 3);
+            //? if >=26.2 {
+            renderPass.draw(3, 1, 0, 0);
+            //?} else {
+            /*renderPass.draw(0, 3);
+            *///?}
         }
         this.ubo.rotate();
         profilerFiller.pop();

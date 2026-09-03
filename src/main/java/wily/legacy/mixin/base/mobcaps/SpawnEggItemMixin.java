@@ -50,7 +50,27 @@ public class SpawnEggItemMixin {
         cir.setReturnValue(InteractionResult.FAIL);
     }
 
+    // 26.2 reshaped SpawnEggItem#spawnMob: it gained a leading EntityType and now takes a ServerLevel
+    // directly, so the handler's parameter list had to follow or the injector fails to apply.
+    //? if >=26.2 {
     @Inject(method = "spawnMob", at = @At("HEAD"), cancellable = true)
+    private static void gateSpawnEggUse(EntityType<?> type, LivingEntity user, ItemStack stack, ServerLevel serverLevel, BlockPos pos, boolean alignPosition, boolean invertY, CallbackInfoReturnable<InteractionResult> cir) {
+        if (type == null) {
+            return;
+        }
+
+        String failure = ConsoleMobCaps.spawnEggFailure(serverLevel, type);
+        if (failure == null) {
+            return;
+        }
+
+        if (user instanceof Player player) {
+            ConsoleMobCaps.sendFailure(player, failure);
+        }
+        cir.setReturnValue(InteractionResult.FAIL);
+    }
+    //?} else {
+    /*@Inject(method = "spawnMob", at = @At("HEAD"), cancellable = true)
     private static void gateSpawnEggUse(LivingEntity user, ItemStack stack, Level level, BlockPos pos, boolean alignPosition, boolean invertY, CallbackInfoReturnable<InteractionResult> cir) {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
@@ -71,6 +91,7 @@ public class SpawnEggItemMixin {
         }
         cir.setReturnValue(InteractionResult.FAIL);
     }
+    *///?}
 
     @Inject(method = "spawnOffspringFromSpawnEgg", at = @At("HEAD"), cancellable = true)
     private static void gateSpawnEggOffspring(Player player, Mob parent, EntityType<? extends Mob> type, ServerLevel level, Vec3 pos, ItemStack stack, CallbackInfoReturnable<Optional<Mob>> cir) {
@@ -99,7 +120,7 @@ public class SpawnEggItemMixin {
     private static void spawnTraderLlamas(ServerLevel level, WanderingTrader trader) {
         for (int[] offset : TRADER_LLAMA_OFFSETS) {
             BlockPos pos = trader.blockPosition().offset(offset[0], 0, offset[1]);
-            TraderLlama llama = EntityType.TRADER_LLAMA.spawn(level, pos, EntitySpawnReason.EVENT);
+            TraderLlama llama = /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.TRADER_LLAMA.spawn(level, pos, EntitySpawnReason.EVENT);
             if (llama != null) {
                 llama.setLeashedTo(trader, true);
             }

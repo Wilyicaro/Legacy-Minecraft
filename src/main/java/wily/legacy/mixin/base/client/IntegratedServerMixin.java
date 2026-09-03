@@ -42,7 +42,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     private boolean paused;
 
     public IntegratedServerMixin(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener) {
-        super(thread, levelStorageAccess, packRepository, worldStem, Optional.empty(), proxy, dataFixer, services, levelLoadListener, false);
+        super(thread, levelStorageAccess, packRepository, worldStem, Optional.empty(), proxy, dataFixer, services, levelLoadListener, false/*? if >=26.2 {*/, new net.minecraft.server.notifications.NotificationManager()/*?}*/);
     }
 
 

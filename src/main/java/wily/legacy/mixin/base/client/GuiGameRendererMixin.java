@@ -6,6 +6,14 @@ import net.minecraft.client.DeltaTracker;
 //?}
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.gui.Gui;
+//? if >=26.2 {
+import net.minecraft.client.gui.Hud;
+import com.llamalad7.mixinextras.sugar.Local;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.ScreenshotToast;
+import wily.legacy.util.client.LegacyRenderUtil;
+//?}
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import wily.legacy.client.LegacyOptions;
 
-@Mixin(GameRenderer.class)
+@Mixin(/*? if >=26.2 {*/Gui.class/*?} else {*//*GameRenderer.class*//*?}*/)
 public class GuiGameRendererMixin {
     //? if <1.20.5 {
     /*@Shadow
@@ -47,10 +55,21 @@ public class GuiGameRendererMixin {
         }
         return LegacyOptions.displayHUD.get();
     }
-    *///?} else {
-    @WrapWithCondition(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
+    *///?} else if <26.2 {
+    /*@WrapWithCondition(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
     private boolean render(Gui instance, GuiGraphicsExtractor GuiGraphicsExtractor, DeltaTracker deltaTracker) {
         return LegacyOptions.displayHUD.get();
+    }
+    *///?} else {
+    @WrapWithCondition(method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
+    private boolean render(Hud instance, GuiGraphicsExtractor GuiGraphicsExtractor, DeltaTracker deltaTracker) {
+        return LegacyOptions.displayHUD.get();
+    }
+
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastManager;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", shift = At.Shift.AFTER))
+    private void legacy$extractGuiOverlay(DeltaTracker deltaTracker, boolean bl, boolean bl2, CallbackInfo ci, @Local GuiGraphicsExtractor graphics) {
+        LegacyRenderUtil.renderGameOverlay(graphics);
+        ScreenshotToast.render(graphics);
     }
     //?}
 }

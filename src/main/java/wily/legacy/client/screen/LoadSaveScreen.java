@@ -87,7 +87,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                 return;
             }
             publishScreen.setGameType(gameTypeSlider.getObjectValue());
-            minecraft.setScreen(publishScreen);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(publishScreen);
         }, () -> publishScreen.publish);
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
@@ -165,7 +165,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
         PackAlbum album = getSelectedResourceAlbum(summary);
-        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()), album.packs(), false, () -> new WorldOpenFlows(minecraft, source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, () -> minecraft.setScreen(screen)/*?}*/));
+        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()), album.packs(), false, () -> new WorldOpenFlows(minecraft, source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, () -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(screen)/*?}*/));
         Legacy4JClient.serverPlayerJoinConsumer = serverPlayer -> {
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(serverPlayer);
             LegacyClientWorldSettings.of(server.getWorldData()).setSelectedResourceAlbum(album);
@@ -205,7 +205,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, panel.y + 90, getLayoutWidth(), 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(difficulty.getInfo()), difficulty, () -> Arrays.asList(Difficulty.values()), b -> difficulty = b.getObjectValue()))).active = !LegacyClientWorldSettings.of(summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
         Button moreOptionsButton = addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> {
             focusMoreOptionsButton = true;
-            minecraft.setScreen(new WorldMoreOptionsScreen(this));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new WorldMoreOptionsScreen(this));
         }).bounds(layoutX, panel.y + 178, getLayoutWidth(), 20).build()));
         Button loadButton = addRenderableWidget(accessor.putWidget("loadButton", Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> onLoad()).bounds(layoutX, panel.y + 203, getLayoutWidth(), 20).build()));
         addRenderableWidget(accessor.putWidget("gameTypeSlider", gameTypeSlider));
@@ -233,12 +233,12 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             LegacyLoadingScreen loadingScreen = new LegacyLoadingScreen();
             loadingScreen.setGenericLoading(true);
             loadingScreen.setBlackBackground(true);
-            minecraft.setScreen(loadingScreen);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(loadingScreen);
             install.get().whenComplete((installedAlbum, throwable) -> minecraft.execute(() -> {
                 preparingRemoteResourceAlbum = false;
                 if (throwable != null || installedAlbum == null) {
                     Legacy4J.LOGGER.warn("Failed to prepare remote resource album before loading world", throwable);
-                    minecraft.setScreen(this);
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this);
                     return;
                 }
                 try {
@@ -247,7 +247,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                     continueLoad();
                 } catch (Throwable preparationThrowable) {
                     Legacy4J.LOGGER.warn("Failed to prepare remote resource album before loading world", preparationThrowable);
-                    minecraft.setScreen(this);
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this);
                 }
             }));
             return;
@@ -267,7 +267,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         ResourceKey<Level> level = dimensionsToReset.get(index);
 
         Component dimensionName = LegacyComponents.getDimensionName(level);
-        minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.load_save.reset", dimensionName), Component.translatable("legacy.menu.load_save.reset_message", dimensionName, dimensionName), b -> {
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.load_save.reset", dimensionName), Component.translatable("legacy.menu.load_save.reset_message", dimensionName, dimensionName), b -> {
             if (index == dimensionsToReset.size() - 1) {
                 completeLoad();
             } else confirmDimensionToReset(index + 1);

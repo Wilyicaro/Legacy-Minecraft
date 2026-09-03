@@ -106,8 +106,8 @@ public interface Controller {
 
     default void connect(ControllerManager manager) {
         manager.setControllerTheLastInput(true);
-        if (!manager.isCursorDisabled && manager.minecraft.screen != null)
-            manager.minecraft.execute(() -> UIAccessor.of(manager.minecraft.screen).reloadUI());
+        if (!manager.isCursorDisabled && manager.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null)
+            manager.minecraft.execute(() -> UIAccessor.of(manager.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/).reloadUI());
         addOrSetControllerToast(CONTROLLER_DETECTED);
     }
 

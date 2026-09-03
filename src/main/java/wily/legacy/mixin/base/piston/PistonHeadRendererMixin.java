@@ -48,12 +48,12 @@ public abstract class PistonHeadRendererMixin {
         return renderState;
     }
 
-    @WrapOperation(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/PistonHeadRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitMovingBlock(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/MovingBlockRenderState;)V", ordinal = 0))
-    private void submit(SubmitNodeCollector instance, PoseStack poseStack, MovingBlockRenderState renderState, Operation<Void> original, @Local CameraRenderState cameraRenderState) {
+    @WrapOperation(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/PistonHeadRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/client/renderer/SubmitNodeCollector;submitMovingBlock(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/MovingBlockRenderState;I)V"/*?} else {*//*"Lnet/minecraft/client/renderer/SubmitNodeCollector;submitMovingBlock(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/MovingBlockRenderState;)V"*//*?}*/, ordinal = 0))
+    private void submit(SubmitNodeCollector instance, PoseStack poseStack, MovingBlockRenderState renderState, /*? if >=26.2 {*/int outlineColor, Operation<Void> original/*?} else {*//*Operation<Void> original*//*?}*/, @Local CameraRenderState cameraRenderState) {
         LegacyMovingBlockRenderState legacyMovingBlockRenderState = LegacyMovingBlockRenderState.of(renderState);
 
         if (legacyMovingBlockRenderState.getEnhancedSubmit() != null) {
             legacyMovingBlockRenderState.getEnhancedSubmit().renderer().submit(legacyMovingBlockRenderState.getEnhancedSubmit().renderState(), poseStack, instance, cameraRenderState);
-        } else original.call(instance, poseStack, renderState);
+        } else original.call(instance, poseStack, /*? if >=26.2 {*/renderState, outlineColor/*?} else {*//*renderState*//*?}*/);
     }
 }

@@ -1,4 +1,5 @@
-package wily.legacy.mixin.base.client;
+//? if <26.2 {
+/*package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.NameTagFeatureRenderer;
@@ -17,3 +18,4 @@ public class NameTagFeatureRendererStorageMixin {
         return e;
     }
 }
+*///?}

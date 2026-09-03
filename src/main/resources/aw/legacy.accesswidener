@@ -12,13 +12,12 @@ accessible field net/minecraft/client/gui/screens/Screen children Ljava/util/Lis
 accessible field net/minecraft/client/gui/screens/Screen narratables Ljava/util/List;
 accessible field net/minecraft/client/server/IntegratedServer publishedPort I
 accessible field net/minecraft/client/server/IntegratedServer lanPinger Lnet/minecraft/client/server/LanServerPinger;
-accessible field net/minecraft/client/server/IntegratedServer publishedGameType Lnet/minecraft/world/level/GameType;
 accessible field net/minecraft/client/gui/screens/LevelLoadingScreen lastNarration J
 accessible field net/minecraft/client/gui/screens/ProgressScreen progress I
 accessible field net/minecraft/client/gui/screens/ProgressScreen header Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/ProgressScreen stage Lnet/minecraft/network/chat/Component;
-accessible field net/minecraft/client/gui/Gui autosaveIndicatorValue F
-accessible field net/minecraft/client/gui/Gui lastAutosaveIndicatorValue F
+accessible field net/minecraft/client/gui/Hud autosaveIndicatorValue F
+accessible field net/minecraft/client/gui/Hud lastAutosaveIndicatorValue F
 accessible field net/minecraft/client/gui/screens/ProgressScreen clearScreenAfterStop Z
 accessible field net/minecraft/client/gui/screens/ProgressScreen stop Z
 accessible class net/minecraft/client/Options$FieldAccess
@@ -77,7 +76,6 @@ accessible field net/minecraft/client/Minecraft pendingReload Ljava/util/concurr
 accessible field net/minecraft/client/gui/screens/AlertScreen callback Ljava/lang/Runnable;
 accessible field net/minecraft/client/gui/screens/AlertScreen okButton Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/AlertScreen messageText Lnet/minecraft/network/chat/Component;
-accessible field net/minecraft/world/level/block/entity/DecoratedPotPatterns ITEM_TO_POT_TEXTURE Ljava/util/Map;
 accessible field net/minecraft/client/multiplayer/ClientAdvancements progress Ljava/util/Map;
 accessible field net/minecraft/stats/StatsCounter stats Lit/unimi/dsi/fastutil/objects/Object2IntMap;
 accessible field net/minecraft/client/KeyMapping clickCount I
@@ -90,13 +88,15 @@ accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/
 accessible field net/minecraft/world/item/CreativeModeTabs OP_BLOCKS Lnet/minecraft/resources/ResourceKey;
 accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
 accessible method net/minecraft/client/Minecraft startUseItem ()V
-accessible field net/minecraft/client/gui/Gui displayHealth I
+accessible field net/minecraft/client/gui/Hud displayHealth I
 accessible method net/minecraft/client/gui/components/events/ContainerEventHandler nextFocusPathInDirection (Lnet/minecraft/client/gui/navigation/ScreenRectangle;Lnet/minecraft/client/gui/navigation/ScreenDirection;Lnet/minecraft/client/gui/components/events/GuiEventListener;Lnet/minecraft/client/gui/navigation/FocusNavigationEvent$ArrowNavigation;)Lnet/minecraft/client/gui/ComponentPath;
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData <init> (IIBZZZLnet/minecraft/resources/ResourceKey;)V
-accessible method net/minecraft/client/gui/font/providers/BitmapProvider <init> (Lcom/mojang/blaze3d/platform/NativeImage;Lnet/minecraft/client/gui/font/CodepointMap;)V
+accessible method net/minecraft/client/gui/font/providers/BitmapProvider <init> (Lnet/minecraft/client/gui/font/providers/BitmapProvider$ImageDataHolder;Lnet/minecraft/client/gui/font/CodepointMap;)V
 accessible class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
 extendable class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
-accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
+accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLnet/minecraft/client/gui/font/providers/BitmapProvider$ImageDataHolder;IIIIII)V
+accessible class net/minecraft/client/gui/font/providers/BitmapProvider$ImageDataHolder
+accessible method net/minecraft/client/gui/font/providers/BitmapProvider$ImageDataHolder <init> (Lnet/minecraft/resources/Identifier;Lcom/mojang/blaze3d/platform/NativeImage;)V
 accessible method net/minecraft/world/inventory/AbstractFurnaceMenu canSmelt (Lnet/minecraft/world/item/ItemStack;)Z
 accessible method net/minecraft/client/multiplayer/ClientPacketListener setKeyPair (Lnet/minecraft/world/entity/player/ProfileKeyPair;)V
 accessible class net/minecraft/client/gui/screens/recipebook/GhostSlots$GhostSlot
@@ -110,15 +110,16 @@ accessible field net/minecraft/client/renderer/GameRenderer resourcePool Lcom/mo
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$Subtitle
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt
 accessible method net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt <init> (Lnet/minecraft/world/phys/Vec3;J)V
-accessible class net/minecraft/client/gui/Gui$HeartType
+accessible class net/minecraft/client/gui/Hud$HeartType
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor deferredTooltip Ljava/lang/Runnable;
 accessible field net/minecraft/client/renderer/PostPass customUniforms Ljava/util/Map;
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor guiRenderState Lnet/minecraft/client/renderer/state/gui/GuiRenderState;
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor scissorStack Lnet/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack;
 accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
 accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
-accessible class net/minecraft/client/Minecraft$GameLoadCookie
-accessible method net/minecraft/client/Minecraft$GameLoadCookie <init> (Lcom/mojang/realmsclient/client/RealmsClient;Lnet/minecraft/client/main/GameConfig$QuickPlayData;)V
+accessible class net/minecraft/client/GameLoadCookie
+accessible method net/minecraft/client/GameLoadCookie <init> (Lcom/mojang/realmsclient/client/RealmsClient;Lnet/minecraft/client/main/GameConfig$QuickPlayData;)V
 accessible class net/minecraft/client/gui/GuiGraphicsExtractor$RenderingTextCollector
 accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding
 accessible method net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding <init> (Lnet/minecraft/resources/Identifier;Ljava/util/function/Supplier;)V
+accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V

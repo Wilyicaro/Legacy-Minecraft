@@ -83,7 +83,7 @@ public abstract class GuiGraphicsExtractorMixin {
     private void renderItem(GuiRenderState instance, GuiItemRenderState arg, Operation<Void> original, @Nullable LivingEntity livingEntity, @Nullable Level level, ItemStack itemStack, int i, int j, int k) {
         if (legacy$hasLegacyThinItemOffset(itemStack)) arg.pose().translate(0.0F, -2.0F);
         float g = (float) itemStack.getPopTime() - FactoryAPIClient.getGamePartialTick(true);
-        if (g > 0.0F && (minecraft.screen == null || minecraft.screen instanceof LegacyMenuAccess<?> m && m.allowItemPopping())) {
+        if (g > 0.0F && (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null || minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof LegacyMenuAccess<?> m && m.allowItemPopping())) {
             float h = 1.0F + g / 5.0F;
             arg.pose().translate((float) (i + 8), (float) (j + 12));
             arg.pose().scale(1.0F / h, (h + 1.0F) / 2.0F);

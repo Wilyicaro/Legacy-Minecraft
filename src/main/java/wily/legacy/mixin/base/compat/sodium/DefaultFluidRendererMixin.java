@@ -30,7 +30,7 @@ public abstract class DefaultFluidRendererMixin {
 
     @Inject(method = "updateQuad", at = @At("RETURN"))
     private void legacy$useWaterBlockLight(ModelQuadViewMutable quad, LevelSlice level, BlockPos pos, LightPipeline lighter, Direction direction, ModelQuadFacing facing, float brightness, ColorProvider<FluidState> colorProvider, FluidState fluidState, CallbackInfo ci) {
-        if (fluidState.is(FluidTags.WATER)) Arrays.fill(quadLightData.lm, LevelRenderer.getLightCoords(level, pos));
+        if (fluidState.is(FluidTags.WATER)) Arrays.fill(quadLightData.lm, /*? if >=26.2 {*/net.minecraft.util.LightCoordsUtil/*?} else {*//*LevelRenderer*//*?}*/.getLightCoords(level, pos));
     }
 }
 //?}

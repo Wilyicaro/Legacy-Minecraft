@@ -224,7 +224,7 @@ public class LegacyBlockBehaviors {
 
         CauldronInteraction fillLava = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             if (level instanceof ServerLevel sl) {
-                Vec3 center = blockPos.getCenter();
+                Vec3 center = Vec3.atCenterOf(blockPos);
                 sl.sendParticles(ParticleTypes.LAVA, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.1, 0.2, 0.02f);
             }
             return successInteraction();
@@ -357,21 +357,21 @@ public class LegacyBlockBehaviors {
 
     public static void sendCauldronBubblesParticles(Level level, BlockPos blockPos) {
         if (level instanceof ServerLevel sl) {
-            Vec3 center = blockPos.getCenter();
+            Vec3 center = Vec3.atCenterOf(blockPos);
             sl.sendParticles(ParticleTypes.BUBBLE, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.1, 0.2, 0.02f);
         }
     }
 
     public static void sendCauldronSplashParticles(Level level, BlockPos blockPos) {
         if (level instanceof ServerLevel sl) {
-            Vec3 center = blockPos.getCenter();
+            Vec3 center = Vec3.atCenterOf(blockPos);
             sl.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.2, 0.2, 1);
         }
     }
 
     public static void sendCauldronPotionParticles(Level level, BlockPos blockPos, PotionContents potion) {
         if (level instanceof ServerLevel sl) {
-            Vec3 center = blockPos.getCenter();
+            Vec3 center = Vec3.atCenterOf(blockPos);
             int color = potion.getColorOr(-13083194);
             sl.sendParticles(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, color), center.x, center.y + 0.5F, center.z, 6, 0.2, 0.1, 0.2, 0.02f);
         }

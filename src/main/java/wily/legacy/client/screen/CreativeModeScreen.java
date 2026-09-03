@@ -181,7 +181,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     protected void init() {
         super.init();
         if (!Legacy4JClient.playerHasInfiniteMaterials()) {
-            minecraft.setScreen(new InventoryScreen(minecraft.player));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new InventoryScreen(minecraft.player));
             return;
         }
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {

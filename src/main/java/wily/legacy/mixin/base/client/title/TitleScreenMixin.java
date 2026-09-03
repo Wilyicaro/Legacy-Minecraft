@@ -73,22 +73,22 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            } else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
+            } else minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         boolean optedOut = GlobalLeaderboardsFeature.isOptedOut();
         Button modButton = optedOut
-                ? Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build()
-                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
+                ? Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ModsScreen(this))).build()
+                : Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build();
         if (LegacyOptions.legacySettingsMenus.get()) {
-            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft.setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.leaderboards"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(LeaderboardsScreen.getOverallLeaderboardsScreenInstance(this))).build());
         }
         if (!LegacyOptions.legacySettingsMenus.get()) {
             renderableVList.addRenderable(modButton);
-            renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
+            renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
         }
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, ContentManager.CATEGORIES))).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new HelpAndOptionsScreen(this))).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new Legacy4JStoreScreen(this, ContentManager.CATEGORIES))).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ExitConfirmationScreen(this))).build());
         //? if forge || neoforge && <=1.20.4 {
         /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
          *///?}
@@ -158,7 +158,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
         PlayGameScreen.preloadCreateWorld(minecraft);
-        if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
+        if (splash == null) this.splash = Minecraft.getInstance()./*? if >=26.2 {*/gui.splashManager()/*?} else {*//*getSplashManager()*//*?}*/.getSplash();
     }
 
     @Override
@@ -182,15 +182,15 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     public boolean keyPressed(KeyEvent keyEvent) {
         if (renderableVList.keyPressed(keyEvent.key())) return true;
         if (keyEvent.key() == InputConstants.KEY_X) {
-            minecraft.setScreen(new ChooseUserScreen(this));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ChooseUserScreen(this));
             return true;
         }
         if (keyEvent.key() == InputConstants.KEY_O && PublishScreen.hasWorldHost()) {
-            minecraft.setScreen(new WorldHostFriendsScreen(this));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new WorldHostFriendsScreen(this));
             return true;
         }
         if (Legacy4JClient.keyLegacy4JSettings.matches(keyEvent)) {
-            minecraft.setScreen(new Legacy4JSettingsScreen(this));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new Legacy4JSettingsScreen(this));
             return true;
         }
         return super.keyPressed(keyEvent);

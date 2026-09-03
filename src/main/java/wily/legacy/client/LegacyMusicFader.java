@@ -51,7 +51,7 @@ public class LegacyMusicFader {
         musicManagerAccessor.setCurrentMusic(null);
         musicManagerShouldTick = false;
         resumeMusicManager = true;
-        mc.getToastManager().hideNowPlayingToast();
+        mc./*? if >=26.2 {*/gui.toastManager()/*?} else {*//*getToastManager()*//*?}*/.hideNowPlayingToast();
     }
 
     public static void fadeOutBgMusic(boolean startMusicManager) {
@@ -59,7 +59,7 @@ public class LegacyMusicFader {
         if (music != null) {
             fadeOutMusic(music, startMusicManager, true);
             musicManagerAccessor.setCurrentMusic(null);
-            mc.getToastManager().hideNowPlayingToast();
+            mc./*? if >=26.2 {*/gui.toastManager()/*?} else {*//*getToastManager()*//*?}*/.hideNowPlayingToast();
         }
     }
 

@@ -118,7 +118,7 @@ public class ModsScreen extends PanelVListScreen {
                 public void onPress(InputWithModifiers input) {
                     if (isFocused()) {
                         Screen config = FactoryAPIClient.getConfigScreen(mod, ModsScreen.this);
-                        if (config != null) minecraft.setScreen(config);
+                        if (config != null) minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(config);
                     }
                 }
 

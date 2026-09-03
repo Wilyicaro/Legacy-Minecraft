@@ -5,7 +5,11 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.contextualbar.LocatorBarRenderer;
+//? if <26.2 {
+/*import net.minecraft.client.gui.contextualbar.LocatorBarRenderer;
+*///?} else {
+import net.minecraft.client.gui.contextualbar.LocatorBar;
+//?}
 import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +19,7 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-@Mixin(LocatorBarRenderer.class)
+@Mixin(/*? if <26.2 {*//*LocatorBarRenderer*//*?} else {*/LocatorBar/*?}*/.class)
 public class LocatorBarRendererMixin {
 
     @ModifyArg(method = "lambda$extractRenderState$1", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIIII)V"), index = 6)

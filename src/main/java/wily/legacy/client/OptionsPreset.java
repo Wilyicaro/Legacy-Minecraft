@@ -35,7 +35,7 @@ public record OptionsPreset(Identifier id, Optional<Component> name, Optional<Co
     public void apply() {
         vanillaOptions.forEach((key, value) -> setVanillaOption(VANILLA_OPTIONS_MAP.get(key), value));
         legacyOptions.forEach((key, value) -> setConfig(LegacyOptions.CLIENT_STORAGE.configMap.get(key), value));
-        if (Minecraft.getInstance().screen instanceof OptionsScreen screen) {
+        if (Minecraft.getInstance()./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof OptionsScreen screen) {
             screen.updateWidgets(true);
         }
     }

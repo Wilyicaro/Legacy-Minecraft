@@ -5,7 +5,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.MultiBufferSource;
+//? if >=26.2 {
+import net.minecraft.client.renderer.SubmitNodeCollector;
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
@@ -29,7 +33,7 @@ public class LegacyActivationAnim {
         display(((pose, f, source) -> {
             pose.pushPose();
             pose.scale(0.5f, 0.5f, 0.5f);
-            TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().getSprite(Gui.getMobEffectSprite(effect));
+            TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().getSprite(/*? if >=26.2 {*/net.minecraft.client.gui.Hud/*?} else {*//*Gui*//*?}*/.getMobEffectSprite(effect));
             renderTex(sprite, pose, source);
             pose.pushPose();
             pose.translate(0.5f, 0.5f, 0.5f);
@@ -41,7 +45,23 @@ public class LegacyActivationAnim {
         }));
     }
 
-    private static void renderTex(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, MultiBufferSource multiBufferSource) {
+    //? if >=26.2 {
+    private static void renderTex(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
+        int i = ARGB.colorFromFloat(1.0F, 0.1F, 0.1F, 0.1F);
+        float m = textureAtlasSprite.getU0();
+        float n = textureAtlasSprite.getU1();
+        float o = textureAtlasSprite.getV0();
+        float p = textureAtlasSprite.getV1();
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.blockScreenEffect(textureAtlasSprite.atlasLocation()), (pose, vertexConsumer) -> {
+            Matrix4f matrix4f = pose.pose();
+            vertexConsumer.addVertex(matrix4f, -1.0F, -1.0F, -0.5F).setUv(n, p).setColor(i);
+            vertexConsumer.addVertex(matrix4f, 1.0F, -1.0F, -0.5F).setUv(m, p).setColor(i);
+            vertexConsumer.addVertex(matrix4f, 1.0F, 1.0F, -0.5F).setUv(m, o).setColor(i);
+            vertexConsumer.addVertex(matrix4f, -1.0F, 1.0F, -0.5F).setUv(n, o).setColor(i);
+        });
+    }
+    //?} else {
+    /*private static void renderTex(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, MultiBufferSource multiBufferSource) {
         int i = ARGB.colorFromFloat(1.0F, 0.1F, 0.1F, 0.1F);
         float m = textureAtlasSprite.getU0();
         float n = textureAtlasSprite.getU1();
@@ -54,9 +74,10 @@ public class LegacyActivationAnim {
         vertexConsumer.addVertex(matrix4f, 1.0F, 1.0F, -0.5F).setUv(m, o).setColor(i);
         vertexConsumer.addVertex(matrix4f, -1.0F, 1.0F, -0.5F).setUv(n, o).setColor(i);
     }
+    *///?}
 
     @FunctionalInterface
     public interface Render {
-        void render(PoseStack poseStack, float partialTick, MultiBufferSource bufferSource);
+        void render(PoseStack poseStack, float partialTick, /*? if >=26.2 {*/SubmitNodeCollector/*?} else {*//*MultiBufferSource*//*?}*/ bufferSource);
     }
 }

@@ -29,8 +29,11 @@ stonecutter {
         fun match(version: String, vararg loaders: String) =
             loaders.forEach { version("$version-$it", version).buildscript = "build.${if (it == "fabric" && stonecutter.eval(version, ">=26.1")) "fabricmc" else it}.gradle.kts" }
 
-        match("26.1.2", "fabric", "forge", "neoforge")
-        vcsVersion = "26.1.2-fabric"
+        // This fork targets Minecraft 26.2 on Fabric only. Upstream's 26.1.2 / Forge / NeoForge
+        // targets are not carried: the 26.2 render-pipeline rewrite required deleting the
+        // MultiBufferSource-based classes those targets depend on. See WORKLOG.md.
+        match("26.2", "fabric")
+        vcsVersion = "26.2-fabric"
     }
 }
 

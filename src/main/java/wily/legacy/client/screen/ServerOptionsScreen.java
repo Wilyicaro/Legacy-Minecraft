@@ -19,14 +19,14 @@ public class ServerOptionsScreen extends ConfirmationScreen {
 
     @Override
     protected void addButtons() {
-        renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96, 200, 20).build());
-        renderableVList.addRenderable(Button.builder(JoinGameScreen.JOIN_GAME, b -> minecraft.setScreen(new JoinGameScreen(parent, serverData, b1 -> parent.serverRenderableList.join(serverData)))).bounds(panel.x + 15, panel.y + panel.height - 74, 200, 20).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("manageServer.edit.title"), b -> minecraft.setScreen(new ServerEditScreen(parent, serverData, false))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("selectServer.delete"), b -> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("selectServer.delete"), Component.translatable("selectServer.deleteQuestion"), b1 -> {
+        renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96, 200, 20).build());
+        renderableVList.addRenderable(Button.builder(JoinGameScreen.JOIN_GAME, b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new JoinGameScreen(parent, serverData, b1 -> parent.serverRenderableList.join(serverData)))).bounds(panel.x + 15, panel.y + panel.height - 74, 200, 20).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("manageServer.edit.title"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ServerEditScreen(parent, serverData, false))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("selectServer.delete"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(parent, Component.translatable("selectServer.delete"), Component.translatable("selectServer.deleteQuestion"), b1 -> {
             parent.getServers().remove(serverData);
             parent.getServers().save();
             parent.serverRenderableList.updateServers();
-            minecraft.setScreen(parent);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
         }))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30, 200, 20).build());
     }
 }

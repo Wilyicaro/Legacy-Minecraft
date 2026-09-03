@@ -10,10 +10,9 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type_specific": {
+              "type_specific/raider": {
                 "has_raid": false,
-                "is_captain": true,
-                "type": "minecraft:raider"
+                "is_captain": true
               }
             }
           }
@@ -57,10 +56,9 @@
           "condition": "minecraft:entity_properties",
           "entity": "this",
           "predicate": {
-            "type_specific": {
+            "type_specific/raider": {
               "has_raid": false,
-              "is_captain": true,
-              "type": "minecraft:raider"
+              "is_captain": true
             }
           }
         }
@@ -101,10 +99,9 @@
               "condition": "minecraft:entity_properties",
               "entity": "this",
               "predicate": {
-                "type_specific": {
+                "type_specific/raider": {
                   "has_raid": true,
-                  "is_captain": false,
-                  "type": "minecraft:raider"
+                  "is_captain": false
                 }
               }
             },
@@ -112,10 +109,9 @@
               "condition": "minecraft:entity_properties",
               "entity": "this",
               "predicate": {
-                "type_specific": {
+                "type_specific/raider": {
                   "has_raid": true,
-                  "is_captain": true,
-                  "type": "minecraft:raider"
+                  "is_captain": true
                 }
               }
             }

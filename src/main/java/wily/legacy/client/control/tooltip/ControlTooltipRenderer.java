@@ -38,7 +38,7 @@ public class ControlTooltipRenderer implements Renderable {
     }
 
     public boolean allowPressed() {
-        return minecraft.screen != null;
+        return minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null;
     }
 
     public ControlTooltips tooltips() {
@@ -47,9 +47,9 @@ public class ControlTooltipRenderer implements Renderable {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int i, int j, float f) {
-        boolean inGame = minecraft.screen == null;
+        boolean inGame = minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null;
         renderTooltips.clear();
-        if (!LegacyOptions.displayControlTooltips.get() || inGame && (!LegacyOptions.displayHUD.get() || minecraft.options.hideGui || !LegacyOptions.inGameTooltips.get()))
+        if (!LegacyOptions.displayControlTooltips.get() || inGame && (!LegacyOptions.displayHUD.get() || minecraft./*? if >=26.2 {*/gui.hud.isHidden()/*?} else {*//*options.hideGui*//*?}*/ || !LegacyOptions.inGameTooltips.get()))
             return;
 
         for (ControlTooltipList list : tooltips) {

@@ -106,7 +106,7 @@ public class CreationList extends RenderableVList {
                     mashupPacks = fetchedMashupPacks;
                     LegacyWorldTemplate.refreshDownloadedPacks();
                     rebuildEntries();
-                    if (minecraft.screen == getScreen() && getScreen() instanceof RenderableVListScreen screen) screen.repositionElements();
+                    if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == getScreen() && getScreen() instanceof RenderableVListScreen screen) screen.repositionElements();
                 });
             });
         });
@@ -114,7 +114,7 @@ public class CreationList extends RenderableVList {
 
     private void rebuildEntries() {
         renderables.clear();
-        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
+        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(getScreen())));
         List<LegacyWorldTemplate> localTemplates = new ArrayList<>(LegacyWorldTemplate.list);
         localTemplates.stream().filter(template -> !isDownloadedTemplate(template)).forEach(this::addLocalTemplateButton);
         if (mashupPacks.isEmpty()) {
@@ -149,7 +149,7 @@ public class CreationList extends RenderableVList {
         if (template.isGamePath() && !Files.exists(template.getPath())) {
             Path path = template.getDownloadPath();
             if (path == null) {
-                minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", template.buttonMessage())));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", template.buttonMessage())));
                 return;
             }
             File file = path.toFile();
@@ -165,7 +165,7 @@ public class CreationList extends RenderableVList {
                 @Override
                 public void onClose() {
                     if (file.exists()) file.delete();
-                    minecraft.setScreen(getScreen());
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(getScreen());
                     LegacyLoadingScreen.closeExecutor(executor);
                 }
 
@@ -174,7 +174,7 @@ public class CreationList extends RenderableVList {
                     return true;
                 }
             };
-            minecraft.setScreen(screen);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
             CompletableFuture.runAsync(() -> {
                 try {
                     URL url = template.downloadURI().orElseThrow().toURL();
@@ -228,13 +228,13 @@ public class CreationList extends RenderableVList {
             ContentManager.prepareDownloadTarget(pack, mashupCategory);
         } catch (IOException e) {
             Component message = e.getMessage() == null || e.getMessage().isBlank() ? Component.literal(e.toString()) : Component.literal(e.getMessage());
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(parent, pack.nameComponent(), message));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(parent, pack.nameComponent(), message));
             return;
         }
 
         LegacyLoadingScreen loadingScreen = new LegacyLoadingScreen(LegacyComponents.DOWNLOADING_WORLD_TEMPLATE, pack.nameComponent());
         loadingScreen.setGenericLoading(true);
-        minecraft.setScreen(loadingScreen);
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(loadingScreen);
         ContentManager.downloadPack(pack, mashupCategory, installedAnything -> {
             if (!ContentManager.isPackInstalled(pack, mashupCategory)) {
                 showMashupInstallFailure(parent, pack);
@@ -257,7 +257,7 @@ public class CreationList extends RenderableVList {
     }
 
     private void showMashupInstallFailure(Screen parent, ContentManager.Pack pack) {
-        minecraft.setScreen(ConfirmationScreen.createInfoScreen(parent, LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", pack.nameComponent())));
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(parent, LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", pack.nameComponent())));
     }
 
     private static Optional<LegacyWorldTemplate> findDownloadedTemplate(ContentManager.Pack pack) {
@@ -301,7 +301,7 @@ public class CreationList extends RenderableVList {
             access.close();
             if (template.directJoin()) {
                 Legacy4JClient.hideNextExperimentalWorldWarning(() -> LoadSaveScreen.loadWorld(parent, minecraft, LegacySaveCache.getLevelStorageSource(), summary));
-            } else minecraft.setScreen(new LoadSaveScreen(parent, summary, access, (album.isPresent() || template.albumId().isEmpty()) && template.isLocked()) {
+            } else minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new LoadSaveScreen(parent, summary, access, (album.isPresent() || template.albumId().isEmpty()) && template.isLocked()) {
                 @Override
                 public void onClose() {
                     if (!LegacyOptions.saveCache.get() || LegacyOptions.alwaysClearSaveCache.get())

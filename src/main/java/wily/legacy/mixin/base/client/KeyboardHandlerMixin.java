@@ -53,8 +53,8 @@ public class KeyboardHandlerMixin {
     @WrapOperation(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z"))
     public boolean screenKeyPress(Screen instance, KeyEvent keyEvent, Operation<Boolean> original) {
         Legacy4JClient.controllerManager.blockNextCharType = false;
-        if (minecraft.getOverlay() == null && original.call(instance, keyEvent)) {
-            if (minecraft.screen != instance)
+        if (minecraft./*? if >=26.2 {*/gui.overlay()/*?} else {*//*getOverlay()*//*?}*/ == null && original.call(instance, keyEvent)) {
+            if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != instance)
                 Legacy4JClient.controllerManager.blockNextCharType = true;
             return true;
         }
@@ -63,7 +63,7 @@ public class KeyboardHandlerMixin {
 
     @WrapOperation(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;keyReleased(Lnet/minecraft/client/input/KeyEvent;)Z"))
     public boolean screenKeyRelease(Screen instance, KeyEvent keyEvent, Operation<Boolean> original) {
-        return minecraft.getOverlay() == null && original.call(instance, keyEvent);
+        return minecraft./*? if >=26.2 {*/gui.overlay()/*?} else {*//*getOverlay()*//*?}*/ == null && original.call(instance, keyEvent);
     }
 
     @WrapOperation(method = "charTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;charTyped(Lnet/minecraft/client/input/CharacterEvent;)Z"))

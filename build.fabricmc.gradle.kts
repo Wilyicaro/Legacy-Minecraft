@@ -57,6 +57,9 @@ fabricApi {
 }
 
 repositories {
+	// LOCAL PORT: Factory API has no published 26.2 build; it is built from source in
+	// ../factoryapi-262 and installed with `gradlew :26.2-fabric:publishToMavenLocal`.
+	mavenLocal()
 	mavenCentral()
 	strictMaven("https://maven.terraformersmc.com/", "com.terraformersmc") { name = "TerraformersMC" }
 	strictMaven("https://api.modrinth.com/maven", "maven.modrinth") { name = "Modrinth" }
@@ -96,3 +99,9 @@ dependencies {
 tasks.withType<Javadoc> {
 	enabled = false
 }
+
+tasks.withType<JavaCompile> {
+	// LOCAL PORT: javac stops at 100 errors by default, which hides the true size of a version bump.
+	options.compilerArgs.addAll(listOf("-Xmaxerrs", "10000"))
+}
+

@@ -26,8 +26,10 @@ public class WeatherEffectRendererMixin {
     }
 
     @Inject(method = "createRainColumnInstance", at = @At("HEAD"), cancellable = true)
-    private void createRainColumnInstance(RandomSource randomSource, int tick, int x, int bottomY, int topY, int z, int light, float partialTick, CallbackInfoReturnable<WeatherEffectRenderer.ColumnInstance> cir) {
-        int phase = tick + x * x * 3121 + x * 45238971 + z * z * 418711 + z * 13761;
+    private void createRainColumnInstance(RandomSource randomSource, /*? if >=26.2 {*/long/*?} else {*//*int*//*?}*/ tick, int x, int bottomY, int topY, int z, int light, float partialTick, CallbackInfoReturnable<WeatherEffectRenderer.ColumnInstance> cir) {
+        // 26.2 widened the tick parameter to long; cast back so the phase arithmetic (and its
+        // 32-bit wraparound) stays bit-identical to the pre-26.2 behaviour.
+        int phase = /*? if >=26.2 {*/(int) /*?}*/tick + x * x * 3121 + x * 45238971 + z * z * 418711 + z * 13761;
         float animation = (float)((((phase & 31) + partialTick) / 32.0) * (3.0 + randomSource.nextDouble()));
         cir.setReturnValue(new WeatherEffectRenderer.ColumnInstance(x, z, bottomY, topY, 0.0F, animation, light));
     }

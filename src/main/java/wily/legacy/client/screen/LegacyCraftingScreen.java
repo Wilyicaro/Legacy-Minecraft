@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -214,7 +215,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         Consumer<CustomCraftingIconHolder> dyeItemUpdateRecipe = h -> {
             clearIngredients(ingredientsGrid);
             if (dyeItemButtons.isEmpty()) return;
-            ItemStack item = dyeItemButtons.get(0).itemIcon.isEmpty() ? Items.WHITE_BED.getDefaultInstance() : dyeItemButtons.get(0).itemIcon.copyWithCount(1);
+            ItemStack item = dyeItemButtons.get(0).itemIcon.isEmpty() ? Items./*? if >=26.2 {*/BED.white()/*?} else {*//*WHITE_BED*//*?}*/.getDefaultInstance() : dyeItemButtons.get(0).itemIcon.copyWithCount(1);
             Optional<Ingredient> dyeIngredient = Optional.of(Ingredient.of(dyeItemButtons.get(1).itemIcon.getItem()));
             LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), dyeIngredient, Optional.empty(), Optional.of(StackIngredient.of(true, item))), gridDimension, 2, 2);
             resultStack = dyeItemButtons.get(0).itemIcon.isEmpty() ? item : h.assembleCraftingResult(Minecraft.getInstance().level, container);
@@ -255,7 +256,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
             ItemStack inputStack = decorateShieldButtons.get(0).itemIcon.isEmpty() ? Items.SHIELD.getDefaultInstance() : decorateShieldButtons.get(0).itemIcon.copyWithCount(1);
 
-            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.empty(), Optional.of(StackIngredient.of(true, inputStack.copy())), Optional.of(StackIngredient.of(true, decorateShieldButtons.get(1).itemIcon.isEmpty() ? Items.WHITE_BANNER.getDefaultInstance() : decorateShieldButtons.get(1).itemIcon.copyWithCount(1)))), gridDimension, 2, 2);
+            LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid, List.of(Optional.empty(), Optional.empty(), Optional.of(StackIngredient.of(true, inputStack.copy())), Optional.of(StackIngredient.of(true, decorateShieldButtons.get(1).itemIcon.isEmpty() ? Items./*? if >=26.2 {*/BANNER.white()/*?} else {*//*WHITE_BANNER*//*?}*/.getDefaultInstance() : decorateShieldButtons.get(1).itemIcon.copyWithCount(1)))), gridDimension, 2, 2);
 
             resultStack = decorateShieldButtons.get(0).itemIcon.isEmpty() ? inputStack : h.assembleCraftingResult(minecraft.level, container);
             canCraft(ingredientsGrid, true);
@@ -263,7 +264,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         decorateShieldButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_SHIELD, i -> i.getItem() instanceof ShieldItem && LegacyItemUtil.getPatternsCount(i) == 0, decorateShieldUpdateRecipe));
         decorateShieldButtons.add(craftingButtonByPredicate(LegacyComponents.SELECT_BANNER_TAB, i -> i.getItem() instanceof BannerItem, decorateShieldUpdateRecipe));
 
-        decoratedPotButtons.add(craftingButtonByList(LegacyComponents.ADD_SHERD, DecoratedPotPatterns.ITEM_TO_POT_TEXTURE.keySet().stream().map(Item::getDefaultInstance).toList(), h -> {
+        decoratedPotButtons.add(craftingButtonByList(LegacyComponents.ADD_SHERD, /*? if >=26.2 {*/Util.make(new ArrayList<ItemStack>(), l -> DecoratedPotPatterns.itemToPatternMappings((itemKey, patternKey) -> l.add(BuiltInRegistries.ITEM.getValueOrThrow(itemKey).getDefaultInstance())))/*?} else {*//*DecoratedPotPatterns.ITEM_TO_POT_TEXTURE.keySet().stream().map(Item::getDefaultInstance).toList()*//*?}*/, h -> {
             clearIngredients(ingredientsGrid);
             if (is2x2) return;
             Function<Integer, Item> sherdByIndex = i -> h.addedIngredientsItems.size() > i ? h.addedIngredientsItems.get(i).getItem() : Items.BRICK;

@@ -67,12 +67,14 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     protected Slot hoveredSlot;
     @Shadow
     protected int imageHeight;
-    @Shadow
+    //? if <26.2 {
+    /*@Shadow
     private Slot clickedSlot;
     @Shadow
     private ItemStack draggingItem;
     @Shadow
     private boolean isSplittingStack;
+    *///?}
     @Shadow
     private int quickCraftingType;
     @Shadow
@@ -137,7 +139,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             cir.setReturnValue(true);
             return;
         }
-        if (keyEvent.key() == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft.screen.isDragging() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
+        if (keyEvent.key() == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/.isDragging() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
             if (!Legacy4JClient.consumeKeyboardActionKeyPress(InputConstants.KEY_W)) cir.setReturnValue(true);
             else if (LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy())))
                 LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
@@ -179,7 +181,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         GuiGraphicsExtractor.pose().translate((float) Legacy4JClient.controllerManager.getPointerX() - 10, (float) Legacy4JClient.controllerManager.getPointerY() - 10);
         if (!LegacyOptions.getUIMode().isSD()) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
         GuiGraphicsExtractor.item(itemStack, 0, 0);
-        GuiGraphicsExtractor.itemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
+        GuiGraphicsExtractor.itemDecorations(Minecraft.getInstance().font, itemStack, 0, (/*? if >=26.2 {*/0/*?} else {*//*this.draggingItem.isEmpty() ? 0 : -8*//*?}*/), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
         GuiGraphicsExtractor.pose().popMatrix();
         ci.cancel();
     }
@@ -221,12 +223,14 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         LegacySlotWidget widget = getSlotWidget(slot);
         ItemStack itemStack = slot.getItem();
         boolean bl = false;
-        boolean bl2 = slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
+        boolean bl2 = /*? if >=26.2 {*/false/*?} else {*//*slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack*//*?}*/;
         ItemStack itemStack2 = this.menu.getCarried();
         String string = null;
-        if (slot == this.clickedSlot && !this.draggingItem.isEmpty() && this.isSplittingStack && !itemStack.isEmpty()) {
+        //? if <26.2 {
+        /*if (slot == this.clickedSlot && !this.draggingItem.isEmpty() && this.isSplittingStack && !itemStack.isEmpty()) {
             itemStack = itemStack.copyWithCount(itemStack.getCount() / 2);
-        } else if (this.isQuickCrafting && this.quickCraftSlots.contains(slot) && !itemStack2.isEmpty()) {
+        } else *///?}
+        if (this.isQuickCrafting && this.quickCraftSlots.contains(slot) && !itemStack2.isEmpty()) {
             if (this.quickCraftSlots.size() == 1) {
                 bl2 = true;
             }

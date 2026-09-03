@@ -29,13 +29,15 @@ public final class LegacyTntFlash {
         });
     }
 
-    public static void registerBuffers(SequencedMap<RenderType, ByteBufferBuilder> buffers) {
+    //? if <26.2 {
+    /*public static void registerBuffers(SequencedMap<RenderType, ByteBufferBuilder> buffers) {
         buffers.put(FLASH, new ByteBufferBuilder(FLASH.bufferSize()));
         buffers.put(OFFSET_FLASH, new ByteBufferBuilder(OFFSET_FLASH.bufferSize()));
     }
+    *///?}
 
     private static RenderType createRenderType(String name, LayeringTransform layering) {
-        return RenderType.create(name, RenderSetup.builder(RenderPipelines.DEBUG_QUADS).bufferSize(1536).sortOnUpload().setLayeringTransform(layering).createRenderSetup());
+        return RenderType.create(name, RenderSetup.builder(RenderPipelines.DEBUG_QUADS)/*? if <26.2 {*//*.bufferSize(1536)*//*?}*/.sortOnUpload().setLayeringTransform(layering).createRenderSetup());
     }
 
     private static void renderFace(PoseStack.Pose pose, VertexConsumer consumer, Direction face, float alpha) {

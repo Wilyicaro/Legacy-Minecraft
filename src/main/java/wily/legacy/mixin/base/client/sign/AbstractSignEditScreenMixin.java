@@ -55,7 +55,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         @Override
         public boolean keyPressed(KeyEvent keyEvent) {
             if (KeyboardScreen.isOpenKey(keyEvent.key())) {
-                minecraft.setScreen(new KeyboardScreen(isSign() ? 60 : -100, () -> this, AbstractSignEditScreenMixin.this));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new KeyboardScreen(isSign() ? 60 : -100, () -> this, AbstractSignEditScreenMixin.this));
                 return true;
             }
             if (keyEvent.isUp() && line > 0) {

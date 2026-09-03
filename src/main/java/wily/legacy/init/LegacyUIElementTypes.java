@@ -76,8 +76,8 @@ public class LegacyUIElementTypes {
             .setEquipSound(SoundEvents.ARMOR_EQUIP_DIAMOND)
             .setAsset(EquipmentAssets.DIAMOND)
             .build();
-    private static final Holder<TrimMaterial> EMERALD_TRIM_MATERIAL = new KeyedHolder<>(TrimMaterials.EMERALD, new TrimMaterial(MaterialAssetGroup.EMERALD, Component.translatable("trim_material.minecraft.emerald").withStyle(Style.EMPTY.withColor(1155126))));
-    private static final Holder<TrimPattern> SENTRY_TRIM_PATTERN = new KeyedHolder<>(TrimPatterns.SENTRY, new TrimPattern(Identifier.withDefaultNamespace("sentry"), Component.translatable("trim_pattern.minecraft.sentry"), false));
+    private static final Holder<TrimMaterial> EMERALD_TRIM_MATERIAL = keyedHolder(TrimMaterials.EMERALD, new TrimMaterial(MaterialAssetGroup.EMERALD, Component.translatable("trim_material.minecraft.emerald").withStyle(Style.EMPTY.withColor(1155126))));
+    private static final Holder<TrimPattern> SENTRY_TRIM_PATTERN = keyedHolder(TrimPatterns.SENTRY, new TrimPattern(Identifier.withDefaultNamespace("sentry"), Component.translatable("trim_pattern.minecraft.sentry"), false));
     private static final ArmorTrim EMERALD_SENTRY_TRIM = new ArmorTrim(EMERALD_TRIM_MATERIAL, SENTRY_TRIM_PATTERN);
     private static boolean itemComponentsBound;
     private static final Container emptyFakeContainer = new SimpleContainer();
@@ -197,7 +197,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "scale");
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
             ArmorStandRenderState state = createArmorStandState(a.getElementValue(elementName + ".fakeItem", ItemStack.EMPTY, ItemStack.class));
-            Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
+            Minecraft.getInstance().gameRenderer./*? if >=26.2 {*/lighting()/*?} else {*//*getLighting()*//*?}*/.setupFor(Lighting.Entry.ENTITY_IN_UI);
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
             int width = a.getInteger(elementName + ".width", 0);
@@ -367,7 +367,7 @@ public class LegacyUIElementTypes {
 
     private static ArmorStandRenderState createArmorStandState(ItemStack armor) {
         ArmorStandRenderState state = new ArmorStandRenderState();
-        state.entityType = EntityType.ARMOR_STAND;
+        state.entityType = /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ARMOR_STAND;
         state.boundingBoxWidth = 0.5F;
         state.boundingBoxHeight = 1.975F;
         state.eyeHeight = 1.7775F;
@@ -452,20 +452,14 @@ public class LegacyUIElementTypes {
     private record PreviewHolderOwner<T>() implements HolderOwner<T> {
     }
 
-    private record KeyedHolder<T>(ResourceKey<T> key, T value) implements Holder<T> {
-        @Override public boolean isBound() { return true; }
-        @Override public boolean areComponentsBound() { return true; }
-        @Override public boolean is(Identifier identifier) { return key.identifier().equals(identifier); }
-        @Override public boolean is(ResourceKey<T> key) { return this.key.equals(key); }
-        @Override public boolean is(Predicate<ResourceKey<T>> predicate) { return predicate.test(key); }
-        @Override public boolean is(TagKey<T> tagKey) { return false; }
-        @Override public boolean is(Holder<T> holder) { return holder.is(key); }
-        @Override public Stream<TagKey<T>> tags() { return Stream.empty(); }
-        @Override public DataComponentMap components() { return DataComponentMap.EMPTY; }
-        @Override public Either<ResourceKey<T>, T> unwrap() { return Either.left(key); }
-        @Override public Optional<ResourceKey<T>> unwrapKey() { return Optional.of(key); }
-        @Override public Kind kind() { return Kind.REFERENCE; }
-        @Override public boolean canSerializeIn(HolderOwner<T> owner) { return true; }
+    // 26.2 sealed net.minecraft.core.Holder to permit only Holder$Direct and Holder$Reference,
+    // so the old KeyedHolder record can no longer implement it. A standalone Reference carries the
+    // same key + value pair and reports Kind.REFERENCE exactly as KeyedHolder did.
+    private static <T> Holder<T> keyedHolder(ResourceKey<T> key, T value) {
+        Holder.Reference<T> holder = Holder.Reference.createStandAlone(new PreviewHolderOwner<>(), key);
+        holder.bindValue(value);
+        holder.bindComponents(DataComponentMap.EMPTY);
+        return holder;
     }
 
     public static void init() {

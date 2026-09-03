@@ -20,7 +20,7 @@ public class BisectModCompat {
         return new IconButton(list, 0, 0, 270, 30, /*? if neoforge {*//*ModRoot.get().clientModRoot*//*?} else {*/ModRoot.INSTANCE/*?}*/.modules.serverCreatorBanner.getTitle()) {
             @Override
             public void onPress(InputWithModifiers input) {
-                Minecraft.getInstance().setScreen(new BHOrderScreen(list.getScreen()));
+                Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(new BHOrderScreen(list.getScreen()));
             }
 
             @Override

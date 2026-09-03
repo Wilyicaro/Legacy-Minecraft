@@ -26,7 +26,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
 
     public LegacyBuffetWorldScreen(CreateWorldScreen screen, HolderLookup.RegistryLookup<Biome> biomeGetter, Consumer<Holder<Biome>> consumer) {
         super(screen, s -> Panel.centered(s, () -> 282, () -> Math.min(248, s.height)), Component.translatable("createWorld.customize.buffet.title"));
-        parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
+        parent = Minecraft.getInstance()./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof WorldMoreOptionsScreen s ? s : screen;
         renderableVList.layoutSpacing(l -> 0);
         this.applySettings = consumer;
         biomeGetter.listElements().forEach(this::addBiome);

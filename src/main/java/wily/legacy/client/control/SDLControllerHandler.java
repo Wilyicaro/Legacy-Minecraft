@@ -112,7 +112,7 @@ public class SDLControllerHandler implements Controller.Handler {
                 if (!natives.file().exists()) {
                     LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
                     LegacyOptions.selectedControllerHandler.save();
-                    FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> openNativesScreen(minecraft), () -> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
+                    FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> openNativesScreen(minecraft), () -> !(minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
                     init = true;
                     return;
                 } else try {
@@ -135,8 +135,8 @@ public class SDLControllerHandler implements Controller.Handler {
     }
 
     public void openNativesScreen(Minecraft minecraft) {
-        Screen s = minecraft.screen;
-        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
+        Screen s = minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/;
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
             Stocker<Long> fileSize = new Stocker<>(1L);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
@@ -154,7 +154,7 @@ public class SDLControllerHandler implements Controller.Handler {
 
                 @Override
                 public void onClose() {
-                    minecraft.setScreen(s);
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(s);
                     LegacyLoadingScreen.closeExecutor(executor);
                     if (getProgress() < 1 && natives.file().exists())
                         natives.file().delete();
@@ -165,7 +165,7 @@ public class SDLControllerHandler implements Controller.Handler {
                     return true;
                 }
             };
-            minecraft.setScreen(screen);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
             CompletableFuture.runAsync(() -> {
                 try {
                     fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
@@ -182,7 +182,7 @@ public class SDLControllerHandler implements Controller.Handler {
             public void onClose() {
                 super.onClose();
                 init = false;
-                if (minecraft.screen instanceof OptionsScreen opts) opts.updateWidgets(false);
+                if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof OptionsScreen opts) opts.updateWidgets(false);
             }
         });
     }

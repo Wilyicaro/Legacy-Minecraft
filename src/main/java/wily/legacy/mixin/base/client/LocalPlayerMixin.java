@@ -96,7 +96,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     }
 
     public boolean canSprintController() {
-        return !this.isSprinting() && !this.isFallFlying() && /*? if <1.21.5 {*//*this.hasEnoughFoodToStartSprinting()*//*?} else {*/this.hasEnoughFoodToDoExhaustiveManoeuvres()/*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft.screen == null;
+        return !this.isSprinting() && !this.isFallFlying() && /*? if <1.21.5 {*//*this.hasEnoughFoodToStartSprinting()*//*?} else {*/this.hasEnoughFoodToDoExhaustiveManoeuvres()/*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == null;
     }
 
     @Override

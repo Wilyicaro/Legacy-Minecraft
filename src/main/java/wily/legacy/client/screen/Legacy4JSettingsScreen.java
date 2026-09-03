@@ -39,7 +39,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
         tabList.add(100, 25, LegacyTabButton.Type.MIDDLE, section.title(), b -> resetElements());
         section.elements().forEach(c -> c.accept(this));
         if (section == Section.GAME_OPTIONS)
-            getRenderableVList().addRenderables(Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(this))).build(), Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(this))).build());
+            getRenderableVList().addRenderables(Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new LegacyKeyMappingScreen(this))).build(), Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ControllerMappingScreen(this))).build());
         section.advancedSection().ifPresent(s1 -> {
             getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(), 0, 1, 200, 9, CommonColor.GRAY_TEXT.get(), false));
             if (s1 == Section.ADVANCED_USER_INTERFACE)

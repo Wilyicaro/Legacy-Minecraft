@@ -170,7 +170,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     private GuiEventListener returnToParent() {
         if (parent == null) return null;
-        if (minecraft.screen == this) onClose();
+        if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == this) onClose();
         GuiEventListener listener = listenerSupplier.get();
         if (listener instanceof LayoutElement original && !parent.children().contains(listener)) {
             for (GuiEventListener child : parent.children()) {

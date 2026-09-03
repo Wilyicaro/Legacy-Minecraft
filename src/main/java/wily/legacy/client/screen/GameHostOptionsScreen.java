@@ -101,7 +101,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     }
 
     protected Button createTeleportButton(boolean toPlayer, Component component) {
-        return new LegacyButton(component, b1 -> minecraft.setScreen(new HostOptionsScreen(title) {
+        return new LegacyButton(component, b1 -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new HostOptionsScreen(title) {
             @Override
             protected void addHostOptionsButton() {
             }
@@ -165,7 +165,7 @@ public class GameHostOptionsScreen extends PanelVListScreen {
             GameHostOptionsScreen screen = new GameHostOptionsScreen(parent, minecraft);
             screen.nonOpGamerules.putAll(nonOpGamerules);
             screen.actionsOnClose.putAll(actionsOnClose);
-            minecraft.setScreen(screen);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
             return true;
         }
         return super.keyPressed(keyEvent);

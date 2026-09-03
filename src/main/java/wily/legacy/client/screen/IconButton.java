@@ -21,7 +21,7 @@ public abstract class IconButton extends ListButton {
         int iconHeight = list.accessor.getInteger(list.name + ".buttonIcon.height", 20);
         int iconPos = (height - iconHeight) / 2;
         renderIcon(GuiGraphicsExtractor, mouseX, mouseY, iconPos, iconPos, iconWidth, iconHeight);
-        if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
+        if (/*? if <26.2 {*//*Minecraft.getInstance().options.touchscreen().get().booleanValue() || *//*?}*/isHovered) {
             renderIconHighlight(GuiGraphicsExtractor, mouseX, mouseY, iconPos, iconPos, iconWidth, iconHeight);
         }
     }

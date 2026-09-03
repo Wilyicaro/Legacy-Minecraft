@@ -14,7 +14,11 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Bucketable;
+//? if >=26.2 {
+import net.minecraft.world.entity.Bucketable;
+//?} else {
+/*import net.minecraft.world.entity.animal.Bucketable;
+*///?}
 import net.minecraft.world.entity.animal.allay.Allay;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.animal.cow.AbstractCow;
@@ -149,7 +153,7 @@ public class UsePrediction {
         return null;
     });
     public static final ControlTooltip.ActionHolder CHESTED_HORSE = registerEntityInteract("chested_horse", ctx -> ctx.entity instanceof AbstractChestedHorse horse && ctx.handItem.is(Items.CHEST) && horse.isTamed() && !horse.hasChest() && !horse.isVehicle() && !ctx.player.isSecondaryUseActive(), LegacyComponents.ATTACH_CHEST);
-    public static final ControlTooltip.ActionHolder COMMAND_BLOCK_MINECART = registerEntityInteract("command_block_minecart", ctx -> ctx.entity != null && ctx.entity.getType() == EntityType.COMMAND_BLOCK_MINECART && ctx.player.canUseGameMasterBlocks(), LegacyComponents.EDIT);
+    public static final ControlTooltip.ActionHolder COMMAND_BLOCK_MINECART = registerEntityInteract("command_block_minecart", ctx -> ctx.entity != null && ctx.entity.getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.COMMAND_BLOCK_MINECART && ctx.player.canUseGameMasterBlocks(), LegacyComponents.EDIT);
     public static final ControlTooltip.ActionHolder HORSE_INVENTORY = registerEntityInteract("horse_inventory", ctx -> ctx.entity instanceof AbstractHorse h && h.isTamed() && ctx.player.isSecondaryUseActive(), LegacyComponents.OPEN);
     public static final ControlTooltip.ActionHolder MINECART_INVENTORY = registerEntityInteract("minecart_inventory", ctx -> ctx.entity instanceof AbstractMinecartContainer, LegacyComponents.OPEN);
     public static final ControlTooltip.ActionHolder BOAT_INVENTORY = registerEntityInteract("boat_inventory", ctx -> ctx.entity instanceof AbstractChestBoat, LegacyComponents.OPEN);
@@ -682,7 +686,7 @@ public class UsePrediction {
         if (!(ctx.itemStack.getItem() instanceof ArmorStandItem) || ctx.hitResult.getDirection() == Direction.DOWN)
             return false;
         BlockPlaceContext context = new BlockPlaceContext(ctx.player, ctx.hand, ctx.itemStack, ctx.hitResult);
-        AABB box = EntityType.ARMOR_STAND.getDimensions().makeBoundingBox(Vec3.atBottomCenterOf(context.getClickedPos()));
+        AABB box = /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ARMOR_STAND.getDimensions().makeBoundingBox(Vec3.atBottomCenterOf(context.getClickedPos()));
         return ctx.level.noCollision(null, box) && ctx.level.getEntities(null, box).isEmpty();
     }
 
@@ -721,10 +725,10 @@ public class UsePrediction {
         if (!(ctx.itemStack.getItem() instanceof HangingEntityItemAccessor hanging && (Block.canSupportCenter(ctx.level, ctx.hitResult.getBlockPos(), ctx.hitResult.getDirection()) || ctx.state.isSolid() || DiodeBlock.isDiode(ctx.state))))
             return false;
 
-        if (hanging.getType() == EntityType.PAINTING)
+        if (hanging.getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.PAINTING)
             return Direction.Plane.HORIZONTAL.test(ctx.hitResult.getDirection());
 
-        return hanging.getType() == EntityType.ITEM_FRAME || hanging.getType() == EntityType.GLOW_ITEM_FRAME;
+        return hanging.getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ITEM_FRAME || hanging.getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.GLOW_ITEM_FRAME;
     }
 
     public static boolean canTill(BlockUseItemOn ctx) {

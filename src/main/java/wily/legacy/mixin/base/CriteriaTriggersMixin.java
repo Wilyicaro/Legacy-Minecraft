@@ -1,7 +1,12 @@
 package wily.legacy.mixin.base;
 
-import net.minecraft.advancements.CriteriaTriggers;
+//? if <26.2 {
+/*import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.criterion.PlayerTrigger;
+*///?} else {
+import net.minecraft.advancements.triggers.CriteriaTriggers;
+import net.minecraft.advancements.triggers.PlayerTrigger;
+//?}
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -15,12 +20,12 @@ import wily.legacy.network.ClientEffectActivationPayload;
 
 @Mixin(CriteriaTriggers.class)
 public class CriteriaTriggersMixin {
-    @Redirect(method = "<clinit>", at = @At(value = "NEW", target = /*? if >1.20.1 {*/"()Lnet/minecraft/advancements/criterion/PlayerTrigger;"/*?} else {*//*"(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/advancements/critereon/PlayerTrigger;"*//*?}*/, ordinal = 3))
+    @Redirect(method = "<clinit>", at = @At(value = "NEW", target = /*? if >=26.2 {*/"()Lnet/minecraft/advancements/triggers/PlayerTrigger;"/*?} else if >1.20.1 {*//*"()Lnet/minecraft/advancements/criterion/PlayerTrigger;"*//*?} else {*//*"(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/advancements/critereon/PlayerTrigger;"*//*?}*/, ordinal = 3))
     private static PlayerTrigger heroOfTheVillagerTrigger(/*? if <=1.20.1 {*//*Identifier location*//*?}*/) {
         return effectTrigger(/*? if <=1.20.1 {*//*location, *//*?}*/MobEffects.HERO_OF_THE_VILLAGE);
     }
 
-    @Redirect(method = "<clinit>", at = @At(value = "NEW", target = /*? if >1.20.1 {*/"()Lnet/minecraft/advancements/criterion/PlayerTrigger;"/*?} else {*//*"(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/advancements/critereon/PlayerTrigger;"*//*?}*/, ordinal = 4))
+    @Redirect(method = "<clinit>", at = @At(value = "NEW", target = /*? if >=26.2 {*/"()Lnet/minecraft/advancements/triggers/PlayerTrigger;"/*?} else if >1.20.1 {*//*"()Lnet/minecraft/advancements/criterion/PlayerTrigger;"*//*?} else {*//*"(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/advancements/critereon/PlayerTrigger;"*//*?}*/, ordinal = 4))
     private static PlayerTrigger badOmenTrigger(/*? if <=1.20.1 {*//*Identifier location*//*?}*/) {
         return effectTrigger(/*? if <=1.20.1 {*//*location, *//*?}*/MobEffects./*? if <1.20.5 {*//*BAD_OMEN*//*?} else {*/RAID_OMEN/*?}*/);
     }

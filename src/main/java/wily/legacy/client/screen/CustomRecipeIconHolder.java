@@ -229,7 +229,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     public void renderSelection(GuiGraphicsExtractor graphics, int i, int j, float f) {
         super.renderSelection(graphics, i, j, f);
         int matchSlot;
-        if (!itemIcon.isEmpty() && hasItem(itemIcon) && minecraft.screen instanceof LegacyMenuAccess<?> a && (matchSlot = findInventoryMatchSlot()) > 0) {
+        if (!itemIcon.isEmpty() && hasItem(itemIcon) && minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof LegacyMenuAccess<?> a && (matchSlot = findInventoryMatchSlot()) > 0) {
             Slot s = a.getMenu().getSlot(matchSlot);
             LegacyIconHolder h = LegacyRenderUtil.iconHolderRenderer.slotBounds(a.getMenuRectangle().left(), a.getMenuRectangle().top(), s);
             h.extractRenderState(graphics, i, j, f);

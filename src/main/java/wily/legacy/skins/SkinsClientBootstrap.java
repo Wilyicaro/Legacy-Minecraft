@@ -91,7 +91,7 @@ public final class SkinsClientBootstrap {
     public static void requestOpenChangeSkinScreen(Minecraft minecraft, Screen parent) {
         if (minecraft == null) return;
         GuiSessionSkin.prewarm();
-        minecraft.setScreen(createChangeSkinScreen(parent));
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(createChangeSkinScreen(parent));
     }
 
     public static void reloadChangeSkinScreen(Minecraft minecraft, Screen parent) {
@@ -102,7 +102,7 @@ public final class SkinsClientBootstrap {
             if (packId != null && !packId.isBlank()) SkinPackLoader.requestFocusPack(packId);
             if (skinId != null && !skinId.isBlank()) SkinPackLoader.requestFocusSkin(skinId);
         }
-        minecraft.setScreen(new wily.legacy.client.screen.LegacyLoadingScreen());
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new wily.legacy.client.screen.LegacyLoadingScreen());
         minecraft.reloadResourcePacks().thenRun(() -> minecraft.execute(() -> requestOpenChangeSkinScreen(minecraft, parent)));
     }
 
@@ -118,7 +118,7 @@ public final class SkinsClientBootstrap {
         }
         if (skinId != null && !skinId.isBlank()) SkinPackLoader.requestFocusSkin(skinId);
         if (minecraft == null) return;
-        minecraft.setScreen(new wily.legacy.client.screen.LegacyLoadingScreen());
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new wily.legacy.client.screen.LegacyLoadingScreen());
         minecraft.reloadResourcePacks().thenRun(() -> minecraft.execute(() -> requestOpenChangeSkinScreen(minecraft, parent)));
     }
 

@@ -12,7 +12,9 @@ import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
-import net.minecraft.client.renderer.MultiBufferSource;
+//? if <26.2 {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
@@ -41,12 +43,15 @@ public class GuiRendererMixin {
     @Shadow
     @Final
     GuiRenderState renderState;
+    //? if <26.2 {
+    /*
     @Shadow
     @Final
     private MultiBufferSource.BufferSource bufferSource;
     @Shadow
     @Final
     private SubmitNodeCollector submitNodeCollector;
+    *///?}
     @Shadow
     @Final
     private FeatureRenderDispatcher featureRenderDispatcher;
@@ -58,8 +63,8 @@ public class GuiRendererMixin {
     private int legacyFrameNumber;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
-        guiEntityRenderers = createGuiEntityRenderers(bufferSource);
+    void initTail(GuiRenderState guiRenderState, /*? if <26.2 {*//*MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector,*//*?}*/ FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
+        guiEntityRenderers = createGuiEntityRenderers(/*? if <26.2 {*//*bufferSource*//*?}*/);
     }
 
     @Inject(method = "prepareItemElements", at = @At("HEAD"))
@@ -87,7 +92,7 @@ public class GuiRendererMixin {
         for (ObjectIterator<LegacyGuiItemRenderer> iter = guiItemRenderers.values().iterator(); iter.hasNext(); ) {
             var renderer = iter.next();
             if (renderer.isValid())
-                renderer.prepareItemElements(featureRenderDispatcher, submitNodeCollector, bufferSource, renderState, legacyFrameNumber);
+                renderer.prepareItemElements(featureRenderDispatcher, /*? if <26.2 {*//*submitNodeCollector, bufferSource,*//*?}*/ renderState, legacyFrameNumber);
             else {
                 renderer.close();
                 iter.remove();
@@ -113,7 +118,7 @@ public class GuiRendererMixin {
         if (arg.getClass() == GuiEntityRenderState.class) {
             GuiEntityRenderer guiEntityRenderer = guiEntityRenderers.stream().map(LegacyGuiEntityRenderer::of).filter(LegacyGuiEntityRenderer::isAvailable).findFirst().map(a -> ((GuiEntityRenderer) a)).orElse(guiEntityRenderers.get(0));
             LegacyGuiEntityRenderer.of(guiEntityRenderer).use();
-            guiEntityRenderer.prepare((GuiEntityRenderState) arg, this.renderState, i);
+            guiEntityRenderer.prepare((GuiEntityRenderState) arg, this.renderState, /*? if >=26.2 {*/featureRenderDispatcher, /*?}*/i);
             //? if neoforge {
             /*cir.setReturnValue(true);
              *///?} else {
@@ -123,11 +128,11 @@ public class GuiRendererMixin {
     }
 
     @Unique
-    private static List<GuiEntityRenderer> createGuiEntityRenderers(MultiBufferSource.BufferSource bufferSource) {
+    private static List<GuiEntityRenderer> createGuiEntityRenderers(/*? if <26.2 {*//*MultiBufferSource.BufferSource bufferSource*//*?}*/) {
         var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         var renderers = new ArrayList<GuiEntityRenderer>(GUI_ENTITY_RENDERER_POOL_SIZE);
         for (int i = 0; i < GUI_ENTITY_RENDERER_POOL_SIZE; i++) {
-            renderers.add(new GuiEntityRenderer(bufferSource, dispatcher));
+            renderers.add(new GuiEntityRenderer(/*? if <26.2 {*//*bufferSource, *//*?}*/dispatcher));
         }
         return List.copyOf(renderers);
     }

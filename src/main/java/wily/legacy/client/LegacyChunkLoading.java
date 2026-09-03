@@ -316,7 +316,7 @@ public final class LegacyChunkLoading {
         Minecraft minecraft = Minecraft.getInstance();
         Runnable dirty = () -> {
             if (minecraft.level != null) {
-                minecraft.levelRenderer.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));
+                minecraft./*? if >=26.2 {*/levelExtractor/*?} else {*//*levelRenderer*//*?}*/.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));
             }
         };
         if (minecraft.isSameThread()) {

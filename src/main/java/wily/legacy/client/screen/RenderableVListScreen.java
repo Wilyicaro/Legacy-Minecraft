@@ -30,7 +30,7 @@ public class RenderableVListScreen extends LegacyScreen implements RenderableVLi
     }
 
     public static Button.Builder openScreenButton(Component component, Supplier<Screen> supplier) {
-        return Button.builder(component, button -> Minecraft.getInstance().setScreen(supplier.get()));
+        return Button.builder(component, button -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(supplier.get()));
     }
 
     @Override

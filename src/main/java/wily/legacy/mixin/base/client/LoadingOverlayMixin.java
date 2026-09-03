@@ -84,8 +84,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
             h = this.fadeInStart > -1L ? (float) (m - this.fadeInStart) / 500.0f : -1.0f;
 
             if (finishedIntro) {
-                if ((MinecraftAccessor.getInstance().hasGameLoaded() && isStartupReady()) && minecraft.screen != null) {
-                    this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(GuiGraphicsExtractor, 0, 0, f);
+                if ((MinecraftAccessor.getInstance().hasGameLoaded() && isStartupReady()) && minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null) {
+                    this.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/.extractRenderStateWithTooltipAndSubtitles(GuiGraphicsExtractor, 0, 0, f);
                 } else {
                     FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight(), GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
                 }
@@ -93,7 +93,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, (GuiGraphicsExtractor.guiWidth() - 75) / 2, (GuiGraphicsExtractor.guiHeight() - 75) / 2);
 
                 if (g >= 2.0f)
-                    this.minecraft.setOverlay(null);
+                    this.minecraft./*? if >=26.2 {*/gui./*?}*/setOverlay(null);
             }
 
             if (this.fadeOutStart == -1L && isStartupReady() && (!this.fadeIn || h >= 2.0f)) {
@@ -104,8 +104,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     this.onFinish.accept(Optional.of(throwable));
                 }
                 this.fadeOutStart = Util.getMillis();
-                if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
+                if (this.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != null) {
+                    this.minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/.init(GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight());
                 }
             }
         }

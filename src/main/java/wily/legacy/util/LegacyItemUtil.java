@@ -192,22 +192,22 @@ public class LegacyItemUtil {
         if (item == Items.INK_SAC) return DyeColor.BLACK;
         if (item == Items.LAPIS_LAZULI) return DyeColor.BLUE;
         if (item == Items.COCOA_BEANS) return DyeColor.BROWN;
-        if (item == Items.WHITE_DYE) return DyeColor.WHITE;
-        if (item == Items.ORANGE_DYE) return DyeColor.ORANGE;
-        if (item == Items.MAGENTA_DYE) return DyeColor.MAGENTA;
-        if (item == Items.LIGHT_BLUE_DYE) return DyeColor.LIGHT_BLUE;
-        if (item == Items.YELLOW_DYE) return DyeColor.YELLOW;
-        if (item == Items.LIME_DYE) return DyeColor.LIME;
-        if (item == Items.PINK_DYE) return DyeColor.PINK;
-        if (item == Items.GRAY_DYE) return DyeColor.GRAY;
-        if (item == Items.LIGHT_GRAY_DYE) return DyeColor.LIGHT_GRAY;
-        if (item == Items.CYAN_DYE) return DyeColor.CYAN;
-        if (item == Items.PURPLE_DYE) return DyeColor.PURPLE;
-        if (item == Items.BLUE_DYE) return DyeColor.BLUE;
-        if (item == Items.BROWN_DYE) return DyeColor.BROWN;
-        if (item == Items.GREEN_DYE) return DyeColor.GREEN;
-        if (item == Items.RED_DYE) return DyeColor.RED;
-        if (item == Items.BLACK_DYE) return DyeColor.BLACK;
+        if (item == Items./*? if >=26.2 {*/DYE.white()/*?} else {*//*WHITE_DYE*//*?}*/) return DyeColor.WHITE;
+        if (item == Items./*? if >=26.2 {*/DYE.orange()/*?} else {*//*ORANGE_DYE*//*?}*/) return DyeColor.ORANGE;
+        if (item == Items./*? if >=26.2 {*/DYE.magenta()/*?} else {*//*MAGENTA_DYE*//*?}*/) return DyeColor.MAGENTA;
+        if (item == Items./*? if >=26.2 {*/DYE.lightBlue()/*?} else {*//*LIGHT_BLUE_DYE*//*?}*/) return DyeColor.LIGHT_BLUE;
+        if (item == Items./*? if >=26.2 {*/DYE.yellow()/*?} else {*//*YELLOW_DYE*//*?}*/) return DyeColor.YELLOW;
+        if (item == Items./*? if >=26.2 {*/DYE.lime()/*?} else {*//*LIME_DYE*//*?}*/) return DyeColor.LIME;
+        if (item == Items./*? if >=26.2 {*/DYE.pink()/*?} else {*//*PINK_DYE*//*?}*/) return DyeColor.PINK;
+        if (item == Items./*? if >=26.2 {*/DYE.gray()/*?} else {*//*GRAY_DYE*//*?}*/) return DyeColor.GRAY;
+        if (item == Items./*? if >=26.2 {*/DYE.lightGray()/*?} else {*//*LIGHT_GRAY_DYE*//*?}*/) return DyeColor.LIGHT_GRAY;
+        if (item == Items./*? if >=26.2 {*/DYE.cyan()/*?} else {*//*CYAN_DYE*//*?}*/) return DyeColor.CYAN;
+        if (item == Items./*? if >=26.2 {*/DYE.purple()/*?} else {*//*PURPLE_DYE*//*?}*/) return DyeColor.PURPLE;
+        if (item == Items./*? if >=26.2 {*/DYE.blue()/*?} else {*//*BLUE_DYE*//*?}*/) return DyeColor.BLUE;
+        if (item == Items./*? if >=26.2 {*/DYE.brown()/*?} else {*//*BROWN_DYE*//*?}*/) return DyeColor.BROWN;
+        if (item == Items./*? if >=26.2 {*/DYE.green()/*?} else {*//*GREEN_DYE*//*?}*/) return DyeColor.GREEN;
+        if (item == Items./*? if >=26.2 {*/DYE.red()/*?} else {*//*RED_DYE*//*?}*/) return DyeColor.RED;
+        if (item == Items./*? if >=26.2 {*/DYE.black()/*?} else {*//*BLACK_DYE*//*?}*/) return DyeColor.BLACK;
         return null;
     }
 
@@ -223,43 +223,43 @@ public class LegacyItemUtil {
 
     public static Item getDyeItem(DyeColor color) {
         return switch (color) {
-            case WHITE -> Items.WHITE_DYE;
-            case ORANGE -> Items.ORANGE_DYE;
-            case MAGENTA -> Items.MAGENTA_DYE;
-            case LIGHT_BLUE -> Items.LIGHT_BLUE_DYE;
-            case YELLOW -> Items.YELLOW_DYE;
-            case LIME -> Items.LIME_DYE;
-            case PINK -> Items.PINK_DYE;
-            case GRAY -> Items.GRAY_DYE;
-            case LIGHT_GRAY -> Items.LIGHT_GRAY_DYE;
-            case CYAN -> Items.CYAN_DYE;
-            case PURPLE -> Items.PURPLE_DYE;
-            case BLUE -> Items.BLUE_DYE;
-            case BROWN -> Items.BROWN_DYE;
-            case GREEN -> Items.GREEN_DYE;
-            case RED -> Items.RED_DYE;
-            case BLACK -> Items.BLACK_DYE;
+            case WHITE -> Items./*? if >=26.2 {*/DYE.white()/*?} else {*//*WHITE_DYE*//*?}*/;
+            case ORANGE -> Items./*? if >=26.2 {*/DYE.orange()/*?} else {*//*ORANGE_DYE*//*?}*/;
+            case MAGENTA -> Items./*? if >=26.2 {*/DYE.magenta()/*?} else {*//*MAGENTA_DYE*//*?}*/;
+            case LIGHT_BLUE -> Items./*? if >=26.2 {*/DYE.lightBlue()/*?} else {*//*LIGHT_BLUE_DYE*//*?}*/;
+            case YELLOW -> Items./*? if >=26.2 {*/DYE.yellow()/*?} else {*//*YELLOW_DYE*//*?}*/;
+            case LIME -> Items./*? if >=26.2 {*/DYE.lime()/*?} else {*//*LIME_DYE*//*?}*/;
+            case PINK -> Items./*? if >=26.2 {*/DYE.pink()/*?} else {*//*PINK_DYE*//*?}*/;
+            case GRAY -> Items./*? if >=26.2 {*/DYE.gray()/*?} else {*//*GRAY_DYE*//*?}*/;
+            case LIGHT_GRAY -> Items./*? if >=26.2 {*/DYE.lightGray()/*?} else {*//*LIGHT_GRAY_DYE*//*?}*/;
+            case CYAN -> Items./*? if >=26.2 {*/DYE.cyan()/*?} else {*//*CYAN_DYE*//*?}*/;
+            case PURPLE -> Items./*? if >=26.2 {*/DYE.purple()/*?} else {*//*PURPLE_DYE*//*?}*/;
+            case BLUE -> Items./*? if >=26.2 {*/DYE.blue()/*?} else {*//*BLUE_DYE*//*?}*/;
+            case BROWN -> Items./*? if >=26.2 {*/DYE.brown()/*?} else {*//*BROWN_DYE*//*?}*/;
+            case GREEN -> Items./*? if >=26.2 {*/DYE.green()/*?} else {*//*GREEN_DYE*//*?}*/;
+            case RED -> Items./*? if >=26.2 {*/DYE.red()/*?} else {*//*RED_DYE*//*?}*/;
+            case BLACK -> Items./*? if >=26.2 {*/DYE.black()/*?} else {*//*BLACK_DYE*//*?}*/;
         };
     }
 
     public static Item getBannerItem(DyeColor color) {
         return switch (color) {
-            case WHITE -> Items.WHITE_BANNER;
-            case ORANGE -> Items.ORANGE_BANNER;
-            case MAGENTA -> Items.MAGENTA_BANNER;
-            case LIGHT_BLUE -> Items.LIGHT_BLUE_BANNER;
-            case YELLOW -> Items.YELLOW_BANNER;
-            case LIME -> Items.LIME_BANNER;
-            case PINK -> Items.PINK_BANNER;
-            case GRAY -> Items.GRAY_BANNER;
-            case LIGHT_GRAY -> Items.LIGHT_GRAY_BANNER;
-            case CYAN -> Items.CYAN_BANNER;
-            case PURPLE -> Items.PURPLE_BANNER;
-            case BLUE -> Items.BLUE_BANNER;
-            case BROWN -> Items.BROWN_BANNER;
-            case GREEN -> Items.GREEN_BANNER;
-            case RED -> Items.RED_BANNER;
-            case BLACK -> Items.BLACK_BANNER;
+            case WHITE -> Items./*? if >=26.2 {*/BANNER.white()/*?} else {*//*WHITE_BANNER*//*?}*/;
+            case ORANGE -> Items./*? if >=26.2 {*/BANNER.orange()/*?} else {*//*ORANGE_BANNER*//*?}*/;
+            case MAGENTA -> Items./*? if >=26.2 {*/BANNER.magenta()/*?} else {*//*MAGENTA_BANNER*//*?}*/;
+            case LIGHT_BLUE -> Items./*? if >=26.2 {*/BANNER.lightBlue()/*?} else {*//*LIGHT_BLUE_BANNER*//*?}*/;
+            case YELLOW -> Items./*? if >=26.2 {*/BANNER.yellow()/*?} else {*//*YELLOW_BANNER*//*?}*/;
+            case LIME -> Items./*? if >=26.2 {*/BANNER.lime()/*?} else {*//*LIME_BANNER*//*?}*/;
+            case PINK -> Items./*? if >=26.2 {*/BANNER.pink()/*?} else {*//*PINK_BANNER*//*?}*/;
+            case GRAY -> Items./*? if >=26.2 {*/BANNER.gray()/*?} else {*//*GRAY_BANNER*//*?}*/;
+            case LIGHT_GRAY -> Items./*? if >=26.2 {*/BANNER.lightGray()/*?} else {*//*LIGHT_GRAY_BANNER*//*?}*/;
+            case CYAN -> Items./*? if >=26.2 {*/BANNER.cyan()/*?} else {*//*CYAN_BANNER*//*?}*/;
+            case PURPLE -> Items./*? if >=26.2 {*/BANNER.purple()/*?} else {*//*PURPLE_BANNER*//*?}*/;
+            case BLUE -> Items./*? if >=26.2 {*/BANNER.blue()/*?} else {*//*BLUE_BANNER*//*?}*/;
+            case BROWN -> Items./*? if >=26.2 {*/BANNER.brown()/*?} else {*//*BROWN_BANNER*//*?}*/;
+            case GREEN -> Items./*? if >=26.2 {*/BANNER.green()/*?} else {*//*GREEN_BANNER*//*?}*/;
+            case RED -> Items./*? if >=26.2 {*/BANNER.red()/*?} else {*//*RED_BANNER*//*?}*/;
+            case BLACK -> Items./*? if >=26.2 {*/BANNER.black()/*?} else {*//*BLACK_BANNER*//*?}*/;
         };
     }
 

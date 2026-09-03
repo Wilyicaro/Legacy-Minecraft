@@ -215,7 +215,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
             }
         }
         GuiGraphicsExtractor.pose().popMatrix();
-        Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
+        Minecraft.getInstance().gameRenderer./*? if >=26.2 {*/lighting()/*?} else {*//*getLighting()*//*?}*/.setupFor(Lighting.Entry.ITEMS_3D);
     }
 
     @Override

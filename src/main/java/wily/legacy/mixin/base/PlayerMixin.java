@@ -83,15 +83,15 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
     }
 
     @Inject(method = "blockUsingItem", at = @At("RETURN"))
-    protected void blockUsingItem(ServerLevel level, LivingEntity attacker, CallbackInfo ci) {
+    protected void blockUsingItem(ServerLevel level, LivingEntity attacker, /*? if >=26.2 {*/DamageSource blockedSource, float blockedAmount, /*?}*/CallbackInfo ci) {
         ItemStack blockingItem = getItemBlockingWith();
         if (blockingItem == null || !(blockingItem.getItem() instanceof ShieldItem) || !(attacker instanceof Mob)) return;
-        attacker.knockback(0.5D, getX() - attacker.getX(), getZ() - attacker.getZ());
+        attacker.knockback(0.5D, getX() - attacker.getX(), getZ() - attacker.getZ()/*? if >=26.2 {*/, blockedSource, blockedAmount/*?}*/);
     }
 
     @Inject(method = "killedEntity", at = @At("HEAD"))
     protected void killedEntity(ServerLevel level, LivingEntity entity, DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        legacy$skeletonJockeyKill = entity.getType() == EntityType.SKELETON && entity.getVehicle() != null && entity.getVehicle().getType() == EntityType.SPIDER;
+        legacy$skeletonJockeyKill = entity.getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SKELETON && entity.getVehicle() != null && entity.getVehicle().getType() == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SPIDER;
     }
 
     @Inject(method = "killedEntity", at = @At("RETURN"))

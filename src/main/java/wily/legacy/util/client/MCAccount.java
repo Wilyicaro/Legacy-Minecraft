@@ -208,7 +208,7 @@ public interface MCAccount {
                 getMCAccessToken(password).ifPresent(s -> {
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     LegacyLoadingScreen screen = MCAccount.prepareLoginInScreen(onClose, executor);
-                    Minecraft.getInstance().setScreen(screen);
+                    Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
                     MCAccount.login(s, executor).thenAccept(u -> {
                         Minecraft.getInstance().execute(onClose);
                         setUser(u);
@@ -722,7 +722,7 @@ public interface MCAccount {
     static CompletableFuture<MCAccount> create(Runnable onClose, String password) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         LegacyLoadingScreen screen = MCAccount.prepareLoginInScreen(onClose, executor);
-        Minecraft.getInstance().setScreen(screen);
+        Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
         Stocker<String> refresh = Stocker.of(null);
         return updateStage(MCAccount.acquireMSAuthCode(bol -> I18n.get(bol ? "legacy.menu.choose_user.login_successful" : "legacy.menu.choose_user.failed_login"), executor), screen, ACQUIRING_MSAUTH_TOKEN, 0).thenComposeAsync(s -> login(screen, s, password, refresh, executor)).thenApplyAsync(user -> create(new GameProfile(user.getProfileId(), user.getName()), password != null, encryptToken(password, user.getAccessToken()), refresh.get()), executor);
     }
@@ -866,7 +866,7 @@ public interface MCAccount {
     default void login(ChooseUserScreen screen, @Nullable String password) {
         login(() -> {
             screen.reloadAccountButtons();
-            Minecraft.getInstance().setScreen(screen);
+            Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(screen);
         }, password);
     }
 

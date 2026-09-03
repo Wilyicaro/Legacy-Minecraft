@@ -1,5 +1,9 @@
 package wily.legacy.client;
 
+//? if >=26.2 {
+import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
+//?}
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
@@ -13,7 +17,10 @@ import wily.factoryapi.mixin.base.RenderPipelinesAccessor;
 import wily.legacy.Legacy4J;
 
 public class LegacyRenderPipelines {
-    public static final RenderPipeline LEGACY_SKY = RenderPipelinesAccessor.register(RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET).withLocation(Legacy4J.createModLocation("pipeline/sky")).withVertexShader("core/sky").withFragmentShader("core/sky").withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS).build());
+    //? if >=26.2 {
+    private static final BindGroupLayout GAMMA_BIND_GROUP = BindGroupLayout.builder().withSampler("InSampler").withUniform("GammaInfo", UniformType.UNIFORM_BUFFER).build();
+    //?}
+    public static final RenderPipeline LEGACY_SKY = RenderPipelinesAccessor.register(RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET).withLocation(Legacy4J.createModLocation("pipeline/sky")).withVertexShader("core/sky").withFragmentShader("core/sky")/*? if >=26.2 {*/.withVertexBinding(0, DefaultVertexFormat.POSITION).withPrimitiveTopology(PrimitiveTopology.QUADS)/*?} else {*//*.withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS)*//*?}*/.build());
     public static final RenderPipeline LEGACY_HURT_FLASH = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/hurt_flash"))
@@ -47,7 +54,11 @@ public class LegacyRenderPipelines {
                     .withLocation(Legacy4J.createModLocation("pipeline/warm_flat_clouds"))
                     .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader(Legacy4J.createModLocation("core/legacy_clouds_warm"))
-                    .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                    //? if >=26.2 {
+                    .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true))
+                    //?} else {
+                    /*.withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                    *///?}
                     .withCull(false)
                     .build()
     );
@@ -64,7 +75,11 @@ public class LegacyRenderPipelines {
                     .withLocation(Legacy4J.createModLocation("pipeline/pack_flat_clouds"))
                     .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader("core/rendertype_clouds")
-                    .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                    //? if >=26.2 {
+                    .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true))
+                    //?} else {
+                    /*.withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                    *///?}
                     .withCull(false)
                     .build()
     );
@@ -73,16 +88,26 @@ public class LegacyRenderPipelines {
                     .withLocation(Legacy4J.createModLocation("pipeline/pack_clouds"))
                     .withVertexShader(Legacy4J.createModLocation("core/legacy_rendertype_clouds"))
                     .withFragmentShader("core/rendertype_clouds")
-                    .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                    //? if >=26.2 {
+                    .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true))
+                    //?} else {
+                    /*.withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true))
+                    *///?}
                     .build()
     );
     public static final RenderPipeline GAMMA = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/gamma"))
-                    .withSampler("InSampler")
+                    //? if >=26.2 {
+                    .withBindGroupLayout(GAMMA_BIND_GROUP)
+                    //?} else {
+                    /*.withSampler("InSampler")
+                     *///?}
                     .withVertexShader("core/screenquad")
                     .withFragmentShader(Legacy4J.createModLocation("core/gamma"))
-                    .withUniform("GammaInfo", UniformType.UNIFORM_BUFFER)
+                    //? if <26.2 {
+                    /*.withUniform("GammaInfo", UniformType.UNIFORM_BUFFER)
+                     *///?}
                     .build()
     );
 }

@@ -139,7 +139,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             });
             onClose = () -> {
                 dataRepository.setSelected(selectedExperiments);
-                parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
+                parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this));
             };
         }
         renderableVList.addRenderable(new LegacyButton(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration()), Tooltip.create(Component.translatable("legacy.menu.selectWorld.dataPacks.description"))));
@@ -243,7 +243,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         Button customizeButton = new LegacyButton(defaultMessage, button -> {
             PresetEditor presetEditor = parent.getUiState().getPresetEditor();
             if (presetEditor != null)
-                minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
         });
         parent.getUiState().addListener(s -> {
             customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
@@ -593,7 +593,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
         if (keyEvent.key() == InputConstants.KEY_O && LegacyOptions.revealAdvancedWorldOptions()) {
-            minecraft.setScreen(advancedOptionsScreen.get());
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(advancedOptionsScreen.get());
             return true;
         }
         tabList.controlTab(keyEvent);
@@ -630,7 +630,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected void openDataPackSelectionScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {
         Pair<Path, PackRepository> pair = screen.getDataPackSelectionSettings(worldDataConfiguration);
         if (pair != null) {
-            this.minecraft.setScreen(new PackSelectionScreen(pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks(packRepository, true, d -> openDataPackSelectionScreen(screen, d)), pair.getFirst(), Component.translatable("dataPack.title")));
+            this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new PackSelectionScreen(pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks(packRepository, true, d -> openDataPackSelectionScreen(screen, d)), pair.getFirst(), Component.translatable("dataPack.title")));
         }
     }
 
@@ -642,7 +642,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public void tryApplyNewDataPacks(PackRepository packRepository) {
         if (parent instanceof CreateWorldScreen screen) {
-            screen.tryApplyNewDataPacks(packRepository, false, w -> minecraft.setScreen(this));
+            screen.tryApplyNewDataPacks(packRepository, false, w -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this));
         }
     }
 

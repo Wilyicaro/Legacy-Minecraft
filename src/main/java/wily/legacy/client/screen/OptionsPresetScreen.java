@@ -45,7 +45,7 @@ public class OptionsPresetScreen extends ConfirmationScreen {
 
     private void applyPreset() {
         if (enablesLegacySettingsMenus()) {
-            minecraft.setScreen(OptionsScreen.createLegacySettingsMenusWarningScreen(this, s -> {
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(OptionsScreen.createLegacySettingsMenusWarningScreen(this, s -> {
                 preset.applyAndSave();
                 updateSelectedPresetState();
                 OptionsScreen.enableLegacySettingsMenus(parent);

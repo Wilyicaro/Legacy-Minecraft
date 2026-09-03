@@ -45,7 +45,7 @@ public class BoxAddonLayer extends RenderLayer {
         ps.pushPose();
         limb.translateAndRotate(ps);
         if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
-        for (ModelPart p : parts) collector.submitModelPart(p, ps, renderType, light, overlay, null, false, false, -1, null, outlineColor);
+        for (ModelPart p : parts) collector.submitModelPart(p, ps, renderType, light, overlay, null, /*? if <26.2 {*//*false, false, *//*?}*/-1, null, outlineColor);
         ps.popPose();
     }
 
@@ -55,7 +55,7 @@ public class BoxAddonLayer extends RenderLayer {
         if (childLike) parent.translateAndRotate(ps);
         child.translateAndRotate(ps);
         if (partScale != 1.0F) ps.scale(partScale, partScale, partScale);
-        for (ModelPart p : parts) collector.submitModelPart(p, ps, renderType, light, overlay, null, false, false, -1, null, outlineColor);
+        for (ModelPart p : parts) collector.submitModelPart(p, ps, renderType, light, overlay, null, /*? if <26.2 {*//*false, false, *//*?}*/-1, null, outlineColor);
         ps.popPose();
     }
 

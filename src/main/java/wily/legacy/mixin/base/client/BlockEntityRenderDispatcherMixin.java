@@ -20,7 +20,7 @@ public abstract class BlockEntityRenderDispatcherMixin {
     private Vec3 cameraPos;
 
     @Inject(method = "tryExtractRenderState", at = @At("HEAD"), cancellable = true)
-    private void tryExtractRenderState(BlockEntity blockEntity, float tickDelta, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, CallbackInfoReturnable<BlockEntityRenderState> cir) {
+    private void tryExtractRenderState(BlockEntity blockEntity, float tickDelta, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, /*? if >=26.2 {*/boolean legacy$unused, /*?}*/CallbackInfoReturnable<BlockEntityRenderState> cir) {
         if (blockEntity instanceof BeaconBlockEntity && !LegacyChunkLoading.isSectionVisible(blockEntity.getBlockPos())) {
             cir.setReturnValue(null);
             return;

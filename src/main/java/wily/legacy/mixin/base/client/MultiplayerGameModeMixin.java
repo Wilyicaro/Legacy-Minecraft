@@ -33,7 +33,7 @@ public class MultiplayerGameModeMixin {
     //? if >=1.21.2 {
     @ModifyVariable(method = "handleCreativeModeItemDrop", at = @At("STORE"))
     public boolean handleCreativeModeItemDrop(boolean original) {
-        return original && !(minecraft.screen instanceof CreativeModeScreen);
+        return original && !(minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof CreativeModeScreen);
     }
     //?}
 

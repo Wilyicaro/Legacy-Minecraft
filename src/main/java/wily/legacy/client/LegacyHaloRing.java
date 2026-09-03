@@ -18,8 +18,14 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+//? if <26.2 {
+/*import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+*///?} else {
+import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import net.minecraft.client.renderer.BindGroupLayouts;
+//?}
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -42,6 +48,7 @@ import org.joml.Vector4f;
 import wily.factoryapi.mixin.base.RenderPipelinesAccessor;
 import wily.legacy.Legacy4J;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
@@ -55,16 +62,27 @@ public final class LegacyHaloRing {
                     .withLocation(Legacy4J.createModLocation("pipeline/halo_ring"))
                     .withVertexShader("core/position_tex_color")
                     .withFragmentShader("core/position_tex_color")
-                    .withSampler("Sampler0")
+                    //? if >=26.2 {
+                    .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+                    //?} else {
+                    /*.withSampler("Sampler0")
+                     *///?}
                     //? if >=26.1 {
                     .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
                     //?} else {
                     /*.withBlend(BlendFunction.TRANSLUCENT)
                      *///?}
-                    .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
-                    //? if >=26.1 {
-                    .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+                    //? if >=26.2 {
+                    .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
+                    .withPrimitiveTopology(PrimitiveTopology.TRIANGLE_STRIP)
                     //?} else {
+                    /*.withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
+                     *///?}
+                    //? if >=26.2 {
+                    .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
+                    //?} else if >=26.1 {
+                    /*.withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+                    *///?} else {
                     /*.withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
                     .withDepthWrite(false)
                      *///?}
@@ -83,7 +101,7 @@ public final class LegacyHaloRing {
             return;
         }
 
-        Camera camera = minecraft.gameRenderer.getMainCamera();
+        Camera camera = minecraft.gameRenderer./*? if >=26.2 {*/mainCamera()/*?} else {*//*getMainCamera()*//*?}*/;
         float partialTick = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         int skyColor = /*? if >=1.21.11 {*/camera.attributeProbe().getValue(EnvironmentAttributes.SKY_COLOR, partialTick)/*?} else {*//*level.getSkyColor(camera.getPosition(), partialTick)*//*?}*/;
         float luminance = (ARGB.redFloat(skyColor) * 2.0f + ARGB.greenFloat(skyColor) * 3.0f + ARGB.blueFloat(skyColor)) / 6.0f;
@@ -97,12 +115,12 @@ public final class LegacyHaloRing {
     }
 
     private static void draw(Matrix4f pose, float brightness) {
-        Matrix4f modelView = new Matrix4f(RenderSystem.getModelViewMatrix()).mul(pose);
+        Matrix4f modelView = new Matrix4f(RenderSystem./*? if >=26.2 {*/getModelViewMatrixCopy()/*?} else {*//*getModelViewMatrix()*//*?}*/).mul(pose);
         GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(brightness, brightness, brightness, 1.0f), new Vector3f(), new Matrix4f()/*? if <1.21.11 {*//*, 0.0f*//*?}*/);
-        RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
+        RenderTarget target = /*? if >=26.2 {*/Minecraft.getInstance().gameRenderer.mainRenderTarget()/*?} else {*//*Minecraft.getInstance().getMainRenderTarget()*//*?}*/;
         AbstractTexture haloTexture = Minecraft.getInstance().getTextureManager().getTexture(TEXTURE);
 
-        try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Legacy halo ring", target.getColorTextureView(), OptionalInt.empty(), target.getDepthTextureView(), OptionalDouble.empty())) {
+        try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Legacy halo ring", target.getColorTextureView(), /*? if >=26.2 {*/Optional.empty()/*?} else {*//*OptionalInt.empty()*//*?}*/, target.getDepthTextureView(), OptionalDouble.empty())) {
             renderPass.setPipeline(PIPELINE);
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("DynamicTransforms", transforms);
@@ -111,8 +129,13 @@ public final class LegacyHaloRing {
             //?} else {
             /*renderPass.bindSampler("Sampler0", haloTexture.getTextureView());
              *///?}
-            renderPass.setVertexBuffer(0, getRingBuffer());
+            //? if >=26.2 {
+            renderPass.setVertexBuffer(0, getRingBuffer().slice());
+            renderPass.draw(VERTEX_COUNT, 1, 0, 0);
+            //?} else {
+            /*renderPass.setVertexBuffer(0, getRingBuffer());
             renderPass.draw(0, VERTEX_COUNT);
+            *///?}
         }
     }
 
@@ -124,7 +147,12 @@ public final class LegacyHaloRing {
     }
 
     private static GpuBuffer buildRingBuffer() {
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_TEX_COLOR);
+        //? if >=26.2 {
+        ByteBufferBuilder byteBuilder = ByteBufferBuilder.exactlySized(VERTEX_COUNT * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize());
+        BufferBuilder builder = new BufferBuilder(byteBuilder, PrimitiveTopology.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_TEX_COLOR);
+        //?} else {
+        /*BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_TEX_COLOR);
+        *///?}
         float u = 0.0f;
         float verticalOffset = RADIUS * 999.0f / 1000.0f;
         float arcRadians = Mth.TWO_PI / SEGMENTS;
@@ -147,6 +175,10 @@ public final class LegacyHaloRing {
 
         try (MeshData meshData = builder.buildOrThrow()) {
             return RenderSystem.getDevice().createBuffer(() -> "Legacy halo ring", GpuBuffer.USAGE_VERTEX, meshData.vertexBuffer());
+        } finally {
+            //? if >=26.2 {
+            byteBuilder.close();
+            //?}
         }
     }
 

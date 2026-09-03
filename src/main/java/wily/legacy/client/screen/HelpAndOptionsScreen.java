@@ -46,16 +46,18 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                                 LegacyOptions.of(Minecraft.getInstance().options.allowCursorChanges()),
                                 LegacyOptions.cursorAtFirstInventorySlot,
                                 LegacyOptions.of(Minecraft.getInstance().options.rawMouseInput()),
-                                LegacyOptions.of(Minecraft.getInstance().options.discreteMouseScroll()),
-                                LegacyOptions.of(Minecraft.getInstance().options.touchscreen())
+                                LegacyOptions.of(Minecraft.getInstance().options.discreteMouseScroll())
+                                //? if <26.2 {
+                                /*, LegacyOptions.of(Minecraft.getInstance().options.touchscreen())
+                                *///?}
                         )))));
     }
 
     private static Screen createControlsScreen(Screen parent) {
         return new RenderableVListScreen(parent, Component.translatable("controls.title"), r -> r.addRenderables(
                 openScreenButton(Component.translatable("options.mouse_settings.title"), () -> createMouseSettingsScreen(r.getScreen())).build(),
-                Button.builder(Component.translatable("controls.keybinds.title"), button -> Minecraft.getInstance().setScreen(new LegacyKeyMappingScreen(r.getScreen()))).build(),
-                Button.builder(Component.translatable("legacy.options.selectedController"), button -> Minecraft.getInstance().setScreen(new ControllerMappingScreen(r.getScreen()))).build()));
+                Button.builder(Component.translatable("controls.keybinds.title"), button -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(new LegacyKeyMappingScreen(r.getScreen()))).build(),
+                Button.builder(Component.translatable("legacy.options.selectedController"), button -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(new ControllerMappingScreen(r.getScreen()))).build()));
     }
 
     private static WinScreen createCredits(Runnable onFinished) {
@@ -64,12 +66,12 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
 
     private static Screen createCreditsScreen(Screen parent) {
         if (LegacyOptions.legacySettingsMenus.get()) {
-            return createCredits(() -> Minecraft.getInstance().setScreen(parent));
+            return createCredits(() -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(parent));
         }
         return new RenderableVListScreen(parent, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(
-                openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCredits(() -> Minecraft.getInstance().setScreen(r.getScreen()))).build(),
-                Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),
-                Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()));
+                openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> createCredits(() -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(r.getScreen()))).build(),
+                Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),
+                Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()));
     }
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
@@ -95,12 +97,12 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
         setReinstallButtonActive(button, true);
         Minecraft client = Minecraft.getInstance();
         if (result != null && result.requiresResourceReload()) client.reloadResourcePacks();
-        if (client.screen != this) return;
+        if (client./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ != this) return;
         if (throwable != null) {
-            client.setScreen(ConfirmationScreen.createInfoScreen(this, REINSTALL_CONTENT, Component.translatable("legacy.menu.reinstall_content.error")));
+            client./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, REINSTALL_CONTENT, Component.translatable("legacy.menu.reinstall_content.error")));
             return;
         }
-        client.setScreen(ConfirmationScreen.createInfoScreen(this, REINSTALL_CONTENT, reinstallContentMessage(result)));
+        client./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, REINSTALL_CONTENT, reinstallContentMessage(result)));
     }
 
     private void setReinstallButtonActive(Button button, boolean active) {

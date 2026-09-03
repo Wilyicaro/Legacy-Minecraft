@@ -14,6 +14,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
+//? if >=26.2 {
+import net.minecraft.client.gui.Hud;
+//?}
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -57,7 +60,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.*;
 
 
-@Mixin(Gui.class)
+@Mixin(/*? if >=26.2 {*/Hud.class/*?} else {*//*Gui.class*//*?}*/)
 public abstract class GuiMixin implements ControlTooltip.Listener {
     @Final
     @Shadow
@@ -203,17 +206,17 @@ public abstract class GuiMixin implements ControlTooltip.Listener {
         LegacyRenderUtil.renderHUDTooltip(GuiGraphicsExtractor, /*? if forge || neoforge {*/ /*shift *//*?} else {*/0/*?}*/);
     }
 
-    @Redirect(method = /*? if neoforge {*//*"extractHealthLevel"*//*?} else {*/"extractPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
-    private void renderPlayerHealth(Gui instance, long value) {
+    @Redirect(method = /*? if neoforge {*//*"extractHealthLevel"*//*?} else {*/"extractPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = /*? if >=26.2 {*/"Lnet/minecraft/client/gui/Hud;healthBlinkTime:J"/*?} else {*//*"Lnet/minecraft/client/gui/Gui;healthBlinkTime:J"*//*?}*/, opcode = Opcodes.PUTFIELD))
+    private void renderPlayerHealth(/*? if >=26.2 {*/Hud/*?} else {*//*Gui*//*?}*/ instance, long value) {
         healthBlinkTime = value - (LegacyOptions.legacyHearts.get() ? 6 : 0);
     }
 
-    @WrapWithCondition(method = "extractHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractHeart(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 2))
-    private boolean noFlashingHeart(Gui instance, GuiGraphicsExtractor arg, Gui.HeartType arg2, int i, int j, boolean bl, boolean bl2, boolean bl3) {
+    @WrapWithCondition(method = "extractHearts", at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/client/gui/Hud;extractHeart(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Hud$HeartType;IIZZZ)V"/*?} else {*//*"Lnet/minecraft/client/gui/Gui;extractHeart(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V"*//*?}*/, ordinal = 2))
+    private boolean noFlashingHeart(/*? if >=26.2 {*/Hud/*?} else {*//*Gui*//*?}*/ instance, GuiGraphicsExtractor arg, /*? if >=26.2 {*/Hud.HeartType/*?} else {*//*Gui.HeartType*//*?}*/ arg2, int i, int j, boolean bl, boolean bl2, boolean bl3) {
         return !LegacyOptions.legacyHearts.get();
     }
 
-    @ModifyArg(method = "extractHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractHeart(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 3), index = 5)
+    @ModifyArg(method = "extractHearts", at = @At(value = "INVOKE", target = /*? if >=26.2 {*/"Lnet/minecraft/client/gui/Hud;extractHeart(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Hud$HeartType;IIZZZ)V"/*?} else {*//*"Lnet/minecraft/client/gui/Gui;extractHeart(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V"*//*?}*/, ordinal = 3), index = 5)
     private boolean renderRemainingAsFlashing(boolean original, @Local(ordinal = 0, argsOnly = true) boolean flash) {
         return LegacyOptions.legacyHearts.get() ? flash : original;
     }

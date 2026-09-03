@@ -22,7 +22,7 @@ public class SpiderMixin {
         if (!isNetherPlayerSpawn(level, reason)) return;
         Spider spider = (Spider) (Object) this;
         if (!(spider.getFirstPassenger() instanceof Skeleton skeleton)) return;
-        Mob witherSkeleton = EntityType.WITHER_SKELETON.create(spider.level(), EntitySpawnReason.JOCKEY);
+        Mob witherSkeleton = /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.WITHER_SKELETON.create(spider.level(), EntitySpawnReason.JOCKEY);
         if (witherSkeleton == null) return;
         skeleton.stopRiding();
         skeleton.discard();

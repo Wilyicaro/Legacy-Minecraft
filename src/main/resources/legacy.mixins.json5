@@ -104,6 +104,9 @@
     "client.GuiGameRendererMixin",
     "client.GuiGraphicsExtractorMixin",
     "client.gui.GuiMixin",
+    //? if >=26.2 {
+    "client.gui.GuiScreenManagerMixin",
+    //?}
     //? if >=26.1 && (forge || neoforge) {
     /*"client.gui.ModdedGuiLayerMixin",
     *///?}
@@ -150,7 +153,6 @@
     "client.PresetEditorMixin",
     "client.RecipeBookComponentMixin",
     "client.RecipeToastMixin",
-    "client.RenderBuffersMixin",
     "client.RenderTypeMixin",
     "client.ScreenEffectRendererMixin",
     "client.ScreenMixin",
@@ -173,7 +175,6 @@
     "client.TutorialToastMixin",
     "client.witch.WitchModelMixin",
     "client.DisconnectedScreenMixin",
-    "client.BufferSourceAccessor",
     "client.BackupConfirmScreenMixin",
     "client.PaintingRendererMixin",
     "piston.PistonHeadRendererMixin",
@@ -189,6 +190,9 @@
     "client.CameraMixin",
     "client.MouseHandlerAccessor",
     "client.LevelRendererMixin",
+    //? if >=26.2 {
+    "client.LightCoordsUtilMixin",
+    //?}
     "client.TutorialMixin",
     "client.LogoRendererMixin",
     "client.LightmapMixin",
@@ -219,12 +223,16 @@
     "client.CloudTextureDataAccessor",
     "client.NameTagSubmitMixin",
     "client.EntityRendererMixin",
-    "client.NameTagFeatureRendererStorageMixin",
+    //? if <26.2 {
+    /*"client.NameTagFeatureRendererStorageMixin",
+    *///?}
     "client.AvatarRendererMixin",
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
-    "client.FeatureRenderDispatcherMixin",
+    //? if >=26.2 {
+    "client.RenderTypeFeatureRendererMixin",
+    //?}
     "skins.client.PlayerSkinMixin",
     "skins.client.SkinIdStateMixin",
     "skins.client.AvatarSkinMixin",

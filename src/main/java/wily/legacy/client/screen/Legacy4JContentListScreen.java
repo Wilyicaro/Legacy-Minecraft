@@ -157,7 +157,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     return;
                 }
                 if (isInstalled(pack)) {
-                    minecraft.setScreen(new PackActionScreen(Legacy4JContentListScreen.this, pack, category));
+                    minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new PackActionScreen(Legacy4JContentListScreen.this, pack, category));
                 } else {
                     if (!prepareDownloadTarget(pack)) return;
                     startDownload(pack, category.requiresResourceReload());
@@ -178,7 +178,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
             return true;
         } catch (IOException e) {
             String message = e.getMessage();
-            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(ConfirmationScreen.createInfoScreen(this, category.title(), Component.literal(message == null || message.isBlank() ? e.toString() : message)));
             return false;
         }
     }
@@ -193,7 +193,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         refreshInstalledPacks();
         boolean appliedResourcePacks = installedAnything && ContentManager.applyAutoResourcePacks(pack, category);
         if (installedAnything && (reloadResources || appliedResourcePacks)) {
-            if (minecraft.screen == this) needsReload = true;
+            if (minecraft./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ == this) needsReload = true;
             else minecraft.reloadResourcePacks();
         }
     }
@@ -377,12 +377,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
         @Override
         protected void addButtons() {
-            renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft.setScreen(parent))
+            renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent))
                 .bounds(panel.x + 15, panel.getRectangle().bottom() - 52, 200, 20).build());
 
             renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.delete"), b -> {
                 deletePack(pack);
-                minecraft.setScreen(parent);
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(parent);
             }).bounds(panel.x + 15, panel.getRectangle().bottom() - 30, 200, 20).build());
         }
     }

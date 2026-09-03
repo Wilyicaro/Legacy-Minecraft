@@ -108,7 +108,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.L
     @Override
     public void onClose() {
         if (!pages.equals(initialPages)) {
-            minecraft.setScreen(new ConfirmationScreen(this, EXIT_BOOK, EXIT_BOOK_MESSAGE, b -> minecraft.setScreen(null)));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, EXIT_BOOK, EXIT_BOOK_MESSAGE, b -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(null)));
         } else super.onClose();
     }
 
@@ -127,9 +127,9 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.L
         this.addRenderableWidget(this.page);
         this.updatePageContent();
         this.numberOfPages = this.getPageNumberMessage();
-        this.addRenderableWidget(Button.builder(Component.translatable("book.signButton"), button -> this.minecraft.setScreen(this.signScreen)).bounds(this.width / 2 - 108, panel.screenButtonY(), 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("book.signButton"), button -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this.signScreen)).bounds(this.width / 2 - 108, panel.screenButtonY(), 100, 20).build());
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> {
-            this.minecraft.setScreen(null);
+            this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(null);
             this.saveChanges();
         }).bounds(this.width / 2 + 8, panel.screenButtonY(), 100, 20).build());
 

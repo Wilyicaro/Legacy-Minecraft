@@ -40,55 +40,55 @@ public final class ConsoleMobCaps {
     }
 
     static TrackedMobCap bucketForType(EntityType<?> type) {
-        if (type == EntityType.CHICKEN) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.CHICKEN) {
             return TrackedMobCap.CHICKENS;
         }
-        if (type == EntityType.WOLF) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.WOLF) {
             return TrackedMobCap.WOLVES;
         }
-        if (type == EntityType.MOOSHROOM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.MOOSHROOM) {
             return TrackedMobCap.MOOSHROOMS;
         }
-        if (type == EntityType.SQUID || type == EntityType.GLOW_SQUID) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SQUID || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.GLOW_SQUID) {
             return TrackedMobCap.SQUIDS;
         }
-        if (type == EntityType.DOLPHIN) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.DOLPHIN) {
             return TrackedMobCap.DOLPHINS;
         }
-        if (type == EntityType.SLIME || type == EntityType.MAGMA_CUBE) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SLIME || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.MAGMA_CUBE) {
             return TrackedMobCap.SLIMES;
         }
-        if (type == EntityType.GUARDIAN || type == EntityType.ELDER_GUARDIAN) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.GUARDIAN || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ELDER_GUARDIAN) {
             return TrackedMobCap.GUARDIANS;
         }
-        if (type == EntityType.BAT) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.BAT) {
             return TrackedMobCap.AMBIENT;
         }
-        if (type == EntityType.VILLAGER) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.VILLAGER) {
             return TrackedMobCap.VILLAGERS;
         }
-        if (type == EntityType.PHANTOM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.PHANTOM) {
             return TrackedMobCap.PHANTOMS;
         }
-        if (type == EntityType.ARMOR_STAND) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ARMOR_STAND) {
             return TrackedMobCap.ARMOR_STANDS;
         }
-        if (type == EntityType.PAINTING || type == EntityType.ITEM_FRAME || type == EntityType.GLOW_ITEM_FRAME) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.PAINTING || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ITEM_FRAME || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.GLOW_ITEM_FRAME) {
             return TrackedMobCap.HANGING;
         }
-        if (type == EntityType.SNOW_GOLEM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SNOW_GOLEM) {
             return TrackedMobCap.SNOW_GOLEMS;
         }
-        if (type == EntityType.IRON_GOLEM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.IRON_GOLEM) {
             return TrackedMobCap.IRON_GOLEMS;
         }
-        if (type == EntityType.WITHER) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.WITHER) {
             return TrackedMobCap.WITHERS;
         }
-        if (type == EntityType.END_CRYSTAL) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.END_CRYSTAL) {
             return TrackedMobCap.END_CRYSTALS;
         }
-        if (type == EntityType.ENDER_DRAGON) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ENDER_DRAGON) {
             return null;
         }
 
@@ -124,13 +124,13 @@ public final class ConsoleMobCaps {
     }
 
     static TrackedMobCap parentBucketForType(EntityType<?> type) {
-        if (type == EntityType.MOOSHROOM || type == EntityType.SNOW_GOLEM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.MOOSHROOM || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SNOW_GOLEM) {
             return TrackedMobCap.GENERAL_ANIMALS;
         }
-        if (type == EntityType.SQUID || type == EntityType.GLOW_SQUID) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SQUID || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.GLOW_SQUID) {
             return TrackedMobCap.WATER_ANIMALS;
         }
-        if (type == EntityType.WITHER || type == EntityType.PHANTOM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.WITHER || type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.PHANTOM) {
             return TrackedMobCap.MONSTERS;
         }
         return null;
@@ -175,13 +175,13 @@ public final class ConsoleMobCaps {
         if (!hasNaturalRoom(tracker, bucket)) {
             return false;
         }
-        if (type == EntityType.GHAST) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.GHAST) {
             return tracker.count(type) < 4;
         }
-        if (type == EntityType.ZOMBIFIED_PIGLIN) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ZOMBIFIED_PIGLIN) {
             return tracker.count(type) < 40;
         }
-        if (type == EntityType.ENDERMAN && Level.END.equals(level.dimension())) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.ENDERMAN && Level.END.equals(level.dimension())) {
             int endermanCap = TrackedMobCap.MONSTERS.naturalLimit();
             if (level.getDifficulty() == Difficulty.NORMAL) {
                 endermanCap -= TrackedMobCap.MONSTERS.naturalLimit() / 4;
@@ -279,13 +279,13 @@ public final class ConsoleMobCaps {
         }
 
         WorldMobCapTracker tracker = LegacyMobCaps.tracker(level);
-        if (type == EntityType.SNOW_GOLEM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.SNOW_GOLEM) {
             return tracker.count(TrackedMobCap.SNOW_GOLEMS) < TrackedMobCap.SNOW_GOLEMS.manualLimit();
         }
-        if (type == EntityType.IRON_GOLEM) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.IRON_GOLEM) {
             return tracker.count(TrackedMobCap.IRON_GOLEMS) < TrackedMobCap.IRON_GOLEMS.manualLimit();
         }
-        if (type == EntityType.WITHER) {
+        if (type == /*? if >=26.2 {*/net.minecraft.world.entity.EntityTypes/*?} else {*//*EntityType*//*?}*/.WITHER) {
             return tracker.count(TrackedMobCap.WITHERS) < TrackedMobCap.WITHERS.manualLimit();
         }
         return true;

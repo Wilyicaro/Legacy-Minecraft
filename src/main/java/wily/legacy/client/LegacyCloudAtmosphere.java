@@ -98,7 +98,7 @@ public final class LegacyCloudAtmosphere {
             return false;
         }
 
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer./*? if >=26.2 {*/mainCamera()/*?} else {*//*getMainCamera()*//*?}*/;
         if (camera == null || isNightVisionActive(camera)) {
             return false;
         }

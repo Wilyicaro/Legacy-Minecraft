@@ -60,7 +60,7 @@ public class LightTextureMixin {
                 || eyePosition.y >= eyePos.getY() + fluidState.getHeight(level, eyePos)) return 0.0F;
 
         int skyLight = level.getBrightness(LightLayer.SKY, eyePos);
-        float skyLightFactor = minecraft.gameRenderer.getMainCamera().attributeProbe().getValue(EnvironmentAttributes.SKY_LIGHT_FACTOR, partialTick);
+        float skyLightFactor = minecraft.gameRenderer./*? if >=26.2 {*/mainCamera()/*?} else {*//*getMainCamera()*//*?}*/.attributeProbe().getValue(EnvironmentAttributes.SKY_LIGHT_FACTOR, partialTick);
         return skyLight * Math.max(skyLightFactor, 0.2F) / 15.0F;
     }
 

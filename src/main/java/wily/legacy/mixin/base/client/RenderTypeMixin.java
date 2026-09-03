@@ -35,7 +35,8 @@ public abstract class RenderTypeMixin {
     }
 
     //I don't think that's needed anymore
-//    @Inject(method = "entityNoOutline(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/rendertype/RenderType;", at = @At("HEAD"), cancellable = true, require = 0)
+//    (was @Inject on RenderTypes.entityNoOutline(Identifier) - that method exists in NEITHER 26.1.2
+//    NOR 26.2, so this hook is permanently dead on every Stonecutter target. No guard needed.)
 //    private static void legacy$entityNoOutline(Identifier texture, CallbackInfoReturnable<RenderType> cir) {
 //        if (legacy$capeWithCutout(texture)) cir.setReturnValue(RenderTypes.entityCutout(texture));
 //    }

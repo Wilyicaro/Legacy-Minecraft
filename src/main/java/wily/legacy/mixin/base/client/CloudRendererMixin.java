@@ -304,8 +304,8 @@ public abstract class CloudRendererMixin {
             return 0;
         }
 
-        double cameraY = minecraft.gameRenderer.getMainCamera().position().y;
-        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : minecraft.gameRenderer.getMainCamera().attributeProbe().getValue(EnvironmentAttributes.CLOUD_HEIGHT, partialTicks);
+        double cameraY = minecraft.gameRenderer./*? if >=26.2 {*/mainCamera()/*?} else {*//*getMainCamera()*//*?}*/.position().y;
+        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : minecraft.gameRenderer./*? if >=26.2 {*/mainCamera()/*?} else {*//*getMainCamera()*//*?}*/.attributeProbe().getValue(EnvironmentAttributes.CLOUD_HEIGHT, partialTicks);
         double top = cloudHeight + CLOUD_BASE_HEIGHT + CLOUD_TOP_EXTENSION;
         double bottom = cloudHeight - CLOUD_BOTTOM_EXTENSION;
 

@@ -58,7 +58,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.L
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
         else
-            minecraft.setScreen(new ConfirmationScreen(this, SAFETY_TITLE, Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)) {
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, SAFETY_TITLE, Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)) {
                 @Override
                 protected void addButtons() {
                     renderableVList.addRenderable(Button.builder(SAFETY_CHECK, b -> {
@@ -269,7 +269,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.L
         }
         if (keyEvent.key() == InputConstants.KEY_X && tabList.getIndex() == 2) {
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200, 20, DIRECT_CONNECTION);
-            minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 120, serverBox.getMessage(), LegacyComponents.ENTER_IP, b1 -> ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("", "",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/, null/*?}*/)) {
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 120, serverBox.getMessage(), LegacyComponents.ENTER_IP, b1 -> ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("", "",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/, null/*?}*/)) {
                 @Override
                 protected void addButtons() {
                     super.addButtons();
@@ -306,7 +306,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.L
                     return;
             }
             String string = list.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-            minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.import_save"), Component.translatable("legacy.menu.import_save_message", string), (b) -> {
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.import_save"), Component.translatable("legacy.menu.import_save_message", string), (b) -> {
                 list.forEach(p -> {
                     try {
                         LegacySaveCache.importSaveFile(new FileInputStream(p.toFile()), minecraft.getLevelSource(), FileNameUtils.getBaseName(p.getFileName().toString()));
@@ -315,7 +315,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.L
                     }
 
                 });
-                minecraft.setScreen(this);
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(this);
                 saveRenderableList.reloadSaveList();
             }));
         }

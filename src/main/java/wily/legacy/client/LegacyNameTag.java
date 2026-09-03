@@ -3,32 +3,56 @@ package wily.legacy.client;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeStorage;
+//? if >=26.2 {
+import net.minecraft.client.renderer.feature.NameTagFeatureRenderer;
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
+//? if <26.2 {
+/*import net.minecraft.client.renderer.SubmitNodeStorage;
+*///?}
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.joml.Matrix4fc;
 
 public interface LegacyNameTag {
     LegacyNameTag NEXT_SUBMIT = new Instance();
 
-    static LegacyNameTag of(SubmitNodeStorage.NameTagSubmit nameTagSubmit) {
+    static LegacyNameTag of(/*? if >=26.2 {*/NameTagFeatureRenderer.Submit/*?} else {*//*SubmitNodeStorage.NameTagSubmit*//*?}*/ nameTagSubmit) {
         return (LegacyNameTag) (Object) nameTagSubmit;
     }
 
-    static SubmitNodeStorage.NameTagSubmit withColor(SubmitNodeStorage.NameTagSubmit nameTagSubmit, float[] color) {
+    static /*? if >=26.2 {*/NameTagFeatureRenderer.Submit/*?} else {*//*SubmitNodeStorage.NameTagSubmit*//*?}*/ withColor(/*? if >=26.2 {*/NameTagFeatureRenderer.Submit/*?} else {*//*SubmitNodeStorage.NameTagSubmit*//*?}*/ nameTagSubmit, float[] color) {
         of(nameTagSubmit).setNameTagColor(color);
         return nameTagSubmit;
     }
+
+    //? if >=26.2 {
+    static boolean shouldRenderOutline(NameTagFeatureRenderer.Submit submit) {
+        return LegacyOptions.displayNameTagBorder.get() && getThickness(submit.distanceToCameraSq()) < 1 && of(submit).hasColor();
+    }
+
+    static net.minecraft.client.renderer.rendertype.RenderType outlineRenderType(NameTagFeatureRenderer.Submit submit) {
+        return submit.displayMode() == Font.DisplayMode.SEE_THROUGH ? RenderTypes.textBackgroundSeeThrough() : RenderTypes.textBackground();
+    }
+    //?}
 
     static float getThickness(double distanceToCameraSq) {
         return Math.max(0.1f, (float) Math.sqrt(distanceToCameraSq) / 16f);
     }
 
-    static void renderNameTagOutline(Font font, MultiBufferSource.BufferSource bufferSource, SubmitNodeStorage.NameTagSubmit submit, boolean seeThrough) {
+    //? if >=26.2 {
+    static void renderNameTagOutline(Font font, VertexConsumer consumer, NameTagFeatureRenderer.Submit submit) {
+    //?} else {
+    /*static void renderNameTagOutline(Font font, MultiBufferSource.BufferSource bufferSource, SubmitNodeStorage.NameTagSubmit submit, boolean seeThrough) {
+    *///?}
         float thickness = getThickness(submit.distanceToCameraSq());
         float[] color = LegacyNameTag.of(submit).getNameTagColor();
         if (!LegacyOptions.displayNameTagBorder.get() || thickness >= 1 || color == null) return;
-        renderOutline(bufferSource.getBuffer(seeThrough ? RenderTypes.textBackgroundSeeThrough() : RenderTypes.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
+        //? if >=26.2 {
+        renderOutline(consumer, submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
+        //?} else {
+        /*renderOutline(bufferSource.getBuffer(seeThrough ? RenderTypes.textBackgroundSeeThrough() : RenderTypes.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
+        *///?}
     }
 
     static void renderOutline(VertexConsumer consumer, Matrix4fc matrix4f, float x, float y, float width, float height, float thickness, float r, float g, float b, float a) {

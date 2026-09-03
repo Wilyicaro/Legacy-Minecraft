@@ -183,7 +183,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private static void legacy$openWorldCreationWhenReady(Minecraft minecraft, Runnable runnable, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CompletableFuture<WorldCreationContext> future) {
         future.thenAcceptAsync(context -> {
             legacy$openingWorldCreation.set(false);
-            minecraft.setScreen(new CreateWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new CreateWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
         }, minecraft).exceptionallyAsync(throwable -> {
             legacy$openingWorldCreation.set(false);
             minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't prepare world creation"));
@@ -248,7 +248,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             difficultyButton.active = !uiState.isHardcore();
         });
 
-        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
+        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> legacy$createWorld()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
             if (LegacyOptions.useLegacyWorldOptions()) {
@@ -261,7 +261,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
                 return;
             }
             publishScreen.setGameType(uiState.getGameMode().gameType);
-            minecraft.setScreen(publishScreen);
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(publishScreen);
         }, () -> publishScreen.publish)));
         resourceAlbumSelector.setX(layoutX);
         resourceAlbumSelector.setY(panel.y + 106);
@@ -304,7 +304,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         LegacyLoadingScreen loadingScreen = new LegacyLoadingScreen();
         loadingScreen.setGenericLoading(true);
         loadingScreen.setBlackBackground(true);
-        minecraft.setScreen(loadingScreen);
+        minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(loadingScreen);
         install.get().whenComplete((installedAlbum, throwable) -> minecraft.execute(() -> {
             if (throwable != null || installedAlbum == null) {
                 legacy$finishRemoteResourceAlbum(throwable == null ? new IOException("Failed to install resource pack") : throwable);
@@ -327,7 +327,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         legacy$preparingRemoteResourceAlbum = false;
         if (throwable != null) {
             Legacy4J.LOGGER.warn("Failed to prepare remote resource album before world creation", throwable);
-            minecraft.setScreen(self());
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(self());
             return;
         }
         legacy$resourceAlbumPrepared = true;

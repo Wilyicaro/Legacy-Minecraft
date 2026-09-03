@@ -62,7 +62,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         super(s -> Panel.createPanel(s, p -> p.appearance(282, Math.min(s.height - 48, 248)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s))), Component.translatable("createWorld.customize.flat.title"));
         panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 14, panel.height - 14), p -> p.pos(panel.x + 7, panel.y + 7));
-        this.parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
+        this.parent = Minecraft.getInstance()./*? if >=26.2 {*/gui.screen()/*?} else {*//*screen*//*?}*/ instanceof WorldMoreOptionsScreen s ? s : screen;
         this.uiState = uiState;
         this.applySettings = consumer;
         this.generator = flatLevelGeneratorSettings;
@@ -263,7 +263,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         if (movingLayer == null) {
             if (tabList.controlTab(keyEvent)) return true;
             if (keyEvent.key() == InputConstants.KEY_O)
-                minecraft.setScreen(new LegacyFlatPresetsScreen(this, uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET), uiState.getSettings().dataConfiguration().enabledFeatures(), f -> setPreset(f.value().settings())));
+                minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new LegacyFlatPresetsScreen(this, uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET), uiState.getSettings().dataConfiguration().enabledFeatures(), f -> setPreset(f.value().settings())));
         }
         return super.keyPressed(keyEvent);
     }
@@ -361,17 +361,17 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             }
             int allHeight = getAllLayersHeight();
             int layerIndex = displayLayers.renderables.indexOf(this);
-            minecraft.setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 120, LegacyComponents.LAYER_OPTIONS, LegacyComponents.LAYER_MESSAGE, b -> {
+            minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 120, LegacyComponents.LAYER_OPTIONS, LegacyComponents.LAYER_MESSAGE, b -> {
             }) {
                 @Override
                 protected void addButtons() {
                     renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.create_flat_world.edit_layer"), b -> {
-                        this.minecraft.setScreen(new FlatWorldLayerSelector(LegacyFlatWorldScreen.this, flatLayerInfo, f -> {
+                        this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new FlatWorldLayerSelector(LegacyFlatWorldScreen.this, flatLayerInfo, f -> {
                             removeLayer(layerIndex);
                             addLayer(f.getFlatLayerInfo(), layerIndex);
                         }, maxOverworldHeight - allHeight + flatLayerInfo.getHeight(), Component.translatable("legacy.menu.create_flat_world.edit_layer")));
                     }).bounds(panel.x + 15, panel.y + panel.height - 74, 200, 20).build());
-                    Button addButton = Button.builder(Component.translatable("legacy.menu.create_flat_world.add_layer"), b -> this.minecraft.setScreen(new FlatWorldLayerSelector(LegacyFlatWorldScreen.this, f -> addLayer(f.getFlatLayerInfo(), layerIndex), maxOverworldHeight - allHeight, Component.translatable("legacy.menu.create_flat_world.add_layer")))).bounds(panel.x + 15, panel.y + panel.height - 52, 200, 20).build();
+                    Button addButton = Button.builder(Component.translatable("legacy.menu.create_flat_world.add_layer"), b -> this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new FlatWorldLayerSelector(LegacyFlatWorldScreen.this, f -> addLayer(f.getFlatLayerInfo(), layerIndex), maxOverworldHeight - allHeight, Component.translatable("legacy.menu.create_flat_world.add_layer")))).bounds(panel.x + 15, panel.y + panel.height - 52, 200, 20).build();
                     if (allHeight >= maxOverworldHeight) addButton.active = false;
                     renderableVList.addRenderable(addButton);
                     renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.create_flat_world.delete_layer"), b -> {

@@ -75,7 +75,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         if (this.hardcore) {
             ExitConfirmationScreen.exit(minecraft, true);
         } else {
-            this.minecraft.setScreen(new ExitConfirmationScreen(this));
+            this.minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(new ExitConfirmationScreen(this));
         }
     }
 

@@ -1,10 +1,15 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.client.renderer.SubmitNodeStorage;
+//? if >=26.2 {
+import net.minecraft.client.renderer.feature.NameTagFeatureRenderer;
+//?} else {
+/*import net.minecraft.client.renderer.SubmitNodeStorage;
+*///?}
 import org.spongepowered.asm.mixin.Mixin;
 import wily.legacy.client.LegacyNameTag;
 
-@Mixin(SubmitNodeStorage.NameTagSubmit.class)
+// 26.2 moved SubmitNodeStorage$NameTagSubmit into its owning renderer as NameTagFeatureRenderer$Submit.
+@Mixin(/*? if >=26.2 {*/NameTagFeatureRenderer.Submit.class/*?} else {*//*SubmitNodeStorage.NameTagSubmit.class*//*?}*/)
 public class NameTagSubmitMixin implements LegacyNameTag {
     float[] nameTagColor = null;
 

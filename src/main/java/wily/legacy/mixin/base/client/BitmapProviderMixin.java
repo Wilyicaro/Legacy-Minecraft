@@ -46,6 +46,11 @@ public abstract class BitmapProviderMixin {
         BitmapProvider var22;
         try {
             NativeImage nativeImage = NativeImage.read(NativeImage.Format.RGBA, inputStream);
+            //? if >=26.2 {
+            // 26.2 wraps the atlas image in BitmapProvider$ImageDataHolder, which both the provider
+            // and every Glyph now take in place of the raw NativeImage.
+            BitmapProvider.ImageDataHolder imageData = new BitmapProvider.ImageDataHolder(resourceLocation, nativeImage);
+            //?}
             int i = nativeImage.getWidth();
             int j = nativeImage.getHeight();
             int k = i / this.codepointGrid[0].length;
@@ -56,7 +61,7 @@ public abstract class BitmapProviderMixin {
 
             while (true) {
                 if (m >= this.codepointGrid.length) {
-                    var22 = new BitmapProvider(nativeImage, codepointMap);
+                    var22 = new BitmapProvider(/*? if >=26.2 {*/imageData/*?} else {*//*nativeImage*//*?}*/, codepointMap);
                     break;
                 }
 
@@ -67,7 +72,7 @@ public abstract class BitmapProviderMixin {
                     int p = n++;
                     if (o != 0) {
                         int q = this.getActualGlyphWidth(nativeImage, k, l, p, m);
-                        BitmapProvider.Glyph glyph = new BitmapProvider.Glyph(f, nativeImage, p * k, m * l, k, l, (int) (0.5 + (double) ((float) q * f)) + 1, this.ascent);
+                        BitmapProvider.Glyph glyph = new BitmapProvider.Glyph(f, /*? if >=26.2 {*/imageData/*?} else {*//*nativeImage*//*?}*/, p * k, m * l, k, l, (int) (0.5 + (double) ((float) q * f)) + 1, this.ascent);
                         GlyphInfo info = new LegacyGlyphInfo((q + 1) * f, f);
                         ((MutableBitmapGlyph)(Object)glyph).setGlyphInfo(info);
                         BitmapProvider.Glyph oldGlyph = codepointMap.put(o, glyph);

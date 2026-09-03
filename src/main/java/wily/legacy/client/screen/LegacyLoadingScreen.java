@@ -44,7 +44,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
         LegacyLoadingScreen screen = new LegacyLoadingScreen(od || lastOd ? Component.translatable("legacy.menu." + (lastOd ? "leaving" : "entering"), LegacyComponents.getDimensionName((lastOd ? lastLevel : newLevel))) : Component.empty(), Component.empty()) {
             @Override
             public void tick() {
-                if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
+                if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(null);
             }
 
             @Override
@@ -68,7 +68,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
         LegacyLoadingScreen screen = new LegacyLoadingScreen(LegacyComponents.RESPAWNING, Component.empty()) {
             @Override
             public void tick() {
-                if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
+                if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft./*? if >=26.2 {*/gui./*?}*/setScreen(null);
             }
 
             @Override
@@ -82,26 +82,26 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
 
     public static void startFakeAutoSave() {
         if (!LegacyOptions.fakeAutosaveScreen.get()) return;
-        Minecraft.getInstance().gui.autosaveIndicatorValue = 0.0f;
+        Minecraft.getInstance().gui./*? if >=26.2 {*/hud./*?}*/autosaveIndicatorValue = 0.0f;
         TopMessage.setMedium(null);
-        Minecraft.getInstance().setScreen(getFakeAutoSaveScreen());
+        Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(getFakeAutoSaveScreen());
     }
 
     public static void openFakeManualSaveScreen(Screen nextScreen) {
         if (!LegacyOptions.fakeManualSaveScreen.get()) {
-            Minecraft.getInstance().setScreen(nextScreen);
+            Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(nextScreen);
             return;
         }
-        Minecraft.getInstance().gui.autosaveIndicatorValue = 0.0f;
-        Minecraft.getInstance().setScreen(getFakeManualSaveScreen(nextScreen));
+        Minecraft.getInstance().gui./*? if >=26.2 {*/hud./*?}*/autosaveIndicatorValue = 0.0f;
+        Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(getFakeManualSaveScreen(nextScreen));
     }
 
     public static LegacyLoadingScreen getFakeAutoSaveScreen() {
-        return createFakeSaveScreen(LegacyComponents.PREPARING_AUTOSAVE, true, () -> Minecraft.getInstance().setScreen(null));
+        return createFakeSaveScreen(LegacyComponents.PREPARING_AUTOSAVE, true, () -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(null));
     }
 
     public static LegacyLoadingScreen getFakeManualSaveScreen(Screen nextScreen) {
-        return createFakeSaveScreen(LegacyComponents.PREPARING_MANUAL_SAVE, true, () -> Minecraft.getInstance().setScreen(nextScreen));
+        return createFakeSaveScreen(LegacyComponents.PREPARING_MANUAL_SAVE, true, () -> Minecraft.getInstance()./*? if >=26.2 {*/gui./*?}*/setScreen(nextScreen));
     }
 
     private static LegacyLoadingScreen createFakeSaveScreen(Component loadingHeader, boolean controlsAutosaveIndicator, Runnable onClose) {
@@ -116,7 +116,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
             @Override
             public void tick() {
                 if (controlsAutosaveIndicator) {
-                    minecraft.gui.autosaveIndicatorValue = 0.0f;
+                    minecraft.gui./*? if >=26.2 {*/hud./*?}*/autosaveIndicatorValue = 0.0f;
                 }
                 super.tick();
 
@@ -134,7 +134,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
                     onClose();
                     LegacySoundUtil.playBackSound();
                     if (controlsAutosaveIndicator) {
-                        minecraft.gui.autosaveIndicatorValue = 1.0f;
+                        minecraft.gui./*? if >=26.2 {*/hud./*?}*/autosaveIndicatorValue = 1.0f;
                     }
                 }
             }
