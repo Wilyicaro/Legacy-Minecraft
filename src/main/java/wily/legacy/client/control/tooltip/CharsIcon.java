@@ -1,6 +1,7 @@
 package wily.legacy.client.control.tooltip;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.control.ControlType;
 
@@ -25,12 +26,12 @@ public abstract class CharsIcon extends LegacyIcon {
 
     @Override
     public Component getOverlayComponent(boolean allowPressed) {
-        return iconOverlayChars.isPresent() ? getActualIcon(iconOverlayChars.get(), allowPressed, getControlType()) : null;
+        return iconOverlayChars.isPresent() ? getActualIcon(iconOverlayChars.get(), allowPressed, getControlType()) : CommonComponents.EMPTY;
     }
 
     @Override
     public Component getComponent() {
-        return tipIcon.isEmpty() ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : ControlTooltip.getControlIcon(tipIcon.get(), ControlType.getActiveControllerType()).getComponent();
+        return tipIcon.isEmpty() ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : ControlTooltip.getControlIcon(tipIcon.get(), getControlType()).getComponent();
     }
 
     public abstract ControlType getControlType();

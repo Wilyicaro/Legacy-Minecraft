@@ -9,6 +9,7 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.control.tooltip.ComponentIcon;
+import wily.legacy.client.control.tooltip.ControllerIcon;
 
 import java.util.*;
 import java.util.function.Function;
@@ -48,7 +49,7 @@ public class ControllerBinding<T extends BindingState> {
     }
 
     public ComponentIcon getIcon() {
-        return ControlType.getActiveControllerType().icons().get(getMapped().getKey());
+        return ControlType.getActiveControllerType().icons().computeIfAbsent(getMapped().getKey(),s -> new ControllerIcon(ControllerBinding.this, Optional.empty(), Optional.empty(), Optional.empty()));
     }
 
     public boolean isSpecial() {
