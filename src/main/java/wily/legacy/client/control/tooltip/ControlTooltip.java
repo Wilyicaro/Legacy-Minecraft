@@ -61,7 +61,6 @@ public interface ControlTooltip {
     String CONTROL_TOOLTIPS = "control_tooltips";
 
     BiFunction<String, Style, ComponentIcon> CONTROL_ICON_FUNCTION = Util.memoize((s, style) -> ComponentIcon.of(Component.literal(s).withStyle(style)));
-    Function<Icon[], Icon> COMPOUND_ICON_FUNCTION = Util.memoize(icons -> (CompoundIcon) () -> icons);
     Function<String, MutableComponent> CONTROL_ACTION_CACHE = Util.memoize(s -> Component.translatable(s));
 
     String MOUSE_BASE_CHAR = "\uC002";
@@ -73,7 +72,6 @@ public interface ControlTooltip {
     Component PLUS = Component.literal("+");
     ComponentIcon SPACE_ICON = ComponentIcon.of(SPACE);
     ComponentIcon PLUS_ICON = ComponentIcon.of(PLUS);
-    Function<ComponentIcon[], ComponentIcon> COMPOUND_COMPONENT_ICON_FUNCTION = Util.memoize(CompoundComponentIcon::new);
     Map<String, ArbitrarySupplier<ComponentIcon>> commonIcons = new HashMap<>();
     ArbitrarySupplier<ComponentIcon> PLAYER_MOVEMENT = registerCommonComponentIcon("player_movement", () -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_W), getKeyIcon(InputConstants.KEY_A), getKeyIcon(InputConstants.KEY_S), getKeyIcon(InputConstants.KEY_D)) : ControllerBinding.LEFT_STICK.getIcon());
     ArbitrarySupplier<ComponentIcon> MENU_QUICK_ACTION = registerCommonComponentIcon("menu_quick_action", () -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON, getKeyIcon(InputConstants.KEY_LSHIFT)) : ControllerBinding.UP_BUTTON.getIcon());

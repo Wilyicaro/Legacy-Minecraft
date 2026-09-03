@@ -2,11 +2,19 @@ package wily.legacy.client.control.tooltip;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.util.Util;
 import wily.legacy.Legacy4JClient;
 
+import java.util.function.Function;
+
+/**
+ * Appends different icons, making them render sequentially. It'll click the first found icon, or all the icons if additive.
+ */
 public interface CompoundIcon extends Icon {
+    Function<Icon[], Icon> COMPOUND_ICON_CACHE = Util.memoize(icons -> (CompoundIcon) () -> icons);
+
     static Icon of(Icon... icons) {
-        return ControlTooltip.COMPOUND_ICON_FUNCTION.apply(icons);
+        return COMPOUND_ICON_CACHE.apply(icons);
     }
 
     Icon[] getIcons();

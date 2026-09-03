@@ -57,7 +57,7 @@ public class ControlTooltipList {
     }
 
     public ControlTooltipList addCompound(Supplier<Icon[]> control, Supplier<Component> action) {
-        return add(ControlTooltip.create(() -> ControlTooltip.COMPOUND_ICON_FUNCTION.apply(control.get()), action));
+        return add(ControlTooltip.create(() -> CompoundIcon.COMPOUND_ICON_CACHE.apply(control.get()), action));
     }
 
     public ControlTooltipList add(Supplier<Icon> control, Supplier<Component> action) {
