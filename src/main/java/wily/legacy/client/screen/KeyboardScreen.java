@@ -377,7 +377,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 try (SpriteContents contents = sprite.contents()) {
                     int bindingOffset = 0;
 
-                    if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
+                    if (binding != null && Legacy4JClient.controllerManager.connectedController != null && binding.getIcon() != null)
                         bindingOffset = binding.getIcon().render(guiGraphics, getX() + 2, getY() + (getHeight() - 9) / 2 + 1, true);
 
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, 2 + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());
