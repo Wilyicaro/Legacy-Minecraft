@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.advancements.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
@@ -23,6 +24,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.AdvancementToastAccessor;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.LegacyKeyMapping;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -46,7 +48,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
          *///?} else {
         ci.cancel();
         //?}
-        Component holdToView = Component.translatable("legacy.menu.advancements.toast", (ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.getIcon()).getComponent());
+        Component holdToView = Component.translatable("legacy.menu.advancements.toast", (LegacyKeyMapping.of(Minecraft.getInstance().options.keyInventory)).getIconComponent());
         DisplayInfo displayInfo = this.advancement./*? if >1.20.1 {*/value().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
         width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3 / 2, font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
         LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, 0, 0, width(), height());

@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import com.google.common.collect.Ordering;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -696,17 +697,16 @@ public class LegacyRenderUtil {
         int p = vector2ic.x();
         int q = vector2ic.y();
         graphics.pose().pushMatrix();
-        if (p == (int) Legacy4JClient.controllerManager.getPointerX() && q == (int) Legacy4JClient.controllerManager.getPointerY())
+        if (i == (int) Legacy4JClient.controllerManager.getPointerX() && j == (int) Legacy4JClient.controllerManager.getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
             graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() - i), (float) (Legacy4JClient.controllerManager.getPointerY() - j));
+        graphics.pose().translate(p, q);
         int scaledWidth = Math.round(scale * k);
         int scaledHeight = Math.round(scale * l);
         switch (LegacyOptions.getUIMode()) {
-            case FHD -> LegacyRenderUtil.renderPointerPanel(graphics, p - 3, q - 6, scaledWidth + 7, scaledHeight + 9);
-            case SD -> LegacyRenderUtil.renderPointerPanel(graphics, p - 3, q - 4, scaledWidth + 7, scaledHeight + 6);
-            default -> LegacyRenderUtil.renderPointerPanel(graphics, p - 5, q - 9, scaledWidth + 11, scaledHeight + 13);
+            case FHD -> LegacyRenderUtil.renderPointerPanel(graphics, -3, -6, scaledWidth + 7, scaledHeight + 9);
+            case SD -> LegacyRenderUtil.renderPointerPanel(graphics, -3, -4, scaledWidth + 7, scaledHeight + 6);
+            default -> LegacyRenderUtil.renderPointerPanel(graphics, -5, -9, scaledWidth + 11, scaledHeight + 13);
         }
-        graphics.pose().translate(p, q);
-        FactoryScreenUtil.disableDepthTest();
         graphics.pose().scale(scale, scale);
         int s = 0;
 
@@ -734,7 +734,6 @@ public class LegacyRenderUtil {
             tooltipComponent.extractImage(font, 0, s,/*? if >=1.21.2 {*/k, l,/*?}*/ graphics);
             s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
         }
-        FactoryScreenUtil.enableDepthTest();
         graphics.pose().popMatrix();
     }
 
