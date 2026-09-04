@@ -1,6 +1,7 @@
 package wily.legacy.network;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import wily.factoryapi.base.network.CommonNetwork;
@@ -38,6 +39,8 @@ public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permi
         ServerPlayer target = server.getPlayerList().getPlayer(player);
         if (target == null) return;
         LegacyPlayerInfo targetInfo = LegacyPlayerInfo.of(target);
+        PlayerTrustPermissions previousPermissions = targetInfo.getTrustPermissions();
+        boolean previousModerator = targetInfo.isModerator();
         PlayerTrustPolicy.Management management = PlayerTrustPolicy.management(actor, target);
         boolean changed = false;
         if (management.canManageTrust() && !Objects.equals(targetInfo.getTrustPermissions(), permissions)) {
@@ -49,7 +52,10 @@ public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permi
             targetInfo.setModerator(moderator);
             changed = true;
         }
-        if (changed) PlayerTrustAdmin.enforceCurrentRestrictions(target);
+        if (changed) {
+            PlayerTrustAdmin.enforceCurrentRestrictions(target);
+            notifyChanges(target, previousPermissions, targetInfo.getTrustPermissions(), previousModerator, targetInfo.isModerator());
+        }
         PlayerInfoSync.All authoritative = PlayerInfoSync.All.fromPlayer(target);
         if (changed) CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), authoritative);
         else CommonNetwork.sendToPlayer(actor, authoritative);
@@ -58,5 +64,26 @@ public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permi
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;
+    }
+
+    private static void notifyChanges(ServerPlayer player, PlayerTrustPermissions previous, PlayerTrustPermissions current, boolean previousModerator, boolean currentModerator) {
+        notifyBuildAndMineChange(player, previous.canBuildAndMine(), current.canBuildAndMine());
+        notifyChange(player, "canUseDoorsAndSwitches", previous.canUseDoorsAndSwitches(), current.canUseDoorsAndSwitches());
+        notifyChange(player, "canOpenContainers", previous.canOpenContainers(), current.canOpenContainers());
+        notifyChange(player, "canAttackPlayers", previous.canAttackPlayers(), current.canAttackPlayers());
+        notifyChange(player, "canAttackAnimals", previous.canAttackAnimals(), current.canAttackAnimals());
+        notifyChange(player, "moderator", previousModerator, currentModerator);
+    }
+
+    private static void notifyBuildAndMineChange(ServerPlayer player, boolean previous, boolean current) {
+        if (previous == current) return;
+        String state = current ? "enabled" : "disabled";
+        player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player.canBuildAndMine.placeBlocks." + state), false);
+        player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player.canBuildAndMine.mineAndUseItems." + state), false);
+    }
+
+    private static void notifyChange(ServerPlayer player, String permission, boolean previous, boolean current) {
+        if (previous != current)
+            player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player." + permission + "." + (current ? "enabled" : "disabled")), false);
     }
 }

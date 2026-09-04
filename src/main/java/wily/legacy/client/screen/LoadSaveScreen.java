@@ -33,6 +33,7 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.world.PlayerTrustAdmin;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -307,6 +308,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
             applyGameRules.accept(s.level().getGameRules(), minecraft.getSingleplayerServer());
+            PlayerTrustAdmin.setTrustPlayers(server, trustPlayers);
             publishScreen.setGameType(gameTypeSlider.getObjectValue());
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);

@@ -135,6 +135,7 @@ public final class PlayerTrustAdmin {
     public static synchronized void kick(ServerPlayer actor, ServerPlayer target) {
         MinecraftServer server = actor.level().getServer();
         SESSION_KICKS.computeIfAbsent(server, s -> new HashSet<>()).add(target.getUUID());
+        actor.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.player_kicked", target.getDisplayName()), false);
         target.connection.disconnect(Component.translatable("multiplayer.disconnect.kicked"));
     }
 
