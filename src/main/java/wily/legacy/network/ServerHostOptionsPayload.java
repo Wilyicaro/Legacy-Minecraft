@@ -13,6 +13,9 @@ import net.minecraft.world.level.GameType;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
+import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPolicy;
+import wily.legacy.world.PlayerTrustAdmin;
 
 import java.util.UUID;
 
@@ -56,6 +59,22 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
         return new ServerHostOptionsPayload(Action.PLAYER_SPAWN, "", player);
     }
 
+    public static ServerHostOptionsPayload trustPlayers(boolean trustPlayers) {
+        return new ServerHostOptionsPayload(Action.TRUST_PLAYERS, Boolean.toString(trustPlayers), EMPTY_UUID);
+    }
+
+    public static ServerHostOptionsPayload kick(UUID player) {
+        return new ServerHostOptionsPayload(Action.KICK, "", player);
+    }
+
+    public static ServerHostOptionsPayload teleportToPlayer(UUID player) {
+        return new ServerHostOptionsPayload(Action.TELEPORT_TO_PLAYER, "", player);
+    }
+
+    public static ServerHostOptionsPayload teleportToMe(UUID player) {
+        return new ServerHostOptionsPayload(Action.TELEPORT_TO_ME, "", player);
+    }
+
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
         buf.get().writeEnum(action);
@@ -65,12 +84,39 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
 
     @Override
     public void apply(Context context) {
-        if (!(context.player() instanceof ServerPlayer sp) || !sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
+        if (!(context.player() instanceof ServerPlayer sp)) return;
         var server = FactoryAPIPlatform.getEntityServer(sp);
-        var source = sp.createCommandSourceStack().withSuppressedOutput();
+        if (action == Action.TRUST_PLAYERS) {
+            if (!PlayerTrustPolicy.isFullAuthority(sp) || !(value.equals("true") || value.equals("false"))) return;
+            PlayerTrustAdmin.setTrustPlayers(server, Boolean.parseBoolean(value));
+            return;
+        }
+        if (action == Action.KICK) {
+            ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
+            if (affectPlayer != null && PlayerTrustPolicy.management(sp, affectPlayer).canKick()) PlayerTrustAdmin.kick(sp, affectPlayer);
+            return;
+        }
+        if (action == Action.TELEPORT_TO_PLAYER || action == Action.TELEPORT_TO_ME) {
+            if (!PlayerTrustPolicy.canManageHostOptions(sp) && !PlayerTrustPolicy.canTeleport(LegacyPlayerInfo.of(sp))) return;
+            ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
+            if (affectPlayer == null || affectPlayer == sp) return;
+            var source = server.createCommandSourceStack().withSuppressedOutput();
+            if (action == Action.TELEPORT_TO_PLAYER)
+                server.getCommands().performPrefixedCommand(source, "tp %s %s".formatted(sp.getGameProfile().name(), affectPlayer.getGameProfile().name()));
+            else
+                server.getCommands().performPrefixedCommand(source, "tp %s %s".formatted(affectPlayer.getGameProfile().name(), sp.getGameProfile().name()));
+            return;
+        }
+        if (!PlayerTrustPolicy.canManageHostOptions(sp)) return;
+        if (action == Action.TIME && !value.equals("day") && !value.equals("night")) return;
+        if (action == Action.WEATHER && !value.equals("clear") && !value.equals("rain") && !value.equals("thunder")) return;
+        if (action == Action.DIFFICULTY && !value.equals("peaceful") && !value.equals("easy") && !value.equals("normal") && !value.equals("hard")) return;
+        if ((action == Action.DEFAULT_GAME_MODE || action == Action.GAME_MODE) && !isGameTypeValue(value)) return;
+        var source = sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) ? sp.createCommandSourceStack().withSuppressedOutput() : server.createCommandSourceStack().withEntity(sp).withPosition(sp.position()).withRotation(sp.getRotationVector()).withLevel(sp.level()).withSuppressedOutput();
         BlockPos pos = sp.blockPosition();
         switch (action) {
             case COMMAND -> {
+                if (!sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
                 server.getCommands().performPrefixedCommand(source, value);
                 CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), PlayerInfoSync.All.fromPlayerList(server));
             }
@@ -79,7 +125,7 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
                 sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.set_" + value), false);
             }
             case WEATHER -> {
-                if (!setWeather(server, sp, value)) server.getCommands().performPrefixedCommand(source, "weather " + value);
+                setWeather(server, sp, value);
                 sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.weather." + value), false);
             }
             case DIFFICULTY -> {
@@ -99,8 +145,9 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             }
             case GAME_MODE -> {
                 ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
+                if (affectPlayer == null || !PlayerTrustPolicy.canManagePlayerOptions(sp, affectPlayer)) return;
                 GameType gameType = gameTypeFromValue(value);
-                if (affectPlayer != null && affectPlayer.setGameMode(gameType)) {
+                if (affectPlayer.setGameMode(gameType)) {
                     affectPlayer.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.game_mode_changed"), false);
                     if (sp == affectPlayer) sp.sendSystemMessage(Component.translatable("commands.gamemode.success.self", gameType.getLongDisplayName()), false);
                     else sp.sendSystemMessage(Component.translatable("commands.gamemode.success.other", affectPlayer.getDisplayName(), gameType.getLongDisplayName()), false);
@@ -112,10 +159,12 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             }
             case PLAYER_SPAWN -> {
                 ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
-                if (affectPlayer != null) {
+                if (affectPlayer != null && PlayerTrustPolicy.canManagePlayerOptions(sp, affectPlayer)) {
                     server.getCommands().performPrefixedCommand(source, "spawnpoint %s ~ ~ ~".formatted(affectPlayer.getGameProfile().name()));
                     sp.sendSystemMessage(Component.translatable("legacy.menu.host_options.message.player_spawn", affectPlayer.getGameProfile().name(), pos.getX(), pos.getY(), pos.getZ()), false);
                 }
+            }
+            case TRUST_PLAYERS, KICK, TELEPORT_TO_PLAYER, TELEPORT_TO_ME -> {
             }
         }
     }
@@ -132,6 +181,10 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             case "spectator" -> GameType.SPECTATOR;
             default -> GameType.SURVIVAL;
         };
+    }
+
+    private static boolean isGameTypeValue(String value) {
+        return value.equals("survival") || value.equals("creative") || value.equals("adventure") || value.equals("spectator");
     }
 
     private static boolean setWeather(MinecraftServer server, ServerPlayer player, String value) {
@@ -180,6 +233,10 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
         DEFAULT_GAME_MODE,
         GAME_MODE,
         WORLD_SPAWN,
-        PLAYER_SPAWN
+        PLAYER_SPAWN,
+        TRUST_PLAYERS,
+        KICK,
+        TELEPORT_TO_PLAYER,
+        TELEPORT_TO_ME
     }
 }

@@ -197,6 +197,7 @@ public class Legacy4JClient {
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
+    public static boolean trustPlayers = true;
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
 

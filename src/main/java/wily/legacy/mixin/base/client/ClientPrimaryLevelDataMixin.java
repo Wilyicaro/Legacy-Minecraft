@@ -19,15 +19,6 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     @Shadow
     private LevelSettings settings;
 
-    public boolean trustPlayers() {
-        return LegacyClientWorldSettings.of(settings).trustPlayers();
-    }
-
-    @Override
-    public void setTrustPlayers(boolean trust) {
-        LegacyClientWorldSettings.of(settings).setTrustPlayers(trust);
-    }
-
     @Override
     public boolean isDifficultyLocked() {
         return settings.difficultySettings().locked();
@@ -46,7 +37,6 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
 
     @Inject(method = "setTagData", at = @At("TAIL"))
     private void setTagData(CompoundTag compoundTag, UUID uuid, CallbackInfo ci) {
-        compoundTag.putBoolean("TrustPlayers", trustPlayers());
         compoundTag.putString("SelectedResourceAssort", getSelectedResourceAlbum().id());
     }
 

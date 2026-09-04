@@ -117,6 +117,8 @@ public class Legacy4J {
             r.register(true, PlayerInfoSync.ID);
             r.register(true, PlayerInfoSync.All.ID_C2S);
             r.register(false, PlayerInfoSync.All.ID_S2C);
+            r.register(true, PlayerHostPrivilegesUpdatePayload.ID);
+            r.register(true, PlayerTrustUpdatePayload.ID);
             r.register(true, ServerMenuCraftPayload.ID);
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerHostOptionsPayload.ID);
@@ -203,7 +205,7 @@ public class Legacy4J {
                 }
         }
         ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
-        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(), (LegacyPlayerInfo) p), Collections.emptyMap(), server.getDefaultGameType(), PlayerInfoSync.All.ID_S2C));
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), PlayerInfoSync.All.fromPlayer(p));
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
         playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayer(p, payload, true));

@@ -14,10 +14,9 @@ import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.PackAlbum;
 
 @Mixin(LevelSettings.class)
-public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
+public abstract class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
     long seed;
     boolean difficultyLocked = false;
-    boolean trustPlayers = true;
     String selectedResourceAssort = PackAlbum.MINECRAFT.id();
     @Mutable
     @Shadow
@@ -27,7 +26,6 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
     @Inject(method = "parse", at = @At("RETURN"))
     private static void parse(Dynamic<?> dynamic, WorldDataConfiguration worldDataConfiguration, CallbackInfoReturnable<LevelSettings> cir) {
         LegacyClientWorldSettings.of(cir.getReturnValue()).setDifficultyLocked(dynamic.get("DifficultyLocked").asBoolean(false));
-        LegacyClientWorldSettings.of(cir.getReturnValue()).setTrustPlayers(dynamic.get("TrustPlayers").asBoolean(true));
         LegacyClientWorldSettings.of(cir.getReturnValue()).setDisplaySeed(dynamic.get("WorldGenSettings").orElseEmptyMap().get("seed").asLong(0));
         LegacyClientWorldSettings.of(cir.getReturnValue()).setSelectedResourceAlbum(PackAlbum.resourceById(dynamic.get("SelectedResourceAssort").asString(PackAlbum.MINECRAFT.id())));
     }
@@ -36,7 +34,6 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
     private void copy(CallbackInfoReturnable<LevelSettings> cir) {
         LegacyClientWorldSettings settings = LegacyClientWorldSettings.of(cir.getReturnValue());
         settings.setDifficultyLocked(isDifficultyLocked());
-        settings.setTrustPlayers(trustPlayers());
         settings.setDisplaySeed(getDisplaySeed());
         settings.setSelectedResourceAlbum(getSelectedResourceAlbum());
     }
@@ -48,15 +45,6 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
     @Override
     public void setDisplaySeed(long s) {
         seed = s;
-    }
-
-    public boolean trustPlayers() {
-        return trustPlayers;
-    }
-
-    @Override
-    public void setTrustPlayers(boolean trust) {
-        trustPlayers = trust;
     }
 
     @Override

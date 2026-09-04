@@ -1,0 +1,16 @@
+{
+  "values": [
+    "#minecraft:doors",
+    "#minecraft:trapdoors",
+    "#minecraft:fence_gates",
+    "#minecraft:buttons",
+    "#minecraft:pressure_plates",
+    "minecraft:lever",
+    "minecraft:repeater",
+    "minecraft:comparator",
+    "minecraft:daylight_detector",
+    "minecraft:note_block",
+    "minecraft:bell",
+    "minecraft:target"
+  ]
+}
