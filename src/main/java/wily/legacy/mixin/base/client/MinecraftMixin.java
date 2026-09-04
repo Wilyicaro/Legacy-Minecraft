@@ -40,6 +40,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.parrot.Parrot;
@@ -51,6 +52,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.PiercingWeapon;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.BlockItem;
@@ -88,6 +90,8 @@ import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.*;
 import wily.legacy.entity.LegacyShieldPlayer;
+import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.network.ServerPlayerMissHitPayload;
@@ -99,6 +103,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -423,6 +428,16 @@ public abstract class MinecraftMixin {
         legacy$pauseShield();
         if (player != null && player.swinging && player.swingingArm == InteractionHand.MAIN_HAND && player.getMainHandItem().has(DataComponents.PIERCING_WEAPON))
             cir.setReturnValue(false);
+    }
+
+    @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;piercingAttack(Lnet/minecraft/world/item/component/PiercingWeapon;)V"), cancellable = true)
+    private void startPiercingAttack(CallbackInfoReturnable<Boolean> cir) {
+        if (player == null || getConnection() == null || !Legacy4JClient.hasModOnServer()) return;
+        var playerInfo = getConnection().getPlayerInfo(player.getUUID());
+        if (playerInfo == null) return;
+        PlayerTrustPolicy trust = PlayerTrustPolicy.of(player, LegacyPlayerInfo.of(playerInfo), Legacy4JClient.trustPlayers);
+        var targets = ProjectileUtil.getHitEntitiesAlong(player, player.getAttackRangeWith(player.getMainHandItem()), target -> PiercingWeapon.canHitEntity(player, target), ClipContext.Block.COLLIDER).map(hit -> List.<EntityHitResult>of(), hits -> hits);
+        if (targets.stream().map(EntityHitResult::getEntity).anyMatch(target -> !trust.canDamage(target))) cir.setReturnValue(false);
     }
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))

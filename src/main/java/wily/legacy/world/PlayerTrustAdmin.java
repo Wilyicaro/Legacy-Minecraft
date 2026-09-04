@@ -44,8 +44,23 @@ public final class PlayerTrustAdmin {
 
     public static void enforceCurrentRestrictions(ServerPlayer player) {
         PlayerTrustPolicy context = PlayerTrustPolicy.of(player);
+        LegacyPlayerInfo info = LegacyPlayerInfo.of(player);
         if (!context.canBuildAndMine() || !context.canOpenContainers()) player.closeContainer();
         if (player.getVehicle() != null && !context.canInteractWithEntity(player.getVehicle(), player.isSecondaryUseActive(), ItemStack.EMPTY)) player.stopRiding();
+        if (player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
+        if (!PlayerTrustPolicy.canBecomeInvisible(info) && !info.isVisible()) {
+            info.setVisibility(true);
+            player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player.invisible.disabled"), false);
+            player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player.invulnerable.disabled"), false);
+        }
+        if (!PlayerTrustPolicy.canDisableExhaustion(info) && info.isExhaustionDisabled()) {
+            info.setDisableExhaustion(false);
+            player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player.disableExhaustion.disabled"), false);
+        }
+        if (!PlayerTrustPolicy.canFly(info) && info.mayFlySurvival()) {
+            LegacyPlayerInfo.setAndUpdateMayFlySurvival(player, false, true);
+            player.sendSystemMessage(Component.translatable("legacy.menu.host_options.player.mayFly.disabled"), false);
+        }
     }
 
     public static <T> T withResponsiblePlayer(@Nullable PlayerTrustPolicy player, Supplier<T> action) {

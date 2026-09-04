@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +29,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyShieldPlayer;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyRegistries;
@@ -48,6 +50,11 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
 
     @Shadow
     public abstract Abilities getAbilities();
+
+    @Override
+    public boolean isIgnoringBlockTriggers() {
+        return (Object) this instanceof ServerPlayer player && !PlayerTrustPolicy.of(player).canUseDoorsAndSwitches() || super.isIgnoringBlockTriggers();
+    }
 
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
