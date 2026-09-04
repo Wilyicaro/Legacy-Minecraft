@@ -37,8 +37,8 @@ public record PlayerHostPrivileges(boolean canBecomeInvisible, boolean canFly,
         return new PlayerHostPrivileges(canBecomeInvisible, canFly, canDisableExhaustion, value);
     }
 
-    public boolean any() {
-        return canBecomeInvisible || canFly || canDisableExhaustion || canTeleport;
+    public boolean hasPlayerOptions(boolean isSurvival) {
+        return canBecomeInvisible || isSurvival && (canFly || canDisableExhaustion);
     }
 
     public void encode(CommonNetwork.PlayBuf buf) {

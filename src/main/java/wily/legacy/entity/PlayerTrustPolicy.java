@@ -155,7 +155,7 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
     public static boolean canManagePlayerOptions(ServerPlayer actor, ServerPlayer target) {
         if (actor.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return true;
         LegacyPlayerInfo actorInfo = LegacyPlayerInfo.of(actor);
-        if (actor == target) return actorInfo.isModerator() || actorInfo.getHostPrivileges().any();
+        if (actor == target) return actorInfo.isModerator() || actorInfo.getHostPrivileges().hasPlayerOptions(actor.gameMode.getGameModeForPlayer().isSurvival());
         return actorInfo.isModerator() && !isFullAuthority(target);
     }
 

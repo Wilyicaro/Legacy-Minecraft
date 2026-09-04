@@ -59,7 +59,7 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
         boolean canSetModerator = management.canSetModerator();
         boolean canKick = management.canKick();
         boolean canManageHostPrivileges = (canManageCheats || moderatorAuthority) && !self && !targetInfo.hasFullTrustAuthority();
-        boolean canManagePlayerOptions = canManageCheats || moderatorAuthority || self && targetInfo.getHostPrivileges().any();
+        boolean canManagePlayerOptions = canManageCheats || moderatorAuthority || self && targetInfo.getHostPrivileges().hasPlayerOptions(isSurvival);
         hasAdditionalTrustOptions = canManageTrust || canManageHostPrivileges || canSetModerator || canKick;
 
         accessor.addStatic(UIDefinition.createBeforeInit(a -> {

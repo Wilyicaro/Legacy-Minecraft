@@ -145,7 +145,7 @@ public class HostOptionsScreen extends PanelVListScreen {
             LegacyPlayerInfo target = LegacyPlayerInfo.of(playerInfo);
             boolean self = minecraft.player.getUUID().equals(playerInfo.getProfile().id());
             boolean canManageTarget = PlayerTrustPolicy.management(Legacy4JClient.trustPlayers, self, hasFullTrustAuthority(minecraft), isModerator(minecraft), target.hasFullTrustAuthority()).canKick();
-            boolean canUseOwnOptions = self && (target.isModerator() || target.getHostPrivileges().any());
+            boolean canUseOwnOptions = self && (target.isModerator() || target.getHostPrivileges().hasPlayerOptions(playerInfo.getGameMode().isSurvival()));
             if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) && !canManageTarget && !canUseOwnOptions) return;
             minecraft.setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
         });
