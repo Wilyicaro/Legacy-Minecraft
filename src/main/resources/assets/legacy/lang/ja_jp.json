@@ -1665,6 +1665,7 @@
   "legacy.menu.host_options.player.mayFly.disabled": "飛行できなくなりました",
   "legacy.menu.host_options.player.mayFly.enabled": "飛行できるようになりました",
   "legacy.menu.host_options.player.kick": "Kick Player",
+  "legacy.menu.host_options.player.kick.confirmation": "Are you sure you want to kick this player from the game? They will not be able to rejoin until you restart the world.",
   "legacy.menu.host_options.player.moderator": "Moderator",
   "legacy.menu.host_options.player.moderator.disabled": "You are no longer a moderator",
   "legacy.menu.host_options.player.moderator.enabled": "You are now a moderator",
