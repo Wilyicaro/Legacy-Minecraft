@@ -31,6 +31,7 @@ import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
 import wily.legacy.world.LegacyGeneratedChunks;
+import wily.legacy.world.PlayerTrustAdmin;
 
 //? if fabric {
 //?} else if forge {
@@ -205,6 +206,7 @@ public class Legacy4J {
                 }
         }
         ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
+        PlayerTrustAdmin.enforceCurrentRestrictions(p);
         CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), PlayerInfoSync.All.fromPlayer(p));
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);

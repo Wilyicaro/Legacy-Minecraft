@@ -198,6 +198,7 @@ public class Legacy4JClient {
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
     public static boolean trustPlayers = true;
+    public static boolean allowHostCheats;
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
 
@@ -221,6 +222,7 @@ public class Legacy4JClient {
             if (minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(s) instanceof LegacyPlayerInfo info)
                 info.copyFrom(i);
         });
+        if (minecraft.screen instanceof HostOptionsScreen screen) screen.refreshHostOptionsButton();
         LeaderboardsScreen.refreshStatsBoards(minecraft);
         if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty())
             minecraft.executeIfPossible(() -> s.changeStatBoard(false));
@@ -757,7 +759,9 @@ public class Legacy4JClient {
 
     public static void onClientPlayerInfoChange() {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
+        if (minecraft.screen instanceof PlayerHostOptionsScreen s) s.closeIfPlayerLeft();
+        else if (minecraft.screen instanceof ConfirmationScreen s && s.parent instanceof PlayerHostOptionsScreen playerOptions) playerOptions.closeIfPlayerLeft();
+        else if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
         else if (minecraft.screen instanceof LeaderboardsScreen s) {
             s.rebuildRenderableVList(minecraft);
             UIAccessor.of(s).reloadUI();

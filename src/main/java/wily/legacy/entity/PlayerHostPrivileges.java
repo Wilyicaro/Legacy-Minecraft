@@ -6,6 +6,7 @@ import wily.factoryapi.base.network.CommonNetwork;
 
 public record PlayerHostPrivileges(boolean canBecomeInvisible, boolean canFly,
                                    boolean canDisableExhaustion, boolean canTeleport) {
+    public static final PlayerHostPrivileges ALL = new PlayerHostPrivileges(true, true, true, true);
     public static final PlayerHostPrivileges NONE = new PlayerHostPrivileges(false, false, false, false);
 
     public static PlayerHostPrivileges decode(CommonNetwork.PlayBuf buf) {

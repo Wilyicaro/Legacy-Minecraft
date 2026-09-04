@@ -13,6 +13,7 @@ import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.animal.nautilus.AbstractNautilus;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
@@ -27,7 +28,7 @@ import wily.legacy.world.LegacyWorldSettings;
 import java.util.List;
 import java.util.UUID;
 
-public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permissions, boolean unrestricted,
+public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permissions, boolean unrestricted, boolean invisible,
                                 @Nullable MinecraftServer server, @Nullable Player onlinePlayer) {
     public static final List<Identifier> MODERATOR_GAME_RULES = List.of(
             LegacyGameRules.FIRE_SPREADS.getId(), LegacyGameRules.getTntExplodes().getIdentifier(),
@@ -45,11 +46,11 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
         LegacyPlayerInfo.initializeTrustPermissions(player);
         LegacyPlayerInfo info = LegacyPlayerInfo.of(player);
         MinecraftServer server = player.level().getServer();
-        return new PlayerTrustPolicy(player.getUUID(), info.getTrustPermissions(), isTrustEnabled(server) || info.hasFullTrustAuthority(), server, player);
+        return new PlayerTrustPolicy(player.getUUID(), info.getTrustPermissions(), isTrustEnabled(server) || info.hasFullTrustAuthority(), !info.isVisible(), server, player);
     }
 
     public static PlayerTrustPolicy of(Player player, LegacyPlayerInfo info, boolean trustPlayers) {
-        return new PlayerTrustPolicy(player.getUUID(), info.getTrustPermissions(), trustPlayers || info.hasFullTrustAuthority(), null, player);
+        return new PlayerTrustPolicy(player.getUUID(), info.getTrustPermissions(), trustPlayers || info.hasFullTrustAuthority(), !info.isVisible(), null, player);
     }
 
     public boolean canBuildAndMine() {
@@ -83,7 +84,11 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
         if (unrestricted) return true;
         boolean containerInteraction = isContainerInteraction(target, secondaryUseActive);
         if (!canUseItem(stack) && !(containerInteraction && stack.getItem() instanceof BlockItem)) return false;
-        return containerInteraction ? permissions.canOpenContainers() : canDestroyEntity(target);
+        if (containerInteraction) return canOpenContainers();
+        if (target instanceof AbstractMinecart) return true;
+        if (target instanceof AbstractHorse horse)
+            return canOpenContainers() || !horse.isTamed() || horse.getOwnerReference() != null && playerId.equals(horse.getOwnerReference().getUUID());
+        return canBuildAndMine();
     }
 
     public boolean canDestroyEntity(Entity target) {
@@ -100,6 +105,7 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
     }
 
     private boolean hasAttackPermission(Entity target) {
+        if (invisible && requiresAttackPlayersPermission(target)) return false;
         if (unrestricted) return true;
         if (requiresAttackPlayersPermission(target)) return permissions.canAttackPlayers();
         return !target.getType().builtInRegistryHolder().is(LegacyTags.ANIMALS) || permissions.canAttackAnimals();
@@ -130,6 +136,10 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
         return LegacyWorldSettings.of(server.getWorldData()).trustPlayers();
     }
 
+    public static boolean allowsHostCheats(MinecraftServer server) {
+        return server.isDedicatedServer() || server.getWorldData().isAllowCommands();
+    }
+
     public static boolean isFullAuthority(ServerPlayer player) {
         MinecraftServer server = player.level().getServer();
         return server.isSingleplayerOwner(player.nameAndId()) || server.isDedicatedServer() && player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
@@ -145,22 +155,27 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
     }
 
     public static boolean canChangeGameRule(ServerPlayer player, Identifier gameRule) {
-        return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || LegacyPlayerInfo.of(player).isModerator() && MODERATOR_GAME_RULES.contains(gameRule);
+        if (player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return true;
+        if (!isFullAuthority(player) && !LegacyPlayerInfo.of(player).isModerator()) return false;
+        return gameRule.equals(LegacyGameRules.FIRE_SPREADS.getId()) || gameRule.equals(LegacyGameRules.getTntExplodes().getIdentifier())
+                || allowsHostCheats(player.level().getServer()) && MODERATOR_GAME_RULES.contains(gameRule);
     }
 
     public static boolean canManageHostOptions(ServerPlayer player) {
-        return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || LegacyPlayerInfo.of(player).isModerator();
+        return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)
+                || allowsHostCheats(player.level().getServer()) && LegacyPlayerInfo.of(player).isModerator();
     }
 
     public static boolean canManagePlayerOptions(ServerPlayer actor, ServerPlayer target) {
         if (actor.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return true;
+        if (!allowsHostCheats(actor.level().getServer())) return false;
         LegacyPlayerInfo actorInfo = LegacyPlayerInfo.of(actor);
         if (actor == target) return actorInfo.isModerator() || actorInfo.getHostPrivileges().hasPlayerOptions(actor.gameMode.getGameModeForPlayer().isSurvival());
         return actorInfo.isModerator() && !isFullAuthority(target);
     }
 
     public static boolean canManageHostPrivileges(ServerPlayer actor, ServerPlayer target) {
-        return actor != target && !isFullAuthority(target) && (actor.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || LegacyPlayerInfo.of(actor).isModerator());
+        return actor != target && !isFullAuthority(target) && canManageHostOptions(actor);
     }
 
     public static boolean canBecomeInvisible(LegacyPlayerInfo info) {
@@ -177,6 +192,11 @@ public record PlayerTrustPolicy(UUID playerId, PlayerTrustPermissions permission
 
     public static boolean canTeleport(LegacyPlayerInfo info) {
         return info.getHostPrivileges().canTeleport();
+    }
+
+    public static boolean canTeleport(ServerPlayer player) {
+        return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)
+                || allowsHostCheats(player.level().getServer()) && canTeleport(LegacyPlayerInfo.of(player));
     }
 
     private static boolean canAttackWithPvpDisabled(UUID playerId, Entity target) {

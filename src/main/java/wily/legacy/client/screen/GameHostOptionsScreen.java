@@ -23,8 +23,6 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
-import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerHostOptionsPayload;
@@ -46,21 +44,24 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     protected final Map<Object, Runnable> actionsOnClose = new LinkedHashMap<>();
 
     public GameHostOptionsScreen(Screen parent, Minecraft minecraft) {
-        super(parent, s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || HostOptionsScreen.isModerator(minecraft), LegacyOptions.useLegacyWorldOptions())), p -> p.centered(s)), HostOptionsScreen.HOST_OPTIONS);
+        super(parent, s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 265, ((GameHostOptionsScreen) s).getPanelHeight(minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || Legacy4JClient.allowHostCheats && HostOptionsScreen.isModerator(minecraft), LegacyOptions.useLegacyWorldOptions())), p -> p.centered(s)), HostOptionsScreen.HOST_OPTIONS);
         getRenderableVList().layoutSpacing(l -> 2);
 
         boolean isOp = minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
         boolean fullAuthority = HostOptionsScreen.hasFullTrustAuthority(minecraft);
         boolean moderator = HostOptionsScreen.isModerator(minecraft);
-        boolean canManageHostOptions = isOp || moderator;
-        LegacyPlayerInfo localPlayerInfo = HostOptionsScreen.getLocalPlayerInfo(minecraft);
-        boolean canTeleport = canManageHostOptions || localPlayerInfo != null && PlayerTrustPolicy.canTeleport(localPlayerInfo);
+        boolean canManageHostOptions = isOp || Legacy4JClient.allowHostCheats && moderator;
+        boolean canTeleport = HostOptionsScreen.canTeleport(minecraft);
         boolean legacyMenus = LegacyOptions.useLegacyWorldOptions();
 
         accessor.addStatic(UIDefinition.createBeforeInit(a -> a.putStaticElement("isOp", canManageHostOptions)));
 
         if (!canManageHostOptions) {
             if (fullAuthority) addTrustPlayersToggle();
+            if (fullAuthority || moderator) {
+                for (GameRule<Boolean> key : List.of(LegacyGameRules.FIRE_SPREADS.get(), LegacyGameRules.getTntExplodes()))
+                    getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.get(key), b -> LegacyComponents.getMenuGameRuleName(key), b -> null, b -> queueGameRule(key, b.selected, isOp)));
+            }
             if (canTeleport) addTeleportOptions(legacyMenus);
             return;
         }
@@ -93,31 +94,34 @@ public class GameHostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addTrustPlayersToggle() {
-        getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, b -> {
-            Legacy4JClient.trustPlayers = b.selected;
-            queueHostAction("trustPlayers", () -> CommonNetwork.sendToServer(ServerHostOptionsPayload.trustPlayers(b.selected)));
-        }));
+        getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, b -> queueHostAction("trustPlayers", () -> CommonNetwork.sendToServer(ServerHostOptionsPayload.trustPlayers(b.selected)))));
     }
 
     protected Button createTeleportButton(boolean toPlayer, Component component) {
-        return new LegacyButton(component, b1 -> minecraft.setScreen(new HostOptionsScreen(title) {
-            @Override
-            protected void addHostOptionsButton() {
-            }
+        return new LegacyButton(component, b -> {
+            applyChanges();
+            HostOptionsScreen screen = new HostOptionsScreen(title) {
+                @Override
+                protected void addHostOptionsButton() {
+                }
 
-            @Override
-            protected void addPlayerButtons() {
-                addPlayerButtons(false, (profile, b1) -> {
-                    if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(toPlayer ? ServerHostOptionsPayload.teleportToPlayer(profile.getProfile().id()) : ServerHostOptionsPayload.teleportToMe(profile.getProfile().id()));
-                    else if (toPlayer) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().name()));
-                    else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().name()));
-                });
-            }
+                @Override
+                protected void addPlayerButtons() {
+                    addPlayerButtons(false, (profile, b1) -> {
+                        if (!HostOptionsScreen.canTeleport(minecraft)) return;
+                        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(toPlayer ? ServerHostOptionsPayload.teleportToPlayer(profile.getProfile().id()) : ServerHostOptionsPayload.teleportToMe(profile.getProfile().id()));
+                        else if (toPlayer) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().name()));
+                        else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().name()));
+                    });
+                }
 
-            public boolean isPauseScreen() {
-                return false;
-            }
-        }));
+                public boolean isPauseScreen() {
+                    return false;
+                }
+            };
+            screen.parent = this;
+            minecraft.setScreen(screen);
+        });
     }
 
     protected void addTeleportOptions(boolean legacyMenus) {
@@ -188,11 +192,17 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         panel.init();
     }
 
-    public void onClose() {
-        super.onClose();
+    protected void applyChanges() {
         actionsOnClose.values().forEach(Runnable::run);
+        actionsOnClose.clear();
         if (!nonOpGamerules.isEmpty() && Legacy4JClient.hasModOnServer())
-            CommonNetwork.sendToServer(new PlayerInfoSync.All(nonOpGamerules, PlayerInfoSync.All.ID_C2S));
+            CommonNetwork.sendToServer(new PlayerInfoSync.All(Map.copyOf(nonOpGamerules), PlayerInfoSync.All.ID_C2S));
+        nonOpGamerules.clear();
+    }
+
+    public void onClose() {
+        applyChanges();
+        super.onClose();
     }
 
     public boolean isPauseScreen() {

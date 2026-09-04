@@ -211,40 +211,40 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
     private static boolean canChangePlayerState(ServerPlayer actor, ServerPlayer target, boolean privilegeEnabled) {
         return actor == target && actor.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)
-                || privilegeEnabled && PlayerTrustPolicy.canManagePlayerOptions(actor, target);
+                || PlayerTrustPolicy.allowsHostCheats(actor.level().getServer()) && privilegeEnabled && PlayerTrustPolicy.canManagePlayerOptions(actor, target);
     }
 
     public record All(Map<UUID, LegacyPlayerInfo> players, Map<Identifier, Integer> gameRules, GameType defaultGameType,
-                      boolean trustPlayers, CommonNetwork.Identifier<All> identifier) implements CommonNetwork.Payload {
+                      boolean trustPlayers, boolean allowHostCheats, CommonNetwork.Identifier<All> identifier) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<All> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_c2s"), b -> new All(b, All.ID_C2S));
         public static final CommonNetwork.Identifier<All> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_s2c"), b -> new All(b, All.ID_S2C));
 
         public All(Map<Identifier, Integer> gameRules, CommonNetwork.Identifier<All> identifier) {
-            this(Collections.emptyMap(), gameRules, GameType.SURVIVAL, true, identifier);
+            this(Collections.emptyMap(), gameRules, GameType.SURVIVAL, true, false, identifier);
         }
 
         public All(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<All> identifier) {
-            this(buf.get().readMap(HashMap::new, b -> b.readUUID(), b -> LegacyPlayerInfo.decode(buf)), buf.get().readMap(HashMap::new, FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readVarInt), buf.get().readEnum(GameType.class), buf.get().readBoolean(), identifier);
+            this(buf.get().readMap(HashMap::new, b -> b.readUUID(), b -> LegacyPlayerInfo.decode(buf)), buf.get().readMap(HashMap::new, FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readVarInt), buf.get().readEnum(GameType.class), buf.get().readBoolean(), buf.get().readBoolean(), identifier);
         }
 
         public static <T> void syncGamerule(GameRule<T> key, T value, MinecraftServer server) {
             if (server != null) {
-                All payload = new All(Collections.emptyMap(), Map.of(key.getIdentifier(), key.getCommandResult(value)), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), All.ID_S2C);
+                All payload = new All(Collections.emptyMap(), Map.of(key.getIdentifier(), key.getCommandResult(value)), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), PlayerTrustPolicy.allowsHostCheats(server), All.ID_S2C);
                 server.getPlayerList().getPlayers().forEach(sp -> CommonNetwork.sendToPlayer(sp, payload));
             }
         }
 
         public static All fromPlayerList(MinecraftServer server) {
-            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), All::getCurrentPlayerInfo)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), All.ID_S2C);
+            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), All::getCurrentPlayerInfo)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), PlayerTrustPolicy.allowsHostCheats(server), All.ID_S2C);
         }
 
         public static All fromPlayer(ServerPlayer player) {
             MinecraftServer server = player.level().getServer();
-            return new All(Map.of(player.getUUID(), getCurrentPlayerInfo(player)), Collections.emptyMap(), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), All.ID_S2C);
+            return new All(Map.of(player.getUUID(), getCurrentPlayerInfo(player)), Collections.emptyMap(), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), PlayerTrustPolicy.allowsHostCheats(server), All.ID_S2C);
         }
 
         public static All fromTrustPlayers(MinecraftServer server) {
-            return new All(Collections.emptyMap(), Collections.emptyMap(), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), All.ID_S2C);
+            return new All(Collections.emptyMap(), Collections.emptyMap(), server.getDefaultGameType(), LegacyWorldSettings.of(server.getWorldData()).trustPlayers(), PlayerTrustPolicy.allowsHostCheats(server), All.ID_S2C);
         }
 
         private static LegacyPlayerInfo getCurrentPlayerInfo(ServerPlayer player) {
@@ -258,6 +258,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             buf.get().writeMap(gameRules, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeVarInt);
             buf.get().writeEnum(defaultGameType);
             buf.get().writeBoolean(trustPlayers);
+            buf.get().writeBoolean(allowHostCheats);
         }
 
         @Override
@@ -266,6 +267,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                 if (context.isClient() && Legacy4JClient.hasModOnServer()) {
                     Legacy4JClient.defaultServerGameType = defaultGameType;
                     Legacy4JClient.trustPlayers = trustPlayers;
+                    Legacy4JClient.allowHostCheats = allowHostCheats;
                     Legacy4JClient.updateLegacyPlayerInfos(players);
                     return true;
                 }

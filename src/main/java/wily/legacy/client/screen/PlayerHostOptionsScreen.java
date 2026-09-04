@@ -25,6 +25,7 @@ import wily.legacy.network.PlayerTrustUpdatePayload;
 import wily.legacy.network.ServerHostOptionsPayload;
 import wily.legacy.util.LegacySprites;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import static wily.legacy.client.screen.LoadSaveScreen.GAME_MODEL_LABEL;
 public class PlayerHostOptionsScreen extends PanelVListScreen {
     protected final PlayerInfo playerInfo;
     protected final Map<AbstractWidget, Runnable> commandsOnClose = new HashMap<>();
+    protected final List<TickBox> hostPrivilegeOptions = new ArrayList<>();
     protected final PlayerTrustPermissions initialTrustPermissions;
     protected final PlayerHostPrivileges initialHostPrivileges;
     protected final boolean initialModerator;
@@ -58,8 +60,8 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
         boolean canManageTrust = management.canManageTrust();
         boolean canSetModerator = management.canSetModerator();
         boolean canKick = management.canKick();
-        boolean canManageHostPrivileges = (canManageCheats || moderatorAuthority) && !self && !targetInfo.hasFullTrustAuthority();
-        boolean canManagePlayerOptions = canManageCheats || moderatorAuthority || self && targetInfo.getHostPrivileges().hasPlayerOptions(isSurvival);
+        boolean canManageHostPrivileges = (canManageCheats || Legacy4JClient.allowHostCheats && moderatorAuthority) && !self && !targetInfo.hasFullTrustAuthority();
+        boolean canManagePlayerOptions = canManageCheats || Legacy4JClient.allowHostCheats && (moderatorAuthority || self && targetInfo.getHostPrivileges().hasPlayerOptions(isSurvival));
         hasAdditionalTrustOptions = canManageTrust || canManageHostPrivileges || canSetModerator || canKick;
 
         accessor.addStatic(UIDefinition.createBeforeInit(a -> {
@@ -86,26 +88,32 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
             getRenderableVList().addRenderable(new TickBox(0, 0, trustPermissions.canAttackAnimals(), b -> Component.translatable("legacy.menu.host_options.player.canAttackAnimals"), b -> null, b -> trustPermissions = trustPermissions.withCanAttackAnimals(b.selected)));
         }
         if (canManageHostPrivileges) {
-            getRenderableVList().addRenderable(new TickBox(0, 0, hostPrivileges.canBecomeInvisible(), b -> Component.translatable("legacy.menu.host_options.player.canBecomeInvisible"), b -> null, b -> {
+            addHostPrivilege(new TickBox(0, 0, hostPrivileges.canBecomeInvisible(), b -> Component.translatable("legacy.menu.host_options.player.canBecomeInvisible"), b -> null, b -> {
                 hostPrivileges = hostPrivileges.withCanBecomeInvisible(b.selected);
-                if (invisibleOption[0] != null) invisibleOption[0].active = b.selected;
+                setPlayerOptionEnabled(invisibleOption[0], b.selected);
             }));
             if (isSurvival) {
-                getRenderableVList().addRenderable(new TickBox(0, 0, hostPrivileges.canFly(), b -> Component.translatable("legacy.menu.host_options.player.canFly"), b -> null, b -> {
+                addHostPrivilege(new TickBox(0, 0, hostPrivileges.canFly(), b -> Component.translatable("legacy.menu.host_options.player.canFly"), b -> null, b -> {
                     hostPrivileges = hostPrivileges.withCanFly(b.selected);
-                    if (flyingOption[0] != null) flyingOption[0].active = b.selected;
+                    setPlayerOptionEnabled(flyingOption[0], b.selected);
                 }));
-                getRenderableVList().addRenderable(new TickBox(0, 0, hostPrivileges.canDisableExhaustion(), b -> Component.translatable("legacy.menu.host_options.player.canDisableExhaustion"), b -> null, b -> {
+                addHostPrivilege(new TickBox(0, 0, hostPrivileges.canDisableExhaustion(), b -> Component.translatable("legacy.menu.host_options.player.canDisableExhaustion"), b -> null, b -> {
                     hostPrivileges = hostPrivileges.withCanDisableExhaustion(b.selected);
-                    if (exhaustionOption[0] != null) exhaustionOption[0].active = b.selected;
+                    setPlayerOptionEnabled(exhaustionOption[0], b.selected);
                 }));
             }
-            getRenderableVList().addRenderable(new TickBox(0, 0, hostPrivileges.canTeleport(), b -> Component.translatable("legacy.menu.host_options.player.canTeleport"), b -> null, b -> hostPrivileges = hostPrivileges.withCanTeleport(b.selected)));
+            addHostPrivilege(new TickBox(0, 0, hostPrivileges.canTeleport(), b -> Component.translatable("legacy.menu.host_options.player.canTeleport"), b -> null, b -> hostPrivileges = hostPrivileges.withCanTeleport(b.selected)));
         }
         if (canSetModerator)
-            getRenderableVList().addRenderable(new TickBox(0, 0, moderator, b -> Component.translatable("legacy.menu.host_options.player.moderator"), b -> null, b -> moderator = b.selected));
+            getRenderableVList().addRenderable(new TickBox(0, 0, moderator, b -> Component.translatable("legacy.menu.host_options.player.moderator"), b -> null, b -> {
+                moderator = b.selected;
+                hostPrivileges = moderator ? PlayerHostPrivileges.ALL : PlayerHostPrivileges.NONE;
+                hostPrivilegeOptions.forEach(option -> option.selected = moderator);
+                for (TickBox option : Arrays.asList(invisibleOption[0], flyingOption[0], exhaustionOption[0]))
+                    setPlayerOptionEnabled(option, moderator);
+            }));
         if (canKick)
-            getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.player.kick"), b -> kickPlayer()));
+            getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.player.kick"), b -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.host_options.player.kick"), Component.translatable("legacy.menu.host_options.player.kick.confirmation"), screen -> kickPlayer()))));
 
         if (!canManagePlayerOptions) return;
 
@@ -136,7 +144,7 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
             exhaustionOption[0].active = self && canManageCheats || hostPrivileges.canDisableExhaustion();
             getRenderableVList().addRenderable(exhaustionOption[0]);
         }
-        if (!canManageCheats && !moderatorAuthority) return;
+        if (!canManageCheats && !(Legacy4JClient.allowHostCheats && moderatorAuthority)) return;
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), (b1) -> Tooltip.create(Component.translatable("selectWorld.gameMode." + playerInfo.getGameMode().getName() + ".info")), playerInfo.getGameMode(), () -> gameTypes, b1 -> commandsOnClose.put(b1, () -> {
             if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(ServerHostOptionsPayload.gameMode(b1.getObjectValue(), playerInfo.getProfile().id()));
@@ -146,6 +154,17 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
             if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(ServerHostOptionsPayload.playerSpawn(playerInfo.getProfile().id()));
             else minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().name()));
         })));
+    }
+
+    protected void addHostPrivilege(TickBox option) {
+        hostPrivilegeOptions.add(option);
+        getRenderableVList().addRenderable(option);
+    }
+
+    protected void setPlayerOptionEnabled(TickBox option, boolean enabled) {
+        if (option == null) return;
+        if (!enabled && option.selected) option.onPress(null);
+        option.active = enabled;
     }
 
     protected int getPanelHeight() {
@@ -163,11 +182,17 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
     protected void applyChanges() {
         if (changesApplied) return;
         changesApplied = true;
-        if (Legacy4JClient.hasModOnServer() && !hostPrivileges.equals(initialHostPrivileges))
-            CommonNetwork.sendToServer(PlayerHostPrivilegesUpdatePayload.forPlayer(playerInfo.getProfile(), hostPrivileges));
         if (Legacy4JClient.hasModOnServer() && (!trustPermissions.equals(initialTrustPermissions) || moderator != initialModerator))
             CommonNetwork.sendToServer(PlayerTrustUpdatePayload.forPlayer(playerInfo.getProfile(), trustPermissions, moderator));
+        PlayerHostPrivileges expectedPrivileges = moderator == initialModerator ? initialHostPrivileges : moderator ? PlayerHostPrivileges.ALL : PlayerHostPrivileges.NONE;
+        if (Legacy4JClient.hasModOnServer() && !hostPrivileges.equals(expectedPrivileges))
+            CommonNetwork.sendToServer(PlayerHostPrivilegesUpdatePayload.forPlayer(playerInfo.getProfile(), hostPrivileges));
         commandsOnClose.values().forEach(Runnable::run);
+    }
+
+    public void closeIfPlayerLeft() {
+        if (minecraft.getConnection() == null || minecraft.getConnection().getPlayerInfo(playerInfo.getProfile().id()) == null)
+            minecraft.setScreen(parent);
     }
 
     protected void kickPlayer() {

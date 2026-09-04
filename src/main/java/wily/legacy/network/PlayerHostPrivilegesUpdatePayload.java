@@ -42,10 +42,7 @@ public record PlayerHostPrivilegesUpdatePayload(UUID player, PlayerHostPrivilege
             return;
         }
         targetInfo.setHostPrivileges(privileges);
-        notifyChange(target, "canBecomeInvisible", previous.canBecomeInvisible(), privileges.canBecomeInvisible());
-        notifyChange(target, "canFly", previous.canFly(), privileges.canFly());
-        notifyChange(target, "canDisableExhaustion", previous.canDisableExhaustion(), privileges.canDisableExhaustion());
-        notifyChange(target, "canTeleport", previous.canTeleport(), privileges.canTeleport());
+        notifyChanges(target, previous, privileges);
         PlayerTrustAdmin.enforceCurrentRestrictions(target);
         CommonNetwork.sendToPlayers(actor.level().getServer().getPlayerList().getPlayers(), PlayerInfoSync.All.fromPlayer(target));
     }
@@ -53,6 +50,13 @@ public record PlayerHostPrivilegesUpdatePayload(UUID player, PlayerHostPrivilege
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;
+    }
+
+    static void notifyChanges(ServerPlayer player, PlayerHostPrivileges previous, PlayerHostPrivileges current) {
+        notifyChange(player, "canBecomeInvisible", previous.canBecomeInvisible(), current.canBecomeInvisible());
+        notifyChange(player, "canFly", previous.canFly(), current.canFly());
+        notifyChange(player, "canDisableExhaustion", previous.canDisableExhaustion(), current.canDisableExhaustion());
+        notifyChange(player, "canTeleport", previous.canTeleport(), current.canTeleport());
     }
 
     private static void notifyChange(ServerPlayer player, String privilege, boolean previous, boolean current) {

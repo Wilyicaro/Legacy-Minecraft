@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerHostPrivileges;
 import wily.legacy.entity.PlayerTrustPermissions;
 import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.world.PlayerTrustAdmin;
@@ -49,7 +50,10 @@ public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permi
             changed = true;
         }
         if (management.canSetModerator() && targetInfo.isModerator() != moderator) {
+            PlayerHostPrivileges previousPrivileges = targetInfo.getHostPrivileges();
             targetInfo.setModerator(moderator);
+            targetInfo.setHostPrivileges(moderator ? PlayerHostPrivileges.ALL : PlayerHostPrivileges.NONE);
+            PlayerHostPrivilegesUpdatePayload.notifyChanges(target, previousPrivileges, targetInfo.getHostPrivileges());
             changed = true;
         }
         if (changed) {

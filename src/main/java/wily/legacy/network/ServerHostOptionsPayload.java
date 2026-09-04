@@ -13,7 +13,6 @@ import net.minecraft.world.level.GameType;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
-import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.world.PlayerTrustAdmin;
 
@@ -97,7 +96,7 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             return;
         }
         if (action == Action.TELEPORT_TO_PLAYER || action == Action.TELEPORT_TO_ME) {
-            if (!PlayerTrustPolicy.canManageHostOptions(sp) && !PlayerTrustPolicy.canTeleport(LegacyPlayerInfo.of(sp))) return;
+            if (!PlayerTrustPolicy.canTeleport(sp)) return;
             ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
             if (affectPlayer == null || affectPlayer == sp) return;
             var source = server.createCommandSourceStack().withSuppressedOutput();

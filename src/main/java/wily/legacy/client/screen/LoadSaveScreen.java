@@ -307,11 +307,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             }
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
+            LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             applyGameRules.accept(s.level().getGameRules(), minecraft.getSingleplayerServer());
             PlayerTrustAdmin.setTrustPlayers(server, trustPlayers);
             publishScreen.setGameType(gameTypeSlider.getObjectValue());
             publishScreen.publish((IntegratedServer) server);
-            LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             server.getPlayerList().sendPlayerPermissionLevel(s);
             LegacyClientWorldSettings.of(server.getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue())
