@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.tags.FlatLevelGeneratorPresetTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
@@ -398,7 +399,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         if (movingLayer == null) {
             if (tabList.controlTab(i, j)) return true;
             if (i == InputConstants.KEY_O)
-                minecraft.setScreen(new LegacyFlatPresetsScreen(this, uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET), uiState.getSettings().dataConfiguration().enabledFeatures(), f -> setPreset(f.value().settings())));
+                minecraft.setScreen(new LegacyFlatPresetsScreen(this, uiState.getSettings().worldgenLoadContext()./*? if <1.21.2 {*/registryOrThrow/*?} else {*//*lookupOrThrow*//*?}*/(Registries.FLAT_LEVEL_GENERATOR_PRESET).getTagOrEmpty(FlatLevelGeneratorPresetTags.VISIBLE), uiState.getSettings().dataConfiguration().enabledFeatures(), f -> setPreset(f.value().settings())));
         }
         return super.keyPressed(i, j, k);
     }

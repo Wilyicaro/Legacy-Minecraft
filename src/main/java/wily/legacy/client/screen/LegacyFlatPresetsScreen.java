@@ -8,13 +8,13 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
 import net.minecraft.world.item.ItemStack;
 import wily.factoryapi.base.client.WidgetAccessor;
+import org.jetbrains.annotations.UnknownNullability;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
@@ -27,15 +27,15 @@ import java.util.stream.Collectors;
 
 public class LegacyFlatPresetsScreen extends PanelVListScreen{
 
-    public LegacyFlatPresetsScreen(Screen parent, HolderLookup.RegistryLookup<FlatLevelGeneratorPreset> presetGetter, FeatureFlagSet enabledFeatures, Consumer<Holder<FlatLevelGeneratorPreset>> applyPreset) {
+    public LegacyFlatPresetsScreen(Screen parent, @UnknownNullability Iterable<Holder<FlatLevelGeneratorPreset>> presetGetter, FeatureFlagSet enabledFeatures, Consumer<Holder<FlatLevelGeneratorPreset>> applyPreset) {
         super(parent, s-> Panel.centered(s, LegacySprites.PANEL,285, 260), Component.translatable("createWorld.customize.presets"));
-        presetGetter.listElements().forEach(holder->{
+        presetGetter.forEach(holder->{
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
                 Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
-                renderableVList.addRenderable(new AbstractButton(0,0,263,30,Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {
+                renderableVList.addRenderable(new AbstractButton(0,0,263,30,Component.translatable(holder.unwrapKey().orElseThrow().location().toLanguageKey("flat_world_preset"))) {
                     @Override
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
