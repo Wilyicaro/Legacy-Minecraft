@@ -1612,6 +1612,8 @@
   "legacy.menu.exit_without_save_title": "Exit Without Saving",
   "legacy.menu.filter.search": "Search",
   "legacy.menu.gameExitMessage": "Are you sure you want to exit the game?",
+  "legacy.menu.game_load_error": "Loading Error",
+  "legacy.menu.game_load_error.description": "\"Minecraft: Java Edition\" has failed to load, and cannot continue.",
   "legacy.menu.game_options": "Game Options",
   "legacy.menu.global_packs.resource": "Global Resource Packs",
   "legacy.menu.global_packs.texture_packs": "Global Texture Packs",
