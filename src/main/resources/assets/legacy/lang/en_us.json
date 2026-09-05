@@ -1631,6 +1631,7 @@
   "legacy.menu.host_options.message.weather.rain": "Changing to rainy weather",
   "legacy.menu.host_options.message.weather.thunder": "Changing to rain and thunder",
   "legacy.menu.host_options.message.world_spawn": "Set the world spawn point to (%s, %s, %s)",
+  "legacy.menu.host_options.message.world_spawn_wrong_dimension": "Failed to set the world spawn point. You must be in the Overworld to perform this action.",
   "legacy.menu.host_options.player.canAttackAnimals": "Can Attack Animals",
   "legacy.menu.host_options.player.canAttackAnimals.disabled": "You can no longer attack animals",
   "legacy.menu.host_options.player.canAttackAnimals.enabled": "You can now attack animals",
