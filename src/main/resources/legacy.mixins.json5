@@ -200,6 +200,7 @@
     "client.gui.SubtitleOverlayMixin",
     "client.ItemPickupParticleMixin",
     "client.SdlGamepadMixin",
+    "client.MipmapMetadataSectionMixin",
     "client.gui.ContextualBarRendererMixin",
     "client.gui.ExperienceBarRendererMixin",
     "client.book.BookSignScreenMixin",
