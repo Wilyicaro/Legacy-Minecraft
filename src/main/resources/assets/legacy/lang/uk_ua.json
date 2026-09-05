@@ -2213,6 +2213,7 @@
   "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Класичні підказки предметів",
   "legacy.options.legacyItemTooltipsScaling": "Класичне масштабування підказок предметів",
+  "legacy.options.legacyLeafMipmaps": "Legacy Leaf Mipmaps",
   "legacy.options.legacyLootTables": "Стара таблиця зі здобиччю",
   "legacy.options.legacyLoadingAndConnecting": "Legacy завантаження та підключення",
   "legacy.options.legacyMapBehavior": "Legacy Map Behavior",
