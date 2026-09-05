@@ -1620,6 +1620,8 @@
   "legacy.menu.host_options.message.player_spawn": "Definido o ponto de invocação %s para (%s, %s, %s)",
   "legacy.menu.host_options.message.set_day": "Definido o tempo para dia",
   "legacy.menu.host_options.message.set_night": "Definido o tempo para noite",
+  "legacy.menu.host_options.message.teleport.to_you": "%s teleported to you",
+  "legacy.menu.host_options.message.teleport.to_them": "%s teleported you to their position",
   "legacy.menu.host_options.message.weather.clear": "Mudando o clima para limpo",
   "legacy.menu.host_options.message.weather.rain": "Mudando o clima para chuvoso",
   "legacy.menu.host_options.message.weather.thunder": "Mudando o clima para chuva e trovões",
