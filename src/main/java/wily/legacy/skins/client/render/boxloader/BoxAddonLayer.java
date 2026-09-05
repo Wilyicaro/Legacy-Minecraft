@@ -98,10 +98,6 @@ public class BoxAddonLayer extends RenderLayer {
         return mask;
     }
 
-    private static boolean hasHeadItem(AvatarRenderState state) {
-        return state.wornHeadType != null || !state.headItem.isEmpty() || LegacyItemUtil.isSkullItem(state.headEquipment);
-    }
-
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, EntityRenderState state, float partialTick, float ageInTicks) {
         if (!(state instanceof AvatarRenderState ars)) return;
@@ -140,15 +136,13 @@ public class BoxAddonLayer extends RenderLayer {
         final boolean rightPantsChildLike = isChildLike(rightLeg, rightPants);
         final boolean leftPantsChildLike = isChildLike(leftLeg, leftPants);
         final int armorMask = getArmorMask(ars);
-        final boolean hideHead = hasHeadItem(ars);
+        final boolean replaceHead = LegacyItemUtil.isSkullItem(ars.headEquipment);
         RenderType renderType = pm.renderType(texFinal);
         float partScale = baked.partScale();
         int overlay = LivingEntityRenderer.getOverlayCoords(ars, 0.0F);
         int outlineColor = ars.outlineColor;
-        if (!hideHead) {
-            submitSlot(head, baked.get(AttachSlot.HEAD, armorMask), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);
-            submitChildSlot(head, hat, hatChildLike, baked.get(AttachSlot.HAT, armorMask), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);
-        }
+        submitSlot(head, baked.get(AttachSlot.HEAD, armorMask, replaceHead), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);
+        submitChildSlot(head, hat, hatChildLike, baked.get(AttachSlot.HAT, armorMask, replaceHead), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);
         submitSlot(body, baked.get(AttachSlot.BODY, armorMask), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);
         submitChildSlot(body, jacket, jacketChildLike, baked.get(AttachSlot.JACKET, armorMask), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);
         submitSlot(rightArm, baked.get(AttachSlot.RIGHT_ARM, armorMask), poseStack, collector, renderType, packedLight, overlay, partScale, outlineColor);

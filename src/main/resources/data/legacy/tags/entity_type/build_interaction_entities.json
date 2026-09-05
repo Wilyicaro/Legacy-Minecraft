@@ -1,0 +1,19 @@
+{
+  "values": [
+    "minecraft:armor_stand",
+    "minecraft:item_frame",
+    "minecraft:glow_item_frame",
+    "minecraft:painting",
+    "minecraft:leash_knot",
+    "minecraft:end_crystal",
+    "minecraft:mannequin",
+    "#minecraft:boat",
+    "minecraft:minecart",
+    "minecraft:chest_minecart",
+    "minecraft:furnace_minecart",
+    "minecraft:tnt_minecart",
+    "minecraft:hopper_minecart",
+    "minecraft:command_block_minecart",
+    "minecraft:spawner_minecart"
+  ]
+}

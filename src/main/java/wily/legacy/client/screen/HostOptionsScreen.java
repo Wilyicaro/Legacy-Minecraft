@@ -29,6 +29,7 @@ import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -43,6 +44,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     protected float oldAlpha = getDefaultOpacity();
     protected float alpha = getDefaultOpacity();
     protected boolean shouldFade = false;
+    protected Button hostOptionsButton;
 
     public HostOptionsScreen(Component title) {
         super(s -> Panel.centered(s, LegacySprites.PANEL, 250, 190, 0, 20), HOST_OPTIONS);
@@ -74,6 +76,31 @@ public class HostOptionsScreen extends PanelVListScreen {
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
             return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.player.getGameProfile().equals(p.getProfile()) ? 0 : ((LegacyPlayerInfo) p).getIdentifierIndex()))).toList();
         return Collections.emptyList();
+    }
+
+    public static LegacyPlayerInfo getLocalPlayerInfo(Minecraft minecraft) {
+        if (minecraft.player == null || minecraft.getConnection() == null) return null;
+        PlayerInfo playerInfo = minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID());
+        return playerInfo instanceof LegacyPlayerInfo info ? info : null;
+    }
+
+    public static boolean hasFullTrustAuthority(Minecraft minecraft) {
+        if (minecraft.player == null) return false;
+        if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().getSingleplayerProfile() != null && Objects.equals(minecraft.getSingleplayerServer().getSingleplayerProfile().id(), minecraft.player.getUUID())) return true;
+        LegacyPlayerInfo info = getLocalPlayerInfo(minecraft);
+        return info != null && info.hasFullTrustAuthority();
+    }
+
+    public static boolean isModerator(Minecraft minecraft) {
+        LegacyPlayerInfo info = getLocalPlayerInfo(minecraft);
+        return info != null && info.isModerator();
+    }
+
+    public static boolean canTeleport(Minecraft minecraft) {
+        if (minecraft.player == null) return false;
+        LegacyPlayerInfo info = getLocalPlayerInfo(minecraft);
+        return minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)
+                || Legacy4JClient.allowHostCheats && info != null && PlayerTrustPolicy.canTeleport(info);
     }
 
     protected static float getDefaultOpacity() {
@@ -123,7 +150,11 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     protected void addPlayerButtons() {
         addPlayerButtons(true, (playerInfo, b) -> {
-            if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;
+            LegacyPlayerInfo target = LegacyPlayerInfo.of(playerInfo);
+            boolean self = minecraft.player.getUUID().equals(playerInfo.getProfile().id());
+            boolean canManageTarget = PlayerTrustPolicy.management(Legacy4JClient.trustPlayers, self, hasFullTrustAuthority(minecraft), isModerator(minecraft), target.hasFullTrustAuthority()).canKick();
+            boolean canUseOwnOptions = self && Legacy4JClient.allowHostCheats && (target.isModerator() || target.getHostPrivileges().hasPlayerOptions(playerInfo.getGameMode().isSurvival()));
+            if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) && !canManageTarget && !canUseOwnOptions) return;
             minecraft.setScreen(new PlayerHostOptionsScreen(this, playerInfo, minecraft));
         });
     }
@@ -145,6 +176,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     protected void init() {
         if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
         super.init();
+        hostOptionsButton = null;
         addHostOptionsButton();
     }
 
@@ -159,8 +191,15 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addHostOptionsButton() {
-        if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) && !minecraft.hasSingleplayerServer()) return;
-        addRenderableWidget(accessor.putWidget("hostOptionsButton", Button.builder(HOST_OPTIONS, this::pressHostOptionsButton).bounds(panel.x, panel.y - 36, 250, 20).build()));
+        hostOptionsButton = addRenderableWidget(accessor.putWidget("hostOptionsButton", Button.builder(HOST_OPTIONS, this::pressHostOptionsButton).bounds(panel.x, panel.y - 36, 250, 20).build()));
+        refreshHostOptionsButton();
+    }
+
+    public void refreshHostOptionsButton() {
+        if (hostOptionsButton == null) return;
+        boolean enabled = hasFullTrustAuthority(minecraft) || isModerator(minecraft) || canTeleport(minecraft);
+        hostOptionsButton.active = hostOptionsButton.visible = enabled;
+        if (!enabled && getFocused() == hostOptionsButton) setFocused(null);
     }
 
     protected void pressHostOptionsButton(Button b) {

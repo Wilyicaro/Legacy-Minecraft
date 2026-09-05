@@ -5,11 +5,11 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
+import org.jetbrains.annotations.UnknownNullability;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
@@ -23,16 +23,16 @@ import java.util.stream.Collectors;
 public class LegacyFlatPresetsScreen extends PanelVListScreen {
     protected final Panel panelRecess;
 
-    public LegacyFlatPresetsScreen(Screen parent, HolderLookup.RegistryLookup<FlatLevelGeneratorPreset> presetGetter, FeatureFlagSet enabledFeatures, Consumer<Holder<FlatLevelGeneratorPreset>> applyPreset) {
+    public LegacyFlatPresetsScreen(Screen parent, @UnknownNullability Iterable<Holder<FlatLevelGeneratorPreset>> presetGetter, FeatureFlagSet enabledFeatures, Consumer<Holder<FlatLevelGeneratorPreset>> applyPreset) {
         super(parent, s -> Panel.centered(s, LegacySprites.PANEL, 285, 260), Component.translatable("createWorld.customize.presets"));
         panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 12, panel.height - 29), p -> p.pos(panel.x + 6, panel.y + 20));
-        presetGetter.listElements().forEach(holder -> {
+        presetGetter.forEach(holder -> {
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
                 Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.identifier().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
-                renderableVList.addRenderable(new LegacyFlatWorldScreen.ItemIconButton(0, 0, 263, 30, Component.translatable(holder.key().identifier().toLanguageKey("flat_world_preset"))) {
+                renderableVList.addRenderable(new LegacyFlatWorldScreen.ItemIconButton(0, 0, 263, 30, Component.translatable(holder.unwrapKey().orElseThrow().identifier().toLanguageKey("flat_world_preset"))) {
                     @Override
                     protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
                         super.extractContents(GuiGraphicsExtractor, i, j, f);

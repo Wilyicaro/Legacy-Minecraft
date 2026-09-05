@@ -29,8 +29,11 @@ import wily.legacy.network.*;
 import wily.legacy.skins.SkinsBootstrap;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPermissions;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.util.ArmorStandPose;
 import wily.legacy.world.LegacyGeneratedChunks;
+import wily.legacy.world.PlayerTrustAdmin;
 
 //? if fabric {
 //?} else if forge {
@@ -117,6 +120,8 @@ public class Legacy4J {
             r.register(true, PlayerInfoSync.ID);
             r.register(true, PlayerInfoSync.All.ID_C2S);
             r.register(false, PlayerInfoSync.All.ID_S2C);
+            r.register(true, PlayerHostPrivilegesUpdatePayload.ID);
+            r.register(true, PlayerTrustUpdatePayload.ID);
             r.register(true, ServerMenuCraftPayload.ID);
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerHostOptionsPayload.ID);
@@ -203,10 +208,14 @@ public class Legacy4J {
                 }
         }
         ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
-        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(), (LegacyPlayerInfo) p), Collections.emptyMap(), server.getDefaultGameType(), PlayerInfoSync.All.ID_S2C));
+        PlayerTrustAdmin.enforceCurrentRestrictions(p);
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), PlayerInfoSync.All.fromPlayer(p));
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
         playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayer(p, payload, true));
+
+        PlayerTrustPolicy trust = PlayerTrustPolicy.of(p);
+        if (!trust.unrestricted()) PlayerTrustUpdatePayload.notifyPermissionChanges(p, PlayerTrustPermissions.TRUSTED, trust.permissions());
 
         if (!FactoryAPIPlatform.getEntityServer(p).isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }
