@@ -2213,6 +2213,7 @@
   "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Perinteiset Esineen Työkaluvihjeet",
   "legacy.options.legacyItemTooltipsScaling": "Perinteinen Esineen Työkaluvihjeiden Skaalaus",
+  "legacy.options.legacyLeafMipmaps": "Legacy Leaf Mipmaps",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
   "legacy.options.legacyLoadingAndConnecting": "Perinteinen Lataus ja Yhdistäminen",
   "legacy.options.legacyMapBehavior": "Legacy Map Behavior",
