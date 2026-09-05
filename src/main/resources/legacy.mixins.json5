@@ -18,8 +18,10 @@
     "client.AbstractRecipeBookScreenMixin",
     "client.crafter.CrafterScreenMixin",
     //? fabric || neoforge {
+    "compat.sodium.BlendedColorProviderMixin",
     "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.DefaultFluidRendererMixin",
+    "compat.sodium.ShaderLoaderMixin",
     "compat.sodium.BlockRendererMixin",
     "compat.sodium.OcclusionCullerMixin",
     "compat.sodium.LevelSliceMixin",

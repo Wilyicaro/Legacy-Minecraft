@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import wily.factoryapi.base.client.FactoryOptions;
 import wily.legacy.client.LegacyChunkLoading;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LevelRendererAccessor;
 
 @Mixin(LevelRenderer.class)
@@ -29,7 +30,7 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
 
     @ModifyArgs(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/GpuDevice;createSampler(Lcom/mojang/blaze3d/textures/AddressMode;Lcom/mojang/blaze3d/textures/AddressMode;Lcom/mojang/blaze3d/textures/FilterMode;Lcom/mojang/blaze3d/textures/FilterMode;ILjava/util/OptionalDouble;)Lcom/mojang/blaze3d/textures/GpuSampler;"))
     private void nearestMipmapSampling(Args args) {
-        if (!FactoryOptions.NEAREST_MIPMAP_SCALING.get()) return;
+        if (!FactoryOptions.NEAREST_MIPMAP_SCALING.get() || !LegacyOptions.legacyLeafMipmaps.get()) return;
         args.set(2, FilterMode.NEAREST);
         args.set(3, FilterMode.NEAREST);
     }
