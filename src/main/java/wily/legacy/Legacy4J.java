@@ -29,6 +29,8 @@ import wily.legacy.network.*;
 import wily.legacy.skins.SkinsBootstrap;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPermissions;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.util.ArmorStandPose;
 import wily.legacy.world.LegacyGeneratedChunks;
 import wily.legacy.world.PlayerTrustAdmin;
@@ -211,6 +213,9 @@ public class Legacy4J {
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
         playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayer(p, payload, true));
+
+        PlayerTrustPolicy trust = PlayerTrustPolicy.of(p);
+        if (!trust.unrestricted()) PlayerTrustUpdatePayload.notifyPermissionChanges(p, PlayerTrustPermissions.TRUSTED, trust.permissions());
 
         if (!FactoryAPIPlatform.getEntityServer(p).isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }

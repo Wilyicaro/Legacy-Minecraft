@@ -58,7 +58,8 @@ public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permi
         }
         if (changed) {
             PlayerTrustAdmin.enforceCurrentRestrictions(target);
-            notifyChanges(target, previousPermissions, targetInfo.getTrustPermissions(), previousModerator, targetInfo.isModerator());
+            notifyPermissionChanges(target, previousPermissions, targetInfo.getTrustPermissions());
+            notifyChange(target, "moderator", previousModerator, targetInfo.isModerator());
         }
         PlayerInfoSync.All authoritative = PlayerInfoSync.All.fromPlayer(target);
         if (changed) CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), authoritative);
@@ -70,13 +71,12 @@ public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permi
         return ID;
     }
 
-    private static void notifyChanges(ServerPlayer player, PlayerTrustPermissions previous, PlayerTrustPermissions current, boolean previousModerator, boolean currentModerator) {
+    public static void notifyPermissionChanges(ServerPlayer player, PlayerTrustPermissions previous, PlayerTrustPermissions current) {
         notifyBuildAndMineChange(player, previous.canBuildAndMine(), current.canBuildAndMine());
         notifyChange(player, "canUseDoorsAndSwitches", previous.canUseDoorsAndSwitches(), current.canUseDoorsAndSwitches());
         notifyChange(player, "canOpenContainers", previous.canOpenContainers(), current.canOpenContainers());
         notifyChange(player, "canAttackPlayers", previous.canAttackPlayers(), current.canAttackPlayers());
         notifyChange(player, "canAttackAnimals", previous.canAttackAnimals(), current.canAttackAnimals());
-        notifyChange(player, "moderator", previousModerator, currentModerator);
     }
 
     private static void notifyBuildAndMineChange(ServerPlayer player, boolean previous, boolean current) {
