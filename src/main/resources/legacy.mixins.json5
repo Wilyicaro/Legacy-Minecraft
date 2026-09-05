@@ -296,6 +296,7 @@
     "EmptyMapItemMixin",
     "EntityTypeMixin",
     "FallingBlockEntityMixin",
+    "FireworkRocketEntityMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
     "GrowingPlantBlockMixin",
