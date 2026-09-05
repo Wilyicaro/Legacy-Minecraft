@@ -6,10 +6,8 @@
     "#minecraft:buttons",
     "#minecraft:pressure_plates",
     "minecraft:lever",
-    "minecraft:repeater",
     "minecraft:comparator",
     "minecraft:daylight_detector",
-    "minecraft:note_block",
     "minecraft:bell",
     "minecraft:target"
   ]

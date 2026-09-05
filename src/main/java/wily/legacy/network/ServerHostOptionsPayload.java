@@ -99,7 +99,9 @@ public record ServerHostOptionsPayload(Action action, String value, UUID player)
             if (!PlayerTrustPolicy.canTeleport(sp)) return;
             ServerPlayer affectPlayer = server.getPlayerList().getPlayer(player);
             if (affectPlayer == null || affectPlayer == sp) return;
-            var source = server.createCommandSourceStack().withSuppressedOutput();
+            var source = server.createCommandSourceStack().withSuppressedOutput().withCallback((success, result) -> {
+                if (success) affectPlayer.sendSystemMessage(Component.translatable(action == Action.TELEPORT_TO_PLAYER ? "legacy.menu.host_options.message.teleport.to_you" : "legacy.menu.host_options.message.teleport.to_them", sp.getDisplayName()), false);
+            });
             if (action == Action.TELEPORT_TO_PLAYER)
                 server.getCommands().performPrefixedCommand(source, "tp %s %s".formatted(sp.getGameProfile().name(), affectPlayer.getGameProfile().name()));
             else

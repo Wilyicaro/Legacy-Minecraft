@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -51,6 +52,11 @@ public abstract class ServerPlayerGameModeMixin {
     @Inject(method = "setGameModeForPlayer", at = @At("RETURN"))
     protected void setGameModeForPlayer(GameType gameType, GameType gameType2, CallbackInfo ci) {
         LegacyPlayerInfo.setAndUpdateMayFlySurvival(player, LegacyPlayerInfo.of(player).mayFlySurvival(), false);
+    }
+
+    @WrapOperation(method = "handleBlockBreakAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;mayInteract(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean mayStartDestroyBlock(ServerLevel level, Entity entity, BlockPos pos, Operation<Boolean> original) {
+        return PlayerTrustPolicy.of(player).canBuildAndMine() && original.call(level, entity, pos);
     }
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)

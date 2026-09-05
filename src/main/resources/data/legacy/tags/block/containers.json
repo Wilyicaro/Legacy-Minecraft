@@ -28,7 +28,6 @@
     "#minecraft:anvil",
     "minecraft:beacon",
     "minecraft:lectern",
-    "minecraft:composter",
-    "minecraft:jukebox"
+    "minecraft:composter"
   ]
 }
