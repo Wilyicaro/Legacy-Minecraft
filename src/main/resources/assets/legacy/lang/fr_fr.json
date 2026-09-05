@@ -2213,6 +2213,7 @@
   "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Info-bulles d'objets legacy",
   "legacy.options.legacyItemTooltipsScaling": "Mise à l'échelle des info-bulles d'objets legacy",
+  "legacy.options.legacyLeafMipmaps": "Legacy Leaf Mipmaps",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
   "legacy.options.legacyLoadingAndConnecting": "Chargement et connexion legacy",
   "legacy.options.legacyMapBehavior": "Legacy Map Behavior",
