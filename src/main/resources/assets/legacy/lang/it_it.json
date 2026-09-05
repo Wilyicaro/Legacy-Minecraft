@@ -1620,6 +1620,8 @@
   "legacy.menu.host_options.message.player_spawn": "Impostato il punto di rinascita di %s a (%s, %s, %s)",
   "legacy.menu.host_options.message.set_day": "Ora impostata su giorno",
   "legacy.menu.host_options.message.set_night": "Ora impostata su notte",
+  "legacy.menu.host_options.message.teleport.to_you": "%s teleported to you",
+  "legacy.menu.host_options.message.teleport.to_them": "%s teleported you to their position",
   "legacy.menu.host_options.message.weather.clear": "Passaggio a tempo sereno",
   "legacy.menu.host_options.message.weather.rain": "Passaggio a pioggia",
   "legacy.menu.host_options.message.weather.thunder": "Passaggio a pioggia e temporali",
