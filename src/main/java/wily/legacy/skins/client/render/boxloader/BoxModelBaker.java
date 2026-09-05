@@ -105,6 +105,7 @@ final class BoxModelBaker {
                 if (!validCube(cube) || Math.max(0, cube.armorMask()) != build.key.armorMask()) continue;
                 float[] origin = cube.origin();
                 float[] size = cube.size();
+                float inflate = cube.inflate();
                 int[] uv = uv(cube.uv());
                 builder = builder.texOffs(uv[0], uv[1]);
                 builder = cube.mirror() ? builder.mirror() : builder.mirror(false);
@@ -112,10 +113,10 @@ final class BoxModelBaker {
                         (origin[0] - pivot[0]) * texelScale,
                         (origin[1] - pivot[1]) * texelScale,
                         (origin[2] - pivot[2]) * texelScale,
-                        size[0] * texelScale,
-                        size[1] * texelScale,
-                        size[2] * texelScale,
-                        new CubeDeformation(cube.inflate() * texelScale)
+                        (size[0] + inflate * 2.0F == 0.0F ? size[0] + 0.0009765625F : size[0]) * texelScale,
+                        (size[1] + inflate * 2.0F == 0.0F ? size[1] + 0.0009765625F : size[1]) * texelScale,
+                        (size[2] + inflate * 2.0F == 0.0F ? size[2] + 0.0009765625F : size[2]) * texelScale,
+                        new CubeDeformation(inflate * texelScale)
                 );
                 build.flipUpV.add(cube.flipUpV());
                 bounds.add(origin, size);

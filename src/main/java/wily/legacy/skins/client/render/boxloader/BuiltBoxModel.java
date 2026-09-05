@@ -50,11 +50,16 @@ public record BuiltBoxModel(int textureWidth,
     }
 
     public List<ModelPart> get(AttachSlot slot, int armorMask) {
+        return get(slot, armorMask, false);
+    }
+
+    public List<ModelPart> get(AttachSlot slot, int armorMask, boolean hideUnmasked) {
         List<ModelPart> parts = get(slot);
-        if (parts == null || parts.isEmpty() || armorMask == 0) return parts;
+        if (parts == null || parts.isEmpty() || armorMask == 0 && !hideUnmasked) return parts;
         ArrayList<ModelPart> visible = new ArrayList<>(parts.size());
         for (ModelPart part : parts) {
-            if ((armorMasks.getOrDefault(part, 0) & armorMask) == 0) visible.add(part);
+            int partMask = armorMasks.getOrDefault(part, 0);
+            if ((!hideUnmasked || partMask != 0) && (partMask & armorMask) == 0) visible.add(part);
         }
         return List.copyOf(visible);
     }
