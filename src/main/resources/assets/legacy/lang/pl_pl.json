@@ -2213,6 +2213,7 @@
   "legacy.options.legacyItemRarity": "Legacy Item Name Rarity",
   "legacy.options.legacyItemTooltips": "Legacy Item Tooltips",
   "legacy.options.legacyItemTooltipsScaling": "Stary rozmiar podpowiedzi",
+  "legacy.options.legacyLeafMipmaps": "Legacy Leaf Mipmaps",
   "legacy.options.legacyLootTables": "Legacy Loot Tables",
   "legacy.options.legacyLoadingAndConnecting": "Legacy Loading & Connecting",
   "legacy.options.legacyMapBehavior": "Legacy Map Behavior",
