@@ -7,14 +7,12 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
-import net.minecraft.world.entity.animal.golem.IronGolem;
-import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -30,7 +28,9 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.world.PlayerTrustAdmin;
 
 import static wily.legacy.Legacy4JClient.gameRules;
 
@@ -73,9 +73,15 @@ public abstract class LivingEntityMixin extends Entity {
             cir.setReturnValue(false);
             return;
         }
-        if (!level().isClientSide() && !level().getServer().overworld().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object) this) instanceof IronGolem i && i.isPlayerCreated() || ((Object) this) instanceof SnowGolem)) {
-            cir.setReturnValue(false);
-        }
+        PlayerTrustPolicy attacker = PlayerTrustAdmin.getResponsiblePlayer(level, damageSource);
+        if (attacker != null && !attacker.canDamage(this)) cir.setReturnValue(false);
+    }
+
+    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
+    private void addEffect(MobEffectInstance effect, Entity source, CallbackInfoReturnable<Boolean> cir) {
+        if (!(level() instanceof ServerLevel level) || effect.getEffect().value().isBeneficial()) return;
+        PlayerTrustPolicy player = PlayerTrustAdmin.getResponsiblePlayer(level, source);
+        if (player != null && !player.canDamage(this)) cir.setReturnValue(false);
     }
 
     @Redirect(method = "calculateEntityAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))

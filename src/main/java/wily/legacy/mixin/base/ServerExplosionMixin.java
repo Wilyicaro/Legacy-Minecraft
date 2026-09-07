@@ -12,9 +12,15 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.projectile.Projectile;
+import wily.legacy.entity.PlayerTrustPolicy;
+import wily.legacy.entity.PlayerTrustOwnedSource;
+import wily.legacy.world.PlayerTrustAdmin;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.ServerExplosion;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
@@ -25,8 +31,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 @Mixin(ServerExplosion.class)
 public abstract class ServerExplosionMixin implements Explosion {
@@ -34,6 +43,9 @@ public abstract class ServerExplosionMixin implements Explosion {
 
     @Unique
     private List<BlockPos> legacy$explodedPositions = List.of();
+
+    @Unique
+    private @Nullable PlayerTrustPolicy legacy$responsiblePlayer;
 
     @Shadow
     @Final
@@ -49,7 +61,20 @@ public abstract class ServerExplosionMixin implements Explosion {
 
     @Shadow
     @Final
+    private DamageSource damageSource;
+
+    @Shadow
+    @Final
+    private @Nullable Entity source;
+
+    @Shadow
+    @Final
     private float radius;
+
+    @Inject(method = "explode", at = @At("HEAD"))
+    private void legacy$captureResponsiblePlayer(CallbackInfoReturnable<Integer> cir) {
+        legacy$responsiblePlayer = PlayerTrustAdmin.getResponsiblePlayer(level, damageSource, source);
+    }
 
     @ModifyExpressionValue(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;calculateExplodedPositions()Ljava/util/List;"))
     private List<BlockPos> legacy$captureExplodedPositions(List<BlockPos> positions) {
@@ -59,17 +84,46 @@ public abstract class ServerExplosionMixin implements Explosion {
 
     @WrapOperation(method = /*? if neoforge {*//*"hurtEntities(Ljava/util/List;)V"*//*?} else {*/"hurtEntities"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     private boolean legacy$hurtEntity(Entity entity, ServerLevel level, DamageSource source, float amount, Operation<Boolean> original) {
-        return legacy$intersectsBlast(entity) && original.call(entity, level, source, amount);
+        return legacy$intersectsBlast(entity) && legacy$canAffectEntity(entity) && original.call(entity, level, source, amount);
+    }
+
+    @Inject(method = {"interactWithBlocks", "createFire"}, at = @At("HEAD"), cancellable = true)
+    private void legacy$protectWorldFromUntrustedExplosion(List<BlockPos> blocks, CallbackInfo ci) {
+        if (legacy$responsiblePlayer != null && !legacy$responsiblePlayer.canBuildAndMine()) ci.cancel();
+    }
+
+    @WrapOperation(method = "interactWithBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;onExplosionHit(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Explosion;Ljava/util/function/BiConsumer;)V"))
+    private void legacy$protectTriggeredBlock(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit, Operation<Void> original) {
+        if (legacy$responsiblePlayer != null && explosion.getBlockInteraction() == Explosion.BlockInteraction.TRIGGER_BLOCK && !legacy$responsiblePlayer.canTriggerBlock(state)) return;
+        PlayerTrustAdmin.withResponsiblePlayer(legacy$responsiblePlayer, () -> original.call(state, level, pos, explosion, onHit));
     }
 
     @ModifyArg(method = /*? if neoforge {*//*"hurtEntities(Ljava/util/List;)V"*//*?} else {*/"hurtEntities"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"), index = 0)
     private double legacy$getKnockbackPower(double power, @Local Entity entity) {
+        if (!legacy$canAffectEntity(entity)) return 0;
         if (legacy$intersectsBlast(entity)) return power;
         double doubleRadius = radius * 2.0F;
         if (doubleRadius <= 0.0) return power;
         double dist = Math.sqrt(entity.distanceToSqr(center)) / doubleRadius;
         double resistance = entity instanceof LivingEntity livingEntity ? livingEntity.getAttributeValue(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE) : 0.0;
         return (1.0 - dist) * damageCalculator.getKnockbackMultiplier(entity) * (1.0 - resistance) * LEGACY_OCCLUDED_KNOCKBACK;
+    }
+
+    @WrapOperation(method = /*? if neoforge {*//*"hurtEntities(Ljava/util/List;)V"*//*?} else {*/"hurtEntities"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;onExplosionHit(Lnet/minecraft/world/entity/Entity;)V"))
+    private void legacy$onExplosionHit(Entity entity, Entity explosionSource, Operation<Void> original) {
+        if (!legacy$canAffectEntity(entity)) return;
+        PlayerTrustAdmin.withResponsiblePlayer(legacy$responsiblePlayer, () -> original.call(entity, explosionSource));
+    }
+
+    @WrapOperation(method = /*? if neoforge {*//*"hurtEntities(Ljava/util/List;)V"*//*?} else {*/"hurtEntities"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/Projectile;setOwner(Lnet/minecraft/world/entity/Entity;)V"))
+    private void legacy$preserveRedirectedProjectileOwner(Projectile projectile, Entity owner, Operation<Void> original) {
+        original.call(projectile, owner);
+        if (legacy$responsiblePlayer != null && projectile instanceof PlayerTrustOwnedSource source) source.setResponsiblePlayer(legacy$responsiblePlayer.playerId());
+    }
+
+    @Unique
+    private boolean legacy$canAffectEntity(Entity entity) {
+        return legacy$responsiblePlayer == null || legacy$responsiblePlayer.canDamage(entity);
     }
 
     @Unique

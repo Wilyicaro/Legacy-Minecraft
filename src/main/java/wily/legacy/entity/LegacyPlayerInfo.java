@@ -26,8 +26,28 @@ public interface LegacyPlayerInfo {
         updateMayFlySurvival(player, mayFlySurvival, updateAbilities);
     }
 
+    static void initializeTrustPermissions(ServerPlayer player) {
+        initializeTrustPermissions(LegacyPlayerInfo.of(player), PlayerTrustPolicy.isTrustEnabled(player.level().getServer()), PlayerTrustPolicy.isFullAuthority(player));
+    }
+
+    static void initializeTrustPermissions(LegacyPlayerInfo info, boolean trustPlayers, boolean fullTrustAuthority) {
+        info.setFullTrustAuthority(fullTrustAuthority);
+        if (info.isTrustPermissionsInitialized()) return;
+        info.setTrustPermissions(trustPlayers ? PlayerTrustPermissions.TRUSTED : PlayerTrustPermissions.RESTRICTED);
+        info.setTrustPermissionsInitialized(true);
+    }
+
     static LegacyPlayerInfo decode(CommonNetwork.PlayBuf buf) {
-        return new Instance(buf.get().readVarInt(), buf.get().readBoolean(), buf.get().readBoolean(), buf.get().readBoolean(),/*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/);
+        int identifierIndex = buf.get().readVarInt();
+        boolean visible = buf.get().readBoolean();
+        boolean exhaustionDisabled = buf.get().readBoolean();
+        boolean mayFlySurvival = buf.get().readBoolean();
+        PlayerTrustPermissions trustPermissions = PlayerTrustPermissions.decode(buf);
+        PlayerHostPrivileges hostPrivileges = PlayerHostPrivileges.decode(buf);
+        boolean moderator = buf.get().readBoolean();
+        boolean trustPermissionsInitialized = buf.get().readBoolean();
+        boolean fullTrustAuthority = buf.get().readBoolean();
+        return new Instance(identifierIndex, visible, exhaustionDisabled, mayFlySurvival, trustPermissions, hostPrivileges, moderator, trustPermissionsInitialized, fullTrustAuthority,/*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/);
     }
 
     static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info) {
@@ -35,6 +55,11 @@ public interface LegacyPlayerInfo {
         buf.get().writeBoolean(info.isVisible());
         buf.get().writeBoolean(info.isExhaustionDisabled());
         buf.get().writeBoolean(info.mayFlySurvival());
+        info.getTrustPermissions().encode(buf);
+        info.getHostPrivileges().encode(buf);
+        buf.get().writeBoolean(info.isModerator());
+        buf.get().writeBoolean(info.isTrustPermissionsInitialized());
+        buf.get().writeBoolean(info.hasFullTrustAuthority());
         //? if <1.20.5 {
         /*buf.get().writeMap(info.getStatsMap(), ClientBoundAwardStatsPacketAccessor::encodeStatCap, FriendlyByteBuf::writeVarInt);
          *///?} else {
@@ -46,97 +71,144 @@ public interface LegacyPlayerInfo {
         return null;
     }
 
-    int getIdentifierIndex();
+    Data legacyMinecraft$getPlayerInfoData();
 
-    void setIdentifierIndex(int i);
+    default int getIdentifierIndex() {
+        return legacyMinecraft$getPlayerInfoData().identifierIndex;
+    }
 
-    boolean isVisible();
+    default void setIdentifierIndex(int identifierIndex) {
+        legacyMinecraft$getPlayerInfoData().identifierIndex = identifierIndex;
+    }
 
-    void setVisibility(boolean visible);
+    default boolean isVisible() {
+        return legacyMinecraft$getPlayerInfoData().visible;
+    }
 
-    boolean isExhaustionDisabled();
+    default void setVisibility(boolean visible) {
+        legacyMinecraft$getPlayerInfoData().visible = visible;
+    }
 
-    void setDisableExhaustion(boolean exhaustion);
+    default boolean isExhaustionDisabled() {
+        return legacyMinecraft$getPlayerInfoData().exhaustionDisabled;
+    }
 
-    boolean mayFlySurvival();
+    default void setDisableExhaustion(boolean exhaustionDisabled) {
+        legacyMinecraft$getPlayerInfoData().exhaustionDisabled = exhaustionDisabled;
+    }
 
-    void setMayFlySurvival(boolean mayFly);
+    default boolean mayFlySurvival() {
+        return legacyMinecraft$getPlayerInfoData().mayFlySurvival;
+    }
 
-    Object2IntMap<Stat<?>> getStatsMap();
+    default void setMayFlySurvival(boolean mayFlySurvival) {
+        legacyMinecraft$getPlayerInfoData().mayFlySurvival = mayFlySurvival;
+    }
 
-    void setStatsMap(Object2IntMap<Stat<?>> statsMap);
+    default PlayerTrustPermissions getTrustPermissions() {
+        return legacyMinecraft$getPlayerInfoData().trustPermissions;
+    }
+
+    default void setTrustPermissions(PlayerTrustPermissions trustPermissions) {
+        legacyMinecraft$getPlayerInfoData().trustPermissions = trustPermissions;
+    }
+
+    default PlayerHostPrivileges getHostPrivileges() {
+        return legacyMinecraft$getPlayerInfoData().hostPrivileges;
+    }
+
+    default void setHostPrivileges(PlayerHostPrivileges hostPrivileges) {
+        legacyMinecraft$getPlayerInfoData().hostPrivileges = hostPrivileges;
+    }
+
+    default boolean isModerator() {
+        return legacyMinecraft$getPlayerInfoData().moderator;
+    }
+
+    default void setModerator(boolean moderator) {
+        legacyMinecraft$getPlayerInfoData().moderator = moderator;
+    }
+
+    default boolean isTrustPermissionsInitialized() {
+        return legacyMinecraft$getPlayerInfoData().trustPermissionsInitialized;
+    }
+
+    default void setTrustPermissionsInitialized(boolean initialized) {
+        legacyMinecraft$getPlayerInfoData().trustPermissionsInitialized = initialized;
+    }
+
+    default boolean hasFullTrustAuthority() {
+        return legacyMinecraft$getPlayerInfoData().fullTrustAuthority;
+    }
+
+    default void setFullTrustAuthority(boolean fullTrustAuthority) {
+        legacyMinecraft$getPlayerInfoData().fullTrustAuthority = fullTrustAuthority;
+    }
+
+    default Object2IntMap<Stat<?>> getStatsMap() {
+        return legacyMinecraft$getPlayerInfoData().statsMap;
+    }
+
+    default void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
+        legacyMinecraft$getPlayerInfoData().statsMap = statsMap;
+    }
 
     default void copyFrom(LegacyPlayerInfo info) {
         this.setIdentifierIndex(info.getIdentifierIndex());
         this.setVisibility(info.isVisible());
         this.setDisableExhaustion(info.isExhaustionDisabled());
         this.setMayFlySurvival(info.mayFlySurvival());
+        this.setTrustPermissions(info.getTrustPermissions());
+        this.setHostPrivileges(info.getHostPrivileges());
+        this.setModerator(info.isModerator());
+        this.setTrustPermissionsInitialized(info.isTrustPermissionsInitialized());
+        this.setFullTrustAuthority(info.hasFullTrustAuthority());
         this.setStatsMap(info.getStatsMap());
     }
 
-    class Instance implements LegacyPlayerInfo {
-        int index = -1;
-        boolean visibility = true;
-        boolean disableExhaustion;
-        boolean mayFlySurvival = false;
-        Object2IntMap<Stat<?>> statsMap;
+    final class Data {
+        private int identifierIndex = -1;
+        private boolean visible = true;
+        private boolean exhaustionDisabled;
+        private boolean mayFlySurvival;
+        private PlayerTrustPermissions trustPermissions = PlayerTrustPermissions.RESTRICTED;
+        private PlayerHostPrivileges hostPrivileges = PlayerHostPrivileges.NONE;
+        private boolean moderator;
+        private boolean trustPermissionsInitialized;
+        private boolean fullTrustAuthority;
+        private Object2IntMap<Stat<?>> statsMap;
 
-        public Instance(int index, boolean invisible, boolean disableExhaustion, boolean mayFlySurvival, Object2IntMap<Stat<?>> object2IntMap) {
-            setIdentifierIndex(index);
-            setVisibility(invisible);
-            setDisableExhaustion(disableExhaustion);
-            setMayFlySurvival(mayFlySurvival);
-            setStatsMap(object2IntMap);
+        public Data() {
         }
 
-        @Override
-        public int getIdentifierIndex() {
-            return index;
-        }
-
-        @Override
-        public void setIdentifierIndex(int i) {
-            index = i;
-        }
-
-        @Override
-        public boolean isVisible() {
-            return visibility;
-        }
-
-        @Override
-        public void setVisibility(boolean visible) {
-            this.visibility = visible;
-        }
-
-        @Override
-        public boolean isExhaustionDisabled() {
-            return disableExhaustion;
-        }
-
-        @Override
-        public void setDisableExhaustion(boolean exhaustion) {
-            this.disableExhaustion = exhaustion;
-        }
-
-        @Override
-        public boolean mayFlySurvival() {
-            return mayFlySurvival;
-        }
-
-        @Override
-        public void setMayFlySurvival(boolean mayFly) {
-            this.mayFlySurvival = mayFly;
-        }
-
-        @Override
-        public Object2IntMap<Stat<?>> getStatsMap() {
-            return statsMap;
-        }
-
-        @Override
-        public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
+        public Data(Object2IntMap<Stat<?>> statsMap) {
             this.statsMap = statsMap;
+        }
+
+        public Data(int identifierIndex, boolean visible, boolean exhaustionDisabled, boolean mayFlySurvival, PlayerTrustPermissions trustPermissions, PlayerHostPrivileges hostPrivileges, boolean moderator, boolean trustPermissionsInitialized, boolean fullTrustAuthority, Object2IntMap<Stat<?>> statsMap) {
+            this.identifierIndex = identifierIndex;
+            this.visible = visible;
+            this.exhaustionDisabled = exhaustionDisabled;
+            this.mayFlySurvival = mayFlySurvival;
+            this.trustPermissions = trustPermissions;
+            this.hostPrivileges = hostPrivileges;
+            this.moderator = moderator;
+            this.trustPermissionsInitialized = trustPermissionsInitialized;
+            this.fullTrustAuthority = fullTrustAuthority;
+            this.statsMap = statsMap;
+        }
+    }
+
+    class Instance implements LegacyPlayerInfo {
+        private final Data data;
+
+        public Instance(int identifierIndex, boolean visible, boolean exhaustionDisabled, boolean mayFlySurvival, PlayerTrustPermissions trustPermissions, PlayerHostPrivileges hostPrivileges, boolean moderator, boolean trustPermissionsInitialized, boolean fullTrustAuthority, Object2IntMap<Stat<?>> statsMap) {
+            data = new Data(identifierIndex, visible, exhaustionDisabled, mayFlySurvival, trustPermissions, hostPrivileges, moderator, trustPermissionsInitialized, fullTrustAuthority, statsMap);
+        }
+
+        @Override
+        public Data legacyMinecraft$getPlayerInfoData() {
+            return data;
         }
     }
 }

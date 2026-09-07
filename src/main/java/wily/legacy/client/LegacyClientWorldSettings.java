@@ -1,6 +1,8 @@
 package wily.legacy.client;
 
-public interface LegacyClientWorldSettings {
+import wily.legacy.world.LegacyWorldSettings;
+
+public interface LegacyClientWorldSettings extends LegacyWorldSettings {
     static LegacyClientWorldSettings of(Object object) {
         return (LegacyClientWorldSettings) object;
     }
@@ -8,10 +10,6 @@ public interface LegacyClientWorldSettings {
     long getDisplaySeed();
 
     void setDisplaySeed(long s);
-
-    boolean trustPlayers();
-
-    void setTrustPlayers(boolean trust);
 
     boolean isDifficultyLocked();
 

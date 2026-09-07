@@ -49,6 +49,7 @@ import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
+import wily.legacy.world.PlayerTrustAdmin;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -283,7 +284,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         legacy$resourceAlbumPrepared = false;
         Legacy4JClient.serverPlayerJoinConsumer = s -> {
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
-            LegacyClientWorldSettings.of(server.getWorldData()).setTrustPlayers(trustPlayers.get());
+            PlayerTrustAdmin.setTrustPlayers(server, trustPlayers.get());
             server.getPlayerList().sendPlayerPermissionLevel(s);
             publishScreen.setGameType(uiState.getGameMode().gameType);
             publishScreen.publish((IntegratedServer) server);

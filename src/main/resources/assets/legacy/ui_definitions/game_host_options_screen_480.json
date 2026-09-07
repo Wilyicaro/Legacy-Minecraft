@@ -18,12 +18,6 @@
           "type": "put_number",
           "name": "height",
           "value": 149
-        },
-        {
-          "applyCondition": "!${isOp}",
-          "type": "put_number",
-          "name": "height",
-          "value": 100
         }
       ]
     }

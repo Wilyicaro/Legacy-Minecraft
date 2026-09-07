@@ -8,10 +8,13 @@ import net.caffeinemc.mods.sodium.client.model.quad.ModelQuadViewMutable;
 import net.caffeinemc.mods.sodium.client.model.quad.properties.ModelQuadFacing;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.DefaultFluidRenderer;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyBiomeOverride;
 
 import java.util.Arrays;
 
@@ -28,9 +32,18 @@ public abstract class DefaultFluidRendererMixin {
     @Final
     private QuadLightData quadLightData;
 
+    @Shadow
+    @Final
+    private int[] quadColors;
+
     @Inject(method = "updateQuad", at = @At("RETURN"))
-    private void legacy$useWaterBlockLight(ModelQuadViewMutable quad, LevelSlice level, BlockPos pos, LightPipeline lighter, Direction direction, ModelQuadFacing facing, float brightness, ColorProvider<FluidState> colorProvider, FluidState fluidState, CallbackInfo ci) {
-        if (fluidState.is(FluidTags.WATER)) Arrays.fill(quadLightData.lm, LevelRenderer.getLightCoords(level, pos));
+    private void legacy$useWaterAppearance(ModelQuadViewMutable quad, LevelSlice level, BlockPos pos, LightPipeline lighter, Direction direction, ModelQuadFacing facing, float brightness, ColorProvider<FluidState> colorProvider, FluidState fluidState, CallbackInfo ci) {
+        if (!fluidState.is(FluidTags.WATER)) return;
+        Arrays.fill(quadLightData.lm, LevelRenderer.getLightCoords(level, pos));
+        ClientLevel clientLevel = Minecraft.getInstance().level;
+        if (clientLevel == null) return;
+        int alpha = Math.round(LegacyBiomeOverride.getOrDefault(clientLevel.getBiome(pos).unwrapKey()).getWaterTransparency() * 255);
+        for (int i = 0; i < quadColors.length; i++) quadColors[i] = ARGB.color(alpha, quadColors[i]);
     }
 }
 //?}

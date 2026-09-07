@@ -2,12 +2,15 @@ package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.ItemStack;
@@ -27,7 +30,9 @@ import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.entity.LegacyShieldPlayer;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyRegistries;
@@ -48,6 +53,21 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
 
     @Shadow
     public abstract Abilities getAbilities();
+
+    @Override
+    public boolean isIgnoringBlockTriggers() {
+        return (Object) this instanceof ServerPlayer player && !PlayerTrustPolicy.of(player).canUseDoorsAndSwitches() || super.isIgnoringBlockTriggers();
+    }
+
+    @Inject(method = "causeFoodExhaustion", at = @At("HEAD"), cancellable = true)
+    private void causeFoodExhaustion(float amount, CallbackInfo ci) {
+        if ((Object) this instanceof ServerPlayer player && (LegacyPlayerInfo.of(player).isExhaustionDisabled() || !PlayerTrustPolicy.of(player).canBuildAndMine())) ci.cancel();
+    }
+
+    @Inject(method = "stabAttack", at = @At("HEAD"), cancellable = true)
+    private void stabAttack(EquipmentSlot slot, Entity target, float damage, boolean dealsDamage, boolean dealsKnockback, boolean dismounts, CallbackInfoReturnable<Boolean> cir) {
+        if ((Object) this instanceof ServerPlayer player && !PlayerTrustPolicy.of(player).canDamage(target)) cir.setReturnValue(false);
+    }
 
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {

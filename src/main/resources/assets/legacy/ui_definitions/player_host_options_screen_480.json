@@ -16,13 +16,13 @@
       "type": "children",
       "elements": [
         {
-          "applyCondition": "${isSurvival}",
+          "applyCondition": "${isSurvival} && !${hasAdditionalTrustOptions}",
           "type": "put_number",
           "name": "height",
           "value": 96
         },
         {
-          "applyCondition": "!${isSurvival}",
+          "applyCondition": "!${isSurvival} && !${hasAdditionalTrustOptions}",
           "type": "put_number",
           "name": "height",
           "value": 78

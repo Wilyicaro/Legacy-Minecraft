@@ -25,6 +25,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -34,6 +35,8 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerHostPrivileges;
+import wily.legacy.entity.PlayerTrustPermissions;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,14 +46,12 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     @Shadow
     @Final
     public ServerPlayerGameMode gameMode;
-    int position = -1;
+    @Unique
+    private final LegacyPlayerInfo.Data legacyMinecraft$playerInfoData = new LegacyPlayerInfo.Data();
     boolean classicCrafting = true;
     boolean classicTrading = true;
     boolean classicStonecutting = true;
     boolean classicLoom = true;
-    boolean disableExhaustion = false;
-    boolean mayFlySurvival = false;
-    boolean visible = true;
     final Set<String> musicDiscHuntProgress = new HashSet<>();
 
     public ServerPlayerMixin(Level level, GameProfile gameProfile) {
@@ -81,13 +82,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
-    public int getIdentifierIndex() {
-        return position;
-    }
-
-    @Override
-    public void setIdentifierIndex(int i) {
-        position = i;
+    public LegacyPlayerInfo.Data legacyMinecraft$getPlayerInfoData() {
+        return legacyMinecraft$playerInfoData;
     }
 
     @Override
@@ -131,42 +127,12 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
-    public boolean isExhaustionDisabled() {
-        return disableExhaustion;
-    }
-
-    @Override
-    public void setDisableExhaustion(boolean exhaustion) {
-        this.disableExhaustion = exhaustion;
-    }
-
-    @Override
-    public void setMayFlySurvival(boolean mayFlySurvival) {
-        this.mayFlySurvival = mayFlySurvival;
-    }
-
-    @Override
-    public boolean mayFlySurvival() {
-        return mayFlySurvival;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return visible;
-    }
-
-    @Override
     public Object2IntMap<Stat<?>> getStatsMap() {
         return getStats().stats;
     }
 
     @Override
     public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
-    }
-
-    @Override
-    public void setVisibility(boolean visible) {
-        this.visible = visible;
     }
 
     @Override
@@ -179,6 +145,9 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         valueOutput.putBoolean("DisableExhaustion", isExhaustionDisabled());
         valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
         valueOutput.putBoolean("HostInvisible", !isVisible());
+        if (isTrustPermissionsInitialized()) getTrustPermissions().save(valueOutput.child("PlayerTrust"));
+        getHostPrivileges().save(valueOutput.child("PlayerHostPrivileges"));
+        valueOutput.putBoolean("PlayerTrustModerator", isModerator());
         valueOutput.store("LegacyMusicDiscHunts", Codec.STRING.listOf(), musicDiscHuntProgress.stream().sorted().toList());
     }
 
@@ -187,6 +156,15 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
         setMayFlySurvival(input.getBooleanOr("MayFlySurvival", false));
         setVisibility(!input.getBooleanOr("HostInvisible", false));
+        setHostPrivileges(input.child("PlayerHostPrivileges").map(PlayerHostPrivileges::load).orElse(
+                new PlayerHostPrivileges(!isVisible(), mayFlySurvival(), isExhaustionDisabled(), false)
+        ));
+        setTrustPermissionsInitialized(false);
+        input.child("PlayerTrust").ifPresent(trustInput -> {
+            setTrustPermissions(PlayerTrustPermissions.load(trustInput));
+            setTrustPermissionsInitialized(true);
+        });
+        setModerator(input.getBooleanOr("PlayerTrustModerator", false));
         musicDiscHuntProgress.clear();
         input.read("LegacyMusicDiscHunts", Codec.STRING.listOf()).ifPresent(musicDiscHuntProgress::addAll);
     }
