@@ -26,12 +26,24 @@ public abstract class CharsIcon extends LegacyIcon {
 
     @Override
     public Component getOverlayComponent(boolean allowPressed) {
-        return iconOverlayChars.isPresent() ? getActualIcon(iconOverlayChars.get(), allowPressed, getControlType()) : CommonComponents.EMPTY;
+        return iconOverlayChars.isPresent() ? getActualIcon(iconOverlayChars.get(), allowPressed, getControlType()) : null;
     }
 
     @Override
     public Component getComponent() {
-        return tipIcon.isEmpty() ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : ControlTooltip.getControlIcon(tipIcon.get(), getControlType()).getComponent();
+        if (tipIcon.isEmpty()) {
+            Component c = getComponent(false);
+
+            if (c != null) return c;
+
+            Component co = getOverlayComponent(false);
+
+            if (co != null) return co;
+
+            return CommonComponents.EMPTY;
+        }
+
+        return ControlTooltip.getControlIcon(tipIcon.get(), getControlType()).getComponent();
     }
 
     public abstract ControlType getControlType();
