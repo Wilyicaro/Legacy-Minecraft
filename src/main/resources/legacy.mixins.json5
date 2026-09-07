@@ -113,7 +113,7 @@
     "client.gui.LocatorBarRendererMixin",
     //?}
     "client.sign.HangingSignEditScreenMixin",
-    "client.inventory.HorseInventoryScreenMixin",
+    "client.inventory.AbstractMountInventoryScreenMixin",
     "client.HugeExplosionParticleMixin",
     "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
