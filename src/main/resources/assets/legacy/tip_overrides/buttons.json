@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "blocks": ["#stone_buttons","#wooden_buttons"],
+    "blocks": ["#stone_buttons","#wooden_buttons", "#buttons"],
     "tip": {"translate": "block.minecraft.button.tip"}
   }
 }
