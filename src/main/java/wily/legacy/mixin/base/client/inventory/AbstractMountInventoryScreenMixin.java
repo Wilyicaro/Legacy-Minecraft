@@ -3,24 +3,18 @@ package wily.legacy.mixin.base.client.inventory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
-import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.animal.equine.Llama;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.HorseInventoryMenu;
+import net.minecraft.world.inventory.AbstractMountInventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec2;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
@@ -29,14 +23,16 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-@Mixin(HorseInventoryScreen.class)
-public abstract class HorseInventoryScreenMixin extends AbstractMountInventoryScreen<HorseInventoryMenu> {
+@Mixin(AbstractMountInventoryScreen.class)
+public abstract class AbstractMountInventoryScreenMixin<T extends AbstractMountInventoryMenu> extends AbstractContainerScreen<T> {
 
+    @Shadow
+    protected LivingEntity mount;
     @Unique
     private static Vec2 SD_SLOTS_OFFSET = new Vec2(0.5f, 0.5f);
 
-    public HorseInventoryScreenMixin(HorseInventoryMenu abstractMountInventoryMenu, Inventory inventory, Component component, int i, LivingEntity livingEntity) {
-        super(abstractMountInventoryMenu, inventory, component, i, livingEntity);
+    public AbstractMountInventoryScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
+        super(abstractContainerMenu, inventory, component);
     }
 
     @Override
