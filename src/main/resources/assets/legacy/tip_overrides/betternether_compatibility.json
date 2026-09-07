@@ -1,6 +1,14 @@
 {
   "overrides": [
     {
+      "block": "betternether:cincinnasite_anvil",
+      "tip": {"translate": "block.minecraft.anvil.tip"}
+    },
+    {
+      "block": "betternether:nether_brewing_stand",
+      "tip": {"translate": "block.minecraft.brewing_stand.tip"}
+    },
+    {
       "block": "betternether:nether_redstone_ore",
       "tip": {"translate": "block.minecraft.redstone_ore.tip"}
     },
