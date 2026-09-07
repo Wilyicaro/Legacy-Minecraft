@@ -33,7 +33,7 @@
       "tip": {"translate": "block.minecraft.chiseled_bookshelf.tip"}
     },
     {
-      "blocks": ["betternether:anchor_tree_composter","betternether:crimson_composter","betternether:gloomwood_dark_composter","betternether:gloomwood_composter","betternether:mushroom_fir_composter","betternether:nether_mushroom_composter","betternether:nether_reed_bookshelf","betternether:nether_sakura_composter","betternether:rubeus_composter","betternether:stalagnate_composter","betternether:warped_composter","betternether:wart_composter","betternether:willow_composter"],
+      "blocks": ["betternether:anchor_tree_composter","betternether:crimson_composter","betternether:gloomwood_dark_composter","betternether:gloomwood_composter","betternether:mushroom_fir_composter","betternether:nether_mushroom_composter","betternether:nether_reed_composter","betternether:nether_sakura_composter","betternether:rubeus_composter","betternether:stalagnate_composter","betternether:warped_composter","betternether:wart_composter","betternether:willow_composter"],
       "tip": {"translate": "block.minecraft.composter.tip"}
     },
     {
