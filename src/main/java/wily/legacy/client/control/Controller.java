@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
@@ -148,7 +149,7 @@ public interface Controller {
     }
 
     default void addOrSetControllerToast(Component component) {
-        if (!LegacyOptions.controllerToasts.get()) return;
+        if (!LegacyOptions.controllerToasts.get() || !MinecraftAccessor.getInstance().hasGameLoaded()) return;
         LegacyTip oldToast = FactoryAPIClient.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
         Component tip = Component.literal(getName());
         if (oldToast == null || (oldToast.title != CONTROLLER_DETECTED && oldToast.title != CONTROLLER_DISCONNECTED) || oldToast.visibility == Toast.Visibility.HIDE) {
