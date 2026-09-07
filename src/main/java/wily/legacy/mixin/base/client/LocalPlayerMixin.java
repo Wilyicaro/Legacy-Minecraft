@@ -371,6 +371,12 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         legacy$updateShieldControls();
     }
 
+    @ModifyExpressionValue(method = "modifyInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;itemUseSpeedMultiplier()F"))
+    private float legacyShieldSpeedMultiplier(float original) {
+        return legacyAutoShielding && isMovingSlowly() && getUseItem().getItem() instanceof ShieldItem
+                && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) ? 1.0f : original;
+    }
+
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isAllowedInPortal()Z"))
     public boolean handleConfusionTransitionEffect(boolean original) {
         return original || Legacy4JClient.hasModOnServer();
