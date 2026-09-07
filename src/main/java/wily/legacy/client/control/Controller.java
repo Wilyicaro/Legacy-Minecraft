@@ -71,7 +71,7 @@ public interface Controller {
     String getName();
 
     /**
-     * @return ControlType corresponding to the Controller Handler's control type, this is based on the control name if the handler does not provide this information, as in GLFW
+     * @return ControlType corresponding to the Controller Handler's controller type, this is based on the controller name if the handler does not provide this information, as in GLFW
      */
     ControlType getType();
 
@@ -88,7 +88,7 @@ public interface Controller {
     float axisValue(int i);
 
     /**
-     * @return If this control has LED
+     * @return If this controller has LED
      * This always returns true on SDL3 and false on GLFW
      */
     default boolean hasLED() {
@@ -133,13 +133,13 @@ public interface Controller {
 
     /**
      * @param button {@link ControllerBinding.Button}
-     * @return If this control contains this button
+     * @return If this controller contains this button
      */
     boolean hasButton(ControllerBinding.Button button);
 
     /**
      * @param axis {@link ControllerBinding.Axis}
-     * @return If this control contains this axis
+     * @return If this controller contains this axis
      */
     boolean hasAxis(ControllerBinding.Axis axis);
 
@@ -159,7 +159,7 @@ public interface Controller {
     }
 
     /**
-     * @return {@link Controller.Handler} used by this control
+     * @return {@link Controller.Handler} used by this controller
      */
     Handler getHandler();
 
@@ -228,7 +228,7 @@ public interface Controller {
         boolean update();
 
         /**
-         * Manages the connected control bindings
+         * Manages the connected controller bindings
          *
          * @param manager Controller Manager instance
          */
@@ -238,13 +238,13 @@ public interface Controller {
 
         /**
          * @param jid Controller ID, generally based on the connection order
-         * @return The control corresponding to this ID, or null if it's invalid
+         * @return The controller corresponding to this ID, or null if it's invalid
          */
         Controller getController(int jid);
 
         /**
          * @param jid Controller ID, generally based on the connection order
-         * @return If this ID corresponds to a valid control
+         * @return If this ID corresponds to a valid controller
          */
         boolean isValidController(int jid);
 
