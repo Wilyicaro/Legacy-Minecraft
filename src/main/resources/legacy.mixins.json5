@@ -91,6 +91,7 @@
     "client.EndCrystalModelMixin",
     "client.EndCrystalRendererMixin",
     "client.NameTagFeatureMixin",
+    "client.FileFixerProgressScreenMixin",
     "client.FireworkEntityRendererMixin",
     "client.AirBasedFogEnvironmentMixin",
     "client.AtmosphericFogEnvironmentMixin",
