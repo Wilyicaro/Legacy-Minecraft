@@ -21,6 +21,10 @@
       "tip": {"translate": "block.minecraft.redstone_ore.tip"}
     },
     {
+      "block": "betternether:gloomwood_dark_sign",
+      "tip": {"translate": "block.minecraft.sign.tip"}
+    },
+    {
       "blocks": ["betternether:gloomwood_dark_molten_log","betternether:gloomwood_transition_log"],
       "tip": {"translate": "block.minecraft.log_unstrippable.tip"}
     },
