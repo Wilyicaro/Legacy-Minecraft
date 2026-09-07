@@ -177,7 +177,9 @@ public class UsePrediction {
                 if (ctx.entity instanceof Boat || ctx.entity instanceof ChestBoat) return LegacyComponents.SAIL;
                 else if (ctx.entity instanceof AbstractMinecart m && /*? if <1.21.2 {*//*m.getMinecartType() == AbstractMinecart.Type.RIDEABLE*//*?} else {*/m.isRideable()/*?}*/)
                     return LegacyComponents.RIDE;
-                else if ((ctx.entity instanceof HappyGhast ghast && !ctx.entity.isVehicle() && !ghast.getItemBySlot(EquipmentSlot.BODY).isEmpty()) || ctx.entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !ctx.entity.isVehicle() && ((!(ctx.entity instanceof AbstractHorse) && s.isSaddled()) || ctx.entity instanceof AbstractHorse h && !ctx.player.isSecondaryUseActive() && !h.isBaby() && (h.isTamed() && !h.isFood(ctx.player.getMainHandItem()) || ctx.player.getMainHandItem().isEmpty())))
+                else if (ctx.entity instanceof AbstractNautilus nautilus)
+                    return nautilus.isTame() && !ctx.player.isSecondaryUseActive() && !nautilus.isFood(ctx.handItem) ? LegacyComponents.MOUNT : null;
+                else if ((ctx.entity instanceof HappyGhast ghast && ghast.isWearingBodyArmor()) || ctx.entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !ctx.entity.isVehicle() && ((!(ctx.entity instanceof AbstractHorse) && s.isSaddled()) || ctx.entity instanceof AbstractHorse h && !ctx.player.isSecondaryUseActive() && !h.isBaby() && (h.isTamed() && !h.isFood(ctx.player.getMainHandItem()) || ctx.player.getMainHandItem().isEmpty())))
                     return LegacyComponents.MOUNT;
             }
         }
