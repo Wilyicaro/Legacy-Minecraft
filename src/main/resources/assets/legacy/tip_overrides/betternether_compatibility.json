@@ -17,7 +17,7 @@
       "tip": {"translate": "block.minecraft.wood.tip"}
     },
     {
-      "blocks": ["betternether:anchor_tree_bookshelf","betternether:crimson_bookshelf","betternether:gloomwood_dark_bookshelf","betternether:gloomwood_bookshelf","betternether:mushroom_fir_bookshelf","betternether:nether_mushroom_bookshelf","betternether:nether_reed_bookhelf","betternether:nether_sakura_bookshelf","betternether:rubeus_bookshelf","betternether:stalagnate_bookshelf","betternether:warped_bookshelf","betternether:wart_bookshelf","betternether:willow_bookshelf"],
+      "blocks": ["betternether:anchor_tree_bookshelf","betternether:crimson_bookshelf","betternether:gloomwood_dark_bookshelf","betternether:gloomwood_bookshelf","betternether:mushroom_fir_bookshelf","betternether:nether_mushroom_bookshelf","betternether:nether_reed_bookshelf","betternether:nether_sakura_bookshelf","betternether:rubeus_bookshelf","betternether:stalagnate_bookshelf","betternether:warped_bookshelf","betternether:wart_bookshelf","betternether:willow_bookshelf"],
       "tip": {"translate": "block.minecraft.bookshelf.tip"}
     },
     {
@@ -29,11 +29,11 @@
       "tip": {"translate": "block.minecraft.chest.tip"}
     },
     {
-      "blocks": ["betternether:anchor_tree_chiseled_bookshelf","betternether:crimson_chiseled_bookshelf","betternether:gloomwood_dark_chiseled_bookshelf","betternether:gloomwood_chiseled_bookshelf","betternether:mushroom_fir_chiseled_bookshelf","betternether:nether_mushroom_chiseled_bookshelf","betternether:nether_reed_bookhelf","betternether:nether_sakura_chiseled_bookshelf","betternether:rubeus_chiseled_bookshelf","betternether:stalagnate_chiseled_bookshelf","betternether:warped_chiseled_bookshelf","betternether:wart_chiseled_bookshelf","betternether:willow_chiseled_bookshelf"],
+      "blocks": ["betternether:anchor_tree_chiseled_bookshelf","betternether:crimson_chiseled_bookshelf","betternether:gloomwood_dark_chiseled_bookshelf","betternether:gloomwood_chiseled_bookshelf","betternether:mushroom_fir_chiseled_bookshelf","betternether:nether_mushroom_chiseled_bookshelf","betternether:nether_reed_bookshelf","betternether:nether_sakura_chiseled_bookshelf","betternether:rubeus_chiseled_bookshelf","betternether:stalagnate_chiseled_bookshelf","betternether:warped_chiseled_bookshelf","betternether:wart_chiseled_bookshelf","betternether:willow_chiseled_bookshelf"],
       "tip": {"translate": "block.minecraft.chiseled_bookshelf.tip"}
     },
     {
-      "blocks": ["betternether:anchor_tree_composter","betternether:crimson_composter","betternether:gloomwood_dark_composter","betternether:gloomwood_composter","betternether:mushroom_fir_composter","betternether:nether_mushroom_composter","betternether:nether_reed_bookhelf","betternether:nether_sakura_composter","betternether:rubeus_composter","betternether:stalagnate_composter","betternether:warped_composter","betternether:wart_composter","betternether:willow_composter"],
+      "blocks": ["betternether:anchor_tree_composter","betternether:crimson_composter","betternether:gloomwood_dark_composter","betternether:gloomwood_composter","betternether:mushroom_fir_composter","betternether:nether_mushroom_composter","betternether:nether_reed_bookshelf","betternether:nether_sakura_composter","betternether:rubeus_composter","betternether:stalagnate_composter","betternether:warped_composter","betternether:wart_composter","betternether:willow_composter"],
       "tip": {"translate": "block.minecraft.composter.tip"}
     },
     {
