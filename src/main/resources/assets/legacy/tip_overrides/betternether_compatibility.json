@@ -9,6 +9,14 @@
       "tip": {"translate": "block.minecraft.brewing_stand.tip"}
     },
     {
+      "block": "betternether:soul_sandstone_wall",
+      "tip": {"translate": "block.minecraft.sandstone_wall.tip"}
+    },
+    {
+      "block": "betternether:nether_brick_wall",
+      "tip": {"translate": "block.minecraft.nether_brick_wall.tip"}
+    },
+    {
       "block": "betternether:nether_redstone_ore",
       "tip": {"translate": "block.minecraft.redstone_ore.tip"}
     },
