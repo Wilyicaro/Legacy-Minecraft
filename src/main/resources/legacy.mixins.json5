@@ -91,6 +91,7 @@
     "client.EndCrystalModelMixin",
     "client.EndCrystalRendererMixin",
     "client.NameTagFeatureMixin",
+    "client.FileFixerProgressScreenMixin",
     "client.FireworkEntityRendererMixin",
     "client.AirBasedFogEnvironmentMixin",
     "client.AtmosphericFogEnvironmentMixin",
@@ -113,7 +114,7 @@
     "client.gui.LocatorBarRendererMixin",
     //?}
     "client.sign.HangingSignEditScreenMixin",
-    "client.inventory.HorseInventoryScreenMixin",
+    "client.inventory.AbstractMountInventoryScreenMixin",
     "client.HugeExplosionParticleMixin",
     "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",

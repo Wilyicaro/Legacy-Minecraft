@@ -43,7 +43,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final String COMMON_COLORS = "common_colors.json";
     public static final String COMMON_VALUES = "common_values.json";
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
-    public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/control.json";
+    public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
     public static final Identifier DEFAULT_CHANGELOG_PATH = Legacy4J.createModLocation("changelog");
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static LegacyIntro intro = LegacyIntro.EMPTY;

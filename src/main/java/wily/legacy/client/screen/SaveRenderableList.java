@@ -307,6 +307,9 @@ public class SaveRenderableList extends RenderableVList {
         String string = summary.getLevelId();
         try (LevelStorageSource.LevelStorageAccess levelStorageAccess = levelStorageSource.createAccess(string)) {
             levelStorageAccess.deleteLevel();
+            renderables.removeIf(renderable -> renderable instanceof SaveButton button && button.summary.getLevelId().equals(string));
+            iconCache.invalidate(new WorldIcon(string, summary.getIcon()));
+            sizeCache.invalidate(summary);
             try (LevelStorageSource.LevelStorageAccess currentAccess = LegacySaveCache.currentWorldSource.createAccess(string)) {
                 currentAccess.deleteLevel();
             } catch (IOException _) {
