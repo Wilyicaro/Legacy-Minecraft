@@ -9,6 +9,10 @@
       "tip": {"translate": "block.minecraft.brewing_stand.tip"}
     },
     {
+      "blocks": ["betternether:basalt_furnace","bethernether:blackstone_furnace","betternether:netherrack_furnace"],
+      "tip": {"translate": "block.minecraft.furnace.tip"}
+    },
+    {
       "block": "betternether:soul_sandstone_wall",
       "tip": {"translate": "block.minecraft.sandstone_wall.tip"}
     },
@@ -67,6 +71,14 @@
     {
       "blocks": ["betternether:anchor_tree_shelf","betternether:gloomwood_dark_shelf","betternether:gloomwood_shelf","betternether:mushroom_fir_shelf","betternether:nether_mushroom_shelf","betternether:nether_reed_shelf","betternether:nether_sakura_shelf","betternether:rubeus_shelf","betternether:stalagnate_shelf","betternether:wart_shelf","betternether:willow_shelf"],
       "tip": {"translate": "block.minecraft.shelf.tip"}
+    },
+    {
+      "item": "betternether:cincinnasite_shears",
+      "tip": {"translate": "item.minecraft.shears.tip"}
+    },
+    {
+      "item": "betternether:cincinnasite_ingot",
+      "tip": {"translate": "item.minecraft.ingot.tip"}
     }
   ]
 }
