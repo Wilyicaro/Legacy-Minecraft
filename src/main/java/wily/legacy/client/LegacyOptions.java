@@ -411,6 +411,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
+    public static final FactoryConfig<Boolean> vibrationWhenBreaking = CLIENT_STORAGE.register(createBooleanWithTooltip("vibrationWhenBreaking", false));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
     public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
     public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", builder -> builder.valueToComponent(v -> v.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeGui), CLIENT_STORAGE));

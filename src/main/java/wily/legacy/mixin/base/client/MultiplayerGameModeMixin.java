@@ -29,6 +29,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -124,6 +126,15 @@ public class MultiplayerGameModeMixin {
         }
         if (minecraft.player != null && minecraft.level != null && LegacyBlockProtection.blocksBreak(minecraft.level, pos, minecraft.level.getBlockState(pos), minecraft.player.getAbilities().instabuild)) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;"))
+    private void rumbleDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (LegacyOptions.vibrationWhenBreaking.get() && Legacy4JClient.controllerManager.connectedController != null) {
+            //For some reason, the triggers don't rumble for me
+            Legacy4JClient.controllerManager.connectedController.rumbleTriggers('\u0000', '\uFF00', 160);
+            Legacy4JClient.controllerManager.connectedController.rumble('\u0000', '\uFF00', 240);
         }
     }
 

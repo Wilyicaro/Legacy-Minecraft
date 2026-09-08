@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.control.ControlType;
 
@@ -13,8 +14,10 @@ public abstract class LegacyIcon implements ComponentIcon {
     boolean lastPressed = false;
     long startPressTime = 0L;
 
+    @Nullable
     public abstract Component getComponent(boolean allowPressed);
 
+    @Nullable
     public abstract Component getOverlayComponent(boolean allowPressed);
 
     public Component getComponent() {
