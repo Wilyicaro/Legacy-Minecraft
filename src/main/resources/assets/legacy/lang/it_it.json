@@ -1152,6 +1152,7 @@
   "legacy.action.cast": "Lancia/Ritira",
   "legacy.action.change_filter": "Cambia Filtro",
   "legacy.action.change_group": "Change Group",
+  "legacy.action.change_ingredient": "Change Ingredient",
   "legacy.action.change_pitch": "Cambia Tonalità",
   "legacy.action.change_pose": "Change Pose",
   "legacy.action.charge": "Carica",
