@@ -1152,6 +1152,7 @@
   "legacy.action.cast": "Lançar",
   "legacy.action.change_filter": "Trocar Filtro",
   "legacy.action.change_group": "Mudar Grupo",
+  "legacy.action.change_ingredient": "Change Ingredient",
   "legacy.action.change_pitch": "Alterar Tom",
   "legacy.action.change_pose": "Mudar Pose",
   "legacy.action.charge": "Carregar",
