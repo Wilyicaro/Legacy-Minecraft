@@ -1152,6 +1152,7 @@
   "legacy.action.cast": "Cast",
   "legacy.action.change_filter": "Change Filter",
   "legacy.action.change_group": "Change Group",
+  "legacy.action.change_ingredient": "Change Ingredient",
   "legacy.action.change_pitch": "Zmień Pitch",
   "legacy.action.change_pose": "Change Pose",
   "legacy.action.charge": "Naładuj",
