@@ -126,6 +126,7 @@ import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import org.lwjgl.glfw.GLFW;
 
 
@@ -538,6 +539,7 @@ public class Legacy4JClient {
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
+            DownloadedSkinPackStore.resetOutdatedPacks(m);
             controllerManager.afterConfigLoad();
             LegacyRenderDistance.initDefault();
             //? if fabric
