@@ -1152,6 +1152,7 @@
   "legacy.action.cast": "Cast",
   "legacy.action.change_filter": "更改篩選器",
   "legacy.action.change_group": "Change Group",
+  "legacy.action.change_ingredient": "Change Ingredient",
   "legacy.action.change_pitch": "更改音調",
   "legacy.action.change_pose": "Change Pose",
   "legacy.action.charge": "蓄力",
