@@ -24,6 +24,7 @@
     "compat.sodium.ShaderLoaderMixin",
     "compat.sodium.BlockRendererMixin",
     "compat.sodium.OcclusionCullerMixin",
+    "compat.sodium.TraversableTreeMixin",
     "compat.sodium.LevelSliceMixin",
     //?}
     //? (fabric || >=1.21 && neoforge && <26.1) {

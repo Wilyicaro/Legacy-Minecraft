@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.LegacyUnderwaterFog;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(FogRenderer.class)
 public abstract class FogRendererMixin {
@@ -56,11 +57,12 @@ public abstract class FogRendererMixin {
             method = "setupFog",
             at = @At("RETURN")
     )
-    private void legacy$removeUnderwaterRenderDistanceFog(
+    private void legacy$useEnvironmentalFogRange(
             Camera camera, int renderDistanceChunks, DeltaTracker deltaTracker,
             float darkenWorldAmount, ClientLevel level, CallbackInfoReturnable<FogData> cir) {
         FogData fogData = cir.getReturnValue();
-        if (LegacyUnderwaterFog.isEnabled() && camera.getFluidInCamera() == FogType.WATER) {
+        if (LegacyCommonOptions.squaredViewDistance.get()
+                || LegacyUnderwaterFog.isEnabled() && camera.getFluidInCamera() == FogType.WATER) {
             fogData.renderDistanceStart = fogData.environmentalStart;
             fogData.renderDistanceEnd = fogData.environmentalEnd;
         }
