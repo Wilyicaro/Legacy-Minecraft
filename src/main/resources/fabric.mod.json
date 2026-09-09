@@ -43,7 +43,9 @@
     "factocrafty": ">=0.0.0.6"
   },
   "breaks": {
-    "rrls": "*",
     "viafabricplus": "*"
+  },
+  "conflicts": {
+    "rrls": "*"
   }
 }
