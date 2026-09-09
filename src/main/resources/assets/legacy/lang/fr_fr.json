@@ -1152,6 +1152,7 @@
   "legacy.action.cast": "Lancer",
   "legacy.action.change_filter": "Changer le filtre",
   "legacy.action.change_group": "Change Group",
+  "legacy.action.change_ingredient": "Change Ingredient",
   "legacy.action.change_pitch": "Changer la hauteur",
   "legacy.action.change_pose": "Change Pose",
   "legacy.action.charge": "Charger",
