@@ -1152,6 +1152,7 @@
   "legacy.action.cast": "Cast",
   "legacy.action.change_filter": "Vaihda Suodatin",
   "legacy.action.change_group": "Change Group",
+  "legacy.action.change_ingredient": "Change Ingredient",
   "legacy.action.change_pitch": "Vaihda Sävelkorkeus",
   "legacy.action.change_pose": "Change Pose",
   "legacy.action.charge": "Lataa",
