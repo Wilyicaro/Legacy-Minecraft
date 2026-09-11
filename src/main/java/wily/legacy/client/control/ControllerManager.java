@@ -21,6 +21,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.Stocker;
@@ -640,6 +642,36 @@ public class ControllerManager {
 
     public void updateCursorInputMode() {
         if (!minecraft.mouseHandler.isMouseGrabbed()) setCursorInputMode(!ReplayCompat.isRendering() && !LegacyOptions.hasSystemCursor());
+    }
+
+    public static Vec2 rumbleIntensityFromTarget(Vec3 pos, Vec2 rot, Vec3 targetPos, double maxDistance, float separationFactor) {
+        double distance = pos.distanceTo(targetPos);
+
+        if (distance >= maxDistance || distance < 0.0001)
+            return Vec2.ZERO;
+
+        Vec3 sub = targetPos.subtract(pos);
+
+        double baseIntensity = 1.0 - (distance / maxDistance);
+
+        double yawRad = Math.toRadians(rot.y);
+        double pitchRad = Math.toRadians(rot.x);
+
+        double rightX = Math.cos(yawRad);
+        double rightZ = Math.sin(yawRad);
+
+        double dirX = sub.x() / distance;
+        double dirZ = sub.z() / distance;
+
+        double sideAlignment = (dirX * rightX) + (dirZ * rightZ);
+
+        double pitchFactor = Math.abs(Math.cos(pitchRad));
+        baseIntensity *= (0.5 + 0.5 * pitchFactor);
+
+        float left = (float) (baseIntensity * (1.0 + separationFactor * sideAlignment));
+        float right = (float) (baseIntensity * (1.0 - separationFactor * sideAlignment));
+
+        return new Vec2(Math.clamp(left, 0.0f, 1.0f), Math.clamp(right, 0.0f, 1.0f));
     }
 
     interface Setup extends Consumer<ControllerManager> {

@@ -406,13 +406,16 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> hudDelay = CLIENT_STORAGE.register(createInteger("hudDelay", builder -> builder.messageFunction((display, value) -> value == 0 ? CommonComponents.optionNameValue(display.name(), CommonComponents.OPTION_OFF) : Component.translatable("options.percent_value", display.name(), value)), 0, () -> 200, 100));
     public static final FactoryConfig<Boolean> bubblesOutsideWater = CLIENT_STORAGE.register(createBoolean("bubblesOutsideWater", true));
     public static final FactoryConfig<Boolean> legacyItemPickup = CLIENT_STORAGE.register(createBoolean("legacyItemPickup", true));
-    public static final FactoryConfig<Boolean> controllerToasts = CLIENT_STORAGE.register(createBoolean("controllerToasts", true));
     public static final FactoryConfig<Boolean> legacyHearts = CLIENT_STORAGE.register(createBoolean("legacyHearts", true));
+
+    public static final FactoryConfig<Boolean> controllerToasts = CLIENT_STORAGE.register(createBoolean("controllerToasts", true));
     public static final FactoryConfig<Boolean> controllerDoubleClick = CLIENT_STORAGE.register(createBoolean("controllerDoubleClick", false));
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
+    //TODO Make this an intensity slider
     public static final FactoryConfig<Boolean> vibrationWhenBreaking = CLIENT_STORAGE.register(createBooleanWithTooltip("vibrationWhenBreaking", false));
+    public static final FactoryConfig<Double> vibrationWhenExploding = CLIENT_STORAGE.register(createDouble("vibrationWhenExploding", Function.identity(), 0.0));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
     public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
     public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", builder -> builder.valueToComponent(v -> v.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeGui), CLIENT_STORAGE));

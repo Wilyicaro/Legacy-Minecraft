@@ -258,7 +258,8 @@
     "client.ClientBiomeMixin",
     "client.EnvironmentAttributeMapMixin",
     "client.chat.ChatComponentDrawingMixin",
-    "client.gui.JumpableVehicleBarRendererMixin"
+    "client.gui.JumpableVehicleBarRendererMixin",
+    "client.ClientLevelMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
