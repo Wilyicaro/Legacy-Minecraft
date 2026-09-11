@@ -44,7 +44,7 @@ public abstract class ClientLevelMixin extends Level {
 
         Controller controller = Legacy4JClient.controllerManager.connectedController;
 
-        if (controller != null) {
+        if (controller != null && Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             LocalPlayer player = minecraft.player;
             Vec2 rumble = ControllerManager.rumbleIntensityFromTarget(player.position(), player.getRotationVector(), center, radius, 0.7f).scale(vibration);
 
