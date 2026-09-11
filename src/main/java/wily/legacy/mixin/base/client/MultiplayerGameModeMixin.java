@@ -131,10 +131,11 @@ public class MultiplayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;"))
     private void rumbleDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyOptions.vibrationWhenBreaking.get() && Legacy4JClient.controllerManager.connectedController != null && Legacy4JClient.controllerManager.isControllerTheLastInput()) {
+        if (LegacyOptions.vibrationWhenBreaking.get() > 0 && Legacy4JClient.controllerManager.connectedController != null && Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             //For some reason, the triggers don't rumble for me
-            Legacy4JClient.controllerManager.connectedController.rumbleTriggers('\u0000', '\uFF00', 160);
-            Legacy4JClient.controllerManager.connectedController.rumble('\u0000', '\uFF00', 240);
+            char rumble = (char) (Character.MAX_VALUE * LegacyOptions.vibrationWhenBreaking.get() * 0.5);
+            Legacy4JClient.controllerManager.connectedController.rumbleTriggers('\u0000', rumble, 160);
+            Legacy4JClient.controllerManager.connectedController.rumble('\u0000', rumble, 240);
         }
     }
 

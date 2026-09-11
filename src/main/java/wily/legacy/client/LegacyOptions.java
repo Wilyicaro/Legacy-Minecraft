@@ -413,8 +413,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
-    //TODO Make this an intensity slider
-    public static final FactoryConfig<Boolean> vibrationWhenBreaking = CLIENT_STORAGE.register(createBooleanWithTooltip("vibrationWhenBreaking", false));
+    public static final FactoryConfig<Double> vibrationWhenBreaking = CLIENT_STORAGE.register(createDouble("vibrationWhenBreaking", Function.identity(), 0.0));
     public static final FactoryConfig<Double> vibrationWhenExploding = CLIENT_STORAGE.register(createDouble("vibrationWhenExploding", Function.identity(), 0.0));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
     public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
