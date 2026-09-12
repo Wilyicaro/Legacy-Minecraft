@@ -14,15 +14,25 @@
           "width": 456,
           "height": 121,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.hud_message"
+                "translate": "legacy.menu.how_to_play.hud_title"
               },
               "width": 434
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.hud_message"
+              },
+              "width": 434
+            },
+            "text2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.hud_message_1",
                 "allowVariables": true,
@@ -346,10 +356,11 @@
           "height": 88,
           "lineHeight": 8,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.hud_message",
+                "translate": "legacy.menu.how_to_play.hud_title",
                 "font": "legacy:default_11"
               },
               "width": 268,
@@ -357,6 +368,17 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.hud_message",
+                "font": "legacy:default_11"
+              },
+              "width": 268,
+              "lineSpacing": 8
+            },
+            "text2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.hud_message_1",
                 "font": "legacy:default_11",
