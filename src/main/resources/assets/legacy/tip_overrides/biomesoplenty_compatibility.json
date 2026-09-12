@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "blocks": ["biomesoplenty:dead_log","biomesoplenty:empyreal_log","biomesoplenty:fir_log","biomesoplenty:hellbark_log","biomesoplenty:jacaranda_log","biomesoplenty:magic_log","biomesoplenty:mahogany_log","biomesoplenty:maple_log","biomesoplenty:origin_oak_log","biomesoplenty:palm_log","biomesoplenty:pine_log","biomesoplenty:redwood_log","biomesoplenty:umbran_log","biomesoplenty:willow_log"],
+      "tip": {"translate": "block.minecraft.log.tip"}
+    },
+    {
+      "blocks": ["biomesoplenty:dead_wood","biomesoplenty:empyreal_wood","biomesoplenty:fir_wood","biomesoplenty:hellbark_wood","biomesoplenty:jacaranda_wood","biomesoplenty:magic_wood","biomesoplenty:mahogany_wood","biomesoplenty:maple_wood","biomesoplenty:origin_oak_wood","biomesoplenty:palm_wood","biomesoplenty:pine_wood","biomesoplenty:redwood_wood","biomesoplenty:umbran_wood","biomesoplenty:willow_wood"],
+      "tip": {"translate": "block.minecraft.wood.tip"}
+    }
+  ]
+}
