@@ -11,6 +11,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.NavigationElement;
 import wily.legacy.client.control.Controller;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -68,7 +69,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
 
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        return isVisible && !isHovered && (!Controller.Listener.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
+        return isVisible && !isHovered && (!Controller.Listener.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyControlsOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
     }
 
     @Override

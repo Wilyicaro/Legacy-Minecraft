@@ -81,7 +81,7 @@ public class ControllerManager {
     private int inputTicks = 1;
 
     public static Controller.Handler getHandler() {
-        return LegacyOptions.selectedControllerHandler.get();
+        return LegacyControlsOptions.selectedControllerHandler.get();
     }
 
     public Component getControllerDisplayName(int jid) {
@@ -96,8 +96,8 @@ public class ControllerManager {
     public static void updatePlayerCamera(BindingState.Axis stick, Controller controller) {
         Minecraft minecraft = Minecraft.getInstance();
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || minecraft.screen != null || !stick.pressed || minecraft.player == null) return;
-        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * Legacy4JClient.controllerManager.getInputScale() * (minecraft.player.isScoping() ? 0.125 : 1.0);
-        minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyOptions.invertYController.get() ? -1 : 1));
+        double f = Math.pow(LegacyControlsOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * Legacy4JClient.controllerManager.getInputScale() * (minecraft.player.isScoping() ? 0.125 : 1.0);
+        minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyControlsOptions.invertYController.get() ? -1 : 1));
     }
 
     public static float getCameraCurve(float f) {
@@ -128,7 +128,7 @@ public class ControllerManager {
     }
 
     private long getPollIntervalMs() {
-        return Mth.clamp(LegacyOptions.controllerPollingRate.get(), 1, 16);
+        return Mth.clamp(LegacyControlsOptions.controllerPollingRate.get(), 1, 16);
     }
 
     private void queueControllerUpdate() {
@@ -167,15 +167,15 @@ public class ControllerManager {
         getHandler().init();
         if (!minecraft.isRunning() || !getHandler().update()) return;
         Setup.EVENT.invoker.accept(ControllerManager.this);
-        if (!getHandler().isValidController(LegacyOptions.selectedController.get())) {
+        if (!getHandler().isValidController(LegacyControlsOptions.selectedController.get())) {
             if (connectedController != null) {
                 connectedController.disconnect(ControllerManager.this);
                 safeDisconnect();
             }
             return;
         }
-        if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null) {
-            activeControllerSlot = LegacyOptions.selectedController.get();
+        if (connectedController == null && (connectedController = getHandler().getController(LegacyControlsOptions.selectedController.get())) != null) {
+            activeControllerSlot = LegacyControlsOptions.selectedController.get();
             controllerNames.put(activeControllerSlot, connectedController.getName());
             connectedController.connect(ControllerManager.this);
         }
@@ -208,7 +208,7 @@ public class ControllerManager {
     }
 
     public void setRawPointerPos(double x, double y) {
-        setRawPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
+        setRawPointerPos(x, y, isControllerTheLastInput() && LegacyControlsOptions.controllerVirtualCursor.get());
     }
 
     public void setRawPointerPos(double x, double y, boolean onlyVirtual) {
@@ -251,9 +251,9 @@ public class ControllerManager {
                 controller.connect(this);
 			    if (controller.hasLED()) {
                     controller.setLED(
-                            LegacyOptions.controllerLedRed.get().byteValue(),
-                            LegacyOptions.controllerLedGreen.get().byteValue(),
-                            LegacyOptions.controllerLedBlue.get().byteValue()
+                            LegacyControlsOptions.controllerLedRed.get().byteValue(),
+                            LegacyControlsOptions.controllerLedGreen.get().byteValue(),
+                            LegacyControlsOptions.controllerLedBlue.get().byteValue()
                     );
                 }
             } else safeDisconnect();
@@ -262,7 +262,7 @@ public class ControllerManager {
 
     public void updateHandler(Controller.Handler handler) {
         if (connectedController != null && connectedController.getHandler() != handler) {
-            connectTo(LegacyOptions.selectedController.get());
+            connectTo(LegacyControlsOptions.selectedController.get());
         }
     }
 
@@ -287,9 +287,9 @@ public class ControllerManager {
 
 			if (controller.hasLED())
                 controller.setLED(
-                        LegacyOptions.controllerLedRed.get().byteValue(),
-                        LegacyOptions.controllerLedGreen.get().byteValue(),
-                        LegacyOptions.controllerLedBlue.get().byteValue()
+                        LegacyControlsOptions.controllerLedRed.get().byteValue(),
+                        LegacyControlsOptions.controllerLedGreen.get().byteValue(),
+                        LegacyControlsOptions.controllerLedBlue.get().byteValue()
                 );
 
             if (state.is(ControllerBinding.START) && state.justPressed)
@@ -564,7 +564,7 @@ public class ControllerManager {
     }
 
     public boolean allowCursorAtFirstInventorySlot() {
-        return (isControllerTheLastInput() && LegacyOptions.controllerCursorAtFirstInventorySlot.get()) || (!isControllerTheLastInput() && LegacyOptions.cursorAtFirstInventorySlot.get());
+        return (isControllerTheLastInput() && LegacyControlsOptions.controllerCursorAtFirstInventorySlot.get()) || (!isControllerTheLastInput() && LegacyOptions.cursorAtFirstInventorySlot.get());
     }
 
     public void tryDisableCursor() {
@@ -602,7 +602,7 @@ public class ControllerManager {
     }
 
     public void toggleCursor() {
-        setCursorMode(LegacyOptions.CursorMode.values()[Stocker.cyclic(0, getCursorMode().ordinal() + 1, LegacyOptions.CursorMode.values().length)]);
+        setCursorMode(LegacyControlsOptions.CursorMode.values()[Stocker.cyclic(0, getCursorMode().ordinal() + 1, LegacyControlsOptions.CursorMode.values().length)]);
         updateCursorMode();
     }
 
@@ -616,13 +616,13 @@ public class ControllerManager {
         }
     }
 
-    public LegacyOptions.CursorMode getCursorMode() {
-        return LegacyOptions.cursorMode.get();
+    public LegacyControlsOptions.CursorMode getCursorMode() {
+        return LegacyControlsOptions.cursorMode.get();
     }
 
-    public void setCursorMode(LegacyOptions.CursorMode cursorMode) {
-        LegacyOptions.cursorMode.set(cursorMode);
-        LegacyOptions.cursorMode.save();
+    public void setCursorMode(LegacyControlsOptions.CursorMode cursorMode) {
+        LegacyControlsOptions.cursorMode.set(cursorMode);
+        LegacyControlsOptions.cursorMode.save();
     }
 
     public boolean isControllerTheLastInput() {

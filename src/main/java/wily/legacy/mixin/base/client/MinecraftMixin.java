@@ -86,6 +86,7 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.control.tooltip.UsePrediction;
@@ -494,7 +495,7 @@ public abstract class MinecraftMixin {
 
     @ModifyReturnValue(method = "isWindowActive", at = @At("RETURN"))
     private boolean isWindowActive(boolean original) {
-        return original || LegacyOptions.unfocusedInputs.get();
+        return original || LegacyControlsOptions.unfocusedInputs.get();
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))

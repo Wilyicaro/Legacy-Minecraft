@@ -28,10 +28,10 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.control.tooltip.CompoundComponentIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyComponents;
@@ -398,7 +398,7 @@ public class OptionsScreen extends PanelVListScreen {
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),
-                                LegacyOptions.unfocusedInputs,
+                                LegacyControlsOptions.unfocusedInputs,
                                 LegacyOptions.invertedFrontCameraPitch,
                                 LegacyOptions.headFollowsTheCamera,
                                 LegacyOptions.vehicleCameraRotation,
@@ -418,9 +418,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("legacy.menu.user_interface_settings"),
                                 LegacyOptions.skipIntro,
                                 LegacyOptions.skipInitialSaveWarning,
-                                LegacyOptions.lockControlTypeChange,
+                                LegacyControlsOptions.lockControlTypeChange,
                                 LegacyOptions.selectedControlType,
-                                LegacyOptions.cursorMode,
+                                LegacyControlsOptions.cursorMode,
                                 LegacyOptions.defaultShowCraftableRecipes),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.accessibility.title"),

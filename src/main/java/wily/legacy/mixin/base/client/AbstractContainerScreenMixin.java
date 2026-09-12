@@ -32,6 +32,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.client.screen.LegacyMenuAccess;
@@ -169,7 +170,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Inject(method = "mouseReleased", at = @At("HEAD"))
     public void mouseReleasedNoDoubleClick(MouseButtonEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (Legacy4JClient.controllerManager.isControllerTheLastInput() && !LegacyOptions.controllerDoubleClick.get())
+        if (Legacy4JClient.controllerManager.isControllerTheLastInput() && !LegacyControlsOptions.controllerDoubleClick.get())
             this.doubleclick = false;
     }
 
