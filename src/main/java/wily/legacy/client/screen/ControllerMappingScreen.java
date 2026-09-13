@@ -131,7 +131,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.isEscape() && selectedMapping != null && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+        if (keyEvent.isEscape() && selectedMapping != null && !ControllerManager.getInstance().isControllerSimulatingInput) {
             setSelectedMapping(null);
             setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
             return true;

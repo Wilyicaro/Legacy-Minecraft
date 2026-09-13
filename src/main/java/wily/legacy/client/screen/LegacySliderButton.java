@@ -1,7 +1,5 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.KeyEvent;
@@ -10,8 +8,8 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.util.Mth;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -99,14 +97,14 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
 
     public void setFocused(boolean bl) {
         super.setFocused(bl);
-        if (bl) canChangeValue = Legacy4JClient.controllerManager.canChangeSlidersValue;
+        if (bl) canChangeValue = ControllerManager.getInstance().canChangeSlidersValue;
     }
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
         if (!active) return false;
         if (keyEvent.isSelection()) {
-            Legacy4JClient.controllerManager.canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
+            ControllerManager.getInstance().canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
             return true;
         }
         if (this.canChangeValue) {

@@ -51,8 +51,6 @@ public class LegacyOptions {
         public void load() {
             loadingClientOptions = true;
             try {
-                if (!LegacyControlsOptions.STORAGE.file.exists())
-                    FactoryConfig.load(file, LegacyControlsOptions.STORAGE.configMap, false);
                 super.load();
             } finally {
                 loadingClientOptions = false;
@@ -64,6 +62,13 @@ public class LegacyOptions {
     }.withFile("legacy/client_options.json");
 
     public static final FactoryConfig.StorageAccess VANILLA_STORAGE_ACCESS = ()-> Minecraft.getInstance().options.save();
+
+    public static void loadDeprecatedConfigs(FactoryConfig.StorageHandler handler) {
+        if (!handler.file.exists()) {
+            FactoryConfig.load(CLIENT_STORAGE.file, handler.configMap, false);
+            handler.save();
+        }
+    }
 
     public static <T> FactoryConfig<T> of(OptionInstance<T> optionInstance) {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
@@ -239,7 +244,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Integer> hudSize = CLIENT_STORAGE.register(createInteger("hudScale", Function.identity(), 1, () -> 3, 2));
     public static final FactoryConfig<Double> hudOpacity = CLIENT_STORAGE.register(createDouble("hudOpacity", Function.identity(), 0.8));
     public static final FactoryConfig<Double> hudDistance = CLIENT_STORAGE.register(createDouble("hudDistance", Function.identity(), 1.0));
-    public static final FactoryConfig<Double> interfaceSensitivity = CLIENT_STORAGE.register(createDouble("interfaceSensitivity", builder -> builder.valueToComponent(d -> Component.literal(String.valueOf((int)(d * 200)))), 0.5, d -> {}));
     public static final FactoryConfig<Boolean> overrideTerrainFogStart = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogStart", true));
     public static final FactoryConfig<Integer> terrainFogStart = CLIENT_STORAGE.register(createInteger("terrainFogStart", builder -> builder.valueToComponent(i -> Component.translatable("options.chunks", Math.min(i, Minecraft.getInstance().options.renderDistance().get()))), 2, ()-> Minecraft.getInstance().options.renderDistance().get(), 4, d -> {}));
     public static final FactoryConfig<Boolean> overrideTerrainFogEnd = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogEnd", true));
@@ -402,7 +406,7 @@ public class LegacyOptions {
     }
 
     public static boolean hasSystemCursor() {
-        return LegacyControlsOptions.systemCursor.get() && !Legacy4JClient.controllerManager.isControllerTheLastInput();
+        return LegacyControlsOptions.systemCursor.get() && !ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     public static float getLeftStickDeadZone() {

@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
@@ -94,7 +95,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @WrapWithCondition(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 0))
     public boolean allowKeyboardSprint(LocalPlayer instance, boolean b) {
-        return !controllerManager.isControllerTheLastInput();
+        return !ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     @ModifyExpressionValue(method = {"shouldStopRunSprinting", "canStartSprinting"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUnderWater()Z"))

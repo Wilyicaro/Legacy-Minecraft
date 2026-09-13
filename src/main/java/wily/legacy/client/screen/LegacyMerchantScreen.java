@@ -22,7 +22,7 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.RecipeMenu;

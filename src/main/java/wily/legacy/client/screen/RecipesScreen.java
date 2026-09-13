@@ -9,8 +9,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerListener;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 
-public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements Controller.Listener, ControlTooltip.Listener {
+public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements ControllerListener, ControlTooltip.Listener {
     protected final UIAccessor accessor = UIAccessor.of(this);
 
     protected final List<H> recipeButtons = new ArrayList<>();
@@ -53,7 +53,7 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
 
     @Override
     public boolean onceClickBindings(BindingState state) {
-        return !state.is(ControllerBinding.DOWN_BUTTON) && Controller.Listener.super.onceClickBindings(state);
+        return !state.is(ControllerBinding.DOWN_BUTTON) && ControllerListener.super.onceClickBindings(state);
     }
 
     protected abstract void updateRecipes();
