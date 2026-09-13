@@ -101,7 +101,7 @@ public class ControllerManager {
     }
 
     public static float getCameraCurve(float f) {
-        if (LegacyOptions.linearCameraMovement.get()) return f;
+        if (LegacyControlsOptions.linearCameraMovement.get()) return f;
         return f * f * Math.signum(f);
     }
 
@@ -213,7 +213,7 @@ public class ControllerManager {
 
     public void setRawPointerPos(double x, double y, boolean onlyVirtual) {
         Window window = minecraft.getWindow();
-        if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
+        if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyControlsOptions.limitCursor.get()) {
             ScreenRectangle rect = a.getMenuRectangleLimit();
             double scaleX = getGuiScaleX();
             double scaleY = getGuiScaleY();
@@ -315,7 +315,7 @@ public class ControllerManager {
                         double moveY;
                         double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5 * getInputScale();
 
-                        if (LegacyOptions.legacyCursor.get()) {
+                        if (LegacyControlsOptions.legacyCursor.get()) {
                             double deadzone = stick.getDeadZone();
                             double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 1, 0.35));
                             double absX = Math.abs(stick.x);
@@ -387,7 +387,7 @@ public class ControllerManager {
 
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s ->
                         state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick) &&
-                        ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.crossedTime(state.getDefaultDelay() / 2) && isHoveringWidget());
+                        ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyControlsOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.crossedTime(state.getDefaultDelay() / 2) && isHoveringWidget());
                 if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)))
                     simulateKeyAction(InputConstants.KEY_UP, state, !state.released, false);
                 else if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)))

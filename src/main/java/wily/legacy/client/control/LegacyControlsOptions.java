@@ -11,6 +11,7 @@ import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.LegacyComponents;
 
 import java.util.Optional;
 
@@ -61,6 +62,11 @@ public class LegacyControlsOptions {
     public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = FactoryConfig.toggleBuilder().key("controllerCursorAtFirstInventorySlot").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName("legacy.options.cursorAtFirstInventorySlot"))).defaultValue(true).buildAndRegister(STORAGE);
     public static final FactoryConfig<Boolean> controllerToasts = FactoryConfig.toggleBuilder().key("controllerToasts").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(true).buildAndRegister(STORAGE);
     public static final FactoryConfig<Boolean> controllerDoubleClick = FactoryConfig.toggleBuilder().key("controllerDoubleClick").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(false).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Boolean> smoothMovement = FactoryConfig.toggleBuilder().key("smoothMovement").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(true).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Boolean> forceSmoothMovement = FactoryConfig.toggleBuilder().key("forceSmoothMovement").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().tooltip(b -> LegacyComponents.MAY_BE_A_CHEAT).build(optionsName(v))).defaultValue(false).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Boolean> linearCameraMovement = FactoryConfig.toggleBuilder().key("linearCameraMovement").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(false).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Boolean> legacyCursor = FactoryConfig.toggleBuilder().key("legacyCursor").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(true).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Boolean> limitCursor = FactoryConfig.toggleBuilder().key("limitCursor").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(true).buildAndRegister(STORAGE);
 
     public enum CursorMode implements StringRepresentable {
         AUTO("auto"),ALWAYS("always"),NEVER("never");
