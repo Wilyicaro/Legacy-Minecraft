@@ -9,9 +9,11 @@ import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public class LegacyControlsOptions {
     public static final FactoryConfig.StorageHandler STORAGE = new FactoryConfig.StorageHandler() {
@@ -66,6 +68,8 @@ public class LegacyControlsOptions {
     public static final FactoryConfig<Boolean> linearCameraMovement = FactoryConfig.toggleBuilder().key("linearCameraMovement").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(false).buildAndRegister(STORAGE);
     public static final FactoryConfig<Boolean> legacyCursor = FactoryConfig.toggleBuilder().key("legacyCursor").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(true).buildAndRegister(STORAGE);
     public static final FactoryConfig<Boolean> limitCursor = FactoryConfig.toggleBuilder().key("limitCursor").displayFromKey(v -> FactoryConfigDisplay.toggleBuilder().build(optionsName(v))).defaultValue(true).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Double> vibrationWhenBreaking = FactoryConfig.<Double>builder().key("vibrationWhenBreaking").displayFromKey(v -> FactoryConfigDisplay.percentBuilder().build(optionsName(v))).control(FactoryConfigControl.createDouble()).defaultValue(0.0).buildAndRegister(STORAGE);
+    public static final FactoryConfig<Double> vibrationWhenExploding = FactoryConfig.<Double>builder().key("vibrationWhenExploding").displayFromKey(v -> FactoryConfigDisplay.percentBuilder().build(optionsName(v))).control(FactoryConfigControl.createDouble()).defaultValue(0.0).buildAndRegister(STORAGE);
 
     public enum CursorMode implements StringRepresentable {
         AUTO("auto"),ALWAYS("always"),NEVER("never");

@@ -384,8 +384,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyHearts = CLIENT_STORAGE.register(createBoolean("legacyHearts", true));
 
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
-    public static final FactoryConfig<Double> vibrationWhenBreaking = CLIENT_STORAGE.register(createDouble("vibrationWhenBreaking", Function.identity(), 0.0));
-    public static final FactoryConfig<Double> vibrationWhenExploding = CLIENT_STORAGE.register(createDouble("vibrationWhenExploding", Function.identity(), 0.0));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
     public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
     public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", builder -> builder.valueToComponent(v -> v.displayName), i -> UIMode.values()[i], UIMode::ordinal, () -> UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeGui), CLIENT_STORAGE));
