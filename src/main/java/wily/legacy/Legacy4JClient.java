@@ -126,6 +126,7 @@ import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import org.lwjgl.glfw.GLFW;
 
 
@@ -537,7 +538,9 @@ public class Legacy4JClient {
             knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
             LegacySaveCache.setup(m);
             ControllerBinding.setupDefaultBindings(m);
+            LegacyControlsOptions.STORAGE.load();
             LegacyOptions.CLIENT_STORAGE.load();
+            DownloadedSkinPackStore.resetOutdatedPacks(m);
             controllerManager.afterConfigLoad();
             LegacyRenderDistance.initDefault();
             //? if fabric
@@ -777,6 +780,8 @@ public class Legacy4JClient {
         }
         LegacyOptions.CLIENT_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyOptions.CLIENT_STORAGE.save();
+        LegacyControlsOptions.STORAGE.configMap.values().forEach(FactoryConfig::reset);
+        LegacyControlsOptions.STORAGE.save();
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyCommonOptions.COMMON_STORAGE.save();
         minecraft.options.save();

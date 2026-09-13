@@ -93,8 +93,8 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public void fallback() {
         Legacy4J.LOGGER.warn("{} isn't supported in this system. {} will be used instead.", getName(), GLFWControllerHandler.getInstance().getName());
-        LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-        LegacyOptions.selectedControllerHandler.save();
+        LegacyControlsOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+        LegacyControlsOptions.selectedControllerHandler.save();
         init = true;
     }
 
@@ -110,8 +110,8 @@ public class SDLControllerHandler implements Controller.Handler {
 
             if (!natives.isPojav()) {
                 if (!natives.file().exists()) {
-                    LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-                    LegacyOptions.selectedControllerHandler.save();
+                    LegacyControlsOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                    LegacyControlsOptions.selectedControllerHandler.save();
                     FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> openNativesScreen(minecraft), () -> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
                     init = true;
                     return;
@@ -143,7 +143,7 @@ public class SDLControllerHandler implements Controller.Handler {
                 @Override
                 public void tick() {
                     if (getProgress() >= 1) {
-                        LegacyOptions.selectedControllerHandler.set(getInstance());
+                        LegacyControlsOptions.selectedControllerHandler.set(getInstance());
                         LegacyOptions.CLIENT_STORAGE.save();
                         onClose();
                         return;

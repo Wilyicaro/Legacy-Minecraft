@@ -89,7 +89,7 @@ public class ControllerBinding<T extends BindingState> {
     }
 
     private static boolean invertControllerButtons() {
-        return LegacyOptions.invertControllerButtons.get() != (ControlType.getActiveControllerType().id().equals(ControlType.SWITCH) || ControlType.getActiveControllerType().id().equals(ControlType.WII_U) || ControlType.getActiveControllerType().id().equals(ControlType.WII_U_EDITION));
+        return LegacyControlsOptions.invertControllerButtons.get() != (ControlType.getActiveControllerType().id().equals(ControlType.SWITCH) || ControlType.getActiveControllerType().id().equals(ControlType.WII_U) || ControlType.getActiveControllerType().id().equals(ControlType.WII_U_EDITION));
     }
 
     public static final ControllerBinding<BindingState.Button> DOWN_BUTTON = registerWithDefaults(createButton("down_button", () -> invertControllerButtons() ? Button.RIGHT : Button.DOWN), o -> List.of(o.keyJump));
@@ -100,13 +100,13 @@ public class ControllerBinding<T extends BindingState> {
     public static final ControllerBinding<BindingState.Button> GUIDE = register(createButton("guide", Button.GUIDE));
     public static final ControllerBinding<BindingState.Button> START = register(createButton("start", Button.START));
     public static final ControllerBinding<BindingState.Axis> LEFT_STICK = register(new ControllerBinding<>("left_stick", c-> BindingState.Axis.createStick(c, LegacyOptions::getLeftStickDeadZone, (a, s)->{}, true), false));
-    public static final ControllerBinding<BindingState.Axis> RIGHT_STICK = register(new ControllerBinding<>("right_stick", c-> BindingState.Axis.createStick(c, ()->LegacyOptions.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera, false), false));
+    public static final ControllerBinding<BindingState.Axis> RIGHT_STICK = register(new ControllerBinding<>("right_stick", c-> BindingState.Axis.createStick(c, ()-> LegacyControlsOptions.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera, false), false));
     public static final ControllerBinding<BindingState.Button> LEFT_STICK_BUTTON = registerWithDefaults(createButton("left_stick_button", Button.LEFT_STICK), o -> List.of(o.keyTogglePerspective));
     public static final ControllerBinding<BindingState.Button> RIGHT_STICK_BUTTON = registerWithDefaults(createButton("right_stick_button", Button.RIGHT_STICK), o -> List.of(o.keyShift));
     public static final ControllerBinding<BindingState.Button> LEFT_BUMPER = registerWithDefaults(createButton("left_bumper", Button.LEFT_BUMPER), o -> List.of(Legacy4JClient.keyCycleHeldLeft));
     public static final ControllerBinding<BindingState.Button> RIGHT_BUMPER = registerWithDefaults(createButton("right_bumper", Button.RIGHT_BUMPER), o -> List.of(Legacy4JClient.keyCycleHeldRight));
-    public static final ControllerBinding<BindingState.Axis> LEFT_TRIGGER = registerWithDefaults(new ControllerBinding<>("left_trigger", c-> BindingState.Axis.createTrigger(c, ()->LegacyOptions.leftTriggerDeadZone.get().floatValue(), true)), o-> List.of(o.keyUse));
-    public static final ControllerBinding<BindingState.Axis> RIGHT_TRIGGER = registerWithDefaults(new ControllerBinding<>("right_trigger", c-> BindingState.Axis.createTrigger(c, ()->LegacyOptions.rightTriggerDeadZone.get().floatValue(), false)), o-> List.of(o.keyAttack));
+    public static final ControllerBinding<BindingState.Axis> LEFT_TRIGGER = registerWithDefaults(new ControllerBinding<>("left_trigger", c-> BindingState.Axis.createTrigger(c, ()-> LegacyControlsOptions.leftTriggerDeadZone.get().floatValue(), true)), o-> List.of(o.keyUse));
+    public static final ControllerBinding<BindingState.Axis> RIGHT_TRIGGER = registerWithDefaults(new ControllerBinding<>("right_trigger", c-> BindingState.Axis.createTrigger(c, ()-> LegacyControlsOptions.rightTriggerDeadZone.get().floatValue(), false)), o-> List.of(o.keyAttack));
     public static final ControllerBinding<BindingState.Button> DPAD_UP = registerWithDefaults(createButton("dpad_up", Button.DPAD_UP), o -> List.of(Legacy4JClient.keyFlyUp));
     public static final ControllerBinding<BindingState.Button> DPAD_DOWN = registerWithDefaults(createButton("dpad_down", Button.DPAD_DOWN), o -> List.of(Legacy4JClient.keyFlyDown));
     public static final ControllerBinding<BindingState.Button> DPAD_LEFT = registerWithDefaults(createButton("dpad_left", Button.DPAD_LEFT), o -> List.of(Legacy4JClient.keyFlyLeft));
