@@ -122,7 +122,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     protected void setNone(LegacyKeyMapping keyMapping) {
         keyMapping.setBinding(null);
-        LegacyOptions.CLIENT_STORAGE.save();
+        LegacyControlsOptions.STORAGE.save();
     }
 
     public boolean unbindConflictingBindings() {
