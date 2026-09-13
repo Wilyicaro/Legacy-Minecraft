@@ -531,35 +531,7 @@ public class Legacy4JClient {
         FactoryOptions.NEAREST_MIPMAP_SCALING.setDefault(true);
         FactoryOptions.RANDOM_BLOCK_ROTATIONS.setDefault(false);
         LegacyControlsOptions.STORAGE.preLoad.register(LegacyOptions::loadDeprecatedConfigs);
-        FactoryAPIClient.setup(m -> {
-            LegacyControls.setup(m);
-            MCAccount.loadAll();
-            knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK, m.gameDirectory.toPath());
-            knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
-            LegacySaveCache.setup(m);
-            LegacyOptions.CLIENT_STORAGE.load();
-            DownloadedSkinPackStore.resetOutdatedPacks(m);
-            LegacyRenderDistance.initDefault();
-            //? if fabric
-            if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
-            //? if fabric || (>=1.21 && neoforge) {
-            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
-            if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            //?}
-            LegacyGuiElements.setup(m);
-
-            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
-                @Override
-                public net.minecraft.network.chat.Component title() {
-                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
-                }
-
-                @Override
-                public Screen build(Screen parent) {
-                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
-                }
-            };
-        });
+        FactoryAPIClient.setup(Legacy4JClient::setup);
 
         FactoryAPIClient.registerBlockColor(registry -> {
             registry.accept(List.of(new BlockTintSource() {
@@ -690,6 +662,36 @@ public class Legacy4JClient {
         });
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID), Legacy4JSettingsScreen::new);
         FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options, false));
+    }
+
+    public static void setup(Minecraft m) {
+        LegacyControls.setup(m);
+        MCAccount.loadAll();
+        knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK, m.gameDirectory.toPath());
+        knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
+        LegacySaveCache.setup(m);
+        LegacyOptions.CLIENT_STORAGE.load();
+        DownloadedSkinPackStore.resetOutdatedPacks(m);
+        LegacyRenderDistance.initDefault();
+        //? if fabric
+        if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
+        //? if fabric || (>=1.21 && neoforge) {
+        if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+        if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
+        //?}
+        LegacyGuiElements.setup(m);
+
+        HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+            @Override
+            public net.minecraft.network.chat.Component title() {
+                return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+            }
+
+            @Override
+            public Screen build(Screen parent) {
+                return SkinsClientBootstrap.createChangeSkinScreen(parent);
+            }
+        };
     }
 
     private static void registerBuiltInPacks() {
