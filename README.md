@@ -78,15 +78,15 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
 - [Minimega](https://modrinth.com/modpack/minimega) | Legacy Console Edition Minigames ported to Java Edition! (Glide & Battle as of 2026)
 - [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
 
-> [!Warning]
-> The following mods are incompatible with Legacy4J due to causing crashes:
-> - [ViaFabricPlus](https://modrinth.com/mod/viafabricplus)
->
-> The following mods are incompatible with Legacy4J due to causing bugs:
-> - [Essential Mod](https://modrinth.com/mod/essential) (Changes game rule names)
-> - [Remove Reloading Screen](https://modrinth.com/mod/rrls) (Softlocks the game when changing resource packs)
->
-> If you have any of the above mods installed, please remove them for Legacy4J to work properly.
+## Incompatible Mods
+The following mods are incompatible with Legacy4J due to causing crashes:
+- [ViaFabricPlus](https://modrinth.com/mod/viafabricplus)
+
+The following mods are incompatible with Legacy4J due to causing bugs:
+- [Essential Mod](https://modrinth.com/mod/essential) (Changes game rule names)
+- [Remove Reloading Screen](https://modrinth.com/mod/rrls) (Softlocks the game when changing resource packs)
+
+If you have any of the above mods installed, please remove them for Legacy4J to work properly.
 
 # 📝 Planned and Implemented Features
 | Feature                                                                    | Implemented | Planned |
