@@ -42,6 +42,10 @@ public class SeedPreviewScreen extends LegacyScreen {
         addRenderableOnly((graphics, mouseX, mouseY, partialTick) -> {
             renderMap(graphics, overview, 10, 20, 109);
             renderMap(graphics, detail, 12, 27, 211);
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SCROLL_UP, detail.getX() + scaled(111), detail.getY() + scaled(28), scaled(13), scaled(7));
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SCROLL_DOWN, detail.getX() + scaled(111), detail.getY() + scaled(230), scaled(13), scaled(7));
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SCROLL_LEFT, detail.getX() + scaled(13), detail.getY() + scaled(127), scaled(6), scaled(11));
+            FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SCROLL_RIGHT, detail.getX() + scaled(216), detail.getY() + scaled(127), scaled(6), scaled(11));
             if (generation != null && !generation.isDone()) {
                 int blockSize = scaled(21);
                 int blockDistance = scaled(6);
