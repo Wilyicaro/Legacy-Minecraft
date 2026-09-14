@@ -82,7 +82,7 @@ public class SeedPreviewScreen extends LegacyScreen {
         int mapX = panel.getX() + scaled(x);
         int mapY = panel.getY() + scaled(y);
         int mapSize = scaled(size);
-        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.PANEL_RECESS, mapX - 1, mapY - 1, mapSize + 2, mapSize + 2);
+        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, mapX - 2, mapY - 2, mapSize + 4, mapSize + 4);
         if (texture != null) {
             graphics.blit(texture.getTextureView(), texture.getSampler(), mapX, mapY, mapX + mapSize, mapY + mapSize, 0, 1, 0, 1);
         }
