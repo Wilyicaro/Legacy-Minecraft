@@ -25,7 +25,7 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes) {
     public static final int VIEW_SIZE = 128;
     public static final int PADDING = 32;
     public static final int SIZE = VIEW_SIZE + PADDING * 2;
-    private static final int BLOCKS_PER_PIXEL = 16;
+    public static final int BLOCKS_PER_PIXEL = 16;
     public static final int MAX_CENTER = (int) WorldBorder.MAX_CENTER_COORDINATE / BLOCKS_PER_PIXEL - VIEW_SIZE / 2;
     public static final int MAX_SAMPLE_CENTER = MAX_CENTER - PADDING;
 

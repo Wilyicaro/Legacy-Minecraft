@@ -77,10 +77,13 @@ public class SeedPreviewScreen extends LegacyScreen {
         addPanel("helpPanel", LegacySprites.POINTER_PANEL, 0, 144, 133, 120);
         addRenderableOnly((graphics, mouseX, mouseY, partialTick) -> {
             updateView();
-            renderTitle(graphics, overview, WORLD_CENTER);
-            renderTitle(graphics, detail, WORLD_MAP);
+            renderLabel(graphics, overview, WORLD_CENTER, 7);
+            renderLabel(graphics, detail, WORLD_MAP, 7);
             renderMap(graphics, overview, 10, 20, 109, overviewTexture, 0, 0);
             renderMap(graphics, detail, 12, 27, 211, texture, viewX, viewZ);
+            Component coordinates = Component.translatable("legacy.menu.seed_preview.coordinates",
+                    Mth.floor(viewX * SeedMap.BLOCKS_PER_PIXEL), Mth.floor(viewZ * SeedMap.BLOCKS_PER_PIXEL));
+            renderLabel(graphics, detail, coordinates, 244);
             for (Arrow arrow : ARROWS) {
                 ScreenRectangle bounds = arrowBounds(arrow);
                 scrollRenderer.renderScroll(graphics, arrow.direction, bounds.left(), bounds.top(),
@@ -159,11 +162,11 @@ public class SeedPreviewScreen extends LegacyScreen {
         setDragging(false);
     }
 
-    private void renderTitle(GuiGraphicsExtractor graphics, Panel panel, Component title) {
+    private void renderLabel(GuiGraphicsExtractor graphics, Panel panel, Component text, int y) {
         graphics.pose().pushMatrix();
-        graphics.pose().translate(panel.getX() + panel.getWidth() / 2f, panel.getY() + scaled(7));
+        graphics.pose().translate(panel.getX() + panel.getWidth() / 2f, panel.getY() + scaled(y));
         graphics.pose().scale(scale);
-        graphics.text(font, title, -font.width(title) / 2, 0, CommonColor.GRAY_TEXT.get(), false);
+        graphics.text(font, text, -font.width(text) / 2, 0, CommonColor.GRAY_TEXT.get(), false);
         graphics.pose().popMatrix();
     }
 
