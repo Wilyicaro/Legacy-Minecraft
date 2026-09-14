@@ -3,12 +3,14 @@ package wily.legacy.mixin.base.client;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.ItemInHandRenderer.HandRenderSelection;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.Mth;
@@ -26,6 +28,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.client.LegacyItemInHandRenderer;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin implements LegacyItemInHandRenderer {
@@ -72,6 +75,14 @@ public abstract class ItemInHandRendererMixin implements LegacyItemInHandRendere
         int light = getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
         if (LegacyOptions.itemLightingInHand.get() && light > 0)
             original.set(LightCoordsUtil.pack(light, LightCoordsUtil.sky(i)));
+    }
+
+    @ModifyReturnValue(method = "evaluateWhichHandsToRender", at = @At("RETURN"))
+    private static HandRenderSelection hideShieldWithChargedCrossbow(HandRenderSelection original, LocalPlayer player) {
+        if (!player.isUsingItem() || !LegacyItemUtil.isLegacyShield(player, player.getUseItem())) return original;
+        InteractionHand hand = player.getUsedItemHand() == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack item = player.getItemInHand(hand);
+        return item.getItem() instanceof CrossbowItem && CrossbowItem.isCharged(item) ? HandRenderSelection.onlyForHand(hand) : original;
     }
 
     @Unique
