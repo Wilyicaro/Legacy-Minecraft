@@ -7,3 +7,8 @@ Please adhere to the [Conventional Commits](https://www.conventionalcommits.org/
 
 ### Adding large features
 Please talk with maintainers and developers before submitting a large Pull Request for the mod. This is to prevent issues from arising if it cannot be merged due to any reason.
+
+> [!Tip]
+> If you find a mod that doesn't work with Legacy4J:
+> - If the mod keeps crashing the game, especially on startup, add the mod to "breaks" in fabric.mod.json, then add it to "The following mods are incompatible with Legacy4J due to causing crashes:" in README.md.
+> - If the mod causes important bugs that we can't fix, add the mod to "conflicts" in fabric.mod.json, then add it to "The following mods are incompatible with Legacy4J due to causing bugs:" in README.md.
