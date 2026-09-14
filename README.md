@@ -78,6 +78,15 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
 - [Minimega](https://modrinth.com/modpack/minimega) | Legacy Console Edition Minigames ported to Java Edition! (Glide & Battle as of 2026)
 - [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
 
+> [!Warning]
+> Mods that are incompatible due to crashes:
+> - [ViaFabricPlus](https://modrinth.com/mod/viafabricplus)
+>
+> Mods that are incompatible due to breaking bugs:
+> - [Remove Reloading Screen](https://modrinth.com/mod/rrls)
+>
+> If you have any of the above mods installed, please remove them for Legacy4J to work properly.
+
 # 📝 Planned and Implemented Features
 | Feature                                                                    | Implemented | Planned |
 |:---------------------------------------------------------------------------|:-----------:|:-------:|
@@ -114,5 +123,6 @@ sudo chmod +x gradlew
 ```
 
 
-## 🚫 **LEGACY4J** CAN BE CONSIDERED A HACK IN SERVERS EQUIPPED WITH ANTI-CHEATS
-WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
+> [!Caution]
+> ## 🚫 **LEGACY4J** CAN BE CONSIDERED A HACK IN SERVERS EQUIPPED WITH ANTI-CHEATS
+> WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
