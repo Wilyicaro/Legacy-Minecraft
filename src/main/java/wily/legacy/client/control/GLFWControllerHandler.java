@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-public class GLFWControllerHandler implements Controller.Handler {
+public class GLFWControllerHandler implements ControllerHandler {
     public static final Component TITLE = Component.literal("GLFW");
     private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
     private boolean init = false;
@@ -90,7 +90,7 @@ public class GLFWControllerHandler implements Controller.Handler {
             }
 
             @Override
-            public Handler getHandler() {
+            public ControllerHandler getHandler() {
                 return GLFWControllerHandler.this;
             }
 

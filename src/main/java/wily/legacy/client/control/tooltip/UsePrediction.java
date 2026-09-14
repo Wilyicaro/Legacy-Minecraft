@@ -68,7 +68,6 @@ import net.minecraft.world.phys.*;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
-import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacyItemUtil;
@@ -385,7 +384,7 @@ public class UsePrediction {
     });
     public static final ControlTooltip.ActionHolder HANG_ITEM = registerUseItemOn("hang_item", UsePrediction::canHang, LegacyComponents.HANG);
     public static final ControlTooltip.ActionHolder TILL = registerUseItemOn("till", UsePrediction::canTill, LegacyComponents.TILL);
-    public static final ControlTooltip.ActionHolder PEEL_BARK = registerUseItemOn("peel_bark", ctx -> ctx.itemStack.getItem() instanceof AxeItem && AxeItem.STRIPPABLES.get(ctx.state.getBlock()) != null && !(ctx.hand.equals(InteractionHand.MAIN_HAND) && ctx.player.getOffhandItem().is(Items.SHIELD) && !ctx.player.isSecondaryUseActive()), LegacyComponents.PEEL_BARK);
+    public static final ControlTooltip.ActionHolder PEEL_BARK = registerUseItemOn("peel_bark", ctx -> ctx.itemStack.getItem() instanceof AxeItem && AxeItem.STRIPPABLES.get(ctx.state.getBlock()) != null && !(ctx.hand.equals(InteractionHand.MAIN_HAND) && ctx.player.getOffhandItem().has(DataComponents.BLOCKS_ATTACKS) && !LegacyItemUtil.isLegacyShield(ctx.player, ctx.player.getOffhandItem()) && !ctx.player.isSecondaryUseActive()), LegacyComponents.PEEL_BARK);
     public static final ControlTooltip.ActionHolder DIG_PATH = registerUseItemOn("dig_path", ctx -> ctx.itemStack.getItem() instanceof ShovelItem && ctx.level.getBlockState(ctx.pos.above()).isAir() && ShovelItem.FLATTENABLES.get(ctx.state.getBlock()) != null, LegacyComponents.DIG_PATH);
     public static final ControlTooltip.ActionHolder DOUSE = registerUseItemOn("douse", ctx -> ctx.itemStack.getItem() instanceof ShovelItem && ctx.state.getBlock() instanceof CampfireBlock && ctx.state.getValue(CampfireBlock.LIT), LegacyComponents.DOUSE);
     public static final ControlTooltip.ActionHolder WAX_BLOCK = registerUseItemOn("wax_block", ctx -> ctx.itemStack.is(Items.HONEYCOMB) && HoneycombItem.WAXABLES.get().containsKey(ctx.state.getBlock()), LegacyComponents.WAX);
@@ -407,7 +406,7 @@ public class UsePrediction {
     public static final ControlTooltip.ActionHolder LAUNCH_FIREWORK = registerUseItemOn("launch_firework", ctx -> ctx.itemStack.getItem() instanceof FireworkRocketItem, LegacyComponents.LAUNCH);
     public static final ControlTooltip.ActionHolder PLACE_BOAT = registerUseItem("place_boat", ctx -> ctx.itemStack.getItem() instanceof BoatItem && canPlaceBoat(ctx), LegacyComponents.PLACE);
     public static final ControlTooltip.ActionHolder PLACE_ON_WATER = registerUseItem("place_on_water", ctx -> (ctx.itemStack.is(Items.LILY_PAD) || ctx.itemStack.is(Items.FROGSPAWN)) && canPlaceOnWater(ctx), LegacyComponents.PLACE);
-    public static final ControlTooltip.ActionHolder BLOCK = registerUseItem("block", ctx -> ctx.itemStack.getUseAnimation().equals(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK) && (!(ctx.itemStack.getItem() instanceof ShieldItem) || LegacyGameRules.getSidedBooleanGamerule(ctx.player, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get())), LegacyComponents.BLOCK);
+    public static final ControlTooltip.ActionHolder BLOCK = registerUseItem("block", ctx -> ctx.itemStack.getUseAnimation().equals(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK) && !LegacyItemUtil.isLegacyShield(ctx.player, ctx.itemStack), LegacyComponents.BLOCK);
     public static final ControlTooltip.ActionHolder EQUIP_SWAP = registerUseItem("equip_swap", UsePrediction::canEquipSwap, LegacyComponents.EQUIP);
     public static final ControlTooltip.ActionHolder BOOST_VEHICLE = registerUseItem("boost_vehicle", UsePrediction::canBoost, LegacyComponents.BOOST);
     public static final ControlTooltip.ActionHolder THROW_CHARGE_TRIDENT = registerUseItem("throw_charge_trident", ctx -> {

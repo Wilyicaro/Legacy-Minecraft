@@ -103,10 +103,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private void initDefaultCreateWorldOptions(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
-        renderableVList.addCategory(ENTER_SEED);
-        EditBox editBox = createSeedEditBox(parent);
-        renderableVList.addRenderable(editBox);
-        renderableVList.addCategory(SEED_INFO);
+        addSeedOptions(parent);
         renderableVList.addCategory(Component.translatable("selectWorld.mapType"));
         renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
                 s -> s.getObjectValue().describePreset(),
@@ -153,10 +150,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private void initLegacyCreateWorldOptions(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
-        renderableVList.addCategory(ENTER_SEED);
-        EditBox editBox = createSeedEditBox(parent);
-        renderableVList.addRenderable(editBox);
-        renderableVList.addCategory(SEED_INFO);
+        addSeedOptions(parent);
 
         TickBox amplifiedWorld = new TickBox(0, 0, isPresetSelected(parent, WorldPresets.AMPLIFIED), b -> Component.translatable("legacy.menu.selectWorld.amplified_world"), b -> Tooltip.create(LegacyComponents.AMPLIFIED_DESCRIPTION), b -> {
             if (b.selected) setWorldPreset(parent, WorldPresets.AMPLIFIED);
@@ -210,6 +204,14 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.BLOCK_DROPS);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.NATURAL_HEALTH_REGENERATION);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.IMMEDIATE_RESPAWN);
+    }
+
+    private void addSeedOptions(CreateWorldScreen parent) {
+        renderableVList.addCategory(ENTER_SEED);
+        renderableVList.addRenderable(createSeedEditBox(parent));
+        renderableVList.addCategory(SEED_INFO);
+        renderableVList.addRenderable(new LegacyButton(Component.translatable("legacy.menu.seed_preview"),
+                b -> minecraft.setScreen(new SeedPreviewScreen(this))));
     }
 
     private EditBox createSeedEditBox(CreateWorldScreen parent) {

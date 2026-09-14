@@ -54,7 +54,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.PiercingWeapon;
 import net.minecraft.world.item.ShearsItem;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -86,17 +85,16 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.control.tooltip.UsePrediction;
 import wily.legacy.client.screen.*;
-import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.network.ServerPlayerMissHitPayload;
-import wily.legacy.network.ServerPlayerShieldPausePayload;
 import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyGuiElements;
@@ -143,7 +141,8 @@ public abstract class MinecraftMixin {
     Screen oldScreen;
     private boolean inventoryKeyLastPressed = false;
     private int inventoryKeyHold = 0;
-    private int legacy$shieldPauseSyncCooldown = 0;
+    @Unique
+    private final LegacyShieldControls legacy$shieldControls = new LegacyShieldControls();
     private boolean legacy$dropKeyDown = false;
     @Unique
     private InteractionHand legacy$suppressedUseAnimationHand;
@@ -172,19 +171,6 @@ public abstract class MinecraftMixin {
 
     @Shadow
     public abstract boolean hasControlDown();
-
-    @Unique
-    private void legacy$pauseShield() {
-        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS)) {
-            boolean usingShield = player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem;
-            if (usingShield && Legacy4JClient.hasModOnServer() && legacy$shieldPauseSyncCooldown == 0) {
-                CommonNetwork.sendToServer(new ServerPlayerShieldPausePayload());
-                legacy$shieldPauseSyncCooldown = 1;
-            }
-            ((LegacyShieldPlayer) player).pauseShield(LegacyShieldPlayer.SHIELD_PAUSE_TICKS);
-            if (usingShield && gameMode != null) gameMode.releaseUsingItem(player);
-        }
-    }
 
     private Minecraft self() {
         return (Minecraft) (Object) this;
@@ -227,11 +213,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
-        if (legacy$shieldPauseSyncCooldown > 0) legacy$shieldPauseSyncCooldown--;
         legacy$handleDropKey();
-        if (player != null && screen == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
-            legacy$pauseShield();
-        }
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
         if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !LegacyItemUtil.canGoInLceOffhand(player.getMainHandItem())) {
             while (options.keySwapOffhand.consumeClick()) {
@@ -239,9 +221,14 @@ public abstract class MinecraftMixin {
         }
     }
 
+    @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z", ordinal = 0))
+    private void updateShieldControls(CallbackInfo ci) {
+        legacy$shieldControls.tick(self());
+    }
+
     @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V"))
     private boolean releaseUsingItem(MultiPlayerGameMode instance, Player player) {
-        return !((LegacyShieldPlayer) player).isAutoShielding();
+        return !legacy$shieldControls.isUsingShield(player);
     }
 
     @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
@@ -287,6 +274,7 @@ public abstract class MinecraftMixin {
 
     @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItem(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult startUseItemUseItem(MultiPlayerGameMode gameMode, Player player, InteractionHand hand, Operation<InteractionResult> original) {
+        if (LegacyItemUtil.isLegacyShield(player, player.getItemInHand(hand))) return InteractionResult.PASS;
         InteractionResult result = original.call(gameMode, player, hand);
         if (result instanceof InteractionResult.Success) {
             legacy$quickUseAnimationHand = hand;
@@ -398,11 +386,6 @@ public abstract class MinecraftMixin {
         legacy$dropKeyDown = down;
     }
 
-    @Inject(method = "continueAttack", at = @At("HEAD"))
-    private void continueAttack(boolean bl, CallbackInfo ci) {
-        if (bl) legacy$pauseShield();
-    }
-
     @Inject(method = "pick", at = @At("RETURN"))
     private void pick(float tickDelta, CallbackInfo ci) {
         if (level == null || player == null || !(hitResult instanceof BlockHitResult blockHit)) return;
@@ -426,7 +409,6 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
     private void startAttackHead(CallbackInfoReturnable<Boolean> cir) {
-        legacy$pauseShield();
         if (player != null && player.swinging && player.swingingArm == InteractionHand.MAIN_HAND && player.getMainHandItem().has(DataComponents.PIERCING_WEAPON))
             cir.setReturnValue(false);
     }
@@ -450,7 +432,6 @@ public abstract class MinecraftMixin {
     private void startUseItem(CallbackInfo ci) {
         legacy$suppressedUseAnimationHand = null;
         legacy$quickUseAnimationHand = null;
-        legacy$pauseShield();
         if (player != null && player.isSleeping()) {
             ClientPacketListener clientPacketListener = player.connection;
             clientPacketListener.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.STOP_SLEEPING));
@@ -494,7 +475,7 @@ public abstract class MinecraftMixin {
 
     @ModifyReturnValue(method = "isWindowActive", at = @At("RETURN"))
     private boolean isWindowActive(boolean original) {
-        return original || LegacyOptions.unfocusedInputs.get();
+        return original || LegacyControlsOptions.unfocusedInputs.get();
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
@@ -522,6 +503,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void disconnectFadeMusic(Screen disconnectScreen, boolean retainDownloadedResourcePacks, boolean updateLevelInEngines, CallbackInfo ci) {
+        legacy$shieldControls.reset();
         ConduitRotationCache.clear();
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }

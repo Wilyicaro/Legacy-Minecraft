@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -29,12 +28,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyBlockProtection;
@@ -58,10 +56,6 @@ public class MultiplayerGameModeMixin {
         PlayerTrustPolicy trust = legacy$getTrust(player);
         if (trust != null && !trust.canUseItem(player.getItemInHand(hand))) {
             cir.setReturnValue(InteractionResult.FAIL);
-            return;
-        }
-        if (LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && player.getItemInHand(hand).getItem() instanceof ShieldItem && (!((LegacyShieldPlayer) player).isAutoShielding() || ((LegacyShieldPlayer) player).isShieldPaused())) {
-            cir.setReturnValue(InteractionResult.PASS);
         }
     }
 
@@ -131,10 +125,11 @@ public class MultiplayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;"))
     private void rumbleDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyOptions.vibrationWhenBreaking.get() && Legacy4JClient.controllerManager.connectedController != null) {
+        if (LegacyControlsOptions.vibrationWhenBreaking.get() > 0 && ControllerManager.getInstance().connectedController != null && ControllerManager.getInstance().isControllerTheLastInput()) {
             //For some reason, the triggers don't rumble for me
-            Legacy4JClient.controllerManager.connectedController.rumbleTriggers('\u0000', '\uFF00', 160);
-            Legacy4JClient.controllerManager.connectedController.rumble('\u0000', '\uFF00', 240);
+            char rumble = (char) (Character.MAX_VALUE * LegacyControlsOptions.vibrationWhenBreaking.get() * 0.5);
+            ControllerManager.getInstance().connectedController.rumbleTriggers('\u0000', rumble, 160);
+            ControllerManager.getInstance().connectedController.rumble('\u0000', rumble, 240);
         }
     }
 

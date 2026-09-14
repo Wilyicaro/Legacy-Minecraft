@@ -14,14 +14,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ContentManager;
 import wily.legacy.client.control.*;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.control.tooltip.Icon;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.skins.client.changeskin.ChangeSkinPackList;
@@ -41,7 +39,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class AbstractChangeSkinScreen extends PanelVListScreen
-        implements Controller.Listener, ControlTooltip.Listener, InputTypeSwitchLock {
+        implements ControllerListener, ControlTooltip.Listener, InputTypeSwitchLock {
     private static final int[] WARMUP_OFFSETS = {0, -1, 1, -2, 2, -3, 3};
     protected final Minecraft minecraft;
     protected final ChangeSkinScreenSource source;
@@ -1225,7 +1223,7 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
                 }
 
                 double dz = stick.getDeadZone();
-                double dx = dz > Math.abs(sx) ? 0 : -sx * 0.12 * Legacy4JClient.controllerManager.getInputScale();
+                double dx = dz > Math.abs(sx) ? 0 : -sx * 0.12 * ControllerManager.getInstance().getInputScale();
                 if (dx != 0) {
                     if (rotateCenterPreview(dx, 0)) {
                         state.block();

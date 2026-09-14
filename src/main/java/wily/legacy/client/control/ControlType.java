@@ -50,8 +50,8 @@ public record ControlType(Identifier id, Optional<Component> name, boolean isKbm
 
     public static ControlType getActiveControllerType() {
         if (LegacyOptions.selectedControlType.get().isAuto()) {
-            if (Legacy4JClient.controllerManager.connectedController != null) {
-                return Legacy4JClient.controllerManager.connectedController.getType();
+            if (ControllerManager.getInstance().connectedController != null) {
+                return ControllerManager.getInstance().connectedController.getType();
             } else return getOrEmpty(x360);
         } else {
             ControlType type = LegacyOptions.selectedControlType.get().get();
@@ -60,9 +60,9 @@ public record ControlType(Identifier id, Optional<Component> name, boolean isKbm
     }
 
     public static ControlType getActiveType() {
-        ControlType type = !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() ||
-                LegacyOptions.lockControlTypeChange.get() &&
-                (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() ||
+        ControlType type = !LegacyControlsOptions.lockControlTypeChange.get() && ControllerManager.getInstance().isControllerTheLastInput() ||
+                LegacyControlsOptions.lockControlTypeChange.get() &&
+                (ControllerManager.getInstance().connectedController != null && LegacyOptions.selectedControlType.get().isAuto() ||
                         !LegacyOptions.selectedControlType.get().orElse(getOrEmpty(KBM)).isKbm())
                 ? getActiveControllerType() : getKbmActiveType();
         return type == null ? ControlType.EMPTY : type;

@@ -27,12 +27,12 @@ import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyRegistries;
@@ -133,7 +133,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public static boolean isOpenKey(int i) {
-        return i == InputConstants.KEY_NUMPADENTER && !Legacy4JClient.controllerManager.isControllerTheLastInput() || i == InputConstants.KEY_RETURN && Legacy4JClient.controllerManager.isControllerTheLastInput();
+        return i == InputConstants.KEY_NUMPADENTER && !ControllerManager.getInstance().isControllerTheLastInput() || i == InputConstants.KEY_RETURN && ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     public static KeyboardScreen fromStaticListener(GuiEventListener listener, Screen parent) {
@@ -186,7 +186,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     @Override
     public boolean charTyped(CharacterEvent characterEvent) {
-        if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+        if (!ControllerManager.getInstance().isControllerSimulatingInput) {
             GuiEventListener listener = returnToParent();
             return listener != null && listener.charTyped(characterEvent);
         }
@@ -202,7 +202,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (!Legacy4JClient.controllerManager.isControllerSimulatingInput && keyEvent.key() != InputConstants.KEY_ESCAPE) {
+        if (!ControllerManager.getInstance().isControllerSimulatingInput && keyEvent.key() != InputConstants.KEY_ESCAPE) {
             GuiEventListener listener = returnToParent();
             return listener != null && (isOpenKey(keyEvent.key()) || listener.keyPressed(keyEvent));
         }
@@ -377,7 +377,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 try (SpriteContents contents = sprite.contents()) {
                     int bindingOffset = 0;
 
-                    if (binding != null && Legacy4JClient.controllerManager.connectedController != null && binding.getIcon() != null)
+                    if (binding != null && ControllerManager.getInstance().connectedController != null && binding.getIcon() != null)
                         bindingOffset = binding.getIcon().render(guiGraphics, getX() + 2, getY() + (getHeight() - 9) / 2 + 1, true);
 
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, 2 + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());

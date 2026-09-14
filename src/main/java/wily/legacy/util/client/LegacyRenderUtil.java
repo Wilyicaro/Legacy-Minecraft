@@ -68,8 +68,8 @@ import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
@@ -697,8 +697,8 @@ public class LegacyRenderUtil {
         int p = vector2ic.x();
         int q = vector2ic.y();
         graphics.pose().pushMatrix();
-        if (i == (int) Legacy4JClient.controllerManager.getPointerX() && j == (int) Legacy4JClient.controllerManager.getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
-            graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() - i), (float) (Legacy4JClient.controllerManager.getPointerY() - j));
+        if (i == (int) ControllerManager.getInstance().getPointerX() && j == (int) ControllerManager.getInstance().getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
+            graphics.pose().translate((float) (ControllerManager.getInstance().getPointerX() - i), (float) (ControllerManager.getInstance().getPointerY() - j));
         graphics.pose().translate(p, q);
         int scaledWidth = Math.round(scale * k);
         int scaledHeight = Math.round(scale * l);
@@ -815,9 +815,9 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.enableDepthTest();
         }
 
-        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
+        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !ControllerManager.getInstance().isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXOffset(), Legacy4JClient.controllerManager.getVisualPointerY());
+            graphics.pose().translate(ControllerManager.getInstance().getVisualPointerX() + LegacyTipManager.getTipXOffset(), ControllerManager.getInstance().getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(LegacyOptions.getUIMode().isFHD() ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
         }

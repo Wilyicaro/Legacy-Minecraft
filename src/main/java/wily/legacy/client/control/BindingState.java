@@ -4,7 +4,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import wily.factoryapi.base.ArbitrarySupplier;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.tooltip.ComponentIcon;
 
 import java.util.function.BiConsumer;
@@ -42,7 +41,7 @@ public abstract class BindingState {
         previousTimePressed = timePressed;
         boolean wasPressed = this.pressed;
         if (this.released = (!pressed && wasPressed)) timePressed = -1;
-        if (pressed) timePressed = wasPressed ? timePressed + Legacy4JClient.controllerManager.getInputTicks() : 0;
+        if (pressed) timePressed = wasPressed ? timePressed + ControllerManager.getInstance().getInputTicks() : 0;
         this.justPressed = pressed && !wasPressed;
         this.pressed = pressed;
         if (justPressed) blockAmount--;

@@ -15,20 +15,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
+import wily.legacy.client.control.*;
 import wily.legacy.client.control.tooltip.ControlTooltip;
-import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
-import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 
 @Mixin(ChatScreen.class)
-public abstract class ChatScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
+public abstract class ChatScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
     @Shadow
     protected EditBox input;
     @Shadow

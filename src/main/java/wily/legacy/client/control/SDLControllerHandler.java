@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
-public class SDLControllerHandler implements Controller.Handler {
+public class SDLControllerHandler implements ControllerHandler {
     public static final String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_MINOR_VERSION + "." + SdlVersionConst.SDL_MICRO_VERSION + "." + SdlVersionConst.SDL_COMMIT;
     public static final String nativesMainURLFormat = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/%s/%s";
     public static final Component TITLE = Component.literal("SDL3 (isXander's libsdl4j)");
@@ -93,8 +93,8 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public void fallback() {
         Legacy4J.LOGGER.warn("{} isn't supported in this system. {} will be used instead.", getName(), GLFWControllerHandler.getInstance().getName());
-        LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-        LegacyOptions.selectedControllerHandler.save();
+        LegacyControlsOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+        LegacyControlsOptions.selectedControllerHandler.save();
         init = true;
     }
 
@@ -110,8 +110,8 @@ public class SDLControllerHandler implements Controller.Handler {
 
             if (!natives.isPojav()) {
                 if (!natives.file().exists()) {
-                    LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-                    LegacyOptions.selectedControllerHandler.save();
+                    LegacyControlsOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                    LegacyControlsOptions.selectedControllerHandler.save();
                     FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> openNativesScreen(minecraft), () -> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
                     init = true;
                     return;
@@ -136,14 +136,14 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public void openNativesScreen(Minecraft minecraft) {
         Screen s = minecraft.screen;
-        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
+        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), ControllerHandler.DOWNLOAD_MESSAGE, b -> {
             Stocker<Long> fileSize = new Stocker<>(1L);
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
+            LegacyLoadingScreen screen = new LegacyLoadingScreen(ControllerHandler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
                 @Override
                 public void tick() {
                     if (getProgress() >= 1) {
-                        LegacyOptions.selectedControllerHandler.set(getInstance());
+                        LegacyControlsOptions.selectedControllerHandler.set(getInstance());
                         LegacyOptions.CLIENT_STORAGE.save();
                         onClose();
                         return;
@@ -170,7 +170,7 @@ public class SDLControllerHandler implements Controller.Handler {
                 try {
                     fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
                     FileUtils.copyURLToFile(getNativesURI().toURL(), natives.file());
-                    screen.setLoadingHeader(Controller.Handler.LOADING_NATIVES);
+                    screen.setLoadingHeader(ControllerHandler.LOADING_NATIVES);
                     screen.setProgress(1);
                     init = false;
                 } catch (IOException | URISyntaxException e) {
@@ -289,7 +289,7 @@ public class SDLControllerHandler implements Controller.Handler {
             }
 
             @Override
-            public Handler getHandler() {
+            public ControllerHandler getHandler() {
                 return SDLControllerHandler.this;
             }
         };

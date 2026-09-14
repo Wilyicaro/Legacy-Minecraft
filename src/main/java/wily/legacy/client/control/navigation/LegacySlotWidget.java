@@ -1,4 +1,4 @@
-package wily.legacy.client.screen;
+package wily.legacy.client.control.navigation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -6,14 +6,13 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.NavigationElement;
-import wily.legacy.client.control.Controller;
-import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.*;
+import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
 
+//TODO Make this not inherit LegacyIconHolder (basically, remove the rendering from this)
 public class LegacySlotWidget extends LegacyIconHolder implements NavigationElement {
     public final Slot slot;
     public int itemSeed;
@@ -38,10 +37,11 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     public void applyFocus(ComponentPath.Path path, boolean apply) {
         if (apply) {
             path.component().setFocused(null);
-            if (Legacy4JClient.controllerManager.isControllerTheLastInput() && LegacyOptions.interfaceSensitivity.get() > 0)
+            if (ControllerManager.getInstance().isControllerTheLastInput() && LegacyControlsOptions.interfaceSensitivity.get() > 0)
                 ControllerBinding.LEFT_STICK.state().block();
-            Legacy4JClient.controllerManager.enableCursor();
-            Legacy4JClient.controllerManager.setPointerPos(getMiddleX(), getMiddleY());
+            ControllerManager.getInstance().enableCursor();
+
+            ControllerManager.getInstance().setPointerPos(getMiddleX(), getMiddleY());
         }
     }
 
@@ -68,7 +68,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
 
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        return isVisible && !isHovered && (!Controller.Listener.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
+        return isVisible && !isHovered && (!ControllerListener.of(Minecraft.getInstance().screen).disableCursorOnInit() || !ControllerManager.getInstance().isControllerTheLastInput() || LegacyControlsOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
     }
 
     @Override

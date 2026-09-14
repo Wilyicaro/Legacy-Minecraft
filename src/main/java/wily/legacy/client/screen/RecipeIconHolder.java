@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -148,23 +149,25 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
             return true;
         }
-        int oldSelection = selectionOffset;
         if ((keyEvent.isUp() || keyEvent.isDown()) && isValidIndex()) {
-            if (!compactMode) {
-                if (keyEvent.isUp() && (getRecipes().size() > 2 || selectionOffset == 1))
-                    selectionOffset = Math.max(selectionOffset - 1, -1);
-                if (keyEvent.isDown() && getRecipes().size() >= 2)
-                    selectionOffset = Math.min(selectionOffset + 1, 1);
-            }
-            if (oldSelection != selectionOffset || canScroll()) {
-                LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
-                if (oldSelection == selectionOffset && (compactMode || selectionOffset != 0))
-                    Collections.rotate(getFocusedRecipes(), keyEvent.isUp() ? 1 : -1);
-                updateRecipeDisplay();
-                return true;
-            }
+            moveSelection(keyEvent.isUp() ? -1 : 1);
+            return true;
         }
         return super.keyPressed(keyEvent);
+    }
+
+    private void moveSelection(int direction) {
+        int oldSelection = selectionOffset;
+        if (!compactMode) {
+            int min = getRecipes().size() > 2 ? -1 : 0;
+            int max = getRecipes().size() >= 2 ? 1 : 0;
+            selectionOffset = Mth.clamp(selectionOffset + direction, min, max);
+        }
+        if (oldSelection == selectionOffset && !canScroll()) return;
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+        if (oldSelection == selectionOffset && (compactMode || selectionOffset != 0))
+            Collections.rotate(getFocusedRecipes(), -direction);
+        updateRecipeDisplay();
     }
 
     protected abstract void updateRecipeDisplay(RecipeInfo<R> rcp);
@@ -212,9 +215,13 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
 
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
-        if (isFocused() && canScroll()) {
-            Collections.rotate(getFocusedRecipes(), (int) Math.signum(g));
-            updateRecipeDisplay();
+        if (isFocused() && isValidIndex() && g != 0) {
+            if (canScroll()) {
+                Collections.rotate(getFocusedRecipes(), (int) Math.signum(g));
+                updateRecipeDisplay();
+            } else {
+                moveSelection(g > 0 ? -1 : 1);
+            }
             return true;
         }
         return false;

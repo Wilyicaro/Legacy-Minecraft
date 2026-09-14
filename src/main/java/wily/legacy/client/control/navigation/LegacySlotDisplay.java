@@ -1,4 +1,4 @@
-package wily.legacy.inventory;
+package wily.legacy.client.control.navigation;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.Slot;

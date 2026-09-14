@@ -25,31 +25,31 @@ import java.util.Set;
 
 public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     public static final Section ADVANCED_CONTROLLER_OPTIONS = new Section(
-            Component.translatable("legacy.menu.settings.advanced_options", LegacyOptions.selectedController.getDisplay().name()),
+            Component.translatable("legacy.menu.settings.advanced_options", LegacyControlsOptions.selectedController.getDisplay().name()),
             screen -> Panel.centered(screen, 250, 180),
             List.of(
                     o -> o.getRenderableVList().addOptions(
-                            LegacyOptions.selectedController,
-                            LegacyOptions.selectedControllerHandler,
-                            LegacyOptions.controllerPollingRate,
-                            LegacyOptions.controllerDoubleClick,
-                            LegacyOptions.controllerVirtualCursor,
-                            LegacyOptions.legacyCursor,
-                            LegacyOptions.limitCursor,
-                            LegacyOptions.leftStickDeadZone,
-                            LegacyOptions.rightStickDeadZone,
-                            LegacyOptions.leftTriggerDeadZone,
-                            LegacyOptions.rightTriggerDeadZone),
+                            LegacyControlsOptions.selectedController,
+                            LegacyControlsOptions.selectedControllerHandler,
+                            LegacyControlsOptions.controllerPollingRate,
+                            LegacyControlsOptions.controllerDoubleClick,
+                            LegacyControlsOptions.controllerVirtualCursor,
+                            LegacyControlsOptions.legacyCursor,
+                            LegacyControlsOptions.limitCursor,
+                            LegacyControlsOptions.leftStickDeadZone,
+                            LegacyControlsOptions.rightStickDeadZone,
+                            LegacyControlsOptions.leftTriggerDeadZone,
+                            LegacyControlsOptions.rightTriggerDeadZone),
                     o -> o.getRenderableVList().addOptionsCategory(KeyMapping.Category.MISC.label(),
-                            LegacyOptions.controllerLedRed,
-                            LegacyOptions.controllerLedGreen,
-                            LegacyOptions.controllerLedBlue),
+                            LegacyControlsOptions.controllerLedRed,
+                            LegacyControlsOptions.controllerLedGreen,
+                            LegacyControlsOptions.controllerLedBlue),
                     o -> o.getRenderableVList().addRenderable(new RGBPreviewWidget(0, 0, 241, 20))));
 
     private final Set<ControllerBinding<?>> recordedBindings = new ObjectOpenHashSet<>();
 
     public ControllerMappingScreen(Screen parent) {
-        super(parent, LegacyOptions.selectedController.getDisplay().name());
+        super(parent, LegacyControlsOptions.selectedController.getDisplay().name());
         advancedOptionsScreen = ADVANCED_CONTROLLER_OPTIONS.build(this);
     }
 
@@ -61,18 +61,18 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"), button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_controls"), Component.translatable("legacy.menu.reset_controls_message"), b -> {
             for (KeyMapping keyMapping : keyMappings)
                 LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
-            LegacyOptions.CLIENT_STORAGE.save();
+            LegacyControlsOptions.STORAGE.save();
             minecraft.setScreen(this);
         }))).size(240, 20).build());
         renderableVList.addOptions(
                 LegacyOptions.unbindConflictingButtons,
-                LegacyOptions.controllerToasts,
-                LegacyOptions.controllerToggleCrouch,
-                LegacyOptions.controllerToggleSprint,
-                LegacyOptions.controllerToggleUse,
-                LegacyOptions.controllerToggleAttack,
-                LegacyOptions.invertControllerButtons,
-                LegacyOptions.controllerCursorAtFirstInventorySlot);
+                LegacyControlsOptions.controllerToasts,
+                LegacyControlsOptions.controllerToggleCrouch,
+                LegacyControlsOptions.controllerToggleSprint,
+                LegacyControlsOptions.controllerToggleUse,
+                LegacyControlsOptions.controllerToggleAttack,
+                LegacyControlsOptions.invertControllerButtons,
+                LegacyControlsOptions.controllerCursorAtFirstInventorySlot);
 
         for (KeyMapping keyMapping : keyMappings) {
             if (Legacy4JClient.isMenuNavigationKey(keyMapping)) continue;
@@ -81,11 +81,11 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 renderableVList.addCategory(category.label());
                 if (category.equals(KeyMapping.Category.MOVEMENT)) {
                     renderableVList.addOptions(
-                            LegacyOptions.invertYController,
-                            LegacyOptions.smoothMovement,
-                            LegacyOptions.forceSmoothMovement,
-                            LegacyOptions.linearCameraMovement);
-                    renderableVList.addMultSliderOption(LegacyOptions.controllerSensitivity, 2);
+                            LegacyControlsOptions.invertYController,
+                            LegacyControlsOptions.smoothMovement,
+                            LegacyControlsOptions.forceSmoothMovement,
+                            LegacyControlsOptions.linearCameraMovement);
+                    renderableVList.addMultSliderOption(LegacyControlsOptions.controllerSensitivity, 2);
                 }
             }
             lastCategory = keyMapping.getCategory();
@@ -122,7 +122,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     protected void setNone(LegacyKeyMapping keyMapping) {
         keyMapping.setBinding(null);
-        LegacyOptions.CLIENT_STORAGE.save();
+        LegacyControlsOptions.STORAGE.save();
     }
 
     public boolean unbindConflictingBindings() {
@@ -131,7 +131,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.isEscape() && selectedMapping != null && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+        if (keyEvent.isEscape() && selectedMapping != null && !ControllerManager.getInstance().isControllerSimulatingInput) {
             setSelectedMapping(null);
             setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
             return true;
@@ -157,7 +157,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     public void applyBinding(ControllerBinding<?> binding) {
         selectedMapping.setBinding(binding);
-        LegacyOptions.CLIENT_STORAGE.save();
+        LegacyControlsOptions.STORAGE.save();
         setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
         resolveConflictingMappings();
         setSelectedMapping(null);

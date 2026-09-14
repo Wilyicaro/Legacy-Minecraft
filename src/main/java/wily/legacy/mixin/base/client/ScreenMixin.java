@@ -24,7 +24,8 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
-import wily.legacy.client.NavigationElement;
+import wily.legacy.client.control.navigation.NavigationElement;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.LegacyLoading;
 import wily.legacy.util.LegacyItemUtil;
@@ -97,7 +98,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     //?}
     @Inject(method = "keyPressed", at = @At("HEAD"))
     private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (Legacy4JClient.keyToggleCursor.matches(keyEvent)) Legacy4JClient.controllerManager.toggleCursor();
+        if (Legacy4JClient.keyToggleCursor.matches(keyEvent)) ControllerManager.getInstance().toggleCursor();
     }
 
     @Inject(method = "getTooltipFromItem", at = @At("RETURN"), cancellable = true)

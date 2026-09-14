@@ -18,7 +18,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.*;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
