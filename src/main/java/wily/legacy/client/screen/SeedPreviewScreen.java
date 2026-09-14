@@ -2,6 +2,8 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -9,13 +11,17 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biome;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
@@ -24,6 +30,7 @@ import wily.legacy.client.seedpreview.SeedMapTexture;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -41,12 +48,15 @@ public class SeedPreviewScreen extends LegacyScreen {
     };
     private final WorldCreationContext settings;
     private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    private final ScrollableRenderer helpScroll = new ScrollableRenderer();
     private CompletableFuture<Void> generation;
     private AtomicBoolean cancelled;
     private ChunkPos requested;
     private SeedMapTexture texture;
     private SeedMapTexture overviewTexture;
     private Panel detail;
+    private Panel help;
+    private ResourceKey<Biome> biome;
     private double targetX;
     private double targetZ;
     private double viewX;
@@ -58,6 +68,11 @@ public class SeedPreviewScreen extends LegacyScreen {
     public SeedPreviewScreen(Screen parent, WorldCreationContext settings) {
         super(parent, Component.translatable("legacy.menu.seed_preview"));
         this.settings = settings;
+    }
+
+    @Override
+    public boolean disableCursorOnInit() {
+        return false;
     }
 
     @Override
@@ -74,13 +89,18 @@ public class SeedPreviewScreen extends LegacyScreen {
         top = (height - scaled(265)) / 2 - scaled(17);
         Panel overview = addPanel("overviewPanel", LegacySprites.PANEL, 0, 0, 131, 141);
         detail = addPanel("detailPanel", LegacySprites.PANEL, 136, 0, 234, 262);
-        addPanel("helpPanel", LegacySprites.POINTER_PANEL, 0, 144, 133, 120);
+        help = addPanel("helpPanel", LegacySprites.POINTER_PANEL, 0, 144, 133, 120);
         addRenderableOnly((graphics, mouseX, mouseY, partialTick) -> {
             updateView();
             renderLabel(graphics, overview, WORLD_CENTER, 7);
             renderLabel(graphics, detail, WORLD_MAP, 7);
-            renderMap(graphics, overview, 10, 20, 109, overviewTexture, 0, 0);
-            renderMap(graphics, detail, 12, 27, 211, texture, viewX, viewZ);
+            ScreenRectangle overviewBounds = mapBounds(overview, 10, 20, 109);
+            ScreenRectangle detailBounds = mapBounds();
+            renderMap(graphics, overviewBounds, overviewTexture, 0, 0);
+            renderMap(graphics, detailBounds, texture, viewX, viewZ);
+            updateBiome(overviewBounds, overviewTexture, 0, 0, mouseX, mouseY);
+            updateBiome(detailBounds, texture, viewX, viewZ, mouseX, mouseY);
+            renderHelp(graphics);
             Component coordinates = Component.translatable("legacy.menu.seed_preview.coordinates",
                     Mth.floor(viewX * SeedMap.BLOCKS_PER_PIXEL), Mth.floor(viewZ * SeedMap.BLOCKS_PER_PIXEL));
             renderLabel(graphics, detail, coordinates, 244);
@@ -155,6 +175,8 @@ public class SeedPreviewScreen extends LegacyScreen {
         texture = null;
         overviewTexture = null;
         requested = null;
+        biome = null;
+        helpScroll.resetScrolled();
         targetX = 0;
         targetZ = 0;
         viewX = 0;
@@ -170,10 +192,10 @@ public class SeedPreviewScreen extends LegacyScreen {
         graphics.pose().popMatrix();
     }
 
-    private void renderMap(GuiGraphicsExtractor graphics, Panel panel, int x, int y, int size, SeedMapTexture texture, double viewX, double viewZ) {
-        int mapX = panel.getX() + scaled(x);
-        int mapY = panel.getY() + scaled(y);
-        int mapSize = scaled(size);
+    private void renderMap(GuiGraphicsExtractor graphics, ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ) {
+        int mapX = bounds.left();
+        int mapY = bounds.top();
+        int mapSize = bounds.width();
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, mapX - 2, mapY - 2, mapSize + 4, mapSize + 4);
         if (texture != null) {
             graphics.enableScissor(mapX, mapY, mapX + mapSize, mapY + mapSize);
@@ -185,6 +207,41 @@ public class SeedPreviewScreen extends LegacyScreen {
             graphics.pose().popMatrix();
             graphics.disableScissor();
         }
+    }
+
+    private void updateBiome(ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ, int mouseX, int mouseY) {
+        if (!bounds.containsPoint(mouseX, mouseY)) return;
+        ResourceKey<Biome> hovered = null;
+        if (texture != null) {
+            double samplesPerPixel = (double) SeedMap.VIEW_SIZE / bounds.width();
+            int x = Mth.floor((mouseX - bounds.left()) * samplesPerPixel + viewX - texture.map.chunkX() + SeedMap.PADDING);
+            int z = Mth.floor((mouseY - bounds.top()) * samplesPerPixel + viewZ - texture.map.chunkZ() + SeedMap.PADDING);
+            if (x >= 0 && z >= 0 && x < SeedMap.SIZE && z < SeedMap.SIZE) {
+                hovered = texture.map.biomes().get(z * SeedMap.SIZE + x).unwrapKey().orElse(null);
+            }
+        }
+        if (Objects.equals(biome, hovered)) return;
+        biome = hovered;
+        helpScroll.resetScrolled();
+    }
+
+    private void renderHelp(GuiGraphicsExtractor graphics) {
+        if (biome == null) return;
+        String key = "biome." + biome.identifier().toLanguageKey();
+        MutableComponent message = Component.translatableWithFallback(key, biome.identifier().toString());
+        if (LegacyTipManager.hasTip(key + ".description")) {
+            message.append("\n\n").append(Component.translatable(key + ".description"));
+        }
+        int width = (int) (help.getWidth() / scale) - 14;
+        int height = (int) (help.getHeight() / scale) - 24;
+        MultiLineLabel label = Panel.labelsCache.apply(message, width);
+        helpScroll.scrolled.max = Math.max(0, label.getLineCount() - height / 12);
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(help.getX(), help.getY());
+        graphics.pose().scale(scale);
+        helpScroll.extractRenderState(graphics, 7, 7, width, height,
+                () -> label.visitLines(TextAlignment.LEFT, 7, 7, 12, graphics.textRenderer()));
+        graphics.pose().popMatrix();
     }
 
     private void pan(ScreenDirection direction) {
@@ -271,6 +328,9 @@ public class SeedPreviewScreen extends LegacyScreen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, help.getX(), help.getY(), help.getWidth(), help.getHeight())) {
+            return biome != null && helpScroll.mouseScrolled(scrollY);
+        }
         if (texture == null || ControlType.getActiveType().isKbm() && !mapBounds().containsPoint((int) mouseX, (int) mouseY)) {
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
         }
@@ -285,7 +345,11 @@ public class SeedPreviewScreen extends LegacyScreen {
     }
 
     private ScreenRectangle mapBounds() {
-        return new ScreenRectangle(detail.getX() + scaled(12), detail.getY() + scaled(27), scaled(211), scaled(211));
+        return mapBounds(detail, 12, 27, 211);
+    }
+
+    private ScreenRectangle mapBounds(Panel panel, int x, int y, int size) {
+        return new ScreenRectangle(panel.getX() + scaled(x), panel.getY() + scaled(y), scaled(size), scaled(size));
     }
 
     private ScreenRectangle arrowBounds(Arrow arrow) {
