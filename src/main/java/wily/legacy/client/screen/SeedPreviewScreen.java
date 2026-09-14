@@ -15,6 +15,7 @@ import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
@@ -27,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SeedPreviewScreen extends LegacyScreen {
+    private static final Component WORLD_CENTER = Component.translatable("legacy.menu.seed_preview.world_center");
+    private static final Component WORLD_MAP = Component.translatable("legacy.menu.seed_preview.world_map");
     private static final int PAN_STEP = 4;
     private static final double PAN_SPEED = 16;
     private static final int REFRESH_STEP = SeedMap.PADDING / 2;
@@ -74,6 +77,8 @@ public class SeedPreviewScreen extends LegacyScreen {
         addPanel("helpPanel", LegacySprites.POINTER_PANEL, 0, 144, 133, 120);
         addRenderableOnly((graphics, mouseX, mouseY, partialTick) -> {
             updateView();
+            renderTitle(graphics, overview, WORLD_CENTER);
+            renderTitle(graphics, detail, WORLD_MAP);
             renderMap(graphics, overview, 10, 20, 109, overviewTexture, 0, 0);
             renderMap(graphics, detail, 12, 27, 211, texture, viewX, viewZ);
             for (Arrow arrow : ARROWS) {
@@ -152,6 +157,14 @@ public class SeedPreviewScreen extends LegacyScreen {
         viewX = 0;
         viewZ = 0;
         setDragging(false);
+    }
+
+    private void renderTitle(GuiGraphicsExtractor graphics, Panel panel, Component title) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(panel.getX() + panel.getWidth() / 2f, panel.getY() + scaled(7));
+        graphics.pose().scale(scale);
+        graphics.text(font, title, -font.width(title) / 2, 0, CommonColor.GRAY_TEXT.get(), false);
+        graphics.pose().popMatrix();
     }
 
     private void renderMap(GuiGraphicsExtractor graphics, Panel panel, int x, int y, int size, SeedMapTexture texture, double viewX, double viewZ) {
