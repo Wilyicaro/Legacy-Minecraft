@@ -1988,6 +1988,7 @@
   "legacy.menu.savingLevel.preparing_chunks": "詳細を設定中...",
   "legacy.menu.savingLevel.preparing_manual": "セーブレベル",
   "legacy.menu.screenshot": "Screenshot Taken",
+  "legacy.menu.seed_preview": "Seed Preview",
   "legacy.menu.selectWorld.amplified_world": "Amplified Worlds",
   "legacy.menu.selectWorld.biome_scale": "バイオームのサイズ調整",
   "legacy.menu.selectWorld.biome_scale.description": "各バイオームが使用するワールドのスペースを変更するには、バイオームのサイズ調整を選択します。大きくすると、バイオームの数は減りますがサイズは大きくなります",
