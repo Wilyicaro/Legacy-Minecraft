@@ -79,10 +79,10 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
 - [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
 
 > [!Warning]
-> Mods that are incompatible due to crashes:
+> The following mods are incompatible with Legacy4J due to crashes:
 > - [ViaFabricPlus](https://modrinth.com/mod/viafabricplus)
 >
-> Mods that are incompatible due to breaking bugs:
+> The following mods are incompatible with Legacy4J due to breaking bugs:
 > - [Remove Reloading Screen](https://modrinth.com/mod/rrls)
 >
 > If you have any of the above mods installed, please remove them for Legacy4J to work properly.
