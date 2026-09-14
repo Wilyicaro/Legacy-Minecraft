@@ -15,7 +15,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ShieldItem;
@@ -34,7 +33,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
 import wily.legacy.client.control.ControllerManager;
 import wily.legacy.entity.LegacyLocalPlayer;
-import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.*;
@@ -51,7 +49,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Shadow
     private boolean lastOnGround;
 
-    private boolean legacyAutoShielding;
     private float legacyUnderwaterVisionTime;
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
@@ -190,61 +187,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
                 && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get());
     }
 
-    public boolean isAutoShielding() {
-        return legacyAutoShielding;
-    }
-
-    @Inject(method = "aiStep", at = @At("RETURN"))
-    private void updateShieldControlsAfterMovement(CallbackInfo ci) {
-        legacy$updateShieldControls();
-    }
-
-    @Inject(method = "rideTick", at = @At("RETURN"))
-    private void updateShieldControlsWhileRiding(CallbackInfo ci) {
-        legacy$updateShieldControls();
-    }
-
     @ModifyExpressionValue(method = "modifyInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;itemUseSpeedMultiplier()F"))
     private float legacyShieldSpeedMultiplier(float original) {
-        return legacyAutoShielding && isMovingSlowly() && getUseItem().getItem() instanceof ShieldItem
+        return isMovingSlowly() && getUseItem().getItem() instanceof ShieldItem
                 && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) ? 1.0f : original;
-    }
-
-    @WrapWithCondition(method = "onSyncedDataUpdated", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;startUsingItem(Lnet/minecraft/world/InteractionHand;)V"))
-    private boolean allowSyncedItemUse(LocalPlayer instance, InteractionHand hand) {
-        return !((LegacyShieldPlayer) this).isShieldPaused() || !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) || !(getItemInHand(hand).getItem() instanceof ShieldItem);
-    }
-
-    private void legacy$updateShieldControls() {
-        InteractionHand hand = legacy$getShieldHand();
-        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
-            if (LegacyShieldPlayer.hasConflictingUse((LocalPlayer) (Object) this, hand)) {
-                legacyAutoShielding = false;
-                return;
-            }
-            if (((LegacyShieldPlayer) this).isShieldPaused()) {
-                if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
-                legacyAutoShielding = false;
-                return;
-            }
-            legacyAutoShielding = true;
-            if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
-                if (isUsingItem()) stopUsingItem();
-                startUsingItem(hand);
-                if (minecraft.gameMode != null) minecraft.gameMode.useItem((LocalPlayer) (Object) this, hand);
-            }
-        } else {
-            if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) {
-                if (minecraft.gameMode != null) minecraft.gameMode.releaseUsingItem((LocalPlayer) (Object) this);
-                else stopUsingItem();
-            }
-            legacyAutoShielding = false;
-        }
-    }
-
-    private InteractionHand legacy$getShieldHand() {
-        if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
-        return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
     }
 
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isAllowedInPortal()Z"))

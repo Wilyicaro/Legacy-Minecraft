@@ -1,7 +1,6 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -17,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,11 +25,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryItemUtil;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.init.LegacyGameRules;
@@ -39,11 +35,7 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPlayer {
-    @Unique
-    private boolean legacy$autoShielding;
-    @Unique
-    private int legacy$shieldPauseUntilTick;
+public abstract class PlayerMixin extends LivingEntity {
     @Unique
     private boolean legacy$skeletonJockeyKill;
 
@@ -97,9 +89,8 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
-    protected void tickShieldControls(CallbackInfo ci) {
+    protected void tick(CallbackInfo ci) {
         legacy$stopFallFlyingInWater();
-        legacy$updateShieldControls();
     }
 
     @Inject(method = "blockUsingItem", at = @At("RETURN"))
@@ -169,47 +160,5 @@ public abstract class PlayerMixin extends LivingEntity implements LegacyShieldPl
         if ((!FactoryAPI.isClient() || Legacy4JClient.hasModOnServer()) && isFallFlying() && isInWater()) {
             stopFallFlying();
         }
-    }
-
-    @Unique
-    private void legacy$updateShieldControls() {
-        InteractionHand hand = legacy$getShieldHand();
-        if (level().isClientSide()) return;
-        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && hand != null && (isPassenger() || isShiftKeyDown())) {
-            if (!isShieldPaused() && LegacyShieldPlayer.hasConflictingUse((Player) (Object) this, hand)) {
-                legacy$autoShielding = false;
-                return;
-            }
-            if (isShieldPaused()) {
-                if (legacy$autoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
-                legacy$autoShielding = false;
-                return;
-            }
-            if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
-                if (isUsingItem()) stopUsingItem();
-                startUsingItem(hand);
-            }
-            legacy$autoShielding = true;
-        } else {
-            if (legacy$autoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
-            legacy$autoShielding = false;
-        }
-    }
-
-    @Unique
-    private InteractionHand legacy$getShieldHand() {
-        if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
-        return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
-    }
-
-    @Override
-    public void pauseShield(int ticks) {
-        legacy$shieldPauseUntilTick = Math.max(legacy$shieldPauseUntilTick, tickCount + ticks);
-        if (isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
-    }
-
-    @Override
-    public boolean isShieldPaused() {
-        return tickCount < legacy$shieldPauseUntilTick;
     }
 }

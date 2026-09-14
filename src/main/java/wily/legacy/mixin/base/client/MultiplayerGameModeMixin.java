@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -34,7 +33,6 @@ import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyBlockProtection;
@@ -58,10 +56,6 @@ public class MultiplayerGameModeMixin {
         PlayerTrustPolicy trust = legacy$getTrust(player);
         if (trust != null && !trust.canUseItem(player.getItemInHand(hand))) {
             cir.setReturnValue(InteractionResult.FAIL);
-            return;
-        }
-        if (LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && player.getItemInHand(hand).getItem() instanceof ShieldItem && (!((LegacyShieldPlayer) player).isAutoShielding() || ((LegacyShieldPlayer) player).isShieldPaused())) {
-            cir.setReturnValue(InteractionResult.PASS);
         }
     }
 
