@@ -1989,6 +1989,8 @@
   "legacy.menu.savingLevel.preparing_manual": "Preparando para Salvar Nível",
   "legacy.menu.screenshot": "Tela Capturada",
   "legacy.menu.seed_preview": "Seed Preview",
+  "legacy.menu.seed_preview.world_center": "World Center",
+  "legacy.menu.seed_preview.world_map": "World Map",
   "legacy.menu.selectWorld.amplified_world": "Mundos Amplificados",
   "legacy.menu.selectWorld.biome_scale": "Escala de Bioma",
   "legacy.menu.selectWorld.biome_scale.description": "Selecione uma escala de bioma para alterar a quantidade de espaço que cada Bioma vai ocupar. Escala maior geralmente significa menor, mas maiores, Biomas.",
