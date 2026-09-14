@@ -211,7 +211,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addRenderable(createSeedEditBox(parent));
         renderableVList.addCategory(SEED_INFO);
         renderableVList.addRenderable(new LegacyButton(Component.translatable("legacy.menu.seed_preview"),
-                b -> minecraft.setScreen(new SeedPreviewScreen(this))));
+                b -> minecraft.setScreen(new SeedPreviewScreen(this, parent.getUiState().getSettings()))));
     }
 
     private EditBox createSeedEditBox(CreateWorldScreen parent) {
