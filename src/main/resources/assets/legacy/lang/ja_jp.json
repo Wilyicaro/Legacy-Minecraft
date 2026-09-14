@@ -1989,6 +1989,7 @@
   "legacy.menu.savingLevel.preparing_manual": "セーブレベル",
   "legacy.menu.screenshot": "Screenshot Taken",
   "legacy.menu.seed_preview": "Seed Preview",
+  "legacy.menu.seed_preview.coordinates": "X: %s, Z: %s",
   "legacy.menu.seed_preview.world_center": "World Center",
   "legacy.menu.seed_preview.world_map": "World Map",
   "legacy.menu.selectWorld.amplified_world": "Amplified Worlds",
