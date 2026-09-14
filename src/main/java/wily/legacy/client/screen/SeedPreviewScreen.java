@@ -58,6 +58,11 @@ public class SeedPreviewScreen extends LegacyScreen {
     }
 
     @Override
+    public void renderDefaultBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, graphics, false);
+    }
+
+    @Override
     protected void init() {
         super.init();
         setDragging(false);
