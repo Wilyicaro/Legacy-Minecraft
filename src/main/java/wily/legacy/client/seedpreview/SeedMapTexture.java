@@ -11,8 +11,11 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.material.MapColor;
 
 public class SeedMapTexture extends DynamicTexture {
+    public final SeedMap map;
+
     public SeedMapTexture(SeedMap map) {
         super(() -> "Seed preview", createImage(map));
+        this.map = map;
         sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
     }
 
@@ -21,7 +24,9 @@ public class SeedMapTexture extends DynamicTexture {
         for (int z = 0; z < SeedMap.SIZE; z++) {
             for (int x = 0; x < SeedMap.SIZE; x++) {
                 Holder<Biome> biome = map.biomes().get(z * SeedMap.SIZE + x);
-                image.setPixel(x, z, 0xFF000000 | color(biome, SeedMap.blockCoordinate(x), SeedMap.blockCoordinate(z)));
+                int blockX = SeedMap.blockCoordinate(map.chunkX(), x);
+                int blockZ = SeedMap.blockCoordinate(map.chunkZ(), z);
+                image.setPixel(x, z, 0xFF000000 | color(biome, blockX, blockZ));
             }
         }
         return image;
