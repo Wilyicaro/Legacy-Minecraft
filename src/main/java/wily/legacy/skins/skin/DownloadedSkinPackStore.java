@@ -5,13 +5,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.repository.PackRepository;
+import wily.legacy.client.LegacyOptions;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.Path;
 
 public final class DownloadedSkinPackStore {
+    private static final int CONTENT_REVISION = 1;
     private static final String RESOURCE_PACK_DIR = "Legacy Downloaded Skinpacks";
     private static final String PACK_DESCRIPTION = "Legacy4J skin packs";
     private static final String ASSET_NAMESPACE = "lce_skinpacks";
@@ -74,6 +77,38 @@ public final class DownloadedSkinPackStore {
 
     public static void enableResourcePack(Minecraft minecraft) throws IOException {
         SkinPackFiles.enableResourcePack(minecraft, RESOURCE_PACK_DIR, PACK_DESCRIPTION, RESOURCE_PACK_ICON, "Missing bundled downloaded skin pack resource icon");
+    }
+
+    public static void resetOutdatedPacks(Minecraft minecraft) {
+        if (LegacyOptions.downloadedSkinPackRevision.get() >= CONTENT_REVISION) return;
+        Path dir = SkinPackFiles.resourcePackDir(minecraft, RESOURCE_PACK_DIR);
+        if (dir == null) return;
+        try {
+            if (!clearDownloadedPacks(dir)) return;
+            LegacyOptions.downloadedSkinPackRevision.set(CONTENT_REVISION);
+            LegacyOptions.CLIENT_STORAGE.save();
+            minecraft.execute(minecraft::reloadResourcePacks);
+        } catch (IOException ignored) {
+        }
+    }
+
+    private static boolean clearDownloadedPacks(Path dir) throws IOException {
+        if (Files.exists(dir) && !dir.toRealPath().equals(dir.getParent().toRealPath().resolve(RESOURCE_PACK_DIR))) {
+            return false;
+        }
+        Path packs = dir.resolve(PACKS_DIR);
+        if (Files.exists(packs)) {
+            Path expectedRoot = dir.toRealPath().resolve(PACKS_DIR);
+            try (var paths = Files.walk(packs)) {
+                for (Path path : (Iterable<Path>) paths::iterator) {
+                    if (Files.isDirectory(path) && !path.toRealPath().startsWith(expectedRoot)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        SkinPackFiles.deleteTree(packs);
+        return true;
     }
 
     public static List<String> preserveSelection(PackRepository repository, List<String> selectedIds) {

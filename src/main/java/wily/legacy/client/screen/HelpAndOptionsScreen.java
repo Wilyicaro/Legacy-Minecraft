@@ -8,10 +8,10 @@ import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
-import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.ContentReinstaller;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.util.LegacySprites;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.of(Minecraft.getInstance().options.invertMouseX()),
                                 LegacyOptions.of(Minecraft.getInstance().options.invertMouseY()),
-                                LegacyOptions.systemCursor,
+                                LegacyControlsOptions.systemCursor,
                                 LegacyOptions.of(Minecraft.getInstance().options.allowCursorChanges()),
                                 LegacyOptions.cursorAtFirstInventorySlot,
                                 LegacyOptions.of(Minecraft.getInstance().options.rawMouseInput()),

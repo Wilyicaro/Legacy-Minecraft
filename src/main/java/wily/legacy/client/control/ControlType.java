@@ -60,8 +60,8 @@ public record ControlType(Identifier id, Optional<Component> name, boolean isKbm
     }
 
     public static ControlType getActiveType() {
-        ControlType type = !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() ||
-                LegacyOptions.lockControlTypeChange.get() &&
+        ControlType type = !LegacyControlsOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() ||
+                LegacyControlsOptions.lockControlTypeChange.get() &&
                 (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() ||
                         !LegacyOptions.selectedControlType.get().orElse(getOrEmpty(KBM)).isKbm())
                 ? getActiveControllerType() : getKbmActiveType();
