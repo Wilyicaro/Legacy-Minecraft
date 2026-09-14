@@ -82,7 +82,7 @@ Consider joining the [Nostalgica Reverie Discord](https://discord.gg/6pRkrYxbGW)
 The following mods are incompatible with Legacy4J due to causing crashes:
 - [ViaFabricPlus](https://modrinth.com/mod/viafabricplus)
 
-The following mods are incompatible with Legacy4J due to causing bugs:
+The following mods cause bugs when used with Legacy4J:
 - [Essential Mod](https://modrinth.com/mod/essential) (Changes game rule names)
 - [Remove Reloading Screen](https://modrinth.com/mod/rrls) (Softlocks the game when changing resource packs)
 
