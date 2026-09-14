@@ -1988,6 +1988,7 @@
   "legacy.menu.savingLevel.preparing_chunks": "Preparazione Chunk in corso...",
   "legacy.menu.savingLevel.preparing_manual": "Preparazione per il Salvataggio del Livello",
   "legacy.menu.screenshot": "Screenshot Catturato",
+  "legacy.menu.seed_preview": "Seed Preview",
   "legacy.menu.selectWorld.amplified_world": "Mondo Amplificato",
   "legacy.menu.selectWorld.biome_scale": "Scala del Bioma",
   "legacy.menu.selectWorld.biome_scale.description": "Seleziona una scala del Bioma per cambiare la quantità di spazio nel mondo che ogni Bioma occuperà. Una scala maggiore di solito significa meno Biomi, ma più grandi.",
