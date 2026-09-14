@@ -32,13 +32,14 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.client.screen.LegacySlotWidget;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
+import wily.legacy.client.control.navigation.LegacySlotWidget;
 import wily.legacy.client.screen.RecipesScreen;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -147,14 +148,14 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Inject(method = "mouseClicked", at = @At("RETURN"))
     private void mouseClicked(MouseButtonEvent event, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-        boolean downPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed;
-        boolean upPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;
+        boolean downPressed = ControllerManager.getInstance().getButtonState(ControllerBinding.DOWN_BUTTON).justPressed;
+        boolean upPressed = ControllerManager.getInstance().getButtonState(ControllerBinding.UP_BUTTON).justPressed;
         if (Util.getMillis() - lastUpPressedTime < 250L && downPressed) this.doubleclick = false;
         if (upPressed) lastUpPressedTime = Util.getMillis();
         if (!this.skipNextRelease) {
-            boolean leftPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.LEFT_BUTTON).justPressed;
+            boolean leftPressed = ControllerManager.getInstance().getButtonState(ControllerBinding.LEFT_BUTTON).justPressed;
             if (downPressed || upPressed || leftPressed) {
-                this.mouseReleased(new MouseButtonEvent(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), new MouseButtonInfo(leftPressed ? 1 : 0, event.modifiers())));
+                this.mouseReleased(new MouseButtonEvent(ControllerManager.getInstance().getPointerX(), ControllerManager.getInstance().getPointerY(), new MouseButtonInfo(leftPressed ? 1 : 0, event.modifiers())));
                 this.skipNextRelease = true;
             }
         }
@@ -170,14 +171,14 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Inject(method = "mouseReleased", at = @At("HEAD"))
     public void mouseReleasedNoDoubleClick(MouseButtonEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (Legacy4JClient.controllerManager.isControllerTheLastInput() && !LegacyControlsOptions.controllerDoubleClick.get())
+        if (ControllerManager.getInstance().isControllerTheLastInput() && !LegacyControlsOptions.controllerDoubleClick.get())
             this.doubleclick = false;
     }
 
     @Inject(method = "extractFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphicsExtractor GuiGraphicsExtractor, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         GuiGraphicsExtractor.pose().pushMatrix();
-        GuiGraphicsExtractor.pose().translate((float) Legacy4JClient.controllerManager.getPointerX() - 10, (float) Legacy4JClient.controllerManager.getPointerY() - 10);
+        GuiGraphicsExtractor.pose().translate((float) ControllerManager.getInstance().getPointerX() - 10, (float) ControllerManager.getInstance().getPointerY() - 10);
         if (!LegacyOptions.getUIMode().isSD()) GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);
         GuiGraphicsExtractor.item(itemStack, 0, 0);
         GuiGraphicsExtractor.itemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
@@ -266,12 +267,12 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/MouseButtonEvent;hasShiftDown()Z"))
     public boolean mouseClickedShift(boolean original) {
-        return original || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).pressed;
+        return original || ControllerManager.getInstance().getButtonState(ControllerBinding.UP_BUTTON).pressed;
     }
 
     @ModifyExpressionValue(method = "mouseReleased", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/MouseButtonEvent;hasShiftDown()Z"))
     public boolean mouseReleasedShift0(boolean original) {
-        return original || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;
+        return original || ControllerManager.getInstance().getButtonState(ControllerBinding.UP_BUTTON).released || ControllerManager.getInstance().getButtonState(ControllerBinding.UP_BUTTON).justPressed;
     }
 
     @Inject(method = "onClose", at = @At("RETURN"))
@@ -284,7 +285,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Override
     public boolean isOutsideClick(int i) {
-        return hasClickedOutside(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), leftPos, topPos);
+        return hasClickedOutside(ControllerManager.getInstance().getPointerX(), ControllerManager.getInstance().getPointerY(), leftPos, topPos);
     }
 
     @Override

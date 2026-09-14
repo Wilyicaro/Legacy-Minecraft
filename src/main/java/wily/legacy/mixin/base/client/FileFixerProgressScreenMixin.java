@@ -30,7 +30,7 @@ public abstract class FileFixerProgressScreenMixin extends Screen implements Leg
 
     @Inject(method = "init", at = @At("TAIL"))
     private void legacy$positionCancelButton(CallbackInfo ci) {
-        if (LegacyOptions.legacyLoadingAndConnecting.get()) cancelButton.setY(height - 25);
+        if (LegacyOptions.legacyLoadingAndConnecting.get()) cancelButton.setY(UIAccessor.of(this).getInteger("loadingBar.y", height / 2 + 15) + 20);
     }
 
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)

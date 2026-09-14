@@ -691,7 +691,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 o.getRenderableVList().addRenderable(createDisplayPackManagementTooltipsTickBox());
                             }
                         },
-                        o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
+                        o -> o.renderableVList.addMultSliderOption(LegacyControlsOptions.interfaceSensitivity, 2),
                         o -> {
                             if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.inGameOnlineIds,

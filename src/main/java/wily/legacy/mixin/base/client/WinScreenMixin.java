@@ -36,15 +36,9 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
-import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.*;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
-import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.LegacyCreditsScreen;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -53,7 +47,7 @@ import java.io.Reader;
 import java.util.List;
 
 @Mixin(WinScreen.class)
-public abstract class WinScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
+public abstract class WinScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
 
     @Unique
     Identifier POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
@@ -207,7 +201,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Listen
     @Override
     public void simulateKeyAction(ControllerManager manager, BindingState state) {
         if (!poem && !isLegacyCredits()) return;
-        Controller.Listener.super.simulateKeyAction(manager, state);
+        ControllerListener.super.simulateKeyAction(manager, state);
         if (poem) {
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_UP), InputConstants.KEY_UP, state, true);
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_DOWN), InputConstants.KEY_DOWN, state, true);

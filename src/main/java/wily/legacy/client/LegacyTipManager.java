@@ -20,7 +20,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
 import wily.legacy.util.LegacyTipBuilder;
 
 import java.io.BufferedReader;

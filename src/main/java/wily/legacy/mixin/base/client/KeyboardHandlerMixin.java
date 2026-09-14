@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControllerManager;
 
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixin {
@@ -22,8 +23,8 @@ public class KeyboardHandlerMixin {
 
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     public void keyPress(long l, int i, KeyEvent keyEvent, CallbackInfo ci) {
-        if (l == minecraft.getWindow().handle() && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
-            Legacy4JClient.controllerManager.setControllerTheLastInput(false);
+        if (l == minecraft.getWindow().handle() && !ControllerManager.getInstance().isControllerSimulatingInput) {
+            ControllerManager.getInstance().setControllerTheLastInput(false);
             Legacy4JClient.updateKeyboardToggleKeyPress(keyEvent, i);
             if (i != GLFW.GLFW_RELEASE && keyEvent.isEscape() && !Legacy4JClient.consumeKeyboardActionKeyPress(keyEvent.key())) {
                 ci.cancel();
@@ -52,10 +53,10 @@ public class KeyboardHandlerMixin {
     *///?} else {
     @WrapOperation(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z"))
     public boolean screenKeyPress(Screen instance, KeyEvent keyEvent, Operation<Boolean> original) {
-        Legacy4JClient.controllerManager.blockNextCharType = false;
+        ControllerManager.getInstance().blockNextCharType = false;
         if (minecraft.getOverlay() == null && original.call(instance, keyEvent)) {
             if (minecraft.screen != instance)
-                Legacy4JClient.controllerManager.blockNextCharType = true;
+                ControllerManager.getInstance().blockNextCharType = true;
             return true;
         }
         return false;
@@ -68,8 +69,8 @@ public class KeyboardHandlerMixin {
 
     @WrapOperation(method = "charTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;charTyped(Lnet/minecraft/client/input/CharacterEvent;)Z"))
     public boolean charTyped(Screen instance, CharacterEvent characterEvent, Operation<Boolean> original) {
-        if (Legacy4JClient.controllerManager.blockNextCharType) {
-            return Legacy4JClient.controllerManager.blockNextCharType = false;
+        if (ControllerManager.getInstance().blockNextCharType) {
+            return ControllerManager.getInstance().blockNextCharType = false;
         }
         return original.call(instance, characterEvent);
     }

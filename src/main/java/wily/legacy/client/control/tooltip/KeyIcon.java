@@ -8,8 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import org.lwjgl.glfw.GLFW;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.util.IOUtil;
 
@@ -46,7 +46,7 @@ public class KeyIcon extends CharsIcon {
         super.click(event);
 
         if (key.getValue() == InputConstants.KEY_LSHIFT || key.getValue() == InputConstants.KEY_RSHIFT) {
-            Legacy4JClient.controllerManager.simulateShift = true;
+            ControllerManager.getInstance().simulateShift = true;
         }
 
         if (key.getType() == InputConstants.Type.KEYSYM)

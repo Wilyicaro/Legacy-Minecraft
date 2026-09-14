@@ -1,6 +1,6 @@
 package wily.legacy.client;
 
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControllerManager;
 
 public final class ReplayCompat {
     private static volatile boolean rendering;
@@ -11,6 +11,6 @@ public final class ReplayCompat {
 
     public static void setRendering(boolean rendering) {
         ReplayCompat.rendering = rendering;
-        Legacy4JClient.controllerManager.updateCursorInputMode();
+        ControllerManager.getInstance().updateCursorInputMode();
     }
 }

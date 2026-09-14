@@ -7,7 +7,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -20,11 +19,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.control.Controller;
 import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.LegacyControlsOptions;
 
 @Mixin(ClientLevel.class)
 public abstract class ClientLevelMixin extends Level {
@@ -38,15 +35,15 @@ public abstract class ClientLevelMixin extends Level {
 
     @Inject(method = "trackExplosionEffects", at = @At("RETURN"))
     private void trackExplosionEffects(Vec3 center, float radius, int blockCount, WeightedList<ExplosionParticleInfo> blockParticles, CallbackInfo ci) {
-        float vibration = LegacyOptions.vibrationWhenExploding.get().floatValue();
+        float vibration = LegacyControlsOptions.vibrationWhenExploding.get().floatValue();
 
-        if (vibration <= 0) return;
+        if (vibration <= 0 || radius <= 0) return;
 
-        Controller controller = Legacy4JClient.controllerManager.connectedController;
+        Controller controller = ControllerManager.getInstance().connectedController;
 
-        if (controller != null && Legacy4JClient.controllerManager.isControllerTheLastInput()) {
+        if (controller != null && ControllerManager.getInstance().isControllerTheLastInput()) {
             LocalPlayer player = minecraft.player;
-            Vec2 rumble = ControllerManager.rumbleIntensityFromTarget(player.position(), player.getRotationVector(), center, radius, 0.7f).scale(vibration);
+            Vec2 rumble = ControllerManager.rumbleIntensityFromTarget(player.position(), player.getRotationVector(), center, radius + 2, 0.7f).scale(vibration);
 
             if (rumble.length() == 0) return;
 

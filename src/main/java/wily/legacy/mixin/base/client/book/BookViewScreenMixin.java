@@ -16,19 +16,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
-import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.*;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
-import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.BookPanel;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
 @Mixin(BookViewScreen.class)
-public abstract class BookViewScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
+public abstract class BookViewScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
 
     @Shadow
     private PageButton forwardButton;

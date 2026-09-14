@@ -3,10 +3,10 @@ package wily.legacy.client.control.tooltip;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.input.MouseButtonEvent;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.util.IOUtil;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class ControllerIcon extends CharsIcon {
 
     @Override
     public void click(MouseButtonEvent event) {
-        if (Legacy4JClient.controllerManager.connectedController != null) {
+        if (ControllerManager.getInstance().connectedController != null) {
             super.click(event);
             state().nextUpdatePress();
         }

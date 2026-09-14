@@ -159,7 +159,6 @@ public class Legacy4JClient {
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
     public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
     public static final MapIdValueManager<ControlType, ListMap<Identifier, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("control_types"), ControlType.CODEC);
-    public static final ControllerManager controllerManager = new ControllerManager();
     public static final Map<Block, Identifier> fastLeavesModels = new HashMap<>();
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
     public static final RenderType GHAST_SHOOTING_GLOW = RenderTypes.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
@@ -334,7 +333,7 @@ public class Legacy4JClient {
     }
 
     private static boolean consumeKeyboardPress(int action) {
-        if (controllerManager.isControllerTheLastInput() || action == 0) return true;
+        if (ControllerManager.getInstance().isControllerTheLastInput() || action == 0) return true;
         if ((consumedKeyboardActions & action) != 0) return false;
         consumedKeyboardActions |= action;
         return true;
@@ -396,8 +395,8 @@ public class Legacy4JClient {
         }
 
         if (sprintTicksLeft > 0) --sprintTicksLeft;
-        if (minecraft.player != null && controllerManager.isControllerTheLastInput()) {
-            BindingState.Axis stick = controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
+        if (minecraft.player != null && ControllerManager.getInstance().isControllerTheLastInput()) {
+            BindingState.Axis stick = ControllerManager.getInstance().getButtonState(ControllerBinding.LEFT_STICK);
             float y = Math.abs(stick.y) > stick.getDeadZone() ? stick.y : 0;
             if (((LegacyLocalPlayer) minecraft.player).canSprintController()) {
                 if (y < -0.85) {
@@ -444,13 +443,13 @@ public class Legacy4JClient {
         if (screen.getFocused() != null && !screen.children().contains(screen.getFocused())) {
             screen.clearFocus();
         }
-        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.isControllerTheLastInput() || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
-            Controller.Listener e = Controller.Listener.of(screen);
-            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways())
-                controllerManager.tryDisableCursor();
-            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways()))
-                controllerManager.enableCursorAndScheduleReset();
-            if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
+        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || ControllerManager.getInstance().isControllerTheLastInput() || ControllerManager.getInstance().getCursorMode().isNever()) && !ControllerManager.getInstance().getCursorMode().isAlways()) {
+            ControllerListener e = ControllerListener.of(screen);
+            if (e.disableCursorOnInit() && !ControllerManager.getInstance().getCursorMode().isAlways())
+                ControllerManager.getInstance().tryDisableCursor();
+            if (ControllerManager.getInstance().isCursorDisabled && (!e.disableCursorOnInit() || ControllerManager.getInstance().getCursorMode().isAlways()))
+                ControllerManager.getInstance().enableCursorAndScheduleReset();
+            if (ControllerManager.getInstance().isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                 if (path != null) {
                     path.applyFocus(true);
@@ -458,7 +457,7 @@ public class Legacy4JClient {
                 }
             }
         }
-        controllerManager.resetCursor();
+        ControllerManager.getInstance().resetCursor();
     }
 
     public static void clientPlayerJoin(LocalPlayer p) {
@@ -531,38 +530,8 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, howToPlaySectionManager);
         FactoryOptions.NEAREST_MIPMAP_SCALING.setDefault(true);
         FactoryOptions.RANDOM_BLOCK_ROTATIONS.setDefault(false);
-        FactoryAPIClient.setup(m -> {
-            MCAccount.loadAll();
-            controllerManager.setup(m);
-            knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK, m.gameDirectory.toPath());
-            knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
-            LegacySaveCache.setup(m);
-            ControllerBinding.setupDefaultBindings(m);
-            LegacyControlsOptions.STORAGE.load();
-            LegacyOptions.CLIENT_STORAGE.load();
-            DownloadedSkinPackStore.resetOutdatedPacks(m);
-            controllerManager.afterConfigLoad();
-            LegacyRenderDistance.initDefault();
-            //? if fabric
-            if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
-            //? if fabric || (>=1.21 && neoforge) {
-            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
-            if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            //?}
-            LegacyGuiElements.setup(m);
-
-            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
-                @Override
-                public net.minecraft.network.chat.Component title() {
-                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
-                }
-
-                @Override
-                public Screen build(Screen parent) {
-                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
-                }
-            };
-        });
+        LegacyControlsOptions.STORAGE.preLoad.register(LegacyOptions::loadDeprecatedConfigs);
+        FactoryAPIClient.setup(Legacy4JClient::setup);
 
         FactoryAPIClient.registerBlockColor(registry -> {
             registry.accept(List.of(new BlockTintSource() {
@@ -693,6 +662,36 @@ public class Legacy4JClient {
         });
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID), Legacy4JSettingsScreen::new);
         FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options, false));
+    }
+
+    public static void setup(Minecraft m) {
+        LegacyControls.setup(m);
+        MCAccount.loadAll();
+        knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK, m.gameDirectory.toPath());
+        knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
+        LegacySaveCache.setup(m);
+        LegacyOptions.CLIENT_STORAGE.load();
+        DownloadedSkinPackStore.resetOutdatedPacks(m);
+        LegacyRenderDistance.initDefault();
+        //? if fabric
+        if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
+        //? if fabric || (>=1.21 && neoforge) {
+        if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+        if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
+        //?}
+        LegacyGuiElements.setup(m);
+
+        HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+            @Override
+            public net.minecraft.network.chat.Component title() {
+                return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+            }
+
+            @Override
+            public Screen build(Screen parent) {
+                return SkinsClientBootstrap.createChangeSkinScreen(parent);
+            }
+        };
     }
 
     private static void registerBuiltInPacks() {
