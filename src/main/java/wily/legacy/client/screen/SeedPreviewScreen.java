@@ -57,6 +57,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     private final Bearer<BlockPos> seedStart;
     private SeedMapMarker startMarker;
     private BlockPos hovered;
+    private boolean showStructures = true;
     private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final ScrollableRenderer helpScroll = new ScrollableRenderer();
     private CompletableFuture<SeedMapGenerator> generator;
@@ -94,6 +95,10 @@ public class SeedPreviewScreen extends LegacyScreen {
         list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_HOME)
                         : ControllerBinding.RIGHT_STICK_BUTTON.getIcon(),
                 () -> texture != null ? Component.translatable("legacy.menu.seed_preview.recenter") : null);
+        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_S)
+                        : ControllerBinding.LEFT_STICK_BUTTON.getIcon(),
+                () -> settings.options().generateStructures() ? Component.translatable(showStructures
+                        ? "legacy.menu.seed_preview.hide_structures" : "legacy.menu.seed_preview.show_structures") : null);
     }
 
     private void setSeedStart(BlockPos pos) {
@@ -103,6 +108,17 @@ public class SeedPreviewScreen extends LegacyScreen {
 
     private SeedMapMarker previewMarker(SeedMapMarker marker) {
         return startMarker != null && marker.isSpawn() ? startMarker : marker;
+    }
+
+    private boolean isVisible(SeedMapMarker marker) {
+        return showStructures || marker.isSpawn();
+    }
+
+    private void toggleStructures() {
+        showStructures = !showStructures;
+        helpText = null;
+        helpLabel = null;
+        helpScroll.resetScrolled();
     }
 
     @Override
@@ -251,6 +267,7 @@ public class SeedPreviewScreen extends LegacyScreen {
             graphics.pose().popMatrix();
             for (SeedMapMarker entry : texture.map.markers()) {
                 SeedMapMarker marker = previewMarker(entry);
+                if (!isVisible(marker)) continue;
                 ScreenRectangle icon = markerBounds(bounds, marker, viewX, viewZ);
                 if (!bounds.overlaps(icon)) continue;
                 graphics.blit(RenderPipelines.GUI_TEXTURED, marker.texture(), icon.left(), icon.top(), 0, 0,
@@ -271,6 +288,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     private Component tooltipAt(ScreenRectangle bounds, SeedMap map, double viewX, double viewZ, int mouseX, int mouseY) {
         for (int i = map.markers().size() - 1; i >= 0; i--) {
             SeedMapMarker marker = previewMarker(map.markers().get(i));
+            if (!isVisible(marker)) continue;
             if (markerBounds(bounds, marker, viewX, viewZ).containsPoint(mouseX, mouseY)) return marker.tooltip();
         }
         ChunkPos chunk = mapChunk(bounds, viewX, viewZ, mouseX, mouseY);
@@ -356,6 +374,7 @@ public class SeedPreviewScreen extends LegacyScreen {
             case InputConstants.KEY_LEFT -> pan(ScreenDirection.LEFT);
             case InputConstants.KEY_RIGHT -> pan(ScreenDirection.RIGHT);
             case InputConstants.KEY_HOME -> recenter();
+            case InputConstants.KEY_S -> toggleStructures();
             case InputConstants.KEY_X -> {
                 if (hovered != null) setSeedStart(hovered);
             }
@@ -372,6 +391,8 @@ public class SeedPreviewScreen extends LegacyScreen {
         if (!state.canClick()) return;
         if (state.is(ControllerBinding.RIGHT_STICK_BUTTON)) {
             recenter();
+        } else if (state.is(ControllerBinding.LEFT_STICK_BUTTON) && state.justPressed) {
+            toggleStructures();
         } else if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && state.pressed
                 && Math.abs(stick.x) >= Math.abs(stick.y)) {
             pan(stick.x > 0 ? ScreenDirection.RIGHT : ScreenDirection.LEFT);
