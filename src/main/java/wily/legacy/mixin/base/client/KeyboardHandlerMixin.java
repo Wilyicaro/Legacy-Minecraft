@@ -45,8 +45,8 @@ public class KeyboardHandlerMixin {
 
     @WrapOperation(method = "charTyped", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;onScreenCharTyped(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/input/CharacterEvent;)Z", remap = false))
     public boolean charTyped(Screen instance, CharacterEvent characterEvent, Operation<Boolean> original) {
-        if (Legacy4JClient.controllerManager.blockNextCharType) {
-            return Legacy4JClient.controllerManager.blockNextCharType = false;
+        if (ControllerManager.getInstance().blockNextCharType) {
+            return ControllerManager.getInstance().blockNextCharType = false;
         }
         return original.call(instance, characterEvent);
     }
