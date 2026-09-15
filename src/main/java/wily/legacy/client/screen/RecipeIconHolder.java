@@ -20,6 +20,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.*;
 import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.util.LegacyComponents;

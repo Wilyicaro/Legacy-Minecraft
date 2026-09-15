@@ -51,6 +51,7 @@ import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.client.control.tooltip.CompoundComponentIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.client.control.navigation.LegacySlotDisplay;
