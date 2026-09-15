@@ -39,6 +39,8 @@ import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.control.tooltip.ControlTooltips;
+import wily.legacy.client.packselection.PackSelectButton;
+import wily.legacy.client.screen.compat.RespackoptCompat;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import wily.legacy.util.LegacyComponents;
@@ -55,13 +57,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
-import static wily.legacy.util.LegacySprites.UNSELECT;
-
 @Mixin(PackSelectionScreen.class)
 public abstract class PackSelectionScreenMixin extends Screen implements ControlTooltip.Listener, RenderableVList.Access {
     private static final Component INCOMPATIBLE_TITLE = Component.translatable("pack.incompatible").withStyle(ChatFormatting.RED);
-    private static final Component INCOMPATIBLE_CONFIRM_TITLE = Component.translatable("pack.incompatible.confirm.title");
     private static final Component AVAILABLE_PACK = Component.translatable("pack.selected.title");
     private static final Component SELECTED_PACK = Component.translatable("pack.available.title");
     @Shadow
@@ -118,6 +116,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     public void addControlTooltips(ControlTooltipList list) {
         ControlTooltip.setupDefaultScreen(list, this);
         list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> LegacyComponents.OPEN_DIRECTORY);
+        list.add(() -> (getFocused() instanceof PackSelectButton focused && RespackoptCompat.isPackConfigurable(focused.getEntry()) ? ControlTooltip.getKeyIcon(InputConstants.KEY_C) : null), () -> Component.literal("Config"));
     }
 
     @Override
@@ -159,126 +158,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                 description.add(e.getCompatibility().getDescription());
             }
             if (!descriptionText.getString().isEmpty()) description.add(descriptionText);
-            AbstractButton button = new AbstractButton(0, 0, 180, 30, title) {
-                @Override
-                protected void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
-                    extractDefaultSprite(GuiGraphicsExtractor);
-                    renderScrollingString(GuiGraphicsExtractor, Minecraft.getInstance().font, 2, e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) : 0xFF0000FF);
-                    FactoryScreenUtil.enableBlend();
-                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-                    FactoryScreenUtil.disableBlend();
-                    if ((minecraft.options.touchscreen().get().booleanValue() || isHovered) && showHoverOverlay()) {
-                        GuiGraphicsExtractor.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                        int p = mouseX - getX();
-                        int q = mouseY - getY();
-                        if (e.canSelect()) {
-                            if (p < 32) {
-                                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX() + 5, getY() + 5, 20, 20);
-                            } else {
-                                FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.JOIN, getX() + 5, getY() + 5, 20, 20);
-                            }
-                        } else {
-                            if (e.canUnselect()) {
-                                if (p < 16) {
-                                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UNSELECT_HIGHLIGHTED, getX() + 5, getY() + 5, 20, 20);
-                                } else {
-                                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(UNSELECT, getX() + 5, getY() + 5, 20, 20);
-                                }
-                            }
-                            if (e.canMoveUp()) {
-                                if (p < 32 && p > 16 && q < 16) {
-                                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
-                                } else {
-                                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TRANSFER_MOVE_UP, getX(), getY(), 32, 32);
-                                }
-                            }
-                            if (e.canMoveDown()) {
-                                if (p < 32 && p > 16 && q > 16) {
-                                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
-                                } else {
-                                    FactoryGuiGraphics.of(GuiGraphicsExtractor).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN, getX(), getY(), 32, 32);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                protected void renderScrollingString(GuiGraphicsExtractor GuiGraphicsExtractor, Font font, int i, int j) {
-                    LegacyRenderUtil.renderScrollingString(GuiGraphicsExtractor, font, getMessage(), getX() + 30, getY(), getX() + width - 2, getY() + height, e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) : 0xFF0000FF, true);
-                }
-
-                @Override
-                public void onClick(MouseButtonEvent event, boolean bl) {
-                    double f = event.x() - getX();
-                    double g = event.y() - getY();
-                    if (this.showHoverOverlay() && f <= 32.0) {
-                        if (e.canSelect()) {
-                            onPress(event);
-                            return;
-                        }
-                        if (f < 16.0 && e.canUnselect()) {
-                            e.unselect();
-                            return;
-                        }
-                        if (f > 16.0 && g < 16.0 && e.canMoveUp()) {
-                            e.moveUp();
-                            return;
-                        }
-                        if (f > 16.0 && g > 16.0 && e.canMoveDown()) {
-                            e.moveDown();
-                            return;
-                        }
-                    }
-                    if (isFocused()) onPress(event);
-                }
-
-                private boolean showHoverOverlay() {
-                    return !e.isFixedPosition() || !e.isRequired();
-                }
-
-                @Override
-                public void onPress(InputWithModifiers input) {
-                    if (e.isSelected() && e.canUnselect()) {
-                        e.unselect();
-                        return;
-                    }
-                    if (e.getCompatibility().isCompatible()) {
-                        e.select();
-                    } else
-                        minecraft.setScreen(new ConfirmationScreen(self(), INCOMPATIBLE_CONFIRM_TITLE, e.getCompatibility().getConfirmation(), (b) -> {
-                            e.select();
-                            if (minecraft.screen != null) minecraft.screen.onClose();
-                        }));
-                }
-
-                @Override
-                public boolean keyPressed(KeyEvent keyEvent) {
-                    if (keyEvent.hasShiftDown() || ControllerBinding.LEFT_BUTTON.state().pressed) {
-                        switch (keyEvent.key()) {
-                            case 265 -> {
-                                int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
-                                if (e.canMoveUp()) e.moveUp();
-                                if (oldFocused >= 0 && oldFocused < children.size())
-                                    PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
-                                return false;
-                            }
-                            case 264 -> {
-                                int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
-                                if (e.canMoveDown()) e.moveDown();
-                                if (oldFocused >= 0 && oldFocused < children.size())
-                                    PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
-                                return false;
-                            }
-                        }
-                    }
-                    return super.keyPressed(keyEvent);
-                }
-
-                @Override
-                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                    defaultButtonNarrationText(narrationElementOutput);
-                }
-            };
+            AbstractButton button = new PackSelectButton(self(), minecraft, title, e);
             packIds.put(button, e.getId());
             if (!description.isEmpty()) button.setTooltip(Tooltip.create(LegacyRenderUtil.getAppendedComponent(description)));
             list.addRenderable(button);
@@ -370,6 +250,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         for (RenderableVList renderableVList : getRenderableVLists()) {
             if (renderableVList.keyPressed(keyEvent.key())) return true;
         }
+        if (RespackoptCompat.isAvailable() && keyEvent.key() == InputConstants.KEY_C && (getFocused() instanceof PackSelectButton focused) && RespackoptCompat.openConfigScreen(focused)) return true;
         if (keyEvent.key() == InputConstants.KEY_O) {
             //? if <1.20.5 {
             /*Util.getPlatform().openUri(this.packDir.toUri());

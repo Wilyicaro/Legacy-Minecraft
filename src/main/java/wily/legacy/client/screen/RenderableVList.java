@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 public class RenderableVList {
     public final List<Renderable> renderables = new ArrayList<>();
     public final UIAccessor accessor;
-    protected final Stocker<Integer> scrolledList = Stocker.of(0);
+    public final Stocker<Integer> scrolledList = Stocker.of(0);
     public boolean forceWidth = true;
     public boolean cyclic = true;
     protected boolean canScrollDown = false;
