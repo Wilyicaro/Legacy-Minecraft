@@ -5,8 +5,8 @@ import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
-public record IdRecipeInfo(Identifier id) implements RecipeInfoFilter {
-    public static final Codec<IdRecipeInfo> CODEC = Identifier.CODEC.xmap(IdRecipeInfo::new, IdRecipeInfo::id);
+public record IdRecipeFilter(Identifier id) implements RecipeInfoFilter {
+    public static final Codec<IdRecipeFilter> CODEC = Identifier.CODEC.xmap(IdRecipeFilter::new, IdRecipeFilter::id);
 
     @Override
     public <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {

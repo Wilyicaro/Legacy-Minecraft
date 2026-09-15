@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
-    ListMap<Identifier, Codec<? extends RecipeInfoFilter>> map = ListMap.<String, Codec<? extends RecipeInfoFilter>>builder().put("id", IdRecipeInfo.CODEC).put("item_tag", ItemTagRecipeFilter.CODEC).put("block_tag", BlockTagRecipeInfo.CODEC).put("item_id", ItemIdRecipeFilter.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
+    ListMap<Identifier, Codec<? extends RecipeInfoFilter>> map = ListMap.<String, Codec<? extends RecipeInfoFilter>>builder().put("id", IdRecipeFilter.CODEC).put("item_tag", ItemTagRecipeFilter.CODEC).put("block_tag", BlockTagRecipeFilter.CODEC).put("item_id", ItemIdRecipeFilter.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
     Codec<RecipeInfoFilter> BY_TYPE_CODEC = new Codec<>() {
         @Override
         public <T> DataResult<T> encode(RecipeInfoFilter input, DynamicOps<T> ops, T prefix) {
@@ -43,7 +43,7 @@ public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
             return new ItemTagRecipeFilter(TagKey.create(Registries.ITEM, FactoryAPI.createLocation(s.replaceFirst("#", ""))));
         else if (s.startsWith("result_item/"))
             return new ItemIdRecipeFilter(FactoryAPI.createLocation(s.replaceFirst("result_item/", "")));
-        return new IdRecipeInfo(FactoryAPI.createLocation(s));
+        return new IdRecipeFilter(FactoryAPI.createLocation(s));
     }
 
     default <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {

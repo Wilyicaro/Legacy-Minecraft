@@ -6,8 +6,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 
-public record BlockTagRecipeInfo(TagKey<Block> tag) implements RecipeInfoFilter {
-    public static final Codec<BlockTagRecipeInfo> CODEC = TagKey.codec(Registries.BLOCK).xmap(BlockTagRecipeInfo::new, BlockTagRecipeInfo::tag);
+public record BlockTagRecipeFilter(TagKey<Block> tag) implements RecipeInfoFilter {
+    public static final Codec<BlockTagRecipeFilter> CODEC = TagKey.codec(Registries.BLOCK).xmap(BlockTagRecipeFilter::new, BlockTagRecipeFilter::tag);
 
     @Override
     public boolean test(RecipeInfo<?> h) {
@@ -15,7 +15,7 @@ public record BlockTagRecipeInfo(TagKey<Block> tag) implements RecipeInfoFilter 
     }
 
     @Override
-    public Codec<BlockTagRecipeInfo> codec() {
+    public Codec<BlockTagRecipeFilter> codec() {
         return CODEC;
     }
 
