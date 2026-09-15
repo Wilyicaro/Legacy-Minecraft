@@ -91,6 +91,9 @@ public class SeedPreviewScreen extends LegacyScreen {
                 ? Component.translatable("legacy.menu.seed_preview.set_start") : null);
         list.add(ControlTooltip.OPTION::get, () -> seedStart.get() != null
                 ? Component.translatable("legacy.menu.seed_preview.reset_start") : null);
+        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_HOME)
+                        : ControllerBinding.RIGHT_STICK_BUTTON.getIcon(),
+                () -> texture != null ? Component.translatable("legacy.menu.seed_preview.recenter") : null);
     }
 
     private void setSeedStart(BlockPos pos) {
@@ -319,6 +322,16 @@ public class SeedPreviewScreen extends LegacyScreen {
                 Mth.clamp(targetZ + z, viewZ - PAN_STEP, viewZ + PAN_STEP));
     }
 
+    private void recenter() {
+        if (texture == null) return;
+        for (SeedMapMarker marker : texture.map.markers()) {
+            if (!marker.isSpawn()) continue;
+            BlockPos spawn = previewMarker(marker).pos();
+            jumpTo(spawn.getX() / (double) SeedMap.BLOCKS_PER_PIXEL, spawn.getZ() / (double) SeedMap.BLOCKS_PER_PIXEL);
+            return;
+        }
+    }
+
     private void jumpTo(double x, double z) {
         panTo(x, z);
         viewX = targetX;
@@ -342,7 +355,7 @@ public class SeedPreviewScreen extends LegacyScreen {
             case InputConstants.KEY_DOWN -> pan(ScreenDirection.DOWN);
             case InputConstants.KEY_LEFT -> pan(ScreenDirection.LEFT);
             case InputConstants.KEY_RIGHT -> pan(ScreenDirection.RIGHT);
-            case InputConstants.KEY_HOME -> jumpTo(0, 0);
+            case InputConstants.KEY_HOME -> recenter();
             case InputConstants.KEY_X -> {
                 if (hovered != null) setSeedStart(hovered);
             }
@@ -358,7 +371,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     public void bindingStateTick(BindingState state) {
         if (!state.canClick()) return;
         if (state.is(ControllerBinding.RIGHT_STICK_BUTTON)) {
-            jumpTo(0, 0);
+            recenter();
         } else if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && state.pressed
                 && Math.abs(stick.x) >= Math.abs(stick.y)) {
             pan(stick.x > 0 ? ScreenDirection.RIGHT : ScreenDirection.LEFT);
