@@ -7,10 +7,19 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
-public record SeedMapMarker(BlockPos pos, Identifier texture, Component name, int size) {
+public record SeedMapMarker(BlockPos pos, Identifier texture, Component name, int size, boolean estimated) {
+    private static final Identifier COMPASS = Identifier.withDefaultNamespace("textures/item/compass_16.png");
+
     public static SeedMapMarker spawn(BlockPos pos) {
-        return new SeedMapMarker(pos, Identifier.withDefaultNamespace("textures/item/compass_16.png"),
-                Component.translatable("legacy.menu.seed_preview.spawn"), 12);
+        return new SeedMapMarker(pos, COMPASS, Component.translatable("legacy.menu.seed_preview.spawn"), 16, true);
+    }
+
+    public static SeedMapMarker seedStart(BlockPos pos) {
+        return new SeedMapMarker(pos, COMPASS, Component.translatable("legacy.menu.seed_preview.seed_start"), 16, false);
+    }
+
+    public boolean isSpawn() {
+        return texture.equals(COMPASS);
     }
 
     public static SeedMapMarker structure(BlockPos pos, Holder<StructureSet> set, Holder<Structure> structure) {
@@ -30,12 +39,13 @@ public record SeedMapMarker(BlockPos pos, Identifier texture, Component name, in
         Component name = set.unwrapKey().map(key -> Component.translatableWithFallback(
                 "structure." + key.identifier().toLanguageKey(), key.identifier().toString()))
                 .orElse(Component.translatable("legacy.menu.seed_preview.structure"));
-        return new SeedMapMarker(pos, Identifier.withDefaultNamespace("textures/map/decorations/" + icon + ".png"), name, icon.equals("red_x") ? 5 : 7);
+        return new SeedMapMarker(pos, Identifier.withDefaultNamespace("textures/map/decorations/" + icon + ".png"), name, icon.equals("red_x") ? 5 : 7, true);
     }
 
     public Component tooltip() {
-        return Component.translatable("legacy.menu.seed_preview.estimated", name)
+        return (estimated ? Component.translatable("legacy.menu.seed_preview.estimated", name) : name.copy())
                 .append("\n\n").append(Component.translatable("legacy.menu.seed_preview.coordinates", pos.getX(), pos.getZ()))
-                .append("\n\n").append(Component.translatable("legacy.menu.seed_preview.estimate_description"));
+                .append("\n\n").append(Component.translatable(estimated
+                        ? "legacy.menu.seed_preview.estimate_description" : "legacy.menu.seed_preview.start_description"));
     }
 }

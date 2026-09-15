@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -19,6 +20,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
+import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
@@ -26,6 +28,8 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.seedpreview.SeedMap;
 import wily.legacy.client.seedpreview.SeedMapGenerator;
 import wily.legacy.client.seedpreview.SeedMapMarker;
@@ -50,6 +54,9 @@ public class SeedPreviewScreen extends LegacyScreen {
             new Arrow(ScreenDirection.RIGHT, 216, 127, 6, 11)
     };
     private final WorldCreationContext settings;
+    private final Bearer<BlockPos> seedStart;
+    private SeedMapMarker startMarker;
+    private BlockPos hovered;
     private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final ScrollableRenderer helpScroll = new ScrollableRenderer();
     private CompletableFuture<SeedMapGenerator> generator;
@@ -70,9 +77,29 @@ public class SeedPreviewScreen extends LegacyScreen {
     private int left;
     private int top;
 
-    public SeedPreviewScreen(Screen parent, WorldCreationContext settings) {
+    public SeedPreviewScreen(Screen parent, WorldCreationContext settings, Bearer<BlockPos> seedStart) {
         super(parent, Component.translatable("legacy.menu.seed_preview"));
         this.settings = settings;
+        this.seedStart = seedStart;
+        setSeedStart(seedStart.get());
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(ControlTooltip.EXTRA::get, () -> hovered != null && !hovered.equals(seedStart.get())
+                ? Component.translatable("legacy.menu.seed_preview.set_start") : null);
+        list.add(ControlTooltip.OPTION::get, () -> seedStart.get() != null
+                ? Component.translatable("legacy.menu.seed_preview.reset_start") : null);
+    }
+
+    private void setSeedStart(BlockPos pos) {
+        seedStart.set(pos);
+        startMarker = pos == null ? null : SeedMapMarker.seedStart(pos);
+    }
+
+    private SeedMapMarker previewMarker(SeedMapMarker marker) {
+        return startMarker != null && marker.isSpawn() ? startMarker : marker;
     }
 
     @Override
@@ -102,6 +129,8 @@ public class SeedPreviewScreen extends LegacyScreen {
             renderLabel(graphics, detail, WORLD_MAP, 7);
             ScreenRectangle overviewBounds = mapBounds(overview, 10, 20, 109);
             ScreenRectangle detailBounds = mapBounds();
+            hovered = texture != null && detailBounds.containsPoint(mouseX, mouseY)
+                    ? mapChunk(detailBounds, viewX, viewZ, mouseX, mouseY).getWorldPosition().offset(8, 0, 8) : null;
             renderMap(graphics, overviewBounds, overviewTexture, 0, 0);
             renderMap(graphics, detailBounds, texture, viewX, viewZ);
             updateHelp(overviewBounds, overviewTexture, 0, 0, mouseX, mouseY);
@@ -188,6 +217,7 @@ public class SeedPreviewScreen extends LegacyScreen {
         helpText = null;
         helpLabel = null;
         helpScroll.resetScrolled();
+        hovered = null;
         targetX = 0;
         targetZ = 0;
         viewX = 0;
@@ -216,7 +246,8 @@ public class SeedPreviewScreen extends LegacyScreen {
             graphics.pose().translate((float) (texture.map.chunkX() - viewX - SeedMap.PADDING), (float) (texture.map.chunkZ() - viewZ - SeedMap.PADDING));
             graphics.blit(texture.getTextureView(), texture.getSampler(), 0, 0, SeedMap.SIZE, SeedMap.SIZE, 0, 1, 0, 1);
             graphics.pose().popMatrix();
-            for (SeedMapMarker marker : texture.map.markers()) {
+            for (SeedMapMarker entry : texture.map.markers()) {
+                SeedMapMarker marker = previewMarker(entry);
                 ScreenRectangle icon = markerBounds(bounds, marker, viewX, viewZ);
                 if (!bounds.overlaps(icon)) continue;
                 graphics.blit(RenderPipelines.GUI_TEXTURED, marker.texture(), icon.left(), icon.top(), 0, 0,
@@ -236,14 +267,12 @@ public class SeedPreviewScreen extends LegacyScreen {
 
     private Component tooltipAt(ScreenRectangle bounds, SeedMap map, double viewX, double viewZ, int mouseX, int mouseY) {
         for (int i = map.markers().size() - 1; i >= 0; i--) {
-            SeedMapMarker marker = map.markers().get(i);
+            SeedMapMarker marker = previewMarker(map.markers().get(i));
             if (markerBounds(bounds, marker, viewX, viewZ).containsPoint(mouseX, mouseY)) return marker.tooltip();
         }
-        double samplesPerPixel = (double) SeedMap.VIEW_SIZE / bounds.width();
-        int x = Mth.floor((mouseX - bounds.left()) * samplesPerPixel + viewX - map.chunkX() + SeedMap.PADDING);
-        int z = Mth.floor((mouseY - bounds.top()) * samplesPerPixel + viewZ - map.chunkZ() + SeedMap.PADDING);
-        if (x < 0 || z < 0 || x >= SeedMap.SIZE || z >= SeedMap.SIZE) return null;
-        ResourceKey<Biome> biome = map.biomes().get(z * SeedMap.SIZE + x).unwrapKey().orElse(null);
+        ChunkPos chunk = mapChunk(bounds, viewX, viewZ, mouseX, mouseY);
+        if (!map.contains(chunk)) return null;
+        ResourceKey<Biome> biome = map.biomeAt(chunk).unwrapKey().orElse(null);
         if (biome == null) return null;
         String key = "biome." + biome.identifier().toLanguageKey();
         MutableComponent message = Component.translatableWithFallback(key, biome.identifier().toString());
@@ -314,6 +343,10 @@ public class SeedPreviewScreen extends LegacyScreen {
             case InputConstants.KEY_LEFT -> pan(ScreenDirection.LEFT);
             case InputConstants.KEY_RIGHT -> pan(ScreenDirection.RIGHT);
             case InputConstants.KEY_HOME -> jumpTo(0, 0);
+            case InputConstants.KEY_X -> {
+                if (hovered != null) setSeedStart(hovered);
+            }
+            case InputConstants.KEY_O -> setSeedStart(null);
             default -> {
                 return super.keyPressed(event);
             }
@@ -330,6 +363,11 @@ public class SeedPreviewScreen extends LegacyScreen {
                 && Math.abs(stick.x) >= Math.abs(stick.y)) {
             pan(stick.x > 0 ? ScreenDirection.RIGHT : ScreenDirection.LEFT);
         }
+    }
+
+    @Override
+    public int getBindingMouseClick(BindingState state) {
+        return state.is(ControllerBinding.DOWN_BUTTON) ? 0 : -1;
     }
 
     @Override
@@ -378,6 +416,13 @@ public class SeedPreviewScreen extends LegacyScreen {
 
     private ScreenRectangle mapBounds() {
         return mapBounds(detail, 12, 27, 211);
+    }
+
+    private ChunkPos mapChunk(ScreenRectangle bounds, double viewX, double viewZ, int mouseX, int mouseY) {
+        double samplesPerPixel = (double) SeedMap.VIEW_SIZE / bounds.width();
+        int x = Mth.floor(viewX + (mouseX - bounds.left()) * samplesPerPixel - SeedMap.VIEW_SIZE / 2);
+        int z = Mth.floor(viewZ + (mouseY - bounds.top()) * samplesPerPixel - SeedMap.VIEW_SIZE / 2);
+        return new ChunkPos(x, z);
     }
 
     private ScreenRectangle mapBounds(Panel panel, int x, int y, int size) {

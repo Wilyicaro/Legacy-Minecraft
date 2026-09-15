@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -89,10 +90,12 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected Runnable onClose = () -> {
     };
     protected final Supplier<WorldMoreOptionsScreen> advancedOptionsScreen;
+    private final Bearer<BlockPos> seedStart;
 
-    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
+    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale, Bearer<BlockPos> seedStart) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
-        advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent, trustPlayers, onlineGame, biomeScale);
+        this.seedStart = seedStart;
+        advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent, trustPlayers, onlineGame, biomeScale, seedStart);
         renderableVLists.add(gameRenderables);
         if (LegacyOptions.useLegacyWorldOptions()) {
             initLegacyCreateWorldOptions(parent, trustPlayers, onlineGame, biomeScale);
@@ -211,7 +214,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVList.addRenderable(createSeedEditBox(parent));
         renderableVList.addCategory(SEED_INFO);
         renderableVList.addRenderable(new LegacyButton(Component.translatable("legacy.menu.seed_preview"),
-                b -> minecraft.setScreen(new SeedPreviewScreen(this, parent.getUiState().getSettings()))));
+                b -> minecraft.setScreen(new SeedPreviewScreen(this, parent.getUiState().getSettings(), seedStart))));
     }
 
     private EditBox createSeedEditBox(CreateWorldScreen parent) {
@@ -361,6 +364,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                         : Panel.centered(s, 244, 199),
                 Component.translatable("createWorld.tab.more.title"));
         advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent);
+        seedStart = Bearer.of(null);
         renderableVLists.add(gameRenderables);
         tabList.setSelected(1);
         GameRules gameRules = parent.gameRules == null ? loadSavedGameRules(parent) : parent.gameRules;
