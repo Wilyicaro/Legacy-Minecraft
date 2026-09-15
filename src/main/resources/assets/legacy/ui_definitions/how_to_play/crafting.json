@@ -9,8 +9,17 @@
       "width": 456,
       "height": 222,
       "elements": {
-        "text": {
+		"text": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.crafting_title"
+          },
+          "width": 433
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.crafting_message",
             "allowVariables": true,
@@ -20,8 +29,9 @@
           },
           "width": 433
         },
-        "text1": {
+        "text2": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.crafting_message_1",
             "allowVariables": true,
@@ -34,8 +44,9 @@
           },
           "width": 433
         },
-        "text2": {
+        "text3": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.crafting_message_2",
             "allowVariables": true,
@@ -62,8 +73,19 @@
       "height": 137,
       "lineHeight": 8,
       "elements": {
-        "text": {
+		"text": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.crafting_title",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.crafting_message",
             "font": "legacy:default_11",
@@ -75,8 +97,9 @@
           "width": 268,
           "lineSpacing": 8
         },
-        "text1": {
+        "text2": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.crafting_message_1",
             "font": "legacy:default_11",
@@ -91,8 +114,9 @@
           "width": 268,
           "lineSpacing": 8
         },
-        "text2": {
+        "text3": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.crafting_message_2",
             "font": "legacy:default_11",
