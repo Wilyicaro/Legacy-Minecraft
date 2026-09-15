@@ -3,8 +3,8 @@ package wily.legacy.client.seedpreview;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.FixedBiomeSource;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.function.BooleanSupplier;
 
-public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes) {
+public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<SeedMapMarker> markers) {
     public static final int VIEW_SIZE = 128;
     public static final int PADDING = 32;
     public static final int SIZE = VIEW_SIZE + PADDING * 2;
@@ -32,21 +32,21 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes) {
     public SeedMap {
         if (biomes.size() != SIZE * SIZE) throw new IllegalArgumentException("Biome count must match the map size");
         biomes = List.copyOf(biomes);
+        markers = List.copyOf(markers);
     }
 
-    public static SeedMap generate(WorldCreationContext context, int chunkX, int chunkZ, SeedMap previous, BooleanSupplier cancelled) {
+    public static SeedMap generate(WorldCreationContext context, RandomState random, int chunkX, int chunkZ, SeedMap previous, BooleanSupplier cancelled) {
         checkCancelled(cancelled);
         if (previous != null && previous.chunkX == chunkX && previous.chunkZ == chunkZ) return previous;
         LevelStem dimension = context.selectedDimensions().bake(context.datapackDimensions()).dimensions().getValueOrThrow(LevelStem.OVERWORLD);
         ChunkGenerator generator = dimension.generator();
         if (generator.getBiomeSource() instanceof FixedBiomeSource fixed) {
-            return new SeedMap(chunkX, chunkZ, Collections.nCopies(SIZE * SIZE, fixed.getNoiseBiome(0, 0, 0)));
+            return new SeedMap(chunkX, chunkZ, Collections.nCopies(SIZE * SIZE, fixed.getNoiseBiome(0, 0, 0)), List.of());
         }
-        if (!(generator instanceof NoiseBasedChunkGenerator noise)) {
+        if (!(generator instanceof NoiseBasedChunkGenerator)) {
             throw new UnsupportedOperationException("Unsupported preview generator: " + generator.getClass().getName());
         }
         long seed = context.options().seed();
-        RandomState random = RandomState.create(noise.generatorSettings().value(), context.worldgenLoadContext().lookupOrThrow(Registries.NOISE), seed);
         BiomeManager biomes = new BiomeManager((x, y, z) -> generator.getBiomeSource().getNoiseBiome(x, y, z, random.sampler()), BiomeManager.obfuscateSeed(seed));
         int minY = dimension.type().value().minY();
         int maxY = minY + dimension.type().value().height() - 1;
@@ -70,11 +70,21 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes) {
                 samples.add(biomes.getBiome(pos.set(blockX, surface, blockZ)));
             }
         }
-        return new SeedMap(chunkX, chunkZ, samples);
+        return new SeedMap(chunkX, chunkZ, samples, List.of());
     }
 
-    private static void checkCancelled(BooleanSupplier cancelled) {
+    static void checkCancelled(BooleanSupplier cancelled) {
         if (cancelled.getAsBoolean()) throw new CancellationException();
+    }
+
+    public boolean contains(ChunkPos chunk) {
+        int x = chunk.x() - chunkX + SIZE / 2;
+        int z = chunk.z() - chunkZ + SIZE / 2;
+        return x >= 0 && z >= 0 && x < SIZE && z < SIZE;
+    }
+
+    public Holder<Biome> biomeAt(ChunkPos chunk) {
+        return biomes.get((chunk.z() - chunkZ + SIZE / 2) * SIZE + chunk.x() - chunkX + SIZE / 2);
     }
 
     public static int blockCoordinate(int chunk, int pixel) {

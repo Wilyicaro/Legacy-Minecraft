@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -26,6 +27,8 @@ import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.client.seedpreview.SeedMap;
+import wily.legacy.client.seedpreview.SeedMapGenerator;
+import wily.legacy.client.seedpreview.SeedMapMarker;
 import wily.legacy.client.seedpreview.SeedMapTexture;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -49,6 +52,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     private final WorldCreationContext settings;
     private final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final ScrollableRenderer helpScroll = new ScrollableRenderer();
+    private CompletableFuture<SeedMapGenerator> generator;
     private CompletableFuture<Void> generation;
     private AtomicBoolean cancelled;
     private ChunkPos requested;
@@ -56,7 +60,8 @@ public class SeedPreviewScreen extends LegacyScreen {
     private SeedMapTexture overviewTexture;
     private Panel detail;
     private Panel help;
-    private ResourceKey<Biome> biome;
+    private Component helpText;
+    private MultiLineLabel helpLabel;
     private double targetX;
     private double targetZ;
     private double viewX;
@@ -84,6 +89,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     protected void init() {
         super.init();
         setDragging(false);
+        helpLabel = null;
         scale = Math.min(1, Math.min((width - 24) / 371f, (height - 48) / 265f));
         left = (width - scaled(371)) / 2;
         top = (height - scaled(265)) / 2 - scaled(17);
@@ -98,8 +104,8 @@ public class SeedPreviewScreen extends LegacyScreen {
             ScreenRectangle detailBounds = mapBounds();
             renderMap(graphics, overviewBounds, overviewTexture, 0, 0);
             renderMap(graphics, detailBounds, texture, viewX, viewZ);
-            updateBiome(overviewBounds, overviewTexture, 0, 0, mouseX, mouseY);
-            updateBiome(detailBounds, texture, viewX, viewZ, mouseX, mouseY);
+            updateHelp(overviewBounds, overviewTexture, 0, 0, mouseX, mouseY);
+            updateHelp(detailBounds, texture, viewX, viewZ, mouseX, mouseY);
             renderHelp(graphics);
             Component coordinates = Component.translatable("legacy.menu.seed_preview.coordinates",
                     Mth.floor(viewX * SeedMap.BLOCKS_PER_PIXEL), Mth.floor(viewZ * SeedMap.BLOCKS_PER_PIXEL));
@@ -131,7 +137,10 @@ public class SeedPreviewScreen extends LegacyScreen {
         AtomicBoolean cancelled = new AtomicBoolean();
         this.cancelled = cancelled;
         SeedMap previous = texture == null ? null : texture.map;
-        generation = CompletableFuture.supplyAsync(() -> SeedMap.generate(settings, center.x(), center.z(), previous, cancelled::get), Util.backgroundExecutor()).thenAcceptAsync(map -> {
+        if (generator == null) {
+            generator = CompletableFuture.supplyAsync(() -> new SeedMapGenerator(settings), Util.backgroundExecutor());
+        }
+        generation = generator.thenApplyAsync(source -> source.generate(center.x(), center.z(), previous, cancelled::get), Util.backgroundExecutor()).thenAcceptAsync(map -> {
             if (cancelled.get()) return;
             SeedMapTexture next = new SeedMapTexture(map);
             if (texture != null && texture != overviewTexture) texture.close();
@@ -169,13 +178,15 @@ public class SeedPreviewScreen extends LegacyScreen {
     public void removed() {
         super.removed();
         if (cancelled != null) cancelled.set(true);
+        generator = null;
         generation = null;
         if (texture != null && texture != overviewTexture) texture.close();
         if (overviewTexture != null) overviewTexture.close();
         texture = null;
         overviewTexture = null;
         requested = null;
-        biome = null;
+        helpText = null;
+        helpLabel = null;
         helpScroll.resetScrolled();
         targetX = 0;
         targetZ = 0;
@@ -205,42 +216,63 @@ public class SeedPreviewScreen extends LegacyScreen {
             graphics.pose().translate((float) (texture.map.chunkX() - viewX - SeedMap.PADDING), (float) (texture.map.chunkZ() - viewZ - SeedMap.PADDING));
             graphics.blit(texture.getTextureView(), texture.getSampler(), 0, 0, SeedMap.SIZE, SeedMap.SIZE, 0, 1, 0, 1);
             graphics.pose().popMatrix();
+            for (SeedMapMarker marker : texture.map.markers()) {
+                ScreenRectangle icon = markerBounds(bounds, marker, viewX, viewZ);
+                if (!bounds.overlaps(icon)) continue;
+                graphics.blit(RenderPipelines.GUI_TEXTURED, marker.texture(), icon.left(), icon.top(), 0, 0,
+                        icon.width(), icon.height(), icon.width(), icon.height());
+            }
             graphics.disableScissor();
         }
     }
 
-    private void updateBiome(ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ, int mouseX, int mouseY) {
-        if (!bounds.containsPoint(mouseX, mouseY)) return;
-        ResourceKey<Biome> hovered = null;
-        if (texture != null) {
-            double samplesPerPixel = (double) SeedMap.VIEW_SIZE / bounds.width();
-            int x = Mth.floor((mouseX - bounds.left()) * samplesPerPixel + viewX - texture.map.chunkX() + SeedMap.PADDING);
-            int z = Mth.floor((mouseY - bounds.top()) * samplesPerPixel + viewZ - texture.map.chunkZ() + SeedMap.PADDING);
-            if (x >= 0 && z >= 0 && x < SeedMap.SIZE && z < SeedMap.SIZE) {
-                hovered = texture.map.biomes().get(z * SeedMap.SIZE + x).unwrapKey().orElse(null);
-            }
-        }
-        if (Objects.equals(biome, hovered)) return;
-        biome = hovered;
-        helpScroll.resetScrolled();
+    private ScreenRectangle markerBounds(ScreenRectangle map, SeedMapMarker marker, double viewX, double viewZ) {
+        double pixelsPerSample = (double) map.width() / SeedMap.VIEW_SIZE;
+        int x = Mth.floor(map.left() + (marker.pos().getX() / (double) SeedMap.BLOCKS_PER_PIXEL - viewX + SeedMap.VIEW_SIZE / 2) * pixelsPerSample);
+        int y = Mth.floor(map.top() + (marker.pos().getZ() / (double) SeedMap.BLOCKS_PER_PIXEL - viewZ + SeedMap.VIEW_SIZE / 2) * pixelsPerSample);
+        int size = scaled(marker.size());
+        return new ScreenRectangle(x - size / 2, y - size / 2, size, size);
     }
 
-    private void renderHelp(GuiGraphicsExtractor graphics) {
-        if (biome == null) return;
+    private Component tooltipAt(ScreenRectangle bounds, SeedMap map, double viewX, double viewZ, int mouseX, int mouseY) {
+        for (int i = map.markers().size() - 1; i >= 0; i--) {
+            SeedMapMarker marker = map.markers().get(i);
+            if (markerBounds(bounds, marker, viewX, viewZ).containsPoint(mouseX, mouseY)) return marker.tooltip();
+        }
+        double samplesPerPixel = (double) SeedMap.VIEW_SIZE / bounds.width();
+        int x = Mth.floor((mouseX - bounds.left()) * samplesPerPixel + viewX - map.chunkX() + SeedMap.PADDING);
+        int z = Mth.floor((mouseY - bounds.top()) * samplesPerPixel + viewZ - map.chunkZ() + SeedMap.PADDING);
+        if (x < 0 || z < 0 || x >= SeedMap.SIZE || z >= SeedMap.SIZE) return null;
+        ResourceKey<Biome> biome = map.biomes().get(z * SeedMap.SIZE + x).unwrapKey().orElse(null);
+        if (biome == null) return null;
         String key = "biome." + biome.identifier().toLanguageKey();
         MutableComponent message = Component.translatableWithFallback(key, biome.identifier().toString());
         if (LegacyTipManager.hasTip(key + ".description")) {
             message.append("\n\n").append(Component.translatable(key + ".description"));
         }
+        return message;
+    }
+
+    private void updateHelp(ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ, int mouseX, int mouseY) {
+        if (!bounds.containsPoint(mouseX, mouseY)) return;
+        Component hovered = texture == null ? null : tooltipAt(bounds, texture.map, viewX, viewZ, mouseX, mouseY);
+        if (Objects.equals(helpText, hovered)) return;
+        helpText = hovered;
+        helpLabel = null;
+        helpScroll.resetScrolled();
+    }
+
+    private void renderHelp(GuiGraphicsExtractor graphics) {
+        if (helpText == null) return;
         int width = (int) (help.getWidth() / scale) - 14;
         int height = (int) (help.getHeight() / scale) - 24;
-        MultiLineLabel label = Panel.labelsCache.apply(message, width);
-        helpScroll.scrolled.max = Math.max(0, label.getLineCount() - height / 12);
+        if (helpLabel == null) helpLabel = MultiLineLabel.create(font, helpText, width);
+        helpScroll.scrolled.max = Math.max(0, helpLabel.getLineCount() - height / 12);
         graphics.pose().pushMatrix();
         graphics.pose().translate(help.getX(), help.getY());
         graphics.pose().scale(scale);
         helpScroll.extractRenderState(graphics, 7, 7, width, height,
-                () -> label.visitLines(TextAlignment.LEFT, 7, 7, 12, graphics.textRenderer()));
+                () -> helpLabel.visitLines(TextAlignment.LEFT, 7, 7, 12, graphics.textRenderer()));
         graphics.pose().popMatrix();
     }
 
@@ -329,7 +361,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (LegacyRenderUtil.isMouseOver(mouseX, mouseY, help.getX(), help.getY(), help.getWidth(), help.getHeight())) {
-            return biome != null && helpScroll.mouseScrolled(scrollY);
+            return helpText != null && helpScroll.mouseScrolled(scrollY);
         }
         if (texture == null || ControlType.getActiveType().isKbm() && !mapBounds().containsPoint((int) mouseX, (int) mouseY)) {
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
