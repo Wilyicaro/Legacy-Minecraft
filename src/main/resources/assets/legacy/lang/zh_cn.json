@@ -2000,6 +2000,8 @@
   "legacy.menu.seed_preview.set_start": "Set Seed Start",
   "legacy.menu.seed_preview.reset_start": "Reset Seed Start",
   "legacy.menu.seed_preview.recenter": "Recenter",
+  "legacy.menu.seed_preview.hide_structures": "Hide Structures",
+  "legacy.menu.seed_preview.show_structures": "Show Structures",
   "legacy.menu.seed_preview.start_description": "The world will search for a suitable spawn near this point. The final spawn may differ. World coordinates and terrain are unchanged.",
   "legacy.menu.selectWorld.amplified_world": "Amplified Worlds",
   "legacy.menu.selectWorld.biome_scale": "Biome Scale",
