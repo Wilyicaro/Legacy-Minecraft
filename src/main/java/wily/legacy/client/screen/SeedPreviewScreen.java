@@ -110,8 +110,8 @@ public class SeedPreviewScreen extends LegacyScreen {
         return startMarker != null && marker.isSpawn() ? startMarker : marker;
     }
 
-    private boolean isVisible(SeedMapMarker marker) {
-        return showStructures || marker.isSpawn();
+    private boolean isVisible(SeedMapMarker marker, boolean overview) {
+        return marker.isSpawn() || !overview && showStructures;
     }
 
     private void toggleStructures() {
@@ -149,11 +149,12 @@ public class SeedPreviewScreen extends LegacyScreen {
             ScreenRectangle overviewBounds = mapBounds(overview, 10, 20, 109);
             ScreenRectangle detailBounds = mapBounds();
             hovered = texture != null && detailBounds.containsPoint(mouseX, mouseY)
-                    ? mapChunk(detailBounds, viewX, viewZ, mouseX, mouseY).getWorldPosition().offset(8, 0, 8) : null;
-            renderMap(graphics, overviewBounds, overviewTexture, 0, 0);
-            renderMap(graphics, detailBounds, texture, viewX, viewZ);
-            updateHelp(overviewBounds, overviewTexture, 0, 0, mouseX, mouseY);
-            updateHelp(detailBounds, texture, viewX, viewZ, mouseX, mouseY);
+                    ? mapChunk(detailBounds, viewX, viewZ, SeedMap.VIEW_SIZE, mouseX, mouseY).getWorldPosition().offset(8, 0, 8) : null;
+            renderMap(graphics, overviewBounds, overviewTexture, 0, 0, true);
+            renderGuide(graphics, overviewBounds);
+            renderMap(graphics, detailBounds, texture, viewX, viewZ, false);
+            updateHelp(overviewBounds, overviewTexture, 0, 0, true, mouseX, mouseY);
+            updateHelp(detailBounds, texture, viewX, viewZ, false, mouseX, mouseY);
             renderHelp(graphics);
             Component coordinates = Component.translatable("legacy.menu.seed_preview.coordinates",
                     Mth.floor(viewX * SeedMap.BLOCKS_PER_PIXEL), Mth.floor(viewZ * SeedMap.BLOCKS_PER_PIXEL));
@@ -252,23 +253,24 @@ public class SeedPreviewScreen extends LegacyScreen {
         graphics.pose().popMatrix();
     }
 
-    private void renderMap(GuiGraphicsExtractor graphics, ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ) {
+    private void renderMap(GuiGraphicsExtractor graphics, ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ, boolean overview) {
         int mapX = bounds.left();
         int mapY = bounds.top();
         int mapSize = bounds.width();
+        int viewSize = overview ? SeedMap.SIZE : SeedMap.VIEW_SIZE;
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, mapX - 2, mapY - 2, mapSize + 4, mapSize + 4);
         if (texture != null) {
             graphics.enableScissor(mapX, mapY, mapX + mapSize, mapY + mapSize);
             graphics.pose().pushMatrix();
             graphics.pose().translate(mapX, mapY);
-            graphics.pose().scale(mapSize / (float) SeedMap.VIEW_SIZE);
-            graphics.pose().translate((float) (texture.map.chunkX() - viewX - SeedMap.PADDING), (float) (texture.map.chunkZ() - viewZ - SeedMap.PADDING));
+            graphics.pose().scale(mapSize / (float) viewSize);
+            graphics.pose().translate((float) (texture.map.chunkX() - viewX + (viewSize - SeedMap.SIZE) / 2), (float) (texture.map.chunkZ() - viewZ + (viewSize - SeedMap.SIZE) / 2));
             graphics.blit(texture.getTextureView(), texture.getSampler(), 0, 0, SeedMap.SIZE, SeedMap.SIZE, 0, 1, 0, 1);
             graphics.pose().popMatrix();
             for (SeedMapMarker entry : texture.map.markers()) {
                 SeedMapMarker marker = previewMarker(entry);
-                if (!isVisible(marker)) continue;
-                ScreenRectangle icon = markerBounds(bounds, marker, viewX, viewZ);
+                if (!isVisible(marker, overview)) continue;
+                ScreenRectangle icon = markerBounds(bounds, marker, viewX, viewZ, viewSize);
                 if (!bounds.overlaps(icon)) continue;
                 graphics.blit(RenderPipelines.GUI_TEXTURED, marker.texture(), icon.left(), icon.top(), 0, 0,
                         icon.width(), icon.height(), icon.width(), icon.height());
@@ -277,21 +279,35 @@ public class SeedPreviewScreen extends LegacyScreen {
         }
     }
 
-    private ScreenRectangle markerBounds(ScreenRectangle map, SeedMapMarker marker, double viewX, double viewZ) {
-        double pixelsPerSample = (double) map.width() / SeedMap.VIEW_SIZE;
-        int x = Mth.floor(map.left() + (marker.pos().getX() / (double) SeedMap.BLOCKS_PER_PIXEL - viewX + SeedMap.VIEW_SIZE / 2) * pixelsPerSample);
-        int y = Mth.floor(map.top() + (marker.pos().getZ() / (double) SeedMap.BLOCKS_PER_PIXEL - viewZ + SeedMap.VIEW_SIZE / 2) * pixelsPerSample);
+    private void renderGuide(GuiGraphicsExtractor graphics, ScreenRectangle bounds) {
+        if (overviewTexture == null) return;
+        int size = bounds.width();
+        double pixelsPerChunk = (double) size / SeedMap.SIZE;
+        int guideSize = (int) Math.round(SeedMap.VIEW_SIZE * pixelsPerChunk);
+        int x = Mth.floor(bounds.left() + (viewX + SeedMap.PADDING) * pixelsPerChunk);
+        int y = Mth.floor(bounds.top() + (viewZ + SeedMap.PADDING) * pixelsPerChunk);
+        graphics.enableScissor(bounds.left(), bounds.top(), bounds.left() + size, bounds.top() + size);
+        graphics.outline(x, y, guideSize, guideSize, CommonColor.BLACK.get());
+        graphics.outline(x + 1, y + 1, guideSize - 2, guideSize - 2, CommonColor.WHITE.get());
+        graphics.disableScissor();
+    }
+
+    private ScreenRectangle markerBounds(ScreenRectangle map, SeedMapMarker marker, double viewX, double viewZ, int viewSize) {
+        double pixelsPerSample = (double) map.width() / viewSize;
+        int x = Mth.floor(map.left() + (marker.pos().getX() / (double) SeedMap.BLOCKS_PER_PIXEL - viewX + viewSize / 2) * pixelsPerSample);
+        int y = Mth.floor(map.top() + (marker.pos().getZ() / (double) SeedMap.BLOCKS_PER_PIXEL - viewZ + viewSize / 2) * pixelsPerSample);
         int size = scaled(marker.size());
         return new ScreenRectangle(x - size / 2, y - size / 2, size, size);
     }
 
-    private Component tooltipAt(ScreenRectangle bounds, SeedMap map, double viewX, double viewZ, int mouseX, int mouseY) {
+    private Component tooltipAt(ScreenRectangle bounds, SeedMap map, double viewX, double viewZ, boolean overview, int mouseX, int mouseY) {
+        int viewSize = overview ? SeedMap.SIZE : SeedMap.VIEW_SIZE;
         for (int i = map.markers().size() - 1; i >= 0; i--) {
             SeedMapMarker marker = previewMarker(map.markers().get(i));
-            if (!isVisible(marker)) continue;
-            if (markerBounds(bounds, marker, viewX, viewZ).containsPoint(mouseX, mouseY)) return marker.tooltip();
+            if (!isVisible(marker, overview)) continue;
+            if (markerBounds(bounds, marker, viewX, viewZ, viewSize).containsPoint(mouseX, mouseY)) return marker.tooltip();
         }
-        ChunkPos chunk = mapChunk(bounds, viewX, viewZ, mouseX, mouseY);
+        ChunkPos chunk = mapChunk(bounds, viewX, viewZ, viewSize, mouseX, mouseY);
         if (!map.contains(chunk)) return null;
         ResourceKey<Biome> biome = map.biomeAt(chunk).unwrapKey().orElse(null);
         if (biome == null) return null;
@@ -303,9 +319,9 @@ public class SeedPreviewScreen extends LegacyScreen {
         return message;
     }
 
-    private void updateHelp(ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ, int mouseX, int mouseY) {
+    private void updateHelp(ScreenRectangle bounds, SeedMapTexture texture, double viewX, double viewZ, boolean overview, int mouseX, int mouseY) {
         if (!bounds.containsPoint(mouseX, mouseY)) return;
-        Component hovered = texture == null ? null : tooltipAt(bounds, texture.map, viewX, viewZ, mouseX, mouseY);
+        Component hovered = texture == null ? null : tooltipAt(bounds, texture.map, viewX, viewZ, overview, mouseX, mouseY);
         if (Objects.equals(helpText, hovered)) return;
         helpText = hovered;
         helpLabel = null;
@@ -452,10 +468,10 @@ public class SeedPreviewScreen extends LegacyScreen {
         return mapBounds(detail, 12, 27, 211);
     }
 
-    private ChunkPos mapChunk(ScreenRectangle bounds, double viewX, double viewZ, int mouseX, int mouseY) {
-        double samplesPerPixel = (double) SeedMap.VIEW_SIZE / bounds.width();
-        int x = Mth.floor(viewX + (mouseX - bounds.left()) * samplesPerPixel - SeedMap.VIEW_SIZE / 2);
-        int z = Mth.floor(viewZ + (mouseY - bounds.top()) * samplesPerPixel - SeedMap.VIEW_SIZE / 2);
+    private ChunkPos mapChunk(ScreenRectangle bounds, double viewX, double viewZ, int viewSize, int mouseX, int mouseY) {
+        double samplesPerPixel = (double) viewSize / bounds.width();
+        int x = Mth.floor(viewX + (mouseX - bounds.left()) * samplesPerPixel - viewSize / 2);
+        int z = Mth.floor(viewZ + (mouseY - bounds.top()) * samplesPerPixel - viewSize / 2);
         return new ChunkPos(x, z);
     }
 
