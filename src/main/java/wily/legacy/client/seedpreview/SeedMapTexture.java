@@ -6,6 +6,8 @@ import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.Holder;
 import net.minecraft.tags.BiomeTags;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.material.MapColor;
@@ -26,10 +28,20 @@ public class SeedMapTexture extends DynamicTexture {
                 Holder<Biome> biome = map.biomes().get(z * SeedMap.SIZE + x);
                 int blockX = SeedMap.blockCoordinate(map.chunkX(), x);
                 int blockZ = SeedMap.blockCoordinate(map.chunkZ(), z);
-                image.setPixel(x, z, 0xFF000000 | color(biome, blockX, blockZ));
+                int color = color(biome, blockX, blockZ);
+                if (!biome.is(BiomeTags.IS_OCEAN) && !biome.is(BiomeTags.IS_RIVER)) {
+                    color = ARGB.scaleRGB(color, shade(map, x, z));
+                }
+                image.setPixel(x, z, 0xFF000000 | color);
             }
         }
         return image;
+    }
+
+    private static float shade(SeedMap map, int x, int z) {
+        float slope = (map.heightAt(x + 1, z) - map.heightAt(x - 1, z)
+                + map.heightAt(x, z + 1) - map.heightAt(x, z - 1)) / (2f * SeedMap.BLOCKS_PER_PIXEL);
+        return Mth.clamp(1 + slope * 0.25f, 0.7f, 1.15f);
     }
 
     private static int color(Holder<Biome> biome, int x, int z) {
