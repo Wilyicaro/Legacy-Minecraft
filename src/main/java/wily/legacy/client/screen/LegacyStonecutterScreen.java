@@ -15,7 +15,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.RecipeInfo;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.control.navigation.LegacySlotDisplay;

@@ -1,4 +1,4 @@
-package wily.legacy.client;
+package wily.legacy.client.recipe;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;

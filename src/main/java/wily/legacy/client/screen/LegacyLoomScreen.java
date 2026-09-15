@@ -31,7 +31,7 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.RecipeInfo;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.client.LoomTabListing;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;

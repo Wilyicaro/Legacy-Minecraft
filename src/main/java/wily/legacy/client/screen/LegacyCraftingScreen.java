@@ -45,6 +45,9 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.recipe.CraftingRecipeAlternatives;
+import wily.legacy.client.recipe.ItemIdRecipeFilter;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.ImpossibleIngredient;
 import wily.legacy.client.control.navigation.LegacySlotDisplay;
@@ -246,7 +249,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"), i -> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b && b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ || i.getItem() instanceof BundleItem/*?}*/), dyeItemUpdateRecipe));
         dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, dyeItemUpdateRecipe));
         if (!is2x2)
-            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(LegacyItemUtil.getBannerItem(c))))).toList()));
+            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new ItemIdRecipeFilter(BuiltInRegistries.ITEM.getKey(LegacyItemUtil.getBannerItem(c))))).toList()));
         bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i -> i.getItem() instanceof BannerItem && LegacyItemUtil.hasValidPatterns(i), h -> {
             clearIngredients(ingredientsGrid);
             if (bannerButtons.isEmpty() || h.itemIcon.isEmpty()) return;
