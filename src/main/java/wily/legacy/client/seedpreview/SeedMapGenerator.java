@@ -53,7 +53,7 @@ public class SeedMapGenerator {
     public SeedMap generate(int chunkX, int chunkZ, SeedMap previous, BooleanSupplier cancelled) {
         SeedMap map = SeedMap.generate(context, random, chunkX, chunkZ, previous, cancelled);
         if (map == previous) return previous;
-        return new SeedMap(chunkX, chunkZ, map.biomes(), findMarkers(map, previous, cancelled));
+        return new SeedMap(chunkX, chunkZ, map.biomes(), map.heights(), findMarkers(map, previous, cancelled));
     }
 
     private List<SeedMapMarker> findMarkers(SeedMap map, SeedMap previous, BooleanSupplier cancelled) {

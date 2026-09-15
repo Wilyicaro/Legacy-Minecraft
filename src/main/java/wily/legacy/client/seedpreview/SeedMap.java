@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.function.BooleanSupplier;
 
-public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<SeedMapMarker> markers) {
+public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, int[] heights, List<SeedMapMarker> markers) {
     public static final int VIEW_SIZE = 128;
     public static final int PADDING = 32;
     public static final int SIZE = VIEW_SIZE + PADDING * 2;
@@ -31,6 +31,7 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<S
 
     public SeedMap {
         if (biomes.size() != SIZE * SIZE) throw new IllegalArgumentException("Biome count must match the map size");
+        if (heights.length != SIZE * SIZE) throw new IllegalArgumentException("Height count must match the map size");
         biomes = List.copyOf(biomes);
         markers = List.copyOf(markers);
     }
@@ -40,8 +41,9 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<S
         if (previous != null && previous.chunkX == chunkX && previous.chunkZ == chunkZ) return previous;
         LevelStem dimension = context.selectedDimensions().bake(context.datapackDimensions()).dimensions().getValueOrThrow(LevelStem.OVERWORLD);
         ChunkGenerator generator = dimension.generator();
-        if (generator.getBiomeSource() instanceof FixedBiomeSource fixed) {
-            return new SeedMap(chunkX, chunkZ, Collections.nCopies(SIZE * SIZE, fixed.getNoiseBiome(0, 0, 0)), List.of());
+        int[] heights = new int[SIZE * SIZE];
+        if (generator.getBiomeSource() instanceof FixedBiomeSource fixed && !(generator instanceof NoiseBasedChunkGenerator)) {
+            return new SeedMap(chunkX, chunkZ, Collections.nCopies(SIZE * SIZE, fixed.getNoiseBiome(0, 0, 0)), heights, List.of());
         }
         if (!(generator instanceof NoiseBasedChunkGenerator)) {
             throw new UnsupportedOperationException("Unsupported preview generator: " + generator.getClass().getName());
@@ -61,6 +63,7 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<S
                 int oldZ = z + offsetZ;
                 if (previous != null && oldX >= 0 && oldX < SIZE && oldZ >= 0 && oldZ < SIZE) {
                     samples.add(previous.biomes.get(oldZ * SIZE + oldX));
+                    heights[z * SIZE + x] = previous.heights[oldZ * SIZE + oldX];
                     continue;
                 }
                 int blockX = blockCoordinate(chunkX, x);
@@ -68,9 +71,10 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<S
                 int surface = Mth.floor(random.router().preliminarySurfaceLevel().compute(new DensityFunction.SinglePointContext(blockX, 0, blockZ)));
                 surface = Mth.clamp(Math.max(generator.getSeaLevel() - 1, surface), minY, maxY);
                 samples.add(biomes.getBiome(pos.set(blockX, surface, blockZ)));
+                heights[z * SIZE + x] = surface;
             }
         }
-        return new SeedMap(chunkX, chunkZ, samples, List.of());
+        return new SeedMap(chunkX, chunkZ, samples, heights, List.of());
     }
 
     static void checkCancelled(BooleanSupplier cancelled) {
@@ -85,6 +89,10 @@ public record SeedMap(int chunkX, int chunkZ, List<Holder<Biome>> biomes, List<S
 
     public Holder<Biome> biomeAt(ChunkPos chunk) {
         return biomes.get((chunk.z() - chunkZ + SIZE / 2) * SIZE + chunk.x() - chunkX + SIZE / 2);
+    }
+
+    public int heightAt(int x, int z) {
+        return heights[Mth.clamp(z, 0, SIZE - 1) * SIZE + Mth.clamp(x, 0, SIZE - 1)];
     }
 
     public static int blockCoordinate(int chunk, int pixel) {

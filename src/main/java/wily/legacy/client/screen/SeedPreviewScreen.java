@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.stats.StatFormatter;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
@@ -47,6 +48,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     private static final int PAN_STEP = 4;
     private static final double PAN_SPEED = 16;
     private static final int REFRESH_STEP = SeedMap.PADDING / 2;
+    private static final int MIN_VIEW_SIZE = SeedMap.VIEW_SIZE / 4;
     private static final Arrow[] ARROWS = {
             new Arrow(ScreenDirection.UP, 111, 28, 13, 7),
             new Arrow(ScreenDirection.DOWN, 111, 230, 13, 7),
@@ -74,6 +76,8 @@ public class SeedPreviewScreen extends LegacyScreen {
     private double targetZ;
     private double viewX;
     private double viewZ;
+    private double viewSize = SeedMap.VIEW_SIZE;
+    private double targetSize = SeedMap.VIEW_SIZE;
     private float scale;
     private int left;
     private int top;
@@ -95,6 +99,12 @@ public class SeedPreviewScreen extends LegacyScreen {
         list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_HOME)
                         : ControllerBinding.RIGHT_STICK_BUTTON.getIcon(),
                 () -> texture != null ? Component.translatable("legacy.menu.seed_preview.recenter") : null);
+        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_MINUS)
+                        : ControllerBinding.LEFT_TRIGGER.getIcon(),
+                () -> texture != null && targetSize < SeedMap.VIEW_SIZE ? Component.translatable("legacy.menu.seed_preview.zoom_out") : null);
+        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_EQUALS)
+                        : ControllerBinding.RIGHT_TRIGGER.getIcon(),
+                () -> texture != null && targetSize > MIN_VIEW_SIZE ? Component.translatable("legacy.menu.seed_preview.zoom_in") : null);
         list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_S)
                         : ControllerBinding.LEFT_STICK_BUTTON.getIcon(),
                 () -> settings.options().generateStructures() ? Component.translatable(showStructures
@@ -149,7 +159,7 @@ public class SeedPreviewScreen extends LegacyScreen {
             ScreenRectangle overviewBounds = mapBounds(overview, 10, 20, 109);
             ScreenRectangle detailBounds = mapBounds();
             hovered = texture != null && detailBounds.containsPoint(mouseX, mouseY)
-                    ? mapChunk(detailBounds, viewX, viewZ, SeedMap.VIEW_SIZE, mouseX, mouseY).getWorldPosition().offset(8, 0, 8) : null;
+                    ? mapChunk(detailBounds, viewX, viewZ, viewSize, mouseX, mouseY).getWorldPosition().offset(8, 0, 8) : null;
             renderMap(graphics, overviewBounds, overviewTexture, 0, 0, true);
             renderGuide(graphics, overviewBounds);
             renderMap(graphics, detailBounds, texture, viewX, viewZ, false);
@@ -158,7 +168,10 @@ public class SeedPreviewScreen extends LegacyScreen {
             renderHelp(graphics);
             Component coordinates = Component.translatable("legacy.menu.seed_preview.coordinates",
                     Mth.floor(viewX * SeedMap.BLOCKS_PER_PIXEL), Mth.floor(viewZ * SeedMap.BLOCKS_PER_PIXEL));
-            renderLabel(graphics, detail, coordinates, 244);
+            Component mapScale = Component.translatable("legacy.menu.seed_preview.scale", (int) (SeedMap.VIEW_SIZE / targetSize),
+                    StatFormatter.DEFAULT.format((int) (targetSize * SeedMap.BLOCKS_PER_PIXEL)));
+            renderLabel(graphics, detail, coordinates, 241);
+            renderLabel(graphics, detail, mapScale, 251);
             for (Arrow arrow : ARROWS) {
                 ScreenRectangle bounds = arrowBounds(arrow);
                 scrollRenderer.renderScroll(graphics, arrow.direction, bounds.left(), bounds.top(),
@@ -210,6 +223,9 @@ public class SeedPreviewScreen extends LegacyScreen {
 
     private void updateView() {
         double elapsed = Math.min(minecraft.getDeltaTracker().getRealtimeDeltaTicks() / 20.0, 0.1);
+        double blend = 1 - Math.exp(-12 * elapsed);
+        viewSize = Mth.lerp(blend, viewSize, targetSize);
+        if (Math.abs(viewSize - targetSize) < 0.01) viewSize = targetSize;
         double dx = targetX - viewX;
         double dz = targetZ - viewZ;
         double distance = Math.hypot(dx, dz);
@@ -218,7 +234,7 @@ public class SeedPreviewScreen extends LegacyScreen {
             viewZ = targetZ;
             return;
         }
-        double step = Math.min(distance * (1 - Math.exp(-12 * elapsed)), PAN_SPEED * elapsed);
+        double step = Math.min(distance * blend, PAN_SPEED * elapsed * viewSize / SeedMap.VIEW_SIZE);
         viewX += dx * step / distance;
         viewZ += dz * step / distance;
     }
@@ -242,6 +258,8 @@ public class SeedPreviewScreen extends LegacyScreen {
         targetZ = 0;
         viewX = 0;
         viewZ = 0;
+        viewSize = SeedMap.VIEW_SIZE;
+        targetSize = SeedMap.VIEW_SIZE;
         setDragging(false);
     }
 
@@ -257,7 +275,7 @@ public class SeedPreviewScreen extends LegacyScreen {
         int mapX = bounds.left();
         int mapY = bounds.top();
         int mapSize = bounds.width();
-        int viewSize = overview ? SeedMap.SIZE : SeedMap.VIEW_SIZE;
+        double viewSize = overview ? SeedMap.SIZE : this.viewSize;
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, mapX - 2, mapY - 2, mapSize + 4, mapSize + 4);
         if (texture != null) {
             graphics.enableScissor(mapX, mapY, mapX + mapSize, mapY + mapSize);
@@ -283,16 +301,16 @@ public class SeedPreviewScreen extends LegacyScreen {
         if (overviewTexture == null) return;
         int size = bounds.width();
         double pixelsPerChunk = (double) size / SeedMap.SIZE;
-        int guideSize = (int) Math.round(SeedMap.VIEW_SIZE * pixelsPerChunk);
-        int x = Mth.floor(bounds.left() + (viewX + SeedMap.PADDING) * pixelsPerChunk);
-        int y = Mth.floor(bounds.top() + (viewZ + SeedMap.PADDING) * pixelsPerChunk);
+        int guideSize = (int) Math.round(viewSize * pixelsPerChunk);
+        int x = Mth.floor(bounds.left() + (viewX + (SeedMap.SIZE - viewSize) / 2) * pixelsPerChunk);
+        int y = Mth.floor(bounds.top() + (viewZ + (SeedMap.SIZE - viewSize) / 2) * pixelsPerChunk);
         graphics.enableScissor(bounds.left(), bounds.top(), bounds.left() + size, bounds.top() + size);
         graphics.outline(x, y, guideSize, guideSize, CommonColor.BLACK.get());
         graphics.outline(x + 1, y + 1, guideSize - 2, guideSize - 2, CommonColor.WHITE.get());
         graphics.disableScissor();
     }
 
-    private ScreenRectangle markerBounds(ScreenRectangle map, SeedMapMarker marker, double viewX, double viewZ, int viewSize) {
+    private ScreenRectangle markerBounds(ScreenRectangle map, SeedMapMarker marker, double viewX, double viewZ, double viewSize) {
         double pixelsPerSample = (double) map.width() / viewSize;
         int x = Mth.floor(map.left() + (marker.pos().getX() / (double) SeedMap.BLOCKS_PER_PIXEL - viewX + viewSize / 2) * pixelsPerSample);
         int y = Mth.floor(map.top() + (marker.pos().getZ() / (double) SeedMap.BLOCKS_PER_PIXEL - viewZ + viewSize / 2) * pixelsPerSample);
@@ -301,7 +319,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     }
 
     private Component tooltipAt(ScreenRectangle bounds, SeedMap map, double viewX, double viewZ, boolean overview, int mouseX, int mouseY) {
-        int viewSize = overview ? SeedMap.SIZE : SeedMap.VIEW_SIZE;
+        double viewSize = overview ? SeedMap.SIZE : this.viewSize;
         for (int i = map.markers().size() - 1; i >= 0; i--) {
             SeedMapMarker marker = previewMarker(map.markers().get(i));
             if (!isVisible(marker, overview)) continue;
@@ -352,8 +370,15 @@ public class SeedPreviewScreen extends LegacyScreen {
     }
 
     private void panBy(double x, double z) {
-        panTo(Mth.clamp(targetX + x, viewX - PAN_STEP, viewX + PAN_STEP),
-                Mth.clamp(targetZ + z, viewZ - PAN_STEP, viewZ + PAN_STEP));
+        double factor = viewSize / SeedMap.VIEW_SIZE;
+        double step = PAN_STEP * factor;
+        panTo(Mth.clamp(targetX + x * factor, viewX - step, viewX + step),
+                Mth.clamp(targetZ + z * factor, viewZ - step, viewZ + step));
+    }
+
+    private void zoom(boolean in) {
+        if (texture == null) return;
+        targetSize = Mth.clamp(targetSize * (in ? 0.5 : 2), MIN_VIEW_SIZE, SeedMap.VIEW_SIZE);
     }
 
     private void recenter() {
@@ -390,6 +415,8 @@ public class SeedPreviewScreen extends LegacyScreen {
             case InputConstants.KEY_LEFT -> pan(ScreenDirection.LEFT);
             case InputConstants.KEY_RIGHT -> pan(ScreenDirection.RIGHT);
             case InputConstants.KEY_HOME -> recenter();
+            case InputConstants.KEY_EQUALS, InputConstants.KEY_ADD -> zoom(true);
+            case InputConstants.KEY_MINUS -> zoom(false);
             case InputConstants.KEY_S -> toggleStructures();
             case InputConstants.KEY_X -> {
                 if (hovered != null) setSeedStart(hovered);
@@ -409,6 +436,10 @@ public class SeedPreviewScreen extends LegacyScreen {
             recenter();
         } else if (state.is(ControllerBinding.LEFT_STICK_BUTTON) && state.justPressed) {
             toggleStructures();
+        } else if (state.is(ControllerBinding.LEFT_TRIGGER)) {
+            zoom(false);
+        } else if (state.is(ControllerBinding.RIGHT_TRIGGER)) {
+            zoom(true);
         } else if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && state.pressed
                 && Math.abs(stick.x) >= Math.abs(stick.y)) {
             pan(stick.x > 0 ? ScreenDirection.RIGHT : ScreenDirection.LEFT);
@@ -441,7 +472,7 @@ public class SeedPreviewScreen extends LegacyScreen {
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (!isDragging() || getFocused() != null || event.button() != 0) return super.mouseDragged(event, dx, dy);
-        double chunksPerPixel = (double) SeedMap.VIEW_SIZE / mapBounds().width();
+        double chunksPerPixel = viewSize / mapBounds().width();
         jumpTo(viewX - dx * chunksPerPixel, viewZ - dy * chunksPerPixel);
         return true;
     }
@@ -468,8 +499,8 @@ public class SeedPreviewScreen extends LegacyScreen {
         return mapBounds(detail, 12, 27, 211);
     }
 
-    private ChunkPos mapChunk(ScreenRectangle bounds, double viewX, double viewZ, int viewSize, int mouseX, int mouseY) {
-        double samplesPerPixel = (double) viewSize / bounds.width();
+    private ChunkPos mapChunk(ScreenRectangle bounds, double viewX, double viewZ, double viewSize, int mouseX, int mouseY) {
+        double samplesPerPixel = viewSize / bounds.width();
         int x = Mth.floor(viewX + (mouseX - bounds.left()) * samplesPerPixel - viewSize / 2);
         int z = Mth.floor(viewZ + (mouseY - bounds.top()) * samplesPerPixel - viewSize / 2);
         return new ChunkPos(x, z);
