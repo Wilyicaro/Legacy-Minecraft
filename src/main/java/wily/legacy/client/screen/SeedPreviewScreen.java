@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.stats.StatFormatter;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
@@ -167,7 +168,10 @@ public class SeedPreviewScreen extends LegacyScreen {
             renderHelp(graphics);
             Component coordinates = Component.translatable("legacy.menu.seed_preview.coordinates",
                     Mth.floor(viewX * SeedMap.BLOCKS_PER_PIXEL), Mth.floor(viewZ * SeedMap.BLOCKS_PER_PIXEL));
-            renderLabel(graphics, detail, coordinates, 244);
+            Component mapScale = Component.translatable("legacy.menu.seed_preview.scale", (int) (SeedMap.VIEW_SIZE / targetSize),
+                    StatFormatter.DEFAULT.format((int) (targetSize * SeedMap.BLOCKS_PER_PIXEL)));
+            renderLabel(graphics, detail, coordinates, 241);
+            renderLabel(graphics, detail, mapScale, 251);
             for (Arrow arrow : ARROWS) {
                 ScreenRectangle bounds = arrowBounds(arrow);
                 scrollRenderer.renderScroll(graphics, arrow.direction, bounds.left(), bounds.top(),

@@ -1990,6 +1990,7 @@
   "legacy.menu.screenshot": "Screenshot Taken",
   "legacy.menu.seed_preview": "Seed Preview",
   "legacy.menu.seed_preview.coordinates": "X: %s, Z: %s",
+  "legacy.menu.seed_preview.scale": "%sx · %s blocks",
   "legacy.menu.seed_preview.estimated": "%s (Estimated)",
   "legacy.menu.seed_preview.estimate_description": "Predicted from the seed. The final location or structure may differ when the world generates.",
   "legacy.menu.seed_preview.spawn": "World Spawn",
