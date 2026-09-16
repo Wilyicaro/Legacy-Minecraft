@@ -36,7 +36,7 @@ public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
     };
     Codec<RecipeInfoFilter> CODEC = IOUtil.createFallbackCodec(BY_TYPE_CODEC, Codec.STRING.xmap(RecipeInfoFilter::parse, RecipeInfoFilter::toString));
     Codec<List<RecipeInfoFilter>> LIST_CODEC = CODEC.listOf().xmap(ArrayList::new, Function.identity());
-    Codec<Map<String, List<RecipeInfoFilter>>> LISTING_CODEC = IOUtil.createListingCodec(IOUtil.createFallbackCodec(LIST_CODEC, CODEC.xmap(f -> new ArrayList<>(Collections.singleton(f)), list -> list.get(0))), "group", "recipe", l -> l.get(0).toString());
+    Codec<Map<String, List<RecipeInfoFilter>>> LISTING_CODEC = IOUtil.createListingCodec(IOUtil.createFallbackCodec(LIST_CODEC, CODEC.xmap(f -> new ArrayList<>(Collections.singleton(f)), list -> list.get(0))), "group", "recipes", l -> l.get(0).toString());
 
     static RecipeInfoFilter parse(String s) {
         if (s.startsWith("#"))
