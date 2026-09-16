@@ -3,18 +3,16 @@ package wily.legacy.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.Ingredient;
 import wily.factoryapi.base.FactoryIngredient;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.RecipeInfo;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.inventory.RecipeMenu;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public record ServerMenuCraftPayload(Optional<Identifier> craftId, List<Optional<Ingredient>> customIngredients,
                                      int button, boolean max) implements CommonNetwork.Payload {

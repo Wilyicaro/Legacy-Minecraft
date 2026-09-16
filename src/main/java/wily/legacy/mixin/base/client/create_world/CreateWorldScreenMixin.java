@@ -15,12 +15,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.*;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelDataAndDimensions;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
@@ -50,6 +52,7 @@ import wily.legacy.client.screen.*;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 import wily.legacy.world.PlayerTrustAdmin;
+import wily.legacy.world.SeedStart;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,6 +73,8 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Final
     private static Component NAME_LABEL;
     protected Bearer<Boolean> trustPlayers = Bearer.of(true);
+    @Unique
+    private final Bearer<BlockPos> legacy$seedStart = Bearer.of(null);
     protected Bearer<ResourceKey<WorldPreset>> legacyBiomeScale = Bearer.of(WorldPresets.NORMAL);
     protected Panel panel;
     protected PublishScreen publishScreen;
@@ -249,7 +254,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             difficultyButton.active = !uiState.isHardcore();
         });
 
-        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
+        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale, legacy$seedStart))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> legacy$createWorld()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
             if (LegacyOptions.useLegacyWorldOptions()) {
@@ -290,6 +295,11 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
         };
+    }
+
+    @Inject(method = "createWorldAndCleanup", at = @At("HEAD"))
+    private void setSeedStart(CallbackInfo ci, @Local(argsOnly = true) LevelDataAndDimensions.WorldDataAndGenSettings worldData) {
+        ((SeedStart) worldData.data()).setSeedStart(legacy$seedStart.get());
     }
 
     @Unique
