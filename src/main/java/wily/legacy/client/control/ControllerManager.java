@@ -85,6 +85,9 @@ public class ControllerManager {
     private long lastPollError;
     private long lastInputMillis;
     private int inputTicks = 1;
+    private final GyroInput gyroInput = new GyroInput();
+    private final float[] gyroVelocity = new float[3];
+    private Controller gyroController;
 
     public static ControllerHandler getHandler() {
         return LegacyControlsOptions.selectedControllerHandler.get();
@@ -113,6 +116,35 @@ public class ControllerManager {
     public static float getCameraCurve(float f) {
         if (LegacyControlsOptions.linearCameraMovement.get()) return f;
         return f * f * Math.signum(f);
+    }
+
+    private void updateGyroCamera() {
+        if (connectedController == null) return;
+        if (gyroController != connectedController) {
+            gyroController = connectedController;
+            gyroInput.reset();
+        }
+        boolean enabled = LegacyControlsOptions.gyroElytraControls.get() && minecraft.isWindowActive();
+        connectedController.setGyroEnabled(enabled);
+        if (!enabled || !connectedController.readGyro(gyroVelocity)) {
+            gyroInput.stop();
+            return;
+        }
+        boolean steering = minecraft.player != null && minecraft.player.isFallFlying() && minecraft.screen == null
+                && minecraft.mouseHandler.isMouseGrabbed() && !minecraft.isPaused() && minecraft.getCameraEntity() == minecraft.player;
+        if (!steering && minecraft.screen == null) {
+            gyroInput.stop();
+            return;
+        }
+        gyroInput.update(gyroVelocity[0], gyroVelocity[1], gyroVelocity[2], System.nanoTime(), steering);
+        if (!steering) return;
+        double sensitivity = LegacyControlsOptions.gyroSensitivity.get() / 100.0 / 0.15;
+        double yaw = gyroInput.yawDelta * sensitivity;
+        double pitch = gyroInput.pitchDelta * sensitivity * (LegacyControlsOptions.invertGyroY.get() ? -1 : 1);
+        if (yaw == 0 && pitch == 0) return;
+        minecraft.player.turn(yaw, pitch);
+        setControllerTheLastInput(true);
+        minecraft.getFramerateLimitTracker().onInputReceived();
     }
 
     public void setup(Minecraft minecraft) {
@@ -189,7 +221,10 @@ public class ControllerManager {
             controllerNames.put(activeControllerSlot, connectedController.getName());
             connectedController.connect(ControllerManager.this);
         }
-        if (connectedController != null) getHandler().setup(ControllerManager.this);
+        if (connectedController != null) {
+            getHandler().setup(ControllerManager.this);
+            updateGyroCamera();
+        }
     }
 
     private void warnControllerPoll(RuntimeException e) {

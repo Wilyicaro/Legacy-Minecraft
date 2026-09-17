@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 
 public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements ControllerListener, ControlTooltip.Listener {
     protected final UIAccessor accessor = UIAccessor.of(this);
@@ -29,6 +30,8 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private int timesInventoryChanged;
     private int updateTimer = 0;
+    private final int defaultImageWidth;
+    private final int defaultImageHeight;
 
     public RecipesScreen(T menu, Inventory inventory, Component component) {
         this(menu, inventory, component, 348, 215);
@@ -36,6 +39,8 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
 
     public RecipesScreen(T menu, Inventory inventory, Component component, int width, int height) {
         super(menu, inventory, component, width, height);
+        this.defaultImageWidth = width;
+        this.defaultImageHeight = height;
         this.inventory = inventory;
         addRecipeButtons();
     }
@@ -150,6 +155,8 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     }
 
     protected void init() {
+        ((AbstractContainerScreenAccessor) this).legacy$setImageWidth(defaultImageWidth);
+        ((AbstractContainerScreenAccessor) this).legacy$setImageHeight(defaultImageHeight);
         super.init();
         addRecipeButtons();
     }

@@ -3,7 +3,6 @@ package wily.legacy.client.recipe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
@@ -12,32 +11,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class CraftingRecipeAlternatives implements RecipeInfo<CraftingRecipe> {
-    private final List<RecipeInfo<CraftingRecipe>> recipes;
-    private RecipeInfo<CraftingRecipe> selected;
+public class CollapsedRecipeInfo<T> implements RecipeInfo<T> {
+    private final List<RecipeInfo<T>> recipes;
+    private RecipeInfo<T> selected;
     private boolean previewLocked;
 
-    private CraftingRecipeAlternatives(List<RecipeInfo<CraftingRecipe>> recipes) {
+    private CollapsedRecipeInfo(List<RecipeInfo<T>> recipes) {
         this.recipes = recipes.stream().sorted(Comparator.comparing(r -> r.getId().toString())).toList();
         selected = this.recipes.getFirst();
     }
 
-    public static List<RecipeInfo<CraftingRecipe>> group(List<RecipeInfo<CraftingRecipe>> recipes) {
-        List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
-        for (RecipeInfo<CraftingRecipe> recipe : recipes) {
-            List<RecipeInfo<CraftingRecipe>> group = recipe.isOverride() ? null : groups.stream().filter(g -> !g.getFirst().isOverride() && ItemStack.isSameItemSameComponents(g.getFirst().getResultItem(), recipe.getResultItem())).findFirst().orElse(null);
+    public static <T> List<RecipeInfo<T>> group(RecipeInfoFilter filter, Iterable<RecipeInfo<T>> recipes) {
+        List<List<RecipeInfo<T>>> groups = new ArrayList<>();
+        for (RecipeInfo<T> recipe : recipes) {
+            if (!filter.test(recipe)) continue;
+
+            List<RecipeInfo<T>> group = recipe.isOverride() ? null : groups.stream().filter(g -> !g.getFirst().isOverride() && filter.test(g.getFirst())).findFirst().orElse(null);
             if (group == null) {
                 group = new ArrayList<>();
                 groups.add(group);
             }
             if (group.stream().noneMatch(r -> r.getId().equals(recipe.getId()))) group.add(recipe);
         }
-        return groups.stream().map(g -> g.size() == 1 ? g.getFirst() : new CraftingRecipeAlternatives(g)).toList();
+        return groups.stream().map(g -> g.size() == 1 ? g.getFirst() : new CollapsedRecipeInfo<>(g)).toList();
     }
 
-    public boolean update(Predicate<RecipeInfo<CraftingRecipe>> canCraft, long time) {
+    public boolean update(Predicate<RecipeInfo<T>> canCraft, long time) {
         if (canCraft.test(selected)) return false;
-        RecipeInfo<CraftingRecipe> next = recipes.stream().filter(canCraft).findFirst().orElse(null);
+        RecipeInfo<T> next = recipes.stream().filter(canCraft).findFirst().orElse(null);
         if (next != null) previewLocked = false;
         else if (!previewLocked) next = recipes.get((int) (time / 800 % recipes.size()));
         if (next == null || next == selected) return false;
@@ -45,17 +46,17 @@ public class CraftingRecipeAlternatives implements RecipeInfo<CraftingRecipe> {
         return true;
     }
 
-    private List<RecipeInfo<CraftingRecipe>> availableRecipes(Predicate<RecipeInfo<CraftingRecipe>> canCraft) {
-        List<RecipeInfo<CraftingRecipe>> available = recipes.stream().filter(canCraft).toList();
+    private List<RecipeInfo<T>> availableRecipes(Predicate<RecipeInfo<T>> canCraft) {
+        List<RecipeInfo<T>> available = recipes.stream().filter(canCraft).toList();
         return available.isEmpty() ? recipes : available;
     }
 
-    public boolean canCycle(Predicate<RecipeInfo<CraftingRecipe>> canCraft) {
+    public boolean canCycle(Predicate<RecipeInfo<T>> canCraft) {
         return availableRecipes(canCraft).size() > 1;
     }
 
-    public boolean cycle(Predicate<RecipeInfo<CraftingRecipe>> canCraft) {
-        List<RecipeInfo<CraftingRecipe>> available = availableRecipes(canCraft);
+    public boolean cycle(Predicate<RecipeInfo<T>> canCraft) {
+        List<RecipeInfo<T>> available = availableRecipes(canCraft);
         if (available.size() < 2) return false;
         selected = available.get((available.indexOf(selected) + 1) % available.size());
         previewLocked = true;
@@ -63,7 +64,7 @@ public class CraftingRecipeAlternatives implements RecipeInfo<CraftingRecipe> {
     }
 
     @Override
-    public CraftingRecipe get() {
+    public T get() {
         return selected.get();
     }
 

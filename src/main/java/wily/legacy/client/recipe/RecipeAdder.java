@@ -15,9 +15,11 @@ import wily.legacy.util.LegacyItemUtil;
 import java.util.*;
 import java.util.function.Consumer;
 
-public interface CustomRecipeAdder<T> {
+public interface RecipeAdder {
     Identifier TIPPED_ARROW = FactoryAPI.createVanillaLocation("tipped_arrow");
-    Map<Identifier, CustomRecipeAdder> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> {
+    Map<Identifier, RecipeAdder> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, RecipeAdder::addTippedArrowRecipes));
+
+    static <T> void addTippedArrowRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
         BuiltInRegistries.POTION.asHolderIdMap().forEach(p -> {
             if (p.value().getEffects().isEmpty() && !p.equals(Potions.WATER)) return;
             ItemStack potion = LegacyItemUtil.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(), p);
@@ -33,7 +35,7 @@ public interface CustomRecipeAdder<T> {
                 return description.get(0);
             }));
         });
-    }));
+    }
 
-    void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder);
+    <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder);
 }

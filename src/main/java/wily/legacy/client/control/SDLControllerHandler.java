@@ -1,5 +1,6 @@
 package wily.legacy.client.control;
 
+import com.sun.jna.Memory;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.FloatByReference;
 import dev.isxander.sdl3java.api.SdlInit;
@@ -7,6 +8,7 @@ import dev.isxander.sdl3java.api.SdlSubSystemConst;
 import dev.isxander.sdl3java.api.gamepad.*;
 import dev.isxander.sdl3java.api.joystick.SDL_JoystickID;
 import dev.isxander.sdl3java.api.joystick.SdlJoystick;
+import dev.isxander.sdl3java.api.sensor.SDL_SensorType;
 import dev.isxander.sdl3java.api.version.SdlVersionConst;
 import dev.isxander.sdl3java.jna.SdlNativeLibraryLoader;
 import net.minecraft.util.Util;
@@ -202,6 +204,23 @@ public class SDLControllerHandler implements ControllerHandler {
         SDL_Gamepad controller = SdlGamepad.SDL_OpenGamepad(actualIds[jid]);
         return new Controller() {
             String name;
+            private final Memory gyroData = SdlGamepad.SDL_GamepadHasSensor(controller, SDL_SensorType.SDL_SENSOR_GYRO) ? new Memory(3 * Float.BYTES) : null;
+            private boolean gyroRequested;
+            private boolean gyroEnabled;
+
+            @Override
+            public void setGyroEnabled(boolean enabled) {
+                if (gyroData == null || gyroRequested == enabled) return;
+                gyroRequested = enabled;
+                gyroEnabled = SdlGamepad.SDL_SetGamepadSensorEnabled(controller, SDL_SensorType.SDL_SENSOR_GYRO, enabled) && enabled;
+            }
+
+            @Override
+            public boolean readGyro(float[] angularVelocity) {
+                if (!gyroEnabled || !SdlGamepad.SDL_GetGamepadSensorData(controller, SDL_SensorType.SDL_SENSOR_GYRO, gyroData, 3)) return false;
+                gyroData.read(0, angularVelocity, 0, 3);
+                return true;
+            }
 
             @Override
             public String getName() {
@@ -286,6 +305,7 @@ public class SDLControllerHandler implements ControllerHandler {
             public void disconnect(ControllerManager manager) {
                 Controller.super.disconnect(manager);
                 SdlGamepad.SDL_CloseGamepad(controller);
+                if (gyroData != null) gyroData.close();
             }
 
             @Override
