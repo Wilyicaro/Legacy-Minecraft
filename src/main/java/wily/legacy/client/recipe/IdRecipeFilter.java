@@ -11,7 +11,7 @@ public record IdRecipeFilter(Identifier id) implements RecipeInfoFilter {
     @Override
     public <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
         RecipeInfoFilter.super.addRecipes(validRecipes, recipeAdder);
-        CustomRecipeAdder<T> value = CustomRecipeAdder.ID_RECIPE_INFO_OVERRIDES.get(id);
+        RecipeAdder value = RecipeAdder.ID_RECIPE_INFO_OVERRIDES.get(id);
         if (value != null) value.addRecipes(validRecipes, recipeAdder);
     }
 
