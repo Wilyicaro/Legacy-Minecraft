@@ -28,20 +28,20 @@ public record TopMessage(Component message, int baseColor, int ticksOnScreen, bo
     public static int smallTicks;
     public static int mediumTicks;
 
-    public TopMessage(Component message, int baseColor, boolean shadow, boolean fade, boolean pulse) {
-        this(message, baseColor, 40, shadow, fade, pulse);
+    public TopMessage(Component message, int baseColor, int ticksOnScreen, boolean shadow, boolean fade) {
+        this(message, baseColor, ticksOnScreen, shadow, fade, false);
     }
 
-    public TopMessage(Component message, int baseColor, boolean shadow, boolean fade) {
-        this(message, baseColor, shadow, fade, false);
+    public TopMessage(Component message, int baseColor, int ticksOnScreen, boolean shadow) {
+        this(message, baseColor, ticksOnScreen, shadow, false);
     }
 
-    public TopMessage(Component message, int baseColor, boolean shadow) {
-        this(message, baseColor, shadow, false);
+    public TopMessage(Component message, int baseColor, int ticksOnScreen) {
+        this(message, baseColor, ticksOnScreen, true, false);
     }
 
     public TopMessage(Component message, int baseColor) {
-        this(message, baseColor, true);
+        this(message, baseColor, 40);
     }
 
     public static void tick() {
@@ -132,10 +132,10 @@ public record TopMessage(Component message, int baseColor, int ticksOnScreen, bo
     public static LiteralArgumentBuilder<CommandSourceStack> setupTopMessageArgument(CommandBuildContext ctx, String id, SendType sendType) {
         return Commands.literal(id).
                 then(Commands.argument("message", ComponentArgument.textComponent(ctx)).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF))).
-                then(Commands.argument("shadow", BoolArgumentType.bool()).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, BoolArgumentType.getBool(c, "shadow")))).
-                then(Commands.argument("fade", BoolArgumentType.bool()).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, BoolArgumentType.getBool(c, "shadow"), BoolArgumentType.getBool(c, "fade")))).
-                then(Commands.argument("pulse", BoolArgumentType.bool()).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, BoolArgumentType.getBool(c, "shadow"), BoolArgumentType.getBool(c, "fade"), BoolArgumentType.getBool(c, "pulse")))).
-                then(Commands.argument("ticksOnScreen", IntegerArgumentType.integer(1)).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, IntegerArgumentType.getInteger(c, "ticksOnScreen"), BoolArgumentType.getBool(c, "shadow"), BoolArgumentType.getBool(c, "fade"), BoolArgumentType.getBool(c, "pulse")))))))));
+                then(Commands.argument("ticksOnScreen", IntegerArgumentType.integer(1)).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, IntegerArgumentType.getInteger(c, "ticksOnScreen")))).
+                then(Commands.argument("shadow", BoolArgumentType.bool()).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, IntegerArgumentType.getInteger(c, "ticksOnScreen"), BoolArgumentType.getBool(c, "shadow")))).
+                then(Commands.argument("fade", BoolArgumentType.bool()).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, IntegerArgumentType.getInteger(c, "ticksOnScreen"), BoolArgumentType.getBool(c, "shadow"), BoolArgumentType.getBool(c, "fade")))).
+                then(Commands.argument("pulse", BoolArgumentType.bool()).executes((c) -> sendTopMessage(EntityArgument.getPlayers(c, "targets"), sendType, new TopMessage(ComponentArgument.getRawComponent(c, "message"), 0xFFFFFFFF, IntegerArgumentType.getInteger(c, "ticksOnScreen"), BoolArgumentType.getBool(c, "shadow"), BoolArgumentType.getBool(c, "fade"), BoolArgumentType.getBool(c, "pulse")))))))));
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> setupClearTopMessageArgument(String id, SendType sendType) {

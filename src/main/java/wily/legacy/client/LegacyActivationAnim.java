@@ -28,7 +28,7 @@ public class LegacyActivationAnim {
     public static void displayEffect(Holder<MobEffect> effect) {
         display(((pose, f, source) -> {
             pose.pushPose();
-            pose.scale(0.5f, 0.5f, 0.1f);
+            pose.scale(0.5f, 0.5f, 0.5f);
             TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().getSprite(Gui.getMobEffectSprite(effect));
             renderTex(sprite, pose, source, false);
             pose.pushPose();
