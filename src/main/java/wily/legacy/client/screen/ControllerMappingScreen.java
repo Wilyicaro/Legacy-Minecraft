@@ -86,6 +86,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                             LegacyControlsOptions.forceSmoothMovement,
                             LegacyControlsOptions.linearCameraMovement);
                     renderableVList.addMultSliderOption(LegacyControlsOptions.controllerSensitivity, 2);
+                    renderableVList.addLinkedOptions(LegacyControlsOptions.gyroElytraControls, option -> option.get(), LegacyControlsOptions.gyroSensitivity, LegacyControlsOptions.invertGyroY);
                 }
             }
             lastCategory = keyMapping.getCategory();

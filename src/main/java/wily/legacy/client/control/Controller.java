@@ -78,6 +78,13 @@ public interface Controller {
      */
     float axisValue(int i);
 
+    default void setGyroEnabled(boolean enabled) {
+    }
+
+    default boolean readGyro(float[] angularVelocity) {
+        return false;
+    }
+
     /**
      * @return If this controller has LED
      * This always returns true on SDL3 and false on GLFW
