@@ -121,7 +121,7 @@ public record TopMessage(Component message, int baseColor, int ticksOnScreen, bo
     }
 
     public static void registerCommand(CommandDispatcher<CommandSourceStack> commandDispatcher, CommandBuildContext ctx, Commands.CommandSelection environment) {
-        commandDispatcher.register(Commands.literal("displayTopMessage").requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)).then(Commands.argument("targets", EntityArgument.players()).
+        commandDispatcher.register(Commands.literal("topMessage").requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)).then(Commands.argument("targets", EntityArgument.players()).
                 then(setupTopMessageArgument(ctx, "small", SendType.SMALL)).
                 then(setupTopMessageArgument(ctx, "medium", SendType.MEDIUM)).
                 then(setupClearTopMessageArgument("clear_small", SendType.CLEAR_SMALL)).
