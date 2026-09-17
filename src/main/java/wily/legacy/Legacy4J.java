@@ -141,7 +141,10 @@ public class Legacy4J {
         ArmorStandPose.init();
         LegacyMobCaps.init();
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
-        FactoryEvent.registerCommands(TipCommand::register);
+        FactoryEvent.registerCommands(((commandSourceStackCommandDispatcher, commandBuildContext, commandSelection) -> {
+            TipCommand.register(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+            ClientEffectActivationPayload.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+        }));
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
