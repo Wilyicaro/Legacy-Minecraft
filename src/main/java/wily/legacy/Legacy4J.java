@@ -144,6 +144,7 @@ public class Legacy4J {
         FactoryEvent.registerCommands(((commandSourceStackCommandDispatcher, commandBuildContext, commandSelection) -> {
             TipCommand.register(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
             ClientEffectActivationPayload.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+            TopMessage.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
         }));
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
