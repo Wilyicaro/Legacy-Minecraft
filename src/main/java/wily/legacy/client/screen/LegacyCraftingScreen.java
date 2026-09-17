@@ -45,7 +45,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.recipe.CraftingRecipeAlternatives;
+import wily.legacy.client.recipe.CollapsedRecipeInfo;
 import wily.legacy.client.recipe.ItemIdRecipeFilter;
 import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.init.LegacyRegistries;
@@ -157,8 +157,6 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                 craftingTabList.add(LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(ModsScreen.modLogosCache.apply(modInfo)), Component.literal(modInfo.getName()), t -> resetElements());
             });
         }
-
-        recipesByTab.forEach(tab -> tab.replaceAll(CraftingRecipeAlternatives::group));
 
         for (TypeCraftingTab value : Legacy4JClient.typeCraftingTabs.map().values()) {
             if (!value.isValid()) continue;
@@ -521,7 +519,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     protected void updateRecipes() {
         if (typeTabList.getIndex() == 0) {
             recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).forEach(group -> group.forEach(recipe -> {
-                if (recipe instanceof CraftingRecipeAlternatives alternatives) alternatives.update(this::canCraftAlternative, Util.getMillis());
+                if (recipe instanceof CollapsedRecipeInfo<?> alternatives) alternatives.update(this::canCraftAlternative, Util.getMillis());
             }));
             if (onlyCraftableRecipes)
                 filteredRecipesByGroup = recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory, menu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
@@ -532,16 +530,16 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         }
     }
 
-    private boolean canCraftAlternative(RecipeInfo<CraftingRecipe> recipe) {
+    private boolean canCraftAlternative(RecipeInfo<?> recipe) {
         return RecipeMenu.canCraft(recipe.getOptionalIngredients(), inventory, menu.getCarried());
     }
 
-    private CraftingRecipeAlternatives getFocusedAlternatives() {
-        return typeTabList.getIndex() == 0 && getFocused() instanceof RecipeIconHolder<?> holder && holder.getFocusedRecipe() instanceof CraftingRecipeAlternatives alternatives ? alternatives : null;
+    private CollapsedRecipeInfo<CraftingRecipe> getFocusedAlternatives() {
+        return typeTabList.getIndex() == 0 && getFocused() instanceof RecipeIconHolder<?> holder && holder.getFocusedRecipe() instanceof CollapsedRecipeInfo<?> alternatives ? (CollapsedRecipeInfo<CraftingRecipe>) alternatives : null;
     }
 
     private boolean cycleIngredient() {
-        CraftingRecipeAlternatives alternatives = getFocusedAlternatives();
+        CollapsedRecipeInfo<CraftingRecipe> alternatives = getFocusedAlternatives();
         if (alternatives == null || !alternatives.cycle(this::canCraftAlternative)) return false;
         ((RecipeIconHolder<?>) getFocused()).updateRecipeDisplay();
         LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
@@ -551,7 +549,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     @Override
     protected void containerTick() {
         super.containerTick();
-        CraftingRecipeAlternatives alternatives = getFocusedAlternatives();
+        CollapsedRecipeInfo<CraftingRecipe> alternatives = getFocusedAlternatives();
         if (alternatives != null && alternatives.update(this::canCraftAlternative, Util.getMillis()))
             ((RecipeIconHolder<?>) getFocused()).updateRecipeDisplay();
     }
@@ -716,7 +714,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
             }
 
             protected void updateRecipeDisplay(RecipeInfo<CraftingRecipe> rcp) {
-                if (rcp instanceof CraftingRecipeAlternatives alternatives) alternatives.update(LegacyCraftingScreen.this::canCraftAlternative, Util.getMillis());
+                if (rcp instanceof CollapsedRecipeInfo<?> alternatives) alternatives.update(LegacyCraftingScreen.this::canCraftAlternative, Util.getMillis());
                 if (!ItemStack.isSameItem(resultStack, getFocusedResult()))
                     scrollableRenderer.resetScrolled();
                 resultStack = getFocusedResult();

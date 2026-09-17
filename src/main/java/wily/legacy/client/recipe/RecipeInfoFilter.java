@@ -8,6 +8,7 @@ import com.mojang.serialization.DynamicOps;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.StringRepresentable;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.util.IOUtil;
@@ -47,18 +48,44 @@ public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
     }
 
     default <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
-        for (RecipeInfo<T> validRecipe : validRecipes) {
-            if (test(validRecipe)) {
-                recipeAdder.accept(validRecipe);
-                if (onlyFirstMatch()) return;
+        if (additionMethod() == AdditionMethod.COLLAPSE) {
+            List<RecipeInfo<T>> collapsed = CollapsedRecipeInfo.group(this, validRecipes);
+            for (RecipeInfo<T> validRecipe : collapsed) {
+                if (test(validRecipe)) {
+                    recipeAdder.accept(validRecipe);
+                }
+            }
+        } else {
+            for (RecipeInfo<T> validRecipe : validRecipes) {
+                if (test(validRecipe)) {
+                    recipeAdder.accept(validRecipe);
+                    if (additionMethod() == AdditionMethod.FIRST_MATCH) return;
+                }
             }
         }
     }
 
-    default boolean onlyFirstMatch() {
-        return false;
+    default AdditionMethod additionMethod() {
+        return AdditionMethod.ALL;
     }
 
     Codec<? extends RecipeInfoFilter> codec();
 
+    enum AdditionMethod implements StringRepresentable {
+        FIRST_MATCH("first_match"),
+        ALL("all"),
+        COLLAPSE("collapse");
+
+        public static final EnumCodec<AdditionMethod> CODEC = StringRepresentable.fromEnum(AdditionMethod::values);
+        private final String name;
+
+        AdditionMethod(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
 }

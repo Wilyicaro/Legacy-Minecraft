@@ -16,8 +16,8 @@ public record IdRecipeFilter(Identifier id) implements RecipeInfoFilter {
     }
 
     @Override
-    public boolean onlyFirstMatch() {
-        return true;
+    public AdditionMethod additionMethod() {
+        return AdditionMethod.FIRST_MATCH;
     }
 
     @Override
