@@ -167,6 +167,7 @@
   "gamerule.waterSourceConversion": "Water Source Conversion",
   "gamerule.waterSourceConversion.description": "When enabled, two water sources that flow into the same block will create a new water source.",
   "gui.ok": "OK",
+  "gui.togglable_slot": "Press to disable slot",
   "hanging_sign.edit": "Edit hanging sign message:",
   "key.attack": "Action",
   "key.inventory": "Inventory",
