@@ -749,7 +749,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.itemTooltipEllipsis,
                                 LegacyOptions.selectedItemTooltipLines,
                                 LegacyOptions.selectedItemTooltipSpacing,
-                                LegacyOptions.controlTooltipDisplay
+                                LegacyOptions.controlTooltipDisplay,
+                                LegacyOptions.displayMultipleControlsFromAction
                         ),
                         o -> {
                             o.renderableVList.addCategory(Component.translatable("legacy.menu.menu_settings"));
