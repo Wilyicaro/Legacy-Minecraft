@@ -94,8 +94,8 @@ public class LegacyGuiElements {
         }));
 
         FactoryAPIClient.uiDefinitionManager.staticList.add(UIDefinition.createBeforeInit(a -> {
-            CommonValue.COMMON_VALUES.forEach((s, c) -> a.getElements().put("commonValue." + (s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".") + s.getPath(), c));
-            CommonColor.COMMON_COLORS.forEach((s, c) -> a.getElements().put("commonColor." + (s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".") + s.getPath(), c));
+            CommonValue.COMMON_VALUES.forEach((s, c) -> a.getElements().put("commonValue." + s.toShortLanguageKey(), c));
+            CommonColor.COMMON_COLORS.forEach((s, c) -> a.getElements().put("commonColor." + s.toShortLanguageKey(), c));
             CommonIcon.commonIcons.forEach((s, i) -> {
                 a.getElements().put("controlIcon." + s, i.map(ComponentIcon::getComponent));
             });
