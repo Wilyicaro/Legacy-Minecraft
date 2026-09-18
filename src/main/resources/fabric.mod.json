@@ -41,5 +41,13 @@
   },
   "suggests": {
     "factocrafty": ">=0.0.0.6"
+  },
+  "breaks": {
+    "l4jaddons": "<=1.0.0",
+    "viafabricplus": "*"
+  },
+  "conflicts": {
+    "gnetum": "*",
+    "rrls": "*"
   }
 }
