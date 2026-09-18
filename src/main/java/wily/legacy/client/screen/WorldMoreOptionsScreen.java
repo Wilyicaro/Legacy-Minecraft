@@ -46,6 +46,7 @@ import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyGameRules;
@@ -488,7 +489,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
-        list.add(ControlTooltip.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
+        list.add(CommonIcon.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
     }
 
     public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRule<?>> allowGamerule) {

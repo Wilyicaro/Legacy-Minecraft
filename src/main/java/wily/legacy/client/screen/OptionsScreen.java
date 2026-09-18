@@ -29,6 +29,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.LegacyControlsOptions;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.CompoundComponentIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
@@ -88,8 +89,8 @@ public class OptionsScreen extends PanelVListScreen {
 
     public static void setupSelectorControlTooltips(ControlTooltipList list, Screen screen) {
         list.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
-        list.add(ControlTooltip.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
-        list.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
+        list.add(CommonIcon.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
+        list.add(CommonIcon.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
     }
 
     public OptionsScreen withAdvancedOptions(Function<OptionsScreen, Screen> advancedOptionsFunction) {

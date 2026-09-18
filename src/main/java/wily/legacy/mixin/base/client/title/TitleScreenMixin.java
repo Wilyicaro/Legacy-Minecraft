@@ -30,10 +30,7 @@ import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.tooltip.ControlTooltip;
-import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
-import wily.legacy.client.control.tooltip.ControlTooltips;
+import wily.legacy.client.control.tooltip.*;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
@@ -41,8 +38,6 @@ import wily.legacy.client.ContentManager;
 import wily.legacy.util.LegacyComponents;
 
 import java.io.IOException;
-import java.util.function.BiConsumer;
-import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Listener, RenderableVList.Access {
@@ -165,7 +160,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     public void addControlTooltips(ControlTooltipList list) {
         ControlTooltip.setupDefaultScreen(list, this);
         if (LegacyOptions.legacySettingsMenus.get())
-            list.add(ControlTooltip.PRESS::get, () -> LegacyComponents.SELECT);
+            list.add(CommonIcon.PRESS::get, () -> LegacyComponents.SELECT);
         else
             list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
         if (PublishScreen.hasWorldHost())

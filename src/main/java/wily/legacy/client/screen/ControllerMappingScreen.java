@@ -14,8 +14,8 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.control.*;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ComponentIcon;
-import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.Arrays;
@@ -148,7 +148,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     @Override
     public Component getCancelTooltip() {
-        return Component.translatable("legacy.options.controllerMappingTooltip", ControlTooltip.CANCEL_BINDING.get().getComponent());
+        return Component.translatable("legacy.options.controllerMappingTooltip", CommonIcon.CANCEL_BINDING.get().getComponent());
     }
 
     @Override

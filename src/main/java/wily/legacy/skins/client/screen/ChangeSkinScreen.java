@@ -11,7 +11,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.RenderableVList;
@@ -668,7 +668,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void addControlTooltips(ControlTooltipList r) {
         addCommonControlTooltips(
                 r,
-                ControlTooltip.POINTER_MOVEMENT::get,
+                CommonIcon.POINTER_MOVEMENT::get,
                 () -> LegacyComponents.NAVIGATE
         );
     }

@@ -29,6 +29,7 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.seedpreview.SeedMap;
@@ -92,9 +93,9 @@ public class SeedPreviewScreen extends LegacyScreen {
     @Override
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
-        list.add(ControlTooltip.EXTRA::get, () -> hovered != null && !hovered.equals(seedStart.get())
+        list.add(CommonIcon.EXTRA::get, () -> hovered != null && !hovered.equals(seedStart.get())
                 ? Component.translatable("legacy.menu.seed_preview.set_start") : null);
-        list.add(ControlTooltip.OPTION::get, () -> seedStart.get() != null
+        list.add(CommonIcon.OPTION::get, () -> seedStart.get() != null
                 ? Component.translatable("legacy.menu.seed_preview.reset_start") : null);
         list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_HOME)
                         : ControllerBinding.RIGHT_STICK_BUTTON.getIcon(),
