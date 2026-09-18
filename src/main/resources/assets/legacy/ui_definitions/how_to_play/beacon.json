@@ -13,15 +13,25 @@
           "width": 200,
           "height": 222,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.beacon_message"
+                "translate": "legacy.menu.how_to_play.beacon_title"
               },
               "width": 176
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.beacon_message"
+              },
+              "width": 176
+            },
+            "text2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.beacon_message_1"
               },
@@ -209,8 +219,7 @@
         "primary_power_label": {
           "type": "draw_string",
           "component": {
-            "translate": "block.minecraft.beacon.primary",
-            "font": "legacy:default_11"
+            "translate": "block.minecraft.beacon.primary"
           },
           "color": "${commonColor.inventory_gray_text}",
           "shadow": false,
@@ -220,8 +229,7 @@
         "secondary_power_label": {
           "type": "draw_string",
           "component": {
-            "translate": "block.minecraft.beacon.secondary",
-            "font": "legacy:default_11"
+            "translate": "block.minecraft.beacon.secondary"
           },
           "color": "${commonColor.inventory_gray_text}",
           "shadow": false,
@@ -383,10 +391,21 @@
           "height": 137,
           "lineHeight": 8,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.hopper_message",
+                "translate": "legacy.menu.how_to_play.beacon_title",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.beacon_message",
                 "font": "legacy:default_11",
                 "allowVariables": true,
                 "args": [
@@ -396,10 +415,11 @@
               "width": 120,
               "lineSpacing": 8
             },
-            "text1": {
+            "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.hopper_message_1",
+                "translate": "legacy.menu.how_to_play.beacon_message_1",
                 "font": "legacy:default_11"
               },
               "width": 120,
@@ -596,7 +616,8 @@
         "primary_power_label": {
           "type": "draw_string",
           "component": {
-            "translate": "block.minecraft.beacon.primary"
+            "translate": "block.minecraft.beacon.primary",
+            "font": "legacy:default_11"
           },
           "color": "${commonColor.inventory_gray_text}",
           "shadow": false,
@@ -608,7 +629,8 @@
         "secondary_power_label": {
           "type": "draw_string",
           "component": {
-            "translate": "block.minecraft.beacon.secondary"
+            "translate": "block.minecraft.beacon.secondary",
+            "font": "legacy:default_11"
           },
           "color": "${commonColor.inventory_gray_text}",
           "shadow": false,

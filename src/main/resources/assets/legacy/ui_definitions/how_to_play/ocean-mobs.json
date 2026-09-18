@@ -11,62 +11,135 @@
       "elements": {
         "text": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_message"
           },
           "width": 433
         },
-        "fish": {
+		"fish": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_fish_title"
+          },
+          "width": 433
+        },
+        "fish1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_fish"
           },
           "width": 433
         },
-        "squid": {
+		"squid": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_squid_title"
+          },
+          "width": 433
+        },
+        "squid1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_squid"
           },
           "width": 433
         },
-        "dolphins": {
+		"dolphins": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins_title"
+          },
+          "width": 433
+        },
+        "dolphins1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins"
           },
           "width": 433
         },
-        "sea-turtles": {
+		"sea-turtles": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles_title"
+          },
+          "width": 433
+        },
+        "sea-turtles1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles"
           },
           "width": 433
         },
-        "nautilus": {
+		"nautilus": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus_title"
+          },
+          "width": 433
+        },
+        "nautilus1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus"
           },
           "width": 433
         },
-        "zombie-nautilus": {
+		"zombie-nautilus": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus_title"
+          },
+          "width": 433
+        },
+        "zombie-nautilus1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus"
           },
           "width": 433
         },
-        "drowned": {
+		"drowned": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_drowned_title"
+          },
+          "width": 433
+        },
+        "drowned1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_drowned"
           },
           "width": 433
         },
-        "guardians": {
+		"guardians": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_guardians_title"
+          },
+          "width": 433
+        },
+        "guardians1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_guardians"
           },
@@ -90,6 +163,7 @@
       "elements": {
         "text": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_message",
             "font": "legacy:default_11"
@@ -99,74 +173,162 @@
         },
         "fish": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_fish_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "fish1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_fish",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "squid": {
+		"squid": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_squid_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "squid1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_squid",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "dolphins": {
+		"dolphins": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "dolphins1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "sea-turtles": {
+		"sea-turtles": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "sea-turtles1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "nautilus": {
+		"nautilus": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "nautilus1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_nautilus",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "zombie-nautilus": {
+		"zombie-nautilus": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "zombie-nautilus1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_zombie-nautilus",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "drowned": {
+		"drowned": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_drowned_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "drowned1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_drowned",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         },
-        "guardians": {
+		"guardians": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_blue}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_guardians_title",
+            "font": "legacy:default_11"
+          },
+          "width": 433,
+          "lineSpacing": 8
+        },
+        "guardians1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.ocean-mobs_guardians",
             "font": "legacy:default_11"
           },
-          "width": 268,
+          "width": 433,
           "lineSpacing": 8
         }
       }
