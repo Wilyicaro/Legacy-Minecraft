@@ -22,6 +22,7 @@ import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.*;
@@ -33,8 +34,6 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
-
-import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
 public class LegacyAdvancementsScreen extends PanelVListScreen implements TabList.Access {
     public static final Component TITLE = Component.translatable("gui.advancements");
@@ -162,8 +161,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         super.addControlTooltips(list);
         list.tooltips.remove(0);
         list.
-                add(EXTRA::get, () -> LegacyComponents.SHOW_DESCRIPTION).
-                add(CONTROL_PAGE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
+                add(CommonIcon.EXTRA::get, () -> LegacyComponents.SHOW_DESCRIPTION).
+                add(CommonIcon.CONTROL_PAGE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
     }
 
     @Override

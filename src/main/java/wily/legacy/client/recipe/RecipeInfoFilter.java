@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>>, RecipeAdder {
+public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>>, RecipeInfoAdder {
     ListMap<Identifier, Codec<? extends RecipeInfoFilter>> map = ListMap.<String, Codec<? extends RecipeInfoFilter>>builder().put("id", IdRecipeFilter.CODEC).put("item_tag", ItemTagRecipeFilter.CODEC).put("block_tag", BlockTagRecipeFilter.CODEC).put("item_id", ItemIdRecipeFilter.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
     Codec<RecipeInfoFilter> BY_TYPE_CODEC = new Codec<>() {
         @Override
