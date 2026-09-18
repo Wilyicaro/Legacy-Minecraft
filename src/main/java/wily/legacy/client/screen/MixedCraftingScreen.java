@@ -49,6 +49,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.CompoundComponentIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.recipe.RecipeInfo;
@@ -132,10 +133,10 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
         list.
-                add(EXTRA::get, () -> LegacyComponents.INFO).
-                add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
-                add(() -> searchMode ? VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
-                add(CONTROL_TAB::get, () -> LegacyComponents.GROUP);
+                add(CommonIcon.EXTRA::get, () -> LegacyComponents.INFO).
+                add(CommonIcon.OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
+                add(() -> searchMode ? CommonIcon.VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, CommonIcon.OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
+                add(CommonIcon.CONTROL_TAB::get, () -> LegacyComponents.GROUP);
     }
 
     public void resetElements() {

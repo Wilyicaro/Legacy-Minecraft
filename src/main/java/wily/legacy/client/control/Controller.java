@@ -79,6 +79,21 @@ public interface Controller {
     float axisValue(int i);
 
     /**
+     * Sets the gyro sensor state, if present
+     * @param enabled Gyro sensor state
+     */
+    default void setGyroEnabled(boolean enabled) {
+    }
+
+    /**
+     * @param angularVelocity Float array to receive the gyro data
+     * @return If the gyro data reading was successful
+     */
+    default boolean readGyro(float[] angularVelocity) {
+        return false;
+    }
+
+    /**
      * @return If this controller has LED
      * This always returns true on SDL3 and false on GLFW
      */
@@ -87,6 +102,7 @@ public interface Controller {
     }
 
     /**
+     * Sets the controller LED RGB, if it's present
      * @param r Red RGB value
      * @param g Green RGB value
      * @param b Blue RGB value

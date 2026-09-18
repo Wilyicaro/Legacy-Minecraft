@@ -35,7 +35,6 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 public class LegacyOptions {
     public static final Function<OptionInstance<?>, FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
-    private static boolean suppressPlayerInfoSync = false;
 
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
             Component.translatable("key.sprint"), Component.translatable("options.key.toggleSprint"),
@@ -98,7 +97,7 @@ public class LegacyOptions {
             control = new FactoryConfigControl.FromInt<>(optionInstance.codec(), i -> set.valueListSupplier().getSelectedList().get(i), v-> set.valueListSupplier().getSelectedList().indexOf(v), ()->set.valueListSupplier().getSelectedList().size());
         } else if (optionInstance.values() instanceof OptionInstance.SliderableValueSet<T> set) {
             control = new FactoryConfigControl.FromDouble<>(optionInstance.codec(), set::fromSliderValue, set::toSliderValue);
-        } else return null;
+        } else throw new RuntimeException("Unhandled OptionInstance.ValueSet in FactoryConfig.create! " + optionInstance.values().getClass().getName());
         return FactoryConfig.create(OptionInstanceAccessor.of(optionInstance).getKey(), FactoryConfigDisplay.<T>builder().tooltip(v -> componentFromTooltip(OptionInstanceAccessor.of(optionInstance).tooltip().apply(v))).valueToComponent(optionInstance.toString).messageFunctionLabel((c, v) -> optionInstance.values() instanceof OptionInstance.CycleableValueSet<T> ? CommonComponents.optionNameValue(c, v) : v).build(vanillaCaptionOverrideMap.getOrDefault(optionInstance.caption, optionInstance.caption)), OptionInstanceAccessor.of(optionInstance).defaultValue(), Bearer.of(optionInstance::get, v->{
             if (optionInstance.values() instanceof OptionInstance.CycleableValueSet<T> set) {
                 set.valueSetter().set(optionInstance,v);
@@ -183,7 +182,6 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> skinSelectionInitialized = FactoryConfig.<Boolean>builder().key("skinSelectionInitialized").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Integer> downloadedSkinPackRevision = FactoryConfig.<Integer>builder().key("downloadedSkinPackRevision").control(FactoryConfigControl.of(Codec.INT)).defaultValue(0).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<Boolean> legacyEntityDistance = CLIENT_STORAGE.register(createBoolean("legacyEntityDistance", true));
-    public static final FactoryConfig<Boolean> legacyEntityDistanceInitialized = FactoryConfig.<Boolean>builder().key("legacyEntityDistanceInitialized").control(FactoryConfigControl.of(Codec.BOOL)).defaultValue(false).buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> lastUsedCustomPackId = FactoryConfig.<String>builder().key("lastUsedCustomPackId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> selectedSkinUserId = FactoryConfig.<String>builder().key("selectedSkinUserId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
     public static final FactoryConfig<String> selectedSkinId = FactoryConfig.<String>builder().key("selectedSkinId").control(FactoryConfigControl.of(Codec.STRING)).defaultValue("").buildAndRegister(CLIENT_STORAGE);
@@ -329,9 +327,10 @@ public class LegacyOptions {
 
     private static void syncLegacyClassicWorkstations(boolean enabled) {
         if (!legacySettingsMenus.get()) return;
-        FactoryConfig.saveOptionAndConsume(classicStonecutting, enabled, v -> {});
-        FactoryConfig.saveOptionAndConsume(classicLoom, enabled, v -> {});
-        FactoryConfig.saveOptionAndConsume(classicTrading, enabled, v -> {});
+        classicStonecutting.set(enabled);
+        classicLoom.set(enabled);
+        classicTrading.set(enabled);
+        CLIENT_STORAGE.save();
     }
 
     public static void ensureLegacySettingsMenusUseMergeMode() {
@@ -362,18 +361,9 @@ public class LegacyOptions {
 
     public static boolean canSendPlayerInfoSync() {
         Minecraft minecraft = Minecraft.getInstance();
-        return !suppressPlayerInfoSync && minecraft.player != null && Legacy4JClient.hasModOnServer();
+        return minecraft.player != null && Legacy4JClient.hasModOnServer();
     }
 
-    public static void runWithoutPlayerInfoSync(Runnable runnable) {
-        boolean previous = suppressPlayerInfoSync;
-        suppressPlayerInfoSync = true;
-        try {
-            runnable.run();
-        } finally {
-            suppressPlayerInfoSync = previous;
-        }
-    }
     public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", builder -> builder.valueToComponent(v -> v.displayName), i -> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, () -> ControlTooltipDisplay.values().length, ControlTooltipDisplay.CODEC, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> legacyLoadingAndConnecting = CLIENT_STORAGE.register(createBoolean("legacyLoadingAndConnecting", true));
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
@@ -426,7 +416,7 @@ public class LegacyOptions {
                 "combinedLookSensitivity",
                 mouseSensitivity.getDisplay(),
                 mouseSensitivity.get(),
-                Bearer.of(mouseSensitivity::get, d -> {
+                Bearer.of(mouseSensitivity, d -> {
                     mouseSensitivity.set(d);
                     LegacyControlsOptions.controllerSensitivity.set(d);
                 }),

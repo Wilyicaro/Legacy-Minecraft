@@ -11,13 +11,13 @@ public record IdRecipeFilter(Identifier id) implements RecipeInfoFilter {
     @Override
     public <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
         RecipeInfoFilter.super.addRecipes(validRecipes, recipeAdder);
-        CustomRecipeAdder<T> value = CustomRecipeAdder.ID_RECIPE_INFO_OVERRIDES.get(id);
+        RecipeInfoAdder value = RecipeInfoAdder.ID_RECIPE_INFO_OVERRIDES.get(id);
         if (value != null) value.addRecipes(validRecipes, recipeAdder);
     }
 
     @Override
-    public boolean onlyFirstMatch() {
-        return true;
+    public AdditionMethod additionMethod() {
+        return AdditionMethod.FIRST_MATCH;
     }
 
     @Override

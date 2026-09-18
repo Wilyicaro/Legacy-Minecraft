@@ -8,6 +8,7 @@ import com.mojang.serialization.DynamicOps;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.StringRepresentable;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.util.IOUtil;
@@ -20,7 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
+public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>>, RecipeInfoAdder {
     ListMap<Identifier, Codec<? extends RecipeInfoFilter>> map = ListMap.<String, Codec<? extends RecipeInfoFilter>>builder().put("id", IdRecipeFilter.CODEC).put("item_tag", ItemTagRecipeFilter.CODEC).put("block_tag", BlockTagRecipeFilter.CODEC).put("item_id", ItemIdRecipeFilter.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
     Codec<RecipeInfoFilter> BY_TYPE_CODEC = new Codec<>() {
         @Override
@@ -36,7 +37,7 @@ public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
     };
     Codec<RecipeInfoFilter> CODEC = IOUtil.createFallbackCodec(BY_TYPE_CODEC, Codec.STRING.xmap(RecipeInfoFilter::parse, RecipeInfoFilter::toString));
     Codec<List<RecipeInfoFilter>> LIST_CODEC = CODEC.listOf().xmap(ArrayList::new, Function.identity());
-    Codec<Map<String, List<RecipeInfoFilter>>> LISTING_CODEC = IOUtil.createListingCodec(IOUtil.createFallbackCodec(LIST_CODEC, CODEC.xmap(f -> new ArrayList<>(Collections.singleton(f)), list -> list.get(0))), "group", "recipe", l -> l.get(0).toString());
+    Codec<Map<String, List<RecipeInfoFilter>>> LISTING_CODEC = IOUtil.createListingCodec(IOUtil.createFallbackCodec(LIST_CODEC, CODEC.xmap(f -> new ArrayList<>(Collections.singleton(f)), list -> list.get(0))), "group", "recipes", l -> l.get(0).toString());
 
     static RecipeInfoFilter parse(String s) {
         if (s.startsWith("#"))
@@ -47,18 +48,44 @@ public interface RecipeInfoFilter extends Predicate<RecipeInfo<?>> {
     }
 
     default <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
-        for (RecipeInfo<T> validRecipe : validRecipes) {
-            if (test(validRecipe)) {
-                recipeAdder.accept(validRecipe);
-                if (onlyFirstMatch()) return;
+        if (additionMethod() == AdditionMethod.COLLAPSE) {
+            List<RecipeInfo<T>> collapsed = CollapsedRecipeInfo.group(this, validRecipes);
+            for (RecipeInfo<T> validRecipe : collapsed) {
+                if (test(validRecipe)) {
+                    recipeAdder.accept(validRecipe);
+                }
+            }
+        } else {
+            for (RecipeInfo<T> validRecipe : validRecipes) {
+                if (test(validRecipe)) {
+                    recipeAdder.accept(validRecipe);
+                    if (additionMethod() == AdditionMethod.FIRST_MATCH) return;
+                }
             }
         }
     }
 
-    default boolean onlyFirstMatch() {
-        return false;
+    default AdditionMethod additionMethod() {
+        return AdditionMethod.ALL;
     }
 
     Codec<? extends RecipeInfoFilter> codec();
 
+    enum AdditionMethod implements StringRepresentable {
+        FIRST_MATCH("first_match"),
+        ALL("all"),
+        COLLAPSE("collapse");
+
+        public static final EnumCodec<AdditionMethod> CODEC = StringRepresentable.fromEnum(AdditionMethod::values);
+        private final String name;
+
+        AdditionMethod(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
 }

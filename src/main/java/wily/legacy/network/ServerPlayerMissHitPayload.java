@@ -12,7 +12,9 @@ import java.util.function.Supplier;
 public class ServerPlayerMissHitPayload extends CommonNetwork.EmptyPayload {
     public ServerPlayerMissHitPayload() {
         super(ID);
-    }    public static final CommonNetwork.Identifier<ServerPlayerMissHitPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_player_miss_hit"), ServerPlayerMissHitPayload::new);
+    }
+
+    public static final CommonNetwork.Identifier<ServerPlayerMissHitPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_player_miss_hit"), ServerPlayerMissHitPayload::new);
 
     @Override
     public void apply(Context context) {
