@@ -90,7 +90,6 @@ import net.minecraft.world.phys.HitResult;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.client.control.*;
-import wily.legacy.client.control.tooltip.ControlTooltip;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
@@ -154,7 +153,6 @@ public class Legacy4JClient {
     public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.createModLocation("loom_tab_listing"), LoomTabListing.CODEC);
     public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("type_crafting_tabs"), TypeCraftingTab.CODEC);
     public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
-    public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
     public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
@@ -475,6 +473,7 @@ public class Legacy4JClient {
     public static void init() {
         SkinsClientBootstrap.init();
         GlobalLeaderboardsFeature.init();
+        LegacyControls.init();
         UIDefinitionManager.registerNamedUITarget("book_edit_screen", BookEditScreen.class);
         UIDefinitionManager.registerNamedUITarget("book_sign_screen", BookSignScreen.class);
         UIDefinitionManager.registerNamedUITarget("book_view_screen", BookViewScreen.class);
@@ -525,7 +524,6 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, loomListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, typeCraftingTabs);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, mixedCraftingTabs);
-        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, howToPlaySectionManager);
         FactoryOptions.NEAREST_MIPMAP_SCALING.setDefault(true);

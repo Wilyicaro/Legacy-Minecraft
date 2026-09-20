@@ -15,6 +15,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
@@ -29,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
 
 public class LegacyStonecutterScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIconHolder<StonecutterRecipe>> {
@@ -57,7 +56,7 @@ public class LegacyStonecutterScreen extends RecipesScreen<LegacyCraftingMenu, R
     @Override
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
-        list.add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
+        list.add(CommonIcon.OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
     }
 
     @Override

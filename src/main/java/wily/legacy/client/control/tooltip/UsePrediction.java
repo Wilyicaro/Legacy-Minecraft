@@ -433,6 +433,7 @@ public class UsePrediction {
     public static final ControlTooltip.ActionHolder BLOW_INSTRUMENT = registerUseItem("blow_instrument", ctx -> ctx.itemStack.getItem() instanceof InstrumentItem && !ctx.player.isUsingItem(), LegacyComponents.BLOW);
     public static final ControlTooltip.ActionHolder RELEASE_BUNDLE = registerUseItem("release_bundle", ctx -> ControlTooltip.isBundle(ctx.itemStack) && BundleItem.getFullnessDisplay(ctx.itemStack) > 0, LegacyComponents.RELEASE);
     public static final ControlTooltip.ActionHolder CONSUME_ITEM = registerUseItem("consume_item", ctx -> isConsumable(ctx.itemStack, ctx.player) ? isDrinkable(ctx.itemStack) ? LegacyComponents.DRINK : LegacyComponents.EAT : null);
+    public static final ControlTooltip.ActionHolder CHARGE_KINETIC_WEAPON = registerUseItem("charge_kinectic_weapon", ctx -> ctx.itemStack.has(DataComponents.KINETIC_WEAPON) && !ctx.player.isUsingItem(), LegacyComponents.CHARGE);
 
     public static ControlTooltip.ActionHolder registerGenericUse(String id, Function<Player, Component> function) {
         ControlTooltip.ActionHolder holder = ctx -> ctx instanceof Player p ? function.apply(p) : null;

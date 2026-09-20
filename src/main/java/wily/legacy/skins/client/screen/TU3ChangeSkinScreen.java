@@ -14,7 +14,7 @@ import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.client.control.ControllerManager;
-import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
@@ -470,7 +470,7 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     public void addControlTooltips(ControlTooltipList r) {
         addCommonControlTooltips(
                 r,
-                ControlTooltip.POINTER_MOVEMENT::get,
+                CommonIcon.POINTER_MOVEMENT::get,
                 () -> Component.literal("Navigate")
         );
     }

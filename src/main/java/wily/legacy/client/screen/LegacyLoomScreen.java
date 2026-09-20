@@ -31,6 +31,7 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.client.LoomTabListing;
 import wily.legacy.client.control.tooltip.ControlTooltip;
@@ -50,7 +51,6 @@ import wily.legacy.util.client.LegacySoundUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 import static wily.legacy.client.screen.LegacyCraftingScreen.clearIngredients;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
@@ -153,10 +153,10 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
         list.
-                add(OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
-                add(ControlTooltip.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE_PATTERN : null).
-                add(CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.CHANGE_GROUP).
-                add(CONTROL_TYPE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
+                add(CommonIcon.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
+                add(CommonIcon.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE_PATTERN : null).
+                add(CommonIcon.CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.CHANGE_GROUP).
+                add(CommonIcon.CONTROL_TYPE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
     }
 
     public void resetElements() {

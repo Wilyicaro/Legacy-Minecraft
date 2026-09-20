@@ -44,6 +44,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.control.*;
 import wily.legacy.client.control.navigation.LegacyMenuAccess;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 import wily.legacy.util.*;
@@ -160,7 +161,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         list.
                 replace(2, i -> i, a -> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3, i -> i, a -> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(() -> page.max > 0 ? CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
+                add(() -> page.max > 0 ? CommonIcon.CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
                 add(() -> canClearQuickSelect() && ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : null, () -> LegacyComponents.CLEAR_QUICK_SELECT);
     }
 
