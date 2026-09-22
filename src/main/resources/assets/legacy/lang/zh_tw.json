@@ -2089,6 +2089,7 @@
   "legacy.options.autoSaveWhenPaused": "遊戲暫停時自動保存",
   "legacy.options.auto_value": "Auto (%s)",
   "legacy.options.backSound": "Back Sound",
+  "legacy.options.bedrockBridging": "Bedrock Bridging",
   "legacy.options.bubblesOutsideWater": "Bubbles Outside Water",
   "legacy.options.caveSounds": "洞穴音效",
   "legacy.options.classicCrafting": "經典合成介面",
