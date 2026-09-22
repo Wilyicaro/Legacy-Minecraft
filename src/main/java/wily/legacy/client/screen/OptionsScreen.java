@@ -405,6 +405,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.vehicleCameraRotation,
                                 LegacyOptions.create(mc.options.rotateWithMinecart()),
                                 LegacyOptions.legacyCreativeBlockPlacing,
+                                LegacyOptions.bedrockBridging,
                                 LegacyOptions.mapsWithCoords,
                                 LegacyOptions.vanillaTutorial,
                                 LegacyOptions.forceLegacyFlight,
