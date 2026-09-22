@@ -15,6 +15,7 @@
           "elements": {
             "text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
                 "translate": "legacy.menu.how_to_play.ender-chest_message"
               },
@@ -22,6 +23,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.ender-chest_message_1"
               },
@@ -77,6 +79,7 @@
           "elements": {
             "text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
                 "translate": "legacy.menu.how_to_play.ender-chest_message",
                 "font": "legacy:default_11",
@@ -90,6 +93,7 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.ender-chest_message_1",
                 "font": "legacy:default_11"
