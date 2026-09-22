@@ -64,7 +64,7 @@ public abstract class PlayerMixin extends LivingEntity {
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
         if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
-        cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
+        cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 1.3f : 2) : 1));
     }
 
     @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
