@@ -2089,6 +2089,7 @@
   "legacy.options.autoSaveWhenPaused": "Sauvegarde automatique en pause",
   "legacy.options.auto_value": "Auto (%s)",
   "legacy.options.backSound": "Son de retour",
+  "legacy.options.bedrockBridging": "Bedrock Bridging",
   "legacy.options.bubblesOutsideWater": "Bulles hors de l'eau",
   "legacy.options.caveSounds": "Sons de caverne",
   "legacy.options.classicCrafting": "Fabrication classique",
