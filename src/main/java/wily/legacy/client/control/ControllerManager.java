@@ -23,6 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
@@ -466,7 +467,9 @@ public class ControllerManager {
                     keyMapping.setDown(false);
                 } else {
                     if (handleDebugKeyMapping(keyMapping, state)) continue;
-                    if (state.canClick()) keyMapping.clickCount++;
+                    boolean breakingCreativeBlock = keyMapping == minecraft.options.keyAttack && minecraft.player != null && minecraft.player.getAbilities().instabuild
+                            && minecraft.hitResult != null && minecraft.hitResult.getType() == HitResult.Type.BLOCK;
+                    if (state.canClick() && (!breakingCreativeBlock || state.justPressed)) keyMapping.clickCount++;
                     if (state.pressed && state.canDownKeyMapping(keyMapping)) keyMapping.setDown(true);
                     else if (state.canReleaseKeyMapping(keyMapping)) keyMapping.setDown(false);
                     if (state.pressed) {

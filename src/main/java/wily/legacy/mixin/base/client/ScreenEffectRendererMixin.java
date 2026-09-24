@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.LegacyActivationAnim;
+import wily.legacy.client.LegacyOptions;
 
 import java.util.Collections;
 import java.util.List;
@@ -75,7 +76,7 @@ public abstract class ScreenEffectRendererMixin {
 
     @Redirect(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isOnFire()Z"))
     private boolean renderScreenEffect(LocalPlayer player) {
-        return player.isOnFire() && !player.hasEffect(MobEffects.FIRE_RESISTANCE);
+        return player.isOnFire() && (!LegacyOptions.hideFireWithResistance.get() || !player.hasEffect(MobEffects.FIRE_RESISTANCE));
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
