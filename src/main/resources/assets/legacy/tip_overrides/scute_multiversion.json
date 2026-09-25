@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "items": ["scute","turtle_scute"],
+    "tip": {"translate": "block.minecraft.scute.tip"}
+  }
+}

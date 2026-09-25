@@ -37,10 +37,10 @@
           },
           "width": 433
         },
-        "sea-turtles": {
+        "turtles": {
           "type": "draw_multiline_string",
           "component": {
-            "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles"
+            "translate": "legacy.menu.how_to_play.ocean-mobs_turtles"
           },
           "width": 433
         },
@@ -124,10 +124,10 @@
           "width": 268,
           "lineSpacing": 8
         },
-        "sea-turtles": {
+        "turtles": {
           "type": "draw_multiline_string",
           "component": {
-            "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles",
+            "translate": "legacy.menu.how_to_play.ocean-mobs_turtles",
             "font": "legacy:default_11"
           },
           "width": 268,

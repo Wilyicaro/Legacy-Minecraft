@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["torch", "copper_torch"],
+    "tip": {"translate": "block.minecraft.torch.tip"}
+  }
+}

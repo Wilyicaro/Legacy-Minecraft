@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "blocks": ["copper_golem_statue","exposed_copper_golem_statue","weathered_copper_golem_statue","oxidized_copper_golem_statue"],
+      "tip": {"translate": "block.minecraft.copper_golem_statue.tip"}
+    },
+    {
+      "blocks": ["waxed_copper_golem_statue","waxed_exposed_copper_golem_statue","waxed_weathered_copper_golem_statue","waxed_oxidized_copper_golem_statue"],
+      "tip": {"translate": "block.minecraft.waxed_copper_golem_statue.tip"}
+    }
+  ]
+}
