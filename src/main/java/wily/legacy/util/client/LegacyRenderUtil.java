@@ -68,9 +68,7 @@ import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.ControllerManager;
-import wily.legacy.skins.skin.ClientSkinAssets;
+import wily.legacy.client.control.access.InternalControlAccess;import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
 import wily.legacy.skins.skin.SkinIdUtil;
@@ -84,12 +82,11 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.control.tooltip.ControlTooltip.MORE;
+import static wily.legacy.client.control.access.InternalControlAccess.MORE;
 
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
@@ -166,7 +163,7 @@ public class LegacyRenderUtil {
     }
 
     public static boolean hasLegacyLogo() {
-        return ControlType.getActiveType().minecraftLogo().flatMap(mc.getResourceManager()::getResource).isPresent() || mc.getResourceManager().getResource(LegacyRenderUtil.MINECRAFT).isPresent();
+        return InternalControlAccess.getInstance().currentMinecraftLogo().flatMap(mc.getResourceManager()::getResource).isPresent() || mc.getResourceManager().getResource(LegacyRenderUtil.MINECRAFT).isPresent();
     }
 
     public static void renderLegacyLogo(GuiGraphicsExtractor GuiGraphicsExtractor, int y) {
@@ -174,7 +171,7 @@ public class LegacyRenderUtil {
         GuiGraphicsExtractor.pose().pushMatrix();
         GuiGraphicsExtractor.pose().translate((GuiGraphicsExtractor.guiWidth() - 285.5f * getLogoScale()) / 2, y);
         GuiGraphicsExtractor.pose().scale(0.5f * getLogoScale(), 0.5f * getLogoScale());
-        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : ControlType.getActiveType().minecraftLogo().get(), 0, 0, 0, 0, 571, 138, 571, 138);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : InternalControlAccess.getInstance().currentMinecraftLogo().get(), 0, 0, 0, 0, 571, 138, 571, 138);
         GuiGraphicsExtractor.pose().popMatrix();
         FactoryScreenUtil.disableBlend();
     }
@@ -697,8 +694,8 @@ public class LegacyRenderUtil {
         int p = vector2ic.x();
         int q = vector2ic.y();
         graphics.pose().pushMatrix();
-        if (i == (int) ControllerManager.getInstance().getPointerX() && j == (int) ControllerManager.getInstance().getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
-            graphics.pose().translate((float) (ControllerManager.getInstance().getPointerX() - i), (float) (ControllerManager.getInstance().getPointerY() - j));
+        if (i == (int) InternalControlAccess.getInstance().getPointerX() && j == (int) InternalControlAccess.getInstance().getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
+            graphics.pose().translate((float) (InternalControlAccess.getInstance().getPointerX() - i), (float) (InternalControlAccess.getInstance().getPointerY() - j));
         graphics.pose().translate(p, q);
         int scaledWidth = Math.round(scale * k);
         int scaledHeight = Math.round(scale * l);
@@ -815,9 +812,9 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.enableDepthTest();
         }
 
-        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !ControllerManager.getInstance().isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
+        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !InternalControlAccess.getInstance().isCursorDisabled() && !LegacyOptions.hasSystemCursor()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(ControllerManager.getInstance().getVisualPointerX() + LegacyTipManager.getTipXOffset(), ControllerManager.getInstance().getVisualPointerY());
+            graphics.pose().translate(InternalControlAccess.getInstance().getVisualPointerX() + LegacyTipManager.getTipXOffset(), InternalControlAccess.getInstance().getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(LegacyOptions.getUIMode().isFHD() ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
         }

@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.access.InternalControlAccess;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.skins.skin.SkinIdUtil;
@@ -339,7 +339,7 @@ public final class ChangeSkinPackList {
             extractDefaultSprite(graphics);
             renderString(graphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             if (isDimmedPack()) graphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), DIM_OVERLAY);
-            if (!owner.reorderMode && !ControlType.getActiveType().isKbm() && isFocused() && packIndex >= 0 && owner.focusedPackIndex != packIndex)
+            if (!owner.reorderMode && !InternalControlAccess.getInstance().isKbm() && isFocused() && packIndex >= 0 && owner.focusedPackIndex != packIndex)
                 owner.setFocusedPackIndex(packIndex, false);
         }
 

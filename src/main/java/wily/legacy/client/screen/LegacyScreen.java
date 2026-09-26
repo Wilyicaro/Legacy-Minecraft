@@ -4,12 +4,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.client.control.ControllerListener;
-import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
-public class LegacyScreen extends Screen implements ControllerListener, ControlTooltip.Listener {
+public class LegacyScreen extends Screen {
     protected final UIAccessor accessor = UIAccessor.of(this);
     public Screen parent;
 

@@ -17,11 +17,7 @@ import net.minecraft.util.FormattedCharSequence;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.tooltip.ControlTooltip;
-import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -131,13 +127,6 @@ public class ChooseUserScreen extends PanelVListScreen {
                 }).build());
             }
         };
-    }
-
-    @Override
-    public void addControlTooltips(ControlTooltipList list) {
-        super.addControlTooltips(list);
-        list.add(() -> getFocused() == null || renderableVList.renderables.indexOf(getFocused()) <= 0 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> ACCOUNT_OPTIONS);
-        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_LOGIN);
     }
 
     @Override

@@ -1,8 +1,6 @@
 package wily.legacy.client.control.navigation;
 
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.navigation.ScreenAxis;
-import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,8 +10,6 @@ import wily.legacy.client.control.ControllerManager;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.TabList;
 import wily.legacy.util.client.LegacyRenderUtil;
-
-import java.util.Comparator;
 
 public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, ControllerListener {
     default boolean movePointerToSlot(Slot s) {

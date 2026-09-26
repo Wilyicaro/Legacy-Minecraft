@@ -33,7 +33,6 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.LegacyTags;
@@ -41,7 +40,7 @@ import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
-public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
+public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry {
     private static final float ITEM_PADDING = 1.0f;
     private static final float ITEM_SCALE = 14.0f / 16.0f;
     private static final float TRAPDOOR_Y_OFFSET = -2.0f;
@@ -416,10 +415,5 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
 
     public int getMinSize() {
         return Math.min(getWidth(), getHeight());
-    }
-
-    @Override
-    public @Nullable Component getAction(Object context) {
-        return ControlTooltip.getSelectAction(this, context);
     }
 }

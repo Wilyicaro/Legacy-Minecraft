@@ -25,5 +25,8 @@
     "fabric-api": "*",
     "factory_api": ">=${factory_api_version}",
     "minecraft": ["${mc_version_range}"]
-  }
+  },
+  "mixins": [
+    "controller.mixins.json"
+  ]
 }

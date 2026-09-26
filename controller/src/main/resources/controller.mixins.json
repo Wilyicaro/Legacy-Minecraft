@@ -1,0 +1,20 @@
+{
+  "refmap": "legacy.refmap.json",
+  "required": true,
+  "package": "wily.legacy.control.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "plugin": "wily.legacy.mixin.LegacyMixinPlugin",
+  "client": [
+    "TU3ChangeSkinScreenMixin",
+    "controllerlistener.LegacyScreenMixin",
+    "controltooltiplistener.ChooseUserScreenMixin",
+    "controltooltiplistener.LegacyLoadingScreenMixin",
+    "controltooltiplistener.LegacyScreenMixin"
+  ],
+  "mixins": [
+    "actionholder.LegacyIconHolderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
