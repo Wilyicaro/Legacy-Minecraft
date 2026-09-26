@@ -24,14 +24,19 @@ plugins {
     id("dev.kikugie.stonecutter") version "0.9"
 }
 
+include("base")
 stonecutter {
-    create(rootProject) {
-        fun match(version: String, vararg loaders: String) =
-            loaders.forEach { version("$version-$it", version).buildscript = "build.${if (it == "fabric" && stonecutter.eval(version, ">=26.1")) "fabricmc" else it}.gradle.kts" }
-
-        match("26.1.2", "fabric", "forge", "neoforge")
+    create("base") {
+        branch("") {
+            fun match(version: String, vararg loaders: String) =
+                loaders.forEach {
+                    version("$version-$it", version).buildscript = "../build.${if (it == "fabric") "fabricmc" else it}.gradle.kts"
+                }
+            match("26.1.2", "fabric", "forge", "neoforge")
+        }
         vcsVersion = "26.1.2-fabric"
     }
+//    create(rootProject)
 }
 
 rootProject.name = "Legacy4J"
