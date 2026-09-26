@@ -97,7 +97,7 @@ tasks.withType<Javadoc> {
 	enabled = false
 }
 
-if (sc.current.isActive) {
+if (sc.current.isActive && project.path.startsWith(":base:")) {
 	sourceSets {
 		main {
 			java {

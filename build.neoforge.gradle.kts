@@ -94,7 +94,7 @@ tasks.named("createMinecraftArtifacts") {
 	dependsOn(tasks.named("stonecutterGenerate"))
 }
 
-if (sc.current.isActive) {
+if (sc.current.isActive && project.path.startsWith(":base:")) {
 	sourceSets {
 		main {
 			java {
