@@ -145,3 +145,16 @@ sourceSets {
 tasks.withType<Javadoc> {
 	enabled = false
 }
+
+if (sc.current.isActive) {
+	sourceSets {
+		main {
+			java {
+				setSrcDirs(listOf(rootProject.file("src/main/java")))
+			}
+			resources {
+				setSrcDirs(listOf(rootProject.file("src/main/resources")))
+			}
+		}
+	}
+}

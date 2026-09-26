@@ -93,3 +93,16 @@ tasks.withType<Javadoc> {
 tasks.named("createMinecraftArtifacts") {
 	dependsOn(tasks.named("stonecutterGenerate"))
 }
+
+if (sc.current.isActive) {
+	sourceSets {
+		main {
+			java {
+				setSrcDirs(listOf(rootProject.file("src/main/java")))
+			}
+			resources {
+				setSrcDirs(listOf(rootProject.file("src/main/resources")))
+			}
+		}
+	}
+}
