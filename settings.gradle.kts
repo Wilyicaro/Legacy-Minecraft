@@ -26,16 +26,33 @@ plugins {
 
 include("base")
 stonecutter {
-    create("base") {
-        branch("") {
+    create(rootProject) {
+        branch("base") {
             fun match(version: String, vararg loaders: String) =
                 loaders.forEach {
                     version("$version-$it", version).buildscript = "../build.${if (it == "fabric") "fabricmc" else it}.gradle.kts"
                 }
             match("26.1.2", "fabric", "forge", "neoforge")
         }
+        branch("controller") {
+            fun match(version: String, vararg loaders: String) =
+                loaders.forEach {
+                    version("$version-$it", version).buildscript = "../build.${if (it == "fabric") "fabricmc" else it}.gradle.kts"
+                }
+            match("26.1.2", "fabric"/*, "forge", "neoforge"*/)
+        }
         vcsVersion = "26.1.2-fabric"
     }
+//    create("base") {
+//        branch("") {
+//            fun match(version: String, vararg loaders: String) =
+//                loaders.forEach {
+//                    version("$version-$it", version).buildscript = "../build.${if (it == "fabric") "fabricmc" else it}.gradle.kts"
+//                }
+//            match("26.1.2", "fabric", "forge", "neoforge")
+//        }
+//        vcsVersion = "26.1.2-fabric"
+//    }
 //    create(rootProject)
 }
 

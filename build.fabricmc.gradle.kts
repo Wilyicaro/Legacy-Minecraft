@@ -92,6 +92,8 @@ dependencies {
 		api(include("org.apache.httpcomponents:httpcore:4.4.16") as Any)
 		api(include("commons-logging:commons-logging:1.2") as Any)
 		api(include("commons-codec:commons-codec:1.11") as Any)
+	} else {
+		implementation(project(":base:" + stonecutter.current.version + "-fabric"))
 	}
 }
 
