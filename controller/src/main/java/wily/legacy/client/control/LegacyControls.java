@@ -2,7 +2,6 @@ package wily.legacy.client.control;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.PackType;
-import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryEvent;
 import wily.legacy.client.control.tooltip.GuiControlTooltip;
 

@@ -12,12 +12,6 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.LegacyKeyMapping;
-import wily.legacy.client.control.tooltip.CommonIcon;
-import wily.legacy.client.control.tooltip.ComponentIcon;
-import wily.legacy.client.control.tooltip.ControlTooltip;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.network.TopMessage;
 
 public class LegacyGuiElements {
@@ -50,8 +44,6 @@ public class LegacyGuiElements {
             lastHotbarSelection = newSelection;
         });
         FactoryGuiElement.HOTBAR.post().register(GuiGraphicsExtractor -> {
-            if (minecraft.player != null)
-                ControlTooltipRenderer.of(minecraft.gui).extractRenderState(GuiGraphicsExtractor, 0, 0, FactoryAPIClient.getPartialTick());
             LegacyRenderUtil.renderTopText(GuiGraphicsExtractor, TopMessage.small, 21, 1.0f, TopMessage.smallTicks);
             LegacyRenderUtil.renderTopText(GuiGraphicsExtractor, TopMessage.medium, 37, 1.5f, TopMessage.mediumTicks);
         });
@@ -96,15 +88,6 @@ public class LegacyGuiElements {
         FactoryAPIClient.uiDefinitionManager.staticList.add(UIDefinition.createBeforeInit(a -> {
             CommonValue.COMMON_VALUES.forEach((s, c) -> a.getElements().put("commonValue." + s.toShortLanguageKey(), c));
             CommonColor.COMMON_COLORS.forEach((s, c) -> a.getElements().put("commonColor." + s.toShortLanguageKey(), c));
-            CommonIcon.commonIcons.forEach((s, i) -> {
-                a.getElements().put("controlIcon." + s, i.map(ComponentIcon::getComponent));
-            });
-            for (KeyMapping keyMapping : minecraft.options.keyMappings) {
-                a.getElements().put("controlIcon." + keyMapping.getName(), () -> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));
-            }
-            Legacy4JClient.controlTypesManager.map().forEach((s, c) -> {
-                a.getElements().put("activeControlType." + s, () -> ControlType.getActiveType().equals(c));
-            });
 
             for (int i = 1; i < LegacyOptions.UIMode.values().length; i++) {
                 LegacyOptions.UIMode uiMode = LegacyOptions.UIMode.values()[i];

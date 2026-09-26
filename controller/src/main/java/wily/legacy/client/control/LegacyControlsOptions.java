@@ -9,11 +9,9 @@ import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 public class LegacyControlsOptions {
     public static final FactoryConfig.StorageHandler STORAGE = new FactoryConfig.StorageHandler() {

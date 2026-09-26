@@ -7,7 +7,6 @@ import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.control.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
