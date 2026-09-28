@@ -26,8 +26,6 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final int PACK_LIST_FOOTER_RESERVE = 12;
-    private static final int PACK_BUTTON_BORDER_OVERLAP = 1;
-    private static final int PADLOCK_TEXTURE_SIZE = 32;
     private static final int HEART_TEXTURE_SIZE = 9;
     private static final int PACK_BUTTON_BASE_HEIGHT = 20;
 
@@ -58,7 +56,6 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final float HEART_HOLDER_OFFSET_Y = -2.0f / 117.0f;
     private static final Identifier
             CHANGE_SKIN_FRAME = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/change_skin_frame"),
-            PADLOCK_TEXTURE = Identifier.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/padlock.png"),
             HEART_CONTAINER = Identifier.fromNamespaceAndPath("minecraft", "hud/heart/container"),
             HEART_FULL = Identifier.fromNamespaceAndPath("minecraft", "hud/heart/full");
 
@@ -150,11 +147,6 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         return Math.max(1, panel.y + panel.height - sc(PACK_LIST_BOTTOM_INSET) - minY);
     }
 
-    private int adjustPackListHeight(int height) {
-        int visibleRowsHeight = resolvedPackRowHeight * visiblePackRows();
-        return Math.max(1, Math.min(height, visibleRowsHeight + PACK_LIST_FOOTER_RESERVE));
-    }
-
     private int centerTextX() {
         if (playerSkinWidgetList != null && playerSkinWidgetList.getCenter() != null)
             return playerSkinWidgetList.getCenterAnchorX();
@@ -223,23 +215,14 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private float compactTextScale() {
-        return Math.clamp(
-                uiScale / accessor.getFloat("text.compactReferenceScale", 0.94116f),
-                accessor.getFloat("text.compactMinScale", 0.52f),
-                1.0f
-        );
+        float referenceScale = accessor.getFloat("text.compactReferenceScale", 0.94116f);
+        return Math.clamp(uiScale / referenceScale, accessor.getFloat("text.compactMinScale", 0.52f), 1.0f);
     }
 
     private Component packLabel(SkinPack pack) {
-        if (isReorderingCustomPack()) return Component.translatable("legacy.menu.reorder_custom_skin_pack");
-        if (isEditingCustomPack()) return Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
-        return packSubtitle(pack);
-    }
-
-    @Override
-    protected int previewBoxX() {
-        int size = previewBoxSize();
-        return panel.x + Math.max(sc(7), (panel.width - size) / 2);
+        if (customPacks.isReordering()) return Component.translatable("legacy.menu.reorder_custom_skin_pack");
+        if (customPacks.isEditing()) return Component.translatable("legacy.menu.edit_custom_skin_pack_skins");
+        return source.packSubtitle(pack);
     }
 
     @Override
@@ -261,15 +244,16 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
                 int groupWidth = panel.width + tooltipWidth - 2;
                 int desiredGroupX = (ChangeSkinScreen.this.width - groupWidth) / 2;
                 panel.x = desiredGroupX;
-                int minX = sc(layoutProfile.tooltipGroupMargin()), maxX = ChangeSkinScreen.this.width - groupWidth - sc(layoutProfile.tooltipGroupMargin());
+                int margin = sc(ChangeSkinScreen.this.accessor.getInteger("layout.tooltip.groupMargin", 6));
+                int minX = margin, maxX = ChangeSkinScreen.this.width - groupWidth - margin;
                 if (maxX < minX) maxX = minX;
                 panel.x = Math.clamp(panel.x, minX, maxX);
-                int minY = sc(layoutProfile.tooltipGroupMargin());
+                int minY = margin;
                 int groupBottomTrim = Math.max(0, sc(layoutProfile.tooltipYOffset() - layoutProfile.tooltipHeightInset()));
                 int groupHeight = panel.height + groupBottomTrim;
                 int desiredGroupY = (ChangeSkinScreen.this.height - groupHeight) / 2;
                 panel.y = desiredGroupY;
-                int maxY = ChangeSkinScreen.this.height - controlTooltipFooterReserve() - groupHeight - sc(layoutProfile.tooltipGroupMargin());
+                int maxY = ChangeSkinScreen.this.height - controlTooltipFooterReserve() - groupHeight - margin;
                 if (maxY < minY) maxY = minY;
                 panel.y = Math.clamp(panel.y, minY, maxY);
                 appearance(LegacySprites.POINTER_PANEL, tooltipWidth, panel.height - sc(layoutProfile.tooltipHeightInset()));
@@ -291,11 +275,8 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     protected boolean isInCarouselBounds(double mx, double my) {
         if (tooltipBox == null || panel == null) return false;
-        int clipLeft = carouselClipLeft();
-        int clipTop = tooltipContentTop();
-        int clipRight = carouselClipRight();
-        int clipBottom = tooltipContentBottom() - sc(getLayoutMetrics().carouselClipBottomTrim());
-        return inside(mx, my, clipLeft, clipTop, Math.max(1, clipRight - clipLeft), Math.max(1, clipBottom - clipTop));
+        int left = carouselClipLeft(), top = tooltipContentTop();
+        return inside(mx, my, left, top, Math.max(1, carouselClipRight() - left), Math.max(1, carouselClipBottom() - top));
     }
 
     @Override
@@ -309,6 +290,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private int carouselClipRight() {
         return previewOpeningRight(changeSkinFrameBounds());
+    }
+
+    private int carouselClipBottom() {
+        return tooltipContentBottom() - sc(carouselInt("clipBottomTrim", 24));
     }
 
     @Override
@@ -325,7 +310,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int x = frameX + sc(4);
         int w = Math.max(1, frameW - sc(8));
         packList.refreshPackIdsIfNeeded();
-        packList.setReorderMode(isReorderingCustomPack());
+        packList.setReorderMode(customPacks.isReordering());
         int visibleRows = visiblePackRows();
         int maxListBottom = arrowTop - Math.round(arrowHeight * 0.75f);
         int rowPitch = Math.max(10, resolvedPackRowHeight);
@@ -432,7 +417,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void syncPackFocus() {
-        if (isReorderingCustomPack()) {
+        if (customPacks.isReordering()) {
             String packId = customPacks.reorderingPackId();
             if (packId != null) packList.focusPackId(packId, false);
         }
@@ -445,7 +430,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private void startHoldingPackStick(int dir) {
         packHold.start(dir);
-        if (isReorderingCustomPack()) customPacks.moveReorderingPack(packHold.dir());
+        if (customPacks.isReordering()) customPacks.moveReorderingPack(packHold.dir());
         else if (focusRelativePack(packHold.dir(), true)) applyQueuedPackChange();
     }
 
@@ -455,7 +440,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
 
     private void pumpHoldingPackStick() {
         if (!packHold.ready()) return;
-        if (isReorderingCustomPack()) customPacks.moveReorderingPack(packHold.dir());
+        if (customPacks.isReordering()) customPacks.moveReorderingPack(packHold.dir());
         else if (focusRelativePack(packHold.dir(), true)) applyQueuedPackChange();
         packHold.step();
     }
@@ -464,7 +449,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     public boolean mouseClicked(MouseButtonEvent e, boolean bl) {
         if (handleCarouselMouseClicked(e, bl)) return true;
         double mx = e.x(), my = e.y();
-        if (isReorderingCustomPack() && e.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (customPacks.isReordering() && e.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             ChangeSkinPackList.PackButton packButton = pickPackButton(mx, my);
             if (packButton != null) {
                 customPacks.moveReorderingPackTo(packButton.getPackIndex());
@@ -574,22 +559,22 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         boolean isAuto = SkinIdUtil.isAutoSelect(selected);
         boolean isAutoActive = current == null || current.isBlank();
         boolean isImport = customPacks.isImportSkinSelection(selected);
-        boolean reordering = isReorderingCustomPack();
-        boolean editing = isEditingCustomPack();
+        boolean reordering = customPacks.isReordering();
+        boolean editing = customPacks.isEditing();
         boolean locked = customPacks.isLockedSkinSelection(selected);
 
         if (reordering) {
             drawTick(g, footer.primaryAction());
         } else if (editing) {
             if (isImport || locked) {
-                drawPadlock(g, footer.primaryAction());
+                drawActionSprite(g, LegacySprites.PADLOCK, footer.primaryAction());
             } else if (selected != null) {
                 drawTick(g, footer.primaryAction());
             }
             if (customPacks.isRemovableSkinSelection(selected))
                 drawActionSprite(g, LegacySprites.ERROR_CROSS, footer.secondaryAction());
         } else if (isImport) {
-            drawPadlock(g, footer.primaryAction());
+            drawActionSprite(g, LegacySprites.PADLOCK, footer.primaryAction());
         } else if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
             drawTick(g, footer.primaryAction());
         }
@@ -598,11 +583,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     private void updateCarouselClip() {
-        int clipLeft = carouselClipLeft();
-        int clipTop = tooltipContentTop();
-        int clipRight = carouselClipRight();
-        int clipBottom = tooltipContentBottom() - sc(getLayoutMetrics().carouselClipBottomTrim());
-        PlayerSkinWidget.setCarouselClip(clipLeft, clipTop, clipRight, clipBottom);
+        PlayerSkinWidget.setCarouselClip(carouselClipLeft(), tooltipContentTop(), carouselClipRight(), carouselClipBottom());
     }
 
     private void renderSelectedSkinText(GuiGraphicsExtractor g, FrameFooterLayout footer) {
@@ -705,21 +686,6 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (fittedSize >= fullSize) return fullSize;
         if (fittedSize >= sourceSize) return sourceSize;
         return fittedSize;
-    }
-
-    private void drawPadlock(GuiGraphicsExtractor guiGraphics, Bounds holder) {
-        float size = Math.max(1f, holder.width() - 8f);
-        float scale = size / PADLOCK_TEXTURE_SIZE;
-        float left = holder.x() + (holder.width() - PADLOCK_TEXTURE_SIZE * scale) / 2.0f;
-        float top = holder.y() + (holder.height() - PADLOCK_TEXTURE_SIZE * scale) / 2.0f;
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(left, top);
-        guiGraphics.pose().scale(scale, scale);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, PADLOCK_TEXTURE,
-                0, 0, 0, 0,
-                PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE,
-                PADLOCK_TEXTURE_SIZE, PADLOCK_TEXTURE_SIZE);
-        guiGraphics.pose().popMatrix();
     }
 
     private void drawFavoriteHeart(GuiGraphicsExtractor guiGraphics, Bounds holder) {

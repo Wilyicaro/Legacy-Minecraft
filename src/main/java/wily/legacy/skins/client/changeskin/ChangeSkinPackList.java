@@ -313,10 +313,6 @@ public final class ChangeSkinPackList {
             return packIndex;
         }
 
-        private boolean isMovingPack() {
-            return owner.reorderMode && packIndex >= 0 && owner.focusedPackIndex == packIndex;
-        }
-
         private boolean isDimmedPack() {
             return owner.reorderMode && packIndex >= 0 && owner.focusedPackIndex != packIndex;
         }
