@@ -2179,6 +2179,7 @@
   "legacy.options.invertControllerButtons": "Käännä Painikkeiden Asettelu",
   "legacy.options.invertYController": "Käännä Katselu",
   "legacy.options.gyroElytraControls": "Gyro Elytra Controls",
+  "legacy.options.gyroAimControls": "Gyro Aim Controls",
   "legacy.options.gyroSensitivity": "Gyro Sensitivity",
   "legacy.options.invertGyroY": "Invert Gyro Look",
   "legacy.options.invertedCrosshair": "Näytä Käänteinen Tähtäin",
