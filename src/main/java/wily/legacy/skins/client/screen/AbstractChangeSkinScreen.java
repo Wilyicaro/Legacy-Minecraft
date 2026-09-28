@@ -1349,11 +1349,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         private int dir;
         private long startAt, nextAt;
 
-        public boolean active() {
+        boolean active() {
             return dir != 0;
         }
 
-        public int dir() {
+        int dir() {
             return dir;
         }
 
