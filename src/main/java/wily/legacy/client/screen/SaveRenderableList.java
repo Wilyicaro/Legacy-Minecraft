@@ -37,6 +37,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.CreateWorldPreload;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.control.tooltip.ControlTooltip;
@@ -201,7 +202,8 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     private CompletableFuture<List<LevelSummary>> loadLevels() {
-        if (currentlyDisplayedLevels == null || currentlyDisplayedLevels.isEmpty())
+        CompletableFuture<?> createWorldPreload = CreateWorldPreload.whenSettled(minecraft);
+        if (currentlyDisplayedLevels == null || currentlyDisplayedLevels.isEmpty() || !createWorldPreload.isDone())
             getScreen(PlayGameScreen.class).isLoading = true;
         LevelStorageSource levelSource = minecraft.getLevelSource();
         Path saves = levelSource.getBaseDir();
@@ -215,7 +217,7 @@ public class SaveRenderableList extends RenderableVList {
                 ? CompletableFuture.<List<LevelSummary>>completedFuture(List.of())
                 : levelSource.loadLevelSummaries(candidates), Util.nonCriticalIoPool());
         levels.thenAcceptAsync(summaries -> refreshSizes(saves, summaries), Util.nonCriticalIoPool());
-        return levels.handleAsync((summaries, throwable) -> {
+        CompletableFuture<List<LevelSummary>> handledLevels = levels.handleAsync((summaries, throwable) -> {
             if (throwable == null) return summaries;
             Throwable cause = throwable instanceof CompletionException && throwable.getCause() != null ? throwable.getCause() : throwable;
             if (cause instanceof LevelStorageException exception) {
@@ -226,6 +228,7 @@ public class SaveRenderableList extends RenderableVList {
             minecraft.delayCrash(CrashReport.forThrowable(cause, "Couldn't load level list"));
             return List.of();
         }, minecraft);
+        return handledLevels.thenCombine(createWorldPreload, (summaries, unused) -> summaries);
     }
 
     private static void refreshSizes(Path saves, List<LevelSummary> summaries) {
