@@ -2179,6 +2179,7 @@
   "legacy.options.invertControllerButtons": "反转控制器按钮布局",
   "legacy.options.invertYController": "反转 Y 轴视角",
   "legacy.options.gyroElytraControls": "Gyro Elytra Controls",
+  "legacy.options.gyroAimControls": "Gyro Aim Controls",
   "legacy.options.gyroSensitivity": "Gyro Sensitivity",
   "legacy.options.invertGyroY": "Invert Gyro Look",
   "legacy.options.invertedCrosshair": "显示反转准星",
