@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -20,11 +19,9 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.control.ControlType;
-import wily.legacy.client.LegacyMixinOptions;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.control.tooltip.CommonIcon;
@@ -72,40 +69,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.L
             });
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
-    private static final ThreadLocal<Boolean> preloadingCreateWorld = ThreadLocal.withInitial(() -> false);
-    private static volatile CompletableFuture<?> createWorldPreload;
     public boolean isLoading = false;
-
-    public static boolean isPreloadingCreateWorld() {
-        return preloadingCreateWorld.get();
-    }
-
-    public static synchronized void preloadCreateWorld(Minecraft minecraft) {
-        if (minecraft.isDemo() || !LegacyMixinOptions.legacyCreateWorldScreen.get()) return;
-        CompletableFuture<?> preload = createWorldPreload;
-        if (preload != null && !preload.isCancelled() && !preload.isCompletedExceptionally()) return;
-        createWorldPreload = null;
-        preloadingCreateWorld.set(true);
-        try {
-            CreateWorldScreen.openFresh(minecraft, () -> {});
-            if (createWorldPreload == null) createWorldPreload = CompletableFuture.failedFuture(new IllegalStateException("World creation preload did not start"));
-        } catch (RuntimeException exception) {
-            createWorldPreload = CompletableFuture.failedFuture(exception);
-            Legacy4J.LOGGER.warn("Couldn't preload world creation", exception);
-        } finally {
-            preloadingCreateWorld.remove();
-        }
-    }
-
-    public static void setCreateWorldPreload(CompletableFuture<?> preload) {
-        createWorldPreload = preload;
-    }
-
-    public static boolean isCreateWorldPreloadReady(Minecraft minecraft) {
-        if (minecraft.isDemo() || !LegacyMixinOptions.legacyCreateWorldScreen.get()) return true;
-        CompletableFuture<?> preload = createWorldPreload;
-        return preload != null && preload.isDone();
-    }
 
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s -> Panel.createPanel(s, p -> p.appearance(300, Math.min(256, s.height - 52)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList", true) ? 12 : 0))), Component.translatable("legacy.menu.play_game"));

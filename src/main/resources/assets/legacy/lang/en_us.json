@@ -2182,6 +2182,7 @@
   "legacy.options.invertControllerButtons": "Invert Buttons Layout",
   "legacy.options.invertYController": "Invert Look",
   "legacy.options.gyroElytraControls": "Gyro Elytra Controls",
+  "legacy.options.gyroAimControls": "Gyro Aim Controls",
   "legacy.options.gyroSensitivity": "Gyro Sensitivity",
   "legacy.options.invertGyroY": "Invert Gyro Look",
   "legacy.options.invertedCrosshair": "Display Inverted Crosshair",

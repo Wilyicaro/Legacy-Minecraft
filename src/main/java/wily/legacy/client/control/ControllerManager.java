@@ -21,8 +21,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
 import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -125,13 +128,15 @@ public class ControllerManager {
             gyroController = connectedController;
             gyroInput.reset();
         }
-        boolean enabled = LegacyControlsOptions.gyroElytraControls.get() && minecraft.isWindowActive();
+        boolean elytraControls = LegacyControlsOptions.gyroElytraControls.get();
+        boolean aimControls = LegacyControlsOptions.gyroAimControls.get();
+        boolean enabled = (elytraControls || aimControls) && minecraft.isWindowActive();
         connectedController.setGyroEnabled(enabled);
         if (!enabled || !connectedController.readGyro(gyroVelocity)) {
             gyroInput.stop();
             return;
         }
-        boolean steering = minecraft.player != null && minecraft.player.isFallFlying() && minecraft.screen == null
+        boolean steering = minecraft.player != null && (elytraControls && minecraft.player.isFallFlying() || aimControls && isAiming(minecraft.player)) && minecraft.screen == null
                 && minecraft.mouseHandler.isMouseGrabbed() && !minecraft.isPaused() && minecraft.getCameraEntity() == minecraft.player;
         if (!steering && minecraft.screen == null) {
             gyroInput.stop();
@@ -146,6 +151,14 @@ public class ControllerManager {
         minecraft.player.turn(yaw, pitch);
         setControllerTheLastInput(true);
         minecraft.getFramerateLimitTracker().onInputReceived();
+    }
+
+    private static boolean isAiming(Player player) {
+        if (player.isUsingItem()) {
+            ItemUseAnimation animation = player.getUseItem().getUseAnimation();
+            if (animation == ItemUseAnimation.BOW || animation == ItemUseAnimation.CROSSBOW || animation == ItemUseAnimation.TRIDENT || animation == ItemUseAnimation.SPEAR || animation == ItemUseAnimation.SPYGLASS) return true;
+        }
+        return CrossbowItem.isCharged(player.getMainHandItem()) || CrossbowItem.isCharged(player.getOffhandItem());
     }
 
     public void setup(Minecraft minecraft) {

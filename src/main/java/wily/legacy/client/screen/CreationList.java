@@ -114,7 +114,9 @@ public class CreationList extends RenderableVList {
 
     private void rebuildEntries() {
         renderables.clear();
-        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
+        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> {
+            if (CreateWorldPreload.isSettled(minecraft)) CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen()));
+        });
         List<LegacyWorldTemplate> localTemplates = new ArrayList<>(LegacyWorldTemplate.list);
         localTemplates.stream().filter(template -> !isDownloadedTemplate(template)).forEach(this::addLocalTemplateButton);
         if (mashupPacks.isEmpty()) {
