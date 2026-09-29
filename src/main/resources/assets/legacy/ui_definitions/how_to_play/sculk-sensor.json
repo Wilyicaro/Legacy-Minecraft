@@ -13,29 +13,41 @@
           "width": 200,
           "height": 222,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.sculk-sensor_message"
+                "translate": "legacy.menu.how_to_play.sculk-sensor_title"
               },
               "width": 176
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.sculk-sensor_message_1"
+                "translate": "legacy.menu.how_to_play.sculk-sensor_message"
               },
               "width": 176
             },
             "text2": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.sculk-sensor_calibrations"
+                "translate": "legacy.menu.how_to_play.sculk-sensor_message_1"
               },
               "width": 176
             },
             "text3": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.sculk-sensor_calibrations"
+              },
+              "width": 176
+            },
+            "text4": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_2"
               },
@@ -89,10 +101,11 @@
           "height": 137,
           "lineHeight": 8,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.sculk-sensor_message",
+                "translate": "legacy.menu.how_to_play.sculk-sensor_title",
                 "font": "legacy:default_11"
               },
               "width": 120,
@@ -100,6 +113,17 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.sculk-sensor_message",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            },
+            "text2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_1",
                 "font": "legacy:default_11"
@@ -109,6 +133,7 @@
             },
             "calibrations": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_calibrations",
                 "font": "legacy:default_11"
@@ -116,8 +141,9 @@
               "width": 120,
               "lineSpacing": 8
             },
-            "text2": {
+            "text3": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.sculk-sensor_message_2",
                 "font": "legacy:default_11"

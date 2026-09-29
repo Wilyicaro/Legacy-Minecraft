@@ -9,8 +9,17 @@
       "width": 456,
       "height": 222,
       "elements": {
-        "text": {
+		"text": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.raids_title"
+          },
+          "width": 433
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.raids_message"
           },
@@ -32,8 +41,19 @@
       "height": 137,
       "lineHeight": 8,
       "elements": {
-        "text": {
+		"text": {
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
+          "component": {
+            "translate": "legacy.menu.how_to_play.raids_title",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "translate": "legacy.menu.how_to_play.raids_message",
             "font": "legacy:default_11"

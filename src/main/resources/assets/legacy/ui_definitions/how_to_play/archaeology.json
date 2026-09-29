@@ -13,17 +13,59 @@
           "width": 200,
           "height": 222,
           "elements": {
-            "text": {
+			"title": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.archaeology_message"
+                "translate": "legacy.menu.how_to_play.archaeology_title"
               },
               "width": 176
             },
-            "text1": {
+            "brushing": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
               "component": {
-                "translate": "legacy.menu.how_to_play.archaeology_message_1"
+                "translate": "legacy.menu.how_to_play.archaeology_brushing_title"
+              },
+              "width": 176
+            },
+			"brushing1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_brushing"
+              },
+              "width": 176
+            },
+			"decorated-pots": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_decorated-pots_title"
+              },
+              "width": 176
+            },
+			"decorated-pots1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_decorated-pots"
+              },
+              "width": 176
+            },
+			"sniffer-eggs": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_sniffer-eggs_title"
+              },
+              "width": 176
+            },
+			"sniffer-eggs1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_sniffer-eggs"
               },
               "width": 176
             }
@@ -73,22 +115,74 @@
           "height": 137,
           "lineHeight": 8,
           "elements": {
-            "text": {
+            "title": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.archaeology_message",
+                "translate": "legacy.menu.how_to_play.archaeology_title",
                 "font": "legacy:default_11"
               },
-              "width": 120,
+              "width": 176,
               "lineSpacing": 8
             },
-            "text1": {
+            "brushing": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
               "component": {
-                "translate": "legacy.menu.how_to_play.archaeology_message_1",
+                "translate": "legacy.menu.how_to_play.archaeology_brushing_title",
                 "font": "legacy:default_11"
               },
-              "width": 120,
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"brushing1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_brushing",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"decorated-pots": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_decorated-pots_title",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"decorated-pots1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_decorated-pots",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"sniffer-eggs": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_sniffer-eggs_title",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"sniffer-eggs1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.archaeology_sniffer-eggs",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
               "lineSpacing": 8
             }
           }
