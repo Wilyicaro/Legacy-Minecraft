@@ -1,15 +1,16 @@
 package wily.legacy.mixin.base.client.create_world;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
+import net.minecraft.CrashReport;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.*;
 import net.minecraft.client.input.KeyEvent;
@@ -33,6 +34,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIPlatform;
@@ -56,6 +59,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 @Mixin(CreateWorldScreen.class)
@@ -84,6 +90,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private boolean legacy$preparingRemoteResourceAlbum;
     @Unique
     private boolean legacy$resourceAlbumPrepared;
+    @Unique
+    private static final AtomicReference<CompletableFuture<WorldCreationContext>> legacy$worldCreationPreload = new AtomicReference<>();
+    @Unique
+    private static final AtomicBoolean legacy$openingWorldCreation = new AtomicBoolean();
     @Shadow
     @Final
     private WorldCreationUiState uiState;
@@ -118,23 +128,73 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Inject(method = "openCreateWorldScreen", at = @At("HEAD"), cancellable = true)
     private static void legacy$usePreloadedWorldCreation(Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CallbackInfo ci) {
-        if (CreateWorldPreload.isCapturing() || !WorldPresets.NORMAL.equals(preset)) return;
-        WorldCreationContext context = CreateWorldPreload.getNow();
-        if (context == null) return;
-        minecraft.setScreen(new CreateWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
+        if (!WorldPresets.NORMAL.equals(preset)) return;
+        if (PlayGameScreen.isPreloadingCreateWorld()) {
+            if (legacy$getWorldCreationPreload() != null) ci.cancel();
+            return;
+        }
+        if (!legacy$openingWorldCreation.compareAndSet(false, true)) {
+            ci.cancel();
+            return;
+        }
+        CompletableFuture<WorldCreationContext> future = legacy$getWorldCreationPreload();
+        if (future == null) {
+            legacy$openingWorldCreation.set(false);
+            return;
+        }
+        legacy$openWorldCreationWhenReady(minecraft, runnable, preset, callback, future);
         ci.cancel();
     }
 
-    @WrapWithCondition(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;queueLoadScreen(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)V"))
-    private static boolean legacy$skipPreloadLoadScreen(Minecraft minecraft, Component component) {
-        return !CreateWorldPreload.isCapturing();
+    @Redirect(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;queueLoadScreen(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)V"))
+    private static void legacy$showWorldPreparationScreen(Minecraft targetMinecraft, Component component, Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback) {
+        if (!PlayGameScreen.isPreloadingCreateWorld() || !WorldPresets.NORMAL.equals(preset)) {
+            targetMinecraft.setScreenAndShow(new GenericMessageScreen(component));
+        }
+    }
+
+    @ModifyArg(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/WorldLoader;load(Lnet/minecraft/server/WorldLoader$InitConfig;Lnet/minecraft/server/WorldLoader$WorldDataSupplier;Lnet/minecraft/server/WorldLoader$ResultFactory;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"), index = 4)
+    private static Executor legacy$queuePreloadApply(Executor executor) {
+        return PlayGameScreen.isPreloadingCreateWorld() && executor instanceof Minecraft minecraft ? minecraft::schedule : executor;
     }
 
     @Inject(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;managedBlock(Ljava/util/function/BooleanSupplier;)V"), cancellable = true)
-    private static void legacy$capturePreload(Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CallbackInfo ci, @Local CompletableFuture<WorldCreationContext> future) {
-        if (!CreateWorldPreload.isCapturing()) return;
-        CreateWorldPreload.capture(future);
+    private static void legacy$avoidBlockingWorldCreation(Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CallbackInfo ci, @Local CompletableFuture<WorldCreationContext> future) {
+        if (!WorldPresets.NORMAL.equals(preset)) return;
+        if (PlayGameScreen.isPreloadingCreateWorld()) {
+            if (legacy$worldCreationPreload.compareAndSet(null, future)) {
+                PlayGameScreen.setCreateWorldPreload(future);
+                future.whenComplete((context, throwable) -> {
+                    if (throwable != null) legacy$worldCreationPreload.compareAndSet(future, null);
+                });
+            }
+        } else {
+            legacy$openingWorldCreation.set(true);
+            legacy$openWorldCreationWhenReady(minecraft, runnable, preset, callback, future);
+        }
         ci.cancel();
+    }
+
+    @Unique
+    private static CompletableFuture<WorldCreationContext> legacy$getWorldCreationPreload() {
+        while (true) {
+            CompletableFuture<WorldCreationContext> future = legacy$worldCreationPreload.get();
+            if (future == null) return null;
+            if (!future.isCancelled() && !future.isCompletedExceptionally()) return future;
+            if (legacy$worldCreationPreload.compareAndSet(future, null)) return null;
+        }
+    }
+
+    @Unique
+    private static void legacy$openWorldCreationWhenReady(Minecraft minecraft, Runnable runnable, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CompletableFuture<WorldCreationContext> future) {
+        future.thenAcceptAsync(context -> {
+            legacy$openingWorldCreation.set(false);
+            minecraft.setScreen(new CreateWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
+        }, minecraft).exceptionallyAsync(throwable -> {
+            legacy$openingWorldCreation.set(false);
+            minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't prepare world creation"));
+            return null;
+        }, minecraft);
     }
 
     private CreateWorldScreen self() {
@@ -283,11 +343,6 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         }
         legacy$resourceAlbumPrepared = true;
         onCreate();
-    }
-
-    @WrapWithCondition(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;queueLoadScreen(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)V"))
-    private boolean legacy$skipCreateLoadScreen(Minecraft minecraft, Component component) {
-        return false;
     }
 
     @ModifyExpressionValue(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))

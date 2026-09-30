@@ -27,7 +27,6 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.ControlType;
-import wily.legacy.client.CreateWorldPreload;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.control.ControllerBinding;
@@ -155,7 +154,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        CreateWorldPreload.start(minecraft);
+        PlayGameScreen.preloadCreateWorld(minecraft);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
     }
 
