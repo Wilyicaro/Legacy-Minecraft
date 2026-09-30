@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "blocks": ["andesite_wall","diorite_wall","granite_wall"],
+      "tip": {"translate": "block.minecraft.stone_wall.tip"}
+    },
+    {
+      "blocks": ["brick_wall","mossy_stone_brick_wall","end_stone_brick_wall","stone_brick_wall"],
+      "tip": {"translate": "block.minecraft.brick_wall.tip"}
+    }
+  ]
+}
