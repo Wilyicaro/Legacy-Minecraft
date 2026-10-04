@@ -106,8 +106,8 @@ public class Legacy4J {
     }
 
     public static void init() {
-        FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
-        FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
+        FactoryConfig.registerCommonStorage(identifier("common"), LegacyCommonOptions.COMMON_STORAGE);
+        FactoryConfig.registerCommonStorage(identifier("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
         LegacyGameRules.register();
         FactoryEvent.registerPayload(r -> {
@@ -152,7 +152,7 @@ public class Legacy4J {
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static Identifier createModLocation(String path) {
+    public static Identifier identifier(String path) {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 

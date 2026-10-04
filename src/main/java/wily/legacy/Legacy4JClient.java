@@ -142,21 +142,21 @@ public class Legacy4JClient {
 
     public static final List<Runnable> whenResetOptions = new ArrayList<>();
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
-    public static final MapIdValueManager<LegacyCreativeTabListing, ?> legacyCreativeListingManager = MapIdValueManager.create(Legacy4J.createModLocation("creative_tab_listing"), LegacyCreativeTabListing.CODEC);
-    public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.createModLocation("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
-    public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.createModLocation("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
+    public static final MapIdValueManager<LegacyCreativeTabListing, ?> legacyCreativeListingManager = MapIdValueManager.create(Legacy4J.identifier("creative_tab_listing"), LegacyCreativeTabListing.CODEC);
+    public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.identifier("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
+    public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.identifier("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
     public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
     public static final ContentManager.CategoryManager categoryManager = new ContentManager.CategoryManager();
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
-    public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.createModLocation("loom_tab_listing"), LoomTabListing.CODEC);
-    public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("type_crafting_tabs"), TypeCraftingTab.CODEC);
-    public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
+    public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.identifier("loom_tab_listing"), LoomTabListing.CODEC);
+    public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.identifier("type_crafting_tabs"), TypeCraftingTab.CODEC);
+    public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.identifier("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
-    public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
-    public static final MapIdValueManager<ControlType, ListMap<Identifier, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("control_types"), ControlType.CODEC);
+    public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.identifier("option_presets"), OptionsPreset.CODEC);
+    public static final MapIdValueManager<ControlType, ListMap<Identifier, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.identifier("control_types"), ControlType.CODEC);
     public static final Map<Block, Identifier> fastLeavesModels = new HashMap<>();
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
     public static final RenderType GHAST_SHOOTING_GLOW = RenderTypes.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
@@ -694,13 +694,13 @@ public class Legacy4JClient {
 
     private static void registerBuiltInPacks() {
         FactoryEvent.registerBuiltInPacks(registry -> {
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
-            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
+            registry.registerResourcePack(Legacy4J.identifier("legacy_resources"), true);
+            registry.registerResourcePack(Legacy4J.identifier("legacy_waters"), true);
+            registry.registerResourcePack(Legacy4J.identifier("console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.identifier("rosenfeld_patch"), false);
             if (FactoryAPI.getLoader().isForgeLike()) {
-                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
-                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+                registry.register("programmer_art", Legacy4J.identifier("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+                registry.register("high_contrast", Legacy4J.identifier("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
             }
         });
     }

@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public record PlayerHostPrivilegesUpdatePayload(UUID player, PlayerHostPrivileges privileges) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<PlayerHostPrivilegesUpdatePayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_host_privileges_update_c2s"), PlayerHostPrivilegesUpdatePayload::new);
+    public static final CommonNetwork.Identifier<PlayerHostPrivilegesUpdatePayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("player_host_privileges_update_c2s"), PlayerHostPrivilegesUpdatePayload::new);
 
     public PlayerHostPrivilegesUpdatePayload(CommonNetwork.PlayBuf buf) {
         this(buf.get().readUUID(), PlayerHostPrivileges.decode(buf));

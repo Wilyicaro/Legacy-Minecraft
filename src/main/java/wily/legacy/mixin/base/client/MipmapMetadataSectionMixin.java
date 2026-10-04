@@ -41,7 +41,7 @@ public class MipmapMetadataSectionMixin {
         String name = sprite.getPath().substring("block/".length());
         Map<Integer, MipmapMetadataSection.Level> levels = new HashMap<>();
         for (int level = 1; level <= maxLevel; level++) {
-            Identifier mipmap = Legacy4J.createModLocation("textures/mipmap/" + name + "/" + level + ".png");
+            Identifier mipmap = Legacy4J.identifier("textures/mipmap/" + name + "/" + level + ".png");
             if (resources.getResource(mipmap).isPresent()) levels.put(level, new MipmapMetadataSection.Level(mipmap));
         }
         if (!levels.isEmpty()) cir.setReturnValue(new MipmapMetadataSection(levels));

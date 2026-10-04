@@ -24,7 +24,7 @@ public class ShaderLoaderMixin {
     private static void legacy$loadWaterShader(Identifier name, CallbackInfoReturnable<String> cir) {
         if (!name.getNamespace().equals("sodium") || !name.getPath().equals("blocks/block_layer_opaque.vsh")) return;
         if (FactoryAPI.isModLoaded("iris") && IrisCompat.isShaderPackInUse()) return;
-        Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(Legacy4J.createModLocation("shaders/core/sodium_terrain.vsh"));
+        Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(Legacy4J.identifier("shaders/core/sodium_terrain.vsh"));
         if (resource.isEmpty()) return;
         try (Reader reader = resource.get().openAsReader()) {
             cir.setReturnValue(IOUtils.toString(reader));
