@@ -19,7 +19,7 @@ import wily.legacy.world.PlayerTrustAdmin;
 import java.util.UUID;
 
 public record ServerHostOptionsPayload(Action action, String value, UUID player) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<ServerHostOptionsPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_host_options"), ServerHostOptionsPayload::new);
+    public static final CommonNetwork.Identifier<ServerHostOptionsPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("server_host_options"), ServerHostOptionsPayload::new);
     private static final UUID EMPTY_UUID = new UUID(0L, 0L);
 
     public ServerHostOptionsPayload(CommonNetwork.PlayBuf buf) {

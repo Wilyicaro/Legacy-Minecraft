@@ -18,7 +18,7 @@ import java.util.List;
 
 public record LegacyIntro(List<Identifier> brands, Identifier background, float brandDuration, float fadeIn,
                           float fadeOut, boolean crossFade) {
-    public static final Identifier DEFAULT_BACKGROUND = Legacy4J.createModLocation("textures/gui/intro/background.png");
+    public static final Identifier DEFAULT_BACKGROUND = Legacy4J.identifier("textures/gui/intro/background.png");
     public static final LegacyIntro EMPTY = new LegacyIntro(Collections.emptyList());
     public static final Codec<LegacyIntro> COMPLETE_CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.listOf().fieldOf("brands").forGetter(LegacyIntro::brands), Identifier.CODEC.fieldOf("background").orElse(DEFAULT_BACKGROUND).forGetter(LegacyIntro::background), Codec.FLOAT.fieldOf("brandDuration").forGetter(LegacyIntro::brandDuration), Codec.FLOAT.fieldOf("fadeIn").orElse(0.4f).forGetter(LegacyIntro::fadeIn), Codec.FLOAT.fieldOf("fadeOut").orElse(0.4f).forGetter(LegacyIntro::fadeOut), Codec.BOOL.fieldOf("crossFade").orElse(false).forGetter(LegacyIntro::crossFade)).apply(i, LegacyIntro::new));
     public static final Codec<LegacyIntro> CODEC = IOUtil.createFallbackCodec(COMPLETE_CODEC, Identifier.CODEC.listOf().xmap(LegacyIntro::new, LegacyIntro::brands));

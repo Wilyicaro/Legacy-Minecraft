@@ -49,10 +49,10 @@ public final class LegacyHaloRing {
     private static final int RADIUS = 100;
     private static final int SEGMENTS = 50;
     private static final int VERTEX_COUNT = (SEGMENTS + 1) * 2;
-    private static final /*? if >=1.21.11 {*/Identifier/*?} else {*//*ResourceLocation*//*?}*/ TEXTURE = Legacy4J.createModLocation("textures/misc/halo_ring.png");
+    private static final /*? if >=1.21.11 {*/Identifier/*?} else {*//*ResourceLocation*//*?}*/ TEXTURE = Legacy4J.identifier("textures/misc/halo_ring.png");
     private static final RenderPipeline PIPELINE = RenderPipelinesAccessor.register(
             RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-                    .withLocation(Legacy4J.createModLocation("pipeline/halo_ring"))
+                    .withLocation(Legacy4J.identifier("pipeline/halo_ring"))
                     .withVertexShader("core/position_tex_color")
                     .withFragmentShader("core/position_tex_color")
                     .withSampler("Sampler0")

@@ -9,13 +9,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.commands.arguments.ResourceArgument;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
-import net.minecraft.world.effect.MobEffect;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 
@@ -89,7 +85,7 @@ public record TopMessage(Component message, int baseColor, int ticksOnScreen, bo
     }
 
     public record Payload(SendType sendType, TopMessage topMessage) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_top_message"), Payload::decode);
+        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_top_message"), Payload::decode);
 
         public static Payload decode(CommonNetwork.PlayBuf buf) {
             SendType type = buf.get().readEnum(SendType.class);

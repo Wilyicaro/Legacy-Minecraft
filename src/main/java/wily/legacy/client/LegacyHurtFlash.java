@@ -19,7 +19,7 @@ import net.minecraft.util.ARGB;
 import wily.legacy.Legacy4J;
 
 public class LegacyHurtFlash {
-    private static final Identifier TEXTURE = Legacy4J.createModLocation("hurt_flash");
+    private static final Identifier TEXTURE = Legacy4J.identifier("hurt_flash");
     private static final RenderType RENDER_TYPE = RenderType.create("legacy_hurt_flash", RenderSetup.builder(LegacyRenderPipelines.LEGACY_HURT_FLASH).withTexture("Sampler0", TEXTURE).useLightmap().sortOnUpload().createRenderSetup());
     private static final RenderType EQUIPMENT_RENDER_TYPE = RenderType.create("legacy_equipment_hurt_flash", RenderSetup.builder(LegacyRenderPipelines.LEGACY_HURT_FLASH).withTexture("Sampler0", TEXTURE).useLightmap().setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING).sortOnUpload().createRenderSetup());
     private static boolean registered;

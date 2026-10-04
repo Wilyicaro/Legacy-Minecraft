@@ -50,13 +50,13 @@ import java.util.List;
 public abstract class WinScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
 
     @Unique
-    Identifier POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
+    Identifier POEM_BACKGROUND = Legacy4J.identifier("textures/gui/end_poem_background.png");
     @Unique
-    Identifier CREDITS_BACKGROUND = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_121.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
+    Identifier CREDITS_BACKGROUND = Legacy4J.identifier(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_121.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
     @Unique
-    Identifier CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_fade_121.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
+    Identifier CREDITS_BACKGROUND_FADE = Legacy4J.identifier(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_fade_121.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
     @Unique
-    Identifier LEGACY_CREDITS = Legacy4J.createModLocation("texts/credits.json");
+    Identifier LEGACY_CREDITS = Legacy4J.identifier("texts/credits.json");
     @Shadow
     @Final
     private boolean poem;
@@ -265,7 +265,7 @@ public abstract class WinScreenMixin extends Screen implements ControllerListene
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Ljava/lang/String;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"*//*?} else {*/"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"/*?}*/, ordinal = 0))
     private /*? if <1.20.5 {*//*String*//*?} else {*/Identifier/*?}*/ addPoemFile(/*? if <1.20.5 {*//*String*//*?} else {*/Identifier/*?}*/ arg) {
-        Identifier langLocation = Legacy4J.createModLocation("end_poem/" + minecraft.getLanguageManager().getSelected() + ".txt");
+        Identifier langLocation = Legacy4J.identifier("end_poem/" + minecraft.getLanguageManager().getSelected() + ".txt");
         return minecraft.getResourceManager().getResource(langLocation).isPresent() ? langLocation/*? if <1.20.5 {*//*.toString()*//*?}*/ : arg;
     }
 

@@ -27,7 +27,7 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity, FireworkRocketRenderState> {
-    private static final Identifier FIREWORK_LOCATION = Legacy4J.createModLocation("textures/entity/projectiles/firework.png");
+    private static final Identifier FIREWORK_LOCATION = Legacy4J.identifier("textures/entity/projectiles/firework.png");
     @Unique
     private ArrowModel model;
 

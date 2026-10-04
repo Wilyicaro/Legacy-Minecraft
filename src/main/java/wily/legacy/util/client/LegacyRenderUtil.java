@@ -84,7 +84,6 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -99,11 +98,11 @@ public class LegacyRenderUtil {
     public static boolean tooltipTextColorOverrideForcesStyle;
     public static boolean autoFocusedWidget = false;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
-    public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
-    public static final Identifier PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
-    public static final Identifier MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
-    public static final Identifier LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
+    public static final Identifier MINECRAFT = Legacy4J.identifier("textures/gui/title/minecraft.png");
+    public static final Identifier PANORAMA_DAY = Legacy4J.identifier("textures/gui/title/panorama_day.png");
+    public static final Identifier PANORAMA_NIGHT = Legacy4J.identifier("textures/gui/title/panorama_night.png");
+    public static final Identifier MENU_BACKGROUND = Legacy4J.identifier("textures/gui/menu_background.png");
+    public static final Identifier LOADING_BACKGROUND = Legacy4J.identifier("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
 
     private static final Minecraft mc = Minecraft.getInstance();

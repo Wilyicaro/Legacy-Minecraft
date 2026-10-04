@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<PlayerInfoSync> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_c2s"), PlayerInfoSync::new);
+    public static final CommonNetwork.Identifier<PlayerInfoSync> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("player_info_sync_c2s"), PlayerInfoSync::new);
 
     public PlayerInfoSync(CommonNetwork.PlayBuf buf) {
         this(Sync.byId(buf.get().readVarInt()), buf.get().readUUID());
@@ -216,8 +216,8 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
     public record All(Map<UUID, LegacyPlayerInfo> players, Map<Identifier, Integer> gameRules, GameType defaultGameType,
                       boolean trustPlayers, boolean allowHostCheats, CommonNetwork.Identifier<All> identifier) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<All> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_c2s"), b -> new All(b, All.ID_C2S));
-        public static final CommonNetwork.Identifier<All> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_s2c"), b -> new All(b, All.ID_S2C));
+        public static final CommonNetwork.Identifier<All> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.identifier("player_info_sync_all_c2s"), b -> new All(b, All.ID_C2S));
+        public static final CommonNetwork.Identifier<All> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.identifier("player_info_sync_all_s2c"), b -> new All(b, All.ID_S2C));
 
         public All(Map<Identifier, Integer> gameRules, CommonNetwork.Identifier<All> identifier) {
             this(Collections.emptyMap(), gameRules, GameType.SURVIVAL, true, false, identifier);

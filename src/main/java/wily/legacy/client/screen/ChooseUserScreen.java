@@ -186,7 +186,7 @@ public class ChooseUserScreen extends PanelVListScreen {
 
     protected void addAccountButtons() {
         Minecraft minecraft = Minecraft.getInstance();
-        CreationList.addIconButton(renderableVList, Legacy4J.createModLocation("icon/add_user"), ADD_ACCOUNT, b -> minecraft.setScreen(accountScreen(ADD_ACCOUNT, this, true, a -> {
+        CreationList.addIconButton(renderableVList, Legacy4J.identifier("icon/add_user"), ADD_ACCOUNT, b -> minecraft.setScreen(accountScreen(ADD_ACCOUNT, this, true, a -> {
             MCAccount.list.add(a);
             MCAccount.saveAll();
             reloadAccountButtons();

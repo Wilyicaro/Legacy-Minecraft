@@ -1,18 +1,11 @@
 package wily.legacy.network;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceArgument;
-import net.minecraft.commands.arguments.item.ItemArgument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,14 +15,12 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyActivationAnim;
-import wily.legacy.config.LegacyWorldOptions;
-import wily.legacy.util.LegacyTipBuilder;
 
 import java.util.Collection;
 
 public record ClientEffectActivationPayload(/*? if <1.20.5 {*//*MobEffect*//*?} else {*/
                                             Holder<MobEffect>/*?}*/ effect) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<ClientEffectActivationPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_effect_activation"), ClientEffectActivationPayload::new);
+    public static final CommonNetwork.Identifier<ClientEffectActivationPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("client_effect_activation"), ClientEffectActivationPayload::new);
 
     public ClientEffectActivationPayload(CommonNetwork.PlayBuf buf) {
         this(/*? if <1.20.5 {*//*BuiltInRegistries.MOB_EFFECT.getHolder(buf.get().readVarInt()).get().value()*//*?} else {*/MobEffect.STREAM_CODEC.decode(buf.get())/*?}*/);
