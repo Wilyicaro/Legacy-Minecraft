@@ -38,6 +38,8 @@ import wily.legacy.client.ContentManager;
 import wily.legacy.util.LegacyComponents;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
+import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Listener, RenderableVList.Access {
