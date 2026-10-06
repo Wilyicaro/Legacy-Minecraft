@@ -124,15 +124,16 @@ public class LegacyTripleTConfigScreen extends OptionsScreen implements TabList.
                     });
             if (widget != null) {
                 // 'add(wily.legacy.client.screen.compat.LegacyTripleTConfigScreen.ThrowableRunnable)' in 'java.util.List' cannot be applied to '(wily.legacy.client.screen.compat.LegacyTripleTConfigScreen.ThrowableRunnable)'
-                sync.add(switch (widget) {
+                // which is why this isn't directly inlined into sync.add()
+                ThrowableRunnable thrRunnable = switch (widget) {
                     case EditBox box -> () -> box.setValue(Objects.toString(entry.getValue()));
-					default -> switch (entry.getValueType()) {
+                    default -> switch (entry.getValueType()) {
                         case Type.TBool _ -> () -> ((TickBox)widget).selected = (Boolean) entry.getValue();
                         case Type.TDouble _, Type.TEnum<?> _, Type.TFloat _, Type.TInt _, Type.TLong _  -> () -> ((LegacySliderButton)(widget)).setObjectValue(entry.getValue());
-                        case Type.TString _ -> () -> ((EditBox)widget).setValue((String) entry.getValue());
-                        case Type.TUnknown _ -> () -> {};
+                        case Type.TString _, Type.TUnknown _ -> () -> {};
                     };
-                });
+                };
+                sync.add(thrRunnable);
                 list.add(widget);
             }
         }
