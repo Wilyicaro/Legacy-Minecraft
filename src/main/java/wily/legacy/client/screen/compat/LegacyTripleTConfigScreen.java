@@ -17,6 +17,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import org.jspecify.annotations.Nullable;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.LegacySliderButton;
 import wily.legacy.client.screen.LegacyTabButton;
 import wily.legacy.client.screen.OptionsScreen;
@@ -156,9 +157,11 @@ public class LegacyTripleTConfigScreen extends OptionsScreen implements TabList.
                         for (ThrowableRunnable throwableRunnable : sync) {
                             try {
                                 throwableRunnable.run();
-                            } catch (Throwable t) {t.printStackTrace();}
+                            } catch (Throwable t) {
+                                Legacy4J.LOGGER.error("Failed to synchronize UI element!", t);
+                            }
                         }
-                        if (config instanceof ConfigInstance i) {i.write();}
+                        if (config instanceof ConfigInstance i) i.write();
                         resetElements();
                     }));
                 } catch (Throwable e) {
