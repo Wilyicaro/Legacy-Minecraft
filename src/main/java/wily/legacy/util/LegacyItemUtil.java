@@ -12,6 +12,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.material.Fluid;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.init.LegacyGameRules;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -107,6 +109,11 @@ public class LegacyItemUtil {
 
     public static boolean canGoInLceOffhand(ItemStack stack) {
         return stack.isEmpty() || stack.is(LCE_OFFHAND) || canGoInLocalOffhand(stack);
+    }
+
+    public static boolean isLegacyShield(Player player, ItemStack stack) {
+        return stack.getItem() instanceof ShieldItem
+                && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS);
     }
 
     private static boolean canGoInLocalOffhand(ItemStack stack) {

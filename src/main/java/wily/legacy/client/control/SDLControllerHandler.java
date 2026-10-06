@@ -1,5 +1,6 @@
 package wily.legacy.client.control;
 
+import com.sun.jna.Memory;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.FloatByReference;
 import dev.isxander.sdl3java.api.SdlInit;
@@ -7,6 +8,7 @@ import dev.isxander.sdl3java.api.SdlSubSystemConst;
 import dev.isxander.sdl3java.api.gamepad.*;
 import dev.isxander.sdl3java.api.joystick.SDL_JoystickID;
 import dev.isxander.sdl3java.api.joystick.SdlJoystick;
+import dev.isxander.sdl3java.api.sensor.SDL_SensorType;
 import dev.isxander.sdl3java.api.version.SdlVersionConst;
 import dev.isxander.sdl3java.jna.SdlNativeLibraryLoader;
 import net.minecraft.util.Util;
@@ -36,7 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
-public class SDLControllerHandler implements Controller.Handler {
+public class SDLControllerHandler implements ControllerHandler {
     public static final String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_MINOR_VERSION + "." + SdlVersionConst.SDL_MICRO_VERSION + "." + SdlVersionConst.SDL_COMMIT;
     public static final String nativesMainURLFormat = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/%s/%s";
     public static final Component TITLE = Component.literal("SDL3 (isXander's libsdl4j)");
@@ -93,8 +95,8 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public void fallback() {
         Legacy4J.LOGGER.warn("{} isn't supported in this system. {} will be used instead.", getName(), GLFWControllerHandler.getInstance().getName());
-        LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-        LegacyOptions.selectedControllerHandler.save();
+        LegacyControlsOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+        LegacyControlsOptions.selectedControllerHandler.save();
         init = true;
     }
 
@@ -110,8 +112,8 @@ public class SDLControllerHandler implements Controller.Handler {
 
             if (!natives.isPojav()) {
                 if (!natives.file().exists()) {
-                    LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-                    LegacyOptions.selectedControllerHandler.save();
+                    LegacyControlsOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                    LegacyControlsOptions.selectedControllerHandler.save();
                     FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> openNativesScreen(minecraft), () -> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
                     init = true;
                     return;
@@ -136,14 +138,14 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public void openNativesScreen(Minecraft minecraft) {
         Screen s = minecraft.screen;
-        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
+        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), ControllerHandler.DOWNLOAD_MESSAGE, b -> {
             Stocker<Long> fileSize = new Stocker<>(1L);
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
+            LegacyLoadingScreen screen = new LegacyLoadingScreen(ControllerHandler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
                 @Override
                 public void tick() {
                     if (getProgress() >= 1) {
-                        LegacyOptions.selectedControllerHandler.set(getInstance());
+                        LegacyControlsOptions.selectedControllerHandler.set(getInstance());
                         LegacyOptions.CLIENT_STORAGE.save();
                         onClose();
                         return;
@@ -170,7 +172,7 @@ public class SDLControllerHandler implements Controller.Handler {
                 try {
                     fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
                     FileUtils.copyURLToFile(getNativesURI().toURL(), natives.file());
-                    screen.setLoadingHeader(Controller.Handler.LOADING_NATIVES);
+                    screen.setLoadingHeader(ControllerHandler.LOADING_NATIVES);
                     screen.setProgress(1);
                     init = false;
                 } catch (IOException | URISyntaxException e) {
@@ -202,6 +204,23 @@ public class SDLControllerHandler implements Controller.Handler {
         SDL_Gamepad controller = SdlGamepad.SDL_OpenGamepad(actualIds[jid]);
         return new Controller() {
             String name;
+            private final Memory gyroData = SdlGamepad.SDL_GamepadHasSensor(controller, SDL_SensorType.SDL_SENSOR_GYRO) ? new Memory(3 * Float.BYTES) : null;
+            private boolean gyroRequested;
+            private boolean gyroEnabled;
+
+            @Override
+            public void setGyroEnabled(boolean enabled) {
+                if (gyroData == null || gyroRequested == enabled) return;
+                gyroRequested = enabled;
+                gyroEnabled = SdlGamepad.SDL_SetGamepadSensorEnabled(controller, SDL_SensorType.SDL_SENSOR_GYRO, enabled) && enabled;
+            }
+
+            @Override
+            public boolean readGyro(float[] angularVelocity) {
+                if (!gyroEnabled || !SdlGamepad.SDL_GetGamepadSensorData(controller, SDL_SensorType.SDL_SENSOR_GYRO, gyroData, 3)) return false;
+                gyroData.read(0, angularVelocity, 0, 3);
+                return true;
+            }
 
             @Override
             public String getName() {
@@ -286,10 +305,11 @@ public class SDLControllerHandler implements Controller.Handler {
             public void disconnect(ControllerManager manager) {
                 Controller.super.disconnect(manager);
                 SdlGamepad.SDL_CloseGamepad(controller);
+                if (gyroData != null) gyroData.close();
             }
 
             @Override
-            public Handler getHandler() {
+            public ControllerHandler getHandler() {
                 return SDLControllerHandler.this;
             }
         };

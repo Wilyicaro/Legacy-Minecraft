@@ -1,4 +1,4 @@
-package wily.legacy.inventory;
+package wily.legacy.client.control.navigation;
 
 public interface LegacySlot {
     LegacySlotDisplay getDisplay();

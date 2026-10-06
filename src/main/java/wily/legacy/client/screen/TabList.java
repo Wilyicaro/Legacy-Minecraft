@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.NavigationElement;
+import wily.legacy.client.control.navigation.NavigationElement;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
 

@@ -3,7 +3,7 @@ package wily.legacy.client.control.tooltip;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.util.Util;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControllerManager;
 
 import java.util.function.Function;
 
@@ -31,7 +31,7 @@ public interface CompoundIcon extends Icon {
             }
             tooltipX += icon.getWidth();
         }
-        if (Legacy4JClient.controllerManager.simulateShift) Legacy4JClient.controllerManager.simulateShift = false;
+        if (ControllerManager.getInstance().simulateShift) ControllerManager.getInstance().simulateShift = false;
     }
 
     default boolean isAdditive() {

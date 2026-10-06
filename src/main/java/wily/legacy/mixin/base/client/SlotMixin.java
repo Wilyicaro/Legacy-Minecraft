@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.inventory.LegacySlot;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlot;
 
 @Mixin(Slot.class)
 public abstract class SlotMixin implements LegacySlot {

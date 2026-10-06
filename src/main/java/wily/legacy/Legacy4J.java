@@ -106,8 +106,8 @@ public class Legacy4J {
     }
 
     public static void init() {
-        FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
-        FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
+        FactoryConfig.registerCommonStorage(identifier("common"), LegacyCommonOptions.COMMON_STORAGE);
+        FactoryConfig.registerCommonStorage(identifier("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
         LegacyGameRules.register();
         FactoryEvent.registerPayload(r -> {
@@ -126,7 +126,6 @@ public class Legacy4J {
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerHostOptionsPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
-            r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.PersistentPayload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
@@ -142,14 +141,18 @@ public class Legacy4J {
         ArmorStandPose.init();
         LegacyMobCaps.init();
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
-        FactoryEvent.registerCommands(TipCommand::register);
+        FactoryEvent.registerCommands(((commandSourceStackCommandDispatcher, commandBuildContext, commandSelection) -> {
+            TipCommand.register(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+            ClientEffectActivationPayload.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+            TopMessage.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+        }));
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static Identifier createModLocation(String path) {
+    public static Identifier identifier(String path) {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 

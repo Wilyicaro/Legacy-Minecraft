@@ -3,15 +3,11 @@ package wily.legacy.network;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.player.Player;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 
-import java.util.function.Supplier;
-
 public record ClientAnimalInLoveSyncPayload(int entityID, int inLove, int age) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<ClientAnimalInLoveSyncPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_in_love"), ClientAnimalInLoveSyncPayload::new);
+    public static final CommonNetwork.Identifier<ClientAnimalInLoveSyncPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("client_in_love"), ClientAnimalInLoveSyncPayload::new);
 
     public ClientAnimalInLoveSyncPayload(CommonNetwork.PlayBuf buf) {
         this(buf.get().readVarInt(), buf.get().readVarInt(), buf.get().readVarInt());

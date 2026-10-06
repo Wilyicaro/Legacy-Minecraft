@@ -31,6 +31,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.*;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
@@ -85,10 +86,10 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         super.addControlTooltips(list);
         list.add(() -> movingLayer != null || tabList.getIndex() != 0 || getFocused() == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> LegacyComponents.MOVE_LAYER).
                 add(() -> movingLayer != null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> LegacyComponents.PRESETS).
-                add(ControlTooltip.CONTROL_TAB::get, () -> movingLayer != null ? null : LegacyComponents.SELECT_TAB).
+                add(CommonIcon.CONTROL_TAB::get, () -> movingLayer != null ? null : LegacyComponents.SELECT_TAB).
                 add(() -> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEUP) : ControllerBinding.LEFT_TRIGGER.getIcon(), () -> LegacyComponents.PAGE_UP).
                 add(() -> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEDOWN) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> LegacyComponents.PAGE_DOWN).
-                add(ControlTooltip.VERTICAL_NAVIGATION::get, () -> movingLayer == null ? null : LegacyComponents.MOVE_UP_DOWN);
+                add(CommonIcon.VERTICAL_NAVIGATION::get, () -> movingLayer == null ? null : LegacyComponents.MOVE_UP_DOWN);
     }
 
     public void addStructure(Holder.Reference<StructureSet> structure) {

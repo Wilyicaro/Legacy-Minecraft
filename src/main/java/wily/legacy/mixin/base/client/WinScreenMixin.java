@@ -36,15 +36,9 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
-import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.*;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
-import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
-import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.LegacyCreditsScreen;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -53,16 +47,16 @@ import java.io.Reader;
 import java.util.List;
 
 @Mixin(WinScreen.class)
-public abstract class WinScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
+public abstract class WinScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
 
     @Unique
-    Identifier POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
+    Identifier POEM_BACKGROUND = Legacy4J.identifier("textures/gui/end_poem_background.png");
     @Unique
-    Identifier CREDITS_BACKGROUND = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_121.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
+    Identifier CREDITS_BACKGROUND = Legacy4J.identifier(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_121.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
     @Unique
-    Identifier CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_fade_121.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
+    Identifier CREDITS_BACKGROUND_FADE = Legacy4J.identifier(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else if <26.1 {*//*"textures/gui/credits_background_fade_121.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
     @Unique
-    Identifier LEGACY_CREDITS = Legacy4J.createModLocation("texts/credits.json");
+    Identifier LEGACY_CREDITS = Legacy4J.identifier("texts/credits.json");
     @Shadow
     @Final
     private boolean poem;
@@ -207,7 +201,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Listen
     @Override
     public void simulateKeyAction(ControllerManager manager, BindingState state) {
         if (!poem && !isLegacyCredits()) return;
-        Controller.Listener.super.simulateKeyAction(manager, state);
+        ControllerListener.super.simulateKeyAction(manager, state);
         if (poem) {
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_UP), InputConstants.KEY_UP, state, true);
             manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_STICK_DOWN), InputConstants.KEY_DOWN, state, true);
@@ -271,7 +265,7 @@ public abstract class WinScreenMixin extends Screen implements Controller.Listen
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Ljava/lang/String;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"*//*?} else {*/"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"/*?}*/, ordinal = 0))
     private /*? if <1.20.5 {*//*String*//*?} else {*/Identifier/*?}*/ addPoemFile(/*? if <1.20.5 {*//*String*//*?} else {*/Identifier/*?}*/ arg) {
-        Identifier langLocation = Legacy4J.createModLocation("end_poem/" + minecraft.getLanguageManager().getSelected() + ".txt");
+        Identifier langLocation = Legacy4J.identifier("end_poem/" + minecraft.getLanguageManager().getSelected() + ".txt");
         return minecraft.getResourceManager().getResource(langLocation).isPresent() ? langLocation/*? if <1.20.5 {*//*.toString()*//*?}*/ : arg;
     }
 

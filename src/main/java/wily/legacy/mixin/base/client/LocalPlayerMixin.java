@@ -12,10 +12,8 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.ClientInput;
 //?}
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ShieldItem;
@@ -32,8 +30,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.FirstPersonDropAnimation;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.entity.LegacyLocalPlayer;
-import wily.legacy.entity.LegacyShieldPlayer;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.*;
@@ -50,8 +48,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     @Shadow
     private boolean lastOnGround;
 
-    private boolean legacyAutoShielding;
     private float legacyUnderwaterVisionTime;
+    private int legacyFlightSprintTicks;
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
@@ -94,7 +92,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @WrapWithCondition(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 0))
     public boolean allowKeyboardSprint(LocalPlayer instance, boolean b) {
-        return !controllerManager.isControllerTheLastInput();
+        return !ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     @ModifyExpressionValue(method = {"shouldStopRunSprinting", "canStartSprinting"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUnderWater()Z"))
@@ -134,9 +132,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"))
     public void applyLegacyVerticalFlight(LocalPlayer instance, Vec3 vec3) {
-        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get()))
-            move(MoverType.SELF, vec3.with(Direction.Axis.Y, (vec3.y - getDeltaMovement().y) * (input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ ? (/*? if <1.20.5 {*//*0.42f*//*?} else {*/this.getAttributeValue(Attributes.JUMP_STRENGTH)/*?}*/ + getJumpBoostPower()) * 6 : 3)));
-        else setDeltaMovement(vec3);
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get())) {
+            double speed = getAbilities().getFlyingSpeed() / 0.05f;
+            double vertical = vec3.y > getDeltaMovement().y ? getAttributeValue(Attributes.JUMP_STRENGTH) + getJumpBoostPower() : -0.57;
+            move(MoverType.SELF, new Vec3(0, vertical * speed, 0));
+        } else setDeltaMovement(vec3);
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(/*? if <1.21.2 {*//*value = "FIELD",target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z"*//*?} else {*/value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Input;shift()Z"/*?}*/, ordinal = /*? if <1.21.5 {*//*2*//*?} else {*/2/*?}*/))
@@ -158,24 +158,33 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         return (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get()) && input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && isSprinting() && getAbilities().flying ? 0.5f : 0) + super.maxUpStep();
     }
 
+    @Inject(method = "aiStep", at = @At("HEAD"))
+    private void updateLegacyFlightSprint(CallbackInfo ci) {
+        legacyFlightSprintTicks = isSprinting() ? Math.min(legacyFlightSprintTicks + 1, 10) : 0;
+    }
+
     @Inject(method = "aiStep", at = @At(value = "RETURN"))
     public void applyLegacyFlightElevation(CallbackInfo ci) {
         if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get())) return;
         if (this.getAbilities().flying && this.isControlledCamera()) {
-            if (keyFlyDown.isDown() && !keyFlyUp.isDown() || !keyFlyDown.isDown() && keyFlyUp.isDown() || keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown())
-                setDeltaMovement(getDeltaMovement().add(0, (keyFlyUp.isDown() ? 1.5 : keyFlyDown.isDown() ? -1.5 : 0) * this.getAbilities().getFlyingSpeed(), 0));
-            if (getXRot() != 0 && (!lastOnGround || getXRot() < 0) && input.hasForwardImpulse() && isSprinting())
-                move(MoverType.SELF, new Vec3(0, -(getXRot() / 90) * input./*? if <1.21.5 {*//*forwardImpulse*//*?} else {*/getMoveVector().y/*?}*/ * getFlyingSpeed() * 2, 0));
+            double speed = getAbilities().getFlyingSpeed() / 0.05f;
+            if (isSprinting()) {
+                float boost = legacyFlightSprintTicks / 10.0f;
+                move(MoverType.SELF, getLookAngle().scale(input.getMoveVector().y * boost * boost * speed));
+            } else if (keyFlyUp.isDown() != keyFlyDown.isDown()) {
+                move(MoverType.SELF, new Vec3(0, (keyFlyUp.isDown() ? 0.1 : -0.1) * speed, 0));
+            }
         }
     }
 
     @Inject(method = /*? if <1.21.5 {*//*"serverAiStep"*//*?} else {*/"applyInput"/*?}*/, at = @At("RETURN"))
     public void applyLegacyMovementInput(CallbackInfo ci) {
         if (this.isControlledCamera() && this.getAbilities().flying && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get())) {
-            if (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown())
-                xxa += (keyFlyLeft.isDown() ? 12 : -12) * this.getAbilities().getFlyingSpeed();
-            if (getXRot() != 0 && input.hasForwardImpulse() && isSprinting())
-                zza *= Math.max(0.1f, 1 - Math.abs(getXRot() / 90));
+            if (keyFlyLeft.isDown() != keyFlyRight.isDown()) {
+                float yaw = Mth.floor(getYRot() / 90.0f + 0.5f) * Mth.HALF_PI;
+                double speed = (keyFlyLeft.isDown() ? 3 : -3) * getAbilities().getFlyingSpeed();
+                setDeltaMovement(Mth.cos(yaw) * speed, getDeltaMovement().y, Mth.sin(yaw) * speed);
+            }
         }
         if (Legacy4JClient.hasModOnServer() && wantsToStopRiding() && this.isPassenger()) {
             minecraft.options.keyShift.setDown(false);
@@ -189,61 +198,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
                 && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT.get());
     }
 
-    public boolean isAutoShielding() {
-        return legacyAutoShielding;
-    }
-
-    @Inject(method = "aiStep", at = @At("RETURN"))
-    private void updateShieldControlsAfterMovement(CallbackInfo ci) {
-        legacy$updateShieldControls();
-    }
-
-    @Inject(method = "rideTick", at = @At("RETURN"))
-    private void updateShieldControlsWhileRiding(CallbackInfo ci) {
-        legacy$updateShieldControls();
-    }
-
     @ModifyExpressionValue(method = "modifyInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;itemUseSpeedMultiplier()F"))
     private float legacyShieldSpeedMultiplier(float original) {
-        return legacyAutoShielding && isMovingSlowly() && getUseItem().getItem() instanceof ShieldItem
+        return isMovingSlowly() && getUseItem().getItem() instanceof ShieldItem
                 && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) ? 1.0f : original;
-    }
-
-    @WrapWithCondition(method = "onSyncedDataUpdated", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;startUsingItem(Lnet/minecraft/world/InteractionHand;)V"))
-    private boolean allowSyncedItemUse(LocalPlayer instance, InteractionHand hand) {
-        return !((LegacyShieldPlayer) this).isShieldPaused() || !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) || !(getItemInHand(hand).getItem() instanceof ShieldItem);
-    }
-
-    private void legacy$updateShieldControls() {
-        InteractionHand hand = legacy$getShieldHand();
-        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SHIELD_CONTROLS.get()) && hand != null && (isPassenger() || input./*? if >=1.21.2 {*/keyPresses.shift()/*?} else {*//*shiftKeyDown*//*?}*/)) {
-            if (LegacyShieldPlayer.hasConflictingUse((LocalPlayer) (Object) this, hand)) {
-                legacyAutoShielding = false;
-                return;
-            }
-            if (((LegacyShieldPlayer) this).isShieldPaused()) {
-                if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) stopUsingItem();
-                legacyAutoShielding = false;
-                return;
-            }
-            legacyAutoShielding = true;
-            if (!isUsingItem() || !getUseItem().is(getItemInHand(hand).getItem()) || getUsedItemHand() != hand) {
-                if (isUsingItem()) stopUsingItem();
-                startUsingItem(hand);
-                if (minecraft.gameMode != null) minecraft.gameMode.useItem((LocalPlayer) (Object) this, hand);
-            }
-        } else {
-            if (legacyAutoShielding && isUsingItem() && getUseItem().getItem() instanceof ShieldItem) {
-                if (minecraft.gameMode != null) minecraft.gameMode.releaseUsingItem((LocalPlayer) (Object) this);
-                else stopUsingItem();
-            }
-            legacyAutoShielding = false;
-        }
-    }
-
-    private InteractionHand legacy$getShieldHand() {
-        if (getOffhandItem().getItem() instanceof ShieldItem) return InteractionHand.OFF_HAND;
-        return getMainHandItem().getItem() instanceof ShieldItem ? InteractionHand.MAIN_HAND : null;
     }
 
     @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else if <1.21.5 {*//*"handleConfusionTransitionEffect"*//*?} else {*/"handlePortalTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isAllowedInPortal()Z"))

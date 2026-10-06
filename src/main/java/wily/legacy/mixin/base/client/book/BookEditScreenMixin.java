@@ -26,11 +26,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.control.ControlType;
-import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
-import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.LegacyKeyMapping;
+import wily.legacy.client.control.*;
 import wily.legacy.client.control.tooltip.*;
 import wily.legacy.client.screen.BookPanel;
 import wily.legacy.client.screen.ConfirmationScreen;
@@ -40,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Mixin(BookEditScreen.class)
-public abstract class BookEditScreenMixin extends Screen implements Controller.Listener, ControlTooltip.Listener {
+public abstract class BookEditScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
 
     private static final Component EXIT_BOOK = Component.translatable("legacy.menu.exit_book");
     private static final Component EXIT_BOOK_MESSAGE = Component.translatable("legacy.menu.exit_book_message");

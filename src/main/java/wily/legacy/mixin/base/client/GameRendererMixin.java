@@ -7,8 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.TextureFilteringMethod;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.state.OptionsRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;
 import org.objectweb.asm.Opcodes;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.base.client.FactoryOptions;
 import wily.legacy.client.LegacyGamma;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
@@ -48,6 +51,11 @@ public abstract class GameRendererMixin {
 
     @Shadow
     protected abstract void takeAutoScreenshot(Path path);
+
+    @Inject(method = "extractOptions", at = @At("TAIL"))
+    private void extractTextureFiltering(CallbackInfo ci, @Local OptionsRenderState options) {
+        if (FactoryOptions.NEAREST_MIPMAP_SCALING.get()) options.textureFiltering = TextureFilteringMethod.NONE;
+    }
 
     @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastManager;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", shift = At.Shift.AFTER))
     private void extractGui(DeltaTracker deltaTracker, boolean bl, boolean bl2, CallbackInfo ci, @Local GuiGraphicsExtractor graphics) {

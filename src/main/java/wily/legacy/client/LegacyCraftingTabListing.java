@@ -5,14 +5,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.util.DynamicUtil;
+import wily.legacy.client.recipe.RecipeInfoFilter;
 import wily.legacy.client.screen.LegacyTabButton;
 
 import java.util.*;
 
 public record LegacyCraftingTabListing(Identifier id, Optional<Component> name,
                                        Optional<LegacyTabButton.IconHolder<?>> iconHolder,
-                                       Map<String, List<RecipeInfo.Filter>> craftings) implements LegacyTabInfo<LegacyCraftingTabListing> {
-    public static final Codec<LegacyCraftingTabListing> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyCraftingTabListing::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyCraftingTabListing::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(LegacyCraftingTabListing::iconHolder), RecipeInfo.Filter.LISTING_CODEC.fieldOf("listing").orElseGet(LinkedHashMap::new).forGetter(LegacyCraftingTabListing::craftings)).apply(i, LegacyCraftingTabListing::new));
+                                       Map<String, List<RecipeInfoFilter>> craftings) implements LegacyTabInfo<LegacyCraftingTabListing> {
+    public static final Codec<LegacyCraftingTabListing> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(LegacyCraftingTabListing::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyCraftingTabListing::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(LegacyCraftingTabListing::iconHolder), RecipeInfoFilter.LISTING_CODEC.fieldOf("listing").orElseGet(LinkedHashMap::new).forGetter(LegacyCraftingTabListing::craftings)).apply(i, LegacyCraftingTabListing::new));
 
     @Override
     public boolean isValid() {

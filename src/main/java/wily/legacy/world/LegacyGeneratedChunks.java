@@ -56,7 +56,7 @@ public final class LegacyGeneratedChunks {
     }
 
     public record Payload(int x, int z) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_fresh_chunk"), Payload::new);
+        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("client_fresh_chunk"), Payload::new);
 
         public Payload(CommonNetwork.PlayBuf buf) {
             this(buf.get().readInt(), buf.get().readInt());

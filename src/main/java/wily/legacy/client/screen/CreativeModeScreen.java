@@ -42,14 +42,13 @@ import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.*;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 import wily.legacy.util.*;
-import wily.legacy.client.control.BindingState;
-import wily.legacy.client.control.Controller;
-import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -58,7 +57,7 @@ import java.util.function.Supplier;
 
 import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
-public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, Controller.Listener, Listener {
+public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, ControllerListener, Listener {
     public static final Container creativeModeGrid = new SimpleContainer(50);
     public static final LegacyTabButton.StateOffset TAB_OFFSET = new LegacyTabButton.StateOffset(Vec2.ZERO, new Vec2(0, 1.4f), Vec2.ZERO);
     public static final LegacySlotDisplay DEFAULT_SLOT_DISPLAY = new LegacySlotDisplay() {
@@ -162,7 +161,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         list.
                 replace(2, i -> i, a -> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3, i -> i, a -> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(() -> page.max > 0 ? CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
+                add(() -> page.max > 0 ? CommonIcon.CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
                 add(() -> canClearQuickSelect() && ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : null, () -> LegacyComponents.CLEAR_QUICK_SELECT);
     }
 
@@ -327,7 +326,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
 
     @Override
     public int getBindingMouseClick(BindingState state) {
-        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : Controller.Listener.super.getBindingMouseClick(state);
+        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : ControllerListener.super.getBindingMouseClick(state);
     }
 
     @Override

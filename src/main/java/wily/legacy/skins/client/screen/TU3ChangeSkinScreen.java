@@ -13,33 +13,45 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.control.ControlType;
 import wily.legacy.client.control.BindingState;
 import wily.legacy.client.control.ControllerBinding;
-import wily.legacy.client.control.ControllerManager;
-import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
+import wily.legacy.skins.client.preview.PlayerSkinWidgetList;
 import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPack;
 import wily.legacy.skins.skin.SkinSync;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
-    private static final int TU3_TAB_OUTSET = 2;
-    private static final int TU3_MID_TAB_TOP_DROP = 6;
-    private static final float TU3_GREY_TINT = 0.84f;
-    private static final float TU3_SIDE_TAB_TINT = 0.94f;
-    private static final Identifier TU3_TOP_STRIP = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip"),
-            TU3_BOTTOM_STRIP = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_bottom_strip"),
-            TU3_TAB_PLATE = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_tab_plate"),
-            TU3_SELECTED_BADGE = Identifier.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
-    private static final int TU3_NAME_PLATE_HIGHLIGHT = 0xFFEBEB0F;
-    private final HoldRepeat tu3HorizontalHold = new HoldRepeat();
-    private int layoutX, layoutY, layoutW, layoutH, tu3StripY, tu3StripH, tu3BottomStripY, tu3BottomStripH, tu3TabY, tu3TabH,
-            tu3TabLeftX, tu3TabMidX, tu3TabRightX, tu3TabLeftW, tu3TabMidW, tu3TabRightW;
-    private Tu3LayoutMetrics tu3Layout = Tu3LayoutMetrics.DEFAULT;
-    private Tu3NavZone tu3NavZone = Tu3NavZone.CAROUSEL;
+    private static final int TAB_OUTSET = 2, MID_TAB_TOP_DROP = 6;
+    private static final float GREY_TINT = 0.84f, SIDE_TAB_TINT = 0.94f;
+    private static final int NAME_PLATE_HIGHLIGHT = 0xFFEBEB0F;
+    private static final Identifier TOP_STRIP = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_top_strip"),
+            BOTTOM_STRIP = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_bottom_strip"),
+            TAB_PLATE = Identifier.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/tu3_tab_plate"),
+            SELECTED_BADGE = Identifier.fromNamespaceAndPath("legacy", "tiles/tu3_selected");
+    private final HoldRepeat horizontalHold = new HoldRepeat();
+    private int layoutX, layoutY, layoutW, layoutH, stripY, stripH, bottomStripY, bottomStripH, tabY, tabH,
+            tabLeftX, tabMidX, tabRightX, tabLeftW, tabMidW, tabRightW;
+    private float textScale = 1f;
+    private boolean carouselFocused = true;
+    private String namePlateSkinId;
+
+    private int tu3Int(String name, int fallback) {
+        return accessor.getInteger("tu3." + name, fallback);
+    }
+
+    private float tu3Float(String name, float fallback) {
+        return accessor.getFloat("tu3." + name, fallback);
+    }
+
+    private int carouselPad() {
+        return sc(tu3Int("carouselPad", 6));
+    }
 
     public TU3ChangeSkinScreen(Screen parent) {
         this(parent, ChangeSkinScreenSource.Default.INSTANCE);
@@ -49,62 +61,15 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         super(parent, source, false);
     }
 
-    private void refreshTu3Layout() {
-        Tu3LayoutMetrics fallback = Tu3LayoutMetrics.DEFAULT;
-        tu3Layout = new Tu3LayoutMetrics(
-                accessor.getFloat("tu3.topStripScale", fallback.topStripScale()),
-                accessor.getInteger("tu3.bottomStripBaseHeight", fallback.bottomStripBaseHeight()),
-                accessor.getFloat("tu3.greyHeightRatio", fallback.greyHeightRatio()),
-                accessor.getInteger("tu3.menuYOffset", fallback.menuYOffset()),
-                accessor.getInteger("tu3.tabInsetNumerator", fallback.tabInsetNumerator()),
-                accessor.getInteger("tu3.midExtra", fallback.midExtra()),
-                accessor.getInteger("tu3.activeTabLift", fallback.activeTabLift()),
-                accessor.getFloat("tu3.carouselScale", fallback.carouselScale()),
-                accessor.getFloat("tu3.carouselSpacing", fallback.carouselSpacing()),
-                accessor.getInteger("tu3.panelTopOffset", fallback.panelTopOffset()),
-                accessor.getInteger("tu3.tooltipWidthOverscan", fallback.tooltipWidthOverscan()),
-                accessor.getInteger("tu3.tooltipBottomOverscan", fallback.tooltipBottomOverscan()),
-                accessor.getInteger("tu3.carouselPad", fallback.carouselPad()),
-                accessor.getInteger("tu3.namePlateBaseHeight", fallback.namePlateBaseHeight()),
-                accessor.getInteger("tu3.namePlateTopMargin", fallback.namePlateTopMargin()),
-                accessor.getInteger("tu3.namePlateBottomMargin", fallback.namePlateBottomMargin()),
-                accessor.getFloat("tu3.badgeWidthRatio", fallback.badgeWidthRatio()),
-                accessor.getInteger("tu3.badgeBaseHeight", fallback.badgeBaseHeight()),
-                accessor.getInteger("tu3.badgeYOffset", fallback.badgeYOffset()),
-                accessor.getFloat("tu3.badgeScale", fallback.badgeScale()),
-                accessor.getInteger("tu3.tabLabelWidthTrim", fallback.tabLabelWidthTrim()),
-                accessor.getInteger("tu3.centerOriginYOffset", fallback.centerOriginYOffset()),
-                accessor.getInteger("tu3.spawnerExtraMin", fallback.spawnerExtraMin()),
-                accessor.getFloat("tu3.spawnerExtraFactor", fallback.spawnerExtraFactor()),
-                accessor.getFloat("tu3.textScale", fallback.textScale())
-        );
+    private void startHoldingHorizontal(int dir) {
+        horizontalHold.start(dir);
+        handleNavMove(dir);
     }
 
-    private boolean carouselNavActive() {
-        return tu3NavZone == Tu3NavZone.CAROUSEL;
-    }
-
-    private void setTu3NavZone(Tu3NavZone zone) {
-        tu3NavZone = zone == null ? Tu3NavZone.CAROUSEL : zone;
-    }
-
-    private boolean once(BindingState state, ControllerBinding<?> binding) {
-        return state != null && state.is(binding) && state.onceClick(true);
-    }
-
-    private void startHoldingTu3Horizontal(int dir) {
-        tu3HorizontalHold.start(dir);
-        handleTu3NavMove(dir < 0, dir > 0);
-    }
-
-    private void stopHoldingTu3Horizontal() {
-        tu3HorizontalHold.stop();
-    }
-
-    private void pumpHoldingTu3Horizontal() {
-        if (!tu3HorizontalHold.ready()) return;
-        handleTu3NavMove(tu3HorizontalHold.dir() < 0, tu3HorizontalHold.dir() > 0);
-        tu3HorizontalHold.step();
+    private void pumpHoldingHorizontal() {
+        if (!horizontalHold.ready()) return;
+        handleNavMove(horizontalHold.dir());
+        horizontalHold.step();
     }
 
     private void tintBlitSprite(GuiGraphicsExtractor g, Identifier sprite, int x, int y, int w, int h, float tint) {
@@ -113,23 +78,26 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         FactoryGuiGraphics.of(g).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    private boolean handleTu3NavMove(boolean left, boolean right) {
-        if (!(left || right)) return false;
-        if (carouselNavActive()) return control(left, right);
-        int dir = (left ? -1 : 0) + (right ? 1 : 0);
-        if (dir == 0 || packList.getPackCount() <= 1) return true;
+    private float activeTint() {
+        return carouselFocused ? GREY_TINT : 1.0f;
+    }
+
+    private boolean handleNavMove(int dir) {
+        if (dir == 0) return false;
+        if (carouselFocused) return control(dir < 0, dir > 0);
+        if (packList.getPackCount() <= 1) return true;
         focusRelativePack(dir, true);
         applyQueuedPackChange();
         return true;
     }
 
-    private boolean handleTu3NavVertical(boolean up, boolean down) {
-        if (up && carouselNavActive()) {
-            setTu3NavZone(Tu3NavZone.PACKS);
+    private boolean handleNavVertical(boolean up, boolean down) {
+        if (up && carouselFocused) {
+            carouselFocused = false;
             return true;
         }
-        if (down && !carouselNavActive()) {
-            setTu3NavZone(Tu3NavZone.CAROUSEL);
+        if (down && !carouselFocused) {
+            carouselFocused = true;
             return true;
         }
         return false;
@@ -139,24 +107,19 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     protected Panel createTooltipBox() {
         return new Panel(UIAccessor.of(this)) {
             @Override
-            public void init(String name) {
-                super.init(name);
-            }
-
-            @Override
-            public void init() {
-                init("tooltipBox");
-            }
-
-            @Override
             public void extractRenderState(GuiGraphicsExtractor g, int i, int j, float f) {
             }
         };
     }
 
     @Override
+    protected void onWidgetListCreated(PlayerSkinWidgetList list) {
+        list.setCenterOverlay(this::renderNamePlate);
+    }
+
+    @Override
     protected void onAfterSkinPackChanged() {
-        applyTu3CarouselTuning();
+        applyCarouselTuning();
     }
 
     @Override
@@ -173,97 +136,78 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     protected void panelInit() {
         refreshSharedLayout();
-        refreshTu3Layout();
+        textScale = tu3Float("textScale", 1f);
         renderableVList.layoutSpacing(l -> 0);
         panel.init();
         tooltipBox.init("tooltipBox");
         layoutX = 0;
         layoutW = Math.max(1, width);
-        tu3StripH = Math.max(1, Math.round(62f * uiScale * tu3Layout.topStripScale()));
-        tu3BottomStripH = Math.max(1, Math.round(tu3Layout.bottomStripBaseHeight() * uiScale));
-        int maxGrey = height - tu3StripH - tu3BottomStripH;
-        if (maxGrey < 1) maxGrey = 1;
-        int shrunkGrey = Math.max(1, Math.round(maxGrey * tu3Layout.greyHeightRatio()));
-        int blockH = tu3StripH + shrunkGrey + tu3BottomStripH;
-        tu3StripY = Math.max(0, (height - blockH) / 2 + sc(tu3Layout.menuYOffset()));
-        tu3TabH = Math.max(1, Math.round((50f / 62f) * tu3StripH));
-        tu3TabY = tu3StripY + Math.round((2f / 62f) * tu3StripH);
-        int tabMaxH = (tu3StripY + tu3StripH) - tu3TabY;
-        if (tabMaxH < 1) tabMaxH = 1;
-        if (tu3TabH > tabMaxH) tu3TabH = tabMaxH;
-        layoutY = tu3StripY + tu3StripH;
-        tu3BottomStripY = Math.max(layoutY + 1, Math.min(height - tu3BottomStripH, layoutY + shrunkGrey));
-        layoutH = Math.max(1, tu3BottomStripY - layoutY);
-        int off45 = Math.round(tu3Layout.panelTopOffset() * uiScale);
-        int off23 = Math.round(tu3Layout.tooltipWidthOverscan() * uiScale);
-        int off90 = Math.round(tu3Layout.tooltipBottomOverscan() * uiScale);
-        panel.pos(layoutX, layoutY - off45);
+        stripH = Math.max(1, Math.round(62f * uiScale * tu3Float("topStripScale", 0.6f)));
+        bottomStripH = Math.max(1, Math.round(tu3Int("bottomStripBaseHeight", 20) * uiScale));
+        int shrunkGrey = Math.max(1, Math.round(Math.max(1, height - stripH - bottomStripH) * tu3Float("greyHeightRatio", 0.67f)));
+        stripY = Math.max(0, (height - (stripH + shrunkGrey + bottomStripH)) / 2 + sc(tu3Int("menuYOffset", 0)));
+        tabY = stripY + Math.round((2f / 62f) * stripH);
+        tabH = Math.min(Math.max(1, Math.round((50f / 62f) * stripH)), Math.max(1, stripY + stripH - tabY));
+        layoutY = stripY + stripH;
+        bottomStripY = Math.max(layoutY + 1, Math.min(height - bottomStripH, layoutY + shrunkGrey));
+        layoutH = Math.max(1, bottomStripY - layoutY);
+        panel.pos(layoutX, layoutY);
         panel.size(1, layoutH);
         tooltipBox.pos(layoutX, layoutY);
-        tooltipBox.size(layoutW + off23, layoutH + off90);
+        tooltipBox.size(layoutW, layoutH);
+        computeTabs();
     }
 
-    private void computeTu3Tabs() {
-        int inset = Math.round((tu3Layout.tabInsetNumerator() / 1280f) * width);
-        if (inset < 0) inset = 0;
-        int left = inset;
-        int total = width - inset * 2;
+    private void computeTabs() {
+        int inset = Math.max(0, Math.round((tu3Int("tabInsetNumerator", 105) / 1280f) * width));
+        int left = inset, total = width - inset * 2;
         if (total < 1) {
             left = 0;
             total = Math.max(1, width);
         }
-        int w = total / 3, extra = total - (w * 3);
-        tu3TabLeftX = left;
-        tu3TabMidX = left + w;
-        tu3TabRightX = left + w * 2;
-        tu3TabLeftW = w;
-        tu3TabMidW = w;
-        tu3TabRightW = w + extra;
+        int w = total / 3;
+        tabLeftX = left;
+        tabMidX = left + w;
+        tabRightX = left + w * 2;
+        tabLeftW = tabMidW = w;
+        tabRightW = w + (total - w * 3);
     }
 
-    private String tu3PackNameAt(int idx) {
-        return packList.getWrappedLabelForIndex(idx).getString();
+    private int midTabExtra() {
+        return Math.max(1, sc(tu3Int("midExtra", 11)));
     }
 
-    private int tu3MidExtra() {
-        return Math.max(1, sc(tu3Layout.midExtra()));
+    private int midTabY() {
+        return tabY - tu3Int("activeTabLift", 2) - midTabExtra() + MID_TAB_TOP_DROP;
     }
 
-    private void renderTu3TabsBehindStrip(GuiGraphicsExtractor g) {
-        computeTu3Tabs();
-        float sideTint = carouselNavActive() ? TU3_GREY_TINT : TU3_SIDE_TAB_TINT;
-        tintBlitSprite(g, TU3_TAB_PLATE, tu3TabLeftX - TU3_TAB_OUTSET, tu3TabY, tu3TabLeftW + TU3_TAB_OUTSET, tu3TabH, sideTint);
-        tintBlitSprite(g, TU3_TAB_PLATE, tu3TabRightX, tu3TabY, tu3TabRightW + TU3_TAB_OUTSET, tu3TabH, sideTint);
+    private int midTabH() {
+        return tabH + midTabExtra() - MID_TAB_TOP_DROP;
     }
 
-    private void renderTu3Tabs(GuiGraphicsExtractor g) {
-        computeTu3Tabs();
-        int midExtra = tu3MidExtra(), shiftUpPx = tu3Layout.activeTabLift();
-        int baseY = tu3TabY - shiftUpPx;
-        int midY = baseY - midExtra + TU3_MID_TAB_TOP_DROP, midH = tu3TabH + midExtra - TU3_MID_TAB_TOP_DROP;
-        tintBlitSprite(g, TU3_TAB_PLATE, tu3TabMidX, midY, tu3TabMidW, midH, carouselNavActive() ? TU3_GREY_TINT : 1.0f);
-        int baseLabelY = tu3TabY + (tu3TabH - minecraft.font.lineHeight) / 2;
+    private void renderTabs(GuiGraphicsExtractor g) {
+        int midY = midTabY(), midH = midTabH();
+        tintBlitSprite(g, TAB_PLATE, tabMidX, midY, tabMidW, midH, activeTint());
+        int baseLabelY = tabY + (tabH - minecraft.font.lineHeight) / 2;
         int midLabelY = midY + (midH - minecraft.font.lineHeight) / 2;
         int idx = packList.getFocusedPackIndex();
-        renderTu3TabLabel(g, tu3TabLeftX - TU3_TAB_OUTSET, tu3TabLeftW + TU3_TAB_OUTSET, baseLabelY, tu3PackNameAt(idx - 1), CommonColor.GRAY_TEXT.get());
-        renderTu3TabLabel(g, tu3TabMidX, tu3TabMidW, midLabelY, tu3PackNameAt(idx), CommonColor.GRAY_TEXT.get());
-        renderTu3TabLabel(g, tu3TabRightX, tu3TabRightW + TU3_TAB_OUTSET, baseLabelY, tu3PackNameAt(idx + 1), CommonColor.GRAY_TEXT.get());
+        renderTabLabel(g, tabLeftX - TAB_OUTSET, tabLeftW + TAB_OUTSET, baseLabelY, idx - 1);
+        renderTabLabel(g, tabMidX, tabMidW, midLabelY, idx);
+        renderTabLabel(g, tabRightX, tabRightW + TAB_OUTSET, baseLabelY, idx + 1);
     }
 
-    private void renderTu3TabLabel(GuiGraphicsExtractor g, int x, int w, int y, String label, int color) {
-        float textScale = tu3Layout.textScale();
-        int maxPx = Math.max(1, Math.round((w - sc(tu3Layout.tabLabelWidthTrim())) / textScale));
-        String text = PlayerSkinWidget.clipText(minecraft.font, label, maxPx);
+    private void renderTabLabel(GuiGraphicsExtractor g, int x, int w, int y, int packIndex) {
+        int maxPx = Math.max(1, Math.round((w - sc(tu3Int("tabLabelWidthTrim", 16))) / textScale));
+        String text = PlayerSkinWidget.clipText(minecraft.font, packList.getWrappedLabelForIndex(packIndex).getString(), maxPx);
+        int color = CommonColor.GRAY_TEXT.get();
         LegacyFontUtil.applySDFont(b -> {
             g.pose().pushMatrix();
             if (textScale == 1f) {
-                int drawX = x + (Math.max(1, w) - minecraft.font.width(text)) / 2;
                 g.pose().translate(0.4f, 0.4f);
-                g.text(minecraft.font, Component.literal(text), drawX, y, color, false);
+                g.text(minecraft.font, Component.literal(text), x + (Math.max(1, w) - minecraft.font.width(text)) / 2, y, color, false);
             } else {
                 int lineHeight = Math.max(1, Math.round(minecraft.font.lineHeight * textScale));
-                g.pose().translate(x + Math.max(1, w) / 2f + 0.4f,
-                        y + (minecraft.font.lineHeight - lineHeight) / 2f + 0.4f);
+                g.pose().translate(x + Math.max(1, w) / 2f + 0.4f, y + (minecraft.font.lineHeight - lineHeight) / 2f + 0.4f);
                 g.pose().scale(textScale, textScale);
                 g.text(minecraft.font, Component.literal(text), -minecraft.font.width(text) / 2, 0, color, false);
             }
@@ -271,42 +215,33 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
         });
     }
 
-    private void applyTu3CarouselTuning() {
+    private void applyCarouselTuning() {
         if (playerSkinWidgetList == null) return;
-        playerSkinWidgetList.setCarouselTuning(tu3Layout.carouselScale(), tu3Layout.carouselSpacing());
+        float carouselScale = tu3Float("carouselScale", 1.4175f);
+        playerSkinWidgetList.setCarouselTuning(carouselScale, tu3Float("carouselSpacing", 1.1f));
         SkinPack p = packList.getFocusedPack();
-        boolean fav = p != null && SkinIdUtil.isFavouritesPack(p.id());
-        playerSkinWidgetList.setAvoidRepeatsWhenFew(fav, 7);
-        float mult = tu3Layout.carouselScale();
-        float s0 = 0.935f * uiScale * mult, s1 = 0.77f * uiScale * mult;
-        float s2 = 0.605f * uiScale * mult, s3 = 0.44f * uiScale * mult;
+        playerSkinWidgetList.setAvoidRepeatsWhenFew(p != null && SkinIdUtil.isFavouritesPack(p.id()), 7);
+        float s0 = 0.935f * uiScale * carouselScale, s1 = 0.77f * uiScale * carouselScale;
+        float s2 = 0.605f * uiScale * carouselScale, s3 = 0.44f * uiScale * carouselScale;
         float w0 = 106f * s0, w1 = 106f * s1, w2 = 106f * s2, w3 = 106f * s3;
-        int pad = Math.max(1, sc(tu3Layout.carouselPad()));
-        float available = Math.max(1f, (float) layoutW - pad * 2f);
-        float sum = w0 + (w1 + w2 + w3) * 2f;
-        float gap = (available - sum) / 6f;
-        float leftEdge = layoutX + pad;
-        float cM3 = leftEdge + w3 / 2f;
+        int pad = Math.max(1, carouselPad());
+        float gap = (Math.max(1f, (float) layoutW - pad * 2f) - (w0 + (w1 + w2 + w3) * 2f)) / 6f;
+        float cM3 = layoutX + pad + w3 / 2f;
         float cM2 = cM3 + w3 / 2f + gap + w2 / 2f;
         float cM1 = cM2 + w2 / 2f + gap + w1 / 2f;
         float c0 = cM1 + w1 / 2f + gap + w0 / 2f;
         float cP1 = c0 + w0 / 2f + gap + w1 / 2f;
         float cP2 = cP1 + w1 / 2f + gap + w2 / 2f;
         float cP3 = cP2 + w2 / 2f + gap + w3 / 2f;
-        float spawnerExtra = Math.max(tu3Layout.spawnerExtraMin() * uiScale, w3 * tu3Layout.spawnerExtraFactor());
-        float cM4 = cM3 - (w3 / 2f + gap + w3 / 2f) - spawnerExtra;
-        float cP4 = cP3 + (w3 / 2f + gap + w3 / 2f) + spawnerExtra;
-        int[] centers = {
-                Math.round(cM4), Math.round(cM3), Math.round(cM2), Math.round(cM1), Math.round(c0),
-                Math.round(cP1), Math.round(cP2), Math.round(cP3), Math.round(cP4)
-        };
-        playerSkinWidgetList.setCustomCarouselCenters(centers);
-        int baseCenterW = Math.round(106f * 0.935f * uiScale);
-        int dx = Math.round(baseCenterW * (tu3Layout.carouselScale() - 1f) / 2f);
-        float areaCenter = (layoutY + tu3BottomStripY) / 2f;
-        float centerH = 150f * s0;
-        int desiredOriginY = Math.round(areaCenter - (centerH / 2f) - tu3Layout.centerOriginYOffset() * uiScale);
-        playerSkinWidgetList.setOrigin(playerSkinWidgetList.x - dx, desiredOriginY);
+        float spawnerExtra = Math.max(tu3Int("spawnerExtraMin", 10) * uiScale, w3 * tu3Float("spawnerExtraFactor", 0.35f));
+        float spawnerStep = w3 / 2f + gap + w3 / 2f;
+        playerSkinWidgetList.setCustomCarouselCenters(new int[]{
+                Math.round(cM3 - spawnerStep - spawnerExtra), Math.round(cM3), Math.round(cM2), Math.round(cM1), Math.round(c0),
+                Math.round(cP1), Math.round(cP2), Math.round(cP3), Math.round(cP3 + spawnerStep + spawnerExtra)
+        });
+        float areaCenter = (layoutY + bottomStripY) / 2f;
+        int originY = Math.round(areaCenter - 150f * s0 / 2f - tu3Int("centerOriginYOffset", 32) * uiScale);
+        playerSkinWidgetList.setOrigin(playerSkinWidgetList.x, originY);
         playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index, true);
     }
 
@@ -318,28 +253,24 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public boolean mouseClicked(MouseButtonEvent e, boolean bl) {
         if (e.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-            computeTu3Tabs();
             double mx = e.x(), my = e.y();
-            int midExtra = tu3MidExtra(), shiftUpPx = tu3Layout.activeTabLift();
-            int midY = tu3TabY - shiftUpPx - midExtra + TU3_MID_TAB_TOP_DROP, midH = tu3TabH + midExtra - TU3_MID_TAB_TOP_DROP;
-
-            if (inside(mx, my, tu3TabLeftX - TU3_TAB_OUTSET, tu3TabY, Math.max(1, tu3TabLeftW + TU3_TAB_OUTSET), tu3TabH)) {
-                setTu3NavZone(Tu3NavZone.PACKS);
+            if (inside(mx, my, tabLeftX - TAB_OUTSET, tabY, Math.max(1, tabLeftW + TAB_OUTSET), tabH)) {
+                carouselFocused = false;
                 focusRelativePack(-1, false);
                 return true;
             }
-            if (inside(mx, my, tu3TabRightX, tu3TabY, Math.max(1, tu3TabRightW + TU3_TAB_OUTSET), tu3TabH)) {
-                setTu3NavZone(Tu3NavZone.PACKS);
+            if (inside(mx, my, tabRightX, tabY, Math.max(1, tabRightW + TAB_OUTSET), tabH)) {
+                carouselFocused = false;
                 focusRelativePack(1, false);
                 return true;
             }
-            if (inside(mx, my, tu3TabMidX, midY, Math.max(1, tu3TabMidW), midH)) {
-                setTu3NavZone(Tu3NavZone.PACKS);
+            if (inside(mx, my, tabMidX, midTabY(), Math.max(1, tabMidW), midTabH())) {
+                carouselFocused = false;
                 return true;
             }
         }
         if (handleCarouselMouseClicked(e, bl)) {
-            setTu3NavZone(Tu3NavZone.CAROUSEL);
+            carouselFocused = true;
             return true;
         }
         return super.mouseClicked(e, bl);
@@ -348,156 +279,146 @@ public class TU3ChangeSkinScreen extends AbstractChangeSkinScreen {
     @Override
     public boolean keyPressed(KeyEvent e) {
         int key = InputConstants.getKey(e).getValue();
-        if (handleTu3NavVertical(
-                key == InputConstants.KEY_UP || key == InputConstants.KEY_W,
+        if (handleNavVertical(key == InputConstants.KEY_UP || key == InputConstants.KEY_W,
                 key == InputConstants.KEY_DOWN || key == InputConstants.KEY_S))
             return true;
-        if (handleTu3NavMove(
-                key == InputConstants.KEY_LEFT || key == InputConstants.KEY_A,
-                key == InputConstants.KEY_RIGHT || key == InputConstants.KEY_D))
-            return true;
+        int dir = key == InputConstants.KEY_LEFT || key == InputConstants.KEY_A ? -1
+                : key == InputConstants.KEY_RIGHT || key == InputConstants.KEY_D ? 1 : 0;
+        if (handleNavMove(dir)) return true;
         return super.keyPressed(e);
     }
 
     @Override
     public void bindingStateTick(BindingState state) {
         if (state != null && (state.is(ControllerBinding.LEFT_BUMPER) || state.is(ControllerBinding.RIGHT_BUMPER))) {
-            if (state.pressed && state.canClick()) {
-                int dir = state.is(ControllerBinding.RIGHT_BUMPER) ? 1 : -1;
-                if (packList.getPackCount() > 1) {
-                    focusRelativePack(dir, true);
-                    applyQueuedPackChange();
-                }
+            if (state.pressed && state.canClick() && packList.getPackCount() > 1) {
+                focusRelativePack(state.is(ControllerBinding.RIGHT_BUMPER) ? 1 : -1, true);
+                applyQueuedPackChange();
             }
             state.block();
             return;
         }
-        if (once(state, ControllerBinding.DPAD_UP) || once(state, ControllerBinding.LEFT_STICK_UP)) {
-            if (handleTu3NavVertical(true, false)) return;
-        }
-        if (once(state, ControllerBinding.DPAD_DOWN) || once(state, ControllerBinding.LEFT_STICK_DOWN)) {
-            if (handleTu3NavVertical(false, true)) return;
-        }
-        if (state != null && (
-                state.is(ControllerBinding.DPAD_LEFT)
-                        || state.is(ControllerBinding.LEFT_STICK_LEFT)
-                        || state.is(ControllerBinding.DPAD_RIGHT)
-                        || state.is(ControllerBinding.LEFT_STICK_RIGHT))) {
-            int dir = (state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.LEFT_STICK_RIGHT)) ? 1 : -1;
+        if ((buttonOnce(state, ControllerBinding.DPAD_UP) || buttonOnce(state, ControllerBinding.LEFT_STICK_UP)) && handleNavVertical(true, false))
+            return;
+        if ((buttonOnce(state, ControllerBinding.DPAD_DOWN) || buttonOnce(state, ControllerBinding.LEFT_STICK_DOWN)) && handleNavVertical(false, true))
+            return;
+        if (state != null && (state.is(ControllerBinding.DPAD_LEFT) || state.is(ControllerBinding.LEFT_STICK_LEFT)
+                || state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.LEFT_STICK_RIGHT))) {
+            int dir = state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.LEFT_STICK_RIGHT) ? 1 : -1;
             if (state.released) {
-                if (tu3HorizontalHold.active() && tu3HorizontalHold.dir() == dir) stopHoldingTu3Horizontal();
+                if (horizontalHold.active() && horizontalHold.dir() == dir) horizontalHold.stop();
             } else if (state.pressed) {
-                if (!tu3HorizontalHold.active() || tu3HorizontalHold.dir() != dir) startHoldingTu3Horizontal(dir);
-                pumpHoldingTu3Horizontal();
+                if (!horizontalHold.active() || horizontalHold.dir() != dir) startHoldingHorizontal(dir);
+                pumpHoldingHorizontal();
                 state.block();
                 return;
             }
         }
         if (handleSharedBindingState(state)) return;
-        if (!ControlType.getActiveType().isKbm()
-                && state != null && state.is(ControllerBinding.LEFT_STICK)
-                && state instanceof BindingState.Axis stick) {
-            double sx = stick.x, sy = stick.y;
-            if (Math.abs(sx) <= 0.45d) {
-                if (sy <= -0.65d) {
-                    if (!leftStickUpHeld) leftStickUpHeld = true;
-                    state.block();
-                    return;
-                } else if (sy >= 0.65d) {
-                    if (!leftStickDownHeld) leftStickDownHeld = true;
-                    state.block();
-                    return;
-                }
-            }
-            if (Math.abs(sy) < 0.25d) {
-                leftStickUpHeld = false;
-                leftStickDownHeld = false;
-            }
+        if (!ControlType.getActiveType().isKbm() && state != null && state.is(ControllerBinding.LEFT_STICK)
+                && state instanceof BindingState.Axis stick && Math.abs(stick.x) <= 0.45d && Math.abs(stick.y) >= 0.65d) {
+            state.block();
+            return;
         }
         super.bindingStateTick(state);
     }
 
     @Override
-    public void simulateKeyAction(ControllerManager manager, BindingState state) {
-        if (manager.isCursorDisabled)
-            manager.simulateKeyAction(s -> s.is(ControllerBinding.DOWN_BUTTON), InputConstants.KEY_RETURN, state);
-        manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_BUTTON), InputConstants.KEY_ESCAPE, state, true);
-        manager.simulateKeyAction(s -> s.is(ControllerBinding.LEFT_BUTTON), InputConstants.KEY_X, state);
-        manager.simulateKeyAction(s -> s.is(ControllerBinding.UP_BUTTON), InputConstants.KEY_O, state);
-        if (source.supportsCustomPackOptions())
-            manager.simulateKeyAction(s -> s.is(ControllerBinding.BACK), InputConstants.KEY_C, state, true);
-        if (manager.isCursorDisabled) {
-            manager.simulateKeyAction(s -> s.is(ControllerBinding.LEFT_TRIGGER), InputConstants.KEY_PAGEUP, state);
-            manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_TRIGGER), InputConstants.KEY_PAGEDOWN, state);
-        } else {
-            manager.simulateKeyAction(s -> s.is(ControllerBinding.RIGHT_TRIGGER), InputConstants.KEY_W, state);
-        }
-        manager.simulateKeyAction(s -> s.is(ControllerBinding.CAPTURE), InputConstants.KEY_F2, state);
+    protected boolean bumpersScrollCarousel() {
+        return false;
     }
 
     @Override
     public void tick() {
         super.tick();
-        pumpHoldingTu3Horizontal();
+        pumpHoldingHorizontal();
         tickScreenTail();
     }
 
     @Override
     public void renderDefaultBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float pt) {
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), g, false, false, false);
-        renderTu3TabsBehindStrip(g);
-        if (tu3StripH > 0)
-            tintBlitSprite(g, TU3_TOP_STRIP, 0, tu3StripY, width, tu3StripH, carouselNavActive() ? TU3_GREY_TINT : 1.0f);
-        g.fill(0, tu3StripY + tu3StripH, Math.max(1, width), Math.max(tu3StripY + tu3StripH + 1, tu3BottomStripY), 0x880D0D0D);
-        if (tu3BottomStripH > 0)
-            tintBlitSprite(g, TU3_BOTTOM_STRIP, 0, tu3BottomStripY, width, tu3BottomStripH, carouselNavActive() ? TU3_GREY_TINT : 1.0f);
-        int pad = sc(tu3Layout.carouselPad());
-        PlayerSkinWidget.setCarouselClip(layoutX + pad, layoutY + pad, layoutX + layoutW - pad, tu3BottomStripY - pad);
-        renderTu3Tabs(g);
-        int plateH = Math.max(1, Math.round(tu3Layout.namePlateBaseHeight() * uiScale) * 2);
-        int plateY = Math.max(tu3StripY + tu3StripH + Math.max(1, sc(tu3Layout.namePlateTopMargin())), tu3BottomStripY - Math.max(1, sc(tu3Layout.namePlateBottomMargin())) - plateH);
-        PlayerSkinWidget.setCenterNamePlateReady(!carouselAnimating());
-        PlayerSkinWidget.setCenterNamePlate(true, tu3TabMidW, plateH, 0, plateY, tu3Layout.textScale());
-        PlayerSkinWidget.setCenterNamePlateCenterX(width / 2);
-        PlayerSkinWidget.setCenterNamePlateSprite(LegacySprites.SQUARE_RECESSED_PANEL);
-        PlayerSkinWidget.setCenterNamePlateHighlight(carouselNavActive(), 1, 1, TU3_NAME_PLATE_HIGHLIGHT);
-        int badgeW = Math.max(1, Math.round(tu3TabMidW * tu3Layout.badgeWidthRatio()));
-        int badgeH = Math.max(1, Math.round(tu3Layout.badgeBaseHeight() * uiScale));
-        PlayerSkinWidget.setCenterSelectedBadge(true, badgeW, badgeH, Math.max(0, sc(tu3Layout.badgeYOffset())) + Math.max(1, sc(4)), TU3_SELECTED_BADGE);
+        computeTabs();
+        float sideTint = carouselFocused ? GREY_TINT : SIDE_TAB_TINT;
+        tintBlitSprite(g, TAB_PLATE, tabLeftX - TAB_OUTSET, tabY, tabLeftW + TAB_OUTSET, tabH, sideTint);
+        tintBlitSprite(g, TAB_PLATE, tabRightX, tabY, tabRightW + TAB_OUTSET, tabH, sideTint);
+        tintBlitSprite(g, TOP_STRIP, 0, stripY, width, stripH, activeTint());
+        g.fill(0, stripY + stripH, Math.max(1, width), Math.max(stripY + stripH + 1, bottomStripY), 0x880D0D0D);
+        tintBlitSprite(g, BOTTOM_STRIP, 0, bottomStripY, width, bottomStripH, activeTint());
+        int pad = carouselPad();
+        PlayerSkinWidget.setCarouselClip(layoutX + pad, layoutY + pad, layoutX + layoutW - pad, bottomStripY - pad);
+        renderTabs(g);
+    }
+
+    private void renderNamePlate(GuiGraphicsExtractor g, PlayerSkinWidget center) {
+        int pad = carouselPad();
+        g.enableScissor(layoutX + pad, layoutY + pad, layoutX + layoutW - pad, bottomStripY - pad);
+        try {
+            renderNamePlateClipped(g, center);
+        } finally {
+            g.disableScissor();
+        }
+    }
+
+    private void renderNamePlateClipped(GuiGraphicsExtractor g, PlayerSkinWidget center) {
+        String id = center.skinId.get();
+        if (id == null) return;
+        boolean settled = !carouselAnimating();
+        if (settled || namePlateSkinId == null) namePlateSkinId = id;
+        if (namePlateSkinId == null) return;
+        var font = minecraft.font;
+        int plateW = Math.max(1, tabMidW);
+        int plateH = Math.max(1, Math.round(tu3Int("namePlateBaseHeight", 16) * uiScale) * 2);
+        int plateX = width / 2 - plateW / 2;
+        int clipTop = layoutY + carouselPad(), clipBottom = bottomStripY - carouselPad();
+        int plateY = Math.max(stripY + stripH + Math.max(1, sc(tu3Int("namePlateTopMargin", 4))), bottomStripY - Math.max(1, sc(tu3Int("namePlateBottomMargin", 8))) - plateH);
+        plateY = Math.max(clipTop, Math.min(plateY, clipBottom - plateH - 1));
+        if (carouselFocused) {
+            g.fill(plateX - 1, plateY - 1, plateX + plateW + 1, plateY, NAME_PLATE_HIGHLIGHT);
+            g.fill(plateX - 1, plateY + plateH, plateX + plateW + 1, plateY + plateH + 1, NAME_PLATE_HIGHLIGHT);
+            g.fill(plateX - 1, plateY, plateX, plateY + plateH, NAME_PLATE_HIGHLIGHT);
+            g.fill(plateX + plateW, plateY, plateX + plateW + 1, plateY + plateH, NAME_PLATE_HIGHLIGHT);
+        }
+        blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, plateX, plateY, plateW, plateH);
+        String name = source.skinName(namePlateSkinId);
+        String theme = SkinIdUtil.isAutoSelect(namePlateSkinId) ? null : source.skinTheme(namePlateSkinId);
+        if (theme != null && (theme.isBlank() || theme.equals(name))) theme = null;
+        int maxPx = Math.max(1, Math.round((plateW - 8) / textScale));
+        int lineHeight = Math.max(1, Math.round(font.lineHeight * textScale));
+        int baseY = plateY + (plateH - lineHeight * (theme == null ? 1 : 2)) / 2;
+        drawPlateText(g, PlayerSkinWidget.clipText(font, name, maxPx), plateX + plateW / 2, baseY);
+        if (theme != null) drawPlateText(g, PlayerSkinWidget.clipText(font, theme, maxPx), plateX + plateW / 2, baseY + lineHeight);
+        if (!settled || !isAppliedSkin(namePlateSkinId)) return;
+        int badgeW = Math.max(1, Math.round(tabMidW * tu3Float("badgeWidthRatio", 0.52f)));
+        int badgeH = Math.max(1, Math.round(tu3Int("badgeBaseHeight", 12) * uiScale));
+        int badgeX = width / 2 - badgeW / 2;
+        int badgeY = plateY - (Math.max(0, sc(tu3Int("badgeYOffset", 4))) + Math.max(1, sc(4))) - badgeH;
+        badgeY = Math.max(clipTop, Math.min(badgeY, clipBottom - badgeH - 1));
+        blitSprite(g, SELECTED_BADGE, badgeX, badgeY, badgeW, badgeH);
+        drawPlateText(g, "Selected", badgeX + badgeW / 2, badgeY + (badgeH - lineHeight) / 2 + Math.round(2 * textScale));
+    }
+
+    private void drawPlateText(GuiGraphicsExtractor g, String text, int centerX, int y) {
+        g.pose().pushMatrix();
+        g.pose().translate(centerX, y);
+        g.pose().scale(textScale, textScale);
+        g.centeredText(minecraft.font, Component.literal(text), 0, 0, 0xFFFFFFFF);
+        g.pose().popMatrix();
+    }
+
+    private boolean isAppliedSkin(String skinId) {
+        String applied = currentAppliedSkinId();
+        return SkinIdUtil.isAutoSelect(skinId) ? applied == null || applied.isBlank() : skinId.equals(applied);
     }
 
     @Override
     public void addControlTooltips(ControlTooltipList r) {
-        addCommonControlTooltips(
-                r,
-                ControlTooltip.POINTER_MOVEMENT::get,
-                () -> Component.literal("Navigate")
-        );
+        addCommonControlTooltips(r, CommonIcon.POINTER_MOVEMENT::get, () -> LegacyComponents.NAVIGATE);
     }
 
     @Override
     public void removed() {
-        stopHoldingTu3Horizontal();
-        PlayerSkinWidget.setCenterNamePlate(false, 1, 1, 0, -1, 1f);
-        PlayerSkinWidget.setCenterNamePlateReady(true);
-        PlayerSkinWidget.setCenterNamePlateCenterX(-1);
-        PlayerSkinWidget.setCenterNamePlateHighlight(false, 0, 1, TU3_NAME_PLATE_HIGHLIGHT);
-        PlayerSkinWidget.setCenterSelectedBadge(false, 1, 1, 0, TU3_SELECTED_BADGE);
+        horizontalHold.stop();
         super.removed();
-    }
-
-    private enum Tu3NavZone {CAROUSEL, PACKS}
-
-    private record Tu3LayoutMetrics(
-            float topStripScale, int bottomStripBaseHeight, float greyHeightRatio, int menuYOffset, int tabInsetNumerator, int midExtra,
-            int activeTabLift,
-            float carouselScale, float carouselSpacing, int panelTopOffset, int tooltipWidthOverscan,
-            int tooltipBottomOverscan, int carouselPad,
-            int namePlateBaseHeight, int namePlateTopMargin, int namePlateBottomMargin, float badgeWidthRatio,
-            int badgeBaseHeight, int badgeYOffset,
-            float badgeScale, int tabLabelWidthTrim, int centerOriginYOffset, int spawnerExtraMin,
-            float spawnerExtraFactor, float textScale
-    ) {
-        static final Tu3LayoutMetrics DEFAULT = new Tu3LayoutMetrics(0.60f, 20, 0.67f, 0, 105, 11, 2, 1.4175f, 1.1f, 45, 23, 90, 6, 16, 4, 8, 0.52f, 12, 4, 0.75f, 16, 32, 10, 0.35f, 1f);
     }
 }

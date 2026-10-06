@@ -68,8 +68,8 @@ import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
@@ -84,7 +84,6 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -99,11 +98,11 @@ public class LegacyRenderUtil {
     public static boolean tooltipTextColorOverrideForcesStyle;
     public static boolean autoFocusedWidget = false;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
-    public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
-    public static final Identifier PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
-    public static final Identifier MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
-    public static final Identifier LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
+    public static final Identifier MINECRAFT = Legacy4J.identifier("textures/gui/title/minecraft.png");
+    public static final Identifier PANORAMA_DAY = Legacy4J.identifier("textures/gui/title/panorama_day.png");
+    public static final Identifier PANORAMA_NIGHT = Legacy4J.identifier("textures/gui/title/panorama_night.png");
+    public static final Identifier MENU_BACKGROUND = Legacy4J.identifier("textures/gui/menu_background.png");
+    public static final Identifier LOADING_BACKGROUND = Legacy4J.identifier("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -697,8 +696,8 @@ public class LegacyRenderUtil {
         int p = vector2ic.x();
         int q = vector2ic.y();
         graphics.pose().pushMatrix();
-        if (i == (int) Legacy4JClient.controllerManager.getPointerX() && j == (int) Legacy4JClient.controllerManager.getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
-            graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() - i), (float) (Legacy4JClient.controllerManager.getPointerY() - j));
+        if (i == (int) ControllerManager.getInstance().getPointerX() && j == (int) ControllerManager.getInstance().getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
+            graphics.pose().translate((float) (ControllerManager.getInstance().getPointerX() - i), (float) (ControllerManager.getInstance().getPointerY() - j));
         graphics.pose().translate(p, q);
         int scaledWidth = Math.round(scale * k);
         int scaledHeight = Math.round(scale * l);
@@ -815,9 +814,9 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.enableDepthTest();
         }
 
-        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
+        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !ControllerManager.getInstance().isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXOffset(), Legacy4JClient.controllerManager.getVisualPointerY());
+            graphics.pose().translate(ControllerManager.getInstance().getVisualPointerX() + LegacyTipManager.getTipXOffset(), ControllerManager.getInstance().getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(LegacyOptions.getUIMode().isFHD() ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
         }

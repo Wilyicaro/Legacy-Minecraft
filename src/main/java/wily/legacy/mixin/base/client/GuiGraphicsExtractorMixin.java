@@ -35,7 +35,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.MutablePIPRenderState;
-import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 

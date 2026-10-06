@@ -13,8 +13,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.LegacyControlsOptions;
 import wily.legacy.skins.skin.DownloadedSkinPackStore;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
@@ -68,22 +69,22 @@ public abstract class OptionsMixin {
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILnet/minecraft/client/KeyMapping$Category;Ljava/util/function/BooleanSupplier;Z)V", ordinal = 0), index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
-        return () -> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isInWater() || minecraft.player.onGround()) && !minecraft.player./*? if >=1.21 {*/getInBlockState/*?} else {*//*getFeetBlockState*//*?}*/().is(Blocks.SCAFFOLDING))) && (booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleCrouch.get() && Legacy4JClient.controllerManager.isControllerTheLastInput());
+        return () -> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isInWater() || minecraft.player.onGround()) && !minecraft.player./*? if >=1.21 {*/getInBlockState/*?} else {*//*getFeetBlockState*//*?}*/().is(Blocks.SCAFFOLDING))) && (booleanSupplier.getAsBoolean() && !ControllerManager.getInstance().isControllerTheLastInput() || LegacyControlsOptions.controllerToggleCrouch.get() && ControllerManager.getInstance().isControllerTheLastInput());
     }
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILnet/minecraft/client/KeyMapping$Category;Ljava/util/function/BooleanSupplier;Z)V", ordinal = 1), index = 3)
     protected BooleanSupplier initKeySprint(BooleanSupplier booleanSupplier) {
-        return () -> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleSprint.get() && Legacy4JClient.controllerManager.isControllerTheLastInput();
+        return () -> booleanSupplier.getAsBoolean() && !ControllerManager.getInstance().isControllerTheLastInput() || LegacyControlsOptions.controllerToggleSprint.get() && ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILnet/minecraft/client/KeyMapping$Category;Ljava/util/function/BooleanSupplier;Z)V", ordinal = 0), index = 4)
     protected BooleanSupplier initKeyUse(BooleanSupplier booleanSupplier) {
-        return () -> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleUse.get() && Legacy4JClient.controllerManager.isControllerTheLastInput();
+        return () -> booleanSupplier.getAsBoolean() && !ControllerManager.getInstance().isControllerTheLastInput() || LegacyControlsOptions.controllerToggleUse.get() && ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILnet/minecraft/client/KeyMapping$Category;Ljava/util/function/BooleanSupplier;Z)V", ordinal = 1), index = 4)
     protected BooleanSupplier initKeyAttack(BooleanSupplier booleanSupplier) {
-        return () -> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleAttack.get() && Legacy4JClient.controllerManager.isControllerTheLastInput();
+        return () -> booleanSupplier.getAsBoolean() && !ControllerManager.getInstance().isControllerTheLastInput() || LegacyControlsOptions.controllerToggleAttack.get() && ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     @ModifyReturnValue(method = "getFinalSoundSourceVolume", at = @At("RETURN"))

@@ -27,6 +27,7 @@ import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyMixinOptions;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
@@ -137,7 +138,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.L
     @Override
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
-        list.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
+        list.add(CommonIcon.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
         list.add(() -> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_CONNECTION);
     }
 

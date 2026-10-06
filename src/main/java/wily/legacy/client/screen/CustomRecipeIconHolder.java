@@ -22,6 +22,7 @@ import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;

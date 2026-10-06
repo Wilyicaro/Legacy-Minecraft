@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.RecipeBookMenu;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /*import wily.legacy.client.screen.DisplayRecipe;
 import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
 *///?}
-import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
 
 @Mixin(RecipeBookComponent.class)
 public class RecipeBookComponentMixin {

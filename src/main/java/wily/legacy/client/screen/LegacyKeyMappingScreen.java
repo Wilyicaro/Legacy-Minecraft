@@ -159,7 +159,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
     }
 
     public Component getCancelTooltip() {
-        return Component.translatable("legacy.options.keyMappingTooltip", ControlTooltip.CANCEL_BINDING.get().getComponent());
+        return Component.translatable("legacy.options.keyMappingTooltip", CommonIcon.CANCEL_BINDING.get().getComponent());
     }
 
     public Component getConflictingTooltip() {
@@ -232,7 +232,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         list.replace(1, i -> i, c -> selectedMapping == null ? c : null);
         list.replace(2, i -> i, c -> selectedMapping == null ? c : null);
         list.replace(3, i -> i, c -> selectedMapping == null ? c : null);
-        list.add(ControlTooltip.CANCEL_BINDING::get, () -> selectedMapping == null ? null : LegacyComponents.CANCEL);
+        list.add(CommonIcon.CANCEL_BINDING::get, () -> selectedMapping == null ? null : LegacyComponents.CANCEL);
     }
 
     @Override

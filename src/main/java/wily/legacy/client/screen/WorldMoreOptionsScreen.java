@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -45,6 +46,7 @@ import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.CommonIcon;
 import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyGameRules;
@@ -89,10 +91,12 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected Runnable onClose = () -> {
     };
     protected final Supplier<WorldMoreOptionsScreen> advancedOptionsScreen;
+    private final Bearer<BlockPos> seedStart;
 
-    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
+    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale, Bearer<BlockPos> seedStart) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
-        advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent, trustPlayers, onlineGame, biomeScale);
+        this.seedStart = seedStart;
+        advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent, trustPlayers, onlineGame, biomeScale, seedStart);
         renderableVLists.add(gameRenderables);
         if (LegacyOptions.useLegacyWorldOptions()) {
             initLegacyCreateWorldOptions(parent, trustPlayers, onlineGame, biomeScale);
@@ -103,10 +107,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private void initDefaultCreateWorldOptions(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
-        renderableVList.addCategory(ENTER_SEED);
-        EditBox editBox = createSeedEditBox(parent);
-        renderableVList.addRenderable(editBox);
-        renderableVList.addCategory(SEED_INFO);
+        addSeedOptions(parent);
         renderableVList.addCategory(Component.translatable("selectWorld.mapType"));
         renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
                 s -> s.getObjectValue().describePreset(),
@@ -153,10 +154,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     private void initLegacyCreateWorldOptions(CreateWorldScreen parent, Bearer<Boolean> trustPlayers, Bearer<Boolean> onlineGame, Bearer<ResourceKey<WorldPreset>> biomeScale) {
-        renderableVList.addCategory(ENTER_SEED);
-        EditBox editBox = createSeedEditBox(parent);
-        renderableVList.addRenderable(editBox);
-        renderableVList.addCategory(SEED_INFO);
+        addSeedOptions(parent);
 
         TickBox amplifiedWorld = new TickBox(0, 0, isPresetSelected(parent, WorldPresets.AMPLIFIED), b -> Component.translatable("legacy.menu.selectWorld.amplified_world"), b -> Tooltip.create(LegacyComponents.AMPLIFIED_DESCRIPTION), b -> {
             if (b.selected) setWorldPreset(parent, WorldPresets.AMPLIFIED);
@@ -210,6 +208,14 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.BLOCK_DROPS);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.NATURAL_HEALTH_REGENERATION);
         addBooleanGameRuleOption(gameRenderables, gameRules, GameRules.IMMEDIATE_RESPAWN);
+    }
+
+    private void addSeedOptions(CreateWorldScreen parent) {
+        renderableVList.addCategory(ENTER_SEED);
+        renderableVList.addRenderable(createSeedEditBox(parent));
+        renderableVList.addCategory(SEED_INFO);
+        renderableVList.addRenderable(new LegacyButton(Component.translatable("legacy.menu.seed_preview"),
+                b -> minecraft.setScreen(new SeedPreviewScreen(this, parent.getUiState().getSettings(), seedStart))));
     }
 
     private EditBox createSeedEditBox(CreateWorldScreen parent) {
@@ -359,6 +365,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                         : Panel.centered(s, 244, 199),
                 Component.translatable("createWorld.tab.more.title"));
         advancedOptionsScreen = () -> new WorldMoreOptionsScreen(parent);
+        seedStart = Bearer.of(null);
         renderableVLists.add(gameRenderables);
         tabList.setSelected(1);
         GameRules gameRules = parent.gameRules == null ? loadSavedGameRules(parent) : parent.gameRules;
@@ -482,7 +489,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public void addControlTooltips(ControlTooltipList list) {
         super.addControlTooltips(list);
-        list.add(ControlTooltip.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
+        list.add(CommonIcon.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
     }
 
     public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRule<?>> allowGamerule) {
