@@ -43,6 +43,7 @@ public class LegacyTripleTConfigScreen extends AbstractSettingsScreen {
 
 
     public LegacyTripleTConfigScreen(ConfigCategory config, Naming naming, @Nullable Screen parent, boolean considerTabs) {
+        // Field initialization needs to happen **before** the superclass constructor is called, otherwise, `config`, `naming`, and `sync`, which are used by `LegacyTripleTConfigScreen#addSection` would be null when called.
         this.config = config;
         this.naming = naming;
         this.sync = new ArrayList<>();
