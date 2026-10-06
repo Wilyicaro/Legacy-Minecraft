@@ -76,15 +76,6 @@ public class LegacyTripleTConfigScreen extends AbstractSettingsScreen {
         return config.getEntries().isEmpty() && config.getReferencedConfigs().isEmpty() && config.getCategories().size() > 1 && naming.description() == null;
     }
 
-    private void selectTab(int index) {
-        getRenderableVList().renderables.clear();
-        getRenderableVList().renderables.addAll(renderablesByTab.get(index));
-
-        getRenderableVList().scrolledList.set(0);
-        resetElements();
-        repositionElements();
-    }
-
     // TODO fix warcrimes
     private Screen makePresetsScreen(Screen parent, ConfigCategory config, Naming naming, Runnable afterSelect) throws Throwable {
         MethodHandles.Lookup lookup = MethodHandles.lookup();

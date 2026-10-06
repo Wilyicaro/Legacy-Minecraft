@@ -63,7 +63,7 @@ public class LegacyTTTConfigWidgets {
             );
         }
 
-        return createTextWidget(info, naming, x, y, width, value == null ? "" : value.toString(), _ -> {});
+        return createTextWidget(info, naming, x, y, width, value == null ? "" : value.toString(), afterSet::accept);
     }
 
     private static <T> AbstractWidget createTextWidget(
@@ -136,6 +136,7 @@ public class LegacyTTTConfigWidgets {
             case Type.TLong _ -> Long.parseLong(value);
             case Type.TFloat _ -> Float.parseFloat(value);
             case Type.TDouble _ -> Double.parseDouble(value);
+            // Strings are passed through as strings; booleans and enums should never encounter this case
             case Type.TString _, Type.TBool _, Type.TEnum<?> _, Type.TUnknown _ -> value;
         };
     }

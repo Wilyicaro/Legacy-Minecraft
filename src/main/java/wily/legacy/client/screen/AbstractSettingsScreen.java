@@ -94,4 +94,13 @@ public abstract class AbstractSettingsScreen extends OptionsScreen implements Ta
     public TabList getTabList() {
         return tabList;
     }
+
+    protected void selectTab(int index) {
+        getRenderableVList().renderables.clear();
+        getRenderableVList().renderables.addAll(renderablesByTab.get(index));
+
+        getRenderableVList().scrolledList.set(0);
+        resetElements();
+        repositionElements();
+    }
 }
