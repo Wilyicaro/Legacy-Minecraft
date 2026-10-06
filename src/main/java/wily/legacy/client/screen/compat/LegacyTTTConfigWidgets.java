@@ -63,7 +63,7 @@ public class LegacyTTTConfigWidgets {
             );
         }
 
-        return createTextWidget(info, naming, x, y, width, value == null ? "" : value.toString(), afterSet::accept);
+        return createTextWidget(info, naming, x, y, width, value == null ? "" : value.toString(), afterSet);
     }
 
     private static <T> AbstractWidget createTextWidget(
@@ -102,7 +102,7 @@ public class LegacyTTTConfigWidgets {
     }
 
     private static <T> AbstractWidget createToggleWidget(
-            EntryInfo<T> info,
+            @SuppressWarnings("unused") EntryInfo<T> info,
             Naming.Entry naming,
             int x,
             int y,
@@ -120,10 +120,10 @@ public class LegacyTTTConfigWidgets {
 
     private static <T> AbstractWidget createEnumWidget(EntryInfo<T> info, Naming.Entry naming, int x, int y, int width, T value, Object[] values, Consumer<T> afterSet
     ) {
-		LegacySliderButton<T> b;
+        LegacySliderButton<T> b;
         //noinspection unchecked
-		b = new LegacySliderButton<>(x, y, width, DEFAULT_HEIGHT, h -> CommonComponents.optionNameValue(naming.name(), naming.enumValue(info.getValueType(), h.getObjectValue())), _ -> null, value, () -> (java.util.List<T>) Arrays.stream(values).toList(), v -> afterSet.accept(v.getObjectValue()));
-		if (naming.tooltip() instanceof Component component) b.setTooltip(Tooltip.create(component));
+        b = new LegacySliderButton<>(x, y, width, DEFAULT_HEIGHT, h -> CommonComponents.optionNameValue(naming.name(), naming.enumValue(info.getValueType(), h.getObjectValue())), _ -> null, value, () -> (java.util.List<T>) Arrays.stream(values).toList(), v -> afterSet.accept(v.getObjectValue()));
+        if (naming.tooltip() instanceof Component component) b.setTooltip(Tooltip.create(component));
         return b;
     }
 
