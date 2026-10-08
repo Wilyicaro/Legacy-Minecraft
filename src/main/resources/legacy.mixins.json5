@@ -4,6 +4,9 @@
   "package": "wily.legacy.mixin.base",
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.mixin.LegacyMixinPlugin",
+  "mixinextras": {
+    "minVersion": "0.5.4"
+  },
   "client": [
     //? !forge {
     "compat.jei.RecipesGuiMixin",
@@ -16,6 +19,7 @@
     "client.GhostSlotsMixin",
     "client.MapDecorationRenderStateMixin",
     "client.AbstractRecipeBookScreenMixin",
+    "client.GuiItemAtlasMixin",
     "client.crafter.CrafterScreenMixin",
     //? fabric || neoforge {
     "compat.sodium.BlendedColorProviderMixin",
