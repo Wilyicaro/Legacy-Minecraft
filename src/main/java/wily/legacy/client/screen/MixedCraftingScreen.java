@@ -70,11 +70,11 @@ import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
 
 public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends RecipesScreen<T, RecipeIconHolder<MixedCraftingScreen.VanillaCrafting>> implements TabList.Access {
-    public static final Identifier STRUCTURES_TAB = Legacy4J.createModLocation("structures");
-    public static final Identifier MECHANISMS_TAB = Legacy4J.createModLocation("mechanisms");
-    public static final Identifier TOOLS_TAB = Legacy4J.createModLocation("tools");
-    public static final Identifier MISC_TAB = Legacy4J.createModLocation("misc");
-    public static final Identifier SEARCH_TAB = Legacy4J.createModLocation("search");
+    public static final Identifier STRUCTURES_TAB = Legacy4J.identifier("structures");
+    public static final Identifier MECHANISMS_TAB = Legacy4J.identifier("mechanisms");
+    public static final Identifier TOOLS_TAB = Legacy4J.identifier("tools");
+    public static final Identifier MISC_TAB = Legacy4J.identifier("misc");
+    public static final Identifier SEARCH_TAB = Legacy4J.identifier("search");
     public static final ExtendedRecipeBookCategory[] VANILLA_CATEGORIES = new ExtendedRecipeBookCategory[]{RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_REDSTONE, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_MISC, SearchRecipeBookCategory.CRAFTING};
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
     protected final StackedItemContents stackedContents = new StackedItemContents();

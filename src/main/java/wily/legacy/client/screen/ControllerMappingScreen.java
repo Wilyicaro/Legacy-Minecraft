@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
@@ -86,7 +87,15 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                             LegacyControlsOptions.forceSmoothMovement,
                             LegacyControlsOptions.linearCameraMovement);
                     renderableVList.addMultSliderOption(LegacyControlsOptions.controllerSensitivity, 2);
-                    renderableVList.addLinkedOptions(LegacyControlsOptions.gyroElytraControls, option -> option.get(), LegacyControlsOptions.gyroSensitivity, LegacyControlsOptions.invertGyroY);
+                    AbstractWidget gyroSensitivity = LegacyConfigWidgets.createWidget(LegacyControlsOptions.gyroSensitivity);
+                    AbstractWidget invertGyroY = LegacyConfigWidgets.createWidget(LegacyControlsOptions.invertGyroY);
+                    Runnable updateGyroOptions = () -> gyroSensitivity.active = invertGyroY.active = LegacyControlsOptions.gyroElytraControls.get() || LegacyControlsOptions.gyroAimControls.get();
+                    updateGyroOptions.run();
+                    renderableVList.addRenderables(
+                            LegacyConfigWidgets.createWidget(LegacyControlsOptions.gyroElytraControls, b -> updateGyroOptions.run()),
+                            LegacyConfigWidgets.createWidget(LegacyControlsOptions.gyroAimControls, b -> updateGyroOptions.run()),
+                            gyroSensitivity,
+                            invertGyroY);
                 }
             }
             lastCategory = keyMapping.getCategory();

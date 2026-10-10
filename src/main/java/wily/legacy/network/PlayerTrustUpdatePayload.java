@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public record PlayerTrustUpdatePayload(UUID player, PlayerTrustPermissions permissions, boolean moderator) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<PlayerTrustUpdatePayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_trust_update_c2s"), PlayerTrustUpdatePayload::new);
+    public static final CommonNetwork.Identifier<PlayerTrustUpdatePayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("player_trust_update_c2s"), PlayerTrustUpdatePayload::new);
 
     public PlayerTrustUpdatePayload(CommonNetwork.PlayBuf buf) {
         this(buf.get().readUUID(), PlayerTrustPermissions.decode(buf), buf.get().readBoolean());

@@ -24,7 +24,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -103,6 +105,11 @@ public class MultiplayerGameModeMixin {
     private void attack(Player player, Entity target, CallbackInfo ci) {
         PlayerTrustPolicy trust = legacy$getTrust(player);
         if (trust != null && !trust.canDamageByTrust(target)) ci.cancel();
+    }
+
+    @ModifyConstant(method = {"startDestroyBlock", "continueDestroyBlock"}, constant = @Constant(intValue = 5, ordinal = 0))
+    private int legacyCreativeDestroyDelay(int original) {
+        return 4;
     }
 
     @Inject(method = {"startDestroyBlock", "continueDestroyBlock"}, at = @At("HEAD"), cancellable = true)

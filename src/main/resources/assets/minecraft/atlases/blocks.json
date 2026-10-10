@@ -1,0 +1,74 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/oak_leaves",
+      "sprite": "minecraft:block/snowy_oak_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/spruce_leaves",
+      "sprite": "minecraft:block/snowy_spruce_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/birch_leaves",
+      "sprite": "minecraft:block/snowy_birch_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/jungle_leaves",
+      "sprite": "minecraft:block/snowy_jungle_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/acacia_leaves",
+      "sprite": "minecraft:block/snowy_acacia_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/dark_oak_leaves",
+      "sprite": "minecraft:block/snowy_dark_oak_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/mangrove_leaves",
+      "sprite": "minecraft:block/snowy_mangrove_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_oak_leaves",
+      "sprite": "minecraft:block/snowy_fast_oak_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_spruce_leaves",
+      "sprite": "minecraft:block/snowy_fast_spruce_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_birch_leaves",
+      "sprite": "minecraft:block/snowy_fast_birch_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_jungle_leaves",
+      "sprite": "minecraft:block/snowy_fast_jungle_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_acacia_leaves",
+      "sprite": "minecraft:block/snowy_fast_acacia_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_dark_oak_leaves",
+      "sprite": "minecraft:block/snowy_fast_dark_oak_leaves"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:block/fast_mangrove_leaves",
+      "sprite": "minecraft:block/snowy_fast_mangrove_leaves"
+    }
+  ]
+}

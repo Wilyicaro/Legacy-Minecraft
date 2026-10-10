@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public record ServerMenuCraftPayload(Optional<Identifier> craftId, List<Optional<Ingredient>> customIngredients,
                                      int button, boolean max) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<ServerMenuCraftPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_menu_craft"), ServerMenuCraftPayload::new);
+    public static final CommonNetwork.Identifier<ServerMenuCraftPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("server_menu_craft"), ServerMenuCraftPayload::new);
 
     public ServerMenuCraftPayload(CommonNetwork.PlayBuf buf) {
         this(buf.get().readOptional(FriendlyByteBuf::readIdentifier), buf.get().readList(b -> buf.get().readOptional(b1 -> FactoryIngredient.decode(buf).toIngredient())), buf.get().readVarInt(), buf.get().readBoolean());

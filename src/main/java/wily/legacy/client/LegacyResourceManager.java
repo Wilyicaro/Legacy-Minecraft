@@ -34,17 +34,17 @@ import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final boolean DEBUG = false;
-    public static final Identifier GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
-    public static final Identifier INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
-    public static final Identifier GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
-    public static final Identifier DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.createModLocation("keyboard_layout/en_us.json");
-    public static final Identifier PLAYER_IDENTIFIERS_LOCATION = Legacy4J.createModLocation("player_identifiers.json");
+    public static final Identifier GAMEPAD_MAPPINGS = Legacy4J.identifier("gamepad_mappings.txt");
+    public static final Identifier INTRO_LOCATION = Legacy4J.identifier("intro.json");
+    public static final Identifier GAMMA_LOCATION = Legacy4J.identifier(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
+    public static final Identifier DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.identifier("keyboard_layout/en_us.json");
+    public static final Identifier PLAYER_IDENTIFIERS_LOCATION = Legacy4J.identifier("player_identifiers.json");
 
     public static final String COMMON_COLORS = "common_colors.json";
     public static final String COMMON_VALUES = "common_values.json";
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
     public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
-    public static final Identifier DEFAULT_CHANGELOG_PATH = Legacy4J.createModLocation("changelog");
+    public static final Identifier DEFAULT_CHANGELOG_PATH = Legacy4J.identifier("changelog");
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static LegacyIntro intro = LegacyIntro.EMPTY;
     public static ControllerBinding<?> shiftBinding;

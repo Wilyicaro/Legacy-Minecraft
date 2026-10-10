@@ -168,7 +168,7 @@ public record LegacyWorldTemplate(Component buttonMessage, Identifier icon, Stri
         String name = entry.name() == null || entry.name().isBlank() ? packId : entry.name();
         String folderName = entry.worldTemplateFolderName();
         if (folderName == null || folderName.isBlank()) folderName = name;
-        return Optional.of(new LegacyWorldTemplate(Component.literal(name), Legacy4J.createModLocation("creation_list/create_world"), downloadedPackLocation(packId), folderName, false, true, true, false, Optional.of(DownloadedResourceAlbums.albumId(packId)), Optional.empty(), Optional.empty(), Optional.empty()));
+        return Optional.of(new LegacyWorldTemplate(Component.literal(name), Legacy4J.identifier("creation_list/create_world"), downloadedPackLocation(packId), folderName, false, true, true, false, Optional.of(DownloadedResourceAlbums.albumId(packId)), Optional.empty(), Optional.empty(), Optional.empty()));
     }
 
     private static Path downloadedPackPath(String packId) {

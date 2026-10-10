@@ -19,10 +19,10 @@ public record TypeCraftingTab(Identifier id, Optional<Component> name,
                               List<CustomTab> tabs) implements LegacyTabInfo<TypeCraftingTab> {
     public static final Codec<TypeCraftingTab> CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(TypeCraftingTab::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(TypeCraftingTab::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(TypeCraftingTab::iconHolder), CustomTab.LIST_CODEC.fieldOf("tabs").orElseGet(ArrayList::new).forGetter(TypeCraftingTab::tabs)).apply(i, TypeCraftingTab::new));
 
-    public static final Identifier CRAFTING = Legacy4J.createModLocation("crafting");
-    public static final Identifier BANNER = Legacy4J.createModLocation("banner");
-    public static final Identifier FIREWORK = Legacy4J.createModLocation("firework");
-    public static final Identifier DYING = Legacy4J.createModLocation("dying");
+    public static final Identifier CRAFTING = Legacy4J.identifier("crafting");
+    public static final Identifier BANNER = Legacy4J.identifier("banner");
+    public static final Identifier FIREWORK = Legacy4J.identifier("firework");
+    public static final Identifier DYING = Legacy4J.identifier("dying");
 
     @Override
     public boolean isValid() {

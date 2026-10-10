@@ -4,6 +4,9 @@
   "package": "wily.legacy.mixin.base",
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.mixin.LegacyMixinPlugin",
+  "mixinextras": {
+    "minVersion": "0.5.4"
+  },
   "client": [
     //? !forge {
     "compat.jei.RecipesGuiMixin",
@@ -16,6 +19,7 @@
     "client.GhostSlotsMixin",
     "client.MapDecorationRenderStateMixin",
     "client.AbstractRecipeBookScreenMixin",
+    "client.GuiItemAtlasMixin",
     "client.crafter.CrafterScreenMixin",
     //? fabric || neoforge {
     "compat.sodium.BlendedColorProviderMixin",
@@ -26,6 +30,8 @@
     "compat.sodium.OcclusionCullerMixin",
     "compat.sodium.TraversableTreeMixin",
     "compat.sodium.LevelSliceMixin",
+    "compat.sodium.FoliageColorProviderMixin",
+    "compat.sodium.VanillaColorAdapterMixin",
     //?}
     //? (fabric || >=1.21 && neoforge && <26.1) {
     /*"compat.sodium.OcclusionCullerMixin",
@@ -34,6 +40,7 @@
     "compat.nostalgic.HudHelperMixin",
     //?}
     //? if fabric {
+    "compat.indigo.AltModelBlockRendererImplMixin",
     //?}
     "client.SectionOcclusionGraphMixin",
     "client.RenderSectionRegionMixin",
@@ -259,7 +266,10 @@
     "client.EnvironmentAttributeMapMixin",
     "client.chat.ChatComponentDrawingMixin",
     "client.gui.JumpableVehicleBarRendererMixin",
-    "client.ClientLevelMixin"
+    "client.sprite.SpriteContentsMixin",
+    "client.ClientLevelMixin",
+    "client.ModelBlockRendererMixin",
+    "client.TerrainParticleMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",

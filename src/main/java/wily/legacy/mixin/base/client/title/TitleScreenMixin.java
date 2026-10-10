@@ -66,7 +66,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
             if (minecraft.isDemo()) {
                 try {
-                    LoadSaveScreen.loadWorld(this, minecraft, LegacySaveCache.getLevelStorageSource(), LegacySaveCache.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(Legacy4J.createModLocation("tutorial/tutorial.mcsave")).open(), LegacySaveCache.getLevelStorageSource(), "Tutorial"));
+                    LoadSaveScreen.loadWorld(this, minecraft, LegacySaveCache.getLevelStorageSource(), LegacySaveCache.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(Legacy4J.identifier("tutorial/tutorial.mcsave")).open(), LegacySaveCache.getLevelStorageSource(), "Tutorial"));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

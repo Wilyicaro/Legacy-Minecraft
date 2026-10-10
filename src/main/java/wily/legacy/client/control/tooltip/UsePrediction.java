@@ -68,6 +68,7 @@ import net.minecraft.world.phys.*;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
+import wily.legacy.client.BedrockBridging;
 import wily.legacy.mixin.base.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacyItemUtil;
@@ -405,6 +406,7 @@ public class UsePrediction {
     public static final ControlTooltip.ActionHolder BONEMEAL_PLANT = registerUseItemOn("bonemeal_plant", ctx -> ctx.itemStack.getItem() instanceof BoneMealItem && ctx.state.getBlock() instanceof BonemealableBlock b && b.isValidBonemealTarget(ctx.level, ctx.pos, ctx.state/*? if <=1.20.2 {*//*,true*//*?}*/), LegacyComponents.GROW);
     public static final ControlTooltip.ActionHolder LAUNCH_FIREWORK = registerUseItemOn("launch_firework", ctx -> ctx.itemStack.getItem() instanceof FireworkRocketItem, LegacyComponents.LAUNCH);
     public static final ControlTooltip.ActionHolder PLACE_BOAT = registerUseItem("place_boat", ctx -> ctx.itemStack.getItem() instanceof BoatItem && canPlaceBoat(ctx), LegacyComponents.PLACE);
+    public static final ControlTooltip.ActionHolder BEDROCK_BRIDGING = registerUseItem("bedrock_bridging", ctx -> BedrockBridging.findHit(Minecraft.getInstance(), ctx.hand) != null, LegacyComponents.PLACE);
     public static final ControlTooltip.ActionHolder PLACE_ON_WATER = registerUseItem("place_on_water", ctx -> (ctx.itemStack.is(Items.LILY_PAD) || ctx.itemStack.is(Items.FROGSPAWN)) && canPlaceOnWater(ctx), LegacyComponents.PLACE);
     public static final ControlTooltip.ActionHolder BLOCK = registerUseItem("block", ctx -> ctx.itemStack.getUseAnimation().equals(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK) && !LegacyItemUtil.isLegacyShield(ctx.player, ctx.itemStack), LegacyComponents.BLOCK);
     public static final ControlTooltip.ActionHolder EQUIP_SWAP = registerUseItem("equip_swap", UsePrediction::canEquipSwap, LegacyComponents.EQUIP);

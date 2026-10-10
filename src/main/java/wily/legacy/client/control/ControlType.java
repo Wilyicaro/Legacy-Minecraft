@@ -27,18 +27,18 @@ public record ControlType(Identifier id, Optional<Component> name, boolean isKbm
     public static final Codec<ControlType> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(ControlType::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(ControlType::name), Codec.BOOL.optionalFieldOf("isKbm", false).forGetter(ControlType::isKbm), SizeableAsset.createWithFallback(ControlFont.CODEC).optionalFieldOf("font").forGetter(ControlType::font), Identifier.CODEC.optionalFieldOf("minecraftLogo").forGetter(ControlType::minecraftLogo)).apply(i, ControlType::new));
     public static final Codec<ControlType> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, Identifier.CODEC.xmap(ControlType::new, ControlType::id));
     public static final Codec<OptionHolder<ControlType>> OPTION_CODEC = OptionHolder.createCodecWithAuto(ControlType::get);
-    public static final Identifier KBM = Legacy4J.createModLocation("java");
-    public static final Identifier x360 = Legacy4J.createModLocation("xbox_360");
-    public static final Identifier xONE = Legacy4J.createModLocation("xbox_one");
-    public static final Identifier PS3 = Legacy4J.createModLocation("playstation_3");
-    public static final Identifier PS4 = Legacy4J.createModLocation("playstation_4");
-    public static final Identifier WII_U = Legacy4J.createModLocation("wii_u");
-    public static final Identifier WII_U_EDITION = Legacy4J.createModLocation("wii_u_edition");
-    public static final Identifier SWITCH = Legacy4J.createModLocation("switch");
-    public static final Identifier STEAM = Legacy4J.createModLocation("steam");
-    public static final Identifier STADIA = Legacy4J.createModLocation("stadia");
-    public static final Identifier PSVITA = Legacy4J.createModLocation("playstation_vita");
-    public static final Identifier PS5 = Legacy4J.createModLocation("playstation_5");
+    public static final Identifier KBM = Legacy4J.identifier("java");
+    public static final Identifier x360 = Legacy4J.identifier("xbox_360");
+    public static final Identifier xONE = Legacy4J.identifier("xbox_one");
+    public static final Identifier PS3 = Legacy4J.identifier("playstation_3");
+    public static final Identifier PS4 = Legacy4J.identifier("playstation_4");
+    public static final Identifier WII_U = Legacy4J.identifier("wii_u");
+    public static final Identifier WII_U_EDITION = Legacy4J.identifier("wii_u_edition");
+    public static final Identifier SWITCH = Legacy4J.identifier("switch");
+    public static final Identifier STEAM = Legacy4J.identifier("steam");
+    public static final Identifier STADIA = Legacy4J.identifier("stadia");
+    public static final Identifier PSVITA = Legacy4J.identifier("playstation_vita");
+    public static final Identifier PS5 = Legacy4J.identifier("playstation_5");
     public static final ControlType EMPTY = new ControlType(KBM, Optional.empty(), true, Optional.empty(), Optional.empty());
 
     public ControlType(Identifier id, Optional<Component> name, boolean isKbm, Optional<SizeableAsset<ControlFont>> font, Optional<Identifier> minecraftLogo) {

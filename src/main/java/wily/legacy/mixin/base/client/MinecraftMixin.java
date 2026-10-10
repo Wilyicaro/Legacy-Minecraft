@@ -451,6 +451,12 @@ public abstract class MinecraftMixin {
         legacy$quickUseAnimationHand = null;
     }
 
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItem(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult bedrockBridging(MultiPlayerGameMode gameMode, Player player, InteractionHand hand, Operation<InteractionResult> original) {
+        BlockHitResult hit = BedrockBridging.findHit(self(), hand);
+        return hit == null ? original.call(gameMode, player, hand) : gameMode.useItemOn(this.player, hand, hit);
+    }
+
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private void startUseItemCreativeBlockPlacing(CallbackInfo ci, @Local InteractionHand hand, @Local BlockHitResult hit) {
         if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && UsePrediction.canPlace(new UsePrediction.BlockUseItemOn(player, hand, hit))) {

@@ -20,7 +20,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
@@ -30,8 +29,6 @@ import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.util.LegacyTipBuilder;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -103,7 +100,7 @@ public class TipCommand {
     }
 
     public record Payload(LegacyTipBuilder builder, boolean force) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_tip"), Payload::new);
+        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_tip"), Payload::new);
 
         public Payload(LegacyTipBuilder builder) {
             this(builder, false);
@@ -134,7 +131,7 @@ public class TipCommand {
     }
 
     public record PersistentPayload(LegacyTipBuilder builder) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<PersistentPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_persistent_tip"), PersistentPayload::new);
+        public static final CommonNetwork.Identifier<PersistentPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_persistent_tip"), PersistentPayload::new);
 
         public PersistentPayload(CommonNetwork.PlayBuf buf) {
             this(LegacyTipBuilder.decode(buf));
@@ -160,7 +157,7 @@ public class TipCommand {
     }
 
     public record EntityPayload(EntityType<?> entityType, boolean force) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<EntityPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_entity_tip"), EntityPayload::new);
+        public static final CommonNetwork.Identifier<EntityPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_entity_tip"), EntityPayload::new);
 
         public EntityPayload(CommonNetwork.PlayBuf buf) {
             this(FactoryAPIPlatform.getRegistryValue(buf.get().readIdentifier(), BuiltInRegistries.ENTITY_TYPE), buf.get().readBoolean());
