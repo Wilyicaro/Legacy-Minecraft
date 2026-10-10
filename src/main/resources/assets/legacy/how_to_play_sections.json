@@ -167,7 +167,7 @@
     "ui_definition": "legacy:how_to_play/trial-chamber"
   },
   {
-    "title": {"translate": "legacy.menu.how_to_play.crafter"},
+    "title": {"translate": "legacy.menu.how_to_play.autocrafter"},
     "ui_definition": "legacy:how_to_play/autocrafter"
   },
   {

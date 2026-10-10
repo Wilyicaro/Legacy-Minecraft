@@ -12,6 +12,7 @@
         {
           "name": "title",
           "type": "draw_multiline_string",
+          "color": "${commonColor.htp_green}",
           "component": {
             "translate": "legacy.menu.how_to_play.whats_new_message"
           },
@@ -20,6 +21,7 @@
         {
           "name": "changelog",
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "baseDir": "minecraft:changelog"
           },
@@ -44,6 +46,7 @@
         {
           "name": "title",
           "type": "draw_multiline_string",
+		  "color": "${commonColor.htp_green}",
           "component": {
             "translate": "legacy.menu.how_to_play.whats_new_message",
             "font": "legacy:default_11"
@@ -54,6 +57,7 @@
         {
           "name": "changelog",
           "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
           "component": {
             "text": "",
             "baseDir": "minecraft:changelog",

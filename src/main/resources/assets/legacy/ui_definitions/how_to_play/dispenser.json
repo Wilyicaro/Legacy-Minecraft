@@ -13,15 +13,25 @@
           "width": 200,
           "height": 222,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.dispenser_message"
+                "translate": "legacy.menu.how_to_play.dispenser_title"
               },
               "width": 176
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.dispenser_message"
+              },
+              "width": 176
+            },
+            "text2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.dispenser_message_1",
                 "allowVariables": true,
@@ -220,10 +230,11 @@
           "height": 137,
           "lineHeight": 8,
           "elements": {
-            "text": {
+			"text": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.dispenser_message",
+                "translate": "legacy.menu.how_to_play.dispenser_title",
                 "font": "legacy:default_11"
               },
               "width": 120,
@@ -231,6 +242,17 @@
             },
             "text1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.dispenser_message",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            },
+            "text2": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
                 "translate": "legacy.menu.how_to_play.dispenser_message_1",
                 "font": "legacy:default_11",
