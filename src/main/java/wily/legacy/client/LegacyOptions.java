@@ -305,6 +305,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> invertedFrontCameraPitch = CLIENT_STORAGE.register(createBoolean("invertedFrontCameraPitch", true, b -> {}));
     public static final FactoryConfig<Boolean> legacySkyShape = CLIENT_STORAGE.register(createBoolean("legacySkyShape", true, b -> Legacy4JClient.updateSkyShape()));
     public static final FactoryConfig<Boolean> fastLeavesCustomModels = CLIENT_STORAGE.register(createBoolean("fastLeavesCustomModels", true, b -> Legacy4JClient.updateChunks()));
+    public static final FactoryConfig<Boolean> bedrockSnowyLeaves = CLIENT_STORAGE.register(createBoolean("bedrockSnowyLeaves", true, b -> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> legacyLeafMipmaps = CLIENT_STORAGE.register(createBoolean("legacyLeafMipmaps", true, b -> Minecraft.getInstance().execute(MinecraftAccessor::reloadResourcePacksIfLoaded)));
     public static final FactoryConfig<Boolean> legacyTorchModel = CLIENT_STORAGE.register(createBoolean("legacyTorchModel", false, b-> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> skipIntro = CLIENT_STORAGE.register(createBoolean("skipIntro", false));

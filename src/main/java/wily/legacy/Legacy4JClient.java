@@ -435,6 +435,7 @@ public class Legacy4JClient {
             }
         }
         SkinsClientBootstrap.postTick(minecraft);
+        BedrockSnowyLeaves.tick(minecraft);
     }
 
     public static void postScreenInit(Screen screen) {
@@ -593,6 +594,7 @@ public class Legacy4JClient {
         fastLeavesModels.put(Blocks.FLOWERING_AZALEA_LEAVES, FactoryAPI.createVanillaLocation("fast_flowering_azalea_leaves"));
 
         FactoryAPIClient.registerExtraModels(register -> fastLeavesModels.values().forEach(register));
+        FactoryAPIClient.registerExtraModels(BedrockSnowyLeaves::registerModels);
         FactoryAPIClient.registerMenuScreen(registry -> {
             registry.register(LegacyRegistries.CRAFTING_PANEL_MENU.get(), LegacyCraftingScreen::craftingScreen);
             registry.register(LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(), LegacyCraftingScreen::playerCraftingScreen);
@@ -740,13 +742,13 @@ public class Legacy4JClient {
                     BlockPos relative = pos.relative(value);
                     BlockState relativeBlockState = blockGetter.getBlockState(relative);
                     if (!(relativeBlockState.getBlock() instanceof LeavesBlock) && !relativeBlockState.isSolidRender(/*? if <1.21.2 {*//*blockGetter, relative*//*?}*/)) {
-                        return model;
+                        return BedrockSnowyLeaves.getModel(blockGetter, pos, blockState, model, false);
                     }
                 }
             }
-            return FactoryAPIClient.getExtraModel(fastLeavesModels.get(blockState.getBlock()));
+            return BedrockSnowyLeaves.getModel(blockGetter, pos, blockState, FactoryAPIClient.getExtraModel(fastLeavesModels.get(blockState.getBlock())), true);
         }
-        return model;
+        return BedrockSnowyLeaves.getModel(blockGetter, pos, blockState, model, false);
     }
 
     public static boolean hasModOnServer() {

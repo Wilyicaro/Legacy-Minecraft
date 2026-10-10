@@ -30,6 +30,8 @@
     "compat.sodium.OcclusionCullerMixin",
     "compat.sodium.TraversableTreeMixin",
     "compat.sodium.LevelSliceMixin",
+    "compat.sodium.FoliageColorProviderMixin",
+    "compat.sodium.VanillaColorAdapterMixin",
     //?}
     //? (fabric || >=1.21 && neoforge && <26.1) {
     /*"compat.sodium.OcclusionCullerMixin",
@@ -38,6 +40,7 @@
     "compat.nostalgic.HudHelperMixin",
     //?}
     //? if fabric {
+    "compat.indigo.AltModelBlockRendererImplMixin",
     //?}
     "client.SectionOcclusionGraphMixin",
     "client.RenderSectionRegionMixin",
@@ -264,7 +267,9 @@
     "client.chat.ChatComponentDrawingMixin",
     "client.gui.JumpableVehicleBarRendererMixin",
     "client.sprite.SpriteContentsMixin",
-    "client.ClientLevelMixin"
+    "client.ClientLevelMixin",
+    "client.ModelBlockRendererMixin",
+    "client.TerrainParticleMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",

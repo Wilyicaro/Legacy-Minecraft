@@ -621,6 +621,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.slowChunkLoading,
                                 LegacyOptions.fastLeavesWhenBlocked,
                                 LegacyOptions.fastLeavesCustomModels,
+                                LegacyOptions.bedrockSnowyLeaves,
                                 LegacyOptions.legacyLeafMipmaps,
                                 LegacyOptions.legacyTorchModel,
                                 LegacyOptions.displayNameTagBorder,
