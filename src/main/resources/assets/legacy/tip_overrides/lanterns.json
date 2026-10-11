@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["copper_lantern","exposed_copper_lantern","lantern","oxidized_copper_lantern","waxed_copper_lantern","waxed_exposed_copper_lantern","waxed_oxidized_copper_lantern","waxed_weathered_copper_lantern","weathered_copper_lantern"],
+    "tip": {"translate": "block.minecraft.lantern.tip"}
+  }
+}
