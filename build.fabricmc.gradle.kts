@@ -65,6 +65,7 @@ repositories {
 	maven("https://maven.caffeinemc.net/releases") { name = "CaffeineMC" }
 	maven("https://maven.blamejared.com/") { name = "Jared's maven" }
 	maven("https://modmaven.dev") { name = "ModMaven" }
+	strictMaven("https://maven.frohnmeyer-wds.de/artifacts", "dev.jfronny.libjf")
 }
 
 dependencies {
@@ -91,6 +92,13 @@ dependencies {
 	api(include("org.apache.httpcomponents:httpcore:4.4.16") as Any)
 	api(include("commons-logging:commons-logging:1.2") as Any)
 	api(include("commons-codec:commons-codec:1.11") as Any)
+
+	if (hasProperty("deps.respackopts")) {
+		compileOnly("maven.modrinth:TiF5QWZY:${prop("deps.respackopts")}")
+	}
+	if (hasProperty("deps.libjf")) {
+		compileOnly("dev.jfronny.libjf:libjf-config-core-v2:${prop("deps.libjf")}")
+	}
 }
 
 tasks.withType<Javadoc> {
