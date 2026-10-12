@@ -70,29 +70,46 @@ repositories {
 dependencies {
 	minecraft("com.mojang:minecraft:${stonecutter.current.version}")
 	implementation(libs.fabric.loader)
-	implementation("net.fabricmc.fabric-api:fabric-api:${prop("fabric_api_version")}")
-	implementation("com.terraformersmc:modmenu:${prop("modmenu_version")}")
-	api(include(prop("sdl_dependency")) as Any)
-	api("wily.factory_api:factory_api-fabric:${stonecutter.current.version}-${prop("factory_api_version")}")
+	if (project.path.startsWith(":base:")) {
+		implementation("net.fabricmc.fabric-api:fabric-api:${prop("fabric_api_version")}")
+		implementation("com.terraformersmc:modmenu:${prop("modmenu_version")}")
+		api(include(prop("sdl_dependency")) as Any)
+		api("wily.factory_api:factory_api-fabric:${stonecutter.current.version}-${prop("factory_api_version")}")
 
 //	compileOnly("maven.modrinth:world-host:${prop("world_host_version")}")
-	compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
-	compileOnly("net.caffeinemc:sodium-fabric:${prop("sodium_version")}")
-	compileOnly("maven.modrinth:iris:${prop("iris_version")}")
-	compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
-	compileOnly("maven.modrinth:flashback:${prop("flashback_version")}")
-	compileOnly("maven.modrinth:bisect-mod:z62iwoR1")
-	compileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric-api:${prop("jei_version")}")
-	compileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric:${prop("jei_version")}")
+		compileOnly("maven.modrinth:vivecraft:${prop("vivecraft_version")}")
+		compileOnly("net.caffeinemc:sodium-fabric:${prop("sodium_version")}")
+		compileOnly("maven.modrinth:iris:${prop("iris_version")}")
+		compileOnly("maven.modrinth:nostalgic-tweaks:${prop("nt_version")}")
+		compileOnly("maven.modrinth:flashback:${prop("flashback_version")}")
+		compileOnly("maven.modrinth:bisect-mod:z62iwoR1")
+		compileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric-api:${prop("jei_version")}")
+		compileOnly("mezz.jei:jei-${stonecutter.current.version}-fabric:${prop("jei_version")}")
 
-	implementation(libs.moulberry.mixinconstraints)
-	include(libs.moulberry.mixinconstraints)
-	api(include("org.apache.httpcomponents:httpclient:4.5.14") as Any)
-	api(include("org.apache.httpcomponents:httpcore:4.4.16") as Any)
-	api(include("commons-logging:commons-logging:1.2") as Any)
-	api(include("commons-codec:commons-codec:1.11") as Any)
+		implementation(libs.moulberry.mixinconstraints)
+		include(libs.moulberry.mixinconstraints)
+		api(include("org.apache.httpcomponents:httpclient:4.5.14") as Any)
+		api(include("org.apache.httpcomponents:httpcore:4.4.16") as Any)
+		api(include("commons-logging:commons-logging:1.2") as Any)
+		api(include("commons-codec:commons-codec:1.11") as Any)
+	} else {
+		implementation(project(":base:" + stonecutter.current.version + "-fabric"))
+	}
 }
 
 tasks.withType<Javadoc> {
 	enabled = false
+}
+
+if (sc.current.isActive && project.path.startsWith(":base:")) {
+	sourceSets {
+		main {
+			java {
+				setSrcDirs(listOf(rootProject.file("src/main/java")))
+			}
+			resources {
+				setSrcDirs(listOf(rootProject.file("src/main/resources")))
+			}
+		}
+	}
 }
