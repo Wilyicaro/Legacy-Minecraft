@@ -5,7 +5,7 @@
       "tip": {"translate": "item.minecraft.chest_boat.tip"}
     },
     {
-      "items": ["!#chest_boats","#boats"],
+      "items": ["#boats"],
       "tip": {"translate": "item.minecraft.boat.tip"}
     }
   ]
