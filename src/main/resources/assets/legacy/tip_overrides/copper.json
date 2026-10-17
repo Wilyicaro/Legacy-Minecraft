@@ -1,0 +1,28 @@
+{
+  "overrides": [
+    {
+      "blocks": ["copper_block","exposed_copper","weathered_copper","oxidized_copper","cut_copper","exposed_cut_copper","weathered_cut_copper","oxidized_cut_copper"],
+      "tip": {"translate": "block.minecraft.copper_block.tip"}
+    },
+    {
+      "blocks": ["copper_bulb","exposed_copper_bulb","weathered_copper_bulb","oxidized_copper_bulb"],
+      "tip": {"translate": "block.minecraft.copper_bulb.tip"}
+    },
+    {
+      "blocks": ["copper_chain","exposed_copper_chain","weathered_copper_chain","oxidized_copper_chain","waxed_copper_chain","waxed_exposed_copper_chain","waxed_weathered_copper_chain","waxed_oxidized_copper_chain"],
+      "tip": {"translate": "block.minecraft.copper_chain.tip"}
+    },
+    {
+      "blocks": ["copper_grate","exposed_copper_grate","weathered_copper_grate","oxidized_copper_grate","waxed_copper_grate","waxed_exposed_copper_grate","waxed_weathered_copper_grate","waxed_oxidized_copper_grate"],
+      "tip": {"translate": "block.minecraft.copper_grate.tip"}
+    },
+    {
+      "blocks": ["waxed_copper_block","waxed_exposed_copper","waxed_weathered_copper","waxed_oxidized_copper","waxed_cut_copper","waxed_exposed_cut_copper","waxed_weathered_cut_copper","waxed_oxidized_cut_copper"],
+      "tip": {"translate": "block.minecraft.waxed_copper_block.tip"}
+    },
+    {
+      "blocks": ["waxed_copper_bulb","waxed_exposed_copper_bulb","waxed_weathered_copper_bulb","waxed_oxidized_copper_bulb"],
+      "tip": {"translate": "block.minecraft.waxed_copper_bulb.tip"}
+    }
+  ]
+}

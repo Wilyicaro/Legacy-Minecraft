@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["!soul_lantern","lantern"],
+    "tip": {"translate": "block.minecraft.lantern.tip"}
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "block": "#lightning_rods",
+    "tip": {"translate": "block.minecraft.lightning_rod.tip"}
+  }
+}
