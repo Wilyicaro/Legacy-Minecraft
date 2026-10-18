@@ -207,7 +207,7 @@ public class UsePrediction {
         return null;
     });
     public static final ControlTooltip.ActionHolder SLEEP = registerResultBlockUse("sleep", ctx -> ctx.state.getBlock() instanceof BedBlock ? canSleep(ctx) ? ControlTooltip.ResultAction.of(LegacyComponents.SLEEP) : ControlTooltip.ResultAction.cancel() : ControlTooltip.ResultAction.pass());
-    public static final ControlTooltip.ActionHolder CHANGE_PITCH = registerBlockUse("change_pitch", ctx -> ctx.state.getBlock() instanceof NoteBlock, LegacyComponents.CHANGE_PITCH);
+    public static final ControlTooltip.ActionHolder CHANGE_PITCH = registerBlockUse("change_pitch", ctx -> ctx.state.getBlock() instanceof NoteBlock && !canPlaceMobHeadOnNoteBlock(ctx), LegacyComponents.CHANGE_PITCH);
     public static final ControlTooltip.ActionHolder REDSTONE_ORE_USE = registerBlockUse("redstone_ore_use", ctx -> ctx.state.getBlock() instanceof RedStoneOreBlock, LegacyComponents.USE);
     public static final ControlTooltip.ActionHolder MECHANISMS_USE = registerBlockUse("mechanisms_use", ctx -> ctx.state.getBlock() instanceof RepeaterBlock || ctx.state.getBlock() instanceof ComparatorBlock || ctx.state.getBlock() instanceof RedStoneWireBlock, LegacyComponents.USE);
     public static final ControlTooltip.ActionHolder COLLECT_COMPOSTER = registerBlockUse("collect_composter", ctx -> ctx.state.getBlock() instanceof ComposterBlock && ctx.state.getValue(ComposterBlock.LEVEL) == 8, LegacyComponents.COLLECT);
@@ -595,6 +595,22 @@ public class UsePrediction {
             }
         }
        return null;
+    }
+
+    private static boolean canPlaceMobHeadOnNoteBlock(BlockUse ctx) {
+        if (ctx.hitResult.getDirection() != Direction.UP)
+            return false;
+
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack itemStack = ctx.player.getItemInHand(hand);
+            if (itemStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof AbstractSkullBlock) {
+                BlockUseItemOn itemOn = new BlockUseItemOn(itemStack, ctx.state, ctx.level, ctx.pos, ctx.player, hand, ctx.hitResult);
+                if (canPlace(itemOn))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean canSleep(BlockUse ctx) {
