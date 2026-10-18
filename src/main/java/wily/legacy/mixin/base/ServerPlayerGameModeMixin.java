@@ -115,7 +115,13 @@ public abstract class ServerPlayerGameModeMixin {
     private boolean decreaseCreativeTurtleEggs(BlockPos pos, BlockState state) {
         if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyWorldInteractions) || !isCreative() || !state.is(Blocks.TURTLE_EGG)) return false;
         int eggs = state.getValue(TurtleEggBlock.EGGS);
-        if (eggs <= 1) return false;
+        if (eggs <= 1) {
+            // The final egg follows the normal block-destruction path, so play its crack sound here.
+            if (eggs == 1) {
+                level.playSound(null, pos, SoundEvents.TURTLE_EGG_BREAK, SoundSource.BLOCKS, 0.7f, 0.9f + level.getRandom().nextFloat() * 0.2f);
+            }
+            return false;
+        }
         level.playSound(null, pos, SoundEvents.TURTLE_EGG_BREAK, SoundSource.BLOCKS, 0.7f, 0.9f + level.getRandom().nextFloat() * 0.2f);
         if (player.getMainHandItem().isEmpty()) {
             SoundType soundType = SoundType.METAL;
