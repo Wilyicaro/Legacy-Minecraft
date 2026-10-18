@@ -49,11 +49,6 @@ private static final Vec2 EQUIP_SLOT_OFFSET = new Vec2(50, 0);
         return false;
     }
 
-    @Override
-    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
-        super.extractBackground(GuiGraphicsExtractor, i, j, f);
-    }
-
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
