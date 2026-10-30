@@ -747,7 +747,7 @@
   "gamerule.legacy.player_starting_map.description": "Когда включено, игроки будут появляться с пустой картой.",
   "gamerule.legacy.tnt_limit": "Ограничение динамита",
   "gamerule.legacy.tnt_limit.description": "Как много динамита может быть зажжено в одно время.",
-  "gui.ok": "ОК",
+  "gui.ok": "Готово",
   "item.minecraft.amethyst_shard.tip": "Получается при добыче цветущего аметиста. Можно использовать для создания тонированного стекла и подзорной трубы.",
   "item.minecraft.apple.tip": "Восстанавливает 2 §f🍖§r. Можно превратить в золотое яблоко.",
   "item.minecraft.armadillo_scute.tip": "Occasionally dropped by Armadillos, and can be used to craft Wolf Armor.",
