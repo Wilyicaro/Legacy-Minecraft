@@ -1481,7 +1481,7 @@
   "legacy.menu.albums.resource.minecraft": "Альбом ресурсов Minecraft",
   "legacy.menu.albums.resource.minecraft.description": "Текстуры Minecraft по умолчанию",
   "legacy.menu.albums.resource.minecraft_classic": "Классический альбом ресурсов Minecraft",
-  "legacy.menu.albums.resource.minecraft_classic.description": "Классический Minecraft, каким вы его знаете и любите! Мы недавно обновили игру новыми и стильными текстурами, но если вы предпочитаете ретро-вкус к Minecraft, это альбом для вас! Почему бы самому не попробовать и сравнить оба альбома?",
+  "legacy.menu.albums.resource.minecraft_classic.description": "Классический Minecraft, каким вы его знаете и любите! Мы недавно обновили игру новыми и стильными текстурами, но если вы предпочитаете ретро-вкус к Minecraft, этот альбом для вас! Почему бы самому не попробовать и не сравнить оба альбома?",
   "legacy.menu.albums.resource.template": "Альбом ресурсов %s",
   "legacy.menu.albums.resource.template.description": "Альбом, сохранённый с наборами ресурсов, выбранными на экране наборов ресурсов! Вы можете изменить его через resource_assorts.json в папке игры.",
   "legacy.menu.albums.texture.template": "Альбом набора текстур %s",
