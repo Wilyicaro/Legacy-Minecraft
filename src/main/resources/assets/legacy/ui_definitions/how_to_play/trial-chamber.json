@@ -13,24 +13,91 @@
           "width": 200,
           "height": 222,
           "elements": {
-            "text": {
+			"title": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.trial-chamber_message"
+                "translate": "legacy.menu.how_to_play.trial-chamber_title"
               },
               "width": 176
             },
-            "text1": {
+			"chambers": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
               "component": {
-                "translate": "legacy.menu.how_to_play.trial-chamber_message_1"
+                "translate": "legacy.menu.how_to_play.trial-chamber_chambers_title"
               },
               "width": 176
             },
-            "text2": {
+            "chambers1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.trial-chamber_message_2"
+                "translate": "legacy.menu.how_to_play.trial-chamber_chambers"
+              },
+              "width": 176
+            },
+			"spawners": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_spawners_title"
+              },
+              "width": 176
+            },
+			"spawners1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_spawners"
+              },
+              "width": 176
+            },
+			"breezes": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_breezes_title"
+              },
+              "width": 176
+            },
+			"breezes1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_breezes"
+              },
+              "width": 176
+            },
+			"vaults": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_vaults_title"
+              },
+              "width": 176
+            },
+			"vaults1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_vaults"
+              },
+              "width": 176
+            },
+			"ominous-trials": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_ominous-trials_title"
+              },
+              "width": 176
+            },
+			"ominous-trials1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_ominous-trials"
               },
               "width": 176
             }
@@ -82,31 +149,114 @@
           "height": 137,
           "lineHeight": 8,
           "elements": {
-            "text": {
+            "title": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_green}",
               "component": {
-                "translate": "legacy.menu.how_to_play.trial-chamber_message",
+                "translate": "legacy.menu.how_to_play.trial-chamber_title",
                 "font": "legacy:default_11"
               },
-              "width": 120,
+              "width": 176,
               "lineSpacing": 8
             },
-            "text1": {
+			"chambers": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
               "component": {
-                "translate": "legacy.menu.how_to_play.trial-chamber_message_1",
+                "translate": "legacy.menu.how_to_play.trial-chamber_chambers_title",
                 "font": "legacy:default_11"
               },
-              "width": 120,
+              "width": 176,
               "lineSpacing": 8
             },
-            "text2": {
+            "chambers1": {
               "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
               "component": {
-                "translate": "legacy.menu.how_to_play.trial-chamber_message_2",
+                "translate": "legacy.menu.how_to_play.trial-chamber_chambers",
+                "font": "legacy:default_11"
+			  },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"spawners": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_spawners_title",
                 "font": "legacy:default_11"
               },
-              "width": 120,
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"spawners1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_spawners",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"breezes": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_breezes_title",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"breezes1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_breezes",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"vaults": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_vaults_title",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"vaults1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_vaults",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"ominous-trials": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.htp_blue}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_ominous-trials_title",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
+              "lineSpacing": 8
+            },
+			"ominous-trials1": {
+              "type": "draw_multiline_string",
+			  "color": "${commonColor.tip_text}",
+              "component": {
+                "translate": "legacy.menu.how_to_play.trial-chamber_ominous-trials",
+                "font": "legacy:default_11"
+              },
+              "width": 176,
               "lineSpacing": 8
             }
           }
