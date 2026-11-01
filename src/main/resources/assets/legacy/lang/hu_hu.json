@@ -719,7 +719,7 @@
   "entity.minecraft.zombie_villager.tip": "A Villager that has been zombified! Is there a cure?",
   "entity.minecraft.zombified_piglin.tip": "Initially docile, but will attack in groups if you attack one.",
   "filled_map.level": "Level %s/%s",
-  "gamerule.legacy.default_map_size": "Default Map Size",
+  "gamerule.legacy.default_map_size": "Alapértelmezett Pályaméret",
   "gamerule.legacy.default_map_size.description": "The size of maps created from empty non-starter maps.",
   "gamerule.legacy.default_show_armor_stand_arms": "Show Armor Stand Arms",
   "gamerule.legacy.default_show_armor_stand_arms.description": "When enabled, the armor stand will show arms when placed.",
