@@ -50,7 +50,7 @@ import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -58,7 +58,7 @@ import java.util.*;
 
 
 @Mixin(Gui.class)
-public abstract class GuiMixin implements ControlTooltip.Event {
+public abstract class GuiMixin implements ControlTooltip.Listener {
     @Final
     @Shadow
     private static Comparator<? super PlayerScoreEntry> SCORE_DISPLAY_ORDER;

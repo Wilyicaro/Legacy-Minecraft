@@ -24,6 +24,7 @@ public class LegacyGameRules {
 
     // Only the TNT Limit is accurate (enabled) by default, since it won't make the gameplay worse, as no one is going to blow a lot of TNTs at the same time, mainly in Survival
     public static final RegisterListing.Holder<GameRule<Boolean>> GLOBAL_MAP_PLAYER_ICON = registerBoolean("global_map_player_icon", GameRuleCategory.PLAYER, true);
+    public static final RegisterListing.Holder<GameRule<Boolean>> FIRE_SPREADS = registerBoolean("fire_spreads", GameRuleCategory.UPDATES, true);
     public static final RegisterListing.Holder<GameRule<Boolean>> DEFAULT_SHOW_ARMOR_STANDS_ARMS = registerBoolean("default_show_armor_stand_arms", GameRuleCategory.MISC,true);
     public static final RegisterListing.Holder<GameRule<Integer>> TNT_LIMIT = registerInteger("tnt_limit", GameRuleCategory.MISC, 20, 0, Integer.MAX_VALUE);
     public static final RegisterListing.Holder<GameRule<Integer>> FALLING_BLOCK_LIMIT = registerInteger("falling_block_limit", GameRuleCategory.MOBS, 0, 0, Integer.MAX_VALUE);

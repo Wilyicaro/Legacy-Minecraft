@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -17,10 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mobcaps.LegacyMobCaps;
 import wily.legacy.util.LegacyTags;
+import wily.legacy.world.PlayerTrustAdmin;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -48,6 +51,20 @@ public abstract class EntityMixin {
         }
     }
 
+    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+    private void hurt(DamageSource source, float amount, CallbackInfo ci) {
+        if (!(self().level() instanceof ServerLevel level)) return;
+        PlayerTrustPolicy player = PlayerTrustAdmin.getResponsiblePlayer(level, source);
+        if (player != null && !player.canDestroyEntity(self())) ci.cancel();
+    }
+
+    @Inject(method = "hurtOrSimulate", at = @At("HEAD"), cancellable = true)
+    private void hurtOrSimulate(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (!(self().level() instanceof ServerLevel level)) return;
+        PlayerTrustPolicy player = PlayerTrustAdmin.getResponsiblePlayer(level, source);
+        if (player != null && !player.canDestroyEntity(self())) cir.setReturnValue(false);
+    }
+
     @ModifyExpressionValue(method = "doWaterSplashEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getSwimSplashSound()Lnet/minecraft/sounds/SoundEvent;"))
     private SoundEvent getSwimSplashSound(SoundEvent original) {
         return legacy$getSplashSound(original);
@@ -68,7 +85,7 @@ public abstract class EntityMixin {
         return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && self().getType().builtInRegistryHolder().is(LegacyTags.OLD_SPLASH_SOUND) ? LegacyRegistries.ENTITY_GENERIC_OLD_SPLASH.get() : original;
     }
 
-    //? if neoforge && <26.1 {
+    //? if neoforge {
     /*@ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;canStartSwimming()Z", remap = false))
     protected boolean updateSwimming(boolean original) {
         return (LegacyGameRules.getSidedBooleanGamerule(self(), LegacyGameRules.LEGACY_SWIMMING) && (self().isInWater() && self().getXRot() > 0) || original) && !(self() instanceof Player p && p.getAbilities().flying);

@@ -1,0 +1,22 @@
+{
+  "targetUI": "wily.legacy.skins.client.screen.ChangeSkinScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.hd"
+  },
+  "elements": {
+    "layout.panel.width": 198,
+    "layout.panel.height": 319,
+    "layout.tooltip.width": 440,
+    "layout.preview.minSize": 26,
+    "layout.preview.baseSize": 123,
+    "layout.preview.maxInset": 22,
+    "layout.preview.yOffset": 11,
+    "layout.preview.topInset": 6,
+    "layout.preview.bottomInset": 6,
+    "layout.tooltip.yOffset": 20,
+    "layout.tooltip.heightInset": 11,
+    "layout.text.bigScale": 1.485,
+    "layout.text.smallScale": 1.045
+  }
+}

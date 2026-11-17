@@ -23,10 +23,12 @@ import wily.legacy.api.client.leaderboards.GlobalLeaderboardRow;
 import wily.legacy.api.client.leaderboards.GlobalLeaderboardViewMode;
 import wily.legacy.api.client.leaderboards.LegacyLeaderboards;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.CompoundComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.Icon;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.client.screen.globalleaderboards.board.GlobalLeaderboardBoardRegistry;
@@ -52,11 +54,11 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
       this.refreshBoardDefinitions();
       this.selectFirstNonEmptyBoard();
       this.rebuildRenderableVList(Minecraft.getInstance());
-      this.renderableVList.layoutSpacing(layout -> 1);
+      this.renderableVList.layoutSpacing(layout -> 1).cyclic(false);
    }
 
    @Override
-   protected ControlTooltip.Icon filterControlIcon() {
+   protected Icon filterControlIcon() {
       return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon();
    }
 
@@ -157,9 +159,25 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          return true;
       }
       if (this.renderableVList.keyPressed(keyEvent.key())) {
+         if (keyEvent.key() == InputConstants.KEY_DOWN || keyEvent.key() == InputConstants.KEY_PAGEDOWN) {
+            this.requestNextPageIfNearEnd();
+         } else if (keyEvent.key() == InputConstants.KEY_UP || keyEvent.key() == InputConstants.KEY_PAGEUP) {
+            this.requestPreviousPageIfNearStart();
+         }
          return true;
       }
       return super.keyPressed(keyEvent);
+   }
+
+   @Override
+   public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+      boolean handled = super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+      if (verticalAmount < 0) {
+         this.requestNextPageIfNearEnd();
+      } else if (verticalAmount > 0) {
+         this.requestPreviousPageIfNearStart();
+      }
+      return handled;
    }
 
    @Override
@@ -216,9 +234,19 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
       int cacheVersion = GlobalLeaderboardsFeature.cacheVersion();
       int boardsVersion = GlobalLeaderboardsFeature.boards().hashCode();
       if (cacheVersion != this.seenCacheVersion || boardsVersion != this.seenBoardsVersion) {
+         int previousRowCount = this.rows.size();
+         GlobalLeaderboardRow previousFirstRow = this.rows.isEmpty() ? null : this.rows.getFirst();
          this.seenCacheVersion = cacheVersion;
          this.seenBoardsVersion = boardsVersion;
          this.rebuildRenderableVList(this.minecraft);
+         if (previousRowCount > 1) {
+            int previousFirstRowIndex = this.indexOfRow(previousFirstRow);
+            if (previousFirstRowIndex > 0) {
+               this.renderableVList.offsetScroll(previousFirstRowIndex);
+            } else if (previousFirstRowIndex < 0) {
+               this.renderableVList.resetScroll();
+            }
+         }
          this.repositionElements();
       }
    }
@@ -268,7 +296,7 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
             graphics.text(this.font, boardTitle, 0, 0, topTextColor);
             graphics.pose().popMatrix();
             graphics.pose().pushMatrix();
-            Component entries = Component.translatable("legacy.menu.leaderboard.entries", this.rows.size());
+            Component entries = Component.translatable("legacy.menu.leaderboard.entries", Math.max(this.rows.size(), GlobalLeaderboardsFeature.totalEntries(board, this.viewMode, this.difficulty)));
             graphics.pose().translate(entriesTooltipX + (entriesTooltipWidth - this.font.width(entries) * topTooltipScale) / 2, topTooltipY + this.accessor.getInteger("entriesText.y", 6));
             if (!fontOverride) {
                graphics.pose().scale(topTooltipScale);
@@ -307,9 +335,9 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
          graphics.pose().pushMatrix();
          graphics.pose().translate(boardTooltipX + this.accessor.getInteger("boardControlTooltip.x", 2), boardControlTooltipY);
          graphics.pose().scale(LegacyOptions.getUIMode().isSD() ? 1.2f : 0.6f);
-         (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
+         (ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(graphics, 4, 0, false);
          graphics.pose().popMatrix();
-         ControlTooltip.Icon difficultyControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
+         Icon difficultyControl = CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
          graphics.pose().pushMatrix();
          graphics.pose().translate(boardTooltipX + boardTooltipWidth + this.accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
          if (!LegacyOptions.getUIMode().isSD()) {
@@ -371,6 +399,33 @@ public final class GlobalLeaderboardsScreen extends LeaderboardsScreen {
 
    private void requestBoard(GlobalLeaderboardBoard board) {
       GlobalLeaderboardsFeature.requestBoard(board, this.viewMode, this.difficulty);
+   }
+
+   private void requestNextPageIfNearEnd() {
+      GlobalLeaderboardBoard board = this.selectedGlobalBoard();
+      if (board != null && !this.rows.isEmpty() && this.renderableVList.isNearEnd(5)) {
+         GlobalLeaderboardsFeature.requestNextPage(board, this.viewMode, this.difficulty);
+      }
+   }
+
+   private void requestPreviousPageIfNearStart() {
+      GlobalLeaderboardBoard board = this.selectedGlobalBoard();
+      if (board != null && !this.rows.isEmpty() && this.renderableVList.isNearStart(5)) {
+         GlobalLeaderboardsFeature.requestPreviousPage(board, this.viewMode, this.difficulty);
+      }
+   }
+
+   private int indexOfRow(GlobalLeaderboardRow target) {
+      if (target == null) {
+         return -1;
+      }
+      for (int index = 0; index < this.rows.size(); index++) {
+         GlobalLeaderboardRow row = this.rows.get(index);
+         if (!target.playerUuid().isBlank() ? target.playerUuid().equals(row.playerUuid()) : target.rank() == row.rank() && target.playerName().equals(row.playerName())) {
+            return index;
+         }
+      }
+      return -1;
    }
 
    private void applyLocalPlayerRow(GlobalLeaderboardBoard board, List<GlobalLeaderboardRow> entries) {

@@ -42,17 +42,9 @@ public abstract class ClientMinecraftServerMixin {
     @Final
     public LevelStorageSource.LevelStorageAccess storageSource;
 
-    @Shadow
-    private volatile boolean isSaving;
-    @Shadow
-    @Final
-    private Executor executor;
     //? if >1.20.2 {
     @Shadow
     private int ticksUntilAutosave;
-
-    @Shadow
-    public abstract Iterable<ServerLevel> getAllLevels();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Optional<GameRules> gameRules, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, boolean bl, CallbackInfo ci) {

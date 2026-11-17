@@ -1,6 +1,8 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -16,10 +18,14 @@ import net.minecraft.world.level.redstone.Orientation;
 //?}
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.entity.PlayerTrustOwnedSource;
+import wily.legacy.entity.PlayerTrustPolicy;
+import wily.legacy.world.PlayerTrustAdmin;
 
 @Mixin(TntBlock.class)
 public class TntBlockMixin {
@@ -45,5 +51,23 @@ public class TntBlockMixin {
     private void wasExploded(/*? if <1.21.2 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, BlockPos blockPos, Explosion explosion, CallbackInfo ci) {
         if (/*? if <1.21.5 {*//*!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) ||*//*?}*/level.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()) > 0 && level.getEntitiesOfClass(PrimedTnt.class, tntDetectBounding.move(blockPos)).size() >= level.getGameRules().get(LegacyGameRules.TNT_LIMIT.get()))
             ci.cancel();
+    }
+
+    @WrapOperation(method = "wasExploded", at = @At(value = "NEW", target = "(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/entity/item/PrimedTnt;"))
+    private PrimedTnt createChainedTnt(Level level, double x, double y, double z, LivingEntity owner, Operation<PrimedTnt> original) {
+        return createResponsibleTnt(level, x, y, z, owner, original);
+    }
+
+    @WrapOperation(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "NEW", target = "(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/entity/item/PrimedTnt;"))
+    private static PrimedTnt createPrimedTnt(Level level, double x, double y, double z, LivingEntity owner, Operation<PrimedTnt> original) {
+        return createResponsibleTnt(level, x, y, z, owner, original);
+    }
+
+    @Unique
+    private static PrimedTnt createResponsibleTnt(Level level, double x, double y, double z, LivingEntity owner, Operation<PrimedTnt> original) {
+        PrimedTnt tnt = original.call(level, x, y, z, owner);
+        PlayerTrustPolicy player = PlayerTrustAdmin.getScopedResponsiblePlayer();
+        if (player != null) ((PlayerTrustOwnedSource) tnt).setResponsiblePlayer(player.playerId());
+        return tnt;
     }
 }

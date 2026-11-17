@@ -15,7 +15,6 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundSource;
@@ -28,6 +27,12 @@ import wily.factoryapi.base.client.FactoryOptions;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.LegacyControlsOptions;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.control.tooltip.CompoundComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.globalleaderboards.GlobalLeaderboardsFeature;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyComponents;
@@ -36,10 +41,9 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
-import static wily.legacy.client.screen.ControlTooltip.getKeyIcon;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.getKeyIcon;
 
 public class OptionsScreen extends PanelVListScreen {
     private static boolean buildingMergedLegacyAdvancedOptions = false;
@@ -83,10 +87,10 @@ public class OptionsScreen extends PanelVListScreen {
         return LegacyOptions.legacySettingsMenus.get() && !buildingMergedLegacyAdvancedOptions;
     }
 
-    public static void setupSelectorControlTooltips(ControlTooltip.Renderer renderer, Screen screen) {
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
-        renderer.add(ControlTooltip.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
-        renderer.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
+    public static void setupSelectorControlTooltips(ControlTooltipList list, Screen screen) {
+        list.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
+        list.add(CommonIcon.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
+        list.add(CommonIcon.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
     }
 
     public OptionsScreen withAdvancedOptions(Function<OptionsScreen, Screen> advancedOptionsFunction) {
@@ -109,11 +113,11 @@ public class OptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        if (shouldAddSelectorControlTooltips()) setupSelectorControlTooltips(renderer, this);
-        if (renderer.tooltips.size() > 6) {
-            renderer.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        if (shouldAddSelectorControlTooltips()) setupSelectorControlTooltips(list, this);
+        if (list.tooltips.size() > 6) {
+            list.replace(6, i -> i, c -> c == null && !LegacyOptions.hideAdvancedOptionsTooltip.get() && !LegacyOptions.legacySettingsMenus.get() ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
         }
     }
 
@@ -395,12 +399,13 @@ public class OptionsScreen extends PanelVListScreen {
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.in_game_settings"),
-                                LegacyOptions.unfocusedInputs,
+                                LegacyControlsOptions.unfocusedInputs,
                                 LegacyOptions.invertedFrontCameraPitch,
                                 LegacyOptions.headFollowsTheCamera,
                                 LegacyOptions.vehicleCameraRotation,
                                 LegacyOptions.create(mc.options.rotateWithMinecart()),
                                 LegacyOptions.legacyCreativeBlockPlacing,
+                                LegacyOptions.bedrockBridging,
                                 LegacyOptions.mapsWithCoords,
                                 LegacyOptions.vanillaTutorial,
                                 LegacyOptions.forceLegacyFlight,
@@ -415,9 +420,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("legacy.menu.user_interface_settings"),
                                 LegacyOptions.skipIntro,
                                 LegacyOptions.skipInitialSaveWarning,
-                                LegacyOptions.lockControlTypeChange,
+                                LegacyControlsOptions.lockControlTypeChange,
                                 LegacyOptions.selectedControlType,
-                                LegacyOptions.cursorMode,
+                                LegacyControlsOptions.cursorMode,
                                 LegacyOptions.defaultShowCraftableRecipes),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.accessibility.title"),
@@ -567,7 +572,8 @@ public class OptionsScreen extends PanelVListScreen {
                     super.tick();
                 }
             };
-            screen.renderableVList.addRenderables(globalPackSelector, selector);
+            if (LegacyOptions.legacySettingsMenus.get()) screen.renderableVList.addRenderables(0, globalPackSelector, selector);
+            else screen.renderableVList.addRenderables(globalPackSelector, selector);
             return screen;
         }));
         public static final Section ADVANCED_GRAPHICS = new Section(
@@ -584,8 +590,6 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.cutoutLeaves()),
                                 LegacyOptions.of(mc.options.improvedTransparency()),
                                 LegacyOptions.of(mc.options.weatherRadius()),
-                                LegacyOptions.of(mc.options.maxAnisotropyBit()),
-                                LegacyOptions.of(mc.options.textureFiltering()),
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),
@@ -617,6 +621,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.slowChunkLoading,
                                 LegacyOptions.fastLeavesWhenBlocked,
                                 LegacyOptions.fastLeavesCustomModels,
+                                LegacyOptions.bedrockSnowyLeaves,
+                                LegacyOptions.legacyLeafMipmaps,
+                                LegacyOptions.legacyTorchModel,
                                 LegacyOptions.displayNameTagBorder,
                                 LegacyOptions.itemLightingInHand,
                                 LegacyOptions.enhancedItemTranslucency,
@@ -626,8 +633,10 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyEvokerFangs,
                                 LegacyOptions.legacyDrownedHeight,
                                 LegacyOptions.legacyDrownedAnimation,
+                                LegacyOptions.legacySwimmingAnimation,
                                 LegacyOptions.legacyZombieAggressionAnimation,
                                 LegacyOptions.legacyEntityFireTint,
+                                LegacyOptions.hideFireWithResistance,
                                 LegacyOptions.legacyItemPickup,
                                 LegacyOptions.enhancedPistonMovingRenderer,
                                 LegacyOptions.legacyPotionsBar,
@@ -635,8 +644,12 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.defaultParticlePhysics,
                                 LegacyOptions.of(mc.options.particles()),
                                 LegacyOptions.bubblesOutsideWater,
-                                FactoryOptions.NEAREST_MIPMAP_SCALING,
                                 LegacyOptions.of(mc.options.mipmapLevels())),
+                        o -> o.renderableVList.addLinkedOptions(
+                                FactoryOptions.NEAREST_MIPMAP_SCALING,
+                                config -> !config.get(),
+                                LegacyOptions.of(mc.options.textureFiltering()),
+                                LegacyOptions.of(mc.options.maxAnisotropyBit())),
                         o -> o.renderableVList.addCategory(Component.translatable("legacy.menu.mixins")),
                         o -> Legacy4JClient.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> o.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c))))),
                 ArbitrarySupplier.empty(),
@@ -684,7 +697,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 o.getRenderableVList().addRenderable(createDisplayPackManagementTooltipsTickBox());
                             }
                         },
-                        o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
+                        o -> o.renderableVList.addMultSliderOption(LegacyControlsOptions.interfaceSensitivity, 2),
                         o -> {
                             if (useLegacySettingsMenusOptions()) o.renderableVList.addOptions(
                                     LegacyOptions.inGameOnlineIds,
@@ -695,6 +708,7 @@ public class OptionsScreen extends PanelVListScreen {
                                         LegacyOptions.legacyItemTooltips,
                                         FactoryConfig::get,
                                         LegacyOptions.legacyItemTooltipScaling);
+                                o.renderableVList.addOptions(LegacyOptions.legacyItemRarity);
                             }
                         },
                         o -> {
@@ -727,7 +741,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
                                 LegacyOptions.legacyHearts,
-                                LegacyOptions.legacyFont),
+                                LegacyOptions.legacyFont,
+                                LegacyOptions.legacyPinkBossBars),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),
                         o -> o.renderableVList.addOptions(
                                 LegacyOptions.screenshotToasts,
@@ -737,7 +752,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.itemTooltipEllipsis,
                                 LegacyOptions.selectedItemTooltipLines,
                                 LegacyOptions.selectedItemTooltipSpacing,
-                                LegacyOptions.controlTooltipDisplay
+                                LegacyOptions.controlTooltipDisplay,
+                                LegacyOptions.displayMultipleControlsFromAction
                         ),
                         o -> {
                             o.renderableVList.addCategory(Component.translatable("legacy.menu.menu_settings"));
@@ -746,6 +762,7 @@ public class OptionsScreen extends PanelVListScreen {
                             o.renderableVList.addOptions(
                                     LegacyOptions.titleScreenFade,
                                     LegacyOptions.titleScreenVersionText,
+                                    LegacyOptions.legacyCreditsScreen,
                                     LegacyOptions.menusWithBackground,
                                     LegacyOptions.legacyIntroAndReloading,
                                     LegacyOptions.legacyLoadingAndConnecting,

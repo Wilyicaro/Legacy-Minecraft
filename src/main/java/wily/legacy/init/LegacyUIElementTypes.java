@@ -59,8 +59,9 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.client.UIDefinitionManager;
 import wily.factoryapi.util.DynamicUtil;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
 import wily.legacy.client.screen.*;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -159,7 +160,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "color", "outlineColor", "order");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (GuiGraphicsExtractor, i, j, f) -> {
-            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getFloat(elementName + ".outline", 0.5f)));
+            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getInteger(elementName + ".outlineDownColor", a.getInteger(elementName + ".outlineColor", 0xFF000000)), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
     public static final UIDefinitionManager.ElementType RENDER_ITEM_TOOLTIP = UIDefinitionManager.ElementType.registerConditional("render_item_tooltip", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {

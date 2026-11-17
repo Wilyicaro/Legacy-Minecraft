@@ -10,6 +10,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.util.LegacySprites;
 
 public class LegacyScrollRenderer {
+    private static final int FADE_MILLIS = 320;
     public static final Identifier[] SCROLLS = new Identifier[]{LegacySprites.SCROLL_UP, LegacySprites.SCROLL_DOWN, LegacySprites.SCROLL_LEFT, LegacySprites.SCROLL_RIGHT};
     public final long[] lastScrolled = new long[4];
     public long lastScroll = 0;
@@ -17,7 +18,11 @@ public class LegacyScrollRenderer {
 
     public void updateScroll(ScreenDirection direction) {
         lastDirection = direction;
-        lastScroll = (lastScrolled[direction.ordinal()] = Util.getMillis());
+        lastScroll = Util.getMillis();
+        int index = direction.ordinal();
+        if (lastScrolled[index] == 0 || lastScroll - lastScrolled[index] >= FADE_MILLIS) {
+            lastScrolled[index] = lastScroll;
+        }
     }
 
     public void renderSmallScroll(GuiGraphicsExtractor graphics, boolean up, int x, int y) {
@@ -32,7 +37,7 @@ public class LegacyScrollRenderer {
     }
 
     public float getAlpha(long last) {
-        float f = (Util.getMillis() - last) / 320f;
+        float f = (Util.getMillis() - last) / (float) FADE_MILLIS;
         return Math.min(1.0f, f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
     }
 

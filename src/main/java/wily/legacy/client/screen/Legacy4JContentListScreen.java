@@ -21,9 +21,11 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -38,7 +40,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Legacy4JContentListScreen extends PanelVListScreen implements ControlTooltip.Event {
+public class Legacy4JContentListScreen extends PanelVListScreen implements ControlTooltip.Listener {
     private static final int PANEL_WIDTH = 257;
     private static final int PANEL_HEIGHT = 226;
     private static final int TOOLTIP_WIDTH = 240;
@@ -268,11 +270,11 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+    public void addControlTooltips(ControlTooltipList list) {
         boolean isKbm = ControlType.getActiveType().isKbm();
 
         // Contextual Install/Delete Select
-        renderer.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> {
+        list.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), () -> {
             if (hoveredPack != null && isDownloading(hoveredPack)) {
                 return Component.translatable("legacy.menu.install");
             }
@@ -283,7 +285,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         });
 
         // Cancel
-        renderer.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.back"));
+        list.add(() -> isKbm ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), () -> Component.translatable("gui.back"));
     }
 
     @Override
@@ -409,10 +411,13 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 int y = this.getY() + (this.height - size) / 2;
                 LegacyRenderUtil.drawGenericLoading(GuiGraphicsExtractor, x, y, 4, 2);
             } else if (installedPacks.getOrDefault(pack.id(), false)) {
-                int spriteSize = 18;
-                int sx = this.getX() + this.width - spriteSize - 7;
-                int sy = this.getY() + (this.height - spriteSize) / 2;
-                GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, sx, sy, spriteSize, spriteSize);
+                int guiScale = Math.max(1, Minecraft.getInstance().getWindow().getGuiScale());
+                int spriteSize = 28 * Math.max(1, Math.round(18.0f * guiScale / 28));
+                GuiGraphicsExtractor.pose().pushMatrix();
+                GuiGraphicsExtractor.pose().translate(this.getX() + this.width - 16, this.getY() + this.height / 2);
+                GuiGraphicsExtractor.pose().scale(1.0f / guiScale, 1.0f / guiScale);
+                GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.BEACON_CONFIRM, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+                GuiGraphicsExtractor.pose().popMatrix();
             }
         }
 

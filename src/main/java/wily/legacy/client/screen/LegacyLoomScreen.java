@@ -31,12 +31,15 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.RecipeInfo;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.client.LoomTabListing;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
@@ -48,7 +51,6 @@ import wily.legacy.util.client.LegacySoundUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.LegacyCraftingScreen.clearIngredients;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
@@ -64,8 +66,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     private final boolean[] warningSlots = new boolean[9];
     protected final List<CustomRecipeIconHolder> selectBannerButton = Collections.singletonList(new CustomRecipeIconHolder() {
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_O && isFocused() && hasItem() ? LegacyComponents.SELECT : null);
+        public @Nullable Component getAction(Object context) {
+            return context instanceof KeyContext c ? c.key() == InputConstants.KEY_O && isFocused() && hasItem() ? LegacyComponents.SELECT : null : null;
         }
 
         public Component getDisplayName() {
@@ -148,13 +150,13 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.
-                add(OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
-                add(ControlTooltip.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE_PATTERN : null).
-                add(CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.CHANGE_GROUP).
-                add(CONTROL_TYPE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.
+                add(CommonIcon.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
+                add(CommonIcon.EXTRA::get, () -> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE_PATTERN : null).
+                add(CommonIcon.CONTROL_TAB::get, () -> isSelectionTab() ? null : LegacyComponents.CHANGE_GROUP).
+                add(CommonIcon.CONTROL_TYPE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
     }
 
     public void resetElements() {
@@ -346,8 +348,8 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     protected RecipeIconHolder<BannerRecipe> createRecipeButton(int index) {
         RecipeIconHolder<BannerRecipe> h = new RecipeIconHolder<>(leftPos + 13 + index * 27, topPos + 38) {
             @Override
-            public @Nullable Component getAction(Context context) {
-                return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isFocused() && LegacyLoomScreen.this.canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canCraft() ? LegacyComponents.ADD_PATTERN : null);
+            public @Nullable Component getAction(Object context) {
+                return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && isFocused() && LegacyLoomScreen.this.canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canCraft() ? LegacyComponents.ADD_PATTERN : null : null;
             }
 
             @Override
@@ -511,9 +513,9 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.hasShiftDown() && !isSelectionTab() && craftingTabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight()))
+        if (!isSelectionTab() && craftingTabList.controlPage(page, keyEvent))
             return true;
-        if (craftingTabList.controlTab(keyEvent.key())) return true;
+        if (craftingTabList.controlTab(keyEvent)) return true;
         return super.keyPressed(keyEvent);
     }
 

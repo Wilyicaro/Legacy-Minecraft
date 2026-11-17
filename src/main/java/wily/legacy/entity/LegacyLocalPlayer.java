@@ -6,9 +6,5 @@ public interface LegacyLocalPlayer {
 
     boolean isLegacyElytraBoosting();
 
-    boolean isLegacyElytraBoostBobbing();
-
-    double getLegacyElytraBoostYBobMovement();
-
     float getLegacyUnderwaterVisionClarity();
 }

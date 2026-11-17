@@ -7,11 +7,11 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.util.LegacyComponents;
 
 public class PatchNotesScreen extends PanelBackgroundScreen {
-    public static final Identifier NEWER_VERSION = Legacy4J.createModLocation("ui_definitions/newer_version_notes.json");
+    public static final Identifier NEWER_VERSION = Legacy4J.identifier("ui_definitions/newer_version_notes.json");
     public static final Identifier NEWER_MINECRAFT_VERSION = FactoryAPI.createVanillaLocation("ui_definitions/newer_version_notes.json");
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
     private final Identifier uiDefinitionID;
@@ -51,9 +51,9 @@ public class PatchNotesScreen extends PanelBackgroundScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.tooltips.remove(2);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.tooltips.remove(2);
     }
 
     protected void addFooterButtons() {

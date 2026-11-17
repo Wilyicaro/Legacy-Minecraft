@@ -17,14 +17,14 @@ import net.minecraft.world.item.ItemStack;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.controller.Controller;
+import wily.legacy.client.control.ControllerListener;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
-public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controller.Event {
+public class LegacyTip extends SimpleLayoutRenderable implements Toast, ControllerListener {
 
     protected final AdvancedTextWidget tipLabel = new AdvancedTextWidget(FactoryScreenUtil.getGuiAccessor());
     public Visibility visibility = Visibility.SHOW;
@@ -53,7 +53,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     public LegacyTip(Component title, Component tip) {
         this(tip, LegacyOptions.getUIMode().isSD() ? 136 : 250, 0);
         title(title);
-        height = (title == null ? LegacyOptions.getUIMode().isSD() ? 14 : 26 : LegacyOptions.getUIMode().isSD() ? 22 : 38) + tipLabel.getHeight();
+        height = (this.title == null ? LegacyOptions.getUIMode().isSD() ? 14 : 26 : LegacyOptions.getUIMode().isSD() ? 22 : 38) + tipLabel.getHeight();
         setY(25);
         canRemove(() -> initScreen != minecraft.screen);
     }

@@ -1,19 +1,19 @@
-- Added new baby sounds for Wolf, Cat, Pig, Horse, and Chicken
-- Added Golden Dandelion, a new type of flower that can be used to stop baby mobs from aging
+- Added new baby sounds for Wolf, Cat, Pig, Horse, and Chicken.
+- Added Golden Dandelion, a new type of flower that can be used to stop baby mobs from aging.
 - Added adult sound variants for the following animals:
- - Cats have one new sound variant
- - Pigs have two new sound variants
- - Cows have one new sound variant
- - Chickens have one new sound variant
- - The original sounds of each animal are used for the variant called classic
- - Every one of these animals will have a random sound variant assigned to it from the new variants and the original one
-- Added a trumpet instrument for when using a Note Block that is placed on a Copper Block
- - The sound is different based on the oxidation level of the Copper Block
-- Revamped the visuals of most baby mobs
-- Name Tags are now craftable and can be crafted with 1 Paper and 1 of any Metal Nugget
-- Removed Name Tags from loot chests in Ancient Cities and Woodland Mansions
-- Deepslate can now be directly crafted into its cobbled, polished, brick, and tile variants in the Stonecutter
-- Stone can now be directly crafted into cobbled variants in the Stonecutter
-- Updated the Main Menu background panorama
-- The algorithm that maps block and sky light levels to how bright things appear on screen has been fully rewritten
-- Removed baby Herobrine
+ - Cats have one new sound variant.
+ - Pigs have two new sound variants.
+ - Cows have one new sound variant.
+ - Chickens have one new sound variant.
+ - The original sounds of each animal are used for the variant called classic.
+ - Every one of these animals will have a random sound variant assigned to it from the new variants and the original one.
+- Added a trumpet instrument for when using a Note Block that is placed on a Copper Block.
+ - The sound is different based on the oxidation level of the Copper Block.
+- Revamped the visuals of most baby mobs.
+- Name Tags are now craftable and can be crafted with 1 Paper and 1 of any Metal Nugget.
+- Removed Name Tags from loot chests in Ancient Cities and Woodland Mansions.
+- Deepslate can now be directly crafted into its cobbled, polished, brick, and tile variants in the Stonecutter.
+- Stone can now be directly crafted into cobbled variants in the Stonecutter.
+- Updated the Main Menu background panorama.
+- The algorithm that maps block and sky light levels to how bright things appear on screen has been fully rewritten.
+- Removed baby Herobrine.

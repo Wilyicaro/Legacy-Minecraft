@@ -1,22 +1,29 @@
 package wily.legacy.mixin.base.client.create_world;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
+import net.minecraft.CrashReport;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.*;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldLoader;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelDataAndDimensions;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import org.apache.commons.io.FileUtils;
@@ -27,6 +34,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIPlatform;
@@ -35,18 +44,28 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.ControlTooltips;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
+import wily.legacy.world.PlayerTrustAdmin;
+import wily.legacy.world.SeedStart;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 @Mixin(CreateWorldScreen.class)
-public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Event {
+public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Listener {
     @Shadow
     @Final
     private static Component GAME_MODEL_LABEL;
@@ -54,6 +73,8 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Final
     private static Component NAME_LABEL;
     protected Bearer<Boolean> trustPlayers = Bearer.of(true);
+    @Unique
+    private final Bearer<BlockPos> legacy$seedStart = Bearer.of(null);
     protected Bearer<ResourceKey<WorldPreset>> legacyBiomeScale = Bearer.of(WorldPresets.NORMAL);
     protected Panel panel;
     protected PublishScreen publishScreen;
@@ -69,6 +90,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private boolean legacy$preparingRemoteResourceAlbum;
     @Unique
     private boolean legacy$resourceAlbumPrepared;
+    @Unique
+    private static final AtomicReference<CompletableFuture<WorldCreationContext>> legacy$worldCreationPreload = new AtomicReference<>();
+    @Unique
+    private static final AtomicBoolean legacy$openingWorldCreation = new AtomicBoolean();
     @Shadow
     @Final
     private WorldCreationUiState uiState;
@@ -101,6 +126,77 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Shadow
     protected abstract void onCreate();
 
+    @Inject(method = "openCreateWorldScreen", at = @At("HEAD"), cancellable = true)
+    private static void legacy$usePreloadedWorldCreation(Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CallbackInfo ci) {
+        if (!WorldPresets.NORMAL.equals(preset)) return;
+        if (PlayGameScreen.isPreloadingCreateWorld()) {
+            if (legacy$getWorldCreationPreload() != null) ci.cancel();
+            return;
+        }
+        if (!legacy$openingWorldCreation.compareAndSet(false, true)) {
+            ci.cancel();
+            return;
+        }
+        CompletableFuture<WorldCreationContext> future = legacy$getWorldCreationPreload();
+        if (future == null) {
+            legacy$openingWorldCreation.set(false);
+            return;
+        }
+        legacy$openWorldCreationWhenReady(minecraft, runnable, preset, callback, future);
+        ci.cancel();
+    }
+
+    @Redirect(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;queueLoadScreen(Lnet/minecraft/client/Minecraft;Lnet/minecraft/network/chat/Component;)V"))
+    private static void legacy$showWorldPreparationScreen(Minecraft targetMinecraft, Component component, Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback) {
+        if (!PlayGameScreen.isPreloadingCreateWorld() || !WorldPresets.NORMAL.equals(preset)) {
+            targetMinecraft.setScreenAndShow(new GenericMessageScreen(component));
+        }
+    }
+
+    @ModifyArg(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/WorldLoader;load(Lnet/minecraft/server/WorldLoader$InitConfig;Lnet/minecraft/server/WorldLoader$WorldDataSupplier;Lnet/minecraft/server/WorldLoader$ResultFactory;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"), index = 4)
+    private static Executor legacy$queuePreloadApply(Executor executor) {
+        return PlayGameScreen.isPreloadingCreateWorld() && executor instanceof Minecraft minecraft ? minecraft::schedule : executor;
+    }
+
+    @Inject(method = "openCreateWorldScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;managedBlock(Ljava/util/function/BooleanSupplier;)V"), cancellable = true)
+    private static void legacy$avoidBlockingWorldCreation(Minecraft minecraft, Runnable runnable, Function<WorldLoader.DataLoadContext, WorldGenSettings> settingsFactory, WorldCreationContextMapper contextMapper, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CallbackInfo ci, @Local CompletableFuture<WorldCreationContext> future) {
+        if (!WorldPresets.NORMAL.equals(preset)) return;
+        if (PlayGameScreen.isPreloadingCreateWorld()) {
+            if (legacy$worldCreationPreload.compareAndSet(null, future)) {
+                PlayGameScreen.setCreateWorldPreload(future);
+                future.whenComplete((context, throwable) -> {
+                    if (throwable != null) legacy$worldCreationPreload.compareAndSet(future, null);
+                });
+            }
+        } else {
+            legacy$openingWorldCreation.set(true);
+            legacy$openWorldCreationWhenReady(minecraft, runnable, preset, callback, future);
+        }
+        ci.cancel();
+    }
+
+    @Unique
+    private static CompletableFuture<WorldCreationContext> legacy$getWorldCreationPreload() {
+        while (true) {
+            CompletableFuture<WorldCreationContext> future = legacy$worldCreationPreload.get();
+            if (future == null) return null;
+            if (!future.isCancelled() && !future.isCompletedExceptionally()) return future;
+            if (legacy$worldCreationPreload.compareAndSet(future, null)) return null;
+        }
+    }
+
+    @Unique
+    private static void legacy$openWorldCreationWhenReady(Minecraft minecraft, Runnable runnable, ResourceKey<WorldPreset> preset, CreateWorldCallback callback, CompletableFuture<WorldCreationContext> future) {
+        future.thenAcceptAsync(context -> {
+            legacy$openingWorldCreation.set(false);
+            minecraft.setScreen(new CreateWorldScreen(minecraft, runnable, context, Optional.of(preset), OptionalLong.empty(), callback));
+        }, minecraft).exceptionallyAsync(throwable -> {
+            legacy$openingWorldCreation.set(false);
+            minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't prepare world creation"));
+            return null;
+        }, minecraft);
+    }
+
     private CreateWorldScreen self() {
         return (CreateWorldScreen) (Object) this;
     }
@@ -113,12 +209,13 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         resourceAlbumSelector = PackAlbum.Selector.creationResources(panel.x + 13, panel.y + 106, 220, 45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
         legacyBiomeScale.set(WorldMoreOptionsScreen.getLegacyBiomeScalePreset(uiState.getWorldType().preset()));
+        if (uiState.getSeed().isBlank()) uiState.setSeed("");
     }
 
     @Override
-    public void added() {
-        super.added();
-        OptionsScreen.setupSelectorControlTooltips(ControlTooltip.Renderer.of(this), this);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        OptionsScreen.setupSelectorControlTooltips(list, this);
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
@@ -157,7 +254,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             difficultyButton.active = !uiState.isHardcore();
         });
 
-        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
+        addRenderableWidget(accessor.putWidget("moreOptionsButton", Button.builder(Component.translatable("createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers, Bearer.of(() -> publishScreen.publish, b -> publishScreen.publish = b), legacyBiomeScale, legacy$seedStart))).bounds(layoutX, panel.y + 172, layoutWidth, 20).build()));
         addRenderableWidget(accessor.putWidget("createButton", Button.builder(Component.translatable("selectWorld.create"), button -> legacy$createWorld()).bounds(layoutX, panel.y + 197, layoutWidth, 20).build()));
         onlineTickBox = addRenderableWidget(accessor.putWidget("onlineTickBox", new TickBox(layoutX + 1, panel.y + 155, layoutWidth, publishScreen.publish, b -> PublishScreen.getPublishComponent(), b -> PublishScreen.getPublishTooltip(), button -> {
             if (LegacyOptions.useLegacyWorldOptions()) {
@@ -192,12 +289,17 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         legacy$resourceAlbumPrepared = false;
         Legacy4JClient.serverPlayerJoinConsumer = s -> {
             MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
-            LegacyClientWorldSettings.of(server.getWorldData()).setTrustPlayers(trustPlayers.get());
+            PlayerTrustAdmin.setTrustPlayers(server, trustPlayers.get());
             server.getPlayerList().sendPlayerPermissionLevel(s);
             publishScreen.setGameType(uiState.getGameMode().gameType);
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
         };
+    }
+
+    @Inject(method = "createWorldAndCleanup", at = @At("HEAD"))
+    private void setSeedStart(CallbackInfo ci, @Local(argsOnly = true) LevelDataAndDimensions.WorldDataAndGenSettings worldData) {
+        ((SeedStart) worldData.data()).setSeedStart(legacy$seedStart.get());
     }
 
     @Unique

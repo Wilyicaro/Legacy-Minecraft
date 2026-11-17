@@ -27,7 +27,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.ScrollableRenderer;
@@ -312,13 +312,14 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, k -> {
+        public @Nullable Component getAction(Object ctx) {
+            if (ctx instanceof KeyContext k) {
                 if (LegacyOptions.displayPackManagementTooltips.get() && (k.key() == InputConstants.KEY_X && isFocused() || k.key() == InputConstants.MOUSE_BUTTON_LEFT && isHovered())) {
                     return screenComponent;
                 }
-                return ControlTooltip.getSelectAction(this, context);
-            });
+                return ControlTooltip.getSelectAction(this, ctx);
+            }
+            return null;
         }
     }
 }

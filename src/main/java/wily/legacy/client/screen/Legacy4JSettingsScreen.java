@@ -101,7 +101,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (tabList.controlTab(keyEvent.key())) return true;
+        if (tabList.controlTab(keyEvent)) return true;
         return super.keyPressed(keyEvent);
     }
 

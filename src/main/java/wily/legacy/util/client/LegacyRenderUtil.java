@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import com.google.common.collect.Ordering;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -31,6 +32,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -66,7 +68,8 @@ import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerManager;
 import wily.legacy.skins.skin.ClientSkinAssets;
 import wily.legacy.skins.skin.ClientSkinCache;
 import wily.legacy.skins.skin.SkinFairness;
@@ -74,7 +77,6 @@ import wily.legacy.skins.skin.SkinIdUtil;
 import wily.legacy.skins.skin.SkinPackLoader;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.client.screen.MultilineTooltip;
 import wily.legacy.client.screen.SaveInfoScreen;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyItemUtil;
@@ -87,7 +89,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.screen.ControlTooltip.MORE;
+import static wily.legacy.client.control.tooltip.ControlTooltip.MORE;
 
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
@@ -97,11 +99,11 @@ public class LegacyRenderUtil {
     public static boolean tooltipTextColorOverrideForcesStyle;
     public static boolean autoFocusedWidget = false;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
-    public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
-    public static final Identifier PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
-    public static final Identifier MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
-    public static final Identifier LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
+    public static final Identifier MINECRAFT = Legacy4J.identifier("textures/gui/title/minecraft.png");
+    public static final Identifier PANORAMA_DAY = Legacy4J.identifier("textures/gui/title/panorama_day.png");
+    public static final Identifier PANORAMA_NIGHT = Legacy4J.identifier("textures/gui/title/panorama_night.png");
+    public static final Identifier MENU_BACKGROUND = Legacy4J.identifier("textures/gui/menu_background.png");
+    public static final Identifier LOADING_BACKGROUND = Legacy4J.identifier("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -205,27 +207,37 @@ public class LegacyRenderUtil {
         FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() * GuiGraphicsExtractor.guiHeight() / 360 / 66.32f, 1, GuiGraphicsExtractor.guiWidth(), GuiGraphicsExtractor.guiHeight() + 2, GuiGraphicsExtractor.guiHeight() * 820 / 144, GuiGraphicsExtractor.guiHeight() + 2);
     }
 
-    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
-        drawOutlinedString(graphics, font, component.getVisualOrderText(), x, y, color, outlineColor, outline);
+    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, Component component, int x, int y, int color, int outlineColor, int outlineDownColor, float outline) {
+        drawOutlinedString(graphics, font, component.getVisualOrderText(), x, y, color, outlineColor, outlineDownColor, outline);
     }
 
-    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color, int outlineColor, float outline) {
-        drawStringOutline(graphics, font, formattedCharSequence, x, y, outlineColor, outline);
+    public static void drawOutlinedString(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color, int outlineColor, int outlineDownColor, float outline) {
+        drawStringOutline(graphics, font, formattedCharSequence, x, y, outlineColor, outlineDownColor, outline);
         graphics.text(font, formattedCharSequence, x, y, color, false);
     }
 
-    public static void drawStringOutline(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int outlineColor, float outline) {
-        float[] translations = new float[]{0, outline, -outline};
-        for (float t : translations) {
-            for (float t1 : translations) {
-                if (t != 0 || t1 != 0) {
-                    graphics.pose().pushMatrix();
-                    graphics.pose().translate(t, t1);
-                    graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
-                    graphics.pose().popMatrix();
-                }
-            }
-        }
+    public static void drawStringOutline(GuiGraphicsExtractor graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int outlineColor, int outlineDownColor, float outline) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(-outline, -outline);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().translate(outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().translate(outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().popMatrix();
+
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(0, outline);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(-outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(-outline, 0);
+        graphics.text(font, formattedCharSequence, x, y, outlineDownColor, false);
+        graphics.pose().translate(0, -outline);
+        graphics.text(font, formattedCharSequence, x, y, outlineColor, false);
+        graphics.pose().popMatrix();
     }
 
     public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height) {
@@ -538,6 +550,20 @@ public class LegacyRenderUtil {
         return mutableComponent;
     }
 
+    public static List<FormattedCharSequence> getTooltip(List<Component> tooltip, int width) {
+        return tooltip.stream().map(c -> mc.font.split(c, width)).flatMap(List::stream).toList();
+    }
+
+    public static MutableComponent getAppendedComponent(List<Component> tooltip) {
+        MutableComponent component = Component.empty();
+        for (int i = 0; i < tooltip.size(); i++) {
+            Component line = tooltip.get(i);
+            component.append(line);
+            if (i < tooltip.size() - 1) component.append("\n");
+        }
+        return component;
+    }
+
     public static List<Component> getTooltip(ItemStack stack) {
         return getTooltip(stack, false);
     }
@@ -549,7 +575,7 @@ public class LegacyRenderUtil {
     }
 
     public static List<FormattedCharSequence> getTooltip(ItemStack stack, int width) {
-        return new MultilineTooltip(getTooltip(stack), width).toCharSequence(mc);
+        return getTooltip(getTooltip(stack), width);
     }
 
     public static void renderHUDTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int shift) {
@@ -585,7 +611,7 @@ public class LegacyRenderUtil {
                 tooltipLines.forEach((mutableComponent, width) -> {
                     int x = (GuiGraphicsExtractor.guiWidth() - width) / 2;
                     boolean itemNameLine = line[0]++ == 0;
-                    boolean useItemNameColor = itemNameLine && overrideItemNameColor;
+                    boolean useItemNameColor = itemNameLine && overrideItemNameColor && (mutableComponent.getStyle().getColor() == null || mutableComponent.getStyle().getColor().getValue() == 0xFFFFFF);
                     boolean useItemTooltipColor = !itemNameLine && overrideItemTooltipColor;
                     Component text = mutableComponent;
                     int color = defaultColor;
@@ -671,17 +697,16 @@ public class LegacyRenderUtil {
         int p = vector2ic.x();
         int q = vector2ic.y();
         graphics.pose().pushMatrix();
-        if (p == (int) Legacy4JClient.controllerManager.getPointerX() && q == (int) Legacy4JClient.controllerManager.getPointerY())
-            graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() - i), (float) (Legacy4JClient.controllerManager.getPointerY() - j));
+        if (i == (int) ControllerManager.getInstance().getPointerX() && j == (int) ControllerManager.getInstance().getPointerY() && clientTooltipPositioner == DefaultTooltipPositioner.INSTANCE)
+            graphics.pose().translate((float) (ControllerManager.getInstance().getPointerX() - i), (float) (ControllerManager.getInstance().getPointerY() - j));
+        graphics.pose().translate(p, q);
         int scaledWidth = Math.round(scale * k);
         int scaledHeight = Math.round(scale * l);
         switch (LegacyOptions.getUIMode()) {
-            case FHD -> LegacyRenderUtil.renderPointerPanel(graphics, p - 3, q - 6, scaledWidth + 7, scaledHeight + 9);
-            case SD -> LegacyRenderUtil.renderPointerPanel(graphics, p - 3, q - 4, scaledWidth + 7, scaledHeight + 6);
-            default -> LegacyRenderUtil.renderPointerPanel(graphics, p - 5, q - 9, scaledWidth + 11, scaledHeight + 13);
+            case FHD -> LegacyRenderUtil.renderPointerPanel(graphics, -3, -6, scaledWidth + 7, scaledHeight + 9);
+            case SD -> LegacyRenderUtil.renderPointerPanel(graphics, -3, -4, scaledWidth + 7, scaledHeight + 6);
+            default -> LegacyRenderUtil.renderPointerPanel(graphics, -5, -9, scaledWidth + 11, scaledHeight + 13);
         }
-        graphics.pose().translate(p, q);
-        FactoryScreenUtil.disableDepthTest();
         graphics.pose().scale(scale, scale);
         int s = 0;
 
@@ -709,7 +734,6 @@ public class LegacyRenderUtil {
             tooltipComponent.extractImage(font, 0, s,/*? if >=1.21.2 {*/k, l,/*?}*/ graphics);
             s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
         }
-        FactoryScreenUtil.enableDepthTest();
         graphics.pose().popMatrix();
     }
 
@@ -791,9 +815,9 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.enableDepthTest();
         }
 
-        if (GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
+        if (!ReplayCompat.isRendering() && GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !ControllerManager.getInstance().isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXOffset(), Legacy4JClient.controllerManager.getVisualPointerY());
+            graphics.pose().translate(ControllerManager.getInstance().getVisualPointerX() + LegacyTipManager.getTipXOffset(), ControllerManager.getInstance().getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(LegacyOptions.getUIMode().isFHD() ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
         }
@@ -801,7 +825,7 @@ public class LegacyRenderUtil {
 
     public static void renderPotionLevel(GuiGraphicsExtractor graphics, int i, int j, ItemStack itemStack) {
         if (!LegacyOptions.legacyPotionsBar.get()) return;
-        int potionLevel = LegacyItemUtil.getPotionLevel(itemStack);
+        int potionLevel = Math.min(LegacyItemUtil.getPotionLevel(itemStack), 4);
         if (potionLevel > 0) {
             int x = i + 3;
             int y = j + 13;
@@ -831,6 +855,18 @@ public class LegacyRenderUtil {
         else if (y < 0)
             return ScreenDirection.UP;
         return null;
+    }
+
+    public static int getBossBarTextColor(BossEvent.BossBarColor color) {
+        return (switch (color) {
+            case PINK -> CommonColor.DARK_PURPLE;
+            case BLUE -> CommonColor.DARK_BLUE;
+            case RED -> CommonColor.DARK_RED;
+            case GREEN -> CommonColor.GREEN;
+            case YELLOW -> CommonColor.YELLOW;
+            case PURPLE -> CommonColor.LIGHT_PURPLE;
+            case WHITE -> CommonColor.WHITE;
+        }).get();
     }
 
     public static boolean hasHorizontalArtifacts() {

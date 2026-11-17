@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.book;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -26,20 +25,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.*;
+import wily.legacy.client.control.tooltip.*;
 import wily.legacy.client.screen.BookPanel;
 import wily.legacy.client.screen.ConfirmationScreen;
-import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.List;
 import java.util.Objects;
 
 @Mixin(BookEditScreen.class)
-public abstract class BookEditScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
+public abstract class BookEditScreenMixin extends Screen implements ControllerListener, ControlTooltip.Listener {
 
     private static final Component EXIT_BOOK = Component.translatable("legacy.menu.exit_book");
     private static final Component EXIT_BOOK_MESSAGE = Component.translatable("legacy.menu.exit_book_message");
@@ -64,8 +61,8 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     @Unique
     private final BookPanel panel = new BookPanel(this) {
         @Override
-        public @Nullable Component getAction(Context context) {
-            return page.isFocused() ? context.actionOfContext(KeyContext.class, ControlTooltip::getKeyboardAction) : null;
+        public @Nullable Component getAction(Object context) {
+            return page.isFocused() ? context instanceof KeyContext k ? ControlTooltip.getKeyboardAction(k) : null : null;
         }
     };
 
@@ -97,11 +94,11 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
 
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this)
-                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT)) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
-                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        list
+                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(LegacyKeyMapping.of(Legacy4JClient.keyMenuPageLeft).getKey().getValue())) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
+                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(LegacyKeyMapping.of(Legacy4JClient.keyMenuPageRight).getKey().getValue())) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
     }
 
     @Override
@@ -150,8 +147,8 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if ((keyEvent.hasShiftDown() && (keyEvent.isRight() || keyEvent.isLeft())) && getFocused() != panel) {
-            (keyEvent.isRight() ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
+        if (keyEvent.hasShiftDown() && getFocused() != panel && (Legacy4JClient.keyMenuPageRight.matches(keyEvent) || Legacy4JClient.keyMenuPageLeft.matches(keyEvent))) {
+            (Legacy4JClient.keyMenuPageRight.matches(keyEvent) ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
             cir.setReturnValue(true);
             return;
         }

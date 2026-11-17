@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.*;
@@ -11,14 +12,30 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.controller.LegacyKeyMapping;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.LegacyKeyMapping;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.control.tooltip.ComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.network.TopMessage;
 
 public class LegacyGuiElements {
+    private static final FactoryGuiElement MODDED_HUD = new FactoryGuiElement("modded_hud");
     public static long lastHotbarSelectionChange = -1;
     public static int lastHotbarSelection = -1;
     public static long lastGui = -1;
+
+    public static void renderModdedHud(GuiGraphicsExtractor graphics, Runnable render) {
+        UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
+        if (!MODDED_HUD.isVisible(accessor)) return;
+        MODDED_HUD.prepareRender(graphics, accessor);
+        try {
+            render.run();
+        } finally {
+            MODDED_HUD.finalizeRender(graphics, accessor);
+        }
+    }
 
     public static void setup(Minecraft minecraft) {
         FactoryGuiElement[] nonScaledElements = new FactoryGuiElement[]{FactoryGuiElement.SELECTED_ITEM_NAME, FactoryGuiElement.OVERLAY_MESSAGE, FactoryGuiElement.SPECTATOR_TOOLTIP};
@@ -34,7 +51,7 @@ public class LegacyGuiElements {
         });
         FactoryGuiElement.HOTBAR.post().register(GuiGraphicsExtractor -> {
             if (minecraft.player != null)
-                ControlTooltip.Renderer.of(minecraft.gui).extractRenderState(GuiGraphicsExtractor, 0, 0, FactoryAPIClient.getPartialTick());
+                ControlTooltipRenderer.of(minecraft.gui).extractRenderState(GuiGraphicsExtractor, 0, 0, FactoryAPIClient.getPartialTick());
             LegacyRenderUtil.renderTopText(GuiGraphicsExtractor, TopMessage.small, 21, 1.0f, TopMessage.smallTicks);
             LegacyRenderUtil.renderTopText(GuiGraphicsExtractor, TopMessage.medium, 37, 1.5f, TopMessage.mediumTicks);
         });
@@ -77,10 +94,10 @@ public class LegacyGuiElements {
         }));
 
         FactoryAPIClient.uiDefinitionManager.staticList.add(UIDefinition.createBeforeInit(a -> {
-            CommonValue.COMMON_VALUES.forEach((s, c) -> a.getElements().put("commonValue." + (s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".") + s.getPath(), c));
-            CommonColor.COMMON_COLORS.forEach((s, c) -> a.getElements().put("commonColor." + (s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".") + s.getPath(), c));
-            ControlTooltip.commonIcons.forEach((s, i) -> {
-                a.getElements().put("controlIcon." + s, i.map(ControlTooltip.ComponentIcon::getComponent));
+            CommonValue.COMMON_VALUES.forEach((s, c) -> a.getElements().put("commonValue." + s.toShortLanguageKey(), c));
+            CommonColor.COMMON_COLORS.forEach((s, c) -> a.getElements().put("commonColor." + s.toShortLanguageKey(), c));
+            CommonIcon.commonIcons.forEach((s, i) -> {
+                a.getElements().put("controlIcon." + s, i.map(ComponentIcon::getComponent));
             });
             for (KeyMapping keyMapping : minecraft.options.keyMappings) {
                 a.getElements().put("controlIcon." + keyMapping.getName(), () -> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));

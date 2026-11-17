@@ -114,7 +114,7 @@ public class CreationList extends RenderableVList {
 
     private void rebuildEntries() {
         renderables.clear();
-        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
+        addIconButton(this, Legacy4J.identifier("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
         List<LegacyWorldTemplate> localTemplates = new ArrayList<>(LegacyWorldTemplate.list);
         localTemplates.stream().filter(template -> !isDownloadedTemplate(template)).forEach(this::addLocalTemplateButton);
         if (mashupPacks.isEmpty()) {
@@ -204,7 +204,7 @@ public class CreationList extends RenderableVList {
                     if (icon != null) {
                         FactoryGuiGraphics.of(graphics).blit(icon, getX() + x, getY() + y, 0.0f, 0.0f, width, height, width, height);
                     } else {
-                        FactoryGuiGraphics.of(graphics).blitSprite(Legacy4J.createModLocation("creation_list/create_world"), getX() + x, getY() + y, width, height);
+                        FactoryGuiGraphics.of(graphics).blitSprite(Legacy4J.identifier("creation_list/create_world"), getX() + x, getY() + y, width, height);
                     }
                 }
             }

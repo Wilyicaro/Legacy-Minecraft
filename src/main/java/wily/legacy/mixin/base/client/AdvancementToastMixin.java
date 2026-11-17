@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.advancements.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
@@ -21,10 +22,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.AdvancementToastAccessor;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.LegacyKeyMapping;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AdvancementToast.class)
@@ -46,17 +49,18 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
          *///?} else {
         ci.cancel();
         //?}
-        Component holdToView = Component.translatable("legacy.menu.advancements.toast", (ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.getIcon()).getComponent());
+        Component holdToView = Component.translatable("legacy.menu.advancements.toast", (LegacyKeyMapping.of(Minecraft.getInstance().options.keyInventory)).getIconComponent());
         DisplayInfo displayInfo = this.advancement./*? if >1.20.1 {*/value().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
         width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3 / 2, font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
         LegacyRenderUtil.renderPointerPanel(GuiGraphicsExtractor, 0, 0, width(), height());
         if (displayInfo != null) {
             int i = displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/() == /*? if >1.20.1 {*/AdvancementType/*?} else {*//*FrameType*//*?}*/.CHALLENGE ? 0xFF88FF : 0xFFFF00;
-
-            if (l < 1500L)
-                GuiGraphicsExtractor.text(font, displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName(), (width() - font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName())) / 2, height() - 18, i | Mth.floor(Mth.clamp((float) (1500L - l) / 300.0f, 0.0f, 1.0f) * 255.0f) << 24 | 0x4000000);
-            else
-                GuiGraphicsExtractor.text(font, holdToView, (width() - font.width(holdToView)) / 2, height() - 18, 0xFFFFFFFF | Mth.floor(Mth.clamp((float) (l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000);
+            LegacyFontUtil.applySmallerFont(LegacyFontUtil.MOJANGLES_11_FONT, bl -> {
+                if (l < 1500L)
+                    GuiGraphicsExtractor.text(font, displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName(), (width() - font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName())) / 2, height() - 18, i | Mth.floor(Mth.clamp((float) (1500L - l) / 300.0f, 0.0f, 1.0f) * 255.0f) << 24 | 0x4000000);
+                else
+                    GuiGraphicsExtractor.text(font, holdToView, (width() - font.width(holdToView)) / 2, height() - 18, 0xFFFFFFFF | Mth.floor(Mth.clamp((float) (l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000);
+            });
             GuiGraphicsExtractor.pose().pushMatrix();
             GuiGraphicsExtractor.pose().translate((width() - font.width(displayInfo.getTitle()) * 1.5f) / 2, 10);
             GuiGraphicsExtractor.pose().scale(1.5f, 1.5f);

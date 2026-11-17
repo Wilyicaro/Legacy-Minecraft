@@ -86,7 +86,16 @@
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_5.png"
   },
-  "legacy:wii_u",
+  {
+    "id": "legacy:wii_u",
+    "name": {"translate": "legacy.options.controlType.wii_u_pro"},
+    "font": "legacy:wii_u"
+  },
+  {
+    "id": "legacy:wii_u_edition",
+    "name": {"translate": "legacy.options.controlType.wii_u"},
+    "font": "legacy:wii_u_edition"
+  },
   {
     "id": "legacy:switch",
     "name": {"translate": "legacy.options.controlType.switch"},

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -14,6 +15,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.*;
@@ -23,7 +25,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
-import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.phys.Vec2;
@@ -42,13 +43,20 @@ import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.recipe.CollapsedRecipeInfo;
+import wily.legacy.client.recipe.ItemIdRecipeFilter;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.ImpossibleIngredient;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -62,7 +70,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
 public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIconHolder<CraftingRecipe>> implements TabList.Access {
@@ -240,7 +248,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"), i -> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b && b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ || i.getItem() instanceof BundleItem/*?}*/), dyeItemUpdateRecipe));
         dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes, dyeItemUpdateRecipe));
         if (!is2x2)
-            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(LegacyItemUtil.getBannerItem(c))))).toList()));
+            bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c -> allRecipes.stream().filter(new ItemIdRecipeFilter(BuiltInRegistries.ITEM.getKey(LegacyItemUtil.getBannerItem(c))))).toList()));
         bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i -> i.getItem() instanceof BannerItem && LegacyItemUtil.hasValidPatterns(i), h -> {
             clearIngredients(ingredientsGrid);
             if (bannerButtons.isEmpty() || h.itemIcon.isEmpty()) return;
@@ -318,14 +326,15 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.
-                add(EXTRA::get, () -> typeTabList.getIndex() == 0 ? LegacyComponents.craftingInfoAction(infoType.get()) : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
-                add(OPTION::get, () -> typeTabList.getIndex() == 0 ? onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES : ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
-                add(CONTROL_TYPE::get, () -> hasTypeTabList() ? LegacyComponents.TYPE : null).
-                add(CONTROL_TAB::get, () -> LegacyComponents.CHANGE_GROUP).
-                add(CONTROL_PAGE::get, () -> page.max > 0 && typeTabList.getIndex() == 0 ? LegacyComponents.PAGE : null);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.
+                add(CommonIcon.EXTRA::get, () -> typeTabList.getIndex() == 0 ? LegacyComponents.INFO : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
+                add(CommonIcon.OPTION::get, () -> typeTabList.getIndex() == 0 ? onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES : ControlTooltip.getKeyMessage(InputConstants.KEY_O, this)).
+                add(() -> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_V) : ControllerBinding.RIGHT_STICK_BUTTON.getIcon(), () -> getFocusedAlternatives() != null && getFocusedAlternatives().canCycle(this::canCraftAlternative) ? LegacyComponents.CHANGE_INGREDIENT : null).
+                add(CommonIcon.CONTROL_TYPE::get, () -> hasTypeTabList() ? LegacyComponents.TYPE : null).
+                add(CommonIcon.CONTROL_TAB::get, () -> LegacyComponents.GROUP).
+                add(CommonIcon.CONTROL_PAGE::get, () -> page.max > 0 && typeTabList.getIndex() == 0 ? LegacyComponents.PAGE : null);
     }
 
     public void resetElements() {
@@ -510,6 +519,9 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
     @Override
     protected void updateRecipes() {
         if (typeTabList.getIndex() == 0) {
+            recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).forEach(group -> group.forEach(recipe -> {
+                if (recipe instanceof CollapsedRecipeInfo<?> alternatives) alternatives.update(this::canCraftAlternative, Util.getMillis());
+            }));
             if (onlyCraftableRecipes)
                 filteredRecipesByGroup = recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory, menu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
             recipeButtons.get(selectedRecipeButton).updateRecipeDisplay();
@@ -519,9 +531,34 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
         }
     }
 
+    private boolean canCraftAlternative(RecipeInfo<?> recipe) {
+        return RecipeMenu.canCraft(recipe.getOptionalIngredients(), inventory, menu.getCarried());
+    }
+
+    private CollapsedRecipeInfo<CraftingRecipe> getFocusedAlternatives() {
+        return typeTabList.getIndex() == 0 && getFocused() instanceof RecipeIconHolder<?> holder && holder.getFocusedRecipe() instanceof CollapsedRecipeInfo<?> alternatives ? (CollapsedRecipeInfo<CraftingRecipe>) alternatives : null;
+    }
+
+    private boolean cycleIngredient() {
+        CollapsedRecipeInfo<CraftingRecipe> alternatives = getFocusedAlternatives();
+        if (alternatives == null || !alternatives.cycle(this::canCraftAlternative)) return false;
+        ((RecipeIconHolder<?>) getFocused()).updateRecipeDisplay();
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+        return true;
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        CollapsedRecipeInfo<CraftingRecipe> alternatives = getFocusedAlternatives();
+        if (alternatives != null && alternatives.update(this::canCraftAlternative, Util.getMillis()))
+            ((RecipeIconHolder<?>) getFocused()).updateRecipeDisplay();
+    }
+
     @Override
     public void bindingStateTick(BindingState state) {
         if (state.pressed && state.canClick()) {
+            if (state.is(ControllerBinding.RIGHT_STICK_BUTTON)) cycleIngredient();
             if ((state.is(ControllerBinding.LEFT_TRIGGER) || state.is(ControllerBinding.RIGHT_TRIGGER)) && hasTypeTabList())
                 typeTabList.controlTab(state.is(ControllerBinding.LEFT_TRIGGER), state.is(ControllerBinding.RIGHT_TRIGGER));
             if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && typeTabList.getIndex() == 0)
@@ -678,6 +715,7 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
             }
 
             protected void updateRecipeDisplay(RecipeInfo<CraftingRecipe> rcp) {
+                if (rcp instanceof CollapsedRecipeInfo<?> alternatives) alternatives.update(LegacyCraftingScreen.this::canCraftAlternative, Util.getMillis());
                 if (!ItemStack.isSameItem(resultStack, getFocusedResult()))
                     scrollableRenderer.resetScrolled();
                 resultStack = getFocusedResult();
@@ -685,6 +723,12 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
                 if (rcp == null) return;
                 for (int i = 0; i < rcp.getOptionalIngredients().size(); i++)
                     ingredientsGrid.set(i, rcp.getOptionalIngredients().get(i));
+            }
+
+            @Override
+            public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+                if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT && isFocused() && isMouseOver(event.x(), event.y()) && cycleIngredient()) return true;
+                return super.mouseClicked(event, doubleClick);
             }
 
             @Override
@@ -780,11 +824,12 @@ public class LegacyCraftingScreen extends RecipesScreen<LegacyCraftingMenu, Reci
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (hasTypeTabList() && keyEvent.hasShiftDown() && typeTabList.controlTab(keyEvent.key())) {
+        if (keyEvent.key() == InputConstants.KEY_V && cycleIngredient()) return true;
+        if (hasTypeTabList() && keyEvent.hasShiftDown() && typeTabList.controlTab(keyEvent)) {
             return true;
         }
-        getTabList().controlTab(keyEvent.key());
-        if (keyEvent.hasShiftDown() && typeTabList.getIndex() == 0 && craftingTabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight()))
+        getTabList().controlTab(keyEvent);
+        if (typeTabList.getIndex() == 0 && craftingTabList.controlPage(page, keyEvent))
             return true;
         return super.keyPressed(keyEvent);
     }

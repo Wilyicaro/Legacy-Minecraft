@@ -22,11 +22,13 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.LegacyKeyMapping;
+import wily.legacy.client.control.tooltip.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -76,33 +78,45 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
         }))).size(240, 20).build());
         renderableVList.addOptions(LegacyOptions.unbindConflictingKeys, LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()), LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()), LegacyOptions.of(Minecraft.getInstance().options.toggleUse()), LegacyOptions.of(Minecraft.getInstance().options.toggleAttack()));
         for (KeyMapping keyMapping : keyMappings) {
+            if (Legacy4JClient.isMenuNavigationKey(keyMapping)) continue;
             KeyMapping.Category category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
                 renderableVList.addCategory(category.label());
             lastCategory = keyMapping.getCategory();
-            renderableVList.addRenderable(new MappingButton(0, 0, 240, 20, LegacyKeyMapping.of(keyMapping)) {
-                @Override
-                public ControlTooltip.ComponentIcon getIcon() {
-                    return ControlTooltip.getKeyIcon(mapping.getKey().getValue());
-                }
-
-                @Override
-                public boolean isNone() {
-                    return mapping.getKey() == InputConstants.UNKNOWN;
-                }
-
-                @Override
-                public void onPress(InputWithModifiers input) {
-                    if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) {
-                        setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
-                        setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
-                    } else {
-                        setSelectedMapping(mapping);
-                        setAndUpdateMappingTooltip(LegacyKeyMappingScreen.this::getCancelTooltip);
-                    }
-                }
-            });
+            addMappingButton(keyMapping);
         }
+        renderableVList.addCategory(Component.translatable("legacy.key.categories.menuNavigation"));
+        addMappingButton(Legacy4JClient.keyMenuTabLeft);
+        addMappingButton(Legacy4JClient.keyMenuTabRight);
+        addMappingButton(Legacy4JClient.keyMenuPageLeft);
+        addMappingButton(Legacy4JClient.keyMenuPageRight);
+    }
+
+    protected void addMappingButton(KeyMapping keyMapping) {
+        renderableVList.addRenderable(new MappingButton(0, 0, 240, 20, LegacyKeyMapping.of(keyMapping)) {
+            @Override
+            public ComponentIcon getIcon() {
+                if (keyMapping == Legacy4JClient.keyMenuPageLeft || keyMapping == Legacy4JClient.keyMenuPageRight)
+                    return CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(mapping.getKey().getValue()));
+                return ControlTooltip.getKeyIcon(mapping.getKey().getValue());
+            }
+
+            @Override
+            public boolean isNone() {
+                return mapping.getKey() == InputConstants.UNKNOWN;
+            }
+
+            @Override
+            public void onPress(InputWithModifiers input) {
+                if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) {
+                    setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
+                    setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
+                } else {
+                    setSelectedMapping(mapping);
+                    setAndUpdateMappingTooltip(LegacyKeyMappingScreen.this::getCancelTooltip);
+                }
+            }
+        });
     }
 
     @Override
@@ -145,7 +159,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
     }
 
     public Component getCancelTooltip() {
-        return Component.translatable("legacy.options.keyMappingTooltip", ControlTooltip.CANCEL_BINDING.get().getComponent());
+        return Component.translatable("legacy.options.keyMappingTooltip", CommonIcon.CANCEL_BINDING.get().getComponent());
     }
 
     public Component getConflictingTooltip() {
@@ -212,13 +226,13 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.replace(0, i -> i, c -> selectedMapping == null ? c : null);
-        renderer.replace(1, i -> i, c -> selectedMapping == null ? c : null);
-        renderer.replace(2, i -> i, c -> selectedMapping == null ? c : null);
-        renderer.replace(3, i -> i, c -> selectedMapping == null ? c : null);
-        renderer.add(ControlTooltip.CANCEL_BINDING::get, () -> selectedMapping == null ? null : LegacyComponents.CANCEL);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.replace(0, i -> i, c -> selectedMapping == null ? c : null);
+        list.replace(1, i -> i, c -> selectedMapping == null ? c : null);
+        list.replace(2, i -> i, c -> selectedMapping == null ? c : null);
+        list.replace(3, i -> i, c -> selectedMapping == null ? c : null);
+        list.add(CommonIcon.CANCEL_BINDING::get, () -> selectedMapping == null ? null : LegacyComponents.CANCEL);
     }
 
     @Override
@@ -241,7 +255,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
             this.mapping = mapping;
         }
 
-        public abstract ControlTooltip.ComponentIcon getIcon();
+        public abstract ComponentIcon getIcon();
 
         public abstract boolean isNone();
 
@@ -255,7 +269,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
                 GuiGraphicsExtractor.text(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                 return;
             }
-            ControlTooltip.Icon icon = getIcon();
+            Icon icon = getIcon();
             if (icon != null) {
                 FactoryScreenUtil.enableBlend();
                 icon.render(GuiGraphicsExtractor, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);

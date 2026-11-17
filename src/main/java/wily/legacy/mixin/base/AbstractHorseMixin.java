@@ -21,12 +21,12 @@ import wily.legacy.config.LegacyCommonOptions;
 public class AbstractHorseMixin {
     @Inject(method = "isTamed", at = @At("HEAD"), cancellable = true)
     private void isTamed(CallbackInfoReturnable<Boolean> cir) {
-        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) && (Object)this instanceof SkeletonHorse) cir.setReturnValue(true);
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySkeletonHorseRiding) && (Object)this instanceof SkeletonHorse) cir.setReturnValue(true);
     }
 
     @ModifyExpressionValue(method = {"getControllingPassenger", "canJump", "onPlayerJump"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/equine/AbstractHorse;isSaddled()Z"))
     private boolean skeletonHorseRidesWithoutSaddle(boolean saddled) {
-        return saddled || FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) && (Object)this instanceof SkeletonHorse;
+        return saddled || FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyMobInteractions) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySkeletonHorseRiding) && (Object)this instanceof SkeletonHorse;
     }
 
     @Inject(method = "handleEating", at = @At("RETURN"))

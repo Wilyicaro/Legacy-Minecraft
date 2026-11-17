@@ -20,14 +20,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
 @Mixin(DeathScreen.class)
-public abstract class DeathScreenMixin extends Screen implements ControlTooltip.Event {
+public abstract class DeathScreenMixin extends Screen implements ControlTooltip.Listener {
 
     @Shadow
     @Final
@@ -91,7 +91,7 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(this.width / 2 - this.font.width(this.title), this.height / 4 + 20);
         guiGraphics.pose().scale(2.0f);
-        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), CommonColor.TITLE_TEXT_OUTLINE_DOWN.orNotOverridden(CommonColor.TITLE_TEXT_OUTLINE).get(), 0.5f);
         guiGraphics.pose().popMatrix();
     }
 

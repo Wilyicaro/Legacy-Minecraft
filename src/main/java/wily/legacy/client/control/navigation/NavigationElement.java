@@ -1,0 +1,45 @@
+package wily.legacy.client.control.navigation;
+
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.ScreenAxis;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import wily.legacy.client.control.ControllerListener;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.init.LegacyRegistries;
+import wily.legacy.util.client.LegacySoundUtil;
+
+public interface NavigationElement {
+    NavigationElement DEFAULT = new NavigationElement() {};
+
+    static NavigationElement of(GuiEventListener listener) {
+        return listener instanceof NavigationElement element ? element : DEFAULT;
+    }
+
+    default void playFocusSound(ComponentPath.Path path) {
+        if (ControllerManager.getInstance().isCursorDisabled || ControllerListener.of(path.component()).disableCursorOnWidgets())
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+    }
+
+    default void applyFocus(ComponentPath.Path path, boolean apply) {
+        boolean disableCursor = ControllerListener.of(path.component()).disableCursorOnWidgets() && !ControllerManager.getInstance().getCursorMode().isAlways();
+        if (ControllerManager.getInstance().isCursorDisabled || disableCursor) {
+            if (!apply) {
+                path.component().setFocused(null);
+            } else {
+                path.component().setFocused(path.childPath().component());
+            }
+
+            path.childPath().applyFocus(apply);
+
+            if (disableCursor && apply) {
+                ControllerManager.getInstance().disableCursor();
+            }
+        } else if (apply) {
+            path.component().setFocused(null);
+            ScreenRectangle rect = path.childPath().component().getRectangle();
+            ControllerManager.getInstance().setPointerPos(rect.getCenterInAxis(ScreenAxis.HORIZONTAL), rect.getCenterInAxis(ScreenAxis.VERTICAL));
+        }
+    }
+
+}

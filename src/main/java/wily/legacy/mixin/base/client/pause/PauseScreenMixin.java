@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.pause;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin(PauseScreen.class)
-public class PauseScreenMixin extends Screen implements ControlTooltip.Event, RenderableVList.Access {
+public class PauseScreenMixin extends Screen implements ControlTooltip.Listener, RenderableVList.Access {
     @Unique
     protected RenderableVList renderableVList;
     @Unique
@@ -77,7 +77,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
                 Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(LegacyAdvancementsScreen.getActualAdvancementsScreenInstance(this))).build()
         );
         if (LegacySaveCache.hasSaveSystem(minecraft))
-            renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b -> {
+            renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this, LegacyOptions.autoSaveInterval.get() > 0 ? Component.translatable("legacy.menu.disable_autosave_title") : LegacyComponents.SAVE_GAME, LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b -> {
                 if (LegacyOptions.autoSaveInterval.get() > 0) {
                     setAutoSave(0, button);
                     minecraft.setScreen(PauseScreenMixin.this);
@@ -86,6 +86,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
                 }
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
+        /*? if fabric && >=26.1 {*/wily.legacy.client.screen.compat.FlashbackCompat.addBelowRecordingButtons(renderableVList, this);/*?}*/
     }
 
     //? if >1.20.1 {
@@ -116,6 +117,8 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
 
         if (leaderboardsButton != null)
             leaderboardsButton.setMessage(LegacyOptions.legacyLeaderboards.get() ? Component.translatable("legacy.menu.leaderboards") : Component.translatable("gui.stats"));
+
+        /*? if fabric && >=26.1 {*/wily.legacy.client.screen.compat.FlashbackCompat.createSideRecordingButtons(this, renderables).forEach(this::addRenderableWidget);/*?}*/
     }
 
     @Override

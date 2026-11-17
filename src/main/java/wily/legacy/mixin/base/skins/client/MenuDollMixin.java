@@ -175,7 +175,8 @@ public abstract class MenuDollMixin {
         RenderStateSkinIdAccess access = state instanceof RenderStateSkinIdAccess skinAccess ? skinAccess : null;
         String skinId = access == null ? null : access.consoleskins$getSkinId();
         boolean stiffLegs = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
-        boolean customAnimation = LegacyOptions.customSkinAnimation.get() && (access == null || !access.consoleskins$skipCustomAnimation());
+        boolean forceAnimation = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.FORCE_CUSTOM_ANIMATION, skinId);
+        boolean customAnimation = (LegacyOptions.customSkinAnimation.get() || forceAnimation) && (access == null || !access.consoleskins$skipCustomAnimation());
         boolean noIdleSway = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.NO_IDLE_SWAY, skinId);
         if (state.id == GuiDollRender.MENU_DOLL_ID) {
             ModelPart head = self.head;
@@ -205,36 +206,37 @@ public abstract class MenuDollMixin {
                 self.leftSleeve.yRot = self.leftArm.yRot;
                 self.leftSleeve.zRot = self.leftArm.zRot;
             }
-        } else if (customAnimation && stiffLegs) {
-            consoleskins$applyStiffLegs(self, state);
         }
         if (!customAnimation) {
             if (noIdleSway && state.id != GuiDollRender.MENU_DOLL_ID) consoleskins$removeIdleSway(self, state);
             return;
         }
-        boolean zombieArms = ZombieArmsPose.shouldApply(state);
-        if (zombieArms) ZombieArmsPose.apply(self, state);
-        if (IdleSitPose.shouldApply(state)) {
+        boolean idleSitting = IdleSitPose.shouldApply(state);
+        if (idleSitting) {
             if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.SWIMMING || state.pose == Pose.FALL_FLYING) {
                 IdleSitPose.apply(self);
             }
         }
-        if (stiffLegs) consoleskins$applyStiffLegs(self, state);
-        if (!ZombieArmsPose.shouldApply(state) && StiffArmsPose.shouldApply(state)) {
-            StiffArmsPose.apply(self, state);
+        if (!idleSitting) {
+            if (stiffLegs) consoleskins$applyStiffLegs(self, state);
+            else if (SyncLegsPose.shouldApply(state)) SyncLegsPose.apply(self);
         }
-        if (StatueOfLibertyPose.shouldApply(state)) {
-            StatueOfLibertyPose.apply(self, state);
-        }
-        if (!zombieArms) {
+        boolean stiffArms = SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.STIFF_ARMS, skinId);
+        boolean zombieArms = !stiffArms && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.ZOMBIE_ARMS, skinId);
+        boolean syncArms = !stiffArms && !zombieArms && SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.SYNC_ARMS, skinId);
+        if (stiffArms) {
+            if (StiffArmsPose.shouldApply(state)) StiffArmsPose.apply(self, state);
+        } else if (zombieArms) {
+            if (ZombieArmsPose.shouldApply(state)) ZombieArmsPose.apply(self, state);
+        } else if (syncArms) {
             if (consoleskins$shouldSyncArms(state, skinId)) consoleskins$applyMenuSyncArms(self);
             else consoleskins$applySyncArms(self, state, skinId);
-        }
-        if (SyncLegsPose.shouldApply(state)) {
-            SyncLegsPose.apply(self);
-        }
+        } else if (StatueOfLibertyPose.shouldApply(state)) StatueOfLibertyPose.apply(self, state);
         if (noIdleSway && !zombieArms && state.id != GuiDollRender.MENU_DOLL_ID) {
             consoleskins$removeIdleSway(self, state);
+        }
+        if (BackwardsCrouchPose.shouldApply(state)) {
+            BackwardsCrouchPose.apply(self);
         }
         consoleskins$applyBoxPivotAnimations(self, state, access);
     }

@@ -28,10 +28,12 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.world.PlayerTrustAdmin;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -42,8 +44,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-
-import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final Component GAME_MODEL_LABEL = Component.translatable("selectWorld.gameMode");
@@ -174,9 +174,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        OptionsScreen.setupSelectorControlTooltips(renderer, this);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        OptionsScreen.setupSelectorControlTooltips(list, this);
     }
 
     @Override
@@ -307,10 +307,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             }
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
+            LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             applyGameRules.accept(s.level().getGameRules(), minecraft.getSingleplayerServer());
+            PlayerTrustAdmin.setTrustPlayers(server, trustPlayers);
             publishScreen.setGameType(gameTypeSlider.getObjectValue());
             publishScreen.publish((IntegratedServer) server);
-            LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             server.getPlayerList().sendPlayerPermissionLevel(s);
             LegacyClientWorldSettings.of(server.getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue())
@@ -338,7 +339,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         GuiGraphicsExtractor.pose().popMatrix();
         GuiGraphicsExtractor.pose().pushMatrix();
         GuiGraphicsExtractor.pose().translate(0, 0.6f);
-        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(), iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+        FactoryGuiGraphics.of(GuiGraphicsExtractor).blit(SaveRenderableList.getIcon(summary).textureLocation(), iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
         LegacyFontUtil.applySDFont(b -> {
             GuiGraphicsExtractor.text(font, summary.getLevelName(), accessor.getInteger("nameText.x", panel.x + 48), accessor.getInteger("nameText.y", panel.y + 12), CommonColor.GRAY_TEXT.get(), false);
             GuiGraphicsExtractor.text(font, Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()), accessor.getInteger("creationText.x", panel.x + 48), accessor.getInteger("creationText.y", panel.y + 29), CommonColor.GRAY_TEXT.get(), false);

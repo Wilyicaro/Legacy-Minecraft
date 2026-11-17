@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTooltip.Event {
+public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTooltip.Listener {
 
     private static final Component TITLE_LABEL = Component.translatable("legacy.menu.store_title");
     private static final Component STORE_NO_CONTENT = Component.translatable("legacy.menu.store_no_content");

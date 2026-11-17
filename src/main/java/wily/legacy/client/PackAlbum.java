@@ -43,6 +43,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.*;
 import wily.legacy.skins.skin.CustomSkinPackStore;
 import wily.legacy.init.LegacyRegistries;
@@ -60,7 +61,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
 
 public record PackAlbum(String id, int version, Component displayName, Component description,
@@ -77,9 +78,9 @@ public record PackAlbum(String id, int version, Component displayName, Component
     public static final Component ADD_ALBUM = Component.translatable("legacy.menu.add_album");
     public static final Component EDIT_ALBUM = Component.translatable("legacy.menu.edit_album");
     public static final Component REMOVE_ALBUM = Component.translatable("legacy.menu.remove_album");
-    public static final PackAlbum MINECRAFT = registerDefaultResource("minecraft", 2, Component.translatable("legacy.menu.albums.resource.minecraft"), Component.translatable("legacy.menu.albums.resource.minecraft.description"), null, Legacy4J.createModLocation("icon/background"), getMinecraftResourcePacks(), "vanilla");
+    public static final PackAlbum MINECRAFT = registerDefaultResource("minecraft", 2, Component.translatable("legacy.menu.albums.resource.minecraft"), Component.translatable("legacy.menu.albums.resource.minecraft.description"), null, Legacy4J.identifier("icon/background"), getMinecraftResourcePacks(), "vanilla");
     public static final Stocker<String> defaultResourceAlbum = Stocker.of(MINECRAFT.id);
-    public static final PackAlbum MINECRAFT_CLASSIC_TEXTURES = registerDefaultResource("minecraft_classic", 1, Component.translatable("legacy.menu.albums.resource.minecraft_classic"), Component.translatable("legacy.menu.albums.resource.minecraft_classic.description"), Legacy4J.createModLocation("icon/minecraft_classic"), Legacy4J.createModLocation("icon/minecraft_classic_background"), getMinecraftClassicResourcePacks(), null);
+    public static final PackAlbum MINECRAFT_CLASSIC_TEXTURES = registerDefaultResource("minecraft_classic", 1, Component.translatable("legacy.menu.albums.resource.minecraft_classic"), Component.translatable("legacy.menu.albums.resource.minecraft_classic.description"), Legacy4J.identifier("icon/minecraft_classic"), Legacy4J.identifier("icon/minecraft_classic_background"), getMinecraftClassicResourcePacks(), null);
 
     public static List<String> getMinecraftResourcePacks() {
         return new ArrayList<>(List.of("vanilla", /*? if forge || neoforge {*/ /*"mod_resources"*//*?} else {*/"fabric"/*?}*/, "legacy:legacy_waters"));
@@ -797,8 +798,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, k -> {
+        public @Nullable Component getAction(Object context) {
+            if (context instanceof KeyContext k) {
                 if (LegacyOptions.displayPackManagementTooltips.get() && k.key() == InputConstants.KEY_O && isFocused()) {
                     return LegacyComponents.ALBUM_OPTIONS;
                 }
@@ -806,7 +807,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     return screenComponent;
                 }
                 return ControlTooltip.getSelectAction(this, context);
-            });
+            }
+            return null;
         }
     }
 }

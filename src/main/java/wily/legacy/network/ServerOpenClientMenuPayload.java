@@ -1,20 +1,16 @@
 package wily.legacy.network;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Player;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.inventory.LegacyCraftingMenu;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public record ServerOpenClientMenuPayload(ClientMenu menu) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<ServerOpenClientMenuPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_open_client_menu_payload"), ServerOpenClientMenuPayload::new);
+    public static final CommonNetwork.Identifier<ServerOpenClientMenuPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("server_open_client_menu_payload"), ServerOpenClientMenuPayload::new);
 
     public ServerOpenClientMenuPayload(CommonNetwork.PlayBuf buf) {
         this(buf.get().readEnum(ClientMenu.class));

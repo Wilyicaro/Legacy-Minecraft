@@ -20,17 +20,15 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.util.LegacyTipBuilder;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -102,14 +100,14 @@ public class TipCommand {
     }
 
     public record Payload(LegacyTipBuilder builder, boolean force) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_tip"), Payload::decode);
+        public static final CommonNetwork.Identifier<Payload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_tip"), Payload::new);
 
         public Payload(LegacyTipBuilder builder) {
             this(builder, false);
         }
 
-        public static Payload decode(CommonNetwork.PlayBuf buf) {
-            return new Payload(LegacyTipBuilder.decode(buf), buf.get().readBoolean());
+        public Payload(CommonNetwork.PlayBuf buf) {
+            this(LegacyTipBuilder.decode(buf), buf.get().readBoolean());
         }
 
         @Override
@@ -132,8 +130,34 @@ public class TipCommand {
         }
     }
 
+    public record PersistentPayload(LegacyTipBuilder builder) implements CommonNetwork.Payload {
+        public static final CommonNetwork.Identifier<PersistentPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_persistent_tip"), PersistentPayload::new);
+
+        public PersistentPayload(CommonNetwork.PlayBuf buf) {
+            this(LegacyTipBuilder.decode(buf));
+        }
+
+        @Override
+        public void encode(CommonNetwork.PlayBuf buf) {
+            builder.encode(buf);
+        }
+
+        @Override
+        public void apply(Context context) {
+            if (context.player().level().isClientSide()) {
+                Supplier<LegacyTip> tip = LegacyTipManager.getTip(builder.getItem(), builder);
+                if (tip != null) LegacyTipManager.setTip(() -> tip.get().canRemove(() -> false));
+            }
+        }
+
+        @Override
+        public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
+            return ID;
+        }
+    }
+
     public record EntityPayload(EntityType<?> entityType, boolean force) implements CommonNetwork.Payload {
-        public static final CommonNetwork.Identifier<EntityPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_entity_tip"), EntityPayload::new);
+        public static final CommonNetwork.Identifier<EntityPayload> ID = CommonNetwork.Identifier.create(Legacy4J.identifier("send_entity_tip"), EntityPayload::new);
 
         public EntityPayload(CommonNetwork.PlayBuf buf) {
             this(FactoryAPIPlatform.getRegistryValue(buf.get().readIdentifier(), BuiltInRegistries.ENTITY_TYPE), buf.get().readBoolean());

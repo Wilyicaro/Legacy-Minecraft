@@ -14,11 +14,11 @@ public record ClientMerchantTradingPayload(int entityID, Optional<UUID> player,
                                            CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier) implements CommonNetwork.Payload {
     public ClientMerchantTradingPayload(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier) {
         this(buf.get().readVarInt(), buf.get().readOptional(b -> b.readUUID()), identifier);
-    }    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_merchant_trading_c2s"), b -> new ClientMerchantTradingPayload(b, ClientMerchantTradingPayload.ID_C2S));
+    }    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.identifier("client_merchant_trading_c2s"), b -> new ClientMerchantTradingPayload(b, ClientMerchantTradingPayload.ID_C2S));
 
     public static ClientMerchantTradingPayload of(AbstractVillager villager) {
         return new ClientMerchantTradingPayload(villager.getId(), Optional.ofNullable(villager.getTradingPlayer()).map(Player::getUUID), ID_S2C);
-    }    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_merchant_trading_s2c"), b -> new ClientMerchantTradingPayload(b, ClientMerchantTradingPayload.ID_S2C));
+    }    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.identifier("client_merchant_trading_s2c"), b -> new ClientMerchantTradingPayload(b, ClientMerchantTradingPayload.ID_S2C));
 
     public static void sync(AbstractVillager entity) {
         if (entity.level() instanceof ServerLevel l) {

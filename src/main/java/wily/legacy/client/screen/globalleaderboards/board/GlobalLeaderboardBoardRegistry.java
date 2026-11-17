@@ -59,7 +59,7 @@ public final class GlobalLeaderboardBoardRegistry {
    private static final String DAYS_PLAYED = "days_played";
    private static final List<String> GENERAL_STATS = List.of("play_time", DAYS_PLAYED, "time_since_death", "time_since_rest");
    private static final Stat<Identifier> SKELETON_JOCKEY_STAT = Stats.CUSTOM.get(LegacyRegistries.SKELETON_JOCKEY_STAT);
-   private static final Identifier SKELETON_JOCKEY_SPRITE = Legacy4J.createModLocation("icon/leaderboards/entity/skeleton_jockey");
+   private static final Identifier SKELETON_JOCKEY_SPRITE = Legacy4J.identifier("icon/leaderboards/entity/skeleton_jockey");
    private static volatile List<LeaderboardsScreen.StatsBoard> statsBoards = List.of();
    private static volatile Map<String, LeaderboardsScreen.StatsBoard> statsBoardsById = Map.of();
 

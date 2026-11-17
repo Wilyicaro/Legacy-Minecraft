@@ -3,14 +3,11 @@ package wily.legacy.mixin.base.client;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.LevelLoadListener;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -23,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.LegacySaveCache;
 
 import java.net.Proxy;
@@ -65,12 +61,5 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/server/IntegratedServer;paused:Z", opcode = Opcodes.GETFIELD, ordinal = 1))
     public boolean tickServer(IntegratedServer instance) {
         return paused && LegacyOptions.autoSaveWhenPaused.get() && (LegacyOptions.autoSaveInterval.get() > 0 || !LegacySaveCache.isCurrentWorldSource(storageSource)) && !minecraft.isDemo();
-    }
-
-    @Override
-    public boolean isUnderSpawnProtection(ServerLevel serverLevel, BlockPos blockPos, Player player) {
-        if (!isSingleplayerOwner(player.nameAndId()) && !LegacyClientWorldSettings.of(worldData).trustPlayers())
-            return true;
-        return super.isUnderSpawnProtection(serverLevel, blockPos, player);
     }
 }

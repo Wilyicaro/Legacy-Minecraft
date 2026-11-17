@@ -1,0 +1,11 @@
+{
+  "targetUI": "wily.legacy.skins.client.screen.TU3ChangeSkinScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "tu3.menuYOffset": -6,
+    "tu3.textScale": 0.7
+  }
+}

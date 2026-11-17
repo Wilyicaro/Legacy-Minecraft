@@ -21,7 +21,9 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.client.LegacyGuiItemRenderer;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.LegacyComponents;
@@ -242,7 +244,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
-        return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && isFocused() && canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canAddIngredient() ? LegacyComponents.ADD : null);
+    public @Nullable Component getAction(Object context) {
+        return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && isFocused() && canCraft() ? LegacyComponents.CREATE : c.key() == InputConstants.KEY_O && isFocused() && canAddIngredient() ? LegacyComponents.ADD : null : null;
     }
 }

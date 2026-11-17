@@ -56,6 +56,16 @@
     "useResourceAlbum": false
   },
   {
+    "id": "soundtracks",
+    "title": {
+      "translate": "legacy.menu.store.soundtracks"
+    },
+    "indexUrl": "https://raw.githubusercontent.com/creeper2eletricboogaloo/L4JDownloadableContent/main/soundtracks/index.json",
+    "targetDirectoryName": "resourcepacks",
+    "requiresResourceReload": true,
+    "useResourceAlbum": false
+  },
+  {
     "id": "legacy4j",
     "title": {
       "translate": "legacy.menu.store.legacy4j"

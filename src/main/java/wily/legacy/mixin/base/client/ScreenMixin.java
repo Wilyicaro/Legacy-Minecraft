@@ -1,5 +1,7 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,8 +24,9 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
-import wily.legacy.client.NavigationElement;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.navigation.NavigationElement;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
 import wily.legacy.client.screen.LegacyLoading;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -46,17 +49,13 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         return (Screen) (Object) this;
     }
 
-    @Inject(method = "extractRenderStateWithTooltipAndSubtitles", at = @At("HEAD"))
-    private void renderWithTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
-        GuiGraphicsExtractor.pose().pushMatrix();
-        GuiGraphicsExtractor.pose().translate(LegacyTipManager.getTipXOffset(), 0);
-    }
-
-    @Inject(method = "extractRenderStateWithTooltipAndSubtitles", at = @At("RETURN"))
-    private void renderWithTooltipReturn(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
-        GuiGraphicsExtractor.pose().translate(-LegacyTipManager.getTipXOffset(), 0);
-        ControlTooltip.Renderer.of(this).extractRenderState(GuiGraphicsExtractor, i, j, f);
-        GuiGraphicsExtractor.pose().popMatrix();
+    @WrapMethod(method = "extractRenderStateWithTooltipAndSubtitles")
+    private void renderWithTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, Operation<Void> original) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(LegacyTipManager.getTipXOffset(), 0);
+        original.call(graphics, mouseX, mouseY, a);
+        graphics.pose().popMatrix();
+        ControlTooltipRenderer.of(this).extractRenderState(graphics, mouseX, mouseY, a);
     }
 
     @Inject(method = "changeFocus", at = @At("HEAD"))
@@ -99,7 +98,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     //?}
     @Inject(method = "keyPressed", at = @At("HEAD"))
     private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (Legacy4JClient.keyToggleCursor.matches(keyEvent)) Legacy4JClient.controllerManager.toggleCursor();
+        if (Legacy4JClient.keyToggleCursor.matches(keyEvent)) ControllerManager.getInstance().toggleCursor();
     }
 
     @Inject(method = "getTooltipFromItem", at = @At("RETURN"), cancellable = true)

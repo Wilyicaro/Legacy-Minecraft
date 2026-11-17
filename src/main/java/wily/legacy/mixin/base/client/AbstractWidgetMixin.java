@@ -1,7 +1,6 @@
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -14,9 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.CommonValue;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -54,7 +52,7 @@ public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return ControlTooltip.getSelectAction((GuiEventListener) this, context);
     }
 }

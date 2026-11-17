@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.init.LegacyGameRules;
 
 @Mixin(ServerLevel.class)
@@ -27,5 +29,10 @@ public abstract class LevelMixin {
     public void explode(Entity entity, DamageSource damageSource, ExplosionDamageCalculator explosionDamageCalculator, double d, double e, double f, float g, boolean bl, Level.ExplosionInteraction explosionInteraction, ParticleOptions particleOptions, ParticleOptions particleOptions2, WeightedList<ExplosionParticleInfo> weightedList, Holder<SoundEvent> holder, CallbackInfo ci) {
         if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules().get(LegacyGameRules.getTntExplodes()))
             ci.cancel();
+    }
+
+    @Inject(method = "canSpreadFireAround", at = @At("RETURN"), cancellable = true)
+    private void canSpreadFireAround(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(cir.getReturnValue() && getGameRules().get(LegacyGameRules.FIRE_SPREADS.get()));
     }
 }

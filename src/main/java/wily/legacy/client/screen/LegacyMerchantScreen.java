@@ -22,12 +22,12 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.inventory.LegacyMerchantMenu;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.network.ServerMenuCraftPayload;
@@ -79,8 +79,8 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
         LegacyIconHolder h = new LegacyIconHolder(27, 27) {
 
             @Override
-            public @Nullable Component getAction(Context context) {
-                return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_RETURN && !displaySlotsWarning[2] && isValidIndex() && isFocused() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(getIndex()).isOutOfStock() ? LegacyComponents.TRADE : null);
+            public @Nullable Component getAction(Object context) {
+                return context instanceof KeyContext c ? c.key() == InputConstants.KEY_RETURN && !displaySlotsWarning[2] && isValidIndex() && isFocused() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(getIndex()).isOutOfStock() ? LegacyComponents.TRADE : null : null;
             }
 
             @Override

@@ -17,8 +17,10 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -54,9 +56,9 @@ public class HowToPlayScreen extends LegacyScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.replace(1, i -> i, a -> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.replace(1, i -> i, a -> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null);
     }
 
     @Override

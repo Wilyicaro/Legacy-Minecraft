@@ -6,8 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
@@ -18,7 +16,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.UIDefinition;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 
 public class BookPanel extends WidgetPanel {
@@ -114,7 +112,7 @@ public class BookPanel extends WidgetPanel {
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
-        return isFocused() ? context.actionOfContext(KeyContext.class, c -> canTakeBook(c.keyEvent()) ? LegacyComponents.TAKE_BOOK : null) : super.getAction(context);
+    public @Nullable Component getAction(Object context) {
+        return isFocused() ? context instanceof KeyContext c ? canTakeBook(c.keyEvent()) ? LegacyComponents.TAKE_BOOK :  null : null : ControlTooltip.getSelectAction(this, context);
     }
 }

@@ -1,13 +1,25 @@
 ## Additions
 
-- Added LCE's "gothic" font for Japanese Kanji, thanks to hikamari221 and Cjnator38
+- Added Legacy Console's player trust system, allowing hosts and moderators to manage individual player privileges:
 
-## Changes
+    - `Can Build and Mine`
+    - `Can Use Doors and Switches`
+    - `Can Open Containers`
+    - `Can Attack Players`
+    - `Can Attack Animals`
+    - `Can Become Invisible`
+    - `Can Fly`
+    - `Can Disable Exhaustion`
+    - `Can Teleport`
 
-- Reordered options and unified the size of advanced options panels, thanks to Cjnator38
-- Integration with Bisect Hosting Menu
+- Added the `Moderator` option, allowing players to use host options and manage other eligible players
+- Added the `Kick Player` option, preventing kicked players from rejoining until the world or server is restarted
+- Added Fire spreads as a legacy gamerule
+- Added `Seed Preview` to world creation, with pannable and zoomable biome maps and spawn/structure markers
 
 ## Fixes
 
-- Fixed `Load Save Directly` moving the worlds to the cache dir when `Save Cache` is disabled, making the worlds disappear
-- Fixed tutorial world not being properly converted to 26.1.2
+- Fixed Hud mods being misaligned on Forge Loaders
+- Fixed the legacy cursor appearing in replay mod's replays
+- Fixed some incompat with the Flashback mod
+- Fixed many visual inaccuracies in legacy skinpacks, thanks to research done by MayNL

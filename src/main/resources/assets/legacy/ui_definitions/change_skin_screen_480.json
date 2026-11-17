@@ -1,0 +1,29 @@
+{
+  "targetUI": "wily.legacy.skins.client.screen.ChangeSkinScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "carousel.scaleMultiplier": 0.98175,
+    "carousel.spacingMultiplier": 0.9048,
+    "packList.visibleRows": 5,
+    "packList.fitRows": {
+      "type": "put_boolean",
+      "value": true
+    },
+    "packList.scrollArrow.width": 11,
+    "packList.scrollArrow.height": 5,
+    "packList.scrollArrow.offsetX": -1,
+    "packList.scrollArrow.offsetY": 8,
+    "frame.extraInsetX": 8,
+    "text.compact": {
+      "type": "put_boolean",
+      "value": true
+    },
+    "text.centerInFooter": {
+      "type": "put_boolean",
+      "value": true
+    }
+  }
+}

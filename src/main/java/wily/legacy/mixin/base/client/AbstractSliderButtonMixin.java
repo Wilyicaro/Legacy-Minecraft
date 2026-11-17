@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.LegacySliderButton;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -58,7 +58,7 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return isFocused() && context instanceof KeyContext c && c.key() == InputConstants.KEY_RETURN ? canChangeValue ? LegacyComponents.LOCK : LegacyComponents.UNLOCK : null;
     }
 }

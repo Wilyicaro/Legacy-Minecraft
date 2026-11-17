@@ -6,14 +6,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControllerManager;
 
 @Mixin(MultilineTextField.class)
 public class MultilineTextFieldMixin {
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/MultilineTextField;seekCursorLine(I)V", shift = At.Shift.AFTER), cancellable = true)
     private void keyDownUpReturn(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (Legacy4JClient.controllerManager.isControllerTheLastInput())
+        if (ControllerManager.getInstance().isControllerTheLastInput())
             cir.setReturnValue(false);
     }
 }

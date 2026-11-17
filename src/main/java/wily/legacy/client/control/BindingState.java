@@ -1,0 +1,202 @@
+package wily.legacy.client.control;
+
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.ToggleKeyMapping;
+import wily.factoryapi.base.ArbitrarySupplier;
+import wily.legacy.client.control.tooltip.ComponentIcon;
+
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public abstract class BindingState {
+    public final ControllerBinding<?> binding;
+    public boolean justPressed = false;
+    public int timePressed = -1;
+    protected int previousTimePressed = -1;
+    public int blockAmount = 0;
+    public boolean pressed;
+    public boolean released;
+    protected boolean nextUpdatePress = false;
+
+    protected BindingState(ControllerBinding<?> binding) {
+        this.binding = binding;
+    }
+
+    public static BindingState create(ControllerBinding<?> component, Predicate<Controller> update) {
+        return new BindingState(component) {
+            @Override
+            public void update(Controller controller) {
+                update(update.test(controller));
+            }
+        };
+    }
+
+    public void update(boolean pressed) {
+        if (nextUpdatePress) {
+            pressed = true;
+            nextUpdatePress = false;
+        }
+        previousTimePressed = timePressed;
+        boolean wasPressed = this.pressed;
+        if (this.released = (!pressed && wasPressed)) timePressed = -1;
+        if (pressed) timePressed = wasPressed ? timePressed + ControllerManager.getInstance().getInputTicks() : 0;
+        this.justPressed = pressed && !wasPressed;
+        this.pressed = pressed;
+        if (justPressed) blockAmount--;
+    }
+
+    public void nextUpdatePress() {
+        nextUpdatePress = true;
+    }
+
+    public ComponentIcon getIcon() {
+        return binding.getIcon();
+    }
+
+    public boolean canClick() {
+        return canClick(getDefaultDelay());
+    }
+
+    public boolean canClick(int delay) {
+        return !isBlocked() && (crossedTime(0) || timePressed >= 3 * delay && previousTimePressed / delay < timePressed / delay);
+    }
+
+    public boolean onceClick(int timeDelay) {
+        boolean clicked = crossedTime(0) && !isBlocked();
+        if (clicked) timePressed = timeDelay;
+        return clicked;
+    }
+
+    public boolean crossedTime(int time) {
+        return previousTimePressed < time && timePressed >= time;
+    }
+
+    public int getDefaultDelay() {
+        return 100;
+    }
+
+    public boolean onceClick(boolean block) {
+        boolean onceClick = onceClick(-(justPressed ? 3 : 1) * getDefaultDelay());
+        if (block) block();
+        return onceClick;
+    }
+
+    public abstract void update(Controller controller);
+
+    public boolean is(ControllerBinding<?> b) {
+        return binding == b;
+    }
+
+    public <T extends BindingState> boolean isAnd(ControllerBinding<T> binding, Predicate<T> predicate) {
+        return is(binding) && predicate.test((T) this);
+    }
+
+    public void block() {
+        block(1);
+    }
+
+    public void block(int blockAmount) {
+        this.blockAmount = blockAmount;
+    }
+
+    public boolean isBlocked() {
+        return blockAmount > 0;
+    }
+
+    public boolean canDownKeyMapping(KeyMapping mapping) {
+        return !(mapping instanceof ToggleKeyMapping) && canClick() || crossedTime(0);
+    }
+
+    public boolean canReleaseKeyMapping(KeyMapping mapping) {
+        return released;
+    }
+
+    public boolean matches(KeyMapping mapping) {
+        return ((LegacyKeyMapping) mapping).getBinding() == binding;
+    }
+
+    public boolean canBlock(KeyMapping keyMapping) {
+        return keyMapping == Minecraft.getInstance().options.keyTogglePerspective || keyMapping == Minecraft.getInstance().options.keyUse || binding.isSpecial();
+    }
+
+    public static class Button extends BindingState {
+
+        public final ArbitrarySupplier<ControllerBinding.Button> button;
+
+        protected Button(ControllerBinding<?> binding, ArbitrarySupplier<ControllerBinding.Button> button) {
+            super(binding);
+            this.button = button;
+        }
+
+        @Override
+        public void update(Controller controller) {
+            update(controller.hasButton(button.get()) && controller.buttonPressed(controller.getHandler().getButtonIndex(button.get())));
+        }
+    }
+
+    public static abstract class Axis extends BindingState {
+        public final ArbitrarySupplier<ControllerBinding.Axis> xAxis;
+        public final ArbitrarySupplier<ControllerBinding.Axis> yAxis;
+        public float x;
+        public float y;
+
+        protected Axis(ControllerBinding<?> component, ArbitrarySupplier<ControllerBinding.Axis> xAxis, ArbitrarySupplier<ControllerBinding.Axis> yAxis) {
+            super(component);
+            this.xAxis = xAxis;
+            this.yAxis = yAxis;
+        }
+
+        public static Axis createStick(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, BiConsumer<Axis, Controller> update, boolean left) {
+            return new Axis(component, () -> left ? ControllerBinding.Axis.LEFT_STICK_X : ControllerBinding.Axis.RIGHT_STICK_X, () -> left ? ControllerBinding.Axis.LEFT_STICK_Y : ControllerBinding.Axis.RIGHT_STICK_Y) {
+
+                @Override
+                public float getDeadZone() {
+                    return deadZoneGetter.get();
+                }
+
+                @Override
+                public void update(Controller controller) {
+                    super.update(controller);
+                    update.accept(this, controller);
+                }
+            };
+        }
+
+        public static Axis createTrigger(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, boolean left) {
+            return new Axis(component, ArbitrarySupplier.empty(), () -> left ? ControllerBinding.Axis.LEFT_TRIGGER : ControllerBinding.Axis.RIGHT_TRIGGER) {
+                @Override
+                public float getDeadZone() {
+                    return deadZoneGetter.get();
+                }
+            };
+        }
+
+        @Override
+        public void update(Controller controller) {
+            xAxis.ifPresent(axis -> x = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
+            yAxis.ifPresent(axis -> y = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
+            update(getMagnitude() >= getDeadZone());
+        }
+
+        public abstract float getDeadZone();
+
+        public float getMagnitude() {
+            return Math.max(Math.abs(y), Math.abs(x));
+        }
+
+        public float getSmoothMagnitude() {
+            return Math.max(Math.abs(getSmoothY()), Math.abs(getSmoothX()));
+        }
+
+        public float getSmoothX() {
+            return (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0) / (1 - getDeadZone());
+        }
+
+        public float getSmoothY() {
+            return (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0) / (1 - getDeadZone());
+        }
+
+    }
+}

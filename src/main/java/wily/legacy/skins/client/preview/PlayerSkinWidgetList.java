@@ -18,9 +18,6 @@ public class PlayerSkinWidgetList implements Renderable {
     private static final float BASE_WIDGET_W = 106f;
     private static final float BASE_WIDGET_H = 150f;
     private static final int VISIBLE_RADIUS = 4;
-    private static final float[] SLOT_SCALE_MUL = new float[]{1f, 0.8f, 0.6375f, 0.508333f, 0.404167f};
-    private static final float[] SLOT_DX_MUL = new float[]{0f, 1f, 1.808f, 2.460f, 2.989f};
-    private static final float[] SLOT_DY_MUL = new float[]{0f, 30f / 294f, 53f / 294f, 72f / 294f, 87f / 294f};
     public final List<PlayerSkinWidget> widgets;
     private final PlayerSkinWidget[] visible = new PlayerSkinWidget[7];
     private final ArrayList<PlayerSkinWidget> ring = new ArrayList<>();
@@ -36,13 +33,14 @@ public class PlayerSkinWidgetList implements Renderable {
     private float uiScale = 1f;
     private float carouselScaleMultiplier = 1f;
     private float carouselSpacingMultiplier = 1f;
-    private int visibleRadius = VISIBLE_RADIUS;
     private int renderRadius = VISIBLE_RADIUS;
     private boolean forceInstantNextLayout;
     private boolean avoidRepeatsWhenFew;
     private int avoidRepeatsThreshold;
     private int lastShiftDir;
     private boolean customCarouselCenters;
+    private CarouselLayout carouselLayout = CarouselLayout.DEFAULT;
+    private CenterOverlay centerOverlay;
 
     public PlayerSkinWidgetList(int x, int y, List<PlayerSkinWidget> widgetPool) {
         this.x = x;
@@ -93,8 +91,8 @@ public class PlayerSkinWidgetList implements Renderable {
         this.carouselSpacingMultiplier = spacingMultiplier <= 0f ? 1f : spacingMultiplier;
     }
 
-    public void setVisibleRadius(int radius) {
-        this.visibleRadius = Mth.clamp(radius, 1, VISIBLE_RADIUS);
+    public void setCarouselLayout(CarouselLayout layout) {
+        this.carouselLayout = layout == null ? CarouselLayout.DEFAULT : layout;
     }
 
     public void setRenderRadius(int radius) {
@@ -115,6 +113,10 @@ public class PlayerSkinWidgetList implements Renderable {
         this.customCarouselCenters = true;
     }
 
+    public void setCenterOverlay(CenterOverlay overlay) {
+        this.centerOverlay = overlay;
+    }
+
     public PlayerSkinWidget getVisible(int offset) {
         int index = offset + 3;
         return index < 0 || index >= visible.length ? null : visible[index];
@@ -131,6 +133,8 @@ public class PlayerSkinWidgetList implements Renderable {
             renderSlot(graphics, mouseX, mouseY, partialTick, distance);
         }
         renderSlot(graphics, mouseX, mouseY, partialTick, 0);
+        PlayerSkinWidget center = getCenter();
+        if (centerOverlay != null && center != null && center.visible) centerOverlay.render(graphics, center);
         renderSlot(graphics, mouseX, mouseY, partialTick, -1);
         renderSlot(graphics, mouseX, mouseY, partialTick, 1);
     }
@@ -172,15 +176,15 @@ public class PlayerSkinWidgetList implements Renderable {
 
     private SlotLayout computeSlot(int offset) {
         int abs = Math.abs(offset);
-        if (abs > visibleRadius) return null;
+        if (abs > VISIBLE_RADIUS) return null;
 
         float centerScale = getCenterScale();
-        float scale = centerScale * SLOT_SCALE_MUL[abs];
+        float scale = centerScale * getSlotScaleMultiplier(offset);
         int defaultCenterX = getDefaultCenterX(centerScale);
         int slotSpacing = getSlotSpacing();
         int centerX = resolveSlotCenterX(offset, defaultCenterX, slotSpacing);
         int targetPosX = centerX - Math.round(BASE_WIDGET_W * scale / 2f);
-        int targetPosY = getBaseTopY() + Math.round(BASE_WIDGET_H * centerScale * SLOT_DY_MUL[abs]);
+        int targetPosY = getBaseTopY() + Math.round(BASE_WIDGET_H * centerScale * getSlotYOffsetMultiplier(abs));
 
         return new SlotLayout(
                 offset == 0,
@@ -234,8 +238,8 @@ public class PlayerSkinWidgetList implements Renderable {
         }
         clearVisibleElements();
         boolean sparse = isSparseCarousel(n);
-        int sparseStart = sparse ? sparseStartOffset(n) : -visibleRadius;
-        int sparseEnd = sparse ? sparseEndOffset(n) : visibleRadius;
+        int sparseStart = sparse ? sparseStartOffset(n) : -VISIBLE_RADIUS;
+        int sparseEnd = sparse ? sparseEndOffset(n) : VISIBLE_RADIUS;
         boolean avoid = avoidRepeatsWhenFew && n <= avoidRepeatsThreshold;
         String[] avoidIds = null;
         if (avoid) {
@@ -248,7 +252,7 @@ public class PlayerSkinWidgetList implements Renderable {
                     dir < 0 ? -2 : 2, dir < 0 ? 2 : -2,
                     dir < 0 ? -3 : 3, dir < 0 ? 3 : -3};
             for (int off : order) {
-                if (Math.abs(off) > visibleRadius) continue;
+                if (Math.abs(off) > VISIBLE_RADIUS) continue;
                 if (off < sparseStart || off > sparseEnd) continue;
                 int idx = off + 4;
                 if (idx < 0 || idx >= 9) continue;
@@ -267,7 +271,7 @@ public class PlayerSkinWidgetList implements Renderable {
             if (sparse && (offset < sparseStart || offset > sparseEnd)) {
                 id = null;
             } else if (avoid) {
-                if (Math.abs(offset) > visibleRadius) id = null;
+                if (Math.abs(offset) > VISIBLE_RADIUS) id = null;
                 else id = avoidIds[offset + 4];
             } else {
                 int skinIndex = Math.floorMod(this.index + offset, n);
@@ -320,16 +324,16 @@ public class PlayerSkinWidgetList implements Renderable {
 
         int currentX = w.getX();
         int warp = Math.max(1, Math.round(120 * uiScale));
-        int wrapThreshold = Math.max(warp, fin.step() * visibleRadius);
+        int wrapThreshold = Math.max(warp, fin.step() * VISIBLE_RADIUS);
         int n = skinIds == null ? 0 : skinIds.size();
         boolean sparse = isSparseCarousel(n);
         boolean wrapCross = sparse && w.visible && lastShiftDir != 0 && prevOffset != 0 && offset != 0
                 && Integer.signum(prevOffset) != Integer.signum(offset);
         boolean wrap = w.visible && (Math.abs(currentX - fin.x()) > wrapThreshold || wrapCross);
-        boolean doPreSnap = wrap && lastShiftDir != 0 && Math.abs(prevOffset) <= visibleRadius - 1;
+        boolean doPreSnap = wrap && lastShiftDir != 0 && Math.abs(prevOffset) <= VISIBLE_RADIUS - 1;
         if (doPreSnap) {
             int midOffset = prevOffset + lastShiftDir;
-            if (Math.abs(midOffset) <= visibleRadius) {
+            if (Math.abs(midOffset) <= VISIBLE_RADIUS) {
                 SlotLayout mid = computeSlot(midOffset);
                 if (mid != null) {
                     w.visible();
@@ -361,7 +365,7 @@ public class PlayerSkinWidgetList implements Renderable {
     }
 
     private int getBaseTopY() {
-        return y + Math.round(BASE_PADDING_Y * uiScale);
+        return y + Math.round((BASE_PADDING_Y + carouselLayout.baseYOffset()) * uiScale);
     }
 
     private int getDefaultCenterX(float centerScale) {
@@ -384,7 +388,56 @@ public class PlayerSkinWidgetList implements Renderable {
         }
 
         int abs = Math.abs(offset);
-        return defaultCenterX + (offset == 0 ? 0 : Integer.signum(offset) * Math.round(slotSpacing * SLOT_DX_MUL[abs]));
+        return defaultCenterX + (offset == 0 ? 0 : Integer.signum(offset) * Math.round(slotSpacing * getSlotDistanceMultiplier(offset)));
+    }
+
+    private float getSlotScaleMultiplier(int offset) {
+        return carouselLayout.scale(offset);
+    }
+
+    private float getSlotDistanceMultiplier(int offset) {
+        return carouselLayout.distance(offset);
+    }
+
+    private float getSlotYOffsetMultiplier(int abs) {
+        return carouselLayout.yOffset(abs);
+    }
+
+    public record CarouselLayout(
+            float baseYOffset,
+            float[] leftScale, float[] rightScale,
+            float[] leftDistance, float[] rightDistance,
+            float[] yOffsets
+    ) {
+        public static final CarouselLayout DEFAULT = new CarouselLayout(
+                0f,
+                new float[]{1f, 0.8f, 0.6375f, 0.508333f, 0.404167f},
+                new float[]{1f, 0.8f, 0.6375f, 0.508333f, 0.404167f},
+                new float[]{0f, 1f, 1.808f, 2.460f, 2.989f},
+                new float[]{0f, 1f, 1.808f, 2.460f, 2.989f},
+                new float[]{0f, 30f / 294f, 53f / 294f, 72f / 294f, 87f / 294f}
+        );
+
+        private static float value(float[] values, int index) {
+            return values[Math.min(Math.abs(index), values.length - 1)];
+        }
+
+        private float scale(int offset) {
+            return value(offset < 0 ? leftScale : rightScale, offset);
+        }
+
+        private float distance(int offset) {
+            return value(offset < 0 ? leftDistance : rightDistance, offset);
+        }
+
+        private float yOffset(int offset) {
+            return value(yOffsets, offset);
+        }
+    }
+
+    @FunctionalInterface
+    public interface CenterOverlay {
+        void render(GuiGraphicsExtractor graphics, PlayerSkinWidget center);
     }
 
     private record SlotLayout(boolean active, float rotX, float rotY, int x, int y, float scale, int step) {

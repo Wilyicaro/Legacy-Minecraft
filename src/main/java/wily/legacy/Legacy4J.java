@@ -29,8 +29,11 @@ import wily.legacy.network.*;
 import wily.legacy.skins.SkinsBootstrap;
 import wily.legacy.skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPermissions;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.util.ArmorStandPose;
 import wily.legacy.world.LegacyGeneratedChunks;
+import wily.legacy.world.PlayerTrustAdmin;
 
 //? if fabric {
 //?} else if forge {
@@ -103,8 +106,8 @@ public class Legacy4J {
     }
 
     public static void init() {
-        FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
-        FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
+        FactoryConfig.registerCommonStorage(identifier("common"), LegacyCommonOptions.COMMON_STORAGE);
+        FactoryConfig.registerCommonStorage(identifier("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
         LegacyGameRules.register();
         FactoryEvent.registerPayload(r -> {
@@ -117,12 +120,14 @@ public class Legacy4J {
             r.register(true, PlayerInfoSync.ID);
             r.register(true, PlayerInfoSync.All.ID_C2S);
             r.register(false, PlayerInfoSync.All.ID_S2C);
+            r.register(true, PlayerHostPrivilegesUpdatePayload.ID);
+            r.register(true, PlayerTrustUpdatePayload.ID);
             r.register(true, ServerMenuCraftPayload.ID);
             r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerHostOptionsPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
-            r.register(true, ServerPlayerShieldPausePayload.ID);
             r.register(false, TipCommand.Payload.ID);
+            r.register(false, TipCommand.PersistentPayload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
             r.register(true, SkinSync.SetSkinC2S.ID);
@@ -136,14 +141,18 @@ public class Legacy4J {
         ArmorStandPose.init();
         LegacyMobCaps.init();
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
-        FactoryEvent.registerCommands(TipCommand::register);
+        FactoryEvent.registerCommands(((commandSourceStackCommandDispatcher, commandBuildContext, commandSelection) -> {
+            TipCommand.register(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+            ClientEffectActivationPayload.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+            TopMessage.registerCommand(commandSourceStackCommandDispatcher, commandBuildContext, commandSelection);
+        }));
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static Identifier createModLocation(String path) {
+    public static Identifier identifier(String path) {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 
@@ -202,10 +211,14 @@ public class Legacy4J {
                 }
         }
         ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
-        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(), (LegacyPlayerInfo) p), Collections.emptyMap(), server.getDefaultGameType(), PlayerInfoSync.All.ID_S2C));
+        PlayerTrustAdmin.enforceCurrentRestrictions(p);
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), PlayerInfoSync.All.fromPlayer(p));
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
         playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayer(p, payload, true));
+
+        PlayerTrustPolicy trust = PlayerTrustPolicy.of(p);
+        if (!trust.unrestricted()) PlayerTrustUpdatePayload.notifyPermissionChanges(p, PlayerTrustPermissions.TRUSTED, trust.permissions());
 
         if (!FactoryAPIPlatform.getEntityServer(p).isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }

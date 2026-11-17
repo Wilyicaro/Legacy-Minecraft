@@ -43,6 +43,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.compat.BisectModCompat;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -52,6 +53,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -82,9 +84,10 @@ public class ServerRenderableList extends RenderableVList {
     private static final Identifier ICON_MISSING = FactoryAPI.createVanillaLocation("textures/misc/unknown_server.png");
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
-    public final ServerList servers;
+    public ServerList servers;
     public final LanServerDetection.LanServerList lanServerList;
     protected final Minecraft minecraft;
+    private CompletableFuture<ServerList> pendingServers;
     protected boolean lastDisplayRealmsButton = LegacyOptions.displayRealmsButton.get();
     @Nullable
     public LanServerDetection.LanServerDetector lanServerDetector;
@@ -95,9 +98,24 @@ public class ServerRenderableList extends RenderableVList {
         layoutSpacing(l -> 0);
         minecraft = Minecraft.getInstance();
         servers = new ServerList(minecraft);
-        servers.load();
         lanServerList = new LanServerDetection.LanServerList();
         updateServers();
+        reloadServers();
+    }
+
+    public void reloadServers() {
+        CompletableFuture<ServerList> load = CompletableFuture.supplyAsync(() -> {
+            ServerList servers = new ServerList(minecraft);
+            servers.load();
+            return servers;
+        }, Util.nonCriticalIoPool());
+        pendingServers = load;
+        load.thenAcceptAsync(servers -> {
+            if (pendingServers != load) return;
+            this.servers = servers;
+            updateServers();
+            if (minecraft.screen == getScreen()) accessor.reloadUI();
+        }, minecraft);
     }
 
     public static void drawIcon(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y, int width, int height, Identifier resourceLocation) {
@@ -157,11 +175,11 @@ public class ServerRenderableList extends RenderableVList {
 
     public void updateServers() {
         renderables.clear();
-        addIconButton(this, Legacy4J.createModLocation("creation_list/add_server"), Component.translatable("legacy.menu.add_server"), c -> this.minecraft.setScreen(new ServerEditScreen(getScreen(PlayGameScreen.class), new ServerData(I18n.get("selectServer.defaultName"), "", /*? if >1.20.1 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), true)));
+        addIconButton(this, Legacy4J.identifier("creation_list/add_server"), Component.translatable("legacy.menu.add_server"), c -> this.minecraft.setScreen(new ServerEditScreen(getScreen(PlayGameScreen.class), new ServerData(I18n.get("selectServer.defaultName"), "", /*? if >1.20.1 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), true)));
         Component component = this.getMultiplayerDisabledReason();
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
         if (LegacyOptions.displayRealmsButton.get())
-            addIconButton(this, Legacy4J.createModLocation("creation_list/realms"), Component.translatable("menu.online"), b -> minecraft.setScreen(new RealmsMainScreen(getScreen())), tooltip);
+            addIconButton(this, Legacy4J.identifier("creation_list/realms"), Component.translatable("menu.online"), b -> minecraft.setScreen(new RealmsMainScreen(getScreen())), tooltip);
         if (FactoryAPI.isModLoaded("bhmenu"))
             addRenderable(BisectModCompat.createButton(this));
         for (int i = 0; i < servers.size(); i++) {
@@ -546,8 +564,8 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class, c -> c.key() == InputConstants.KEY_O && isFocused() ? LegacyComponents.SERVER_OPTIONS : ControlTooltip.getSelectAction(this, c));
+        public @Nullable Component getAction(Object context) {
+            return context instanceof KeyContext c ? c.key() == InputConstants.KEY_O && isFocused() ? LegacyComponents.SERVER_OPTIONS : ControlTooltip.getSelectAction(this, c) : null;
         }
     }
 }

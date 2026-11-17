@@ -6,9 +6,9 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.LegacyKeyMapping;
 
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements LegacyKeyMapping {

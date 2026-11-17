@@ -47,10 +47,15 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.control.tooltip.CompoundComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.recipe.RecipeInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.LegacyCraftingMenu;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -61,15 +66,15 @@ import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.*;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
 
 public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends RecipesScreen<T, RecipeIconHolder<MixedCraftingScreen.VanillaCrafting>> implements TabList.Access {
-    public static final Identifier STRUCTURES_TAB = Legacy4J.createModLocation("structures");
-    public static final Identifier MECHANISMS_TAB = Legacy4J.createModLocation("mechanisms");
-    public static final Identifier TOOLS_TAB = Legacy4J.createModLocation("tools");
-    public static final Identifier MISC_TAB = Legacy4J.createModLocation("misc");
-    public static final Identifier SEARCH_TAB = Legacy4J.createModLocation("search");
+    public static final Identifier STRUCTURES_TAB = Legacy4J.identifier("structures");
+    public static final Identifier MECHANISMS_TAB = Legacy4J.identifier("mechanisms");
+    public static final Identifier TOOLS_TAB = Legacy4J.identifier("tools");
+    public static final Identifier MISC_TAB = Legacy4J.identifier("misc");
+    public static final Identifier SEARCH_TAB = Legacy4J.identifier("search");
     public static final ExtendedRecipeBookCategory[] VANILLA_CATEGORIES = new ExtendedRecipeBookCategory[]{RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_REDSTONE, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_MISC, SearchRecipeBookCategory.CRAFTING};
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
     protected final StackedItemContents stackedContents = new StackedItemContents();
@@ -125,13 +130,13 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.
-                add(EXTRA::get, () -> LegacyComponents.craftingInfoAction(infoType.get())).
-                add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
-                add(() -> searchMode ? VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
-                add(CONTROL_TAB::get, () -> LegacyComponents.CHANGE_GROUP);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.
+                add(CommonIcon.EXTRA::get, () -> LegacyComponents.INFO).
+                add(CommonIcon.OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
+                add(() -> searchMode ? CommonIcon.VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, CommonIcon.OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
+                add(CommonIcon.CONTROL_TAB::get, () -> LegacyComponents.GROUP);
     }
 
     public void resetElements() {
@@ -252,6 +257,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
             if (!collection.hasAnySelected() || searchCollections != null && !searchCollections.contains(collection))
                 continue;
             var selectedRecipes = collection.getSelectedRecipes(onlyCraftableRecipes ? RecipeCollection.CraftableStatus.CRAFTABLE : RecipeCollection.CraftableStatus.ANY);
+            selectedRecipes.removeIf(e -> e.craftingRequirements().filter(ingredients -> ingredients.size() > menu.getGridWidth() * menu.getGridHeight()).isPresent());
 
 
             if (selectedRecipes.isEmpty()) continue;
@@ -275,7 +281,8 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
                     }
                 }
                 e.craftingRequirements().ifPresent(ingredients -> {
-                    for (int index = 0; index < ingredients.size(); index++) {
+                    int limit = Math.min(ingredients.size(), ings.size());
+                    for (int index = 0; index < limit; index++) {
                         ings.set(index, Optional.of(ingredients.get(index)));
                     }
                 });
@@ -614,7 +621,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
             disableSearchMode();
             return true;
         }
-        if (getTabList().controlTab(keyEvent.key())) return true;
+        if (getTabList().controlTab(keyEvent)) return true;
         if (keyEvent.key() != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(keyEvent);
         return super.keyPressed(keyEvent);
     }

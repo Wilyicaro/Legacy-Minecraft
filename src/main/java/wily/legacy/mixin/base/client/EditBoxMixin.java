@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.TextCursorUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -22,9 +21,9 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.LegacySprites;
 
@@ -75,7 +74,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     @Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
     private void onClick(MouseButtonEvent event, boolean bl, CallbackInfo ci) {
         Screen screen = Minecraft.getInstance().screen;
-        if (event.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
+        if (event.hasShiftDown() || ControllerManager.getInstance().isControllerTheLastInput()) {
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
             ci.cancel();
         }
@@ -108,7 +107,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
-        return isFocused() ? context.actionOfContext(KeyContext.class, ControlTooltip::getKeyboardAction) : null;
+    public @Nullable Component getAction(Object context) {
+        return isFocused() ? context instanceof KeyContext k ? ControlTooltip.getKeyboardAction(k) : null : null;
     }
 }

@@ -26,7 +26,6 @@ import net.minecraft.client.renderer.*;
  *///?} else {
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 //?}
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.*;
@@ -69,7 +68,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 //? if >=1.20.5 {
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
 //?} else {
 /*import net.minecraft.world.item.alchemy.PotionUtils;
@@ -91,7 +89,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.client.controller.*;
+import wily.legacy.client.control.*;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
@@ -127,6 +125,7 @@ import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.MCAccount;
 import wily.legacy.skins.SkinsClientBootstrap;
+import wily.legacy.skins.skin.DownloadedSkinPackStore;
 import org.lwjgl.glfw.GLFW;
 
 
@@ -143,23 +142,21 @@ public class Legacy4JClient {
 
     public static final List<Runnable> whenResetOptions = new ArrayList<>();
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
-    public static final MapIdValueManager<LegacyCreativeTabListing, ?> legacyCreativeListingManager = MapIdValueManager.create(Legacy4J.createModLocation("creative_tab_listing"), LegacyCreativeTabListing.CODEC);
-    public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.createModLocation("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
-    public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.createModLocation("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
+    public static final MapIdValueManager<LegacyCreativeTabListing, ?> legacyCreativeListingManager = MapIdValueManager.create(Legacy4J.identifier("creative_tab_listing"), LegacyCreativeTabListing.CODEC);
+    public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.identifier("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
+    public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.identifier("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
     public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
     public static final ContentManager.CategoryManager categoryManager = new ContentManager.CategoryManager();
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
-    public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.createModLocation("loom_tab_listing"), LoomTabListing.CODEC);
-    public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("type_crafting_tabs"), TypeCraftingTab.CODEC);
-    public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
-    public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
+    public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.identifier("loom_tab_listing"), LoomTabListing.CODEC);
+    public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.identifier("type_crafting_tabs"), TypeCraftingTab.CODEC);
+    public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.identifier("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
-    public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
-    public static final MapIdValueManager<ControlType, ListMap<Identifier, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("control_types"), ControlType.CODEC);
-    public static final ControllerManager controllerManager = new ControllerManager();
+    public static final MapIdValueManager<OptionsPreset, ListMap<Identifier, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.identifier("option_presets"), OptionsPreset.CODEC);
+    public static final MapIdValueManager<ControlType, ListMap<Identifier, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.identifier("control_types"), ControlType.CODEC);
     public static final Map<Block, Identifier> fastLeavesModels = new HashMap<>();
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
     public static final RenderType GHAST_SHOOTING_GLOW = RenderTypes.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
@@ -173,8 +170,13 @@ public class Legacy4JClient {
         return new LegacyFlatWorldScreen(createWorldScreen, createWorldScreen.getUiState(), biomeGetter, structureGetter, flatLevelGeneratorSettings -> createWorldScreen.getUiState().updateDimensions(PresetEditor.flatWorldConfigurator(flatLevelGeneratorSettings)), chunkGenerator instanceof FlatLevelSource ? ((FlatLevelSource) chunkGenerator).settings() : FlatLevelGeneratorSettings.getDefault(biomeGetter, structureGetter, placeFeatureGetter));
     }, Optional.of(WorldPresets.SINGLE_BIOME_SURFACE), (createWorldScreen, settings) -> new LegacyBuffetWorldScreen(createWorldScreen, settings.worldgenLoadContext().lookupOrThrow(Registries.BIOME), holder -> createWorldScreen.getUiState().updateDimensions(PresetEditor.fixedBiomeConfigurator(holder)))));
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, KeyMapping.Category.INVENTORY);
+    public static final KeyMapping keyToggleCrafting = new KeyMapping("legacy.key.toggleCrafting", -1, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, KeyMapping.Category.INVENTORY);
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, KeyMapping.Category.INVENTORY);
+    public static final KeyMapping keyMenuTabLeft = new KeyMapping(MOD_ID + ".key.menuTabLeft", InputConstants.KEY_LBRACKET, KeyMapping.Category.MISC);
+    public static final KeyMapping keyMenuTabRight = new KeyMapping(MOD_ID + ".key.menuTabRight", InputConstants.KEY_RBRACKET, KeyMapping.Category.MISC);
+    public static final KeyMapping keyMenuPageLeft = new KeyMapping(MOD_ID + ".key.menuPageLeft", InputConstants.KEY_LEFT, KeyMapping.Category.MISC);
+    public static final KeyMapping keyMenuPageRight = new KeyMapping(MOD_ID + ".key.menuPageRight", InputConstants.KEY_RIGHT, KeyMapping.Category.MISC);
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, KeyMapping.Category.MISC);
     public static final KeyMapping keyHostOptions = new KeyMapping(MOD_ID + ".key.host_options", InputConstants.KEY_H, KeyMapping.Category.MISC);
     public static final KeyMapping keyLegacy4JSettings = new KeyMapping(MOD_ID + ".key.legacy4JSettings", InputConstants.KEY_Y, KeyMapping.Category.MISC);
@@ -193,6 +195,8 @@ public class Legacy4JClient {
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
+    public static boolean trustPlayers = true;
+    public static boolean allowHostCheats;
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
 
@@ -216,6 +220,7 @@ public class Legacy4JClient {
             if (minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(s) instanceof LegacyPlayerInfo info)
                 info.copyFrom(i);
         });
+        if (minecraft.screen instanceof HostOptionsScreen screen) screen.refreshHostOptionsButton();
         LeaderboardsScreen.refreshStatsBoards(minecraft);
         if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty())
             minecraft.executeIfPossible(() -> s.changeStatBoard(false));
@@ -326,7 +331,7 @@ public class Legacy4JClient {
     }
 
     private static boolean consumeKeyboardPress(int action) {
-        if (controllerManager.isControllerTheLastInput() || action == 0) return true;
+        if (ControllerManager.getInstance().isControllerTheLastInput() || action == 0) return true;
         if ((consumedKeyboardActions & action) != 0) return false;
         consumedKeyboardActions |= action;
         return true;
@@ -344,6 +349,10 @@ public class Legacy4JClient {
 
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
+        while (keyToggleCrafting.consumeClick()) {
+            if (minecraft.player != null && minecraft.screen == null)
+                FactoryConfig.saveOptionAndConsume(LegacyOptions.classicCrafting, !LegacyOptions.classicCrafting.get(), v -> {});
+        }
         while (keyCrafting.consumeClick()) {
             if (!consumeKeyboardToggleKeyPress(keyCrafting)) continue;
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
@@ -384,8 +393,8 @@ public class Legacy4JClient {
         }
 
         if (sprintTicksLeft > 0) --sprintTicksLeft;
-        if (minecraft.player != null && controllerManager.isControllerTheLastInput()) {
-            BindingState.Axis stick = controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
+        if (minecraft.player != null && ControllerManager.getInstance().isControllerTheLastInput()) {
+            BindingState.Axis stick = ControllerManager.getInstance().getButtonState(ControllerBinding.LEFT_STICK);
             float y = Math.abs(stick.y) > stick.getDeadZone() ? stick.y : 0;
             if (((LegacyLocalPlayer) minecraft.player).canSprintController()) {
                 if (y < -0.85) {
@@ -426,19 +435,20 @@ public class Legacy4JClient {
             }
         }
         SkinsClientBootstrap.postTick(minecraft);
+        BedrockSnowyLeaves.tick(minecraft);
     }
 
     public static void postScreenInit(Screen screen) {
         if (screen.getFocused() != null && !screen.children().contains(screen.getFocused())) {
             screen.clearFocus();
         }
-        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.isControllerTheLastInput() || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
-            Controller.Event e = Controller.Event.of(screen);
-            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways())
-                controllerManager.tryDisableCursor();
-            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways()))
-                controllerManager.enableCursorAndScheduleReset();
-            if (controllerManager.isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
+        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || ControllerManager.getInstance().isControllerTheLastInput() || ControllerManager.getInstance().getCursorMode().isNever()) && !ControllerManager.getInstance().getCursorMode().isAlways()) {
+            ControllerListener e = ControllerListener.of(screen);
+            if (e.disableCursorOnInit() && !ControllerManager.getInstance().getCursorMode().isAlways())
+                ControllerManager.getInstance().tryDisableCursor();
+            if (ControllerManager.getInstance().isCursorDisabled && (!e.disableCursorOnInit() || ControllerManager.getInstance().getCursorMode().isAlways()))
+                ControllerManager.getInstance().enableCursorAndScheduleReset();
+            if (ControllerManager.getInstance().isCursorDisabled && (screen.getFocused() == null || !screen.getFocused().isFocused())) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                 if (path != null) {
                     path.applyFocus(true);
@@ -446,7 +456,7 @@ public class Legacy4JClient {
                 }
             }
         }
-        controllerManager.resetCursor();
+        ControllerManager.getInstance().resetCursor();
     }
 
     public static void clientPlayerJoin(LocalPlayer p) {
@@ -464,6 +474,7 @@ public class Legacy4JClient {
     public static void init() {
         SkinsClientBootstrap.init();
         GlobalLeaderboardsFeature.init();
+        LegacyControls.init();
         UIDefinitionManager.registerNamedUITarget("book_edit_screen", BookEditScreen.class);
         UIDefinitionManager.registerNamedUITarget("book_sign_screen", BookSignScreen.class);
         UIDefinitionManager.registerNamedUITarget("book_view_screen", BookViewScreen.class);
@@ -481,10 +492,15 @@ public class Legacy4JClient {
         });
         FactoryAPIClient.registerKeyMapping(registry -> {
             registry.accept(keyCrafting);
+            registry.accept(keyToggleCrafting);
             registry.accept(keyHostOptions);
             registry.accept(keyLegacy4JSettings);
             registry.accept(keyCycleHeldLeft);
             registry.accept(keyCycleHeldRight);
+            registry.accept(keyMenuTabLeft);
+            registry.accept(keyMenuTabRight);
+            registry.accept(keyMenuPageLeft);
+            registry.accept(keyMenuPageRight);
             registry.accept(keyToggleCursor);
             registry.accept(keyFlyUp);
             registry.accept(keyFlyDown);
@@ -509,40 +525,12 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, loomListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, typeCraftingTabs);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, mixedCraftingTabs);
-        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, howToPlaySectionManager);
         FactoryOptions.NEAREST_MIPMAP_SCALING.setDefault(true);
         FactoryOptions.RANDOM_BLOCK_ROTATIONS.setDefault(false);
-        FactoryAPIClient.setup(m -> {
-            MCAccount.loadAll();
-            controllerManager.setup(m);
-            knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK, m.gameDirectory.toPath());
-            knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
-            LegacySaveCache.setup(m);
-            ControllerBinding.setupDefaultBindings(m);
-            LegacyOptions.CLIENT_STORAGE.load();
-            LegacyRenderDistance.initDefault();
-            //? if fabric
-            if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
-            //? if fabric || (>=1.21 && neoforge) {
-            if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
-            if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
-            //?}
-            LegacyGuiElements.setup(m);
-
-            HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
-                @Override
-                public net.minecraft.network.chat.Component title() {
-                    return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
-                }
-
-                @Override
-                public Screen build(Screen parent) {
-                    return SkinsClientBootstrap.createChangeSkinScreen(parent);
-                }
-            };
-        });
+        LegacyControlsOptions.STORAGE.preLoad.register(LegacyOptions::loadDeprecatedConfigs);
+        FactoryAPIClient.setup(Legacy4JClient::setup);
 
         FactoryAPIClient.registerBlockColor(registry -> {
             registry.accept(List.of(new BlockTintSource() {
@@ -606,6 +594,7 @@ public class Legacy4JClient {
         fastLeavesModels.put(Blocks.FLOWERING_AZALEA_LEAVES, FactoryAPI.createVanillaLocation("fast_flowering_azalea_leaves"));
 
         FactoryAPIClient.registerExtraModels(register -> fastLeavesModels.values().forEach(register));
+        FactoryAPIClient.registerExtraModels(BedrockSnowyLeaves::registerModels);
         FactoryAPIClient.registerMenuScreen(registry -> {
             registry.register(LegacyRegistries.CRAFTING_PANEL_MENU.get(), LegacyCraftingScreen::craftingScreen);
             registry.register(LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(), LegacyCraftingScreen::playerCraftingScreen);
@@ -675,15 +664,45 @@ public class Legacy4JClient {
         FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options, false));
     }
 
+    public static void setup(Minecraft m) {
+        LegacyControls.setup(m);
+        MCAccount.loadAll();
+        knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK, m.gameDirectory.toPath());
+        knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE, m.gameDirectory.toPath());
+        LegacySaveCache.setup(m);
+        LegacyOptions.CLIENT_STORAGE.load();
+        DownloadedSkinPackStore.resetOutdatedPacks(m);
+        LegacyRenderDistance.initDefault();
+        //? if fabric
+        if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
+        //? if fabric || (>=1.21 && neoforge) {
+        if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
+        if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
+        //?}
+        LegacyGuiElements.setup(m);
+
+        HelpAndOptionsScreen.CHANGE_SKIN = new ScreenSection<>() {
+            @Override
+            public net.minecraft.network.chat.Component title() {
+                return HelpAndOptionsScreen.CHANGE_SKIN_OPTIONS.title();
+            }
+
+            @Override
+            public Screen build(Screen parent) {
+                return SkinsClientBootstrap.createChangeSkinScreen(parent);
+            }
+        };
+    }
+
     private static void registerBuiltInPacks() {
         FactoryEvent.registerBuiltInPacks(registry -> {
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_resources"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("legacy_waters"), true);
-            registry.registerResourcePack(Legacy4J.createModLocation("console_aspects"), false);
-            registry.registerResourcePack(Legacy4J.createModLocation("rosenfeld_patch"), false);
+            registry.registerResourcePack(Legacy4J.identifier("legacy_resources"), true);
+            registry.registerResourcePack(Legacy4J.identifier("legacy_waters"), true);
+            registry.registerResourcePack(Legacy4J.identifier("console_aspects"), false);
+            registry.registerResourcePack(Legacy4J.identifier("rosenfeld_patch"), false);
             if (FactoryAPI.getLoader().isForgeLike()) {
-                registry.register("programmer_art", Legacy4J.createModLocation("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
-                registry.register("high_contrast", Legacy4J.createModLocation("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+                registry.register("programmer_art", Legacy4J.identifier("programmer_art"), Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+                registry.register("high_contrast", Legacy4J.identifier("high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
             }
         });
     }
@@ -713,7 +732,7 @@ public class Legacy4JClient {
         BlockStateModel featureModel = LegacyChunkLoading.getFeatureModel(pos, blockState, model);
         if (featureModel != model) return featureModel;
 
-        BlockStateModel torchModel = LegacyTorchModel.get(blockState, model);
+        BlockStateModel torchModel = LegacyOptions.legacyTorchModel.get() ? LegacyTorchModel.get(blockState, model) : model;
         if (torchModel != model) return torchModel;
 
         boolean fastGraphics = !Minecraft.getInstance().options.cutoutLeaves().get();
@@ -723,13 +742,13 @@ public class Legacy4JClient {
                     BlockPos relative = pos.relative(value);
                     BlockState relativeBlockState = blockGetter.getBlockState(relative);
                     if (!(relativeBlockState.getBlock() instanceof LeavesBlock) && !relativeBlockState.isSolidRender(/*? if <1.21.2 {*//*blockGetter, relative*//*?}*/)) {
-                        return model;
+                        return BedrockSnowyLeaves.getModel(blockGetter, pos, blockState, model, false);
                     }
                 }
             }
-            return FactoryAPIClient.getExtraModel(fastLeavesModels.get(blockState.getBlock()));
+            return BedrockSnowyLeaves.getModel(blockGetter, pos, blockState, FactoryAPIClient.getExtraModel(fastLeavesModels.get(blockState.getBlock())), true);
         }
-        return model;
+        return BedrockSnowyLeaves.getModel(blockGetter, pos, blockState, model, false);
     }
 
     public static boolean hasModOnServer() {
@@ -742,7 +761,9 @@ public class Legacy4JClient {
 
     public static void onClientPlayerInfoChange() {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
+        if (minecraft.screen instanceof PlayerHostOptionsScreen s) s.closeIfPlayerLeft();
+        else if (minecraft.screen instanceof ConfirmationScreen s && s.parent instanceof PlayerHostOptionsScreen playerOptions) playerOptions.closeIfPlayerLeft();
+        else if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
         else if (minecraft.screen instanceof LeaderboardsScreen s) {
             s.rebuildRenderableVList(minecraft);
             UIAccessor.of(s).reloadUI();
@@ -758,9 +779,15 @@ public class Legacy4JClient {
         }
         LegacyOptions.CLIENT_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyOptions.CLIENT_STORAGE.save();
+        LegacyControlsOptions.STORAGE.configMap.values().forEach(FactoryConfig::reset);
+        LegacyControlsOptions.STORAGE.save();
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyCommonOptions.COMMON_STORAGE.save();
         minecraft.options.save();
+    }
+
+    public static boolean isMenuNavigationKey(KeyMapping keyMapping) {
+        return keyMapping == keyMenuTabLeft || keyMapping == keyMenuTabRight || keyMapping == keyMenuPageLeft || keyMapping == keyMenuPageRight;
     }
 
     public static String manageAvailableSaveDirName(Consumer<File> copy, Predicate<String> exists, LevelStorageSource source, String levelId) {

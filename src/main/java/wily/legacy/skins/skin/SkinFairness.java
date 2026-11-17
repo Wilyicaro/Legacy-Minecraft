@@ -16,7 +16,7 @@ public final class SkinFairness {
     public static boolean isFair(String skinId) {
         if (SkinIdUtil.isBlankOrAutoSelect(skinId)) return true;
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        return entry == null || entry.fair();
+        return entry != null && entry.fair();
     }
 
     public static boolean shouldUseSafeSkin(Minecraft client, String skinId) {

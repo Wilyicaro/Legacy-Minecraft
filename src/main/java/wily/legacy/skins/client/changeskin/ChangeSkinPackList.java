@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.skins.client.preview.PlayerSkinWidget;
 import wily.legacy.skins.client.screen.ChangeSkinScreenSource;
 import wily.legacy.skins.skin.SkinIdUtil;
@@ -313,10 +313,6 @@ public final class ChangeSkinPackList {
             return packIndex;
         }
 
-        private boolean isMovingPack() {
-            return owner.reorderMode && packIndex >= 0 && owner.focusedPackIndex == packIndex;
-        }
-
         private boolean isDimmedPack() {
             return owner.reorderMode && packIndex >= 0 && owner.focusedPackIndex != packIndex;
         }
@@ -351,7 +347,7 @@ public final class ChangeSkinPackList {
             LegacyFontUtil.applySDFont(ignored -> {
                 String visibleText = PlayerSkinWidget.clipText(font, getMessage() == null ? "" : getMessage().getString(), Math.max(0, getWidth() - TEXT_MARGIN * 2));
                 int centerX = getX() + getWidth() / 2;
-                int textY = getY() + (getHeight() - font.lineHeight) / 2;
+                int textY = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                 graphics.centeredText(font, visibleText, centerX, textY, color);
             });
         }

@@ -112,7 +112,7 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @ModifyReturnValue(method = "displayFireAnimation", at = @At("RETURN"))
     private boolean displayFireAnimation(boolean original) {
-        return original && allowDisplayFireAnimation && (!((Object) this instanceof LocalPlayer player) || !player.hasEffect(MobEffects.FIRE_RESISTANCE));
+        return original && allowDisplayFireAnimation && (!LegacyOptions.hideFireWithResistance.get() || !((Object) this instanceof LocalPlayer player) || !player.hasEffect(MobEffects.FIRE_RESISTANCE));
     }
 
     @Override

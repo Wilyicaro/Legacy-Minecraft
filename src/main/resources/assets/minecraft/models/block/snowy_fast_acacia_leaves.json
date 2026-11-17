@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:block/leaves",
+    "textures": {
+      "all": "minecraft:block/snowy_fast_acacia_leaves"
+    }
+  }

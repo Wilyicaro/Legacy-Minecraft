@@ -22,8 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,8 +32,9 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -45,16 +44,16 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Mixin(EnchantmentScreen.class)
-public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
+public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> implements ControlTooltip.Listener {
 
 public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
     @Override
-    public void added() {
-        super.added();
-        ControlTooltip.Renderer.of(this).replace(3, i -> i, this::getQuickMoveLabel);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultScreen(list, this);
+        list.replace(3, i -> i, this::getQuickMoveLabel);
     }
 
     private Component getQuickMoveLabel(Component fallback) {

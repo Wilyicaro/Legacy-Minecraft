@@ -160,7 +160,7 @@ public final class SkinSync {
 
     public record SetSkinC2S(String skinId) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<SetSkinC2S> ID =
-                CommonNetwork.Identifier.create(Legacy4J.createModLocation("set_skin_c2s"), SetSkinC2S::new);
+                CommonNetwork.Identifier.create(Legacy4J.identifier("set_skin_c2s"), SetSkinC2S::new);
 
         public SetSkinC2S(CommonNetwork.PlayBuf buf) {
             this(readSkinId(buf));
@@ -191,7 +191,7 @@ public final class SkinSync {
 
     public record RequestSnapshotC2S() implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<RequestSnapshotC2S> ID =
-                CommonNetwork.Identifier.create(Legacy4J.createModLocation("request_snapshot_c2s"), (CommonNetwork.PlayBuf b) -> new RequestSnapshotC2S(b));
+                CommonNetwork.Identifier.create(Legacy4J.identifier("request_snapshot_c2s"), (CommonNetwork.PlayBuf b) -> new RequestSnapshotC2S(b));
 
         public RequestSnapshotC2S(CommonNetwork.PlayBuf buf) {
             this();
@@ -217,7 +217,7 @@ public final class SkinSync {
 
     public record SyncSkinS2C(UUID uuid, String skinId) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<SyncSkinS2C> ID =
-                CommonNetwork.Identifier.create(Legacy4J.createModLocation("sync_skin_s2c"), SyncSkinS2C::new);
+                CommonNetwork.Identifier.create(Legacy4J.identifier("sync_skin_s2c"), SyncSkinS2C::new);
 
         public SyncSkinS2C(CommonNetwork.PlayBuf buf) {
             this(buf.get().readUUID(), readSkinId(buf));
@@ -246,7 +246,7 @@ public final class SkinSync {
                                       byte[] data) implements CommonNetwork.Payload {
         public static final int MAX_CHUNK = 30 * 1024;
         public static final CommonNetwork.Identifier<UploadAssetChunkC2S> ID =
-                CommonNetwork.Identifier.create(Legacy4J.createModLocation("upload_skin_asset_chunk_c2s"), UploadAssetChunkC2S::new);
+                CommonNetwork.Identifier.create(Legacy4J.identifier("upload_skin_asset_chunk_c2s"), UploadAssetChunkC2S::new);
 
         public UploadAssetChunkC2S(CommonNetwork.PlayBuf buf) {
             this(readSkinId(buf), buf.get().readVarInt(), buf.get().readVarInt(), buf.get().readVarInt(), readChunk(buf));
@@ -291,7 +291,7 @@ public final class SkinSync {
     public record SyncAssetChunkS2C(UUID uuid, String skinId, int assetType, int index, int total,
                                     byte[] data) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<SyncAssetChunkS2C> ID =
-                CommonNetwork.Identifier.create(Legacy4J.createModLocation("sync_skin_asset_chunk_s2c"), SyncAssetChunkS2C::new);
+                CommonNetwork.Identifier.create(Legacy4J.identifier("sync_skin_asset_chunk_s2c"), SyncAssetChunkS2C::new);
 
         public SyncAssetChunkS2C(CommonNetwork.PlayBuf buf) {
             this(buf.get().readUUID(), readSkinId(buf), buf.get().readVarInt(), buf.get().readVarInt(), buf.get().readVarInt(), readChunk(buf));
@@ -323,7 +323,7 @@ public final class SkinSync {
 
     public record RequestSkinS2C() implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<RequestSkinS2C> ID =
-                CommonNetwork.Identifier.create(Legacy4J.createModLocation("request_skin_s2c"), (CommonNetwork.PlayBuf b) -> new RequestSkinS2C(b));
+                CommonNetwork.Identifier.create(Legacy4J.identifier("request_skin_s2c"), (CommonNetwork.PlayBuf b) -> new RequestSkinS2C(b));
 
         public RequestSkinS2C(CommonNetwork.PlayBuf buf) {
             this();

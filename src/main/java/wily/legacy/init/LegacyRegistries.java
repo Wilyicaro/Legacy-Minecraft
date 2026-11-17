@@ -39,8 +39,8 @@ public class LegacyRegistries {
     private static final RegisterListing<SoundEvent> SOUND_EVENT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.SOUND_EVENT);
     private static final RegisterListing<MapCodec<? extends LootItemCondition>> LOOT_CONDITION_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.LOOT_CONDITION_TYPE);
     private static final RegisterListing<Identifier> CUSTOM_STAT_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.CUSTOM_STAT);
-    public static final Identifier SKELETON_JOCKEY_STAT = Legacy4J.createModLocation("skeleton_jockey");
-    public static final Identifier DAYS_PLAYED_STAT = Legacy4J.createModLocation("days_played");
+    public static final Identifier SKELETON_JOCKEY_STAT = Legacy4J.identifier("skeleton_jockey");
+    public static final Identifier DAYS_PLAYED_STAT = Legacy4J.identifier("days_played");
 
     public static final RegisterListing.Holder<MenuType<LegacyMerchantMenu>> MERCHANT_MENU = MENU_REGISTER.add("merchant_menu", ()->new MenuType<>(LegacyMerchantMenu::new, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> STONECUTTER_PANEL_MENU = MENU_REGISTER.add("stonecutter_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::stoneCutterMenu, FeatureFlags.VANILLA_SET));
@@ -57,18 +57,18 @@ public class LegacyRegistries {
 
     public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> FactoryAPIPlatform.createBlockEntityType(WaterCauldronBlockEntity::new, Blocks.WATER_CAULDRON, LegacyRegistries.COLORED_WATER_CAULDRON.get()));
 
-    public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.scroll")));
-    public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.craft_fail")));
-    public static final RegisterListing.Holder<SoundEvent> BACK = SOUND_EVENT_REGISTER.add("random.back",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.back")));
-    public static final RegisterListing.Holder<SoundEvent> FOCUS = SOUND_EVENT_REGISTER.add("random.focus",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.focus")));
-    public static final RegisterListing.Holder<SoundEvent> ACTION = SOUND_EVENT_REGISTER.add("random.action",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.action")));
-    public static final RegisterListing.Holder<SoundEvent> PACK_SELECTION = SOUND_EVENT_REGISTER.add("random.pack_selection",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.pack_selection")));
-    public static final RegisterListing.Holder<SoundEvent> SHIFT_LOCK = SOUND_EVENT_REGISTER.add("random.shift_lock",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.shift_lock")));
-    public static final RegisterListing.Holder<SoundEvent> SHIFT_UNLOCK = SOUND_EVENT_REGISTER.add("random.shift_unlock",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.shift_unlock")));
-    public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.space")));
-    public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.backspace")));
-    public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.screenshot")));
-    public static final RegisterListing.Holder<SoundEvent> ENTITY_GENERIC_OLD_SPLASH = SOUND_EVENT_REGISTER.add("entity.generic.old_splash", ()-> SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("entity.generic.old_splash")));
+    public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.scroll")));
+    public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.craft_fail")));
+    public static final RegisterListing.Holder<SoundEvent> BACK = SOUND_EVENT_REGISTER.add("random.back",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.back")));
+    public static final RegisterListing.Holder<SoundEvent> FOCUS = SOUND_EVENT_REGISTER.add("random.focus",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.focus")));
+    public static final RegisterListing.Holder<SoundEvent> ACTION = SOUND_EVENT_REGISTER.add("random.action",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.action")));
+    public static final RegisterListing.Holder<SoundEvent> PACK_SELECTION = SOUND_EVENT_REGISTER.add("random.pack_selection",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.pack_selection")));
+    public static final RegisterListing.Holder<SoundEvent> SHIFT_LOCK = SOUND_EVENT_REGISTER.add("random.shift_lock",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.shift_lock")));
+    public static final RegisterListing.Holder<SoundEvent> SHIFT_UNLOCK = SOUND_EVENT_REGISTER.add("random.shift_unlock",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.shift_unlock")));
+    public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.space")));
+    public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.backspace")));
+    public static final RegisterListing.Holder<SoundEvent> SCREENSHOT = SOUND_EVENT_REGISTER.add("random.screenshot",()->SoundEvent.createVariableRangeEvent(Legacy4J.identifier("random.screenshot")));
+    public static final RegisterListing.Holder<SoundEvent> ENTITY_GENERIC_OLD_SPLASH = SOUND_EVENT_REGISTER.add("entity.generic.old_splash", ()-> SoundEvent.createVariableRangeEvent(Legacy4J.identifier("entity.generic.old_splash")));
     public static final RegisterListing.Holder<MapCodec<? extends LootItemCondition>> RANDOM_DIFFICULTY_CHANCE = LOOT_CONDITION_REGISTER.add("random_difficulty_chance", () -> RandomDifficultyChanceCondition.CODEC);
     public static final RegisterListing.Holder<MapCodec<? extends LootItemCondition>> LEGACY_LOOT_TABLES = LOOT_CONDITION_REGISTER.add("legacy_loot_tables", () -> LegacyLootTablesCondition.CODEC);
     private static final RegisterListing.Holder<Identifier> SKELETON_JOCKEY_STAT_HOLDER = CUSTOM_STAT_REGISTER.add("skeleton_jockey", () -> SKELETON_JOCKEY_STAT);

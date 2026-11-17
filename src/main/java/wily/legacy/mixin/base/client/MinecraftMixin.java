@@ -40,18 +40,20 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.PiercingWeapon;
 import net.minecraft.world.item.ShearsItem;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -70,7 +72,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -79,16 +80,21 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
+import wily.legacy.client.control.LegacyControlsOptions;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipRenderer;
+import wily.legacy.client.control.tooltip.UsePrediction;
 import wily.legacy.client.screen.*;
-import wily.legacy.entity.LegacyShieldPlayer;
+import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerTrustPolicy;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
 import wily.legacy.network.ServerPlayerMissHitPayload;
-import wily.legacy.network.ServerPlayerShieldPausePayload;
 import wily.legacy.util.LegacyBlockProtection;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyGuiElements;
@@ -96,6 +102,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -133,10 +141,15 @@ public abstract class MinecraftMixin {
     Screen oldScreen;
     private boolean inventoryKeyLastPressed = false;
     private int inventoryKeyHold = 0;
-    private int legacy$shieldPauseSyncCooldown = 0;
+    @Unique
+    private final LegacyShieldControls legacy$shieldControls = new LegacyShieldControls();
     private boolean legacy$dropKeyDown = false;
     @Unique
     private InteractionHand legacy$suppressedUseAnimationHand;
+    @Unique
+    private InteractionHand legacy$quickUseAnimationHand;
+    @Unique
+    private boolean legacy$resourceReloadMusic;
     @Shadow
     private int rightClickDelay;
     @Shadow
@@ -159,21 +172,26 @@ public abstract class MinecraftMixin {
     @Shadow
     public abstract boolean hasControlDown();
 
-    @Unique
-    private void legacy$pauseShield() {
-        if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS)) {
-            boolean usingShield = player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem;
-            if (usingShield && Legacy4JClient.hasModOnServer() && legacy$shieldPauseSyncCooldown == 0) {
-                CommonNetwork.sendToServer(new ServerPlayerShieldPausePayload());
-                legacy$shieldPauseSyncCooldown = 1;
-            }
-            ((LegacyShieldPlayer) player).pauseShield(LegacyShieldPlayer.SHIELD_PAUSE_TICKS);
-            if (usingShield && gameMode != null) gameMode.releaseUsingItem(player);
+    private Minecraft self() {
+        return (Minecraft) (Object) this;
+    }
+
+    @Inject(method = "reloadResourcePacks()Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"))
+    private void beginResourceReloadMusic(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        legacy$resourceReloadMusic = MinecraftAccessor.getInstance().hasGameLoaded() && LegacyMusicFader.beginResourceReload();
+    }
+
+    @Inject(method = "reloadResourcePacks()Ljava/util/concurrent/CompletableFuture;", at = @At("RETURN"))
+    private void finishResourceReloadMusic(CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        if (legacy$resourceReloadMusic) {
+            legacy$resourceReloadMusic = false;
+            cir.getReturnValue().whenComplete((unused, throwable) -> self().execute(() -> LegacyMusicFader.finishResourceReload(throwable == null)));
         }
     }
 
-    private Minecraft self() {
-        return (Minecraft) (Object) this;
+    @Inject(method = "rollbackResourcePacks", at = @At("HEAD"))
+    private void failResourceReloadMusic(CallbackInfo ci) {
+        LegacyMusicFader.finishResourceReload(false);
     }
 
     //? if forge {
@@ -195,16 +213,22 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
-        if (legacy$shieldPauseSyncCooldown > 0) legacy$shieldPauseSyncCooldown--;
         legacy$handleDropKey();
-        if (player != null && screen == null && player.isUsingItem() && player.getUseItem().getItem() instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS) && (options.keyAttack.isDown() || options.keyUse.isDown())) {
-            legacy$pauseShield();
-        }
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
         if (player != null && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_OFFHAND_LIMITS) && !LegacyItemUtil.canGoInLceOffhand(player.getMainHandItem())) {
             while (options.keySwapOffhand.consumeClick()) {
             }
         }
+    }
+
+    @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z", ordinal = 0))
+    private void updateShieldControls(CallbackInfo ci) {
+        legacy$shieldControls.tick(self());
+    }
+
+    @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V"))
+    private boolean releaseUsingItem(MultiPlayerGameMode instance, Player player) {
+        return !legacy$shieldControls.isUsingShield(player);
     }
 
     @WrapWithCondition(method = "handleKeybinds", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"), to = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;keyChat:Lnet/minecraft/client/KeyMapping;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
@@ -214,19 +238,24 @@ public abstract class MinecraftMixin {
 
     @WrapWithCondition(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean startUseItemSwing(LocalPlayer player, InteractionHand hand) {
-        return !legacy$suppressedUseAnimation(hand);
+        return legacy$quickUseAnimationHand != hand && !legacy$suppressedUseAnimation(hand);
     }
 
     @WrapWithCondition(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;itemUsed(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean startUseItemItemUsed(ItemInHandRenderer renderer, InteractionHand hand) {
-        return !legacy$suppressedUseAnimation(hand);
+        return legacy$quickUseAnimationHand == hand || !legacy$suppressedUseAnimation(hand);
     }
 
     @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult startUseItemInteract(MultiPlayerGameMode gameMode, Player player, Entity entity, EntityHitResult hit, InteractionHand hand, Operation<InteractionResult> original) {
-        boolean suppress = legacy$suppressesUseAnimation(hand);
+        boolean itemFrame = entity instanceof ItemFrame;
+        ItemStack item = itemFrame ? player.getItemInHand(hand).copy() : ItemStack.EMPTY;
+        boolean suppress = itemFrame || legacy$suppressesUseAnimation(hand);
         if (suppress) legacy$suppressedUseAnimationHand = hand;
         InteractionResult result = original.call(gameMode, player, entity, hit, hand);
+        if (itemFrame && result instanceof InteractionResult.Success && !ItemStack.matches(item, player.getItemInHand(hand))) {
+            ((LegacyItemInHandRenderer) self().gameRenderer.itemInHandRenderer).legacy$setRenderedItem(hand, item);
+        }
         legacy$rememberServerUseAnimation(hand, suppress, result);
         return result;
     }
@@ -240,6 +269,17 @@ public abstract class MinecraftMixin {
         InteractionResult result = original.call(gameMode, player, hand, hit);
         legacy$rememberServerUseAnimation(hand, suppress, result);
         legacy$playMissingUseAnimation(player, hand, item, state, result, suppress);
+        return result;
+    }
+
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItem(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult startUseItemUseItem(MultiPlayerGameMode gameMode, Player player, InteractionHand hand, Operation<InteractionResult> original) {
+        if (LegacyItemUtil.isLegacyShield(player, player.getItemInHand(hand))) return InteractionResult.PASS;
+        InteractionResult result = original.call(gameMode, player, hand);
+        if (result instanceof InteractionResult.Success) {
+            legacy$quickUseAnimationHand = hand;
+            legacy$rememberServerUseAnimation(hand, true, result);
+        }
         return result;
     }
 
@@ -346,11 +386,6 @@ public abstract class MinecraftMixin {
         legacy$dropKeyDown = down;
     }
 
-    @Inject(method = "continueAttack", at = @At("HEAD"))
-    private void continueAttack(boolean bl, CallbackInfo ci) {
-        if (bl) legacy$pauseShield();
-    }
-
     @Inject(method = "pick", at = @At("RETURN"))
     private void pick(float tickDelta, CallbackInfo ci) {
         if (level == null || player == null || !(hitResult instanceof BlockHitResult blockHit)) return;
@@ -374,9 +409,18 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
     private void startAttackHead(CallbackInfoReturnable<Boolean> cir) {
-        legacy$pauseShield();
         if (player != null && player.swinging && player.swingingArm == InteractionHand.MAIN_HAND && player.getMainHandItem().has(DataComponents.PIERCING_WEAPON))
             cir.setReturnValue(false);
+    }
+
+    @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;piercingAttack(Lnet/minecraft/world/item/component/PiercingWeapon;)V"), cancellable = true)
+    private void startPiercingAttack(CallbackInfoReturnable<Boolean> cir) {
+        if (player == null || getConnection() == null || !Legacy4JClient.hasModOnServer()) return;
+        var playerInfo = getConnection().getPlayerInfo(player.getUUID());
+        if (playerInfo == null) return;
+        PlayerTrustPolicy trust = PlayerTrustPolicy.of(player, LegacyPlayerInfo.of(playerInfo), Legacy4JClient.trustPlayers);
+        var targets = ProjectileUtil.getHitEntitiesAlong(player, player.getAttackRangeWith(player.getMainHandItem()), target -> PiercingWeapon.canHitEntity(player, target), ClipContext.Block.COLLIDER).map(hit -> List.<EntityHitResult>of(), hits -> hits);
+        if (targets.stream().map(EntityHitResult::getEntity).anyMatch(target -> !trust.canDamage(target))) cir.setReturnValue(false);
     }
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
@@ -387,7 +431,7 @@ public abstract class MinecraftMixin {
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
     private void startUseItem(CallbackInfo ci) {
         legacy$suppressedUseAnimationHand = null;
-        legacy$pauseShield();
+        legacy$quickUseAnimationHand = null;
         if (player != null && player.isSleeping()) {
             ClientPacketListener clientPacketListener = player.connection;
             clientPacketListener.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.STOP_SLEEPING));
@@ -404,11 +448,18 @@ public abstract class MinecraftMixin {
     private void startUseItemReturn(CallbackInfo ci) {
         if (player.getAbilities().flying && player.isSprinting()) rightClickDelay = -1;
         legacy$suppressedUseAnimationHand = null;
+        legacy$quickUseAnimationHand = null;
+    }
+
+    @WrapOperation(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItem(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private InteractionResult bedrockBridging(MultiPlayerGameMode gameMode, Player player, InteractionHand hand, Operation<InteractionResult> original) {
+        BlockHitResult hit = BedrockBridging.findHit(self(), hand);
+        return hit == null ? original.call(gameMode, player, hand) : gameMode.useItemOn(this.player, hand, hit);
     }
 
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private void startUseItemCreativeBlockPlacing(CallbackInfo ci, @Local InteractionHand hand, @Local BlockHitResult hit) {
-        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(), player.getItemInHand(hand), hand)) {
+        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && UsePrediction.canPlace(new UsePrediction.BlockUseItemOn(player, hand, hit))) {
             if (lastPlayerBlockUsePos == null) lastPlayerBlockUsePos = player.position();
             rightClickDelay = 0;
         }
@@ -430,7 +481,7 @@ public abstract class MinecraftMixin {
 
     @ModifyReturnValue(method = "isWindowActive", at = @At("RETURN"))
     private boolean isWindowActive(boolean original) {
-        return original || LegacyOptions.unfocusedInputs.get();
+        return original || LegacyControlsOptions.unfocusedInputs.get();
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
@@ -458,6 +509,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void disconnectFadeMusic(Screen disconnectScreen, boolean retainDownloadedResourcePacks, boolean updateLevelInEngines, CallbackInfo ci) {
+        legacy$shieldControls.reset();
         ConduitRotationCache.clear();
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
@@ -523,8 +575,8 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
     private void addedScreen(Screen screen, CallbackInfo ci) {
-        ControlTooltip.Event.of(screen).setupControlTooltips();
-        ControlTooltip.Renderer.SCREEN_EVENT.invoker.accept(screen, ControlTooltip.Event.of(screen).getControlTooltips());
+        ControlTooltip.Listener.of(screen).setupControlTooltips();
+        ControlTooltipRenderer.SCREEN_EVENT.invoker.accept(screen, ControlTooltip.Listener.of(screen).getControlTooltips());
         LegacyTipManager.resetTipOffset(true);
     }
 
@@ -557,6 +609,10 @@ public abstract class MinecraftMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
         oldScreen = this.screen;
+        if (screen instanceof PauseScreen && player != null && player.isUsingItem()) {
+            if (gameMode != null) gameMode.releaseUsingItem(player);
+            else player.stopUsingItem();
+        }
         Screen replacement = Legacy4JClient.getReplacementScreen(screen);
         if (replacement != screen) {
             ci.cancel();
@@ -567,8 +623,8 @@ public abstract class MinecraftMixin {
             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
         if (screen == null && level != null) {
             LegacyGuiElements.lastGui = Util.getMillis();
-            ControlTooltip.Event.of(gui).setupControlTooltips();
-            ControlTooltip.Renderer.GUI_EVENT.invoker.accept(gui, ControlTooltip.Event.of(gui).getControlTooltips());
+            ControlTooltip.Listener.of(gui).setupControlTooltips();
+            ControlTooltipRenderer.GUI_EVENT.invoker.accept(gui, ControlTooltip.Listener.of(gui).getControlTooltips());
         }
     }
 

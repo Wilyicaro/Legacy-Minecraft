@@ -34,29 +34,30 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.control.*;
+import wily.legacy.client.control.navigation.LegacyMenuAccess;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.control.tooltip.ControlTooltip.*;
 
-public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, Controller.Event, ControlTooltip.Event {
+public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, ControllerListener, Listener {
     public static final Container creativeModeGrid = new SimpleContainer(50);
     public static final LegacyTabButton.StateOffset TAB_OFFSET = new LegacyTabButton.StateOffset(Vec2.ZERO, new Vec2(0, 1.4f), Vec2.ZERO);
     public static final LegacySlotDisplay DEFAULT_SLOT_DISPLAY = new LegacySlotDisplay() {
@@ -155,12 +156,12 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        Event.super.addControlTooltips(renderer);
-        renderer.
+    public void addControlTooltips(ControlTooltipList list) {
+        Listener.super.addControlTooltips(list);
+        list.
                 replace(2, i -> i, a -> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3, i -> i, a -> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(() -> page.max > 0 ? CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
+                add(() -> page.max > 0 ? CommonIcon.CONTROL_PAGE.get() : null, () -> LegacyComponents.PAGE).
                 add(() -> canClearQuickSelect() && ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : null, () -> LegacyComponents.CLEAR_QUICK_SELECT);
     }
 
@@ -183,15 +184,27 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
             return;
         }
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
-            LegacySlotDisplay.override(menu.getSlot(i), 21 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
+            LegacySlotDisplay.override(menu.getSlot(i), 20 + (i % 10) * 27, 29 + i / 10 * 27, DEFAULT_SLOT_DISPLAY);
         }
         for (int i = 0; i < 9; i++) {
-            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 35 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
+            LegacySlotDisplay.override(menu.getSlot(creativeModeGrid.getContainerSize() + i), 34 + i * 27, 176, DEFAULT_SLOT_DISPLAY);
         }
-        addRenderableWidget(tabList);
-        addRenderableOnly(panel);
-        addRenderableOnly(tabList::renderSelected);
         panel.init();
+        int panelTop = accessor.getInteger("panel.top", 0);
+        float panelScale = accessor.getFloat("panel.scale", 1);
+        int panelRenderWidth = accessor.getInteger("panel.renderWidth", panel.width);
+        int panelRenderHeight = accessor.getInteger("panel.renderHeight", panel.height + panelTop);
+        if (panelTop == 0 && panelScale == 1) addRenderableOnly(panel);
+        else addRenderableOnly((graphics, i, j, f) -> {
+            graphics.pose().pushMatrix();
+            graphics.pose().translate(panel.x + accessor.getFloat("panel.offset.x", 0), panel.y - panelTop + accessor.getFloat("panel.offset.y", 0));
+            graphics.pose().scale(panelScale, panelScale);
+            FactoryGuiGraphics.of(graphics).blitSprite(panel.panelSprite, 0, 0, panelRenderWidth, panelRenderHeight);
+            graphics.pose().popMatrix();
+        });
+        addRenderableWidget(tabList);
+        addRenderableOnly(this::renderSelectedIconUnderlay);
+        addRenderableOnly(tabList::renderSelected);
         ((AbstractContainerScreenAccessor)this).legacy$setImageWidth(panel.width);
         ((AbstractContainerScreenAccessor)this).legacy$setImageHeight(panel.height);
         leftPos = panel.x;
@@ -216,11 +229,30 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         tabList.init(panel.x, panel.y - 33, panel.width, 39, (t, i) -> {
             int index = tabList.tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
-            t.offset = TAB_OFFSET;
+            t.offset = accessor.getElementValue("tabList.offset", TAB_OFFSET, LegacyTabButton.StateOffset.class);
+            t.iconOffset = new Vec2(accessor.getFloat("tabList.iconOffset.x", 0), accessor.getFloat("tabList.iconOffset.y", 0));
             t.setWidth(accessor.getInteger("tabList.buttonWidth", 41));
-            t.setX(t.getX() - tabList.tabButtons.indexOf(t));
+            t.spriteScale = accessor.getFloat("tabList.spriteScale", 1);
+            int spriteWidth = accessor.getInteger("tabList.spriteWidth", t.getWidth());
+            t.spriteWidth = t.type == LegacyTabButton.Type.RIGHT ? accessor.getInteger("tabList.rightSpriteWidth", spriteWidth) : spriteWidth;
+            t.spriteHeight = accessor.getInteger("tabList.spriteHeight", t.getHeight());
+            t.setX(t.getX() - index * accessor.getInteger("tabList.buttonOverlap", 1));
         });
         fillCreativeGrid();
+    }
+
+    protected void renderSelectedIconUnderlay(GuiGraphicsExtractor graphics, int i, int j, float f) {
+        LegacyTabButton button = tabList.selected;
+        if (button == null || !button.active || button.icon == null) return;
+        graphics.pose().pushMatrix();
+        boolean selected = button.selected;
+        button.selected = false;
+        Vec2 translate = button.offset.apply(button);
+        button.selected = selected;
+        float guiScale = (float) minecraft.getWindow().getGuiScale();
+        graphics.pose().translate(Math.round((translate.x + button.iconOffset.x) * guiScale) / guiScale, Math.round((translate.y - 1 + button.iconOffset.y) * guiScale) / guiScale);
+        button.icon.render(button, graphics, i, j, f);
+        graphics.pose().popMatrix();
     }
 
     protected int getMaxTabCount() {
@@ -256,7 +288,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j) {
         if (arrangement.get() == 2) return;
         Component tabTitle = tabList.tabButtons.get(tabList.getIndex()).getMessage();
-        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 12), CommonColor.GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> GuiGraphicsExtractor.text(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, accessor.getInteger("title.y", 11), CommonColor.GRAY_TEXT.get(), false));
     }
 
     protected void renderBg(GuiGraphicsExtractor GuiGraphicsExtractor, float f, int i, int j) {
@@ -294,15 +326,15 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
 
     @Override
     public int getBindingMouseClick(BindingState state) {
-        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : Controller.Event.super.getBindingMouseClick(state);
+        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : ControllerListener.super.getBindingMouseClick(state);
     }
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (tabList.controlTab(keyEvent.key())) return true;
+        if (tabList.controlTab(keyEvent)) return true;
         if (!keyEvent.isEscape() && searchBox.isFocused()) return searchBox.keyPressed(keyEvent);
 
-        if (keyEvent.hasShiftDown() && tabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight()))
+        if (tabList.controlPage(page, keyEvent))
             repositionElements();
         if (keyEvent.key() == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {

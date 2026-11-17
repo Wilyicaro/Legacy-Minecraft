@@ -7,7 +7,7 @@ import net.minecraft.client.gui.navigation.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.ControllerManager;
 
 import java.util.Optional;
 
@@ -22,14 +22,14 @@ public interface ContainerEventHandlerMixin extends ContainerEventHandler {
     @Overwrite
     default ComponentPath handleArrowNavigation(FocusNavigationEvent.ArrowNavigation arrowNavigation) {
         GuiEventListener guiEventListener = this.getFocused();
-        if (guiEventListener == null && Legacy4JClient.controllerManager.isCursorDisabled) {
+        if (guiEventListener == null && ControllerManager.getInstance().isCursorDisabled) {
             ScreenDirection screenDirection = arrowNavigation.direction();
             ScreenRectangle screenRectangle = this.getRectangle().getBorder(screenDirection.getOpposite());
             return ComponentPath.path(this, this.nextFocusPathInDirection(screenRectangle, screenDirection, null, arrowNavigation));
         } else {
-            ScreenRectangle oldRec = guiEventListener == null ? Legacy4JClient.controllerManager.getPointerRectangle() : guiEventListener.getRectangle();
+            ScreenRectangle oldRec = guiEventListener == null ? ControllerManager.getInstance().getPointerRectangle() : guiEventListener.getRectangle();
             if (guiEventListener == null)
-                guiEventListener = getChildAt(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY()).orElse(null);
+                guiEventListener = getChildAt(ControllerManager.getInstance().getPointerX(), ControllerManager.getInstance().getPointerY()).orElse(null);
             ComponentPath path = ComponentPath.path(this, this.nextFocusPathInDirection(oldRec, arrowNavigation.direction(), guiEventListener, arrowNavigation));
             if (path != null) return path;
             ScreenRectangle screenRec = getRectangle();

@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.Options;
+import net.minecraft.client.resources.sounds.ElytraOnPlayerSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
@@ -16,7 +17,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.SoundEngineAccessor;
@@ -59,9 +62,24 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
     @Shadow
     protected abstract float calculateVolume(SoundInstance arg);
 
+    @Inject(method = "reload", at = @At("HEAD"), cancellable = true)
+    private void keepMusicDuringResourceReload(CallbackInfo ci) {
+        if (LegacyMusicFader.isResourceReloadActive()) ci.cancel();
+    }
+
     @ModifyArg(method = "calculatePitch", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 2)
     private float calculatePitch(float max, @Local(argsOnly = true) SoundInstance sound) {
         return FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio) && sound.getIdentifier().equals(SoundEvents.ITEM_PICKUP.location()) ? 4.0f : max;
+    }
+
+    @WrapOperation(method = "tickInGameSound", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundEngine;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    private void finishElytraLoop(SoundEngine instance, SoundInstance soundInstance, Operation<Void> operation) {
+        ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);
+        if (soundInstance instanceof ElytraOnPlayerSoundInstance && channelHandle != null && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyAudio)) {
+            channelHandle.execute(channel -> channel.setLooping(false));
+        } else {
+            operation.call(instance, soundInstance);
+        }
     }
 
     @Override

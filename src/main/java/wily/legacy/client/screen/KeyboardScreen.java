@@ -1,11 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
@@ -29,13 +27,14 @@ import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
 import wily.legacy.client.LegacyResourceManager;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerManager;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -134,7 +133,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public static boolean isOpenKey(int i) {
-        return i == InputConstants.KEY_NUMPADENTER && !Legacy4JClient.controllerManager.isControllerTheLastInput() || i == InputConstants.KEY_RETURN && Legacy4JClient.controllerManager.isControllerTheLastInput();
+        return i == InputConstants.KEY_NUMPADENTER && !ControllerManager.getInstance().isControllerTheLastInput() || i == InputConstants.KEY_RETURN && ControllerManager.getInstance().isControllerTheLastInput();
     }
 
     public static KeyboardScreen fromStaticListener(GuiEventListener listener, Screen parent) {
@@ -142,9 +141,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.RIGHT_STICK.getIcon(), () -> LegacyComponents.MOVE_KEYBOARD);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.RIGHT_STICK.getIcon(), () -> LegacyComponents.MOVE_KEYBOARD);
     }
 
     @Override
@@ -169,8 +168,28 @@ public class KeyboardScreen extends OverlayPanelScreen {
         if (getFocused() instanceof CharButton c) c.renderTooltip(GuiGraphicsExtractor, i, j, f);
     }
 
+    private GuiEventListener returnToParent() {
+        if (parent == null) return null;
+        if (minecraft.screen == this) onClose();
+        GuiEventListener listener = listenerSupplier.get();
+        if (listener instanceof LayoutElement original && !parent.children().contains(listener)) {
+            for (GuiEventListener child : parent.children()) {
+                if (child.getClass() == listener.getClass() && child instanceof LayoutElement element && element.getX() == original.getX() && element.getY() == original.getY() && element.getWidth() == original.getWidth() && element.getHeight() == original.getHeight()) {
+                    listener = child;
+                    break;
+                }
+            }
+        }
+        if (listener != null) parent.setFocused(listener);
+        return listener;
+    }
+
     @Override
     public boolean charTyped(CharacterEvent characterEvent) {
+        if (!ControllerManager.getInstance().isControllerSimulatingInput) {
+            GuiEventListener listener = returnToParent();
+            return listener != null && listener.charTyped(characterEvent);
+        }
         for (Renderable renderable : renderableVList.renderables) {
             if (renderable instanceof CharButton b && b.matches(characterEvent)) {
                 if (b.isFocused()) b.onRelease();
@@ -183,6 +202,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
+        if (!ControllerManager.getInstance().isControllerSimulatingInput && keyEvent.key() != InputConstants.KEY_ESCAPE) {
+            GuiEventListener listener = returnToParent();
+            return listener != null && (isOpenKey(keyEvent.key()) || listener.keyPressed(keyEvent));
+        }
         if (keyEvent.key() == InputConstants.KEY_BACKSPACE) {
             if (backspaceButton.isFocused()) backspaceButton.onPress(keyEvent);
             else setFocused(backspaceButton);
@@ -354,7 +377,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 try (SpriteContents contents = sprite.contents()) {
                     int bindingOffset = 0;
 
-                    if (binding != null && Legacy4JClient.controllerManager.connectedController != null)
+                    if (binding != null && ControllerManager.getInstance().connectedController != null && binding.getIcon() != null)
                         bindingOffset = binding.getIcon().render(guiGraphics, getX() + 2, getY() + (getHeight() - 9) / 2 + 1, true);
 
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, 2 + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());

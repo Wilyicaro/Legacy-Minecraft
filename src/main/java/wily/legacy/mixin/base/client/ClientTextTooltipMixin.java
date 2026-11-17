@@ -41,7 +41,7 @@ public class ClientTextTooltipMixin {
     }
 
     private static Style tooltipStyle(Style style, Integer color, boolean force) {
-        if (force && color != null) return style.withColor(color & 0x00FFFFFF);
+        if (force && color != null && (style.getColor() == null || style.getColor().getValue() == 0xFFFFFF)) return style.withColor(color & 0x00FFFFFF);
         CommonColor commonColor = commonStyleColor(style);
         if (commonColor != null && commonColor.isOverridden()) return style.withColor(commonColor.get() & 0x00FFFFFF);
         return color != null && style.getColor() == null ? style.withColor(color & 0x00FFFFFF) : style;

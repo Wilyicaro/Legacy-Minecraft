@@ -97,12 +97,12 @@ public class LegacyLoadingRenderer implements Renderable {
         }
 
         if (loadingHeader != null) {
-            LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
+            LegacyFontUtil.applySmallerFont(fontOverride.map(FontDescription.Resource::new).orElse(LegacyFontUtil.HIRES_FONT), b -> {
                 GuiGraphicsExtractor.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
                 GuiGraphicsExtractor.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(loadingHeader) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
                 GuiGraphicsExtractor.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f));
-                LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, minecraft.font, loadingHeader, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
+                LegacyRenderUtil.drawOutlinedString(GuiGraphicsExtractor, minecraft.font, loadingHeader, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), CommonColor.TITLE_TEXT_OUTLINE_DOWN.orNotOverridden(CommonColor.TITLE_TEXT_OUTLINE).get(), accessor.getFloat("loadingHeader.outline", 0.5f));
                 GuiGraphicsExtractor.pose().popMatrix();
             });
         }

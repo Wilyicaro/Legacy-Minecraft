@@ -62,7 +62,6 @@ public abstract class PlayerPartsMixin {
         var overlayPart = PlayerModelParts.get(self, overlay);
         if (model.hides(base)) {
             consoleskins$hidePart(basePart);
-            consoleskins$hidePart(overlayPart);
         }
         if (model.hides(overlay)) {
             consoleskins$hidePart(overlayPart);

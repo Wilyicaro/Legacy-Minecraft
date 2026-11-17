@@ -11,7 +11,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShieldItem;
 //? if <1.21.2 {
 /*import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.InteractionResultHolder;
@@ -25,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
-import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyItemUtil;
 //? if <1.20.5 {
 /*import wily.legacy.util.ItemAccessor;
@@ -68,10 +66,6 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
     *///?} else {
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(Level level, Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
-        if ((Object) this instanceof ShieldItem && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS)) {
-            cir.setReturnValue(InteractionResult.PASS);
-            return;
-        }
         if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && (interactionHand == InteractionHand.OFF_HAND || !player.getOffhandItem().getUseAnimation().equals(ItemUseAnimation.BLOCK))) {
             player.startUsingItem(interactionHand);
             cir.setReturnValue(InteractionResult.CONSUME);

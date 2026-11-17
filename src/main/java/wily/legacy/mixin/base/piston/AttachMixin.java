@@ -23,7 +23,7 @@ import wily.legacy.Legacy4J;
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class AttachMixin {
     @Unique
-    private static final TagKey<Block> LEGACY$PISTON_ATTACHED_BLOCK = TagKey.create(Registries.BLOCK, Legacy4J.createModLocation("piston_attached"));
+    private static final TagKey<Block> LEGACY$PISTON_ATTACHED_BLOCK = TagKey.create(Registries.BLOCK, Legacy4J.identifier("piston_attached"));
 
     @Shadow
     protected abstract BlockState asState();

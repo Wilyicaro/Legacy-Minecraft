@@ -20,15 +20,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.client.control.navigation.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 @Mixin(BeaconScreen.class)
 public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMenu> {
@@ -83,7 +81,13 @@ private static final ItemStack[] DISPLAY_ITEMS = new ItemStack[]{Items.NETHERITE
             }
         }
         this.beaconButtons.clear();
-        BeaconScreen.BeaconConfirmButton confirmButton = self().new BeaconConfirmButton(this.leftPos + (sd ? 112 : 202), this.topPos + (sd ? 80 : 127));
+        BeaconScreen.BeaconConfirmButton confirmButton = self().new BeaconConfirmButton(this.leftPos + (sd ? 112 : 202), this.topPos + (sd ? 80 : 127)) {
+            @Override
+            protected void extractIcon(GuiGraphicsExtractor graphics) {
+                int iconSize = 14;
+                FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.BEACON_CONFIRM,this.getX() + (this.getWidth() - iconSize) / 2, this.getY() + (this.getHeight() - iconSize) / 2, iconSize, iconSize);
+            }
+        };
         confirmButton.setSize(sd ? 16 : 22, sd ? 16 : 22);
         addRenderableWidget(confirmButton);
         beaconButtons.add(confirmButton);
@@ -96,7 +100,12 @@ private static final ItemStack[] DISPLAY_ITEMS = new ItemStack[]{Items.NETHERITE
             j = getFrom(BeaconBlockEntity.BEACON_EFFECTS, i).size();
             for (l = 0; l < j; ++l) {
                 mobEffect = getFrom(getFrom(BeaconBlockEntity.BEACON_EFFECTS, i), l);
-                beaconPowerButton = self().new BeaconPowerButton(this.leftPos + (sd ? 29 : 59) + (j > 1 ? l * (sd ? 20 : 27) : (sd ? 10 : 13)), this.topPos + (sd ? 19 : 38) + i * (sd ? 18 : 30), mobEffect, true, i);
+                beaconPowerButton = self().new BeaconPowerButton(this.leftPos + (sd ? 29 : 59) + (j > 1 ? l * (sd ? 20 : 27) : (sd ? 10 : 13)), this.topPos + (sd ? 19 : 38) + i * (sd ? 18 : 30), mobEffect, true, i) {
+                    @Override
+                    protected void extractIcon(GuiGraphicsExtractor graphics) {
+                        renderBeaconIcon(graphics, this, () -> super.extractIcon(graphics));
+                    }
+                };
                 beaconPowerButton.active = false;
                 addRenderableWidget(beaconPowerButton).setSize(sd ? 16 : 22, sd ? 16 : 22);
                 beaconButtons.add(beaconPowerButton);
@@ -108,7 +117,12 @@ private static final ItemStack[] DISPLAY_ITEMS = new ItemStack[]{Items.NETHERITE
 
         for (l = 0; l < j - 1; ++l) {
             mobEffect = getFrom(getFrom(BeaconBlockEntity.BEACON_EFFECTS, 3), l);
-            beaconPowerButton = self().new BeaconPowerButton(this.leftPos + (sd ? 98 : 164) + l * (sd ? 20 : 27) + k, this.topPos + (sd ? 37 : 68), mobEffect, false, 3);
+            beaconPowerButton = self().new BeaconPowerButton(this.leftPos + (sd ? 98 : 164) + l * (sd ? 20 : 27) + k, this.topPos + (sd ? 37 : 68), mobEffect, false, 3) {
+                @Override
+                protected void extractIcon(GuiGraphicsExtractor graphics) {
+                    renderBeaconIcon(graphics, this, () -> super.extractIcon(graphics));
+                }
+            };
             beaconPowerButton.active = false;
             addRenderableWidget(beaconPowerButton).setSize(sd ? 16 : 22, sd ? 16 : 22);
             beaconButtons.add(beaconPowerButton);
@@ -175,15 +189,15 @@ private static final ItemStack[] DISPLAY_ITEMS = new ItemStack[]{Items.NETHERITE
     }
 
     @Unique
-    private void renderBeaconIcon(GuiGraphicsExtractor arg, AbstractWidget widget, Consumer<GuiGraphicsExtractor> render) {
+    private void renderBeaconIcon(GuiGraphicsExtractor arg, AbstractWidget widget, Runnable render) {
         if (LegacyOptions.getUIMode().isSD()) {
             arg.pose().pushMatrix();
             arg.pose().translate(widget.getX() + widget.getWidth() / 2, widget.getY() + widget.getHeight() / 2);
             arg.pose().scale(0.5f);
             arg.pose().translate(-widget.getX() - 11, -widget.getY() - 11);
-            render.accept(arg);
+            render.run();
             arg.pose().popMatrix();
         } else
-            render.accept(arg);
+            render.run();
     }
 }

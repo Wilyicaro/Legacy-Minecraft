@@ -9,10 +9,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
-import wily.factoryapi.base.client.UIDefinition;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 
 public class WidgetPanel extends Panel implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
     boolean focused;
@@ -51,7 +48,7 @@ public class WidgetPanel extends Panel implements GuiEventListener, NarratableEn
     }
 
     @Override
-    public @Nullable Component getAction(Context context) {
+    public @Nullable Component getAction(Object context) {
         return null;
     }
 }

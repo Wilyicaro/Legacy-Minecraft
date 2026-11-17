@@ -1,7 +1,7 @@
 {
   "overrides": {
     "default": {
-      "water_transparency": 0.8,
+      "water_transparency": 0.64705884,
       "water_fog_distance": 15.0
     },
     "bamboo_jungle": {
@@ -228,7 +228,7 @@
       "water_color": "#02B0E5",
       "water_fog_color": "#0289D5",
       "water_fog_distance": 60.0,
-      "water_transparency": 0.7
+      "water_transparency": 0.64705884
     }
   }
 }

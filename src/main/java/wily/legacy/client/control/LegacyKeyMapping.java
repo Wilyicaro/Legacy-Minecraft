@@ -1,0 +1,53 @@
+package wily.legacy.client.control;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.control.tooltip.ComponentIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.Icon;
+
+public interface LegacyKeyMapping {
+    static LegacyKeyMapping of(KeyMapping key) {
+        return (LegacyKeyMapping) key;
+    }
+
+    static Component getDefaultDisplayName(KeyMapping keyMapping) {
+        String name = keyMapping.getName();
+        Minecraft minecraft = Minecraft.getInstance();
+        boolean hasPlayer = minecraft.player != null && minecraft.gameMode != null;
+        switch (name) {
+            case "legacy.key.crafting" ->
+                    name = hasPlayer && Legacy4JClient.playerHasInfiniteMaterials() ? "selectWorld.gameMode.creative" : name;
+            case "legacy.key.inventory" -> name = "key.inventory";
+        }
+        return ControlTooltip.getAction(name);
+    }
+
+    default KeyMapping self() {
+        return (KeyMapping) this;
+    }
+
+    <T extends BindingState> ControllerBinding<T> getDefaultBinding();
+
+    <T extends BindingState> void setDefaultBinding(ControllerBinding<T> binding);
+
+    <T extends BindingState> ControllerBinding<T> getBinding();
+
+    <T extends BindingState> void setBinding(ControllerBinding<T> binding);
+
+    Component getDisplayName();
+
+    InputConstants.Key getKey();
+
+    default Icon getIcon() {
+        return ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(getKey().getValue()) : getBinding() == null ? null : getBinding().getIcon();
+    }
+
+    default Component getIconComponent() {
+        return getIcon() instanceof ComponentIcon c ? c.getComponent() : CommonComponents.EMPTY;
+    }
+}

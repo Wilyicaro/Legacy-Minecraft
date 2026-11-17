@@ -8,16 +8,18 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.BindingState;
+import wily.legacy.client.control.ControllerBinding;
+import wily.legacy.client.control.ControllerListener;
+import wily.legacy.client.control.tooltip.ControlTooltip;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static wily.legacy.client.screen.ControlTooltip.Renderer;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
+import wily.legacy.mixin.base.client.AbstractContainerScreenAccessor;
 
-public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements Controller.Event, ControlTooltip.Event {
+public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends LegacyIconHolder> extends AbstractContainerScreen<T> implements ControllerListener, ControlTooltip.Listener {
     protected final UIAccessor accessor = UIAccessor.of(this);
 
     protected final List<H> recipeButtons = new ArrayList<>();
@@ -28,6 +30,8 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private int timesInventoryChanged;
     private int updateTimer = 0;
+    private final int defaultImageWidth;
+    private final int defaultImageHeight;
 
     public RecipesScreen(T menu, Inventory inventory, Component component) {
         this(menu, inventory, component, 348, 215);
@@ -35,14 +39,16 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
 
     public RecipesScreen(T menu, Inventory inventory, Component component, int width, int height) {
         super(menu, inventory, component, width, height);
+        this.defaultImageWidth = width;
+        this.defaultImageHeight = height;
         this.inventory = inventory;
         addRecipeButtons();
     }
 
     @Override
-    public void addControlTooltips(Renderer renderer) {
-        ControlTooltip.setupDefaultButtons(renderer, this);
-        ControlTooltip.Event.super.addControlTooltips(renderer);
+    public void addControlTooltips(ControlTooltipList list) {
+        ControlTooltip.setupDefaultButtons(list, this);
+        ControlTooltip.Listener.super.addControlTooltips(list);
     }
 
     @Override
@@ -52,7 +58,7 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
 
     @Override
     public boolean onceClickBindings(BindingState state) {
-        return !state.is(ControllerBinding.DOWN_BUTTON) && Controller.Event.super.onceClickBindings(state);
+        return !state.is(ControllerBinding.DOWN_BUTTON) && ControllerListener.super.onceClickBindings(state);
     }
 
     protected abstract void updateRecipes();
@@ -149,6 +155,8 @@ public abstract class RecipesScreen<T extends AbstractContainerMenu, H extends L
     }
 
     protected void init() {
+        ((AbstractContainerScreenAccessor) this).legacy$setImageWidth(defaultImageWidth);
+        ((AbstractContainerScreenAccessor) this).legacy$setImageHeight(defaultImageHeight);
         super.init();
         addRecipeButtons();
     }

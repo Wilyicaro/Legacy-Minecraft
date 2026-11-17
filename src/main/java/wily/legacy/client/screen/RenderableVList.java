@@ -327,6 +327,18 @@ public class RenderableVList {
         canScrollDown = false;
     }
 
+    public boolean isNearEnd(int remaining) {
+        return !renderables.isEmpty() && renderables.size() - scrolledList.get() - renderablesCount <= Math.max(0, remaining);
+    }
+
+    public boolean isNearStart(int remaining) {
+        return scrolledList.get() <= Math.max(0, remaining);
+    }
+
+    public void offsetScroll(int amount) {
+        scrolledList.set(Math.max(0, Math.min(scrolledList.get() + amount, Math.max(0, renderables.size() - 1))));
+    }
+
     public boolean isHovered(double x, double y) {
         return LegacyRenderUtil.isMouseOver(x, y, leftPos, topPos, listWidth, listHeight == 0 ? getScreen().height : listHeight);
     }

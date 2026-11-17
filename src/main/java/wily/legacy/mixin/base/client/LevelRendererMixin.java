@@ -1,24 +1,51 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.block.state.BlockState;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.SkyRenderer;
 //?}
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.phys.HitResult;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+import wily.factoryapi.base.client.FactoryOptions;
+import wily.legacy.client.BedrockBridging;
 import wily.legacy.client.LegacyChunkLoading;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LevelRendererAccessor;
 
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin implements LevelRendererAccessor {
+    @Shadow
+    public abstract void resetSampler();
+
+    @ModifyArgs(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/GpuDevice;createSampler(Lcom/mojang/blaze3d/textures/AddressMode;Lcom/mojang/blaze3d/textures/AddressMode;Lcom/mojang/blaze3d/textures/FilterMode;Lcom/mojang/blaze3d/textures/FilterMode;ILjava/util/OptionalDouble;)Lcom/mojang/blaze3d/textures/GpuSampler;"))
+    private void nearestMipmapSampling(Args args) {
+        if (!FactoryOptions.NEAREST_MIPMAP_SCALING.get()) return;
+        args.set(2, FilterMode.NEAREST);
+        args.set(3, FilterMode.NEAREST);
+    }
+
+    @Inject(method = "onResourceManagerReload", at = @At("TAIL"))
+    private void resetTerrainSampler(ResourceManager resourceManager, CallbackInfo ci) {
+        resetSampler();
+    }
+
     @Inject(method = "getLightCoords(Lnet/minecraft/client/renderer/LevelRenderer$BrightnessGetter;Lnet/minecraft/world/level/BlockAndLightGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)I", at = @At("RETURN"), cancellable = true)
     private static void getLightCoords(LevelRenderer.BrightnessGetter brightnessGetter, BlockAndLightGetter level, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if (LegacyChunkLoading.hasPendingFeatures(pos)) {
@@ -100,4 +127,9 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
         LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
     }
     *///?}
+
+    @WrapOperation(method = "extractBlockOutline", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;hitResult:Lnet/minecraft/world/phys/HitResult;", opcode = Opcodes.GETFIELD))
+    private HitResult extractBlockOutline(Minecraft instance, Operation<HitResult> original) {
+        return BedrockBridging.findHit(instance, InteractionHand.MAIN_HAND) instanceof HitResult r ? r : original.call(instance);
+    }
 }

@@ -34,6 +34,7 @@ public class LegacyComponents {
     public static final Component CARVE = Component.translatable("legacy.action.carve");
     public static final Component CHANGE_FILTER = Component.translatable("legacy.action.change_filter");
     public static final Component CHANGE_GROUP = Component.translatable("legacy.action.change_group");
+    public static final Component CHANGE_INGREDIENT = Component.translatable("legacy.action.change_ingredient");
     public static final Component CHANGE_PITCH = Component.translatable("legacy.action.change_pitch");
     public static final Component CHANGE_POSE = Component.translatable("legacy.action.change_pose");
     public static final Component CHARGE = Component.translatable("legacy.action.charge");
@@ -107,6 +108,7 @@ public class LegacyComponents {
     public static final Component PLANT = Component.translatable("legacy.action.plant");
     public static final Component PLAY = Component.translatable("legacy.action.play");
     public static final Component PRESETS = Component.translatable("legacy.action.presets");
+    public static final Component PRIVILEGES = Component.translatable("legacy.action.privileges");
     public static final Component PREVIOUS_PAGE = Component.translatable("legacy.action.previous_page");
     public static final Component QUICK_MOVE = Component.translatable("legacy.action.quick_move");
     public static final Component RELEASE = Component.translatable("legacy.action.release");
@@ -335,7 +337,7 @@ public class LegacyComponents {
 
     public static Component getMenuGameRuleName(GameRule<?> key) {
         if (!LegacyOptions.useLegacyWorldOptions()) return Component.translatable(key.getDescriptionId());
-        if (key == GameRules.FIRE_DAMAGE) return Component.translatable("legacy.gamerule.fire_spreads");
+        if (key == LegacyGameRules.FIRE_SPREADS.get()) return Component.translatable("legacy.gamerule.fire_spreads");
         if (key == LegacyGameRules.getTntExplodes()) return Component.translatable("legacy.gamerule.tnt_explodes");
         if (key == LegacyGameRules.getPvp()) return Component.translatable("legacy.gamerule.player_vs_player");
         if (key == GameRules.ADVANCE_TIME) return Component.translatable("legacy.gamerule.daylight_cycle");

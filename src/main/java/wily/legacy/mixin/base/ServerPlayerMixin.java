@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -24,28 +25,34 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.entity.PlayerHostPrivileges;
+import wily.legacy.entity.PlayerTrustPermissions;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, LegacyPlayerInfo {
     @Shadow
     @Final
     public ServerPlayerGameMode gameMode;
-    int position = -1;
+    @Unique
+    private final LegacyPlayerInfo.Data legacyMinecraft$playerInfoData = new LegacyPlayerInfo.Data();
     boolean classicCrafting = true;
     boolean classicTrading = true;
     boolean classicStonecutting = true;
     boolean classicLoom = true;
-    boolean disableExhaustion = false;
-    boolean mayFlySurvival = false;
-    boolean visible = true;
+    final Set<String> musicDiscHuntProgress = new HashSet<>();
 
     public ServerPlayerMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
@@ -62,19 +69,21 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Shadow @Final private MinecraftServer server;
 
+    //? if <1.21.1 {
+    /*@ModifyArg(method = "changeDimension", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ClientboundGameEventPacket;<init>(Lnet/minecraft/network/protocol/game/ClientboundGameEventPacket$Type;F)V"), index = 1)
+    private float showEndPoemEveryTime(float value) {
+        return 1.0F;
+    }
+    *///?}
+
     @Override
     public GameProfile legacyMinecraft$getProfile() {
         return getGameProfile();
     }
 
     @Override
-    public int getIdentifierIndex() {
-        return position;
-    }
-
-    @Override
-    public void setIdentifierIndex(int i) {
-        position = i;
+    public LegacyPlayerInfo.Data legacyMinecraft$getPlayerInfoData() {
+        return legacyMinecraft$playerInfoData;
     }
 
     @Override
@@ -118,31 +127,6 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
-    public boolean isExhaustionDisabled() {
-        return disableExhaustion;
-    }
-
-    @Override
-    public void setDisableExhaustion(boolean exhaustion) {
-        this.disableExhaustion = exhaustion;
-    }
-
-    @Override
-    public void setMayFlySurvival(boolean mayFlySurvival) {
-        this.mayFlySurvival = mayFlySurvival;
-    }
-
-    @Override
-    public boolean mayFlySurvival() {
-        return mayFlySurvival;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return visible;
-    }
-
-    @Override
     public Object2IntMap<Stat<?>> getStatsMap() {
         return getStats().stats;
     }
@@ -152,8 +136,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
-    public void setVisibility(boolean visible) {
-        this.visible = visible;
+    public Set<String> getMusicDiscHuntProgress() {
+        return musicDiscHuntProgress;
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
@@ -161,6 +145,10 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         valueOutput.putBoolean("DisableExhaustion", isExhaustionDisabled());
         valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
         valueOutput.putBoolean("HostInvisible", !isVisible());
+        if (isTrustPermissionsInitialized()) getTrustPermissions().save(valueOutput.child("PlayerTrust"));
+        getHostPrivileges().save(valueOutput.child("PlayerHostPrivileges"));
+        valueOutput.putBoolean("PlayerTrustModerator", isModerator());
+        valueOutput.store("LegacyMusicDiscHunts", Codec.STRING.listOf(), musicDiscHuntProgress.stream().sorted().toList());
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
@@ -168,6 +156,17 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
         setMayFlySurvival(input.getBooleanOr("MayFlySurvival", false));
         setVisibility(!input.getBooleanOr("HostInvisible", false));
+        setHostPrivileges(input.child("PlayerHostPrivileges").map(PlayerHostPrivileges::load).orElse(
+                new PlayerHostPrivileges(!isVisible(), mayFlySurvival(), isExhaustionDisabled(), false)
+        ));
+        setTrustPermissionsInitialized(false);
+        input.child("PlayerTrust").ifPresent(trustInput -> {
+            setTrustPermissions(PlayerTrustPermissions.load(trustInput));
+            setTrustPermissionsInitialized(true);
+        });
+        setModerator(input.getBooleanOr("PlayerTrustModerator", false));
+        musicDiscHuntProgress.clear();
+        input.read("LegacyMusicDiscHunts", Codec.STRING.listOf()).ifPresent(musicDiscHuntProgress::addAll);
     }
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)

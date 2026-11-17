@@ -30,7 +30,8 @@ public class PublishScreen extends ConfirmationScreen {
     protected final LegacySliderButton<GameType> gameTypeSlider;
     public boolean publish = false;
     protected EditBox portEdit;
-    private int port = HttpUtil.getAvailablePort();
+    private int port;
+    private boolean portReady;
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 108 : 145, LAN_SERVER, Component.translatable("lanServer.port"), b -> {});
@@ -87,6 +88,7 @@ public class PublishScreen extends ConfirmationScreen {
     @Override
     protected void init() {
         super.init();
+        ensurePort();
         boolean sd = LegacyOptions.getUIMode().isSD();
         int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
         portEdit = new EditBox(font, layoutX, panel.y + (sd ? 32 : 45), renderableVList.listWidth, sd ? 16 : 20, PORT_INFO_TEXT);
@@ -114,6 +116,7 @@ public class PublishScreen extends ConfirmationScreen {
 
     public void publish(IntegratedServer server) {
         if (!publish) return;
+        ensurePort();
         Minecraft minecraft = Minecraft.getInstance();
         FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> {
             if (!server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port)) {
@@ -125,6 +128,12 @@ public class PublishScreen extends ConfirmationScreen {
     public void setGameType(GameType gameType) {
         gameTypeSlider.setObjectValue(gameType);
         gameTypeSlider.updateMessage();
+    }
+
+    private synchronized void ensurePort() {
+        if (portReady) return;
+        port = HttpUtil.getAvailablePort();
+        portReady = true;
     }
 
     @Override

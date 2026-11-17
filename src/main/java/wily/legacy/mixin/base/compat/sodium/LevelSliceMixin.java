@@ -1,4 +1,4 @@
-//? fabric || neoforge {
+//? if fabric || neoforge {
 package wily.legacy.mixin.base.compat.sodium;
 
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
@@ -12,7 +12,7 @@ import wily.legacy.client.LegacyChunkLoading;
 
 @Mixin(value = LevelSlice.class, remap = false)
 public class LevelSliceMixin {
-    @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getBlockState(III)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"), cancellable = true, remap = true)
     private void getBlockState(int x, int y, int z, CallbackInfoReturnable<BlockState> cir) {
         cir.setReturnValue(LegacyChunkLoading.getFeatureState(new BlockPos(x, y, z), cir.getReturnValue()));
     }

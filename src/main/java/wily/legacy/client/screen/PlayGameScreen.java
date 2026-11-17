@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -19,13 +20,18 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
+import wily.legacy.client.control.ControlType;
+import wily.legacy.client.LegacyMixinOptions;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.control.tooltip.CommonIcon;
+import wily.legacy.client.control.tooltip.ControlTooltip;
+import wily.legacy.client.control.tooltip.ControlTooltipList;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.control.ControllerBinding;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -36,13 +42,15 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event, TabList.Access {
+public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Listener, TabList.Access {
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     private static final Component SAFETY_TITLE = Component.translatable("multiplayerWarning.header").withStyle(ChatFormatting.BOLD);
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
+    private static final CompletableFuture<Long> STORAGE_CAPACITY = CompletableFuture.supplyAsync(() -> new File("/").getTotalSpace(), Util.nonCriticalIoPool());
     public final SaveRenderableList saveRenderableList = new SaveRenderableList(accessor);
     public final CreationList creationList = new CreationList(accessor);
     protected final Panel panelRecess;
@@ -64,7 +72,40 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             });
     });
     private final ServerStatusPinger pinger = new ServerStatusPinger();
+    private static final ThreadLocal<Boolean> preloadingCreateWorld = ThreadLocal.withInitial(() -> false);
+    private static volatile CompletableFuture<?> createWorldPreload;
     public boolean isLoading = false;
+
+    public static boolean isPreloadingCreateWorld() {
+        return preloadingCreateWorld.get();
+    }
+
+    public static synchronized void preloadCreateWorld(Minecraft minecraft) {
+        if (minecraft.isDemo() || !LegacyMixinOptions.legacyCreateWorldScreen.get()) return;
+        CompletableFuture<?> preload = createWorldPreload;
+        if (preload != null && !preload.isCancelled() && !preload.isCompletedExceptionally()) return;
+        createWorldPreload = null;
+        preloadingCreateWorld.set(true);
+        try {
+            CreateWorldScreen.openFresh(minecraft, () -> {});
+            if (createWorldPreload == null) createWorldPreload = CompletableFuture.failedFuture(new IllegalStateException("World creation preload did not start"));
+        } catch (RuntimeException exception) {
+            createWorldPreload = CompletableFuture.failedFuture(exception);
+            Legacy4J.LOGGER.warn("Couldn't preload world creation", exception);
+        } finally {
+            preloadingCreateWorld.remove();
+        }
+    }
+
+    public static void setCreateWorldPreload(CompletableFuture<?> preload) {
+        createWorldPreload = preload;
+    }
+
+    public static boolean isCreateWorldPreloadReady(Minecraft minecraft) {
+        if (minecraft.isDemo() || !LegacyMixinOptions.legacyCreateWorldScreen.get()) return true;
+        CompletableFuture<?> preload = createWorldPreload;
+        return preload != null && preload.isDone();
+    }
 
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s -> Panel.createPanel(s, p -> p.appearance(300, Math.min(256, s.height - 52)), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList", true) ? 12 : 0))), Component.translatable("legacy.menu.play_game"));
@@ -82,22 +123,23 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     public static Screen createAndCheckNewerVersions(Screen parent) {
-        PlayGameScreen screen = new PlayGameScreen(parent);
+        Screen screen = new PlayGameScreen(parent);
+        if (Legacy4JClient.isNewerMinecraftVersion) {
+            Legacy4JClient.isNewerMinecraftVersion = false;
+            screen = PatchNotesScreen.createNewerMinecraftVersion(screen);
+        }
         if (Legacy4JClient.isNewerVersion) {
             Legacy4JClient.isNewerVersion = false;
-            return PatchNotesScreen.createNewerVersion(createAndCheckNewerVersions(parent));
-        } else if (Legacy4JClient.isNewerMinecraftVersion) {
-            Legacy4JClient.isNewerMinecraftVersion = false;
-            return PatchNotesScreen.createNewerMinecraftVersion(createAndCheckNewerVersions(parent));
+            screen = PatchNotesScreen.createNewerVersion(screen);
         }
         return screen;
     }
 
     @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
-        renderer.add(() -> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_CONNECTION);
+    public void addControlTooltips(ControlTooltipList list) {
+        super.addControlTooltips(list);
+        list.add(CommonIcon.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, this));
+        list.add(() -> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_CONNECTION);
     }
 
     public boolean hasTabList() {
@@ -156,7 +198,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             if (saveRenderableList.currentlyDisplayedLevels != null) {
                 GuiGraphicsExtractor.pose().pushMatrix();
                 GuiGraphicsExtractor.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75f);
-                long storage = new File("/").getTotalSpace();
+                long storage = Math.max(1, STORAGE_CAPACITY.getNow(1L));
                 FactoryGuiGraphics.of(GuiGraphicsExtractor).enableScissor(0, 0, panel.width - 24, panel.height - 10);
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
                     Long size;
@@ -184,9 +226,6 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void removed() {
-        if (this.saveRenderableList != null) {
-            SaveRenderableList.resetIconCache();
-        }
         serverRenderableList.removed();
         this.pinger.removeAll();
     }
@@ -215,7 +254,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (hasTabList() && (tabList.controlTab(keyEvent.key()) || tabList.directionalControlTab(keyEvent.key())))
+        if (hasTabList() && (tabList.controlTab(keyEvent) || tabList.directionalControlTab(keyEvent)))
             return true;
         if (super.keyPressed(keyEvent)) {
             return true;
@@ -224,8 +263,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             if (tabList.getIndex() == 0) {
                 saveRenderableList.reloadSaveList();
             } else if (tabList.getIndex() == 2) {
-                serverRenderableList.servers.load();
-                serverRenderableList.updateServers();
+                serverRenderableList.reloadServers();
             }
             this.rebuildWidgets();
             return true;

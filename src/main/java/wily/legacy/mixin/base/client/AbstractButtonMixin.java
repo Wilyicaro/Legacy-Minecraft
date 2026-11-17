@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.CommonValue;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -44,7 +45,7 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
 
     @ModifyArg(method = "extractDefaultLabel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;extractScrollingStringOverContents(Lnet/minecraft/client/gui/ActiveTextCollector;Lnet/minecraft/network/chat/Component;I)V"))
     protected Component getMessage(Component original) {
-        MutableComponent copy = original.copy().withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150));
+        MutableComponent copy = original.copy().withColor(LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150)).withStyle(s -> s.withShadowColor(CommonColor.WIDGET_TEXT_SHADOW.get()));
         if (!CommonValue.WIDGET_TEXT_SHADOW.get()) copy.withoutShadow();
         return copy;
     }

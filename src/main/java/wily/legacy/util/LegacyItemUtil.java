@@ -12,6 +12,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -20,8 +21,11 @@ import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.AbstractSkullBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
+import net.minecraft.world.level.material.Fluid;
+import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.init.LegacyGameRules;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -32,6 +36,10 @@ public class LegacyItemUtil {
     public static final int DECAY_EFFECT_AMPLIFIER = 1;
     public static final TagKey<Item> LCE_OFFHAND = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("legacy", "lce_offhand"));
     private static final Set<String> PEACEFUL_SPAWN_EGG_TIPS = Set.of("item.spawn_egg.peaceful", "item.minecraft.spawn_egg.peaceful.tip");
+
+    public static Fluid getBucketFluid(BucketItem bucket) {
+        return /*? if forge {*/ /*bucket.getFluid()*//*?} else {*/ItemContainerPlatform.getBucketFluid(bucket)/*?}*/;
+    }
 
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient) {
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted() && !ingredient.isEnchanted();
@@ -103,6 +111,11 @@ public class LegacyItemUtil {
         return stack.isEmpty() || stack.is(LCE_OFFHAND) || canGoInLocalOffhand(stack);
     }
 
+    public static boolean isLegacyShield(Player player, ItemStack stack) {
+        return stack.getItem() instanceof ShieldItem
+                && LegacyGameRules.getSidedBooleanGamerule(player, LegacyGameRules.LEGACY_SHIELD_CONTROLS);
+    }
+
     private static boolean canGoInLocalOffhand(ItemStack stack) {
         return stack.is(ItemTags.ARROWS)
                 || stack.is(Items.FIREWORK_ROCKET)
@@ -116,8 +129,16 @@ public class LegacyItemUtil {
         return itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElse(null);
     }
 
+    public static boolean isWaterBottle(ItemStack itemStack) {
+        return getNonNullPotionContents(itemStack).is(Potions.WATER);
+    }
+
+    public static PotionContents getNonNullPotionContents(ItemStack itemStack) {
+        return itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+    }
+
     public static PotionContents getPotionContents(ItemStack itemStack) {
-        PotionContents contents = itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        PotionContents contents = getNonNullPotionContents(itemStack);
         return contents.potion().isPresent() || contents.hasEffects() ? contents : null;
     }
 
@@ -291,6 +312,11 @@ public class LegacyItemUtil {
     public static List<Component> sanitizeTooltip(ItemStack stack, List<Component> tooltip) {
         if (tooltip.stream().anyMatch(LegacyItemUtil::isPeacefulSpawnEggTip)) {
             tooltip = tooltip.stream().filter(component -> !isPeacefulSpawnEggTip(component)).toList();
+        }
+        if (stack.has(DataComponents.JUKEBOX_PLAYABLE) && tooltip.size() > 1) {
+            tooltip = new ArrayList<>(tooltip);
+            Component name = tooltip.get(0);
+            tooltip.set(1, tooltip.get(1).copy().withStyle(style -> style.withColor(name.getStyle().getColor())));
         }
         return tooltip;
     }

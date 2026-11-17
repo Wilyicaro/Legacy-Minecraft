@@ -11,8 +11,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.Fluids;
-import wily.factoryapi.ItemContainerPlatform;
 import wily.legacy.client.CommonColor;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 
@@ -99,6 +99,6 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     @Override
     protected void slotClicked(Slot slot) {
         displayLayer = slot.getItem();
-        selectedLayer = slot.getItem().getItem() instanceof BlockItem item ? item.getBlock() : slot.getItem().getItem() instanceof BucketItem bucket ? ItemContainerPlatform.getBucketFluid(bucket).defaultFluidState().createLegacyBlock().getBlock() : Blocks.AIR;
+        selectedLayer = slot.getItem().getItem() instanceof BlockItem item ? item.getBlock() : slot.getItem().getItem() instanceof BucketItem bucket ? LegacyItemUtil.getBucketFluid(bucket).defaultFluidState().createLegacyBlock().getBlock() : Blocks.AIR;
     }
 }
