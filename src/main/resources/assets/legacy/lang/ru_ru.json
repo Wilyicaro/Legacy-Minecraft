@@ -2019,7 +2019,7 @@
   "legacy.menu.selectWorld.mapType.customize.current": "Текущая конфигурация:",
   "legacy.menu.selectWorld.mapType.customize.description": "Настройте этот тип мира для тонкой генерации.",
   "legacy.menu.selectWorld.mapType.description": "Выберите тип мира для изменения способа его генерации.",
-  "legacy.menu.selectWorld.mapType.flat.customize.description": "Customize a superflat world by specifying its blocks, biome and features, or choose from a variety of preset configurations.",
+  "legacy.menu.selectWorld.mapType.flat.customize.description": "Настройте суперплоский мир указанием его блоков, биома и особенностей, или выберите одну и множества предустановок.",
   "legacy.menu.selectWorld.mapType.flat.description": "Generate a completely flat world in the Overworld. Great to use as a canvas for your builds.",
   "legacy.menu.selectWorld.mapType.large_biomes.description": "Generate a world with much larger Biomes. Biomes may become much harder to find.",
   "legacy.menu.selectWorld.mapType.single_biome_surface.customize.description": "Customize a single biome world by choosing the specific Biome it will generate.",
